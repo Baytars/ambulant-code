@@ -145,11 +145,16 @@ ffmpeg_video_datasource_factory::new_video_datasource(const net::url& url)
 	detail::ffmpeg_demux *thread = new detail::ffmpeg_demux(context);
 	video_datasource *ds = demux_video_datasource::new_demux_video_datasource(url, thread);
 	video_datasource *dds = NULL;
+	thread->start();
 	if (ds) {
 		 video_format fmt = thread->get_video_format();
+		 //dds = ds;
 		 dds = new ffmpeg_video_decoder_datasource(ds, fmt);
+	} else {
+		return NULL;
 	}
-
+	
+	
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory::new_video_datasource (ds = 0x%x)", (void*) ds);
 
 	if ((dds == NULL)  || (ds == NULL)) {
@@ -157,7 +162,6 @@ ffmpeg_video_datasource_factory::new_video_datasource(const net::url& url)
 		thread->cancel();
 		return NULL;
 	}
-	thread->start();
 	return dds;		
 #else
 	return NULL;	
@@ -405,10 +409,11 @@ detail::ffmpeg_demux::run()
 			while (sink && sink->buffer_full() && !exit_requested()) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space");
 				sleep(1);   // This is overdoing it
+				
 				sink = m_sinks[pkt->stream_index];
 			}
 			if (sink && !exit_requested()) {
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pkt->pts, pkt->data, pkt->size);
+				
 #ifdef	WITH_FFMPEG_0_4_9					
 				int num = 0;
 				int den = 0;
@@ -416,14 +421,16 @@ detail::ffmpeg_demux::run()
 				int num = m_con->pts_num;
 				int den = m_con->pts_den;
 #endif/*WITH_FFMPEG_0_4_9*/
-				pts = pkt->pts;
-				if (pts != AV_NOPTS_VALUE) {
-#ifdef	WITH_FFMPEG_0_4_9					
-					pts = (timestamp_t) ((double) pkt->pts / AV_TIME_BASE) * 1000000;							
+				pts = 0;
+				if (pkt->pts != AV_NOPTS_VALUE) {
+#ifdef	WITH_FFMPEG_0_4_9				
+					pts = pkt->pts;							
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: ffmpeg 0.4.9 pts = 0x%llx",pts);
 #else /*WITH_FFMPEG_0_4_9*/							
-					pts = (timestamp_t) ((double) pkt->pts * ((double) num)/den) * 1000000;
+					pts = (timestamp_t) round(((double) pkt->pts * (((double) num)*1000000)/den));
 #endif/*WITH_FFMPEG_0_4_9*/
 				}
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->data, pkt->size);
 				sink->data_avail(pts, pkt->data, pkt->size);
 			}
 		}
@@ -654,7 +661,7 @@ demux_video_datasource::new_demux_video_datasource(
 	
 	int stream_index;
 	
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::new_ffmpeg_audio_datasource()");
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::new_demux_video_datasource()");
 	// Find the index of the audio stream
 	stream_index = thread->video_stream_nr();
 	
@@ -664,7 +671,7 @@ demux_video_datasource::new_demux_video_datasource(
 		return NULL;
 	} 
 
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::new_ffmpeg_audio_datasource() looking for the right codec");
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::new_demux_video_datasource() looking for the right codec");
 	
 	
 	return new demux_video_datasource(url, thread, stream_index);
@@ -684,7 +691,7 @@ demux_video_datasource::demux_video_datasource(const net::url& url, detail::abst
 
 demux_video_datasource::~demux_video_datasource()
 {
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::~ffmpeg_audio_datasource(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::~demux_video_datasource(0x%x)", (void*)this);
 	stop();
 }
 
@@ -692,7 +699,7 @@ void
 demux_video_datasource::stop()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::stop(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::stop(0x%x)", (void*)this);
 	if (m_thread) {
 		detail::abstract_demux *tmpthread = m_thread;
 		m_thread = NULL;
@@ -701,7 +708,7 @@ demux_video_datasource::stop()
 		m_lock.enter();
 	}
 	m_thread = NULL;
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::stop: thread stopped");
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::stop: thread stopped");
 	//if (m_con) delete m_con;
 	//m_con = NULL; // owned by the thread
 	if (m_client_callback) delete m_client_callback;
@@ -714,22 +721,22 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 	ambulant::lib::event *callbackk, timestamp_t timestamp)
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::start_frame: (this = 0x%x), callback = 0x%x", (void*) this, (void*) callbackk);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::start_frame: (this = 0x%x), callback = 0x%x", (void*) this, (void*) callbackk);
 
 	if (m_client_callback != NULL) {
 		delete m_client_callback;
 		m_client_callback = NULL;
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::start(): m_client_callback already set!");
+		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::start(): m_client_callback already set!");
 	}
 	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
 			assert(evp);
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::start: trigger client callback");
+			AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::start: trigger client callback");
 			evp->add_event(callbackk, 0, ambulant::lib::event_processor::med);
 		} else {
-			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_datasource::start(): no client callback!");
+			lib::logger::get_logger()->debug("Internal error: demux_video_datasource::start(): no client callback!");
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
 		}
 	} else {
@@ -752,7 +759,7 @@ demux_video_datasource::frame_done(timestamp_t pts, bool keepdata)
 		return;
 	}
 	
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource.frame_done(%f)", pts);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource.frame_done(%d)", pts);
 	while( m_frames.size() > 0 ) {
 		std::pair<timestamp_t, video_frame> element = m_frames.front();
 		if (element.first > pts)
@@ -776,6 +783,7 @@ demux_video_datasource::frame_done(timestamp_t pts, bool keepdata)
 void 
 demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 {
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): recieving data", m_src_end_of_file);
 	m_src_end_of_file = !(sz == 0);
 	m_lock.enter();
 	if(sz > 0) {
@@ -798,7 +806,6 @@ demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
   		}		
 	}		
 	m_lock.leave();
-	
 }
 
 
@@ -901,7 +908,7 @@ demux_video_datasource::get_dur()
 	m_lock.enter();
 	if (m_thread->duration() >= 0) {
 		rv = std::pair<bool, double>(true, m_thread->duration());
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::get_dur: duration=%f", rv.second);
+		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_dur: duration=%f", rv.second);
 	}
 	m_lock.leave();
 	return rv;
@@ -909,42 +916,6 @@ demux_video_datasource::get_dur()
 
 
 // **************************** ffmpeg_video_decoder_datasource ********************
-
-
-/* video_datasource *
-ffmpeg_video_decoder_datasource::new_ffmpeg_video_decoder_datasource(const net::url& url, detail::ffmpeg_demux *thread)
-{
-	AVCodec *codec;
-	AVCodecContext *codeccontext;
-	int stream_index;
-	
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::new_ffmpeg_video_datasource() called");
-	
-	if (!thread) {
-		lib::logger::get_logger()->error(gettext("ffmpeg_video_datasource::new_ffmpeg_video_datasource(): Cannot start video reader thread"));
-		return NULL;
-	}
-
-	ffmpeg_init();
-
-	
-	
-	codeccontext = &context->streams[stream_index]->codec; 
-	codec = avcodec_find_decoder(codeccontext->codec_id);
-	
-	if( !codec) {
-		lib::logger::get_logger()->error(gettext("%s: Video codec %d(%s) not supported"), repr(url).c_str(), codeccontext->codec_id, codeccontext->codec_name);
-		return NULL;
-	}
-	
-	if((!codec) || (avcodec_open(codeccontext,codec) < 0) ) {
-		lib::logger::get_logger()->error(gettext("%s: Video codec %d(%s): cannot open"), repr(url).c_str(), codeccontext->codec_id, codeccontext->codec_name);
-		return NULL;
-	}
-	thread->start();
-//	return new demux_video_datasource(url, thread, stream_index);
-	
-} */
 
 ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasource* src, video_format fmt)
 :	m_src(src),
@@ -959,7 +930,7 @@ ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasourc
 	
 	ffmpeg_init();
 	//m_duration = m_src->get_dur();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 	if (!select_decoder(fmt))
 		lib::logger::get_logger()->error(gettext("ffmpeg_video_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
 	m_fmt = fmt;	
@@ -1128,21 +1099,22 @@ ffmpeg_video_decoder_datasource::data_avail()
 	got_pic = 0;
 	
 	inbuf = (uint8_t*) m_src->get_frame(&ipts,&sz);
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
+	
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
 	if(sz) {	
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:start decoding (0x%x) ", m_con);
 		assert(&m_con != NULL);
 		ptr = inbuf;
 		
 		while (sz > 0) {
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
 				len = avcodec_decode_video(m_con, frame, &got_pic, ptr, sz);	
 				if (len >= 0) {
 					assert(len <= sz);
 					ptr +=len;	
 					sz -= len;
 					if (got_pic) {
-						/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoded picture, used %d bytes, %d left", len, sz);
+						/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: bla decoded picture, used %d bytes, %d left", len, sz);
 						// Setup the AVPicture for the format we want, plus the data pointer
 						width = m_fmt.width;
 						height = m_fmt.height;
@@ -1161,10 +1133,10 @@ ffmpeg_video_decoder_datasource::data_avail()
 						framebase = m_con->frame_rate_base;
 					
 					
-						pts = 0;
+						pts = ipts;
 						
 
-						AM_DBG lib::logger::get_logger()->debug("pts seems to be : %f",pts);
+						/*AM_DBG*/ lib::logger::get_logger()->debug("pts seems to be : %f",pts / 1000000);
 						pts1= pts;
 						
 						if (m_con->has_b_frames && frame->pict_type != FF_B_TYPE) {
@@ -1190,24 +1162,25 @@ ffmpeg_video_decoder_datasource::data_avail()
 							AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:pts was 0, set to %f", pts);
 						}
 						
-						AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: timestamp=%lld num=%d, den=%d",pts, num,den);
+						/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: timestamp=%lld num=%d, den=%d",pts, num,den);
 						
 						AM_DBG {
 							switch(frame->pict_type) {
 								case FF_B_TYPE:
-									lib::logger::get_logger()->debug("BBBBB ffmpeg_video_decoder_datasource.data_avail: B-frame, timestamp = %f", pts); 
+									lib::logger::get_logger()->debug("BBBBB ffmpeg_video_decoder_datasource.data_avail: B-frame, timestamp = %ldd", pts); 
 									break;
 								case FF_P_TYPE:framebase/framerate;
-									lib::logger::get_logger()->debug("PPPPP ffmpeg_video_decoder_datasource.data_avail: P-frame, timestamp = %f", pts); 
+									lib::logger::get_logger()->debug("PPPPP ffmpeg_video_decoder_datasource.data_avail: P-frame, timestamp = %ldd", pts); 
 									break;
 								case FF_I_TYPE:
-									lib::logger::get_logger()->debug("IIIII ffmpeg_video_decoder_datasource.data_avail: I-frame, timestamp = %f", pts); 
+									lib::logger::get_logger()->debug("IIIII ffmpeg_video_decoder_datasource.data_avail: I-frame, timestamp = %ldd", pts); 
 									break;
 								default:
-									lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: I-frame, timestamp = %f", pts); 
+									lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: I-frame, timestamp = %ldd", pts); 
 							}
 						}
 						// And store the data.
+						AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: storing frame with pts = %lld",pts );
 						std::pair<timestamp_t, char*> element(pts, framedata);
 						m_frames.push(element);
 					} else {
@@ -1217,12 +1190,12 @@ ffmpeg_video_decoder_datasource::data_avail()
 						lib::logger::get_logger()->error(gettext("error decoding video frame"));
 					}
 		}
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:done decoding (0x%x) ", m_con);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
 
   	}
 	if ( m_frames.size() || m_src->end_of_file()  ) {
 	  if ( m_client_callback ) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::data_avail(): calling client callback (eof=%d)", m_src->end_of_file());
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): calling client callback (eof=%d)", m_src->end_of_file());
 		assert(m_event_processor);
 		m_event_processor->add_event(m_client_callback, 0, ambulant::lib::event_processor::med);
 		m_client_callback = NULL;
@@ -1262,7 +1235,7 @@ bool
 ffmpeg_video_decoder_datasource::buffer_full()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size());
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size());
 	bool rv = (m_frames.size() > MAX_VIDEO_FRAMES);
 	m_lock.leave();
 	return rv;
