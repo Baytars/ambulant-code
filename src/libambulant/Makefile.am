@@ -2,15 +2,15 @@
 
 # temp variables to include the live.com stuff
 
-liveincludes = -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/include \
-			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/include \
-			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/include \
-			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/include
+liveincludes = -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/include \
+			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/include \
+			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/include \
+			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/include
 
-livelibs	= -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/ -lliveMedia \
-			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
-			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/ -lgroupsock  \
-			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/ -lUsageEnvironment
+livelibs	= -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/ -lliveMedia \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/ -lgroupsock  \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/ -lUsageEnvironment
 
 if WITH_EXPAT
 expat_parser_source = lib/expat_parser.cpp

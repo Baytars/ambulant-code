@@ -76,6 +76,10 @@ using namespace common;
 
 typedef lib::no_arg_callback<renderer_playable_ds> readdone_callback;
 
+
+
+
+
 renderer_playable_ds::renderer_playable_ds(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
@@ -445,7 +449,8 @@ active_video_renderer::data_avail()
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail(buf = 0x%x) (ts=%f, now=%f):", (void *) buf,ts, now());	
 	if (m_is_playing && buf) {
 		//if (ts <= now()) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("**** (this = 0x%x) Calling show_frame() timestamp : %f, now = %f (located at 0x%x) ", (void *) this, ts, now(), (void *) buf);
+		
+			AM_DBG lib::logger::get_logger()->debug("**** (this = 0x%x) Calling show_frame() timestamp : %f, now = %f (located at 0x%x) ", (void *) this, ts, now(), (void *) buf);
 			show_frame(buf, size);
 			m_dest->need_redraw();
 			displayed = true;
