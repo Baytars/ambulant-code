@@ -70,7 +70,7 @@ class passive_window;
 // NOTE: the "bounds" rectangles are currently all with respect
 // to the parent, and in a coordinate system where (0,0) is the
 // topleft point in the rectangle.
-class passive_region {
+class passive_region : public abstract_rendering_source {
   public:
 	friend class active_region;
 	
@@ -149,7 +149,7 @@ class window_factory {
 	virtual passive_window *new_window(const std::string &name, size bounds) = 0;
 };
 
-class active_region : public abstract_rendering_surface {
+class active_region : public abstract_rendering_surface, public abstract_rendering_source {
   public:
 	active_region(passive_region *const source,
 		const node *node)
