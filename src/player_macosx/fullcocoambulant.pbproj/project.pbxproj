@@ -19,6 +19,34 @@
 			settings = {
 			};
 		};
+		04207FD6063E74D4007647F5 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = smil_animation.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		04207FD7063E74D4007647F5 = {
+			fileRef = 04207FD6063E74D4007647F5;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		04207FD8063E751F007647F5 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = smil_animation.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		04207FD9063E751F007647F5 = {
+			fileRef = 04207FD8063E751F007647F5;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		042239CB0536F48E0010C447 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -999,6 +1027,7 @@
 			children = (
 				04542B0A05E246B900D812FB,
 				04B0C2D805DB8DF400BD8012,
+				04207FD6063E74D4007647F5,
 				04382B8905D7AEE600CFA029,
 				04382B8A05D7AEE600CFA029,
 				04382B8B05D7AEE600CFA029,
@@ -2684,6 +2713,7 @@
 			children = (
 				04542B0C05E246FF00D812FB,
 				04B0C2E705DB8E1C00BD8012,
+				04207FD8063E751F007647F5,
 				04EA7C4005D7C48600487047,
 				04EA7C4105D7C48600487047,
 				04EA7C4205D7C48600487047,
@@ -3392,6 +3422,7 @@
 				045BB3A60625548200A75828,
 				045BB3A70625548200A75828,
 				045BB3A80625548200A75828,
+				04207FD7063E74D4007647F5,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3508,6 +3539,7 @@
 				042D9BE4061D8AE0002F255F,
 				048467B3062171980045A7A7,
 				0469447606249D3C0007093B,
+				04207FD9063E751F007647F5,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
