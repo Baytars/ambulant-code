@@ -95,7 +95,3 @@ void gui::dx::dx_window::need_redraw() {
 	m_viewport->redraw();
 }
 
-void gui::dx::dx_window::mouse_region_changed() {
-}
-
-
