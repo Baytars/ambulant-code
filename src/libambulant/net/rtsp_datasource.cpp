@@ -128,7 +128,7 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		return NULL;
 	}
 	// setup a rtp session
-	int verbose;
+	int verbose = 0;
 	context->rtsp_client = RTSPClient::createNew(*env, verbose, "AmbulantPlayer");
 	if (!context->rtsp_client) {
 		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) failed to create  a RTSP Client");
@@ -234,21 +234,16 @@ ambulant::net::rtsp_demux::run()
 		while ((subsession = iter.next()) != NULL) {
 			if (strcmp(subsession->mediumName(), "audio") == 0) {
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an audio frame");
-				subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,NULL);
+				subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,m_context);
 			} else if (strcmp(subsession->mediumName(), "video") == 0) {
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an video frame");
-				subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,NULL);
+				subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,m_context);
 			} else {
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
 			}
 		}
 		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
-		//if (m_context->blocking_flag) {
-			scheduler.doEventLoop(&m_context->blocking_flag);
-		//} else {
- 		//	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() blocking_flag == NULL ");
-		//}
-
+		scheduler.doEventLoop(&m_context->blocking_flag);
 	}
 	
 }
@@ -256,15 +251,17 @@ ambulant::net::rtsp_demux::run()
 static void 
 after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
 {
+
+	lib::logger::get_logger()->debug("after_reading_audio: called", data);
 	rtsp_context_t* context = NULL;
 	if (data) {
 		context = (rtsp_context_t*) data;
 	} 
-	lib::logger::get_logger()->debug("after_reading_audio: audio data available (client data: 0x%x", data);
+	AM_DBG lib::logger::get_logger()->debug("after_reading_audio: audio data available (client data: 0x%x", data);
 	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
 		if(context->sinks[context->audio_stream])
-			//context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) context->audio_packet, sz);
+			context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) context->audio_packet, sz);
 		context->blocking_flag = ~0;
 		//XXX Do we need to free data here ?
 	}
