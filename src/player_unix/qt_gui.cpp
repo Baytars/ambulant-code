@@ -296,7 +296,7 @@ int main (int argc, char*argv[]) {
 	myapp.showMainWidget(mywidget);
 #endif/*QT_NO_FILEDIALOG*/
 	mywidget->show();
-	myapp.processEvents();
+//	myapp.processEvents();
 	if (argc > 1) {
 	    mywidget->openSMILfile(argv[1], IO_ReadOnly);
 	    mywidget->slot_play();

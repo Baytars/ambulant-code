@@ -53,7 +53,7 @@
 #include "ambulant/common/region_info.h"
 
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -114,7 +114,7 @@ qt_active_video_renderer::redraw(const lib::screen_rect<int> &dirty,
 	AM_DBG lib::logger::get_logger()->trace("qt_active_video_renderer.redraw: info=0x%x", info);
 	ambulant_qt_window* aqw = (ambulant_qt_window*) w;
 	QPainter paint;
-	paint.begin(aqw->ambulant_widget());
+	paint.begin(aqw->ambulant_pixmap());
 	// background drawing
 	if (info && !info->get_transparent()) {
 	// First find our whole area (which we have to clear to 
@@ -137,7 +137,7 @@ qt_active_video_renderer::redraw(const lib::screen_rect<int> &dirty,
 		paint.drawRect(L,T,W,H);
 	}
 	if (m_image_loaded) {
-		QSize qsize = aqw->ambulant_widget()->frameSize();
+		QSize qsize = aqw->ambulant_pixmap()->size();
 		lib::size srcsize = lib::size(qsize.width(), qsize.height());
 		lib::rect srcrect = lib::rect(lib::size(0,0));
 		lib::screen_rect<int> dstrect = m_dest->get_fit_rect(
