@@ -54,6 +54,7 @@
 #include "ambulant/common/region.h"
 #include "ambulant/common/renderer.h"
 
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -63,9 +64,9 @@ using namespace ambulant;
 lib::passive_region *
 lib::passive_region::subregion(const std::string &name, screen_rect<int> bounds)
 {
-	point topleft = m_window_topleft + bounds.left_top();
-	passive_region *rv = new passive_region(name, this, bounds, topleft, NULL);
-	m_children.push_back(rv);
+	AM_DBG lib::logger::get_logger()->trace("subbregion NO-INFO: ltrb=(%d, %d, %d, %d)", bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
+	passive_region *rv = new passive_region(name, this, bounds, NULL);
+	m_active_children.insert(std::make_pair(zindex_t(0), rv));
 	return rv;
 }
 
@@ -73,10 +74,11 @@ lib::passive_region *
 lib::passive_region::subregion(const abstract_smil_region_info *info)
 {
 	screen_rect<int> bounds = info->get_screen_rect();
-	/*AM_DBG*/ lib::logger::get_logger()->trace("subbregion %s: ltrb=(%d, %d, %d, %d)", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
-	point topleft = m_window_topleft + bounds.left_top();
-	passive_region *rv = new passive_region(info->get_name(), this, bounds, topleft, info);
-	m_children.push_back(rv);
+	zindex_t z = info->get_zindex();
+	AM_DBG lib::logger::get_logger()->trace("subbregion %s: ltrb=(%d, %d, %d, %d), z=%d", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), z);
+	passive_region *rv = new passive_region(info->get_name(), this, bounds, info);
+	
+	m_active_children.insert(std::make_pair(zindex_t(z), rv));
 	return rv;
 }
 
@@ -112,10 +114,10 @@ lib::passive_region::redraw(const screen_rect<int> &r, abstract_window *window)
 		draw_background();
 	}
 	// XXXX Should go per z-order value
-	std::vector<passive_region *>::iterator i;
-	for(i=m_children.begin(); i<m_children.end(); i++) {
-		AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x) -> child 0x%x", (void *)this, (void *)(*i));
-		(*i)->redraw(our_rect, window);
+	std::multimap<zindex_t,passive_region *>::iterator i;
+	for(i=m_active_children.begin(); i != m_active_children.end(); i++) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x) -> child 0x%x, z=%d", (void *)this, (void *)(*i).second, (*i).first);
+		(*i).second->redraw(our_rect, window);
 	}
 }
 
@@ -125,6 +127,7 @@ lib::passive_region::draw_background()
 	// Do a quick return if we have nothing to draw
 	if (m_info == NULL) return;
 	if (m_info->get_transparent()) return;
+	if (!m_info->get_showbackground()) return;
 	// Now we should make sure we have a background renderer
 	if (!m_bg_renderer) {
 		AM_DBG lib::logger::get_logger()->trace("passive_region::draw_background(0x%x): allocate bg_renderer", (void *)this);
@@ -155,10 +158,10 @@ lib::passive_region::user_event(const point &where)
 	} else {
 		AM_DBG lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
 	}
-	std::vector<passive_region *>::iterator i;
-	for(i=m_children.begin(); i<m_children.end(); i++) {
-		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) -> child 0x%x", (void *)this, (void *)(*i));
-		(*i)->user_event(our_point);
+	std::multimap<zindex_t,passive_region *>::iterator i;
+	for(i=m_active_children.begin(); i != m_active_children.end(); i++) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) -> child 0x%x,z=%d", (void *)this, (void *)(*i).second, (*i).first);
+		(*i).second->user_event(our_point);
 	}
 }
 
@@ -185,10 +188,19 @@ lib::passive_region::need_events(abstract_mouse_region *rgn)
         m_parent->mouse_region_changed();
 }
 
+const lib::point &
+lib::passive_region::get_global_topleft() const
+{
+	const_cast<passive_region*>(this)->need_bounds();
+	return m_window_topleft;
+}
+
+
 const lib::screen_rect<int>& 
 lib::passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect) const
 {
 	// XXXX For now we implement fit=fill only
+	const_cast<passive_region*>(this)->need_bounds();
 	const int image_width = src_size.w;
 	const int image_height = src_size.h;
 	const int region_width = m_inner_bounds.width();
@@ -227,6 +239,23 @@ lib::passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_
 }
 
 void
+lib::passive_region::need_bounds()
+{
+	if (m_bounds_inited) return;
+	if (m_info) m_outer_bounds = m_info->get_screen_rect();
+	m_inner_bounds = m_outer_bounds.innercoordinates(m_outer_bounds);
+	m_window_topleft = m_outer_bounds.left_top();
+	if (m_parent) m_window_topleft += m_parent->get_global_topleft();
+	m_bounds_inited = true;
+}
+
+void
+lib::passive_region::clear_cache()
+{
+	m_bounds_inited = false;
+}
+
+void
 lib::passive_region::mouse_region_changed()
 {
 //	// Check that we have a mouse region and a parent
@@ -239,9 +268,9 @@ lib::passive_region::mouse_region_changed()
     // Fill with the union of the regions of all our children
     if (m_cur_active_region)
         *m_mouse_region |= m_cur_active_region->get_mouse_region();
-    std::vector<passive_region *>::iterator i;
-    for(i=m_children.begin(); i<m_children.end(); i++) {
-        *m_mouse_region |= (*i)->get_mouse_region();
+    std::multimap<zindex_t,passive_region *>::iterator i;
+    for(i=m_active_children.begin(); i != m_active_children.end(); i++) {
+        *m_mouse_region |= (*i).second->get_mouse_region();
     }
     // Convert to our parent coordinate space
     *m_mouse_region += m_outer_bounds.left_top();
@@ -251,7 +280,7 @@ lib::passive_region::mouse_region_changed()
 }
 
 lib::passive_root_layout::passive_root_layout(const std::string &name, size bounds, window_factory *wf)
-:   passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), point(0, 0), NULL)
+:   passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), NULL)
 {
 	m_mouse_region = wf->new_mouse_region();
 	m_gui_window = wf->new_window(name, bounds, this);
@@ -259,7 +288,7 @@ lib::passive_root_layout::passive_root_layout(const std::string &name, size boun
 }
 		
 lib::passive_root_layout::passive_root_layout(const abstract_smil_region_info *info, size bounds, window_factory *wf)
-:   passive_region(info?info->get_name():"Untitled", NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), point(0, 0), info)
+:   passive_region(info?info->get_name():"Untitled", NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), info)
 {
 	m_mouse_region = wf->new_mouse_region();
 	m_gui_window = wf->new_window(m_name, bounds, this);

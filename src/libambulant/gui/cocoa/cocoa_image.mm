@@ -90,6 +90,7 @@ cocoa_active_image_renderer::redraw(const screen_rect<int> &dirty, abstract_wind
 		m_image = [[NSImage alloc] initWithData: m_nsdata];
 		if (!m_image)
 			logger::get_logger()->error("cocoa_active_image_renderer.redraw: could not create image");
+		[m_image setFlipped: true];
 		// XXXX Could free data and m_data again here...
 	}
 

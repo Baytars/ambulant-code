@@ -60,7 +60,6 @@
 
 #include <Cocoa/Cocoa.h>
 
-#define WITH_COCOA_AUDIO
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -215,16 +214,27 @@ cocoa_window_factory::new_mouse_region()
 
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect
 {
+#ifdef USE_COCOA_BOTLEFT
 	float bot_delta = NSMaxY([self bounds]) - arect->bottom();
 	return NSMakeRect(arect->left(), bot_delta, arect->width(), arect->height());
+#else
+	return NSMakeRect(arect->left(), arect->top(), arect->width(), arect->height());
+#endif
 }
 
 - (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (const NSRect *)nsrect
 {
+#ifdef USE_COCOA_BOTLEFT
 	float top_delta = NSMaxY([self bounds]) - NSMaxY(*nsrect);
 	ambulant::lib::screen_rect<int> arect = ambulant::lib::screen_rect<int>(
                 ambulant::lib::point(int(NSMinX(*nsrect)), int(top_delta)),
 				ambulant::lib::size(int(NSWidth(*nsrect)), int(NSHeight(*nsrect))));
+#else
+	ambulant::lib::screen_rect<int> arect = ambulant::lib::screen_rect<int>(
+                ambulant::lib::point(int(NSMinX(*nsrect)), int(NSMinY(*nsrect))),
+				ambulant::lib::size(int(NSWidth(*nsrect)), int(NSHeight(*nsrect))));
+	 
+#endif
 	return arect;
 }
 
@@ -254,6 +264,15 @@ cocoa_window_factory::new_mouse_region()
 - (bool)isAmbulantWindowInUse
 {
     return (ambulant_window != NULL);
+}
+
+- (BOOL)isFlipped
+{
+#ifdef USE_COCOA_BOTLEFT
+	return false;
+#else
+	return true;
+#endif
 }
 
 - (void)resetCursorRects
