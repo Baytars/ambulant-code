@@ -53,6 +53,7 @@
 #ifndef AMBULANT_GUI_COCOA_COCOA_GUI_H
 #define AMBULANT_GUI_COCOA_COCOA_GUI_H
 
+#include "ambulant/common/factory.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
 #ifdef __OBJC__
@@ -99,7 +100,7 @@ class cocoa_window_factory : public common::window_factory {
 class cocoa_renderer_factory : public common::playable_factory {
   public:
   	cocoa_renderer_factory(common::factories *factory)
-	:   m_datasource_factory(factory) {}
+	:   m_factory(factory) {}
   	
 	common::playable *new_playable(
 		common::playable_notification *context,
