@@ -86,12 +86,17 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
   protected:
 	unsigned long run();
   private:
+	 
+    void after_reading(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+	void on_close(void* clientdata);
+	
+  
     datasink *m_sinks[MAX_STREAMS];
   	RTSPClient* m_rtsp_client;
-    SIPClient*	m_sip_client; // XXX:We might need this later ?
   	MediaSession* m_media_session;
   	char* m_sdp;
 	int m_nstream;
+	char blockingflag;
 };
 
 }
