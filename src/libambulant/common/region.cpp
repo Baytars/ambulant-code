@@ -189,9 +189,41 @@ const lib::screen_rect<int>&
 lib::passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect) const
 {
 	// XXXX For now we implement fit=fill only
-	*out_src_rect = lib::rect(lib::point(0,0), 
-		lib::size(m_inner_bounds.width(), m_inner_bounds.height()));
-	return m_inner_bounds;
+	const int image_width = src_size.w;
+	const int image_height = src_size.h;
+	const int region_width = m_inner_bounds.width();
+	const int region_height = m_inner_bounds.height();
+	const int min_width = std::min(image_width, region_width);
+	const int min_height = std::min(image_height, region_height);
+	const double scale_width = (double)region_width / std::max((double)image_width, 0.1);
+	const double scale_height = (double)region_height / std::max((double)image_height, 0.1);
+	double scale;
+	
+	const lib::fit_t fit = (m_info == NULL? lib::fit_hidden : m_info->get_fit());
+	switch (fit) {
+	  case fit_fill:
+		// Fill the area with the image, ignore aspect ration
+		*out_src_rect = lib::rect(lib::point(0, 0), src_size);
+		return m_inner_bounds;
+	  case fit_scroll:
+	  case fit_hidden:
+		// Don't scale at all
+		*out_src_rect = lib::rect(lib::point(0, 0), lib::size(min_width, min_height));
+		return screen_rect<int>(lib::point(0, 0), lib::point(min_width, min_height));
+	  case fit_meet:
+		// Scale to make smallest edge fit (showing some background color)
+		scale = std::min(scale_width, scale_height);
+		break;
+	  case fit_slice:
+		// Scale to make largest edge fit (not showing the full source image)
+		scale = std::max(scale_width, scale_height);
+		break;
+	}
+	// We end up here as common case for meet and slice
+	int proposed_width = std::min((int)(scale*(image_width+0.5)), region_width);
+	int proposed_height = std::min((int)(scale*(image_height+0.5)), region_height);
+	*out_src_rect = lib::rect(lib::point(0, 0), lib::size((int)(proposed_width/scale), (int)(proposed_height/scale)));
+	return screen_rect<int>(lib::point(0, 0), lib::point(proposed_width, proposed_height));
 }
 
 void
