@@ -139,13 +139,15 @@ class cocoa_renderer_factory : public common::playable_factory {
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseMoved: (NSEvent *)theEvent;
 
-- (void)dumpToImageFile: (NSString *)filename;
+- (void)dumpToImageID: (char *)ident;
+- (void)dump: (id)image toImageID: (char *)ident;
 - (BOOL)wantsDefaultClipping;
 
 - (void) incrementTransitionCount;
 - (void) decrementTransitionCount;
 - (NSImage *)getTransitionSurface;
-- (NSImage *)getTransitionSource;
+- (NSImage *)getTransitionOldSource;
+- (NSImage *)getTransitionNewSource;
 @end
 
 #endif // __OBJC__

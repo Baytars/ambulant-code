@@ -120,5 +120,5 @@ transition_engine::is_done()
 lib::transition_info::time_type
 transition_engine::next_step_delay()
 {
-	return 500; // Show something every half second
+	return 50; // Show something 20 times per second
 }
