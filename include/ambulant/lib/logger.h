@@ -199,6 +199,8 @@ class logger {
 	
 };
 
+
+
 //////////////////////////////
 // Inline part of the implementation
 
@@ -238,4 +240,4 @@ inline void show_message(const char *format, ...) {}
 #define LOGGER_ASSERT(exp) if(!(exp)) ambulant::lib::logger::assert_expr(exp, #exp)
 
 
-#endif // 
+#endif //

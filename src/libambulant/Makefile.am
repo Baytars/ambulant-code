@@ -88,6 +88,7 @@ INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include \
 lib_LTLIBRARIES = libambulant.la $(toolkit_cocoa_libraries)\
 $(toolkit_qt_libraries) $(toolkit_arts_libraries) $(toolkit_sdl_libraries) $(toolkit_ffmpeg_libraries)
 
+AM_CPPFLAGS=-rdynamic
 
 libambulant_la_SOURCES = \
 	get_version.cpp \

@@ -48,6 +48,8 @@
 #include "plugin.h"
 #include "ambulant/common/renderer.h"
 #include "ambulant/lib/logger.h"
+#include "ambulant/lib/unix/unix_mtsync.h"
+
 
 
 #define AM_DBG
@@ -57,15 +59,15 @@
 
 using namespace ambulant;
 
-void 
-initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
-{
-	plugin::basic_plugin_factory *plf = new plugin::basic_plugin_factory(df);
-	AM_DBG lib::logger::get_logger()->trace("Registring test plugin");
-	rf->add_factory( plf);
-}
+static plugin::test P();
 
+
+ambulant::common::playable_factory* create_factory(ambulant::net::datasource_factory* df)
+{
+	return new plugin::basic_plugin_factory(df);
+}
 	
+
 common::playable* 
 plugin::basic_plugin_factory::new_playable(
 		common::playable_notification *context,
@@ -74,18 +76,29 @@ plugin::basic_plugin_factory::new_playable(
 		lib::event_processor *evp)
 {
 	common::playable *rv;
+	
 	lib::xml_string tag = node->get_qname().second;
-    AM_DBG lib::logger::get_logger()->trace("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+	std::cout << "LIB LOGGER IS CALLED \n";
+    //AM_DBG lgr->trace("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "audio") /*or any other tag ofcourse */ {
-		rv = new plugin::basic_plugin(context, cookie, node, evp, m_datasource_factory);
-		AM_DBG lib::logger::get_logger()->trace("sdl_renderer_factory: node 0x%x: returning sdl_active_audio_renderer 0x%x", (void *)node, (void *)rv);
+		//rv = new plugin::basic_plugin(context, cookie, node, evp, m_datasource_factory);
+		rv = NULL;
+		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory: node 0x%x: returning basic_plugin 0x%x", (void *)node, (void *)rv);
 	} else {
-		AM_DBG lib::logger::get_logger()->trace("sdl_renderer_factory: no SDL renderer for tag \"%s\"", tag.c_str());
+		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory : plugin does not support \"%s\"", tag.c_str());
         return NULL;
 	}
 	return rv;
-	
 }
+
+
+//~ void 
+//~ plugin::basic_plugin::show_frame(char* frame, int size)
+//~ {
+	//~ // private method - no locks
+	//~ lib::logger::get_logger ()->trace("**** DISPLAYED");
+//~ }
+
 
 
 plugin::basic_plugin::basic_plugin(
@@ -96,7 +109,7 @@ plugin::basic_plugin::basic_plugin(
 	net::datasource_factory *df) 
 :	common::playable_imp(context, cookie, node, evp)
 {
-	
+	std::cout << "PLUGIN CREATED\n";
 }
 
 void
