@@ -63,7 +63,6 @@ lib::unix::event_processor::wait_event()
 	// times, and absolute time as a timespec is difficult to obtain.
 	ts.tv_sec = 1;
 	ts.tv_nsec = 10000000; /* 10ms */
-	lib::logger::get_logger()->trace("unix_event_processor 0x%x: wait for events", (void *)this);
 	rv = pthread_cond_timedwait_relative_np(&m_queue_condition, &m_queue_mutex, &ts);
 	if ( rv < 0 && errno != ETIMEDOUT) {
 		lib::logger::get_logger()->fatal("unix_event_processor.wait_event: pthread_cond_wait failed: %s", strerror(errno));
