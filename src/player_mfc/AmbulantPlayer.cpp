@@ -57,6 +57,7 @@
 #include "MmView.h"
 #include "OpenUrlDlg.h"
 #include "PreferencesDlg.h"
+#include "LogWindow.h"
 
 #include "ambulant/version.h"
 #include ".\ambulantplayer.h"
@@ -81,6 +82,7 @@ BEGIN_MESSAGE_MAP(CAmbulantPlayerApp, CWinApp)
 	ON_COMMAND_EX_RANGE(ID_FILE_MRU_FILE1, ID_FILE_MRU_FILE1+16, OnOpenRecentFile)
 	ON_COMMAND(ID_FILE_OPENURL, OnFileOpenurl)
 	ON_COMMAND(ID_FILE_PREFERENCES, OnPreferences)
+	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
 END_MESSAGE_MAP()
 
 
@@ -111,6 +113,9 @@ BOOL CAmbulantPlayerApp::InitInstance()
 	}
 	AfxEnableControlContainer();
 	
+	// Enable RichEdit control
+	AfxInitRichEdit2();
+
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size
 	// of your final executable, you should remove from the following
@@ -266,4 +271,15 @@ void CAmbulantPlayerApp::OnPreferences()
 {
 	PreferencesDlg dlg;
 	if(dlg.DoModal() != IDOK) return;
+}
+
+void CAmbulantPlayerApp::OnViewLog()
+{
+	if (m_logwindow == NULL) {
+		MessageBox(NULL, "Will Create log window", "AmbulantPlayer", MB_OK);
+		m_logwindow = new CLogWindow(NULL);
+		m_logwindow->Create(CLogWindow::IDD);
+	}
+	MessageBox(NULL, "Will Show log window", "AmbulantPlayer", MB_OK);
+	m_logwindow->ShowWindow(SW_SHOW);
 }

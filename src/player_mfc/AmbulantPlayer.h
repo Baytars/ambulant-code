@@ -56,6 +56,7 @@
 
 #include "resource.h"       // main symbols
 
+class CLogWindow;
 
 class CAmCommandLineInfo : public CCommandLineInfo {
   public:
@@ -103,6 +104,9 @@ public:
 	afx_msg BOOL OnOpenRecentFile(UINT nID);
 	afx_msg void OnFileOpenurl();
 	afx_msg void OnPreferences();
+	afx_msg void OnViewLog();
+private:
+	CLogWindow *m_logwindow;
 };
 
 extern CAmbulantPlayerApp theApp;
