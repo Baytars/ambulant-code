@@ -74,8 +74,9 @@ class cocoa_window : public lib::abstract_window {
 	void need_redraw(const lib::screen_rect<int> &r);
 //	void need_events(lib::abstract_mouse_region *rgn);
 	void redraw(const lib::screen_rect<int> &r);
-        void mouse_region_changed();
+	void mouse_region_changed();
 	void *view() { return m_view; }
+	const lib::abstract_mouse_region &get_mouse_region() { return m_region->get_mouse_region(); }
   private:
     void *m_view;
 };
@@ -120,6 +121,9 @@ class cocoa_renderer_factory : public lib::renderer_factory {
 - (void)setAmbulantWindow: (ambulant::gui::cocoa::cocoa_window *)window;
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect;
 - (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (const NSRect *)nsrect;
+- (void)resetCursorRects;
+- (void)mouseDown: (NSEvent *)theEvent;
+
 @end
 
 #endif // __OBJC__
