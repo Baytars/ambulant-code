@@ -125,7 +125,7 @@ cocoambulant_bundle: cocoambulant_executable
 	mkdir -p $(APPNAME).app/Contents/Resources/data
 	$(INSTALL_DATA) $(top_srcdir)/Extras/Welcome/Welcome.smil $(APPNAME).app/Contents/Resources
 	$(INSTALL_DATA) $(top_srcdir)/Extras/Welcome/data/*.* $(APPNAME).app/Contents/Resources/data
-	$(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) -s cocoambulant_executable `pwd`/$(APPNAME).app/Contents/MacOS/cocoambulant
+	$(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) cocoambulant_executable `pwd`/$(APPNAME).app/Contents/MacOS/cocoambulant
 	
 LDADD = $(top_builddir)/src/libambulant/.libs/libambulant.a \
 	$(extra_sdl_LDADD) \
@@ -135,7 +135,8 @@ LDADD = $(top_builddir)/src/libambulant/.libs/libambulant.a \
 	$(LIBINTL) \
 	$(top_builddir)/src/libambulant/.libs/libambulant_cocoa.a \
     -lstdc++
-AM_LDFLAGS=$(extra_sdl_ldflags) $(extra_ffmpeg_ldflags) -framework Cocoa -framework QuickTime
+    
+AM_LDFLAGS=-export-dynamic $(extra_sdl_ldflags) $(extra_ffmpeg_ldflags) -framework Cocoa -framework QuickTime
 
 INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include \
     $(extra_expat_DEFINES) \
