@@ -68,11 +68,113 @@ transition_info::from_node(node *n)
 {
 	// Placeholder
 	transition_info *rv = new transition_info();
-	rv->m_type = barWipe;
+#if 0
+	const char *ctype = n->get_attribute("type");
+	if (!ctype) {
+		lib::logger::get_logger()->error("transition: no type");
+		delete rv;
+		return NULL;
+	}
+	std::string type = ctype;
+	if (type == "barWipe") m_type = barWipe;
+	else if (type == "boxWipe") m_type = boxWipe;
+	else if (type == "fourBoxWipe") m_type = fourBoxWipe;
+	else if (type == "barnDoorWipe") m_type = barnDoorWipe;
+	else if (type == "diagonalWipe") m_type = diagonalWipe;
+	else if (type == "bowTieWipe") m_type = bowTieWipe;
+	else if (type == "miscDiagonalWipe") m_type = miscDiagonalWipe;
+	else if (type == "veeWipe") m_type = veeWipe;
+	else if (type == "barnVeeWipe") m_type = barnVeeWipe;
+	else if (type == "zigZagWipe") m_type = zigZagWipe;
+	else if (type == "barnZigZagWipe") m_type = barnZigZagWipe;
+	else if (type == "irisWipe") m_type = irisWipe;
+	else if (type == "triangleWipe") m_type = triangleWipe;
+	else if (type == "arrowHeadWipe") m_type = arrowHeadWipe;
+	else if (type == "pentagonWipe") m_type = pentagonWipe;
+	else if (type == "hexagonWipe") m_type = hexagonWipe;
+	else if (type == "ellipseWipe") m_type = ellipseWipe;
+	else if (type == "eyeWiperoundRectWipe") m_type = eyeWiperoundRectWipe;
+	else if (type == "starWipe") m_type = starWipe;
+	else if (type == "miscShapeWipe") m_type = miscShapeWipe;
+	else if (type == "clockWipe") m_type = clockWipe;
+	else if (type == "pinWheelWipe") m_type = pinWheelWipe;
+	else if (type == "singleSweepWipe") m_type = singleSweepWipe;
+	else if (type == "fanWipe") m_type = fanWipe;
+	else if (type == "doubleFanWipe") m_type = doubleFanWipe;
+	else if (type == "doubleSweepWipe") m_type = doubleSweepWipe;
+	else if (type == "saloonDoorWipe") m_type = saloonDoorWipe;
+	else if (type == "windshieldWipe") m_type = windshieldWipe;
+	else if (type == "snakeWipe") m_type = snakeWipe;
+	else if (type == "spiralWipe") m_type = spiralWipe;
+	else if (type == "parallelSnakesWipe") m_type = parallelSnakesWipe;
+	else if (type == "boxSnakesWipe") m_type = boxSnakesWipe;
+	else if (type == "waterfallWipe") m_type = waterfallWipe;
+	else if (type == "pushWipe") m_type = pushWipe;
+	else if (type == "slideWipe") m_type = slideWipe;
+	else if (type == "fade") m_type = fade;
+	else {
+		lib::logger::get_logger()->error("transition: unknown type=\"%s\"", ctype);
+		delete rv;
+		return NULL;
+	}
+	const char *csubtype = n->get_attribute("subtype");
+	if (csubtype)
+		rv->m_subtype = csubtype;
+	else
+		rv->m_subtype = "";
+#else
+	rv->m_type = barnDoorWipe;
 	rv->m_subtype = "";
+#endif
 	rv->m_dur = 2000;
 	rv->m_startProgress = 0.0;
 	rv->m_endProgress = 1.0;
 	rv->m_reverse = false;
 	return rv;
 }
+
+std::string
+ambulant::lib::repr(transition_type t)
+{
+	switch(t) {
+	case barWipe: return "barWipe";
+	case boxWipe: return "boxWipe";
+	case fourBoxWipe: return "fourBoxWipe";
+	case barnDoorWipe: return "barnDoorWipe";
+	case diagonalWipe: return "diagonalWipe";
+	case bowTieWipe: return "bowTieWipe";
+	case miscDiagonalWipe: return "miscDiagonalWipe";
+	case veeWipe: return "veeWipe";
+	case barnVeeWipe: return "barnVeeWipe";
+	case zigZagWipe: return "zigZagWipe";
+	case barnZigZagWipe: return "barnZigZagWipe";
+	case irisWipe: return "irisWipe";
+	case triangleWipe: return "triangleWipe";
+	case arrowHeadWipe: return "arrowHeadWipe";
+	case pentagonWipe: return "pentagonWipe";
+	case hexagonWipe: return "hexagonWipe";
+	case ellipseWipe: return "ellipseWipe";
+	case eyeWipe: return "eyeWipe";
+	case roundRectWipe: return "roundRectWipe";
+	case starWipe: return "starWipe";
+	case miscShapeWipe: return "miscShapeWipe";
+	case clockWipe: return "clockWipe";
+	case pinWheelWipe: return "pinWheelWipe";
+	case singleSweepWipe: return "singleSweepWipe";
+	case fanWipe: return "fanWipe";
+	case doubleFanWipe: return "doubleFanWipe";
+	case doubleSweepWipe: return "doubleSweepWipe";
+	case saloonDoorWipe: return "saloonDoorWipe";
+	case windshieldWipe: return "windshieldWipe";
+	case snakeWipe: return "snakeWipe";
+	case spiralWipe: return "spiralWipe";
+	case parallelSnakesWipe: return "parallelSnakesWipe";
+	case boxSnakesWipe: return "boxSnakesWipe";
+	case waterfallWipe: return "waterfallWipe";
+	case pushWipe: return "pushWipe";
+	case slideWipe: return "slideWipe";
+	case fade: return "fade";
+	default: return "<unknown transition type>";
+	}
+}
+

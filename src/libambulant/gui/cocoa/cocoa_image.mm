@@ -86,7 +86,8 @@ cocoa_active_image_renderer::start(double where)
 	/*AM_DBG*/ logger::get_logger()->trace("cocoa_active_image_renderer.start(0x%x)", (void *)this);
 	if (m_intransition) {
 		m_trans_engine = cocoa_transition_engine(m_dest, false, m_intransition);
-		m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
+		if (m_trans_engine)
+			m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
 	}
 	if (m_outtransition) {
 		// XXX Schedule beginning of out transition
