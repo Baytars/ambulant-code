@@ -84,7 +84,7 @@ namespace qt_renderer {
 					const lib::node *node,
   					event_processor *const evp,
 				    net::passive_datasource *src,
-				    passive_region *const dest)
+				    rendering_surface *const dest)
   {
     xml_string tag = node->get_qname().second;
     active_renderer* rv;
