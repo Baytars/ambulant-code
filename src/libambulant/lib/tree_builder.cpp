@@ -68,7 +68,6 @@ lib::tree_builder::tree_builder(node_context *context)
 	m_well_formed(false),
 	m_context(context) {
 #ifdef	WITH_XERCES
-	XMLPlatformUtils::Initialize();
 	m_xmlparser = new xerces_sax_parser(this, this);
 #else /*WITH_XERCES*/
 	m_xmlparser = new expat_parser(this, this);
