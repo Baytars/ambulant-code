@@ -110,16 +110,16 @@ void
 lib::passive_region::user_event(const point &where)
 {
 	AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x)", (void *)this);
-	point our_point = where;
-	// Test that it is in our active area
-#if 0
-	screen_rect<int> our_outer_rect = r & m_outer_bounds;
-	screen_rect<int> our_rect = m_outer_bounds.innercoordinates(our_outer_rect);
-	if (our_rect.empty())
+	// Test that it is in our area
+	if (!m_outer_bounds.contains(where))
 		return;
-	AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x, our_ltrb=(%d, %d, %d, %d))", (void *)this, our_rect.left(), our_rect.top(), our_rect.right(), our_rect.bottom());
-		
-#endif
+	// And test whether it is in our mouse area too
+	if (!m_mouse_region->contains(where))
+		return;
+	// Convert to local coordinates
+	point our_point = where;
+	our_point -= m_outer_bounds.left_top();
+	
 	if (m_cur_active_region) {
 		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
 		m_cur_active_region->user_event(our_point);
@@ -219,12 +219,12 @@ void
 lib::active_region::user_event(const point &where)
 {
 	if (m_renderer) {
-		AM_DBG lib::logger::get_logger()->trace("active_region.redraw(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
+		AM_DBG lib::logger::get_logger()->trace("active_region.user_event(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
 		m_renderer->user_event(where);
 	} else {
 		// At this point we should have a renderer that draws the default background
 		// When that is implemented this trace message should turn into an error (or fatal).
-		AM_DBG lib::logger::get_logger()->error("active_region.redraw(0x%x) no renderer", (void *)this);
+		AM_DBG lib::logger::get_logger()->error("active_region.user_event(0x%x) no renderer", (void *)this);
 	}
 }
 
