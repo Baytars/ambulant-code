@@ -98,6 +98,7 @@ class passive_region {
 	
 	const screen_rect<int>& get_rect() const { return m_inner_bounds; }
 	const screen_rect<int>& get_rect_outer() const { return m_outer_bounds; }
+	const point &get_global_topleft() const { return m_window_topleft; }
 	const passive_region* get_parent() const { return m_parent; }
 	
   protected:
@@ -158,18 +159,19 @@ class active_region : public abstract_rendering_surface {
 	virtual ~active_region() {}
 	
 	virtual void show(abstract_rendering_source *renderer);
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft);
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window);
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_redraw();
 	virtual void renderer_done();	
 	const screen_rect<int>& get_rect() const { return m_source->get_rect(); }
 	const screen_rect<int>& get_rect_outer() const { return m_source->get_rect_outer(); }
+	const point &get_global_topleft() const { return m_source->get_global_topleft(); }
 	const passive_region* get_parent() const { return m_source->get_parent(); }
 	
   protected:
 	passive_region *const m_source;
 	const node *m_node;
-	active_renderer *m_renderer;
+	abstract_rendering_source *m_renderer;
 };
 
 } // namespace lib
