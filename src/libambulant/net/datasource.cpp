@@ -148,12 +148,12 @@ void net::databuffer::dump(std::ostream& os, bool verbose) const
 }
 
 char *
-net::databuffer::prepare()
+net::databuffer::prepare(int size)
 {
 	//AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: start BUFSIZ = %d", BUFSIZ);
 	
     if(!m_buffer_full) {
-        m_buffer = (char*) realloc(m_buffer, m_size + BUFSIZ);
+        m_buffer = (char*) realloc(m_buffer, m_size + size);
 		//AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: buffer realloc done (%x)",m_buffer);
         if (!m_buffer) {
             lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
@@ -319,7 +319,7 @@ net::active_datasource::read_file()
 	if (m_stream >= 0) {
 		do {
 		//AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: getting buffer pointer");
-            buf = m_buffer->prepare();
+            buf = m_buffer->prepare(BUFSIZ);
 			//AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: buffer ptr : %x", buf);
 			if (buf) {
 				//AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: start reading %d bytes", BUFSIZ);
