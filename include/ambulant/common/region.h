@@ -148,7 +148,7 @@ class window_factory {
 	virtual passive_window *new_window(const std::string &name, size bounds) = 0;
 };
 
-class active_region : public rendering_surface {
+class active_region : public abstract_rendering_surface {
   public:
 	active_region(passive_region *const source,
 		const node *node)
@@ -157,7 +157,7 @@ class active_region : public rendering_surface {
 		m_renderer(NULL) {}
 	virtual ~active_region() {}
 	
-	virtual void show(active_renderer *renderer);
+	virtual void show(abstract_rendering_source *renderer);
 	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft);
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_redraw();

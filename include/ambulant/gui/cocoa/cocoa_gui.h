@@ -98,7 +98,7 @@ class cocoa_renderer_factory : public lib::renderer_factory {
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
-		lib::rendering_surface *const dest);
+		lib::abstract_rendering_surface *const dest);
 };
 
 } // namespace cocoa
