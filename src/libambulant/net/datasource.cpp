@@ -52,7 +52,7 @@
 
 #include "ambulant/net/datasource.h"
 #include <unistd.h>
-
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -70,6 +70,7 @@ net::databuffer::databuffer()
 {
 	m_used = 0;
     m_size = 0;
+	m_front = NULL;
     m_rear = NULL;
     m_max_size = DEFAULT_MAX_BUF_SIZE;
 	m_buffer = NULL;
@@ -101,6 +102,7 @@ net::databuffer::databuffer(int max_size)
     m_size = 0;
     m_rear = NULL;
     m_front = NULL;
+	m_buffer = NULL;
     if (max_size > 0) {
         m_max_size = max_size;
     } else {
@@ -144,17 +146,24 @@ if (verbose) {
 }
 
 
-
-void net::databuffer::prepare(char* in_ptr)
+char *
+net::databuffer::prepare()
 {
+	AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: start");
+	
     if(!m_buffer_full) {
-        in_ptr = m_front;
         m_buffer = (char*) realloc(m_buffer, m_size + BUFSIZ);
+		if (m_front == NULL) m_front = m_buffer;
+		if (m_rear == NULL) m_rear = m_buffer;
+		AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: buffer realloc done (%x)",m_buffer);
         if (!m_buffer) {
             lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
         }
+		AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: returning m_front (%x)",m_front);
+		return m_front;
     } else {
         lib::logger::get_logger()->warn("databuffer::databuffer::prepare : buffer full but still trying to fill it ");
+		return NULL;
     }
     
 }
@@ -164,12 +173,13 @@ void net::databuffer::pushdata(int size)
     if(!m_buffer_full) {
         m_size  += size;
         m_front += size;
-        m_used = m_front -m_rear;
+        m_used = m_front - m_rear;
         m_buffer = (char*) realloc(m_buffer, m_size);
          if (!m_buffer) {
              lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
          }
         if(m_size > m_max_size) {
+			AM_DBG lib::logger::get_logger()->trace("active_datasource.pushdata: buffer full [size = %d, max size = %d]",m_size, m_max_size);
             m_buffer_full = true;
         }
     } else {
@@ -239,7 +249,7 @@ net::active_datasource::active_datasource(passive_datasource *const source, int 
 }
 
 bool
-net::active_datasource::is_full()
+net::active_datasource::buffer_full()
 {
 	return m_buffer->is_full();
 }
@@ -299,13 +309,17 @@ net::active_datasource::read_file()
 {
   	char *buf;
   	int n; 	
-
+	AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: start reading file ");
 	if (m_stream >= 0) {
-
 		do {
-            	m_buffer->prepare(buf);
+			AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: getting buffer pointer");
+            buf = m_buffer->prepare();
+			AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: buffer ptr : %x", buf);
+			if (!buf) {
+				AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: start reading %d bytes", BUFSIZ);
 				n = ::read(m_stream, buf, BUFSIZ);
-				if (n >= 0) m_buffer->pushdata(n); 
+			}
+			if (n >= 0) m_buffer->pushdata(n); 
 		} while (n > 0);
 		m_end_of_file = true;
 		if (n < 0) {
