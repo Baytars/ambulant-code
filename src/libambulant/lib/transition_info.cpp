@@ -68,7 +68,7 @@ transition_info::from_node(node *n)
 {
 	// Placeholder
 	transition_info *rv = new transition_info();
-	rv->m_type = fade;
+	rv->m_type = barWipe;
 	rv->m_subtype = "";
 	rv->m_dur = 2000;
 	rv->m_startProgress = 0.0;

@@ -65,49 +65,77 @@ namespace gui {
 
 namespace cocoa {
 
-cocoa_transition_engine::cocoa_transition_engine(common::surface *dst, bool outtrans, lib::transition_info *info)
-:   smil2::transition_engine(outtrans, info),
-	m_dst(dst)
-{
-	AM_DBG lib::logger::get_logger()->trace("cocoa_transition_engine::cocoa_transition_engine()");
-}
-
-cocoa_transition_engine::~cocoa_transition_engine()
-{
-	AM_DBG lib::logger::get_logger()->trace("cocoa_transition_engine::~cocoa_transition_engine()");
-}
-
 void
-cocoa_transition_engine::update()
+cocoa_transition_engine_fade::update()
 {
 	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
 	AmbulantView *view = (AmbulantView *)window->view();
-#ifdef COPYOLDSOURCE
-	NSImage *oldsrc = [view getTransitionOldSource];
-#endif
 	NSImage *newsrc = [view getTransitionNewSource];
-	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine::update(%f)", m_progress);
-	// This is a fade:
+	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine_fade::update(%f)", m_progress);
 	const lib::screen_rect<int> &r =  m_dst->get_rect();
 	lib::screen_rect<int> dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
 	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
-//	NSPoint cocoa_dstpoint = NSMakePoint(NSMinX(cocoa_dstrect_whole), NSMinY(cocoa_dstrect_whole));
-
-#ifdef COPYOLDSOURCE
-	// Debug: fill with purple
-	[[NSColor purpleColor] set];
-	NSRectFill(cocoa_dstrect_whole);
-
-	[oldsrc drawInRect: cocoa_dstrect_whole 
-		fromRect: cocoa_dstrect_whole
-		operation: NSCompositeCopy
-		fraction: 1.0];
-#endif
 	[newsrc drawInRect: cocoa_dstrect_whole 
 		fromRect: cocoa_dstrect_whole
 		operation: NSCompositeSourceOver
 		fraction: m_progress];
+}
+
+void
+cocoa_transition_engine_barwipe::update()
+{
+	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
+	AmbulantView *view = (AmbulantView *)window->view();
+
+	NSImage *oldsrc = [view getTransitionOldSource];
+	NSImage *newsrc = [view getTransitionNewSource];
+	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine_barwipe::update(%f)", m_progress);
+	lib::screen_rect<int> oldrect_whole = m_oldrect;
+	lib::screen_rect<int> newrect_whole = m_newrect;
+	oldrect_whole.translate(m_dst->get_global_topleft());
+	newrect_whole.translate(m_dst->get_global_topleft());
+	NSRect cocoa_oldrect_whole = [view NSRectForAmbulantRect: &oldrect_whole];
+	NSRect cocoa_newrect_whole = [view NSRectForAmbulantRect: &newrect_whole];
+
+#if 1
+	// Debug: fill with purple
+	lib::screen_rect<int> dstrect_whole = m_dst->get_rect();
+	dstrect_whole.translate(m_dst->get_global_topleft());
+	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
+	[[NSColor purpleColor] set];
+	NSRectFill(cocoa_dstrect_whole);
+#endif
+
+	[oldsrc drawInRect: cocoa_oldrect_whole 
+		fromRect: cocoa_oldrect_whole
+		operation: NSCompositeCopy
+		fraction: 1.0];
+
+	[newsrc drawInRect: cocoa_newrect_whole 
+		fromRect: cocoa_newrect_whole
+		operation: NSCompositeSourceOver
+		fraction: 1.0];
+}
+
+smil2::transition_engine *
+cocoa_transition_engine(common::surface *dst, bool is_outtrans, lib::transition_info *info)
+{
+	smil2::transition_engine *rv;
+	
+	switch(info->m_type) {
+	case lib::fade:
+		rv = new cocoa_transition_engine_fade();
+		break;
+	case lib::barWipe:
+		rv = new cocoa_transition_engine_barwipe();
+		break;
+	default:
+		rv = NULL;
+	}
+	if (rv)
+		rv->init(dst, is_outtrans, info);
+	return rv;
 }
 
 } // namespace cocoa
