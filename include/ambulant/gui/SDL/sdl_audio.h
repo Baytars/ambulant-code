@@ -76,7 +76,13 @@ namespace ambulant {
 namespace gui {
 namespace sdl {	  
 
+#ifdef USE_SMIL21
+class sdl_active_audio_renderer : public common::renderer_playable, public smil2::audio_transition_engine {
+#endif
+#ifndef USE_SMIL21
 class sdl_active_audio_renderer : public common::renderer_playable {
+#endif
+
   public:
 	sdl_active_audio_renderer(
 	common::playable_notification *context,
@@ -111,13 +117,6 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 
 //	void set_surface(common::surface *dest) { abort(); }
 //	common::surface *get_surface() { abort(); }
-#ifdef USE_SMIL21
-void set_intransition(const lib::transition_info *info);
-void start_outtransition(const lib::transition_info *info);
-#else
-void set_intransition(const lib::transition_info *info) { /* Ignore, for now */ }
-void start_outtransition(const lib::transition_info *info) { /* Ignore, for now */ }
-#endif
 //	void set_alignment(common::alignment *align) { /* Ignore, for now */ }
 //	void transition_freeze_end(lib::screen_rect<int> area) {}		  
 	void redraw(const lib::screen_rect<int> &dirty, common::gui_window *window) {}
@@ -127,9 +126,6 @@ void start_outtransition(const lib::transition_info *info) { /* Ignore, for now 
 	bool restart_audio_input();
 	int get_data(int bytes_wanted, Uint8 **ptr);
 	void get_data_done(int size);
-#ifdef USE_SMIL21
-	void get_transition_params(const lib::transition_info *info);
-#endif
 	net::audio_datasource *m_audio_src;
 	lib::critical_section m_lock;
 	
@@ -139,14 +135,6 @@ void start_outtransition(const lib::transition_info *info) { /* Ignore, for now 
 	bool m_audio_started;
 	int m_volcount;
 	float m_volumes[AMBULANT_MAX_CHANNELS];
-#ifdef USE_SMIL21
-	const lib::transition_info* m_intransition;
-	const lib::transition_info* m_outtransition;
-	lib::transition_info::time_type m_start_time;
-	lib::transition_info::time_type m_dur;
-	lib::transition_info::progress_type m_startProgress;
-	lib::transition_info::progress_type m_endProgress;
-#endif
 	// class methods and attributes:
 	static int init();
  	static void register_renderer(sdl_active_audio_renderer *rnd);
