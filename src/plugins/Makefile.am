@@ -20,7 +20,7 @@ endif
 # XXXX Need to set install directory
 
 lib_LTLIBRARIES = $(dummy_plugin) $(arts_plugin)
-AM_CPPFLAGS=-shared
+#AM_CPPFLAGS=-shared
 #LDADD=$(top_builddir)/src/libambulant/.libs/libambulant.a
 INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include \
 	 $(arts_includes)
