@@ -48,7 +48,7 @@
  */
 
 #include "ambulant/net/datasource.h"
-#include "ambulant/lib/memfile.h"
+#include "ambulant/net/databuffer.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -62,23 +62,26 @@ using namespace net;
 class mem_datasource : virtual public datasource, virtual public ambulant::lib::ref_counted_obj {  	
   public:
 	mem_datasource(const net::url &url)
-	:   m_memfile(url.get_url())
 	{
-		m_memfile.read();
+		const char *data = url.get_url().c_str() + 6; // strlen("data:,")
+		int datalen = strlen(data);
+		char *ptr = m_databuf.get_write_ptr(datalen);
+		memcpy(ptr, data, datalen);
+		m_databuf.pushdata(datalen);
 	}
 	~mem_datasource() {};
 
 	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) {
 		evp->add_event(callback, 0, ambulant::lib::event_processor::high);
 	};
-    void readdone(int len) { m_memfile.get_databuffer().readdone(len); };
+    void readdone(int len) { m_databuf.readdone(len); };
 	void stop() {};
 
-    bool end_of_file() { return m_memfile.get_databuffer().size() == 0; };
-	char* get_read_ptr() { return m_memfile.get_databuffer().get_read_ptr(); };
-	int size() const { return m_memfile.size(); } ;
+    bool end_of_file() { return m_databuf.size() == 0; };
+	char* get_read_ptr() { return m_databuf.get_read_ptr(); };
+	int size() const { return m_databuf.size(); } ;
   private:
-	lib::memfile m_memfile;
+	databuffer m_databuf;
 };
 
 // *********************** audio_format_choices ***********************************************
@@ -219,10 +222,10 @@ datasource_factory::new_raw_datasource(const net::url &url)
     }
 	// Check for a data: url
 	if (lib::starts_with(url.get_url(), "data:")) {
-		/*AM_DBG*/ lib::logger::get_logger()->trace("new_raw_datasource: returning mem_datasource");
+		AM_DBG lib::logger::get_logger()->trace("new_raw_datasource: returning mem_datasource");
 		return new mem_datasource(url);
 	}
-	lib::logger::get_logger()->warn("datasource_factory::new_raw_datasource: no datasource for %s\n", repr(url).c_str());
+	lib::logger::get_logger()->warn("datasource_factory::new_raw_datasource: no datasource for \"%s\"\n", repr(url).c_str());
     return NULL;
 }
 

@@ -68,9 +68,9 @@
 using namespace ambulant;
 
 #ifndef AMBULANT_PLATFORM_WIN32_WCE
-const std::string url_delim = ":/?#";
+const std::string url_delim = ":/?#,";
 #else
-const std::string url_delim = ":/?#\\";
+const std::string url_delim = ":/?#\\,";
 #endif
 
 // static 
@@ -94,7 +94,9 @@ void net::url::init_statics() {
 	static handler_pair h4 = { "n:///", &url::set_from_localhost_file_uri};
  	s_handlers.push_back(&h4);
 
-	// XXX Could be relative
+	static handler_pair h4a = { "n:,", &url::set_from_data_uri};
+ 	s_handlers.push_back(&h4a);
+
 	static handler_pair h5 = {"/n", &url::set_from_unix_path};
  	s_handlers.push_back(&h5);
 
@@ -204,6 +206,15 @@ void net::url::set_from_relative_path(lib::scanner& sc, const std::string& pat) 
 	AM_DBG lib::logger::get_logger()->trace("url::set_from_relative_path: \"%s\" -> \"%s\"", pat.c_str(), m_path.c_str());
 }
 
+// pat: "data:,"
+void net::url::set_from_data_uri(lib::scanner& sc, const std::string& pat) {
+	m_absolute = true;
+	m_protocol = "data";
+	m_host = "";
+	m_port = 0;
+	m_path = sc.join(3);  // Skip data:,
+}
+
 void net::url::set_parts(lib::scanner& sc, const std::string& pat) {
 	const std::string& toks = sc.get_tokens();
 	size_type n = toks.length();
@@ -220,9 +231,9 @@ void net::url::set_parts(lib::scanner& sc, const std::string& pat) {
 
 bool net::url::is_local_file() const
 {
-	if (m_protocol == "file" && m_host == "localhost")
+	if (m_protocol == "file" && (m_host == "localhost" || m_host == ""))
 		return true;
-	if (!m_absolute) {
+	if (!m_absolute && m_protocol == "") {
 		// We're not sure.
 		lib::logger::get_logger()->warn("url::is_local_file: assume True for relative url: \"%s\"", repr(*this).c_str());
 		return true;

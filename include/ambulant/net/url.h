@@ -192,6 +192,9 @@ class url {
 	
 	// pat: "n"
 	void set_from_relative_path(ambulant::lib::scanner& sc, const std::string& pat);
+
+	// pat: "n:,"
+	void set_from_data_uri(ambulant::lib::scanner& sc, const std::string& pat);
 	
 };
 
@@ -264,6 +267,8 @@ inline std::string repr(const ambulant::net::url& u) {
 	if(u.get_protocol() == "file") {
 		os << u.get_protocol() << "://" << 
 			((u.get_host()=="localhost")?"":u.get_host()) << "/" << u.get_path();
+	} else if (u.get_protocol() == "data") {
+		os << "data:," << u.get_path();
 	} else {
 		os << u.get_protocol() << "://" << u.get_host() << "/" << u.get_path();
 	}
