@@ -84,7 +84,7 @@ namespace qt_renderer {
 				const node *node,
     			event_processor *const evp,
 			    net::passive_datasource *src,
-			    passive_region *const dest)
+			    rendering_surface *const dest)
       : active_final_renderer(context, cookie, node, evp, src, dest),
       m_text_storage(NULL){}
     ~qt_active_text_renderer();
