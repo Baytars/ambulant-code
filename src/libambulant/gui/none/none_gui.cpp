@@ -52,7 +52,6 @@
 
 #include "ambulant/gui/none/none_gui.h"
 #include "ambulant/common/renderer.h"
-#include "ambulant/common/region.h"
 #include "ambulant/lib/logger.h"
 
 using namespace ambulant;
