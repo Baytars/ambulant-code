@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2004-09-12 15:08+0200\n"
+"POT-Creation-Date: 2004-09-16 23:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,4 +33,18 @@ msgstr ""
 
 #: src/libambulant/lib/tree_builder.cpp:186
 msgid "Could not create any XML parser (configuration error?)"
+msgstr ""
+
+#: src/player_macosx/mainloop.cpp:150
+#, c-format
+msgid "%s: Cannot build DOM tree"
+msgstr ""
+
+#: src/player_macosx/mainloop.cpp:181
+#, c-format
+msgid "%s: Cannot open"
+msgstr ""
+
+#: src/player_macosx/mainloop.cpp:214
+msgid "Cannot play document: no player"
 msgstr ""

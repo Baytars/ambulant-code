@@ -107,7 +107,7 @@ src/libambulant/lib/tree_builder.cpp
 # src/libambulant/smil2/timegraph.cpp
 # src/libambulant/smil2/trace_player.cpp
 # src/libambulant/smil2/transition.cpp
-# src/player_macosx/mainloop.cpp
+src/player_macosx/mainloop.cpp
 # src/player_mfc/AmbulantPlayer.cpp
 # src/player_mfc/MainFrm.cpp
 # src/player_mfc/MmDoc.cpp

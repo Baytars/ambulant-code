@@ -56,6 +56,7 @@
 #endif
 
 // XXXX Should go elsewhere
+#include "ambulant/config/config.h"
 #include "ambulant/lib/amstream.h"
 #include "ambulant/lib/byte_buffer.h"
 #include "ambulant/lib/logger.h"
@@ -115,6 +116,10 @@ initialize_logger()
 	mypreferences::install_singleton();
 	// Install our logger
 	initialize_logger();
+	// Initialize the gettext library
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
+
 	// Initialize the default system test settings
 	NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
 	NSString *systemTestSettingsPath = [thisBundle pathForResource:@"systemTestSettings" ofType:@"xml"];

@@ -64,6 +64,12 @@ extra_xerces_DEFINES=
 extra_xerces_LDADD=
 endif
 
+#if USE_NLS
+extra_nls_DEFINES=-DLOCALEDIR=\"$(datadir)/locale\"
+#else
+#extra_nls_DEFINES=
+#endif
+
 # Building a MacOSX .app bundle is a bit tricky.
 noinst_PROGRAMS = cocoambulant_executable
 cocoambulant_executable_SOURCES= \
@@ -135,7 +141,8 @@ INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include \
     $(extra_expat_DEFINES) \
     $(extra_xerces_DEFINES) \
 	$(extra_sdl_DEFINES) \
-	$(extra_ffmpeg_DEFINES)
+	$(extra_ffmpeg_DEFINES) \
+	$(extra_nls_DEFINES)
 
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
