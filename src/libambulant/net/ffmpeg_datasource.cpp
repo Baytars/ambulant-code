@@ -562,6 +562,7 @@ ffmpeg_audio_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_audio_datasource::get_dur()
 {
+	if (m_con) lib::logger::get_logger()->debug("ffmpeg_audio_datasource::get_dur: duration=%f", (double)m_con->duration);
 	return std::pair<bool, double>(false, 0.0);
 }
 
@@ -1011,6 +1012,7 @@ ffmpeg_video_datasource::get_frame(double *timestamp, int *size)
 std::pair<bool, double>
 ffmpeg_video_datasource::get_dur()
 {
+	if (m_con) lib::logger::get_logger()->debug("ffmpeg_video_datasource::get_dur: duration=%f", (double)m_con->duration);
 	return std::pair<bool, double>(false, 0.0);
 }
 
@@ -1332,6 +1334,7 @@ ffmpeg_decoder_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_decoder_datasource::get_dur()
 {
+//	if (m_con) lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_dur: duration=%f", (double)m_con->duration);
 	return std::pair<bool, double>(false, 0.0);
 }
 
