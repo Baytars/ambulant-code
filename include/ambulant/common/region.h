@@ -36,22 +36,22 @@ class passive_region {
 	
 	passive_region() 
 	:	m_name("unnamed"),
-		m_inner_bounds(screen_rect<int>(0, 0, 0, 0)),
-		m_outer_bounds(screen_rect<int>(0, 0, 0, 0)),
+		m_inner_bounds(screen_rect<int>()),
+		m_outer_bounds(screen_rect<int>()),
 		m_window_topleft(point(0, 0)),
 		m_parent(NULL),
 		m_cur_active_region(NULL) {}
 	passive_region(const std::string &name)
 	:	m_name(name),
-		m_inner_bounds(screen_rect<int>(0, 0, 0, 0)),
-		m_outer_bounds(screen_rect<int>(0, 0, 0, 0)),
+		m_inner_bounds(screen_rect<int>()),
+		m_outer_bounds(screen_rect<int>()),
 		m_window_topleft(point(0, 0)),
 		m_parent(NULL),
 		m_cur_active_region(NULL) {}
 	virtual ~passive_region() {}
 	
 	virtual void show(active_region *cur);
-	virtual void redraw(const screen_rect<int> &r, passive_window *window);
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window);
 
 	virtual passive_region *subregion(const std::string &name, screen_rect<int> bounds);
 	active_region *activate(event_processor *const evp, const node *node);
@@ -65,6 +65,7 @@ class passive_region {
 		m_parent(parent),
 		m_cur_active_region(NULL) {}
 	virtual void need_redraw(const screen_rect<int> &r);
+	const screen_rect<int>& get_rect() const { return m_inner_bounds; }
 
   	std::string m_name;					// for debugging
   	screen_rect<int> m_inner_bounds;	// region rectangle (0, 0) based
@@ -84,7 +85,7 @@ class passive_region {
 class passive_window : public passive_region {
   public:
   	passive_window(const std::string &name, size bounds)
-  	:	passive_region(name, NULL, screen_rect<int>(0, 0, bounds.w, bounds.h),
+  	:	passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)),
 		point(0, 0)) {}
   	virtual ~passive_window() {}
   	
@@ -114,12 +115,13 @@ class active_region {
 	virtual ~active_region() {}
 	
 	virtual void show(active_renderer *renderer);
-	virtual void redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft);
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft);
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_redraw();
 	virtual void done();	
+	const screen_rect<int>& get_rect() const { return m_source->get_rect(); }
 
-  private:
+  protected:
   	event_processor *const m_event_processor;
 	passive_region *const m_source;
 	const node *m_node;

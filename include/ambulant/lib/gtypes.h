@@ -293,9 +293,6 @@ class screen_rect {
 	screen_rect() 
 	:	m_left(0), m_top(0), m_right(0), m_bottom(0) {}
 	
-	screen_rect(T l, T t, T r, T b) 
-	:	m_left(l), m_top(t), m_right(r), m_bottom(b) {}
-	
 	screen_rect(const screen_rect<T>& o) 
 	:	m_left(o.m_left), m_top(o.m_top), m_right(o.m_right), m_bottom(o.m_bottom) {}
 	
