@@ -64,6 +64,7 @@
 #include "ambulant/smil2/smil_player.h"
 #include "ambulant/smil2/timegraph.h"
 #include "ambulant/smil2/smil_layout.h"
+#include "ambulant/smil2/smil_animation.h"
 
 //#define AM_DBG
 
@@ -340,6 +341,10 @@ smil_player::new_playable(const lib::node *n) {
 	std::string tag = n->get_local_name();
 	const char *pid = n->get_attribute("id");
 	
+	if (tag == "animate") {
+		/*AM_DBG*/ m_logger->trace("%s[%s].new_playable returning animation_playable", tag.c_str(), (pid?pid:"no-id"));
+		return new animation_playable(this, nid, n, m_event_processor, m_layout_manager);
+	}
 	surface *surf = m_layout_manager->get_surface(n);
 	AM_DBG m_logger->trace("%s[%s].new_playable  rect%s at %s", tag.c_str(), (pid?pid:"no-id"),
 		::repr(surf->get_rect()).c_str(),
