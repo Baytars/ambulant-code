@@ -66,7 +66,7 @@ inline double round(double v) {return floor(v+0.5);}
 #endif
 
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -452,7 +452,7 @@ active_video_renderer::data_avail()
 			m_src->frame_done(ts2, true);
 			if (!m_src->end_of_file()) {
 				lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
-				m_src->start_frame (m_event_processor, e, ts);
+				m_src->start_frame (m_event_processor, e, ts2);
 			}
 		} else {
 			lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
