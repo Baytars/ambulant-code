@@ -53,7 +53,10 @@
 #include<stdlib.h>
 #include<dirent.h>
 #include<string.h>
+
+#ifdef	WITH_PLUGINS
 #include <ltdl.h>
+#endif/*WITH_PLUGINS*/
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -79,6 +82,7 @@ int filter(const struct dirent* filen)
 
 plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::datasource_factory* df)
 {
+#ifdef	WITH_PLUGINS
 	int nr_of_files;
 	int errors;
 	char filename[1024];
@@ -135,4 +139,5 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 		free(namelist);
 		}
 	}
+#endif/*WITH_PLUGINS*/
 }
