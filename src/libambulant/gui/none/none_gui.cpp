@@ -59,13 +59,13 @@ using namespace ambulant;
 using namespace lib;
 
 void
-gui::none::none_active_renderer::start(lib::event *playdone)
+gui::none::none_active_renderer::start(double where)
 {
 	lib::logger::ostream os = lib::logger::get_logger()->trace_stream();
 	os << "none_active_renderer.start(" << (void *)this;
 	os << ", node=" << *m_node;
 	os << ")" << lib::endl;
-	lib::active_renderer::start(playdone);
+	lib::active_renderer::start(where);
 }
 
 void
@@ -81,12 +81,14 @@ gui::none::none_active_renderer::stop()
 }
 
 active_renderer *
-gui::none::none_renderer_factory::new_renderer(event_processor *const evp,
-	net::passive_datasource *src,
-	passive_region *const dest,
-	const node *node)
+gui::none::none_renderer_factory::new_renderer(
+	lib::playable_events *context,
+		const lib::node *node,
+		lib::event_processor *const evp,
+		net::passive_datasource *src,
+		lib::passive_region *const dest)
 {
-	return new none_active_renderer(evp, src, dest, node);
+	return new none_active_renderer(context, node, evp, src, dest);
 }
 
 passive_window *

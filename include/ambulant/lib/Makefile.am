@@ -25,5 +25,4 @@ library_include_HEADERS= \
 	string_util.h \
 	thread.h \
 	timer.h \
-	tree_builder.h \
-	vnode.h
+	tree_builder.h
