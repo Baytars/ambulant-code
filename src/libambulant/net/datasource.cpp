@@ -149,7 +149,7 @@ void net::databuffer::prepare(char* in_ptr)
 {
     if(!m_buffer_full) {
         in_ptr = m_front;
-        m_buffer = (char*) realloc(m_buffer, m_size);
+        m_buffer = (char*) realloc(m_buffer, m_size + BUFSIZ);
         if (!m_buffer) {
             lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
         }
@@ -162,7 +162,7 @@ void net::databuffer::prepare(char* in_ptr)
 void net::databuffer::pushdata(int size)
 {
     if(!m_buffer_full) {
-        m_size = m_size +size;
+        m_size  += size;
         m_front += size;
         m_used = m_front -m_rear;
         m_buffer = (char*) realloc(m_buffer, m_size);
