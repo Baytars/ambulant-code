@@ -744,7 +744,7 @@ audio_transition_engine::audio_transition_engine(const lib::event_processor* evp
 	m_dur(0),
 	m_intransition(NULL),
 	m_outtransition(NULL) {
-  AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::audio_transition_engine(0x%x",this);
+	AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::audio_transition_engine(0x%x",this);
 }
 
 void
@@ -773,7 +773,8 @@ const double
 audio_transition_engine::get_volume(const double soundlevel) {
 	double progress;
 	lib::transition_info::time_type now;
-	if (m_dur == 0)
+	if (m_dur == 0 || ! (m_intransition || m_outtransition))
+		// no transition or transition finished
 		return soundlevel;
 	now = m_event_proc->get_timer()->elapsed();
 	if (m_intransition && now >= m_start_time + m_dur) {
@@ -788,7 +789,7 @@ audio_transition_engine::get_volume(const double soundlevel) {
 	if (progress > m_endProgress) progress = m_endProgress;
 	if (progress < m_startProgress) progress = m_startProgress;
 	AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::get_transition_volume(0x%x): soundlevel=%f m_intransition=0x%x  m_outtransition=0x%x now=%d indur=%d outdur=%d progress=%f",this,soundlevel,m_intransition,m_outtransition,now,m_intransition?m_intransition->m_dur:-317,m_outtransition?m_outtransition->m_dur:-318,progress);
-	double level;
+	double level = soundlevel;
 	if (m_outtransition)
 		level *= (1.0 - progress);
 	else

@@ -76,12 +76,7 @@ namespace ambulant {
 namespace gui {
 namespace sdl {	  
 
-#ifdef USE_SMIL21
-class sdl_active_audio_renderer : public common::renderer_playable, public smil2::audio_transition_engine {
-#endif
-#ifndef USE_SMIL21
 class sdl_active_audio_renderer : public common::renderer_playable {
-#endif
 
   public:
 	sdl_active_audio_renderer(
@@ -121,6 +116,10 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 //	void transition_freeze_end(lib::screen_rect<int> area) {}		  
 	void redraw(const lib::screen_rect<int> &dirty, common::gui_window *window) {}
 	static void sdl_callback(Uint8 *stream, int len);
+#ifdef USE_SMIL21
+	void set_intransition(const lib::transition_info* info);
+	void start_outtransition(const lib::transition_info* info);
+#endif
   private:
    	void data_avail();
 	bool restart_audio_input();
@@ -135,6 +134,11 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 	bool m_audio_started;
 	int m_volcount;
 	float m_volumes[AMBULANT_MAX_CHANNELS];
+#ifdef USE_SMIL21
+	const lib::transition_info* m_intransition;
+	const lib::transition_info* m_outtransition;
+	smil2::audio_transition_engine* m_transition_engine;
+#endif
 	// class methods and attributes:
 	static int init();
  	static void register_renderer(sdl_active_audio_renderer *rnd);
