@@ -69,6 +69,8 @@ class none_window : public lib::abstract_window {
   	:	lib::abstract_window(region) {};
   		
 	void need_redraw(const lib::screen_rect<int> &r) { m_region->redraw(r, this); };
+//	void need_events(lib::abstract_mouse_region *rgn) {};
+        void mouse_region_changed() {};
 };
 
 class none_window_factory : public lib::window_factory {
