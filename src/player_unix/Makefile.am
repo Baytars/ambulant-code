@@ -2,14 +2,14 @@ qt_gui-moc.cpp: qt_gui.h qt_gui.cpp
 	$(QT_PREFIX)/bin/moc -o $@ $<
 
 liveincludes = -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/include \
-			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/include \
-			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/include \
-			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/include
+			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/include \
+			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/include \
+			   -I/data/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/include
 
-livelibs	= -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/ -lliveMedia \
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/ -lgroupsock  \
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/ -lUsageEnvironment
+livelibs	= -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/ -lliveMedia \
+			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
+			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/ -lgroupsock  \
+			  -L/data/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/ -lUsageEnvironment
 
 bin_PROGRAMS = AmbulantPlayer
 AmbulantPlayer_SOURCES =					\

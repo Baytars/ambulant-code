@@ -10,5 +10,5 @@ library_include_HEADERS= \
 	ffmpeg_datasource.h \
 	ffmpeg_rawdatasource.h \
 	raw_video_datasource.h \
-	rtsp_datasource.h \ 
+	rtsp_datasource.h \
 	rtsp_factory.h
