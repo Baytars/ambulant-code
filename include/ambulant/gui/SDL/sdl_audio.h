@@ -135,6 +135,8 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 	int m_volcount;
 	float m_volumes[AMBULANT_MAX_CHANNELS];
 #ifdef USE_SMIL21
+	const lib::transition_info* m_intransition;
+	const lib::transition_info* m_outtransition;
 	smil2::audio_transition_engine* m_transition_engine;
 #endif
 	// class methods and attributes:

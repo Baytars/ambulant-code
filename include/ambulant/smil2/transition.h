@@ -381,36 +381,28 @@ class transition_engine_fade : virtual public transition_blitclass_fade {
   protected:
 	void compute();
 };
-
 #ifdef USE_SMIL21
-#include "ambulant/lib/event_processor.h"
 
 class abstract_audio_transition_engine {
   public:
-	virtual void set_intransition(const lib::transition_info* info) = 0;
-	virtual void start_outtransition(const lib::transition_info* info) = 0;
 	virtual const double get_volume(const double soundlevel) = 0;
+	virtual const bool is_done(lib::transition_info::time_type now) = 0;
 };
 
 class audio_transition_engine :  virtual public abstract_audio_transition_engine {
   public:
-	audio_transition_engine(const lib::event_processor* evp);
-	void set_intransition(const lib::transition_info* info);
-	void start_outtransition(const lib::transition_info* info);
+	audio_transition_engine(const lib::event_processor* evp, bool is_intransition, const lib::transition_info* info);
 	const double get_volume(const double soundlevel);
-
-	const lib::transition_info* m_intransition;
-	const lib::transition_info* m_outtransition;
+	const bool is_done(lib::transition_info::time_type now);
 
   protected:
 	lib::transition_info::time_type m_start_time;
 	lib::transition_info::time_type m_dur;
 	lib::transition_info::progress_type m_startProgress;
 	lib::transition_info::progress_type m_endProgress;
+	const bool m_is_intransition;
 
   private:
-	void get_transition_params(const lib::transition_info *info);
-
 	const lib::event_processor* m_event_proc;
 };
 #endif                                   
