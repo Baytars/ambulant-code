@@ -90,7 +90,7 @@ class active_playable : virtual public playable, virtual public lib::ref_counted
     cookie_type m_cookie;
 };
 
-class active_basic_renderer : public active_playable, public abstract_rendering_source {
+class active_basic_renderer : public active_playable, public renderer {
   public:
   	active_basic_renderer()
   	:	active_playable((playable_notification *)NULL, 0),
@@ -143,8 +143,7 @@ class active_renderer : public active_basic_renderer {
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-		net::passive_datasource *src,
-		abstract_rendering_surface *const dest);
+		net::passive_datasource *src);
 		
 	~active_renderer() {}
 	
@@ -157,13 +156,14 @@ class active_renderer : public active_basic_renderer {
 
 	virtual void redraw(const lib::screen_rect<int> &dirty, abstract_window *window) = 0;
 	virtual void user_event(const lib::point &where) { clicked_callback(); }
-	virtual abstract_rendering_surface *get_rendering_surface() { return m_dest;}
+	virtual void set_surface(surface *dest) { m_dest = dest; }
+	virtual surface *get_surface() { return m_dest;}
 	
   protected:
 	virtual void readdone();
 
   	net::active_datasource *m_src;
-	abstract_rendering_surface *const m_dest;
+	surface *m_dest;
 //	lib::event *m_readdone;
 };
 
@@ -178,9 +178,8 @@ class active_final_renderer : public active_renderer {
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-		net::passive_datasource *src,
-		abstract_rendering_surface *const dest)
-	:	active_renderer(context, cookie, node, evp, src, dest),
+		net::passive_datasource *src)
+	:	active_renderer(context, cookie, node, evp, src),
 		m_data(NULL),
 		m_data_size(0) {};
 	virtual ~active_final_renderer();
@@ -194,37 +193,35 @@ class active_final_renderer : public active_renderer {
 
 
 // Foctory class for renderers.
-class abstract_smil_region_info;
+class region_info;
 
-class renderer_factory {
+class playable_factory {
   public:
-	virtual ~renderer_factory() {};
-	virtual active_basic_renderer *new_renderer(
+	virtual ~playable_factory() {};
+	virtual active_basic_renderer *new_playable(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-		net::passive_datasource *src,
-		abstract_rendering_surface *const dest) = 0;
+		net::passive_datasource *src) = 0;
 };
 
-class global_renderer_factory : public renderer_factory {
+class global_playable_factory : public playable_factory {
   public:
-    global_renderer_factory();
-    ~global_renderer_factory();
+    global_playable_factory();
+    ~global_playable_factory();
     
-    void add_factory(renderer_factory *rf);
+    void add_factory(playable_factory *rf);
     
-    active_basic_renderer *new_renderer(
+    active_basic_renderer *new_playable(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-		net::passive_datasource *src,
-		abstract_rendering_surface *const dest);
+		net::passive_datasource *src);
   private:
-    std::vector<renderer_factory *> m_factories;
-    renderer_factory *m_default_factory;
+    std::vector<playable_factory *> m_factories;
+    playable_factory *m_default_factory;
 };
 
 
