@@ -151,10 +151,8 @@ class ffmpeg_resample_datasource: virtual public audio_datasource, virtual publi
 	char* get_read_ptr();
 	int size() const;   
 	
-  	int set_input_format(net::audio_context fmt);
-  	int set_output_format(net::audio_context fmt);
-  
-    
+  	int set_format(net::audio_context in_fmt, net::audio_context out_fmt); 
+   
 	int get_input_format(net::audio_context &fmt);  
   	int get_output_format(net::audio_context &fmt);
   	
