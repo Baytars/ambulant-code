@@ -112,6 +112,46 @@ struct audio_format {
 		bits(0) {};
 };
 
+struct video_format {
+	std::string name;	///< Name of the format, or empty for linear samples
+	void *parameters;	///< For a named format, pointer to parameters
+	int framerate;		///< For linear samples: the samplerate
+	int width;			/// The width of the video
+	int height;			///	The height of the video
+	
+	/// Default constructor: creates unknown audio_format.
+	video_format()
+	:   name("unknown"),
+		parameters(NULL),
+		framerate(0),
+		width(0),
+		height(0) {};
+		
+	/// Constructor for linear samples.
+	video_format(int r, int w, int h)
+	:   name(""),
+		parameters(NULL),
+		framerate(r),
+		width(w),
+		height(h) {};
+	
+	/// Constructor for named video_format.
+	video_format(std::string &n, void *p=(void *)0)
+	:   name(n),
+		parameters(p),
+		framerate(0),
+		width(0),
+		height(0) {};
+		
+	/// Constructor for named video_format.
+	video_format(const char *n, void *p=(void *)0)
+	:   name(n),
+		parameters(p),
+		framerate(0),
+		width(0),
+		height(0) {};
+};
+
 #ifdef __OBJC__
 // This is a workaround for a problem when using gcc 3.3 to compile
 // ObjC++
@@ -242,7 +282,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// Return the current video frame.
 	/// Should only be called from the callback routine.
 	/// The timestamp of the frame and the size of the data are also returned.
-  	virtual char* get_frame(double *timestamp, int *size) = 0; 
+  	virtual char* get_frame(timestamp_t *timestamp, int *size) = 0; 
 
 	/// Returns the width of the image returned by get_frame.
 	virtual int width() = 0;
@@ -253,7 +293,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// Called by the client to indicate all frames up to timestamp are consumed.
 	/// If keepdata is set the actual storage for a frame with an exact
 	/// timestamp match is not freed.
-  	virtual void frame_done(double timestamp, bool keepdata) = 0;
+  	virtual void frame_done(timestamp_t timestamp, bool keepdata) = 0;
 };
 
 /// Interface to create a datasource for a given URL.
