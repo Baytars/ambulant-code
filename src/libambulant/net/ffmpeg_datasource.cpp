@@ -424,7 +424,7 @@ detail::ffmpeg_demux::run()
 		assert(pkt->stream_index >= 0 && pkt->stream_index < MAX_STREAMS);
 		detail::datasink *sink = m_sinks[pkt->stream_index];
 		if (sink == NULL) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, 0x%x, %d)", pkt->stream_index, pkt->pts ,pkt->data, pkt->size);
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, 0x%x, %d)", pkt->stream_index, pkt->pts ,pkt->data, pkt->size);
 		} else {
 			AM_DBG lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink");
 			// Wait until there is room in the buffer
@@ -453,14 +453,14 @@ detail::ffmpeg_demux::run()
 					pts = (timestamp_t) round(((double) pkt->pts * (((double) num)*1000000)/den));
 #endif/*WITH_FFMPEG_0_4_9*/
 				}
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pkt->pts, pkt->data, pkt->size);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pkt->pts, pkt->data, pkt->size);
 				sink->data_avail(pts, pkt->data, pkt->size);
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: final data_avail(0, 0)");
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final data_avail(0, 0)");
 	int i;
 	for (i=0; i<MAX_STREAMS; i++)
 		if (m_sinks[i])
@@ -584,7 +584,7 @@ demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 	// XXX timestamp is ignored, for now
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available", sz);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", sz, pts);
 	if(sz && !m_buffer.buffer_full()){
 		uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(sz);
 		if (outbuf) {
@@ -812,9 +812,10 @@ demux_video_datasource::frame_done(timestamp_t pts, bool keepdata)
 void 
 demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 {
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): recieving data%", m_src_end_of_file);
-	m_src_end_of_file = !(sz == 0);
 	m_lock.enter();
+
+	m_src_end_of_file = (sz == 0);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): recieving data sz=%d ,eof=%d", sz, m_src_end_of_file);
 	if(sz > 0) {
 		char* frame_data = (char*) malloc(sz);
 		assert(frame_data);
@@ -853,7 +854,11 @@ bool
 demux_video_datasource::_end_of_file()
 {
 	// private method - no need to lock
-	if (m_frames.size()) return false;
+	if (m_frames.size()) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() returning false (still %d frames in local buffer)",m_frames.size());
+		return false;
+	}
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() no frames in buffer returning %d", m_src_end_of_file);
 	return m_src_end_of_file;
 }
 
@@ -1176,7 +1181,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 						pts = ipts;
 						
 
-						AM_DBG lib::logger::get_logger()->debug("pts seems to be : %f",pts / 1000000.0);
+						/*AM_DBG*/ lib::logger::get_logger()->debug("pts seems to be : %f",pts / 1000000.0);
 						pts1 = pts;
 						
 						if (m_con->has_b_frames && frame->pict_type != FF_B_TYPE) {
@@ -1270,7 +1275,10 @@ bool
 ffmpeg_video_decoder_datasource::_end_of_file()
 {
 	// private method - no need to lock
-	if (m_frames.size() > 0) return false;
+	if (m_frames.size() > 0)  {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_end_of_file() returning false (still %d frames in local buffer)", m_frames.size());
+			return false;
+	}
 	return m_src->end_of_file();
 }
 
