@@ -70,9 +70,9 @@ net::databuffer::databuffer()
 {
 	m_used = 0;
     m_size = 0;
-	m_front = NULL;
-    m_rear = NULL;
+    m_rear = 0;
     m_max_size = DEFAULT_MAX_BUF_SIZE;
+	AM_DBG lib::logger::get_logger()->trace("active_datasource.databuffer(): [size = %d, max size = %d]",m_size, m_max_size);
 	m_buffer = NULL;
     m_buffer_full = false;
 }
@@ -100,14 +100,14 @@ net::databuffer::databuffer(int max_size)
 {
     m_used = 0;
     m_size = 0;
-    m_rear = NULL;
-    m_front = NULL;
+    m_rear = 0;
 	m_buffer = NULL;
     if (max_size > 0) {
         m_max_size = max_size;
     } else {
         m_max_size = DEFAULT_MAX_BUF_SIZE;
     }
+	AM_DBG lib::logger::get_logger()->trace("active_datasource.databuffer(%d): [size = %d, max size = %d]",max_size, m_size, m_max_size);
     m_buffer_full = false;
 }
 
@@ -118,9 +118,8 @@ net::databuffer::~databuffer()
 		free(m_buffer);
 		m_used = 0;
 		m_size = 0;
-                m_rear = NULL;
-                m_front = NULL;
-		m_buffer = NULL;
+        m_rear = 0;
+        m_buffer = NULL;
 	}
 }
 
@@ -135,9 +134,10 @@ int i;
 
 os << "BUFFER SIZE : " << m_size << " bytes" << std::endl;
 os << "BYTES USED : " << m_used << " bytes" << std::endl;
+os << "m_rear   : " << m_rear << std::endl;
 if (verbose) {
 	if (m_buffer) {
-		for (i = 0;i < m_used;i++) {
+		for (i = m_rear;i < m_size;i++) {
 	   		os << m_buffer[i];
 	   		}
 	   	}
@@ -145,22 +145,19 @@ if (verbose) {
  os << std::endl;
 }
 
-
 char *
 net::databuffer::prepare()
 {
-	AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: start");
+	AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: start BUFSIZ = %d", BUFSIZ);
 	
     if(!m_buffer_full) {
         m_buffer = (char*) realloc(m_buffer, m_size + BUFSIZ);
-		if (m_front == NULL) m_front = m_buffer;
-		if (m_rear == NULL) m_rear = m_buffer;
 		AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: buffer realloc done (%x)",m_buffer);
         if (!m_buffer) {
             lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
         }
-		AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: returning m_front (%x)",m_front);
-		return m_front;
+		AM_DBG lib::logger::get_logger()->trace("databuffer.prepare: returning m_front (%x)",m_buffer + m_size);
+		return (m_buffer + m_size);
     } else {
         lib::logger::get_logger()->warn("databuffer::databuffer::prepare : buffer full but still trying to fill it ");
 		return NULL;
@@ -171,9 +168,9 @@ net::databuffer::prepare()
 void net::databuffer::pushdata(int size)
 {
     if(!m_buffer_full) {
-        m_size  += size;
-        m_front += size;
-        m_used = m_front - m_rear;
+        m_size += size;
+		AM_DBG lib::logger::get_logger()->trace("active_datasource.pushdata:size = %d ",size);
+        m_used = m_size - m_rear;
         m_buffer = (char*) realloc(m_buffer, m_size);
          if (!m_buffer) {
              lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
@@ -191,7 +188,7 @@ void net::databuffer::pushdata(int size)
 char *
 net::databuffer::get_read_ptr()
 {
-return m_rear;
+return (m_buffer + m_rear);
 }
 
 void
@@ -199,7 +196,7 @@ net::databuffer::readdone(int size)
 {
     if (size <= m_used) {
         m_rear += size;
-        m_used = m_front - m_rear;
+        m_used = m_size - m_rear;
     }
 }
 
@@ -299,7 +296,7 @@ net::active_datasource::read(char *data, int size)
     char* in_ptr;
     if (size <= m_buffer->used()) {
             in_ptr = m_buffer->get_read_ptr();
-            memcpy(in_ptr,data,size);
+            memcpy(data,in_ptr,size);
             m_buffer->readdone(size);
     }
 }
@@ -315,11 +312,13 @@ net::active_datasource::read_file()
 			AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: getting buffer pointer");
             buf = m_buffer->prepare();
 			AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: buffer ptr : %x", buf);
-			if (!buf) {
+			if (buf) {
 				AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: start reading %d bytes", BUFSIZ);
 				n = ::read(m_stream, buf, BUFSIZ);
+				AM_DBG lib::logger::get_logger()->trace("active_datasource.readfile: done reading %d bytes", n);
+				if (n > 0) m_buffer->pushdata(n); 
 			}
-			if (n >= 0) m_buffer->pushdata(n); 
+		
 		} while (n > 0);
 		m_end_of_file = true;
 		if (n < 0) {

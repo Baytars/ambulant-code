@@ -89,8 +89,8 @@ class databuffer
  private: 
     
 	char* m_buffer; 			
-	char* m_rear;
-	char* m_front; 
+	unsigned long int m_rear;
+	
 	
 	unsigned long int m_size;  			
  	unsigned long int m_max_size; 														 
