@@ -50,6 +50,7 @@
 #include "ambulant/net/ffmpeg_datasource.h" 
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/logger.h"
+#include "ambulant/net/url.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -63,6 +64,23 @@ typedef lib::no_arg_callback<net::ffmpeg_audio_datasource> readdone_callback;
 
 #define INBUF_SIZE 4096
 
+
+net::datasource* 
+net::ffmpeg_datasource_factory::new_datasource(const std::string& url, audio_context fmt, datasource *src,lib::event_processor *const evp)
+{
+	net::url   loc(url);
+	
+	datasource *ds = NULL;
+	if (src) {
+			// XXXX Here we have to check for the mime type.
+			ds = new ffmpeg_audio_datasource(src, evp);
+			// XXX Here we have to check if ext & fmt are supported by ffmpeg
+			if (ds) return ds;			
+		}
+	return NULL;	
+}
+
+		
 net::ffmpeg_audio_datasource::ffmpeg_audio_datasource(datasource *const src, lib::event_processor *const evp)
 :	m_codec(NULL),
 	m_con(NULL),

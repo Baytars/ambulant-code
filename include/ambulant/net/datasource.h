@@ -119,7 +119,7 @@ class audio_filter_datasource_factory  {
   public: 
 
     virtual ~audio_filter_datasource_factory() {}; 	
-  	virtual datasource* new_datasource(const std::string& url, audio_context fmt, datasource *src) = 0;
+  	virtual datasource* new_datasource(const std::string& url, audio_context fmt, datasource *src,lib::event_processor *const evp) = 0;
 };
 
 
@@ -153,7 +153,7 @@ class global_raw_datasource_factory  :public datasource_factory {
 
 
 
-class global_audio_datasource_factory : public audio_datasource_factory {
+class global_audio_datasource_factory  {
   public:
 	global_audio_datasource_factory(global_raw_datasource_factory *df) 
   	: m_raw_datasource_factory(df)  {};
@@ -162,7 +162,7 @@ class global_audio_datasource_factory : public audio_datasource_factory {
 	void add_factory(audio_datasource_factory *df);
 	void add_decoder_factory(audio_filter_datasource_factory *df);
 	void add_resample_factory(audio_filter_datasource_factory *df);
-	datasource* new_datasource(const std::string &url, audio_context fmt);
+	datasource* new_datasource(const std::string &url, audio_context fmt, lib::event_processor *const evp);
   
   private:
 	std::vector<audio_datasource_factory*> m_factories;

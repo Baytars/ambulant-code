@@ -100,7 +100,7 @@ net::global_audio_datasource_factory::add_resample_factory(audio_filter_datasour
 }
 
 net::datasource* 
-net::global_audio_datasource_factory::new_datasource(const std::string& url, audio_context fmt)
+net::global_audio_datasource_factory::new_datasource(const std::string& url, audio_context fmt, lib::event_processor *const evp)
 {
 	std::vector<audio_datasource_factory *>::iterator i;
 	std::vector<audio_filter_datasource_factory *>::iterator j;
@@ -121,7 +121,7 @@ net::global_audio_datasource_factory::new_datasource(const std::string& url, aud
 	if (!raw_src) return NULL;
 	
 	for(j=m_decoder_factories.begin(); j != m_decoder_factories.end(); j++) {
-        dec_src = (*j)->new_datasource(url, fmt, raw_src);
+        dec_src = (*j)->new_datasource(url, fmt, raw_src, evp);
         if (dec_src) break;
 	}
 	//XXX should we return the default here ?
@@ -129,8 +129,9 @@ net::global_audio_datasource_factory::new_datasource(const std::string& url, aud
 	// if we do it like this we don't need to supply the fmt to the decoder !
 //	if (!dec_src->suport(fmt)) {
 		for(j=m_resample_factories.begin(); j != m_resample_factories.end(); j++) {
-        	res_src = (*j)->new_datasource(url, fmt, dec_src);
+        	res_src = (*j)->new_datasource(url, fmt, dec_src, evp);
         	if (res_src) break;
     	}
 	//}
 }
+

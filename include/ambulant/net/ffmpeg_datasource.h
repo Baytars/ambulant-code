@@ -83,6 +83,12 @@ namespace ambulant
 
 namespace net
 {
+	
+class ffmpeg_datasource_factory : public audio_filter_datasource_factory {
+  public:
+	~ffmpeg_datasource_factory() {};
+	datasource* new_datasource(const std::string& url, audio_context fmt, datasource *src,lib::event_processor *const evp);
+};
 
 class ffmpeg_audio_datasource: virtual public audio_datasource, virtual public lib::ref_counted_obj {
   public:
