@@ -92,10 +92,11 @@ class cocoa_renderer_factory : public lib::renderer_factory {
   	cocoa_renderer_factory() {}
   	
 	lib::active_renderer *new_renderer(
+		lib::playable_events *context,
+		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
-		lib::passive_region *const dest,
-		const lib::node *node);
+		lib::passive_region *const dest);
 };
 
 } // namespace cocoa
