@@ -163,6 +163,8 @@ class region_node : public common::region_info {
 	
 	bool is_descendent_of(region_node *tn) const {return const_nnhelper::is_descendent(this, tn);}
 	
+	region_node *append_child(region_node *child) {return nnhelper::append_child(this, child);}
+	
 	region_node* get_first_child(const char *name) { return NULL; } // XXXX
 	const region_node* get_first_child(const char *name) const { return NULL; } // XXXX
 	

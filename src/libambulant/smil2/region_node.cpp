@@ -95,7 +95,10 @@ region_node::region_node(const lib::node *n, dimension_inheritance di)
 	m_bgcolor(lib::to_color(0,0,0)),
 	m_transparent(true),
 	m_showbackground(true),
-	m_inherit_bgcolor(false) {}
+	m_inherit_bgcolor(false),
+	m_parent(NULL),
+	m_child(NULL),
+	m_next(NULL) {}
 
 bool
 region_node::fix_from_dom_node()

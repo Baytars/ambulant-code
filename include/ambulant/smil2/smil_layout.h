@@ -71,17 +71,21 @@ class smil_layout_manager : public common::layout_manager {
 	
 	common::surface *get_surface(const lib::node *node);
   private:
-	void fix_document_layout(lib::document *doc);
+	void get_document_layout(lib::document *doc);
 	
 	common::surface *get_default_rendering_surface(const lib::node *n);
-	void build_layout_tree(common::window_factory *wf, const region_node *layout_root);
+	void build_surfaces(common::window_factory *wf);
 
 	common::surface_template *create_top_surface(common::window_factory *wf, 
 		const region_node *rn, common::renderer *bgrenderer);
 	
 	const common::schema *m_schema;
 	common::surface_factory *m_surface_factory;
-	std::vector<common::surface_template*> m_rootlayouts;
+	
+	region_node *m_layout_root;
+	region_node *m_first_root_layout;
+	
+	std::vector<common::surface_template*> m_rootsurfaces;
 	std::map<std::string, common::surface_template*> m_id2surface;
 	std::multimap<std::string, common::surface_template*> m_name2surface;
 };

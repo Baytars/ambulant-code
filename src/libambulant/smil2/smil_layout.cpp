@@ -61,7 +61,7 @@
 #include "ambulant/smil2/smil_layout.h"
 #include <stack>
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -78,19 +78,23 @@ common::create_smil2_layout_manager(common::window_factory *wf,lib::document *do
 
 smil_layout_manager::smil_layout_manager(common::window_factory *wf,lib::document *doc)
 :   m_schema(common::schema::get_instance()),
-	m_surface_factory(common::create_smil_surface_factory())
+	m_surface_factory(common::create_smil_surface_factory()),
+	m_layout_root(NULL),
+	m_first_root_layout(NULL)
 {
-	fix_document_layout(doc);
-	const region_node *layout_root = NULL; // doc->get_layout();
+	// First scan the DOM tree and create our own tree of region_node objects
+	get_document_layout(doc);
 
-	if (layout_root) {
-		build_layout_tree(wf, layout_root);
+	// Next, create the surfaces that correspond to this tree
+	if (m_layout_root) {
+		build_surfaces(wf);
 	} else {
 		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: no layout section");
 	}
+	
 	// Finally we make sure there is at least one root-layout. This allows us
 	// to use this as the default region. XXXX Should be auto-show eventually.
-	if (m_rootlayouts.empty()) {
+	if (m_rootsurfaces.empty()) {
 		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: no rootLayouts, creating one");
 		create_top_surface(wf, NULL, NULL);
 	}
@@ -100,13 +104,15 @@ smil_layout_manager::~smil_layout_manager()
 {
 	m_schema = NULL;
 	std::vector<common::surface_template*>::iterator i;
-	for (i=m_rootlayouts.begin(); i != m_rootlayouts.end(); i++)
+	for (i=m_rootsurfaces.begin(); i != m_rootsurfaces.end(); i++)
 		delete (*i);
+	// XXX Delete m_layout_root tree
 }
 
 void
-smil_layout_manager::fix_document_layout(lib::document *doc)
+smil_layout_manager::get_document_layout(lib::document *doc)
 {
+	std::stack<region_node *> stack;
 	// If we have a layout section already we're done
 	if (doc->get_layout()) {
 		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: using existing layout");
@@ -120,7 +126,6 @@ smil_layout_manager::fix_document_layout(lib::document *doc)
 		return;
 	}
 	lib::node *layout_root = head->get_first_child("layout");
-	region_node *layout = NULL; 
 	if (!layout_root) {
 		lib::logger::get_logger()->trace("smil_layout_manager: no <layout> section");
 		return;
@@ -134,8 +139,9 @@ smil_layout_manager::fix_document_layout(lib::document *doc)
 		std::pair<bool, lib::node*> pair = *it;
 		if (pair.first) {
 			level++;
-			if (level == 0) continue; // Skip layout section itself
+			//if (level == 0) continue; // Skip layout section itself
 			lib::node *n = pair.second;
+			AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::get_document_layout: examining %s", n->get_qname().second.c_str());
 			// Find inheritance type
 			common::layout_type tp = m_schema->get_layout_type(n->get_qname());
 			dimension_inheritance di;
@@ -149,11 +155,32 @@ smil_layout_manager::fix_document_layout(lib::document *doc)
 				di = di_parent;
 			}
 
+			// Put it in the tree
 			region_node *rn = new region_node(n, di);
 			rn->fix_from_dom_node();
+			if (stack.empty()) {
+				AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::get_document_layout: 0x%x is m_layout_root", (void*)rn);
+				if(m_layout_root != NULL) {
+					lib::logger::get_logger()->error("smil_layout_manager::get_document_layout: multiple layout roots!");
+				}
+				m_layout_root = rn;
+			} else {
+				region_node *parent = stack.top();
+				parent->append_child(rn);
+				AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::get_document_layout: 0x%x is child of 0x%x", (void*)rn, (void*)parent);
+			}
+			// In addition, remember the first root-layout we see (for the
+			// default region)
+			if (m_first_root_layout == NULL && 
+					(tp == common::l_rootlayout || tp == common::l_toplayout)) {
+				m_first_root_layout = rn;
+			}
+
+			stack.push(rn);
 			// XXXX Tie into tree and set layout
 		} else {
 			level--;
+			stack.pop();
 		}
 	}
 
@@ -164,30 +191,29 @@ smil_layout_manager::fix_document_layout(lib::document *doc)
 }
 
 void
-smil_layout_manager::build_layout_tree(common::window_factory *wf, const region_node *layout_root) {
+smil_layout_manager::build_surfaces(common::window_factory *wf) {
 	std::stack<common::surface_template*> stack;
 	region_node::const_iterator it;
-	region_node::const_iterator end = layout_root->end();
+	region_node::const_iterator end = m_layout_root->end();
 	
-	AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_layout_tree called");
+	AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_surfaces called");
 	// First we check for a root-layout node. This will be used as the parent
 	// of toplevel region nodes. If there is no root-layout but there are
 	// toplevel region nodes we will create it later.
 	common::surface_template *root_layout = NULL;
-	const region_node *rrlnode = layout_root->get_first_child("root-layout");
-	if (rrlnode) {
-		common::renderer *bgrenderer = wf->new_background_renderer(rrlnode);
-		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_layout_tree: create root_layout");
-		root_layout = create_top_surface(wf, rrlnode, bgrenderer);
+	if (m_first_root_layout) {
+		common::renderer *bgrenderer = wf->new_background_renderer(m_first_root_layout);
+		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_surfaces: create root_layout");
+		root_layout = create_top_surface(wf, m_first_root_layout, bgrenderer);
 	}
 		
 	// Loop over all the layout elements, create the regions and root_layouts,
 	// and keep a stack to tie everything together.
-	for(it = layout_root->begin(); it != end; it++) {
+	for(it = m_layout_root->begin(); it != end; it++) {
 		std::pair<bool, const region_node*> pair = *it;
 		const region_node *rn = pair.second;
 		const lib::node *n = rn->dom_node();
-		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: examining %s node", n->get_qname().second.c_str());
+		AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: examining %s node 0x%x", n->get_qname().second.c_str(), rn);
 		common::layout_type tag = m_schema->get_layout_type(n->get_qname());
 		if(tag == common::l_none || tag == common::l_rootlayout) {
 			// XXXX Will need to handle switch here
@@ -212,7 +238,7 @@ smil_layout_manager::build_layout_tree(common::window_factory *wf, const region_
 			}
 			// Create the region or the root-layout
 			if (tag == common::l_toplayout) {	
-				AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_layout_tree: create topLayout");
+				AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_surfaces: create topLayout");
 				common::surface_template *rootrgn = create_top_surface(wf, rn, bgrenderer);
 				rgn = rootrgn;
 			} else if (tag == common::l_region && !stack.empty()) {
@@ -221,7 +247,7 @@ smil_layout_manager::build_layout_tree(common::window_factory *wf, const region_
 			} else if (tag == common::l_region && stack.empty()) {
 				// Create root-layout if it doesn't exist yet
 				if (root_layout == NULL) {
-					AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_layout_tree: create default root-layout");
+					AM_DBG lib::logger::get_logger()->trace("smil_layout_manager::build_surfaces: create default root-layout");
 					root_layout = create_top_surface(wf, NULL, NULL);
 				}
 				rgn = root_layout->new_subsurface(rn, bgrenderer);
@@ -257,7 +283,7 @@ smil_layout_manager::create_top_surface(common::window_factory *wf, const region
 {
 	common::surface_template *rootrgn;
 	rootrgn = m_surface_factory->new_topsurface(rn, bgrenderer, wf);
-	m_rootlayouts.push_back(rootrgn);
+	m_rootsurfaces.push_back(rootrgn);
 	return rootrgn;
 }
 
@@ -293,7 +319,7 @@ common::surface *
 smil_layout_manager::get_default_rendering_surface(const lib::node *n) {
 	const char *nid = n->get_attribute("id");
 	lib::logger::get_logger()->warn("Returning default rendering surface for node %s", (nid?nid:""));
-	return m_rootlayouts[0]->activate();
+	return m_rootsurfaces[0]->activate();
 }
 
 
