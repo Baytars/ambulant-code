@@ -142,16 +142,12 @@ class abstract_event_processor : public event_processor {
 	timer *m_timer;
 
  private:
-	// return true if any of the high-med-low prioritity run queues
-	// contains event(s), after checking with their delta timers
-	bool events_available();
-
 	// check, if needed, with a delta_timer to fill its run queue
 	// return true if the run queue contains any events
 	bool events_available(delta_timer& dt, std::queue<event*> *qp);
 
 	// serve a single event from a delta_timer run queue
-	// return true if the run queue has more events
+	// return true if an event was served
 	bool serve_event(delta_timer& dt, std::queue<event*> *qp);
 	
 	// high priority delta timer and its event queue

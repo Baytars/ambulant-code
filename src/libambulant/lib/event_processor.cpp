@@ -131,35 +131,31 @@ abstract_event_processor::serve_events()
 // serve all events in the high-med-low prioritity run queues
 // in the right order, after checking with their delta timers
 {
-	while (events_available()) {
-		// First serve all high priority events
-		do {
-			while (serve_event(m_high_delta_timer,
-					   &m_high_q));
-		// serving an event may generate another, so check it
-		} while (events_available(m_high_delta_timer,
-					  &m_high_q));
-
-		// After that, serve one medium priority event
-		// or one low priority event, if there is no medium one
-		if (! serve_event(m_med_delta_timer, &m_med_q))
-			(void) serve_event(m_low_delta_timer, &m_low_q);
+	// check all delta_timer queues, in the right order
+	while (events_available(m_high_delta_timer, &m_high_q)
+		|| events_available(m_med_delta_timer, &m_med_q)
+		|| events_available(m_low_delta_timer, &m_low_q)) {
+		// There was at least one event
+		// First try to serve the high priority event
+		if (serve_event(m_high_delta_timer, &m_high_q)) {
+			// serving the event may generate another event
+			// of any priority, must check all queues again
+			continue;
+	  	}
+		// If there was no high priority event, then try to
+		// serve one medium priority event
+		if (serve_event(m_med_delta_timer, &m_med_q))
+			// again, serving this event may generate another
+			// of any priority, so check all queues
+			continue;
+		// There was no medium priority event either, so 
+		// it must be a low priority event
+		(void) serve_event(m_low_delta_timer, &m_low_q);
 	}
 }
 
 bool
-abstract_event_processor::events_available()
-// return true if any of the high-med-low prioritity run queues
-// contains event(s), after checking with their delta timers
-{
-	return events_available(m_high_delta_timer, &m_high_q)
-		|| events_available(m_med_delta_timer, &m_med_q)
-		|| events_available(m_low_delta_timer, &m_low_q);
-}
-
-bool
-abstract_event_processor::events_available(delta_timer& dt,
-					   std::queue<event*> *qp)
+abstract_event_processor::events_available(delta_timer& dt, std::queue<event*> *qp)
 // check, if needed, with a delta_timer to fill its run queue
 // return true if the run queue contains any events
 {
@@ -172,16 +168,17 @@ abstract_event_processor::events_available(delta_timer& dt,
 }
 
 bool
-abstract_event_processor::serve_event(delta_timer& dt,
-				      std::queue<event*> *qp)
+abstract_event_processor::serve_event(delta_timer& dt, std::queue<event*> *qp)
 // serve a single event from a delta_timer run queue
-// return true if the run queue has more events
+// return true if an event was served
+
 {
-	if ( ! qp->empty()) {
+	bool must_serve = ! qp->empty();
+	if (must_serve) {
 		event *e = qp->front();
 		qp->pop();
 		e->fire();
 		delete e;
 	}
-	return ! qp->empty(); 
+	return must_serve; 
 }
