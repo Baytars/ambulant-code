@@ -119,7 +119,7 @@ lib::tree_builder::build_tree_from_file(const char *filename) {
 	net::url u(filename);
 	memfile mf(u);
 	if(!mf.read()) {
-		lib::logger::get_logger()->show("Failed to read file: %s", filename);
+		lib::logger::get_logger()->show(gettext("Failed to read file: %s"), filename);
 		return false;
 	}
 	m_well_formed = m_xmlparser->parse((const char*)mf.data(), int(mf.size()), true);
@@ -135,12 +135,12 @@ bool lib::tree_builder::build_tree_from_url(const net::url& u) {
 #if defined(AMBULANT_PLATFORM_WIN32)
 	memfile mf(u);
 	if(!mf.read()) {
-		lib::logger::get_logger()->show("Failed to read URL: %s", u.get_url().c_str());
+		lib::logger::get_logger()->show(gettext("Failed to read URL: %s"), u.get_url().c_str());
 		return false;
 	}
 	m_well_formed = m_xmlparser->parse((const char*)mf.data(), int(mf.size()), true);
 	if(!m_well_formed) {
-		lib::logger::get_logger()->show("Failed to parse document %s", u.get_url().c_str());	
+		lib::logger::get_logger()->show(gettext("Failed to parse document: %s"), u.get_url().c_str());	
 	}
 	return m_well_formed;
 #else
@@ -183,7 +183,7 @@ lib::tree_builder::reset() {
 		m_xmlparser = new expat_parser(this, this);
 #endif /*WITH_EXPAT*/
 	if (m_xmlparser == NULL) {
-        	lib::logger::get_logger()->fatal("Could not create any XML parser (configuration error?)");
+        	lib::logger::get_logger()->fatal(gettext("Could not create any XML parser (configuration error?)"gettext();
 	}
 }
 
