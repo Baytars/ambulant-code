@@ -34,7 +34,7 @@
       	<img src="data/visit.png" begin="4s" region="info">
       	  <area href="http://www.ambulantplayer.org" show="new" external="true"/>
       	</img>
-      </par>
+      
     </par>
   </body>
 </smil>

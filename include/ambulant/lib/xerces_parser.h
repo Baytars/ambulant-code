@@ -59,6 +59,7 @@
 
 #include "ambulant/common/preferences.h"
 
+#include "ambulant/lib/parser_factory.h"
 #include "ambulant/lib/sax_handler.h"
 
 // temp for inline impl
@@ -72,6 +73,8 @@
 #include "xercesc/util/XMLString.hpp"
 #include "xercesc/util/PlatformUtils.hpp"
 
+
+
 //#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -82,12 +85,12 @@ namespace ambulant {
 namespace lib {
 	
 	
-class xerces_factory : public lib::parser_factory {
+class xerces_factory : public parser_factory {
   public:
 	xerces_factory() {};
 	~xerces_factory() {};
 		
-	lib::xml_parser* new_parser(
+	xml_parser* new_parser(
 		sax_content_handler* content_handler, 
 		sax_error_handler* error_handler);
 };
