@@ -62,8 +62,6 @@ using namespace net;
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
 :	m_context(context)
 {
-	std::cout <<"blocking_flag :" << &context->blocking_flag << "\n";
-	memset(m_sinks, 0, sizeof m_sinks);
 }
 
 
@@ -71,8 +69,8 @@ void
 ambulant::net::rtsp_demux::add_datasink(datasink *parent, int stream_index)
 {
 	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
-	assert(m_sinks[stream_index] == 0);
-	m_sinks[stream_index] = parent;
+	assert(m_context->sinks[stream_index] == 0);
+	m_context->sinks[stream_index] = parent;
 	m_context->nstream++;
 }
 
@@ -80,12 +78,11 @@ void
 ambulant::net::rtsp_demux::remove_datasink(int stream_index)
 {
 	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
-	assert(m_sinks[stream_index] != 0);
-	m_sinks[stream_index] = 0;
+	assert(m_context->sinks[stream_index] != 0);
+	m_context->sinks[stream_index] = 0;
 	m_context->nstream--;
 	if (m_context->nstream <= 0) cancel();
 }
-
 
 
 rtsp_context_t*
@@ -111,7 +108,7 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->fmt = audio_format("live");
 	context->eof = false;
 	
-	
+	memset(context->sinks, 0, sizeof context->sinks);
 	
 	// setup the basics.
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew();
@@ -242,8 +239,11 @@ ambulant::net::rtsp_demux::run()
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
 			}
 		}
-		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
-		scheduler.doEventLoop(&m_context->blocking_flag);
+		do {
+			std::cout << " waiting " << "/n";
+		} while (m_context->blocking_flag == 0);
+		//TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
+		//scheduler.doEventLoop(&m_context->blocking_flag);
 	}
 	
 }
