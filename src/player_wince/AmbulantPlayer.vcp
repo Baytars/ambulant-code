@@ -178,6 +178,12 @@ SOURCE=.\AmbulantPlayer.cpp
 
 # PROP Intermediate_Dir ".\..\..\include"
 DEP_CPP_AMBUL=\
+	"..\..\include\ambulant\config\config.h"\
+	"..\..\include\ambulant\config\posix_features.h"\
+	"..\..\include\ambulant\config\select_compiler_config.h"\
+	"..\..\include\ambulant\config\select_platform_config.h"\
+	"..\..\include\ambulant\config\select_stdlib_config.h"\
+	"..\..\include\ambulant\config\suffix.h"\
 	"..\..\include\ambulant\lib\textptr.h"\
 	"..\..\include\ambulant\version.h"\
 	".\AmbulantPlayer.h"\
@@ -306,22 +312,26 @@ SOURCE=.\AmbulantPlayerView.cpp
 
 # PROP Intermediate_Dir ".\..\..\include"
 DEP_CPP_AMBULAN=\
+	"..\..\include\ambulant\common\embedder.h"\
 	"..\..\include\ambulant\common\layout.h"\
 	"..\..\include\ambulant\common\playable.h"\
 	"..\..\include\ambulant\common\player.h"\
 	"..\..\include\ambulant\common\preferences.h"\
+	"..\..\include\ambulant\common\renderer.h"\
 	"..\..\include\ambulant\config\config.h"\
 	"..\..\include\ambulant\config\posix_features.h"\
 	"..\..\include\ambulant\config\select_compiler_config.h"\
 	"..\..\include\ambulant\config\select_platform_config.h"\
 	"..\..\include\ambulant\config\select_stdlib_config.h"\
 	"..\..\include\ambulant\config\suffix.h"\
+	"..\..\include\ambulant\gui\dg\dg_playable.h"\
 	"..\..\include\ambulant\gui\dg\dg_player.h"\
 	"..\..\include\ambulant\gui\dg\dg_wmuser.h"\
 	"..\..\include\ambulant\lib\abstract_mtsync.h"\
 	"..\..\include\ambulant\lib\amstream.h"\
 	"..\..\include\ambulant\lib\asb.h"\
 	"..\..\include\ambulant\lib\byte_buffer.h"\
+	"..\..\include\ambulant\lib\callback.h"\
 	"..\..\include\ambulant\lib\delta_timer.h"\
 	"..\..\include\ambulant\lib\document.h"\
 	"..\..\include\ambulant\lib\event.h"\
@@ -342,6 +352,9 @@ DEP_CPP_AMBULAN=\
 	"..\..\include\ambulant\lib\win32\win32_asb.h"\
 	"..\..\include\ambulant\lib\win32\win32_fstream.h"\
 	"..\..\include\ambulant\lib\win32\win32_mtsync.h"\
+	"..\..\include\ambulant\net\databuffer.h"\
+	"..\..\include\ambulant\net\datasource.h"\
+	"..\..\include\ambulant\net\raw_video_datasource.h"\
 	"..\..\include\ambulant\net\url.h"\
 	"..\..\include\ambulant\smil2\test_attrs.h"\
 	".\AmbulantPlayer.h"\
