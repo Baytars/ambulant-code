@@ -56,6 +56,7 @@
 #endif
 
 // XXXX Should go elsewhere
+#include "ambulant/version.h"
 #include "ambulant/config/config.h"
 #include "ambulant/lib/amstream.h"
 #include "ambulant/lib/byte_buffer.h"
@@ -119,6 +120,8 @@ initialize_logger()
 	// Initialize the gettext library
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: built on %s for Macintosh/Cocoa"), __DATE__);
 
 	// Initialize the default system test settings
 	NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];

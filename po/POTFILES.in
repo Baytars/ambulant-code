@@ -116,7 +116,7 @@ src/player_macosx/mainloop.cpp
 # src/player_mfc/OpenUrlDlg.cpp
 # src/player_mfc/PreferencesDlg.cpp
 # src/player_mfc/stdafx.cpp
-# src/player_unix/qt_gui.cpp
+src/player_unix/qt_gui.cpp
 # src/player_unix/qt_mainloop.cpp
 # src/player_unix/unix_preferences.cpp
 # src/player_wince/AmbulantPlayer.cpp
