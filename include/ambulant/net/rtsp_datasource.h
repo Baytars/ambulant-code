@@ -109,9 +109,7 @@ struct rtsp_context_t {
 	char* blocking_flag;
 	bool eof;
 	const char* codec_name;
-	int nchannels;
-	int nsamples_per_sec;
-	int bits_per_sample;	
+	audio_format fmt;	
 	datasink *sinks[MAX_STREAMS];
 };
 	

@@ -105,6 +105,9 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->audio_packet = NULL;
 	context->video_packet = NULL;
 	context->codec_name = NULL;
+	context->fmt = audio_format("live");
+	
+	
 	
 	
 	// setup the basics.
@@ -165,6 +168,9 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 				std::cout << "context->nstream = " << context->nstream << "\n";
 				context->audio_stream = context->nstream;
 				context->codec_name = subsession->codecName();
+				context->fmt.channels = subsession->numChannels();
+				//context->fmt.samplerate = subsession->rtpSource()->timestampFrequency();
+				
 			}
 		} else if (strcmp(subsession->mediumName(), "video") == 0) {
 			desired_buf_size = 200000;
@@ -279,7 +285,9 @@ live_audio_datasource::new_live_audio_datasource(
 	// Find the index of the audio stream
 	int stream_index = thread->audio_stream_nr();
 	std::cout << "audio_stream_nr : " << stream_index << "\n";
+	
 	return new live_audio_datasource(url, context, thread, stream_index);
+
 }
 
 
@@ -295,8 +303,8 @@ live_audio_datasource::live_audio_datasource(const net::url& url, AVCodecContext
 	m_thread(thread),
 	m_client_callback(NULL)
 {	
-	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: rate=%d, channels=%d", context->streams[m_stream_index]->codec.sample_rate, context->streams[m_stream_index]->codec.channels);
-//	m_fmt.parameters = (void *)&context->streams[m_stream_index]->codec;
+	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: rate=%d, channels=%d", context->channels);
+    m_fmt.parameters = (void *) context;
 	m_thread->add_datasink(this, stream_index);
 }
 
