@@ -205,7 +205,7 @@ class window_factory {
 
 // surface_factory is an abstract baseclass used by the SMIL2 and MMS layout managers
 // to create hierarchical regions
-class surface_template {
+class surface_template : public animation_notification {
   public:
 	virtual ~surface_template() {}
 	virtual surface_template *new_subsurface(const region_info *info, renderer *bgrend) = 0;

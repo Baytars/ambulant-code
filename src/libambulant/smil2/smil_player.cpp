@@ -343,7 +343,7 @@ smil_player::new_playable(const lib::node *n) {
 	
 	if (tag == "animate") {
 		/*AM_DBG*/ m_logger->trace("%s[%s].new_playable returning animation_playable", tag.c_str(), (pid?pid:"no-id"));
-		return new animation_playable(this, nid, n, m_event_processor, m_layout_manager);
+		return new animation_playable(this, nid, n, m_event_processor, m_layout_manager, m_doc);
 	}
 	surface *surf = m_layout_manager->get_surface(n);
 	AM_DBG m_logger->trace("%s[%s].new_playable  rect%s at %s", tag.c_str(), (pid?pid:"no-id"),

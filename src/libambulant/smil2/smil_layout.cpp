@@ -237,6 +237,9 @@ smil_layout_manager::build_layout_tree(lib::node *layout_root)
 				AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: mapping regionName %s", pname);
 				m_name2region[pname].push_back(rn);
 			}
+			
+			// And finally into the node->region mapping (for animate)
+			m_node2region[n] = rn;
 
 			stack.push(rn);
 		} else {
@@ -467,8 +470,9 @@ smil_layout_manager::get_region(const lib::node *n) {
 }
 
 common::animation_notification *
-smil_layout_manager::get_animation_notification(const lib::node *node) {
-	return NULL;
+smil_layout_manager::get_animation_notification(const lib::node *n) {
+	region_node *rn = get_region_node_for(n, true);
+	return rn?rn->get_animation_notification():NULL;
 }
 
 common::animation_destination *
