@@ -159,7 +159,7 @@ lib::global_renderer_factory::add_factory(renderer_factory *rf)
     m_factories.push_back(rf);
 }
     
-lib::active_renderer *
+lib::active_basic_renderer *
 lib::global_renderer_factory::new_renderer(
 	active_playable_events *context,
 	active_playable_events::cookie_type cookie,
@@ -169,7 +169,7 @@ lib::global_renderer_factory::new_renderer(
 	abstract_rendering_surface *const dest)
 {
     std::vector<renderer_factory *>::iterator i;
-    lib::active_renderer *rv;
+    lib::active_basic_renderer *rv;
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {
         rv = (*i)->new_renderer(context, cookie, node, evp, src, dest);

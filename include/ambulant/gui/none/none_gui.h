@@ -108,7 +108,7 @@ class none_renderer_factory : public lib::renderer_factory {
   public:
   	none_renderer_factory() {}
   	
-	lib::active_renderer *new_renderer(
+	lib::active_basic_renderer *new_renderer(
 		lib::active_playable_events *context,
 		lib::active_playable_events::cookie_type cookie,
 		const lib::node *node,

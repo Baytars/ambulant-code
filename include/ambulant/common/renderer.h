@@ -94,14 +94,18 @@ class active_basic_renderer : public active_playable, public abstract_rendering_
   	event_processor *const m_event_processor;
 };
 
+#if 0
+// XXXX I don't understand virtual bases, and therefore I don't understand how
+// to make a mixin class:-(
 // Mixin for audio renderers and such, to be used with either active_basic_renderer
 // or active_renderer
 
-class nonvisual_renderer_mixin {
+class nonvisual_renderer_mixin : public virtual active_basic_renderer {
 	void wantclicks(bool want) {};
 	void user_event(const point &where) {};
 	void redraw(const screen_rect<int> &dirty, abstract_window *window) {};
 };
+#endif
 
 class active_renderer : public active_basic_renderer, public ref_counted_obj {
   public:
