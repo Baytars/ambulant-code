@@ -385,13 +385,15 @@ class transition_engine_fade : virtual public transition_blitclass_fade {
 
 class abstract_audio_transition_engine {
   public:
+	virtual void init(const lib::event_processor* evp, bool outtrans, const lib::transition_info* info) = 0;
 	virtual const double get_volume(const double soundlevel) = 0;
 	virtual const bool is_done(lib::transition_info::time_type now) = 0;
 };
 
 class audio_transition_engine :  virtual public abstract_audio_transition_engine {
   public:
-	audio_transition_engine(const lib::event_processor* evp, bool is_intransition, const lib::transition_info* info);
+	audio_transition_engine();
+	void init(const lib::event_processor* evp, bool outtrans, const lib::transition_info* info);
 	const double get_volume(const double soundlevel);
 	const bool is_done(lib::transition_info::time_type now);
 
@@ -400,10 +402,10 @@ class audio_transition_engine :  virtual public abstract_audio_transition_engine
 	lib::transition_info::time_type m_dur;
 	lib::transition_info::progress_type m_startProgress;
 	lib::transition_info::progress_type m_endProgress;
-	const bool m_is_intransition;
+	bool m_outtrans;
 
   private:
-	const lib::event_processor* m_event_proc;
+	const lib::event_processor* m_event_processor;
 };
 #endif                                   
 
