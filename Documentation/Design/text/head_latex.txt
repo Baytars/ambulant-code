@@ -1,7 +1,19 @@
 .. This document is prepended when we generate laTeX. It contains the links
    used by the other documents, implemented as hyperlinks. An alternative
    head document is available for LaTeX generation.
-   
+ 
+Ambulant Player - Design documentation
+======================================
+
+This document contains various bits and pieces of ambulant design documentation:
+a breakdown of the important objects, UML diagrams explaining how they relate to
+each other, a walkthrough explaining how Ambulant Player plays a SMIL document,
+an explanation of the source code organization and a list of source code conventions
+used.
+
+A companion document `API documentation`_ explains low-level details of
+the various objects and other API issues.
+
 .. raw:: latex
 
    \tableofcontents
@@ -11,7 +23,7 @@
 
 .. _documentation directory: ../..
 .. _main documentation index: ../index.html
-.. _API documentation: ../../API/html/index.html
+.. _API documentation: ../../API/latex/refman.pdf
 
 .. _Timeline: timeline.html
 .. _Overall design: Overall-design-section_
