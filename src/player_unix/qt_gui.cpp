@@ -452,6 +452,7 @@ main (int argc, char*argv[]) {
 	if (exec_flag)
 		myapp.exec();
 	delete mywidget;
+	unix_prefs.save_preferences();
 	std::cout << "Exiting program" << std::endl;
 	return 0;
 }

@@ -54,12 +54,25 @@
 #define __UNIX_PREFERENCES_H__
 #include "ambulant/common/preferences.h"
 
+static std::string m_ambulant_home = ".ambulant";
+static std::string m_preferences_filename = "preferences";
+static int m_bufsize = 1024;
+
 class unix_preferences : ambulant::common::preferences {
 
  public:
 	bool load_preferences();
 
 	bool save_preferences();
+ 
+ private:
+	FILE* open__preferences_file(std::string mode);
+
+	bool load_preferences_from_environment();
+
+	bool load_preferences_from_file();
+
+	void get_preference(char* buf, char**namep, char** valuep);
 };
 
 #endif/*__UNIX_PREFERENCES_H__*/

@@ -66,7 +66,12 @@ class preferences {
 	
 	virtual ~preferences();
 
+	static void set_preferences_singleton(preferences *prefs);
+
   public:
+	int m_log_level;
+
+	std::string m_parser_id;
 
 	std::string m_validation_scheme;
 
@@ -78,18 +83,12 @@ class preferences {
 
 	bool m_validation_schema_full_checking;
 
-	int m_log_level;
-
-	std::string m_parser_id;
-
 	static preferences* get_preferences();
 
 	virtual bool load_preferences();
 
 	virtual bool save_preferences();
 
-  protected:
-	static void set_preferences_singleton(preferences *prefs);
   private:
 	static preferences* s_preferences; // singleton
 
