@@ -53,10 +53,10 @@
 #ifndef AMBULANT_LIB_REGION_H
 #define AMBULANT_LIB_REGION_H
 
-#include "ambulant/lib/gtypes.h"
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/callback.h"
 #include "ambulant/lib/event_processor.h"
+#include "ambulant/common/layout.h"
 
 namespace ambulant {
 
@@ -148,12 +148,12 @@ class window_factory {
 	virtual passive_window *new_window(const std::string &name, size bounds) = 0;
 };
 
-class active_region {
+class active_region : public rendering_surface {
   public:
 	active_region(event_processor *const evp,
 		passive_region *const source,
 		const node *node)
-	:	m_event_processor(evp),
+	:	// m_event_processor(evp),
 		m_source(source),
 		m_node(node),
 		m_renderer(NULL) {}
@@ -163,13 +163,13 @@ class active_region {
 	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft);
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_redraw();
-	virtual void done();	
+	virtual void renderer_done();	
 	const screen_rect<int>& get_rect() const { return m_source->get_rect(); }
 	const screen_rect<int>& get_rect_outer() const { return m_source->get_rect_outer(); }
 	const passive_region* get_parent() const { return m_source->get_parent(); }
 	
   protected:
-  	event_processor *const m_event_processor;
+//  	event_processor *const m_event_processor;
 	passive_region *const m_source;
 	const node *m_node;
 	active_renderer *m_renderer;

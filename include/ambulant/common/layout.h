@@ -50,73 +50,40 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_COCOA_COCOA_GUI_H
-#define AMBULANT_GUI_COCOA_COCOA_GUI_H
+#ifndef AMBULANT_LIB_LAYOUT_H
+#define AMBULANT_LIB_LAYOUT_H
 
-#include "ambulant/common/layout.h"
-#include "ambulant/common/region.h"
-#include "ambulant/common/renderer.h"
-#ifdef __OBJC__
-#include <Cocoa/Cocoa.h>
-#endif
+#include "ambulant/lib/gtypes.h"
 
 namespace ambulant {
 
-namespace gui {
+namespace lib {
 
-namespace cocoa {
+class active_renderer;
+class node;
 
-class cocoa_passive_window : public lib::passive_window {
+class rendering_surface {
   public:
-  	cocoa_passive_window(const std::string &name, lib::size bounds, void *_view)
-  	:	lib::passive_window(name, bounds),
-  		m_view(_view) {}
-  		
-	void need_redraw(const lib::screen_rect<int> &r);
-	void *view() { return m_view; }
-  private:
-    void *m_view;
+	virtual ~rendering_surface() {};
+	
+	virtual void show(active_renderer *renderer) = 0;
+	virtual void renderer_done() = 0;
+
+	virtual void need_redraw(const screen_rect<int> &r) = 0;
+	virtual void need_redraw() = 0;
+
+	virtual const screen_rect<int>& get_rect() const = 0;
 };
 
-class cocoa_window_factory : public lib::window_factory {
+class layout_manager {
   public:
-  	cocoa_window_factory(void *view)
-  	:	m_view(view) {}
-  	
-	lib::passive_window *new_window(const std::string &name, lib::size bounds);
-  private:
-    void *m_view;
+	virtual ~layout_manager() {};
+	
+	virtual rendering_surface *get_rendering_surface(const node *node) = 0;
 };
-
-class cocoa_renderer_factory : public lib::renderer_factory {
-  public:
-  	cocoa_renderer_factory() {}
-  	
-	lib::active_renderer *new_renderer(
-		lib::active_playable_events *context,
-		lib::active_playable_events::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src,
-		lib::rendering_surface *const dest);
-};
-
-} // namespace cocoa
-
-} // namespace gui
+	
+} // namespace lib
  
 } // namespace ambulant
 
-#ifdef __OBJC__
-@interface AmbulantView : NSView
-{
-    ambulant::lib::passive_window *ambulant_window;
-}
-
-- (void)setAmbulantWindow: (ambulant::lib::passive_window *)window;
-- (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect;
-- (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (const NSRect *)nsrect;
-@end
-
-#endif // __OBJC__
-#endif // AMBULANT_GUI_COCOA_COCOA_GUI_H
+#endif // AMBULANT_LIB_LAYOUT_H

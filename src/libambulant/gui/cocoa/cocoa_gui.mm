@@ -54,8 +54,6 @@
 #include "ambulant/gui/cocoa/cocoa_audio.h"
 #include "ambulant/gui/cocoa/cocoa_text.h"
 #include "ambulant/gui/cocoa/cocoa_image.h"
-#include "ambulant/gui/none/none_gui.h"
-#include "ambulant/common/renderer.h"
 #include "ambulant/lib/mtsync.h"
 
 #include <Cocoa/Cocoa.h>
@@ -93,7 +91,7 @@ cocoa_renderer_factory::new_renderer(
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
-	passive_region *const dest)
+	rendering_surface *const dest)
 {
 	active_renderer *rv;
 	

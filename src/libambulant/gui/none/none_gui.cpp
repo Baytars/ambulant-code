@@ -87,7 +87,7 @@ gui::none::none_renderer_factory::new_renderer(
 	const lib::node *node,
 	lib::event_processor *const evp,
 	net::passive_datasource *src,
-	lib::passive_region *const dest)
+	lib::rendering_surface *const dest)
 {
 	return new none_active_renderer(context, cookie, node, evp, src, dest);
 }

@@ -160,7 +160,7 @@ lib::active_region::need_redraw()
 }
 
 void
-lib::active_region::done()
+lib::active_region::renderer_done()
 {
 	m_renderer = NULL;
 	AM_DBG lib::logger::get_logger()->trace("active_region.done(0x%x, \"%s\")", (void *)this, m_source->m_name.c_str());

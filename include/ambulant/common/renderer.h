@@ -58,13 +58,15 @@
 #include "ambulant/lib/callback.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/lib/event_processor.h"
-#include "ambulant/common/region.h"
+#include "ambulant/common/layout.h"
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/playable.h"
 
 namespace ambulant {
 
 namespace lib {
+
+class passive_window;
 
 class active_basic_renderer : public active_playable {
   public:
@@ -111,7 +113,7 @@ class active_renderer : public active_basic_renderer, public ref_counted_obj {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
-		passive_region *const dest);
+		rendering_surface *const dest);
 		
 	~active_renderer() {}
 	
@@ -127,7 +129,7 @@ class active_renderer : public active_basic_renderer, public ref_counted_obj {
 	virtual void readdone();
 
   	net::active_datasource *m_src;
-	active_region *const m_dest;
+	rendering_surface *const m_dest;
 	lib::event *m_readdone;
 };
 
@@ -143,7 +145,7 @@ class active_final_renderer : public active_renderer {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
-		passive_region *const dest)
+		rendering_surface *const dest)
 	:	active_renderer(context, cookie, node, evp, src, dest),
 		m_data(NULL),
 		m_data_size(0) {};
@@ -167,7 +169,7 @@ class renderer_factory {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
-		passive_region *const dest) = 0;
+		rendering_surface *const dest) = 0;
 };
 
 class global_renderer_factory : public renderer_factory {
@@ -183,7 +185,7 @@ class global_renderer_factory : public renderer_factory {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
-		passive_region *const dest);
+		rendering_surface *const dest);
   private:
     std::vector<renderer_factory *> m_factories;
     renderer_factory *m_default_factory;
