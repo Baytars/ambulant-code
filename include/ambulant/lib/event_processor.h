@@ -58,7 +58,7 @@ class abstract_event_processor : public event_processor {
 		m_high_delta_timer(t), 
 		m_med_delta_timer(t), 
 		m_low_delta_timer(t), 
-		m_delta_timer_cs(pcs) {}
+		m_delta_timer_cs(pcs) { assert(t); }
 	
 	~abstract_event_processor() {
 		delete m_timer;
