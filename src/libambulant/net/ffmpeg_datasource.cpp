@@ -81,6 +81,7 @@ typedef lib::no_arg_callback<ffmpeg_resample_datasource> resample_callback;
 #define INBUF_SIZE 4096
 
 
+
 // Static initializer function shared among ffmpeg classes
 ffmpeg_codec_id* ambulant::net::ffmpeg_codec_id::m_uniqueinstance = NULL;
 
@@ -431,7 +432,7 @@ detail::ffmpeg_demux::run()
 			// Wait until there is room in the buffer
 			//while (sink->buffer_full() && !exit_requested()) {
 			while (sink && sink->buffer_full() && !exit_requested()) {
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space");
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space");
 				usleep(100000);   // This is overdoing it
 				sink = m_sinks[pkt->stream_index];
 			}
