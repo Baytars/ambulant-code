@@ -319,7 +319,7 @@ gui::sdl::sdl_active_audio_renderer::get_data_done(int size)
 	still_busy |= restart_audio_input();
 	if (!still_busy) {
 		AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
-		assert(m_is_playing);
+		//KB assert(m_is_playing);
 		// We cannot call unregister_renderer from here, because we are called from the
 		// SDL callback and already holding the m_global_lock. So, in stead
 		// we use the event processor to unregister ourselves later.

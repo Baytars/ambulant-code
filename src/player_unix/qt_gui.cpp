@@ -103,7 +103,9 @@ find_welcome_doc()
 }
 
 qt_gui::qt_gui(const char* title,
-	       const char* initfile) :
+	       const char* initfile)
+ :
+	QWidget(),  
         m_busy(true),
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
 	m_cursor_shape(Qt::ArrowCursor),
@@ -194,14 +196,6 @@ qt_gui::~qt_gui() {
 	}
 }
 
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-void
-qt_gui::setDocument(const QString& smilfilename) {
-  openSMILfile(smilfilename, IO_ReadOnly);
-  slot_play();
-}
-#endif/*QT_NO_FILEDIALOG*/
-
 void 
 qt_gui::slot_about() {
 	int but = QMessageBox::information(this, "About AmbulantPlayer", about_text,
@@ -277,24 +271,36 @@ qt_gui::slot_open() {
 	openSMILfile(smilfilename, IO_ReadOnly);
 	slot_play();
 #else	/*QT_NO_FILEDIALOG*/	
-	QString mimeTypes("application/smil  ");
 	if (m_fileselector == NULL) {
-	  m_fileselector = new FileSelector(QString::null, this,
+	  QString mimeTypes("application/smil;");
+	  m_fileselector = new FileSelector(mimeTypes, NULL,
 					    "slot_open", false);
 	  m_fileselector->resize(240, 280);
+	  QObject::connect(m_fileselector, 
+			   SIGNAL(fileSelected(const DocLnk&)),
+			   this, 
+			   SLOT(slot_file_selected(const DocLnk&)));
+	  QObject::connect(m_fileselector, SIGNAL(closeMe()), 
+			   this, SLOT(slot_close_fileselector()));
+	} else {
+	  m_fileselector->reread();
 	}
 	m_fileselector->show();
-	QObject::connect(m_fileselector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(slot_file_selected(const DocLnk&)));
-	QObject::connect(m_fileselector, SIGNAL(closeMe()), 
-			 this, SLOT(slot_close_fileselector()));
-
 #endif	/*QT_NO_FILEDIALOG*/
 }
 
-#ifdef	QT_NO_FILEDIALOG
+
+void
+qt_gui::setDocument(const QString& smilfilename) {
+#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
+  openSMILfile(smilfilename, IO_ReadOnly);
+  slot_play();
+#endif/*QT_NO_FILEDIALOG*/
+}
+
 void
 qt_gui::slot_file_selected(const DocLnk& selected_file) {
+#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	FILE* DBG = fopen("/tmp/ambulant-log","a"); //KB
 	fprintf(DBG, "selected_file smilfilename=%s\n",
 		selected_file.file().ascii());
@@ -305,17 +311,18 @@ qt_gui::slot_file_selected(const DocLnk& selected_file) {
 	fclose(DBG);
 	openSMILfile(smilfilename, IO_ReadOnly);
 	slot_play();
+#endif/*QT_NO_FILEDIALOG*/
 }
 void
 qt_gui::slot_close_fileselector()
 {
+#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	FILE* DBG = fopen("/tmp/ambulant-log","a"); //KB
 	fprintf(DBG, "slot_close_fileselector()\n");
 	fclose(DBG);
 	m_fileselector->hide();
+#endif/*QT_NO_FILEDIALOG*/
 }
-
-#endif	/*QT_NO_FILEDIALOG*/
 
 void 
 qt_gui::slot_open_url() {
