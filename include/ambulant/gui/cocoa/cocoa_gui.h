@@ -37,7 +37,7 @@ class cocoa_passive_window : public lib::passive_window {
     void *m_view;
 };
 
-class cocoa_window_factory : lib::window_factory {
+class cocoa_window_factory : public lib::window_factory {
   public:
   	cocoa_window_factory(void *view)
   	:	m_view(view) {}
@@ -47,7 +47,7 @@ class cocoa_window_factory : lib::window_factory {
     void *m_view;
 };
 
-class cocoa_renderer_factory : lib::renderer_factory {
+class cocoa_renderer_factory : public lib::renderer_factory {
   public:
   	cocoa_renderer_factory() {}
   	
