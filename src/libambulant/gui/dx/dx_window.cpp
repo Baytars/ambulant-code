@@ -67,7 +67,7 @@ gui::dx::dx_window::dx_window(const std::string& name,
   	region *rgn,
   	common::window_factory *wf,
   	viewport* v)
-:	common::abstract_window(rgn),
+:	common::gui_window(rgn),
 	m_rgn(rgn),
 	m_name(name),
 	m_viewrc(point(0, 0), point(bounds.w, bounds.h)),

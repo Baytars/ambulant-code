@@ -75,7 +75,7 @@ namespace dg {
 
 class viewport;
 
-class dg_window : public common::abstract_window {
+class dg_window : public common::gui_window {
   public:
   	dg_window(const std::string& name, 
   		lib::size bounds,
@@ -91,10 +91,11 @@ class dg_window : public common::abstract_window {
 	const std::string& get_name() const { return m_name;}
 	region *get_region() { return m_rgn;}
 	void need_redraw();
+	void need_events(bool onoff) { /* Always get them on windows */ }
 	
 	viewport *get_viewport() { return m_viewport;}
   private:
-	// abstract_window:
+	// gui_window:
 	// passive_region *m_region;
 	region *m_rgn;
 	std::string m_name; // for easy access
