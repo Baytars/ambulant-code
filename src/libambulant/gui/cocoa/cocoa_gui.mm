@@ -140,7 +140,7 @@ cocoa_renderer_factory::new_playable(
 	const lib::node *node,
 	event_processor *evp)
 {
-	active_basic_renderer *rv;
+	playable *rv;
 	
 	xml_string tag = node->get_qname().second;
 	if (tag == "img") {
@@ -154,7 +154,7 @@ cocoa_renderer_factory::new_playable(
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_fill_renderer 0x%x", (void *)node, (void *)rv);
 #ifdef WITH_COCOA_AUDIO
 	} else if ( tag == "audio") {
-		rv = new cocoa_active_audio_renderer(context, cookie, node, evp);
+		rv = new cocoa_active_audio_renderer(context, cookie, node);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_audio_renderer 0x%x", (void *)node, (void *)rv);
 #endif
 	} else {

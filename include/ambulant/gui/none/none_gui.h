@@ -82,9 +82,9 @@ class none_window_factory : public common::window_factory {
 	common::abstract_bg_rendering_source *new_background_renderer();
 };
 
-class none_active_renderer : public common::active_renderer {
+class none_playable : public common::active_playable {
   public:
-	none_active_renderer(
+	none_playable(
 		common::playable_notification *context,
 #ifdef AMBULANT_PLATFORM_WIN32_WCE
 		// Workaround for bug in emVC 4.0: it gets confused
@@ -94,13 +94,18 @@ class none_active_renderer : public common::active_renderer {
 #else
 		common::playable_notification::cookie_type cookie,
 #endif
-		const lib::node *node,
-		lib::event_processor *evp)
-	:	common::active_renderer(context, cookie, node, evp) {};
+		const lib::node *node)
+	:	common::active_playable(context, cookie),
+		m_node(node) {};
 	
 	void start(double where);
 	void redraw(const lib::screen_rect<int> &r, common::abstract_window *window);
 	void stop();
+	void pause() {};
+	void resume() {};
+	void wantclicks(bool want) {};
+  private:
+	lib::node *m_node;
 };
 
 class none_background_renderer : public common::abstract_bg_rendering_source {
