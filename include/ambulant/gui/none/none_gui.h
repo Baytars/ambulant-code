@@ -77,7 +77,7 @@ class none_active_renderer : public lib::active_renderer {
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
-		lib::rendering_surface *const dest)
+		lib::abstract_rendering_surface *const dest)
 	:	lib::active_renderer(context, cookie, node, evp, src, dest) {};
 	
 	void start(double where);
@@ -95,7 +95,7 @@ class none_renderer_factory : public lib::renderer_factory {
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
-		lib::rendering_surface *const dest);
+		lib::abstract_rendering_surface *const dest);
 };
 
 } // namespace none

@@ -73,7 +73,7 @@ class cocoa_active_image_renderer : public active_final_renderer {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
-		rendering_surface *const dest)
+		abstract_rendering_surface *const dest)
 	:	active_final_renderer(context, cookie, node, evp, src, dest),
 		m_image(NULL),
 		m_nsdata(NULL) {};

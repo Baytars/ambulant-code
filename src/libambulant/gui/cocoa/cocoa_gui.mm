@@ -91,7 +91,7 @@ cocoa_renderer_factory::new_renderer(
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
-	rendering_surface *const dest)
+	abstract_rendering_surface *const dest)
 {
 	active_renderer *rv;
 	

@@ -68,7 +68,7 @@ lib::active_renderer::active_renderer(
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
-	rendering_surface *const dest)
+	abstract_rendering_surface *const dest)
 :	active_basic_renderer(context, cookie, node, evp),
 	m_src(src?src->activate():NULL),
 	m_dest(dest),
@@ -153,7 +153,7 @@ lib::global_renderer_factory::new_renderer(
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
-	rendering_surface *const dest)
+	abstract_rendering_surface *const dest)
 {
     std::vector<renderer_factory *>::iterator i;
     lib::active_renderer *rv;

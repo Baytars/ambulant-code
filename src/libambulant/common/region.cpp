@@ -126,7 +126,7 @@ lib::passive_window::need_redraw(const screen_rect<int> &r)
 }
 
 void
-lib::active_region::show(active_renderer *renderer)
+lib::active_region::show(abstract_rendering_source *renderer)
 {
 	m_renderer = renderer;
 	m_source->show(this);

@@ -59,14 +59,27 @@ namespace ambulant {
 
 namespace lib {
 
-class active_renderer;
 class node;
+class passive_window;
 
-class rendering_surface {
+// abstract_rendering_source is an pure virtual baseclass for renderers that
+// render to a region (as opposed to audio renderers, etc) and for subregions
+// themselves. It is used to commmunicate redraw requests (and, eventually,
+// other things like mouse clicks) from the GUI window all the way down to
+// the renderer.
+class abstract_rendering_source {
   public:
-	virtual ~rendering_surface() {};
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft) = 0;
+};
+
+// abstract_rendering_surface is a pure virtual baseclass for a region of screenspace.
+// It is the only interface that renderers use when talking to regions, and regions
+// use when talking to their parent regions.
+class abstract_rendering_surface {
+  public:
+	virtual ~abstract_rendering_surface() {};
 	
-	virtual void show(active_renderer *renderer) = 0;
+	virtual void show(abstract_rendering_source *renderer) = 0;
 	virtual void renderer_done() = 0;
 
 	virtual void need_redraw(const screen_rect<int> &r) = 0;
@@ -79,7 +92,7 @@ class layout_manager {
   public:
 	virtual ~layout_manager() {};
 	
-	virtual rendering_surface *get_rendering_surface(const node *node) = 0;
+	virtual abstract_rendering_surface *get_rendering_surface(const node *node) = 0;
 };
 	
 } // namespace lib
