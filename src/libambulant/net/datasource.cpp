@@ -48,6 +48,7 @@
  */
 
 #include "ambulant/net/datasource.h"
+#include "ambulant/lib/memfile.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -56,6 +57,29 @@
 
 using namespace ambulant;
 using namespace net;
+
+// Helper class for data: urls.
+class mem_datasource : virtual public datasource, virtual public ambulant::lib::ref_counted_obj {  	
+  public:
+	mem_datasource(const net::url &url)
+	:   m_memfile(url.get_url())
+	{
+		m_memfile.read();
+	}
+	~mem_datasource() {};
+
+	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) {
+		evp->add_event(callback, 0, ambulant::lib::event_processor::high);
+	};
+    void readdone(int len) { m_memfile.get_databuffer().readdone(len); };
+	void stop() {};
+
+    bool end_of_file() { return m_memfile.get_databuffer().size() == 0; };
+	char* get_read_ptr() { return m_memfile.get_databuffer().get_read_ptr(); };
+	int size() const { return m_memfile.size(); } ;
+  private:
+	lib::memfile m_memfile;
+};
 
 // *********************** audio_format_choices ***********************************************
 audio_format_choices::audio_format_choices(audio_format &fmt)
@@ -193,6 +217,11 @@ datasource_factory::new_raw_datasource(const net::url &url)
 		AM_DBG lib::logger::get_logger()->trace("0x%x->new_raw_datasource returned 0x%x", (void*)(*i), (void*)src);
         if (src) return src;
     }
+	// Check for a data: url
+	if (lib::starts_with(url.get_url(), "data:")) {
+		/*AM_DBG*/ lib::logger::get_logger()->trace("new_raw_datasource: returning mem_datasource");
+		return new mem_datasource(url);
+	}
 	lib::logger::get_logger()->warn("datasource_factory::new_raw_datasource: no datasource for %s\n", repr(url).c_str());
     return NULL;
 }
