@@ -1029,6 +1029,7 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource *const src
 		lib::logger::get_logger()->error("ffmpeg_decoder_datasource: could not select %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 }
 
+  
 
 
 ffmpeg_decoder_datasource::~ffmpeg_decoder_datasource()
