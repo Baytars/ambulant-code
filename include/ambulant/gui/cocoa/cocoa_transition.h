@@ -62,15 +62,19 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_transition_engine : public smil2::transition_engine {
-  public:
-	cocoa_transition_engine(common::surface *dst, bool is_outtrans, lib::transition_info *info);
-	~cocoa_transition_engine();
+class cocoa_transition_engine_fade : public smil2::transition_engine_fade {
+  protected:
 	void update();
-  private:
-	common::surface *m_dst;
 };
 
+class cocoa_transition_engine_barwipe : public smil2::transition_engine_barwipe {
+  protected:
+	void update();
+};
+
+smil2::transition_engine *cocoa_transition_engine(
+	common::surface *dst, bool is_outtrans, lib::transition_info *info);
+	
 } // namespace cocoa
 
 } // namespace gui

@@ -52,6 +52,7 @@
 
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/node.h"
+#include "ambulant/common/layout.h"
 #include "ambulant/smil2/transition.h"
 
 #define AM_DBG
@@ -62,13 +63,27 @@
 using namespace ambulant;
 using namespace smil2;
 
-transition_engine::transition_engine(common::surface *dst, bool outtrans, lib::transition_info *info)
-:   m_dst(dst),
-	m_outtrans(outtrans),
-	m_info(info),
+transition_engine::transition_engine()
+:   m_dst(NULL),
+	m_info(NULL),
 	m_begin_time(0)
 {
 	AM_DBG lib::logger::get_logger()->trace("transition_engine::transition_engine()");
+}
+
+transition_engine::~transition_engine()
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::~transition_engine()");
+	// XXX Free m_info?
+}
+
+void
+transition_engine::init(common::surface *dst, bool outtrans, lib::transition_info *info)
+{
+	m_dst = dst;
+	m_outtrans = outtrans;
+	m_info = info;
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::init()");
 	m_progress = m_info->m_startProgress;
 	lib::transition_info::time_type dur = m_info->m_dur;
 	if (dur <= 0) {
@@ -78,15 +93,11 @@ transition_engine::transition_engine(common::surface *dst, bool outtrans, lib::t
 	m_time2progress = (m_info->m_endProgress - m_info->m_startProgress) / dur;
 }
 
-transition_engine::~transition_engine()
-{
-	AM_DBG lib::logger::get_logger()->trace("transition_engine::~transition_engine()");
-}
-
 void
 transition_engine::begin(lib::transition_info::time_type now)
 {
 	AM_DBG lib::logger::get_logger()->trace("transition_engine::begin(%d)", now);
+	assert(m_info);
 	m_begin_time = now;
 }
 
@@ -94,33 +105,32 @@ void
 transition_engine::end()
 {
 	AM_DBG lib::logger::get_logger()->trace("transition_engine::end()");
+	assert(m_info);
 }
 
 void
 transition_engine::step(lib::transition_info::time_type now)
 {
 	AM_DBG lib::logger::get_logger()->trace("transition_engine::step(%d)", now);
+	assert(m_info);
 	m_progress = (now-m_begin_time) * m_time2progress;
 	if (m_progress > m_info->m_endProgress) m_progress = 1.0;
 	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::step: delta_t=%d, progress=%f%%", now-m_begin_time, m_progress*100);
+	compute();
 	update();
-}
-
-void
-transition_engine::update()
-{
-	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::update()");
 }
 
 bool
 transition_engine::is_done()
 {
+	assert(m_info);
 	return m_progress >= m_info->m_endProgress;
 }
 
 lib::transition_info::time_type
 transition_engine::next_step_delay()
 {
+	assert(m_info);
 	return 50; // Show something 20 times per second
 }
 
@@ -133,11 +143,13 @@ void
 transition_engine_barwipe::compute()
 {
 	lib::screen_rect<int> dstrect = m_dst->get_rect();
-	int xcur = dstrect.m_left + int(m_progress*(dstrect.m_right + dstrect.m_left) + 0.5);
-	int ycur = dstrect.m_top + int(m_progress*(dstrect.m_bottom + dstrect.m_top) + 0.5);
-	m_oldrect = dstrect;
-	m_newrect = lib::screen_rect(
+	int xmid = dstrect.m_left + int(m_progress*(dstrect.m_right - dstrect.m_left) + 0.5);
+	int ymid = dstrect.m_top + int(m_progress*(dstrect.m_bottom - dstrect.m_top) + 0.5);
+	m_oldrect = lib::screen_rect<int>(
+		lib::point(xmid, dstrect.m_top),
+		lib::point(dstrect.m_right, dstrect.m_bottom));
+	m_newrect = lib::screen_rect<int>(
 		lib::point(dstrect.m_left, dstrect.m_top),
-		lib::point(xcur, ycur));
+		lib::point(xmid, dstrect.m_bottom));
 }
 

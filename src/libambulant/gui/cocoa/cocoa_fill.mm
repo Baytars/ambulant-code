@@ -86,7 +86,7 @@ cocoa_active_fill_renderer::start(double where)
 		return;
 	}
 	if (m_intransition) {
-		m_trans_engine = new cocoa_transition_engine(m_dest, false, m_intransition);
+		m_trans_engine = cocoa_transition_engine(m_dest, false, m_intransition);
 		m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
 	}
 	if (m_outtransition) {

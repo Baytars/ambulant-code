@@ -54,27 +54,34 @@
 #define AMBULANT_SMIL2_TRANSITION_H
 
 #include "ambulant/lib/colors.h"
+#include "ambulant/lib/gtypes.h"
 #include "ambulant/lib/transition_info.h"
 
 namespace ambulant {
+
+namespace common {
+class surface;
+};
 	
 namespace smil2 {
 
 class transition_engine {
   public:
-	transition_engine(common::surface *dst, bool is_outtrans, lib::transition_info *info);
+	transition_engine();
 	virtual ~transition_engine();
+	void init(common::surface *dst, bool is_outtrans, lib::transition_info *info);
 	
 	void begin(lib::transition_info::time_type now);
 	void end();
 	
 	void step(lib::transition_info::time_type now);
-//	virtual void resized() {};
-	virtual void compute() = 0;
-	virtual void update() = 0;
 	bool is_done();
 	lib::transition_info::time_type next_step_delay();
   protected:
+//	virtual void resized() {};
+	virtual void compute() = 0;
+	virtual void update() = 0;
+
 	common::surface *m_dst;
 	bool m_outtrans;
 	lib::transition_info *m_info;
@@ -83,13 +90,13 @@ class transition_engine {
 	double m_time2progress;
 };
 
-class transition_engine_fade : virtual public transition_engine {
-  public:
+class transition_engine_fade : public transition_engine {
+  protected:
 	void compute();
 };
 
-class transition_engine_barwipe : virtual public transition_engine {
-  public:
+class transition_engine_barwipe : public transition_engine {
+  protected:
     void compute();
   protected:
 	lib::screen_rect<int> m_oldrect, m_newrect;
