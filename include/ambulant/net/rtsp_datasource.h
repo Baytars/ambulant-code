@@ -73,11 +73,8 @@
 #include "ambulant/net/databuffer.h"
 #include "ambulant/net/posix_datasource.h"
 #include "ambulant/net/datasource.h"
-namespace ambulant
-{
+#include "ambulant/net/ffmpeg_datasource.h"
 
-namespace net
-{
 
 static void 
 after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
@@ -87,6 +84,12 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	
 static void 
 on_source_close(void* data);
+namespace ambulant
+{
+
+namespace net
+{
+
 	
 class datasink {
   public:
@@ -118,12 +121,13 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	void add_datasink(datasink *parent, int stream_index);
 	void remove_datasink(int stream_index);
 	void cancel();
+  	int audio_stream_nr() { return m_context->audio_stream; };
+	int video_stream_nr() { return m_context->video_stream; };  
   protected:
 	unsigned long run();
   private:	
 	
-  	int audio_stream_nr();
-	int video_stream_nr();  
+  	
     //void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
 	//void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
 
@@ -145,26 +149,23 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 
 class live_audio_datasource_factory : public audio_datasource_factory {
   public:
-	~ffmpeg_audio_datasource_factory() {};
+	~live_audio_datasource_factory() {};
 	audio_datasource* new_audio_datasource(const net::url& url, audio_format_choices fmts);
 };
-
-
 
 class live_audio_datasource: 
 	virtual public audio_datasource,
 	public datasink,
-	virtual public lib::ref_counted_obj
-{
+	virtual public lib::ref_counted_obj {
   public:
 	 static live_audio_datasource *new_live_audio_datasource(
   		const net::url& url, 
-  		rtsp_context_t *context,
+  		AVCodecContext *context,
 		rtsp_demux *thread);
   	
   	live_audio_datasource(
   		const net::url& url, 
-  		rtsp_context_t *context,
+  		AVCodecContext *context,
 		rtsp_demux *thread, 
   		int stream_index);
   
@@ -187,7 +188,7 @@ class live_audio_datasource:
   private:
     bool _end_of_file();
 	const net::url m_url;
-	rtsp_context_t *m_con;
+	AVCodecContext *m_con;
 	int m_stream_index;
 	audio_format m_fmt;
 	bool m_src_end_of_file;
