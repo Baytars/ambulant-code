@@ -95,6 +95,7 @@ cocoa_active_image_renderer::redraw(const screen_rect<int> &dirty, abstract_wind
 
 	cocoa_window *cwindow = (cocoa_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
+	// XXXX WRONG! This is the info for the region, not for the node!
 	const abstract_smil_region_info *info = m_dest->get_info();
 	AM_DBG lib::logger::get_logger()->trace("cocoa_active_image_renderer.redraw: %d clearing to 0x%x", !info->get_transparent(), (long)info->get_bgcolor());
 	if (info && !info->get_transparent()) {
