@@ -181,12 +181,12 @@ public:
     void readdone(int len);
     void callback();
     bool end_of_file();
-	
+	bool buffer_full();
 		
 
 	//  Get data from buffer and put 'size' bytes in buffer.
-	void read(char *data, int size);
-	char * read_ptr();
+	void read(char *data, int size); // this function only exists so we don't break anything that uses the old API.
+	char* read_ptr();
 
 	// Return the amount of data currently in buffer.
 	int size() const;
