@@ -121,7 +121,7 @@ class databuffer
  	bool is_full();
     bool not_empty();
 	void readdone(int size);
-	char * prepare();
+	char * prepare(int size);
 	void pushdata(int size);
     char* get_read_ptr();
 	

@@ -161,14 +161,14 @@ net::ffmpeg_audio_datasource::callback()
 		while (size > 0 && !m_buffer.is_full()) {
 			m_inbuf = (uint8_t*) m_src->read_ptr();
 			AM_DBG lib::logger::get_logger()->trace("ffmpeg_audio_datasource.callback: %d bytes available", size);
-			m_outbuf = (uint8_t*) m_buffer.prepare();
+			// How do we guess how much room we need?
+			m_outbuf = (uint8_t*) m_buffer.prepare(20*size);
 
 			if (max_block < size) {
 				blocksize = max_block;
 			} else {
 				blocksize = size;
 			}
-			
 			decoded = avcodec_decode_audio(m_con, (short*) m_outbuf, &outsize, m_inbuf, blocksize);
 			AM_DBG lib::logger::get_logger()->trace("ffmpeg_audio_datasource.callback : %d bytes decoded  to %d bytes", decoded,outsize );
 			m_buffer.pushdata(outsize);
