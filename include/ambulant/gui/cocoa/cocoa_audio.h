@@ -65,7 +65,7 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_active_audio_renderer : public active_basic_renderer, public timer_events {
+class cocoa_active_audio_renderer : public active_basic_renderer, public timer_events, public nonvisual_renderer_mixin {
   public:
 	cocoa_active_audio_renderer(
 		active_playable_events *context,
