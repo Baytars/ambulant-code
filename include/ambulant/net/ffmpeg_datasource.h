@@ -144,7 +144,24 @@ class datasink {
 	virtual bool buffer_full() = 0;
 };
 	
-class ffmpeg_demux : public lib::unix::thread, public lib::ref_counted_obj {
+class abstract_demux : public lib::unix::thread, public lib::ref_counted_obj {
+  public:
+	virtual ~abstract_demux() {};	
+ 
+	virtual void add_datasink(datasink *parent, int stream_index) = 0;
+	virtual void remove_datasink(int stream_index) = 0;
+	virtual void cancel() = 0;
+	virtual int audio_stream_nr() = 0;
+	virtual int video_stream_nr() = 0;
+	virtual int nstreams() = 0;
+	virtual timestamp_t duration() = 0;
+	
+  protected:
+	virtual unsigned long run() = 0;
+};
+
+
+class ffmpeg_demux : public abstract_demux {
   public:
 	ffmpeg_demux(AVFormatContext *con);
 	~ffmpeg_demux();
@@ -153,6 +170,11 @@ class ffmpeg_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	  
 	void add_datasink(datasink *parent, int stream_index);
 	void remove_datasink(int stream_index);
+    int audio_stream_nr();
+  	int video_stream_nr();
+  	timestamp_t duration();
+  	int nstreams();
+  	
 	void cancel();
   protected:
 	unsigned long run();
@@ -162,7 +184,54 @@ class ffmpeg_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	int m_nstream;
 };
 
-}
+} // end namespace detail
+
+class demux_audio_datasource: 
+	virtual public audio_datasource,
+	public detail::datasink,
+	virtual public lib::ref_counted_obj
+{
+  public:
+	 static demux_audio_datasource *new_demux_audio_datasource(
+  		const net::url& url, detail::abstract_demux *thread);
+  	
+  		demux_audio_datasource(
+  		const net::url& url, 
+  		detail::abstract_demux *thread, 
+  		int stream_index);
+  
+    ~demux_audio_datasource();
+
+    void start(lib::event_processor *evp, lib::event *callback);
+	void stop();  
+
+    void readdone(int len);
+    void data_avail(int64_t pts, uint8_t *data, int size);
+    bool end_of_file();
+	bool buffer_full();
+		
+	char* get_read_ptr();
+	int size() const;   
+	audio_format& get_audio_format();
+
+	std::pair<bool, double> get_dur();
+
+  private:
+    bool _end_of_file();
+	const net::url m_url;
+	//AVFormatContext *m_con;
+	int m_stream_index;
+	audio_format m_fmt;
+	bool m_src_end_of_file;
+    lib::event_processor *m_event_processor;
+
+	databuffer m_buffer;
+	detail::abstract_demux *m_thread;
+	lib::event *m_client_callback;  // This is our calllback to the client
+	lib::critical_section m_lock;
+  
+};
+
 
 class ffmpeg_audio_datasource: 
 	virtual public audio_datasource,
