@@ -77,12 +77,12 @@ int filter(const struct dirent* filen)
 	return 0;
 }
 
-plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::datasource_factory* df)
+plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, common::factories* factory)
 {
 	int nr_of_files;
 	int errors;
 	char filename[1024];
-	typedef void (*initfunctype)(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df);
+	typedef void (*initfunctype)(ambulant::common::factories* rf, ambulant::net::datasource_factory* df);
 	lt_dlhandle handle;
 	
 	initfunctype init;

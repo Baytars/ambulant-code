@@ -66,8 +66,8 @@ qt_video_factory::~qt_video_factory()
 {
 }
 
-qt_renderer_factory::qt_renderer_factory(datasource_factory *df)
-:	m_datasource_factory(df)
+qt_renderer_factory::qt_renderer_factory(common::factories *factory)
+:	m_datasource_factory(factory)
 	{
 	AM_DBG lib::logger::get_logger()->debug("qt_renderer factory (0x%x)", (void*) this);
 	}
