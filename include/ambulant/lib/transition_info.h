@@ -116,6 +116,7 @@ class transition_info {
 	// We should also have the <param> contents here
 	
 	static transition_info *from_node(const node *n);
+	time_type get_trans_dur(const node *n) const;
 };
 } // namespace lib
  
