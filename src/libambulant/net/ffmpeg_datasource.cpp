@@ -51,7 +51,7 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/net/url.h"
-
+#include <map>
 //#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -77,6 +77,44 @@ typedef lib::no_arg_callback<ffmpeg_resample_datasource> resample_callback;
 
 
 // Static initializer function shared among ffmpeg classes
+ffmpeg_codec_id* ambulant::net::ffmpeg_codec_id::m_uniqueinstance = NULL;
+
+ffmpeg_codec_id*
+ffmpeg_codec_id::instance()
+{
+	if (m_uniqueinstance == NULL) {
+        m_uniqueinstance = new ffmpeg_codec_id();
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_codec_id::instance() returning 0x%x", (void*) m_uniqueinstance);
+	}
+    return m_uniqueinstance;
+}
+
+void
+ffmpeg_codec_id::add_codec(const char* codec_name, CodecID id)
+{
+  std::string str(codec_name);
+  m_codec_id.insert(std::pair<std::string, CodecID>(str, id));
+}
+
+CodecID
+ffmpeg_codec_id::get_codec_id(const char* codec_name) 
+{
+	std::string str(codec_name);
+	std::map<std::string, CodecID>::iterator i;
+	i = m_codec_id.find(str);
+	if (i != m_codec_id.end()) {
+		return i->second;
+	}
+	
+	return CODEC_ID_NONE;
+}
+
+ffmpeg_codec_id::ffmpeg_codec_id()
+{
+	add_codec("MPA", CODEC_ID_MP3);
+	add_codec("MPA-ROBUST", CODEC_ID_MP3);
+	add_codec("X_MP3-DRAFT-00", CODEC_ID_MP3);
+}
 
 
 // Hack, hack. Get extension of a URL.
@@ -129,9 +167,9 @@ ffmpeg_audio_datasource_factory::new_audio_datasource(const net::url& url, audio
 		return NULL;
 	}
 	detail::ffmpeg_demux *thread = new detail::ffmpeg_demux(context);
-	audio_datasource *ds = ffmpeg_audio_datasource::new_ffmpeg_audio_datasource(url, context, thread);
+	audio_datasource *ds = demux_audio_datasource::new_demux_audio_datasource(url, thread);
 	if (ds == NULL) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory::new_video_datasource: could not allocate ffmpeg_video_datasource");
+		AM_DBG lib::logger::get_logger()->debug("fdemux_audio_datasource_factory::new_audio_datasource: could not allocate ffmpeg_video_datasource");
 		thread->cancel();
 		return NULL;
 	}
@@ -211,6 +249,10 @@ detail::ffmpeg_demux::ffmpeg_demux(AVFormatContext *con)
 :   m_con(con),
 	m_nstream(0)
 {
+	m_fmt = audio_format("ffmpeg");
+	m_fmt.parameters = (void *)&con->streams[audio_stream_nr()]->codec;
+	m_fmt.samplerate = con->streams[audio_stream_nr()]->codec.sample_rate;
+	m_fmt.channels = con->streams[audio_stream_nr()]->codec.channels;
 	memset(m_sinks, 0, sizeof m_sinks);
 }
 
@@ -285,7 +327,7 @@ detail::ffmpeg_demux::video_stream_nr()
 	return -1;
 }
 
-timestamp_t
+double
 detail::ffmpeg_demux::duration()
 {
 	//XXX this is a double now, later this should retrun a long long int 
@@ -464,7 +506,7 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 }
  
 void 
-ffmpeg_audio_datasource::readdone(int len)
+demux_audio_datasource::readdone(int len)
 {
 	m_lock.enter();
 	m_buffer.readdone(len);
@@ -474,7 +516,7 @@ ffmpeg_audio_datasource::readdone(int len)
 }
 
 void 
-ffmpeg_audio_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
+demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 {
 	// XXX timestamp is ignored, for now
 	m_lock.enter();
@@ -551,16 +593,8 @@ demux_audio_datasource::size() const
 audio_format&
 demux_audio_datasource::get_audio_format()
 {
-#if 0
-	if (m_con) {
-		// Refresh info on audio format
-		m_fmt.samplerate = m_con->sample_rate;
-		m_fmt.bits = 16; // XXXX
-		m_fmt.channels = m_con->channels;
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::select_decoder: rate=%d, bits=%d,channels=%d",m_fmt.samplerate, m_fmt.bits, m_fmt.channels);
-	}
-#endif
-	return m_fmt;
+
+	return m_thread->get_audio_format();
 }
 
 std::pair<bool, double>
@@ -638,7 +672,7 @@ ffmpeg_audio_datasource::ffmpeg_audio_datasource(const net::url& url, AVFormatCo
 	m_client_callback(NULL)
 {	
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::ffmpeg_audio_datasource: rate=%d, channels=%d", context->streams[m_stream_index]->codec.sample_rate, context->streams[m_stream_index]->codec.channels);
-	m_fmt.parameters = (void *)&context->streams[m_stream_index]->codec;
+	
 	m_thread->add_datasink(this, stream_index);
 }
 
@@ -1558,6 +1592,30 @@ ffmpeg_decoder_datasource::select_decoder(audio_format &fmt)
 		}
 		
 		m_fmt = audio_format(enc->sample_rate, enc->channels, 16);
+		return true;
+	} else if (fmt.name == "live") {
+		const char* codec_name = (char*) fmt.parameters;
+	
+		AM_DBG lib::logger::get_logger()->debug("ffmpe_decoder_datasource::selectdecoder(): audio codec : %s", codec_name);
+		ffmpeg_codec_id* codecid = ffmpeg_codec_id::instance();
+		AVCodec *codec = avcodec_find_decoder(codecid->get_codec_id(codec_name));
+		m_con = avcodec_alloc_context();	
+		
+		if( !codec) {
+			//lib::logger::get_logger()->error(gettext("%s: Audio codec %d(%s) not supported"), repr(url).c_str(), m_con->codec_id, m_con->codec_name);
+			return false;
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::selectdecoder(): codec found!");
+		}
+	
+		if((avcodec_open(m_con,codec) < 0) ) {
+			//lib::logger::get_logger()->error(gettext("%s: Cannot open audio codec %d(%s)"), repr(url).c_str(), m_con->codec_id, m_con->codec_name);
+			return false;
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(): succesfully opened codec");
+		}
+		
+		m_con->codec_type = CODEC_TYPE_AUDIO;
 		return true;
 	}
 	// Could add support here for raw mp3, etc.
