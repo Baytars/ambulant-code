@@ -87,7 +87,7 @@ gui::none::none_background_renderer::drawbackground(
 }
 
 playable *
-gui::none::none_renderer_factory::new_playable(
+gui::none::none_playable_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,

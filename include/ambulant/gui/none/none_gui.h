@@ -118,9 +118,9 @@ class none_background_renderer : public common::abstract_bg_rendering_source {
 
 class common::region_info;
 
-class none_renderer_factory : public common::playable_factory {
+class none_playable_factory : public common::playable_factory {
   public:
-  	none_renderer_factory() {}
+  	none_playable_factory() {}
   	
 	common::playable *new_playable(
 		common::playable_notification *context,
