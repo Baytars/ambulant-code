@@ -225,6 +225,7 @@ net::active_datasource::active_datasource(passive_datasource *const source, int 
 {
 	if (file >= 0) {
 		m_stream = file;
+		m_end_of_file = false;
 		filesize();
 		m_source = source;
 		m_buffer = new databuffer(m_filesize);
@@ -235,6 +236,19 @@ net::active_datasource::active_datasource(passive_datasource *const source, int 
 		m_source->add_ref();
 		AM_DBG m_buffer->dump(std::cout, false);
 	}
+}
+
+bool
+net::active_datasource::is_full()
+{
+	return m_buffer->is_full();
+}
+
+
+bool
+net::active_datasource::end_of_file()
+{
+	return m_end_of_file;
 }
 
 net::active_datasource::~active_datasource()
@@ -285,6 +299,7 @@ net::active_datasource::read_file()
 {
   	char *buf;
   	int n; 	
+
 	if (m_stream >= 0) {
 
 		do {
@@ -292,7 +307,7 @@ net::active_datasource::read_file()
 				n = ::read(m_stream, buf, BUFSIZ);
 				if (n >= 0) m_buffer->pushdata(n); 
 		} while (n > 0);
-
+		m_end_of_file = true;
 		if (n < 0) {
 			lib::logger::get_logger()->error("active_datasource.read_file(): %s", strerror(errno));
 			} 		
