@@ -119,7 +119,7 @@ class passive_region : public abstract_rendering_source {
 		m_cur_active_region(NULL),
                 m_mouse_region(NULL)
         {
-			if (parent) {
+			if (parent && parent->m_mouse_region) {
 				m_mouse_region = parent->m_mouse_region->clone();
 				m_mouse_region->clear();
 			}
