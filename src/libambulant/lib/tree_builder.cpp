@@ -52,6 +52,7 @@
 
 #include "ambulant/lib/tree_builder.h"
 #include "ambulant/lib/document.h"
+#include "ambulant/common/region_node.h"
 
 #include "ambulant/lib/logger.h"
 
@@ -137,6 +138,7 @@ lib::tree_builder::reset() {
 
 void 
 lib::tree_builder::start_document() {
+	m_parsing_layout = false;
 }
 
 void 
@@ -148,7 +150,13 @@ lib::tree_builder::start_element(const q_name_pair& qn, const q_attributes_list&
 	if(m_root == 0) {
 		m_root = m_current = new node(qn, qattrs, m_context);
 	} else if(m_current != 0) {
-		node *p = new node(qn, qattrs, m_context);
+		node *p;
+		if (qn.second == "layout")
+			m_parsing_layout = true;
+		if (m_parsing_layout)
+			p = new region_node(qn, qattrs, m_context);
+		else
+			p = new node(qn, qattrs, m_context);		
 		m_current->append_child(p);
 		m_current = p;
 	} else
@@ -157,7 +165,8 @@ lib::tree_builder::start_element(const q_name_pair& qn, const q_attributes_list&
 
 void 
 lib::tree_builder::end_element(const q_name_pair& qn) {
-	(qn); // UNREFERENCED_PARAMETER(qn);
+	if (qn.second == "layout")
+		m_parsing_layout = false;
 	if(m_current != 0)
 		m_current = m_current->up();
 	else
