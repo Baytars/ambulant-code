@@ -143,6 +143,8 @@ class active_renderer : public active_basic_renderer {
 	virtual void redraw(const lib::screen_rect<int> &dirty, abstract_window *window) = 0;
 	virtual void user_event(const lib::point &where, int what = 0) { user_event_callback(what); }
 	virtual void set_surface(surface *dest) { m_dest = dest; }
+	virtual void set_intransition(lib::transition_info *info) {  }
+	virtual void set_outtransition(lib::transition_info *info) {  }
 	virtual surface *get_surface() { return m_dest;}
 	virtual renderer *get_renderer() { return this; }
 	virtual void readdone() {};
@@ -226,6 +228,8 @@ class active_video_renderer : public common::active_basic_renderer {
 	void playdone() {};
 
 	virtual void set_surface(common::surface *dest);
+	void set_intransition(lib::transition_info *info) {  }
+	void set_outtransition(lib::transition_info *info) {  }
 	virtual common::surface *get_surface();
 	virtual renderer *get_renderer();
 	
@@ -255,6 +259,8 @@ class background_renderer : public renderer {
 	virtual ~background_renderer() {}
 	virtual void set_surface(surface *destination) { m_dst = destination; }
 	virtual void user_event(const lib::point &where, int what = 0) { /* Ignore, for now */ }
+	void set_intransition(lib::transition_info *info) { /* Ignore, for now */ }
+	void set_outtransition(lib::transition_info *info) { /* Ignore, for now */ }
 	virtual surface *get_surface() { return m_dst; }
   protected:
 	const region_info *m_src;
@@ -289,6 +295,8 @@ class renderer_playable : public playable, public renderer {
 	
 	// common::renderer interface
 	void set_surface(common::surface *dest) { m_dest = dest;}
+	void set_intransition(lib::transition_info *info) {  }
+	void set_outtransition(lib::transition_info *info) {  }
 	surface *get_surface() { return m_dest;}
 	void user_event(const lib::point &where, int what) {}
 	renderer *get_renderer() { return this; }

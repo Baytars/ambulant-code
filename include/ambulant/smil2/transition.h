@@ -50,75 +50,39 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_COCOA_COCOA_FILL_H
-#define AMBULANT_GUI_COCOA_COCOA_FILL_H
+#ifndef AMBULANT_SMIL2_TRANSITION_H
+#define AMBULANT_SMIL2_TRANSITION_H
 
-#include "ambulant/common/renderer.h"
-#include "ambulant/smil2/transition.h"
-#include "ambulant/lib/mtsync.h"
-#include <Cocoa/Cocoa.h>
+#include "ambulant/lib/colors.h"
+#include "ambulant/lib/transition_info.h"
 
 namespace ambulant {
-
-using namespace lib;
-using namespace common;
-
-namespace gui {
-
-namespace cocoa {
-
-class cocoa_active_fill_renderer : public active_basic_renderer {
-  public:
-	cocoa_active_fill_renderer(
-		playable_notification *context,
-		playable_notification::cookie_type cookie,
-		const lib::node *node,
-		event_processor *evp)
-	:	active_basic_renderer(context, cookie, node, evp),
-		m_dest(NULL),
-		m_intransition(NULL),
-		m_outtransition(NULL),
-		m_trans_engine(NULL),
-		m_playing(false) {};
-	~cocoa_active_fill_renderer();
-
-	void freeze() {}
-	void start(double where);
-	void stop();
-	void pause() {}
-	void resume() {}
-	void wantclicks(bool want) { if (m_dest) m_dest->need_events(want); }
-
-	renderer *get_renderer() { return this; }
-	void set_surface(surface *dest) { m_dest = dest; }
-	void set_intransition(lib::transition_info *info) { m_intransition = info; }
-	void set_outtransition(lib::transition_info *info) { m_outtransition = info; }
-	surface *get_surface() { return m_dest;}
-	void user_event(const point &where, int what = 0) { user_event_callback(what); }
-    void redraw(const screen_rect<int> &dirty, abstract_window *window);
-  private:
-	void transition_step();
 	
-	surface *m_dest;
-	lib::transition_info *m_intransition, *m_outtransition;
-	smil2::transition_engine *m_trans_engine;
-	bool m_playing;
-	critical_section m_lock;
+namespace smil2 {
+
+class transition_engine {
+  public:
+	transition_engine(void *srcdst, void *othersrc, bool is_outtrans, lib::transition_info *info);
+	~transition_engine();
+	
+	void begin(lib::transition_info::time_type now);
+	void end();
+	
+	void step(lib::transition_info::time_type now);
+	bool is_done();
+	lib::transition_info::time_type next_step_delay();
+  private:
+	void *m_srcdst;
+	void *m_othersrc;
+	bool m_outtrans;
+	lib::transition_info *m_info;
+	lib::transition_info::time_type m_begin_time;
+	double m_progress;
+	double m_time2progress;
 };
 
-class cocoa_background_renderer : public background_renderer {
-  public:
-    cocoa_background_renderer(const common::region_info *src)
-	:   background_renderer(src) {}
-	void redraw(const lib::screen_rect<int> &dirty, common::abstract_window *window);
-  private:
-	
-};
-
-} // namespace cocoa
-
-} // namespace gui
+} // namespace smil2
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_COCOA_COCOA_FILL_H
+#endif // AMBULANT_SMIL2_TRANSITION_H

@@ -70,6 +70,9 @@ cocoa_active_fill_renderer::~cocoa_active_fill_renderer()
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->trace("~cocoa_active_fill_renderer(0x%x)", (void *)this);
+	if (m_intransition) delete m_intransition;
+	if (m_outtransition) delete m_outtransition;
+	if (m_trans_engine) delete m_trans_engine;
 	m_lock.leave();
 }
 	
@@ -80,6 +83,15 @@ cocoa_active_fill_renderer::start(double where)
 	if (!m_dest) {
 		AM_DBG logger::get_logger()->warn("cocoa_active_fill_renderer.start(0x%x): no surface", (void *)this);
 		return;
+	}
+	if (m_intransition) {
+		m_trans_engine = new smil2::transition_engine(NULL, NULL, false, m_intransition);
+		m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
+	}
+	if (m_outtransition) {
+		// XXX Schedule beginning of out transition
+		//lib::event *ev = new transition_callback(this, &transition_outbegin);
+		//m_event_processor->add_event(ev, XXXX);
 	}
 	m_dest->show(this);
 }
@@ -98,6 +110,14 @@ cocoa_active_fill_renderer::redraw(const screen_rect<int> &dirty, abstract_windo
 	const screen_rect<int> &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->trace("cocoa_active_fill_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	
+	// See whether we're in a transition
+	if (m_trans_engine && m_trans_engine->is_done()) {
+		delete m_trans_engine;
+		m_trans_engine = NULL;
+	}
+	if (m_trans_engine) {
+		// XXX Setup for transition
+	}
 	cocoa_window *cwindow = (cocoa_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	// First find our whole area (which we have to clear to background color)
@@ -106,6 +126,11 @@ cocoa_active_fill_renderer::redraw(const screen_rect<int> &dirty, abstract_windo
 	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
 	// Fill with  color
 	const char *color_attr = m_node->get_attribute("color");
+	if (!color_attr) {
+		lib::logger::get_logger()->warn("<brush> element without color attribute");
+		m_lock.leave();
+		return;
+	}
 	color_t color = lib::to_color(color_attr);
 	AM_DBG lib::logger::get_logger()->trace("cocoa_active_fill_renderer.redraw: clearing to 0x%x", (long)color);
 	NSColor *cocoa_bgcolor = [NSColor colorWithCalibratedRed:redf(color)
@@ -114,7 +139,19 @@ cocoa_active_fill_renderer::redraw(const screen_rect<int> &dirty, abstract_windo
 				alpha:1.0];
 	[cocoa_bgcolor set];
 	NSRectFill(cocoa_dstrect_whole);
+	if (m_trans_engine) {
+		m_trans_engine->step(m_event_processor->get_timer()->elapsed());
+		typedef lib::no_arg_callback<cocoa_active_fill_renderer> transition_callback;
+		lib::event *ev = new transition_callback(this, &cocoa_active_fill_renderer::transition_step);
+		m_event_processor->add_event(ev, m_trans_engine->next_step_delay());
+	}
 	m_lock.leave();
+}
+
+void
+cocoa_active_fill_renderer::transition_step()
+{
+	if (m_dest) m_dest->need_redraw();
 }
 
 void

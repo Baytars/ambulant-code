@@ -50,75 +50,70 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_COCOA_COCOA_FILL_H
-#define AMBULANT_GUI_COCOA_COCOA_FILL_H
-
-#include "ambulant/common/renderer.h"
+#include "ambulant/lib/logger.h"
+#include "ambulant/lib/node.h"
 #include "ambulant/smil2/transition.h"
-#include "ambulant/lib/mtsync.h"
-#include <Cocoa/Cocoa.h>
 
-namespace ambulant {
+#define AM_DBG
+#ifndef AM_DBG
+#define AM_DBG if(0)
+#endif
 
-using namespace lib;
-using namespace common;
+using namespace ambulant;
+using namespace smil2;
 
-namespace gui {
+transition_engine::transition_engine(void *srcdst, void *othersrc, bool outtrans, lib::transition_info *info)
+:   m_srcdst(srcdst),
+	m_othersrc(othersrc),
+	m_outtrans(outtrans),
+	m_info(info),
+	m_begin_time(0)
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::transition_engine()");
+	m_progress = m_info->m_startProgress;
+	lib::transition_info::time_type dur = m_info->m_dur;
+	if (dur <= 0) {
+		lib::logger::get_logger()->error("transition_engine: incorrect transition duration %f", float(dur));
+		dur = 1;
+	}
+	m_time2progress = (m_info->m_endProgress - m_info->m_startProgress) / dur;
+}
 
-namespace cocoa {
+transition_engine::~transition_engine()
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::~transition_engine()");
+}
 
-class cocoa_active_fill_renderer : public active_basic_renderer {
-  public:
-	cocoa_active_fill_renderer(
-		playable_notification *context,
-		playable_notification::cookie_type cookie,
-		const lib::node *node,
-		event_processor *evp)
-	:	active_basic_renderer(context, cookie, node, evp),
-		m_dest(NULL),
-		m_intransition(NULL),
-		m_outtransition(NULL),
-		m_trans_engine(NULL),
-		m_playing(false) {};
-	~cocoa_active_fill_renderer();
+void
+transition_engine::begin(lib::transition_info::time_type now)
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::begin(%d)", now);
+	m_begin_time = now;
+}
 
-	void freeze() {}
-	void start(double where);
-	void stop();
-	void pause() {}
-	void resume() {}
-	void wantclicks(bool want) { if (m_dest) m_dest->need_events(want); }
+void
+transition_engine::end()
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::end()");
+}
 
-	renderer *get_renderer() { return this; }
-	void set_surface(surface *dest) { m_dest = dest; }
-	void set_intransition(lib::transition_info *info) { m_intransition = info; }
-	void set_outtransition(lib::transition_info *info) { m_outtransition = info; }
-	surface *get_surface() { return m_dest;}
-	void user_event(const point &where, int what = 0) { user_event_callback(what); }
-    void redraw(const screen_rect<int> &dirty, abstract_window *window);
-  private:
-	void transition_step();
-	
-	surface *m_dest;
-	lib::transition_info *m_intransition, *m_outtransition;
-	smil2::transition_engine *m_trans_engine;
-	bool m_playing;
-	critical_section m_lock;
-};
+void
+transition_engine::step(lib::transition_info::time_type now)
+{
+	AM_DBG lib::logger::get_logger()->trace("transition_engine::step(%d)", now);
+	m_progress = (now-m_begin_time) * m_time2progress;
+	if (m_progress > m_info->m_endProgress) m_progress = 1.0;
+	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::step(%d): %f%%", now-m_begin_time, m_progress*100);
+}
 
-class cocoa_background_renderer : public background_renderer {
-  public:
-    cocoa_background_renderer(const common::region_info *src)
-	:   background_renderer(src) {}
-	void redraw(const lib::screen_rect<int> &dirty, common::abstract_window *window);
-  private:
-	
-};
+bool
+transition_engine::is_done()
+{
+	return m_progress >= m_info->m_endProgress;
+}
 
-} // namespace cocoa
-
-} // namespace gui
- 
-} // namespace ambulant
-
-#endif // AMBULANT_GUI_COCOA_COCOA_FILL_H
+lib::transition_info::time_type
+transition_engine::next_step_delay()
+{
+	return 0;
+}

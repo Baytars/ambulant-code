@@ -61,10 +61,15 @@
 
 #include <Cocoa/Cocoa.h>
 
-#define DUMP_IMAGES_FORMAT @"/tmp/amdump/ambulant_dump_%03d.tiff"
+// Define this for debugging: on every redraw we dump the view contents
+// to an image file
+//#define DUMP_IMAGES_FORMAT @"/tmp/amdump/ambulant_dump_%03d.tiff"
+
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
+
+static ambulant::lib::critical_section redraw_lock;
 
 namespace ambulant {
 
@@ -93,7 +98,9 @@ cocoa_window::need_redraw(const screen_rect<int> &r)
 	}
 	AmbulantView *my_view = (AmbulantView *)m_view;
 	NSRect my_rect = [my_view NSRectForAmbulantRect: &r];
+	redraw_lock.enter();
 	[my_view setNeedsDisplayInRect: my_rect];
+	redraw_lock.leave();
 	//[my_view setNeedsDisplay: YES];
 }
 
@@ -266,7 +273,8 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 - (void)drawRect:(NSRect)rect
 {
     AM_DBG NSLog(@"AmbulantView.drawRect: self=0x%x rect=(%f,%f,%f,%f)", self, NSMinX(rect), NSMinY(rect), NSMaxX(rect), NSMaxY(rect));
-    if (!ambulant_window) {
+    redraw_lock.enter();
+	if (!ambulant_window) {
         AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
     } else {
 #ifdef DUMP_IMAGES_FORMAT
@@ -274,12 +282,13 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 #endif
         ambulant::lib::screen_rect<int> arect = [self ambulantRectForNSRect: &rect];
         ambulant_window->redraw(arect);
-    }
 #ifdef DUMP_IMAGES_FORMAT
-	// Debug code: dump the contents of the view into an image
-	static int seqnum = 1;
-	[self dumpToImageFile: [NSString stringWithFormat: DUMP_IMAGES_FORMAT, seqnum++]];
+		// Debug code: dump the contents of the view into an image
+		static int seqnum = 1;
+		[self dumpToImageFile: [NSString stringWithFormat: DUMP_IMAGES_FORMAT, seqnum++]];
 #endif
+    }
+	redraw_lock.leave();
 }
 
 - (void)setAmbulantWindow: (ambulant::gui::cocoa::cocoa_window *)window
