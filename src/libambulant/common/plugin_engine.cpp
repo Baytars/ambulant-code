@@ -48,6 +48,7 @@
  
 #include"ambulant/common/plugin_engine.h"
 #include "ambulant/lib/logger.h"
+#include"ambulant/common/plugin_init.h"
 
 #include<dlfcn.h>
 #include<stdlib.h>
@@ -85,10 +86,10 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 	int nr_of_files;
 	int errors;
 	char filename[1024];
-	typedef void (*initfunctype)(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df);
+	//typedef init* (*initfunctype)(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df);
 	lt_dlhandle handle;
-	
-	initfunctype init;
+	ambulant::common::init* init_class;
+	ambulant::common::init_func_type* plugin_init;
 
 	dirent **namelist;
 	m_plugindir = getenv("AMB_PLUGIN_DIR");
@@ -115,11 +116,12 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 				  	if (handle) {
   						AM_DBG lib::logger::get_logger()->trace("plugin_playable_factory::reading plugin SUCCES [ %s ]",filename);
 						AM_DBG lib::logger::get_logger()->trace("Registring test plugin's factory");
-						init = (initfunctype) lt_dlsym(handle,"initialize");
-						if (!init) {
+						plugin_init = (ambulant::common::init_func_type*) lt_dlsym(handle,"initialize");
+						if (!plugin_init) {
 							lib::logger::get_logger()->error("plugin_playable_factory: no initialize routine");
 						} else {
-							(*init)(rf, df);
+							init_class = (*plugin_init)();
+							init_class->register_factories(rf,df);
 						}
 		  			} else {
 						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",filename);

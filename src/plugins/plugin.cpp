@@ -45,6 +45,8 @@
  * which carries forward this exception. 
  * 
  */
+
+#include "ambulant/common/plugin_init.h"
 #include "ambulant/common/renderer.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/unix/unix_mtsync.h"
@@ -55,13 +57,19 @@
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
+//using namespace ambulant;
+//using namespace plugin;
 
-using namespace ambulant;
 
-extern "C" {
-void initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
+class init_plugin : public ambulant::common::init {
+  public :
+	  virtual void register_factories(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df) {
+		  printf("HALLLLOOOOO\n");
+		  rf->add_factory(NULL);
+	  }
+};
+
+extern "C" ambulant::common::init* initialize()
 {
-	printf("HELLOOOOO rf=0x%x df=0x%x\n", rf, df);
-	rf->add_factory(NULL);
-}
+	return new init_plugin;
 }
