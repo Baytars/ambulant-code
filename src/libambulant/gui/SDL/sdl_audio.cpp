@@ -52,7 +52,7 @@
 #endif
 
 #include "ambulant/gui/SDL/sdl_audio.h"
-#include "malloc.h"
+#include <stdlib.h>
 
 namespace ambulant {
 
