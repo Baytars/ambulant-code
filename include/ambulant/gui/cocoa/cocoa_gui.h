@@ -124,6 +124,7 @@ class cocoa_renderer_factory : public lib::renderer_factory {
 - (void)setAmbulantWindow: (ambulant::gui::cocoa::cocoa_window *)window;
 - (void)ambulantWindowClosed;
 - (bool)isAmbulantWindowInUse;
+- (BOOL)isFlipped;
 
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect;
 - (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (const NSRect *)nsrect;
