@@ -65,20 +65,24 @@
 using namespace ambulant;
 
 
+
+void initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
+{
+	
+}
+
 plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::datasource_factory* df)
 {
 	int nr_of_files;
 	char filename[1024];
-
+	typedef common::playable_factory* (*create_fac_type)();
 	void *handle;
-	typedef void (*initfunctype)(common::global_playable_factory* rf, net::datasource_factory* df);
-	initfunctype init;
 	
-	
+	create_fac_type create_fac;
 
-	
 	dirent **namelist;
 	m_plugindir = getenv("AMB_PLUGIN_DIR");
+	
 	AM_DBG lib::logger::get_logger()->trace("plugin_engine::Scaning plugin directory : %s", m_plugindir);
 
 	if (m_plugindir != NULL) {
@@ -95,12 +99,13 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 					strcat(filename,namelist[nr_of_files]->d_name);
 					handle = dlopen(filename, RTLD_LAZY);
 				  	if (handle) {
-  						AM_DBG lib::logger::get_logger()->error("plugin_playable_factory::reading plugin SUCCES [ %s ]",filename);
-						init = (initfunctype) dlsym(handle,"initialize");
-						(*init)(rf, df);
+  						AM_DBG lib::logger::get_logger()->trace("plugin_playable_factory::reading plugin SUCCES [ %s ]",filename);
+						AM_DBG lib::logger::get_logger()->trace("Registring test plugin's factory");
+						create_fac = (create_fac_type) dlsym(handle,"create_factory");
+						rf->add_factory ((*create_fac)());
 		  			} else {
 						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",filename);
-						lib::logger::get_logger()->error("Reading plugin failed because : %s", dlerror());
+						lib::logger::get_logger()->error("Reading plugin failed because : %s\n\n", dlerror());
 					}
 			}
 			free(namelist[nr_of_files]);
