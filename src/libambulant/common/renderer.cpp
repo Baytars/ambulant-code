@@ -350,7 +350,18 @@ active_video_renderer::seek(double t)
 	lib::logger::get_logger()->trace("active_video_renderer: seek(%f) not implemented", t);
 }
 
-
+std::pair<bool, double> 
+active_video_renderer::get_dur()
+{
+	//DBG return std::pair<bool, double>(true, 7);
+	std::pair<bool, double> rv(false, 0.0);
+	m_lock.enter();
+	// video is the important one so we ask the video source
+	if (m_src)
+		rv = m_src->get_dur();
+	m_lock.leave();
+	return rv;
+}
 
 // now() returns the time in seconds !
 double
