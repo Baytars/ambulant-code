@@ -64,7 +64,7 @@ namespace ambulant {
 using namespace lib;
     namespace gui {
         namespace arts {
-        
+          
 class arts_renderer_factory : public lib::renderer_factory {
 public:
     active_renderer *new_renderer(

@@ -123,7 +123,7 @@ class databuffer
 	void readdone(int size);
 	void prepare(char* in_ptr);
 	void pushdata(int size);
-    char* get_read_ptr()   ;
+    char* get_read_ptr();
 	
 };
 
