@@ -2217,7 +2217,7 @@ void time_node::follow_link(qtime_type timestamp) {
 		destination_state = dst_pause;
 	}
 	
-	if (show && strcmp("show", "new") == 0) {
+	if (show && strcmp(show, "new") == 0) {
 		source_state = src_play;
 	} else if (show && strcmp(show, "pause") == 0) {
 		source_state = src_pause;
@@ -2229,8 +2229,6 @@ void time_node::follow_link(qtime_type timestamp) {
 		destination_state = dst_external;
 	}
 	
-	if(href) {
-		m_context->show_link(m_node, href, source_state, destination_state);
-	}
+	m_context->show_link(m_node, href, source_state, destination_state);
 }
 
