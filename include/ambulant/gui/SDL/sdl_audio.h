@@ -78,39 +78,39 @@ namespace sdl {
 
 class sdl_active_audio_renderer : public common::renderer_playable {
   public:
-    sdl_active_audio_renderer(
-    common::playable_notification *context,
-    common::playable_notification::cookie_type cookie,
-    const lib::node *node,
-    lib::event_processor *evp,
-    common::factories *factory);
+	sdl_active_audio_renderer(
+	common::playable_notification *context,
+	common::playable_notification::cookie_type cookie,
+	const lib::node *node,
+	lib::event_processor *evp,
+	common::factories *factory);
 
-    sdl_active_audio_renderer(
-    common::playable_notification *context,
-    common::playable_notification::cookie_type cookie,
-    const lib::node *node,
-    lib::event_processor *evp,
-    common::factories *factory,
-    net::audio_datasource *ds);
+	sdl_active_audio_renderer(
+	common::playable_notification *context,
+	common::playable_notification::cookie_type cookie,
+	const lib::node *node,
+	lib::event_processor *evp,
+	common::factories *factory,
+	net::audio_datasource *ds);
   
-    ~sdl_active_audio_renderer();
+	~sdl_active_audio_renderer();
 
-      
-    bool is_paused();
-    bool is_stopped();
-    bool is_playing();
-    
-    std::pair<bool, double> get_dur();
-    void start(double where);
-    void stop();
-    void seek(double t);
-    void pause();
-    void resume();
-//  void freeze() {};
-//  void speed_changed() {};
+	  
+	bool is_paused();
+	bool is_stopped();
+	bool is_playing();
+	
+	std::pair<bool, double> get_dur();
+	void start(double where);
+	void stop();
+	void seek(double t);
+	void pause();
+	void resume();
+//	void freeze() {};
+//	void speed_changed() {};
 
-//  void set_surface(common::surface *dest) { abort(); }
-//  common::surface *get_surface() { abort(); }
+//	void set_surface(common::surface *dest) { abort(); }
+//	common::surface *get_surface() { abort(); }
 #ifdef USE_SMIL21
 void set_intransition(const lib::transition_info *info);
 void start_outtransition(const lib::transition_info *info);

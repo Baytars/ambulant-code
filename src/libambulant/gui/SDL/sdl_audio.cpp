@@ -46,7 +46,7 @@
  *
  */
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -186,8 +186,10 @@ gui::sdl::sdl_active_audio_renderer::sdl_callback(Uint8 *stream, int len)
 {
 	m_static_lock.enter();
 	std::list<sdl_active_audio_renderer *>::iterator first = m_renderers.begin();
-	if (m_renderers.size() == 1 && (*first)->m_volcount == 0) {
-		// Exactly one active stream, no volume/pan processing: use simple copy
+	if (m_renderers.size() == 1 && (*first)->m_volcount == 0
+	    && ! ((*first)->m_intransition || (*first)->m_outtransition)) {
+		// Exactly one active stream, no volume/pan processing,
+		// no transitions: use simple copy
 		Uint8 *single_data;
 
 		AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::sdl_callback(0x%x, %d) [one stream] calling get_data()", (void*) stream, len);
@@ -357,8 +359,8 @@ gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (m_dest) {
 			double leftlevel, rightlevel;
 			const common::region_info *info = m_dest->get_info();
-			leftlevel = rightlevel = info->get_soundlevel();
 #ifdef USE_SMIL21
+			double level = info->get_soundlevel();
 			if (m_dur && (m_intransition || m_outtransition)) {
 			  	double progress;
 				lib::transition_info::time_type now;
@@ -370,16 +372,17 @@ gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 				}
 				progress = ((double) (now - m_start_time) / m_dur)
 					* (m_endProgress - m_startProgress);
-				if (m_outtransition) {
-					progress = m_endProgress - progress;
-				} else {
-					progress = m_startProgress + progress;
-				}
+
+				progress += m_startProgress;
 				if (progress > m_endProgress) progress = m_endProgress;
 				if (progress < m_startProgress) progress = m_startProgress;
 				AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::get_data(0x%x): m_intransition=0x%x  m_outtransition=0x%x now=%d indur=%d outdur=%d progress=%f",this,m_intransition,m_outtransition,now,m_intransition?m_intransition->m_dur:-317,m_outtransition?m_outtransition->m_dur:-318,progress);
-				leftlevel = rightlevel = leftlevel * progress;
+				if (m_outtransition)
+					level *= (1.0 - progress);
+				else
+					level *= progress;
 			}
+			leftlevel = rightlevel = level;
 #endif
 #ifdef USE_SMIL21
 			common::sound_alignment align = info->get_soundalign();
@@ -403,6 +406,7 @@ gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		}
 	}
 	m_lock.leave();
+	AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::get_data(0x%x) return rv=%d, m_volcount=%d, m_volumes=[%f,%f]",this,rv,m_volcount,m_volumes[0],m_volumes[1]);
 	return rv;
 }
 
