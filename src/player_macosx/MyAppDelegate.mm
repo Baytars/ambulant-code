@@ -128,7 +128,7 @@ initialize_logger()
 	const char *locale = [userLocaleName cString];
 	const char *unix_locale = getenv("LANG");
 	if (unix_locale == NULL || *unix_locale == '\0') {
-		setlocale(LC_MESSAGES, locale);
+//		setlocale(LC_MESSAGES, locale);
 		setenv("LANG", locale, 1);
 	} else if (strcmp(locale, unix_locale) != 0) {
 		ambulant::lib::logger::get_logger()->warn("MacOS System Preferences locale: \"%s\", Unix locale: LANG=\"%s\"", locale, unix_locale);
