@@ -1576,6 +1576,22 @@
 			settings = {
 			};
 		};
+		04383C7706F4600F006338F5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.rtf;
+			name = Dutch;
+			path = Dutch.lproj/Credits.rtf;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		04383CCD06F4639B006338F5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.strings;
+			name = Dutch;
+			path = Dutch.lproj/InfoPlist.strings;
+			refType = 4;
+			sourceTree = "<group>";
+		};
 		0444D2DD051F2EEF0010C447 = {
 			children = (
 				04382AB805D7AEE600CFA029,
@@ -3375,6 +3391,7 @@
 		089C165FFE840EACC02AAC07 = {
 			children = (
 				089C1660FE840EACC02AAC07,
+				04383CCD06F4639B006338F5,
 			);
 			isa = PBXVariantGroup;
 			name = InfoPlist.strings;
@@ -3609,6 +3626,7 @@
 		2A37F4B9FDCFA73011CA2CEA = {
 			children = (
 				2A37F4BAFDCFA73011CA2CEA,
+				04383C7706F4600F006338F5,
 			);
 			isa = PBXVariantGroup;
 			name = Credits.rtf;
