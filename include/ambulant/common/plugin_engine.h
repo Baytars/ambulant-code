@@ -55,6 +55,7 @@
 
 #include "ambulant/common/playable.h"
 #include "ambulant/common/renderer.h"
+#include <ltdl.h>
 
  
 namespace ambulant {

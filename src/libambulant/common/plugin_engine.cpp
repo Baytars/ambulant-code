@@ -53,7 +53,7 @@
 #include<stdlib.h>
 #include<dirent.h>
 #include<string.h>
-
+#include <ltdl.h>
 
 
 
@@ -65,28 +65,42 @@
 using namespace ambulant;
 
 
-
-void initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
+int filter(const struct dirent* filen)
 {
-	
+	int len;
+	len = strlen(filen->d_name);
+	if (!strncmp(filen->d_name+(len-3),".so",3) ) {
+		return 1;
+	} else {
+		return 0;
+	}
+	return 0;
 }
+
+
+
 
 plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::datasource_factory* df)
 {
 	int nr_of_files;
+	int errors;
 	char filename[1024];
-	typedef common::playable_factory* (*create_fac_type)();
-	void *handle;
+	typedef void (*initfunctype)(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df);
+	lt_dlhandle handle;
 	
-	create_fac_type create_fac;
+	initfunctype init;
 
 	dirent **namelist;
 	m_plugindir = getenv("AMB_PLUGIN_DIR");
 	
+	// Init libltdl
+	errors = lt_dlinit ();
+	
+	
 	AM_DBG lib::logger::get_logger()->trace("plugin_engine::Scaning plugin directory : %s", m_plugindir);
 
 	if (m_plugindir != NULL) {
-		nr_of_files = scandir(m_plugindir, &namelist, NULL, NULL);
+		nr_of_files = scandir(m_plugindir, &namelist, &filter , NULL);
 		if (nr_of_files < 0) {
 			lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin directory");
 		} else {
@@ -97,12 +111,16 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 	          		strcmp(namelist[nr_of_files]->d_name, "..")) { 
 					strcpy(filename,m_plugindir);
 					strcat(filename,namelist[nr_of_files]->d_name);
-					handle = dlopen(filename, RTLD_LAZY);
+					handle = lt_dlopen(filename);
 				  	if (handle) {
   						AM_DBG lib::logger::get_logger()->trace("plugin_playable_factory::reading plugin SUCCES [ %s ]",filename);
 						AM_DBG lib::logger::get_logger()->trace("Registring test plugin's factory");
-						create_fac = (create_fac_type) dlsym(handle,"create_factory");
-						rf->add_factory ((*create_fac)());
+						init = (initfunctype) lt_dlsym(handle,"initialize");
+						if (!init) {
+							lib::logger::get_logger()->error("plugin_playable_factory: no initialize routine");
+						} else {
+							(*init)(rf, df);
+						}
 		  			} else {
 						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",filename);
 						lib::logger::get_logger()->error("Reading plugin failed because : %s\n\n", dlerror());
