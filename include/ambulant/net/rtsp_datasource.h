@@ -132,24 +132,7 @@ class rtsp_demux : public detail::abstract_demux {
   protected:
 	unsigned long run();
   private:	
-	
-  	
-    //void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
-	//void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
-
-	
-    //datasink *m_sinks[MAX_STREAMS];
 	rtsp_context_t* m_context;
-  	//RTSPClient *m_rtsp_client;
-	//MediaSession *m_media_session;
-  	//char* m_sdp;
-	//int m_nstream;
-	//int m_audio_stream;
-	//int m_video_stream;		
-	//unsigned char* m_audio_packet;
-	//unsigned char* m_video_packet;
-	//char* m_blocking_flag;
-	//bool m_eof;
 };
 
 

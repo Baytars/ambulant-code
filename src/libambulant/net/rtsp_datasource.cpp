@@ -53,7 +53,7 @@
 using namespace ambulant;
 using namespace net;
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -151,7 +151,6 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	}
 	
 	context->media_session = MediaSession::createNew(*env, context->sdp);
-	std::cout << "MEDIA_SESSION <<" << context->media_session <<"\n";
 	if (!context->media_session) {
 		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) failed to create  a MediaSession");
 		//lib::logger::get_logger()->error("RTSP Connection Failed");		
@@ -168,11 +167,12 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
 			desired_buf_size = 100000;
 			if (context->audio_stream < 0) {
-				std::cout << "context->nstream = " << context->nstream << "\n";
 				context->audio_stream = context->nstream;
 				context->codec_name = subsession->codecName();
-				context->fmt.channels = subsession->numChannels();
-				context->fmt.samplerate = subsession->rtpSource()->timestampFrequency();
+				context->fmt.channels = subsession->numChannels() + 1;
+				context->fmt.bits = 16;
+				context->fmt.samplerate = 0;
+				//context->fmt.samplerate = subsession->rtpSource()->timestampFrequency();
 				
 			}
 		} else if (strcmp(subsession->mediumName(), "video") == 0) {
@@ -244,9 +244,7 @@ ambulant::net::rtsp_demux::run()
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
 			}
 		}
-		//~ do {
-			//~ std::cout << " waiting " << "/n";
-		//~ } while (m_context->blocking_flag == 0);
+
 		AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() blocking_flag: 0x%x, %d, need_audio %d", &m_context->blocking_flag, m_context->blocking_flag, m_context->need_audio);		
 		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
 		scheduler.doEventLoop(&m_context->blocking_flag);
@@ -301,219 +299,3 @@ on_source_close(void* data)
 		context->blocking_flag = ~0;
 	}
 }
-
-//====================================== proof of concept ffmpeg datasources ==================
-
-
-
-
-//~ live_audio_datasource *
-//~ live_audio_datasource::new_live_audio_datasource(
-  		//~ const net::url& url, 
-  		//~ AVCodecContext *context,
-		//~ rtsp_demux *thread)
-//~ {
-
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::new_live_ffmpeg_audio_datasource()");
-	//~ ffmpeg_init();
-	//~ // Find the index of the audio stream
-	//~ int stream_index = thread->audio_stream_nr();
-	//~ std::cout << "audio_stream_nr : " << stream_index << "\n";
-	
-	//~ return new live_audio_datasource(url, context, thread, stream_index);
-
-//~ }
-
-
-
-//~ live_audio_datasource::live_audio_datasource(const net::url& url, AVCodecContext *context,
-	//~ rtsp_demux *thread, int stream_index)
-//~ :	m_url(url),
-	//~ m_con(context),
-	//~ m_stream_index(stream_index),
-	//~ m_fmt(audio_format("ffmpeg")),
-	//~ m_src_end_of_file(false),
-	//~ m_event_processor(NULL),
-	//~ m_thread(thread),
-	//~ m_client_callback(NULL)
-//~ {	
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: channels=%d", context->channels);
-    //~ m_fmt.parameters = (void *) context;
-	//~ m_thread->add_datasink(this, stream_index);
-//~ }
-
-//~ live_audio_datasource::~live_audio_datasource()
-//~ {
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::~live_audio_datasource(0x%x)", (void*)this);
-	//~ stop();
-//~ }
-
-//~ void
-//~ live_audio_datasource::stop()
-//~ {
-	//~ m_lock.enter();
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::stop(0x%x)", (void*)this);
-	//~ if (m_thread) {
-		//~ rtsp_demux *tmpthread = m_thread;
-		//~ m_thread = NULL;
-		//~ m_lock.leave();
-		//~ tmpthread->remove_datasink(m_stream_index);
-		//~ m_lock.enter();
-	//~ }
-	//~ m_thread = NULL;
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::stop: thread stopped");
-	//~ //if (m_con) delete m_con;
-	//~ m_con = NULL; // owned by the thread
-	//~ if (m_client_callback) delete m_client_callback;
-	//~ m_client_callback = NULL;
-	//~ m_lock.leave();
-//~ }	
-
-//~ void 
-//~ live_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk)
-//~ {
-	//~ m_lock.enter();
-	
-	//~ if (m_client_callback != NULL) {
-		//~ delete m_client_callback;
-		//~ m_client_callback = NULL;
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::start(): m_client_callback already set!");
-	//~ }
-	//~ if (m_buffer.buffer_not_empty() || _end_of_file() ) {
-		//~ // We have data (or EOF) available. Don't bother starting up our source again, in stead
-		//~ // immedeately signal our client again
-		//~ if (callbackk) {
-			//~ assert(evp);
-			//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::start: trigger client callback");
-			//~ evp->add_event(callbackk, 0, ambulant::lib::event_processor::med);
-		//~ } else {
-			//~ lib::logger::get_logger()->debug("Internal error: live_audio_datasource::start(): no client callback!");
-			//~ lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
-		//~ }
-	//~ } else {
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::start(): no data available");
-		//~ // We have no data available. Start our source, and in our data available callback we
-		//~ // will signal the client.
-		//~ m_client_callback = callbackk;
-		//~ m_event_processor = evp;
-	//~ }
-	//~ m_lock.leave();
-//~ }
- 
-//~ void 
-//~ live_audio_datasource::readdone(int len)
-//~ {
-	//~ m_lock.enter();
-	//~ m_buffer.readdone(len);
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource.readdone : done with %d bytes", len);
-//~ //	restart_input();
-	//~ m_lock.leave();
-//~ }
-
-//~ void 
-//~ live_audio_datasource::data_avail(double pts, uint8_t *inbuf, int sz)
-//~ {
-	//~ // XXX timestamp is ignored, for now
-	//~ m_lock.enter();
-	//~ m_src_end_of_file = (sz == 0);
-	//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource.data_avail: %d bytes available", sz);
-	//~ if(sz && !m_buffer.buffer_full()){
-		//~ uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(sz);
-		//~ if (outbuf) {
-			//~ memcpy(outbuf, inbuf, sz);
-			//~ m_buffer.pushdata(sz);
-			//~ // XXX m_src->readdone(sz);
-		//~ } else {
-			//~ lib::logger::get_logger()->debug("Internal error: live_audio_datasource::data_avail: no room in output buffer");
-			//~ lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
-			//~ m_buffer.pushdata(0);
-		//~ }
-	//~ }
-
-	//~ if ( m_client_callback && (m_buffer.buffer_not_empty() || m_src_end_of_file ) ) {
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), m_src_end_of_file);
-		//~ assert(m_event_processor);
-		//~ m_event_processor->add_event(m_client_callback, 0, ambulant::lib::event_processor::med);
-		//~ m_client_callback = NULL;
-		//~ //m_event_processor = NULL;
-	//~ } else {
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::data_avail(): No client callback!");
-	//~ }
-	//~ m_lock.leave();
-//~ }
-
-
-//~ bool 
-//~ live_audio_datasource::end_of_file()
-//~ {
-	//~ m_lock.enter();
-	//~ bool rv = _end_of_file();
-	//~ m_lock.leave();
-	//~ return rv;
-//~ }
-
-//~ bool 
-//~ live_audio_datasource::_end_of_file()
-//~ {
-	//~ // private method - no need to lock
-	//~ if (m_buffer.buffer_not_empty()) return false;
-	//~ return m_src_end_of_file;
-//~ }
-
-//~ bool 
-//~ live_audio_datasource::buffer_full()
-//~ {
-	//~ m_lock.enter();
-	//~ bool rv = m_buffer.buffer_full();
-	//~ m_lock.leave();
-	//~ return rv;
-//~ }	
-
-//~ char* 
-//~ live_audio_datasource::get_read_ptr()
-//~ {
-	//~ m_lock.enter();
-	//~ char *rv = m_buffer.get_read_ptr();
-	//~ m_lock.leave();
-	//~ return rv;
-//~ }
-
-//~ int 
-//~ live_audio_datasource::size() const
-//~ {
-		//~ return m_buffer.size();
-//~ }	
-
-
-//~ audio_format&
-//~ live_audio_datasource::get_audio_format()
-//~ {
-	//~ if (m_con) {
-		//~ // Refresh info on audio format
-		//~ m_fmt.samplerate = m_con->sample_rate;
-		//~ m_fmt.bits = 16; // XXXX
-		//~ m_fmt.channels = m_con->channels;
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::select_decoder: rate=%d, bits=%d,channels=%d",m_fmt.samplerate, m_fmt.bits, m_fmt.channels);
-	//~ }
-	//~ return m_fmt;
-//~ }
-
-//~ std::pair<bool, double>
-//~ live_audio_datasource::get_dur()
-//~ {
-	//~ #if 0
-	//~ std::pair<bool, double> rv(false, 0.0);
-	//~ m_lock.enter();
-	//~ if (m_con && m_con->duration >= 0) {
-		//~ rv = std::pair<bool, double>(true, m_con->duration / (double)AV_TIME_BASE);
-		//~ AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::get_dur: duration=%f", rv.second);
-	//~ }
-	//~ m_lock.leave();
-	//~ #endif
-	//~ std::pair<bool, double> rv(false, 0.0);
-	//~ return rv;
-//~ }
-
-
-
-//~ //#endif // WITH_FFMPEG_AVFORMAT
