@@ -50,10 +50,11 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_COCOA_COCOA_TEXT_H
-#define AMBULANT_GUI_COCOA_COCOA_TEXT_H
+#ifndef AMBULANT_GUI_COCOA_COCOA_RENDERER_H
+#define AMBULANT_GUI_COCOA_COCOA_RENDERER_H
 
 #include "ambulant/common/renderer.h"
+#include "ambulant/smil2/transition.h"
 #include "ambulant/lib/mtsync.h"
 #include <Cocoa/Cocoa.h>
 
@@ -66,23 +67,32 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_text_renderer : public renderer_playable_dsall {
+class cocoa_renderer : public renderer_playable_dsall {
   public:
-	cocoa_text_renderer(
+	cocoa_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp,
 		net::datasource_factory *df)
-	:   renderer_playable_dsall(context, cookie, node, evp, df),
-            m_text_storage(NULL) {};
-        ~cocoa_text_renderer();
-	
+	:	renderer_playable_dsall(context, cookie, node, evp, df),
+		m_intransition(NULL),
+		m_outtransition(NULL),
+		m_trans_engine(NULL) {};
+	~cocoa_renderer();
+
+	void start(double where);
     void redraw(const screen_rect<int> &dirty, gui_window *window);
+    virtual void redraw_body(const screen_rect<int> &dirty, gui_window *window) = 0;
+	void set_intransition(lib::transition_info *info) { m_intransition = info; }
+	void start_outtransition(lib::transition_info *info);
   private:
-    NSTextStorage *m_text_storage;
-	NSLayoutManager *m_layout_manager;
-	NSTextContainer *m_text_container;
+	void transition_step();
+	void stop_transition();
+	
+	lib::transition_info *m_intransition;
+	lib::transition_info *m_outtransition;
+	smil2::transition_engine *m_trans_engine;
 	critical_section m_lock;
 };
 
@@ -92,4 +102,4 @@ class cocoa_text_renderer : public renderer_playable_dsall {
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_COCOA_COCOA_TEXT_H
+#endif // AMBULANT_GUI_COCOA_COCOA_RENDERER_H

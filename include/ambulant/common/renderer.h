@@ -130,52 +130,6 @@ class renderer_playable : public playable_imp, public renderer {
 	bool m_activated;
 };
 
-#if 0
-class active_playable : public playable {
-  public:
-    active_playable(playable_notification *context, const cookie_type cookie)
-    :   m_context(context),
-        m_cookie(cookie) {};
-    virtual ~active_playable() {};
-
-	virtual void seek(double t) {};
-	virtual void preroll(double when, double where, double how_much) {};
-	virtual std::pair<bool, double> get_dur() { return std::pair<bool, double>(false, 0); };
-	const cookie_type& get_cookie() const { return m_cookie;}
-	
-  protected:
-    void started_callback() const { m_context->started(m_cookie, 0); };
-    void stopped_callback() const { m_context->stopped(m_cookie, 0); };
-    void clicked_callback() const { m_context->clicked(m_cookie, 0); };
-    void pointed_callback() const { m_context->pointed(m_cookie, 0); };
-	void user_event_callback(int what) const {
-		if (what == user_event_click) m_context->clicked(m_cookie, 0);
-		else if (what == user_event_mouse_over) m_context->pointed(m_cookie, 0);
-		else assert(0);
-	}
-    
-    playable_notification *const m_context;
-    cookie_type m_cookie;
-};
-
-class active_basic_renderer : public playable_imp, public renderer {
-  public:
-	active_basic_renderer(
-		playable_notification *context,
-		playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *const evp)
-	:   active_playable(context, cookie),
-		m_node(node),
-		m_event_processor(evp) {};
-		
-	~active_basic_renderer() {};
-	
-  protected:
-	const lib::node *m_node;
-	lib::event_processor *const m_event_processor;
-};
-#endif
 
 class renderer_playable_ds : public renderer_playable {
   public:
