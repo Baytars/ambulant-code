@@ -430,14 +430,14 @@ detail::ffmpeg_demux::run()
 					pts = (timestamp_t) round(((double) pkt->pts * (((double) num)*1000000)/den));
 #endif/*WITH_FFMPEG_0_4_9*/
 				}
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->data, pkt->size);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->data, pkt->size);
 				sink->data_avail(pts, pkt->data, pkt->size);
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final data_avail(0, 0)");
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: final data_avail(0, 0)");
 	int i;
 	for (i=0; i<MAX_STREAMS; i++)
 		if (m_sinks[i])
@@ -794,17 +794,17 @@ demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 		vframe.data = frame_data;
 		vframe.size = sz;
 		m_frames.push(std::pair<timestamp_t, video_frame>(pts,vframe));
-		if ( m_frames.size() || m_src_end_of_file  ) {
-	  		if ( m_client_callback ) {
-				AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): calling client callback (eof=%d)", m_src_end_of_file);
-				assert(m_event_processor);
-				m_event_processor->add_event(m_client_callback, 0, ambulant::lib::event_processor::med);
-				m_client_callback = NULL;
-				//m_event_processor = NULL;
-	  		} else {
-				AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): No client callback! (callback = 0x%x)",(void*) m_client_callback);
-	  		}
-  		}		
+	}		
+	if ( m_frames.size() || m_src_end_of_file  ) {
+		if ( m_client_callback ) {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): calling client callback (eof=%d)", m_src_end_of_file);
+			assert(m_event_processor);
+			m_event_processor->add_event(m_client_callback, 0, ambulant::lib::event_processor::med);
+			m_client_callback = NULL;
+			//m_event_processor = NULL;
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): No client callback! (callback = 0x%x)",(void*) m_client_callback);
+		}
 	}		
 	m_lock.leave();
 }
