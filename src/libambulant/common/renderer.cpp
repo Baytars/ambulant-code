@@ -87,7 +87,7 @@ renderer_playable::renderer_playable(
 	m_activated(false),
 	m_erase_never(false)
 {
-	char *erase = m_node->get_attribute("erase");
+	const char *erase = m_node->get_attribute("erase");
 	if (erase && strcmp(erase, "never") == 0)
 		m_erase_never = true;
 }
