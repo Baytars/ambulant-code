@@ -60,26 +60,28 @@ namespace ambulant
 namespace net
 {
 
- 
-typedef rtsp_packet_t {
-	unsigned char* data;
-	int data_sz;
-	double pts;	
+
+typedef rtsp_context_t {
+	RTSPClient* rtsp_client;
+  	MediaSession* media_session;
+	char* sdp;
 }
+	
+
 
 class datasink {
   public:
-    virtual void data_avail(double` pts, uint8_t *data, int size) = 0;
+    virtual void data_avail(double pts, uint8_t *data, int size) = 0;
 	virtual bool buffer_full() = 0;
 };
 	
 class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
   public:
-	rtsp_demux(net::url& url);
+	rtsp_demux(rtsp_context_t* context);
 	~ffmpeg_demux();
 	
-	//static AVFormatContext *supported(const net::url& url);
-	  
+	static  rtsp_context_t* supported(const net::url& url);
+	
 	void add_datasink(datasink *parent, int stream_index);
 	void remove_datasink(int stream_index);
 	void cancel();
@@ -95,8 +97,8 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	
     
     datasink *m_sinks[MAX_STREAMS];
-  	RTSPClient* m_rtsp_client;
-  	MediaSession* m_media_session;
+  	RTSPClient *m_rtsp_client;
+	MediaSession *m_media_session
   	char* m_sdp;
 	int m_nstream;
 	int m_audio_stream;
