@@ -59,8 +59,7 @@
 #ifndef QT_NO_FILEDIALOG
   /* Assume plain Qt */
 # include <qapplication.h>
-#else /*QT_NO_FILEDIALOG*/
-  /* Assume embedded Qt */
+#else /*QT_NO_FILEDIALOG*/   /* Assume embedded Qt */
 #include <qpe/qpeapplication.h>
 #include <qpe/applnk.h>
 #include <fileselector.h>
@@ -134,11 +133,16 @@ class qt_gui : public QWidget {
 	void	     fileError(QString smilfilename);
 
   public slots:
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	void setDocument(const QString&);
+  /* following slots are needed for Qt Embedded, and are implemented
+     as empty functions for normal Qt because Qt's moc doesn't recogzize
+     #ifdef and #define
+  */
+#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
+#define DocLnk void*
+#endif/*QT_NO_FILEDIALOG*/
 	void slot_file_selected(const DocLnk&);
 	void slot_close_fileselector();
-#endif/*QT_NO_FILEDIALOG*/
 	void slot_play();
 
   private slots:
