@@ -230,9 +230,6 @@
 				RelativePath=".\res\Toolbar.bmp">
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt">
-		</File>
 	</Files>
 	<Globals>
 		<Global
