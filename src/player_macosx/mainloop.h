@@ -45,6 +45,10 @@
  * which carries forward this exception. 
  * 
  */
+ 
+
+#include "ambulant/common/factory.h"
+
 #include "ambulant/version.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/refcount.h"
