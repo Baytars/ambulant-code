@@ -207,12 +207,16 @@ gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
     m_bits=16;
 	m_audio_format = AUDIO_S16;
 	m_buffer_size = 4096;
-	m_channel_used = 0;	
+	m_channel_used = 0;
+	if (m_src) {
 #ifdef WITH_FFMPEG
-	m_audio_src = new net::ffmpeg_audio_datasource(m_src, evp);
+		m_audio_src = new net::ffmpeg_audio_datasource(m_src, evp);
 #else
-	m_audio_src = new net::raw_audio_datasource(m_src);
-#endif	
+		m_audio_src = new net::raw_audio_datasource(m_src);
+#endif
+	} else {
+		m_audio_src = NULL;
+	}
 }
 
 gui::sdl::sdl_active_audio_renderer::~sdl_active_audio_renderer()
@@ -224,8 +228,9 @@ int
 gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
 {
     int err = 0;
+	if (m_sdl_init) return 0; // XXX try by Jack
     if (!m_sdl_init) {	
-  		err = SDL_Init(SDL_INIT_AUDIO /* | SDL_INIT_NOPARACHUTE */ );
+  		err = SDL_Init(SDL_INIT_AUDIO| SDL_INIT_NOPARACHUTE);
 		if (err < 0) {
         	lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL init failed", (void *)this);
        		return err;
