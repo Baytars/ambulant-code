@@ -287,7 +287,11 @@ int
 gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 {
 	m_lock.enter();
-	assert(m_is_playing);
+	//assert(m_is_playing);
+	if (!m_is_playing) {
+	    m_lock.leave();
+	    return 0;
+	}
 	int rv;
 	if (m_is_paused||!m_audio_src) {
 		rv = 0;
