@@ -47,6 +47,7 @@
  */
 #ifndef NONE_FACTORY_H
 #define NONE_FACTORY_H
+#include "ambulant/common/factory.h"
 #include "ambulant/common/playable.h"
 namespace ambulant {
 namespace gui {

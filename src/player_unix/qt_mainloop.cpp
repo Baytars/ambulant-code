@@ -102,30 +102,29 @@ open_web_browser(const std::string &href)
 }
 
 qt_mainloop::qt_mainloop(qt_gui* parent) :
-	m_df(NULL),
 	m_doc(NULL),
 	m_parent(parent),
 	m_player(NULL),
  	m_refcount(1),
-	m_rf(NULL),
  	m_running(false),
-	m_speed(1.0),
-	m_wf(NULL)
+	m_speed(1.0)
 {
+
+	
 	// First create the datasource factory and populate it too.
-	m_df = new net::datasource_factory();
+	m_factories.df = new net::datasource_factory();
 	
 #ifdef WITH_FFMPEG
     AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
-	m_df->add_audio_factory(new net::ffmpeg_audio_datasource_factory());
+	m_factories.df->add_audio_factory(new net::ffmpeg_audio_datasource_factory());
     AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: add ffmpeg_audio_parser_finder");
-	m_df->add_audio_parser_finder(new net::ffmpeg_audio_parser_finder());
+	m_factories.df->add_audio_parser_finder(new net::ffmpeg_audio_parser_finder());
     AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: add ffmpeg_audio_filter_finder");
-	m_df->add_audio_filter_finder(new net::ffmpeg_audio_filter_finder());
+	m_factories.df->add_audio_filter_finder(new net::ffmpeg_audio_filter_finder());
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
-	m_df->add_video_factory(new net::ffmpeg_video_datasource_factory());
+	m_factories.df->add_video_factory(new net::ffmpeg_video_datasource_factory());
     AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
-	m_df->add_raw_factory(new net::ffmpeg_raw_datasource_factory());
+	m_factories.df->add_raw_factory(new net::ffmpeg_raw_datasource_factory());
 #endif
 
 #ifdef WITH_STDIO_DATASOURCE
@@ -134,39 +133,38 @@ qt_mainloop::qt_mainloop(qt_gui* parent) :
 	// If you define WITH_STDIO_DATASOURCE we prefer to use the stdio datasource,
 	// however.
     AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: add stdio_datasource_factory");
-	m_df->add_raw_factory(new net::stdio_datasource_factory());
+	m_factories.df->add_raw_factory(new net::stdio_datasource_factory());
 #endif
     AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: add posix_datasource_factory");
-	m_df->add_raw_factory(new net::posix_datasource_factory());
+	m_factories.df->add_raw_factory(new net::posix_datasource_factory());
 
 	// Next create the playable factory and populate it.
-	common::global_playable_factory *m_rf =
-		new common::global_playable_factory(); 
+	m_factories.rf = new common::global_playable_factory();
 		
 	AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: Starting the plugin engine");
-	plugin::plugin_engine *m_pf = new plugin::plugin_engine(m_rf,m_df);
+	plugin::plugin_engine *m_pf = new plugin::plugin_engine(m_factories);
 	
 #ifdef WITH_SDL
 
 	AM_DBG logger::get_logger()->debug("add factory for SDL");
-	m_rf->add_factory( new sdl::sdl_renderer_factory(m_df) );
+	m_factories.rf->add_factory( new sdl::sdl_renderer_factory(m_df) );
 AM_DBG logger::get_logger()->debug("add factory for SDL done");
 #endif
 
 #ifdef WITH_ARTS
-	m_rf->add_factory(new arts::arts_renderer_factory(m_df));
+	m_factories.rf->add_factory(new arts::arts_renderer_factory(m_df));
 #endif 
 
-	m_rf->add_factory(new qt_renderer_factory(m_df));
+	m_factories.rf->add_factory(new qt_renderer_factory(m_df));
 	
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: added qt_video_factory");		
- 	m_rf->add_factory(new qt_video_factory(m_df));
+ 	m_factories.rf->add_factory(new qt_video_factory(m_df));
 		AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: added none_video_factory");		
 
-	m_rf->add_factory(new none::none_video_factory(m_df));
+	m_factories.rf->add_factory(new none::none_video_factory(m_df));
 
 	
-	m_wf = new qt_window_factory(parent, 
+	m_factories.wf = new qt_window_factory(parent, 
 				     parent->get_o_x(),
 				     parent->get_o_y());
 

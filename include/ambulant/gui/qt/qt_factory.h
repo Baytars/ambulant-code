@@ -151,7 +151,7 @@ class qt_renderer_factory : public common::playable_factory {
 class qt_video_factory : public common::playable_factory {
   public:
   
-	qt_video_factory(common::factory *factory)
+	qt_video_factory(common::factories *factory)
 	:   m_factory(factory) {}
 	~qt_video_factory();
 

@@ -131,7 +131,7 @@ class qt_mainloop : public ambulant::common::embedder, public ambulant::lib::ref
  private: 
 	ambulant::lib::document *create_document(const char *filename);
 	// sorted alphabetically on member name
- 	common::factories *m_factories;
+ 	common::factories m_factories;
 	document*				m_doc;
 	qt_gui*					m_parent;
 	player*					m_player;
