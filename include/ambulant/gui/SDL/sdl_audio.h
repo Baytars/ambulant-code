@@ -104,17 +104,17 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	net::abstract_audio_datasource *m_audio_src;
  	int inc_channels();
 	int init(int rate, int bits, int channels);
+	
     static bool m_sdl_init;
     static int m_mixed_channels;
+    
     Mix_Chunk m_audio_chunck;
-	int m_use_channel;
     int m_rate;
 	int m_bits;
     int m_channels;
     int m_buffer_size;
 	int m_channel_used;
 	Uint16 m_audio_format;
-    event *m_playdone;
 };
 
 } // end namespace sdl

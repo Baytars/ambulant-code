@@ -116,12 +116,12 @@ class ffmpeg_audio_datasource: public abstract_audio_datasource {
     lib::event *m_readdone;
   	abstract_active_datasource* m_src;
 
-  	bool m_ffmpeg_init;
 	uint8_t* m_inbuf;
 	uint8_t* m_outbuf;
 	databuffer m_buffer;
 	bool m_blocked_full;
 	bool m_client_waiting;
+	
     static bool m_codec_selected;
   	static bool m_avcodec_open;
   
