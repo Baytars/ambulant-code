@@ -64,23 +64,6 @@
 using namespace ambulant;
 using namespace lib;
 
-transition_info::time_type
-transition_info::get_trans_dur(const node *n) const
-{
-	if(!n) return 0;
-	const char *p = n->get_attribute("dur");
-	if(!p) return 1000;  // XXX What is the correct way to say "1 second"?
-	std::string sdur = trim(p);
-	clock_value_p pl;
-	std::string::const_iterator b = sdur.begin();
-	std::string::const_iterator e = sdur.end();
-	std::ptrdiff_t d = pl.parse(b, e);
-	if(d == -1) {
-		return 0;
-	}
-	return pl.m_result;
-}
-
 transition_info *
 transition_info::from_node(const node *n)
 {
@@ -145,9 +128,9 @@ transition_info::from_node(const node *n)
 	rv->rv->m_type = barnDoorWipe;
 	rv->m_subtype = "";
 #endif
-	rv->m_dur = 2000;
-	rv->m_startProgress = 0.0;
-	rv->m_endProgress = 1.0;
+	rv->m_dur = get_trans_dur(n);
+	rv->m_startProgress = get_progress(n, "startProgress", 0.0);
+	rv->m_endProgress = get_progress(n, "endProgress", 1.0);
 	rv->m_reverse = false;
 	return rv;
 }
@@ -195,4 +178,38 @@ ambulant::lib::repr(transition_type t)
 	case fade: return "fade";
 	default: return "<unknown transition type>";
 	}
+}
+
+transition_info::time_type
+transition_info::get_trans_dur(const node *n)
+{
+	if(!n) return 0;
+	const char *p = n->get_attribute("dur");
+	if(!p) return 1000;  // XXX What is the correct way to say "1 second"?
+	std::string sdur = trim(p);
+	clock_value_p pl;
+	std::string::const_iterator b = sdur.begin();
+	std::string::const_iterator e = sdur.end();
+	std::ptrdiff_t d = pl.parse(b, e);
+	if(d == -1) {
+		return 0;
+	}
+	return pl.m_result;
+}
+
+transition_info::progress_type
+transition_info::get_progress(const node *n, const char* progress, progress_type default_value)
+{
+	if(!n) return 0;
+	const char *p = n->get_attribute(progress);
+	if(!p) return default_value;
+	std::string sdur = trim(p);
+	number_p np;
+	std::string::const_iterator b = sdur.begin();
+	std::string::const_iterator e = sdur.end();
+	std::ptrdiff_t d = np.parse(b, e);
+	if(d == -1) {
+		return -1;
+	}
+	return np.m_result;
 }

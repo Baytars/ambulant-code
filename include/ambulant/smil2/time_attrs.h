@@ -239,8 +239,8 @@ class time_attrs : public time_traits {
 	void parse_transitions();
 	const lib::transition_info *get_trans_in() const { return m_trans_in;}
 	const lib::transition_info *get_trans_out() const { return m_trans_out;}
-	time_type get_trans_in_dur() const;
-	time_type get_trans_out_dur() const;
+	time_type get_trans_in_dur() const { return m_trans_in->m_dur;}
+	time_type get_trans_out_dur() const { return m_trans_out->m_dur;}
 	
   private:
 	void parse_sync_list(const std::list<std::string>& strlist, sync_list& svslist);
