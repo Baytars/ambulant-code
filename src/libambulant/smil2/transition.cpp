@@ -62,8 +62,9 @@
 using namespace ambulant;
 using namespace smil2;
 
-transition_engine::transition_engine(bool outtrans, lib::transition_info *info)
-:   m_outtrans(outtrans),
+transition_engine::transition_engine(common::surface *dst, bool outtrans, lib::transition_info *info)
+:   m_dst(dst),
+	m_outtrans(outtrans),
 	m_info(info),
 	m_begin_time(0)
 {
@@ -122,3 +123,21 @@ transition_engine::next_step_delay()
 {
 	return 50; // Show something 20 times per second
 }
+
+void
+transition_engine_fade::compute()
+{
+}
+
+void
+transition_engine_barwipe::compute()
+{
+	lib::screen_rect<int> dstrect = m_dst->get_rect();
+	int xcur = dstrect.m_left + int(m_progress*(dstrect.m_right + dstrect.m_left) + 0.5);
+	int ycur = dstrect.m_top + int(m_progress*(dstrect.m_bottom + dstrect.m_top) + 0.5);
+	m_oldrect = dstrect;
+	m_newrect = lib::screen_rect(
+		lib::point(dstrect.m_left, dstrect.m_top),
+		lib::point(xcur, ycur));
+}
+
