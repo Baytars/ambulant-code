@@ -77,7 +77,7 @@ cocoa_text_renderer::~cocoa_text_renderer()
 }
 
 void
-cocoa_text_renderer::redraw(const screen_rect<int> &dirty, gui_window *window)
+cocoa_text_renderer::redraw_body(const screen_rect<int> &dirty, gui_window *window)
 {
 	m_lock.enter();
 	const screen_rect<int> &r = m_dest->get_rect();
@@ -124,7 +124,7 @@ cocoa_text_renderer::redraw(const screen_rect<int> &dirty, gui_window *window)
 		}
 		AM_DBG logger::get_logger()->trace("cocoa_text_renderer.redraw at Cocoa-point (%f, %f)", origin.x, origin.y);
 		NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
-		[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: origin];
+		//[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: origin];
 		[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: origin];
 	}
 	m_lock.leave();
