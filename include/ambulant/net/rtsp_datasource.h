@@ -79,6 +79,20 @@ namespace ambulant
 namespace net
 {
 
+static void 
+after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+
+static void 
+after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+	
+static void 
+on_source_close(void* data);
+	
+class datasink {
+  public:
+    virtual void data_avail(double pts, uint8_t *data, int size) = 0;
+	virtual bool buffer_full() = 0;
+};
 
 struct rtsp_context_t {
 	RTSPClient* rtsp_client;
@@ -86,15 +100,12 @@ struct rtsp_context_t {
 	char* sdp;
 	int audio_stream;
 	int video_stream;
+	unsigned char* audio_packet;
+	unsigned char* video_packet;
 	int nstream;
-};
-	
-
-
-class datasink {
-  public:
-    virtual void data_avail(double pts, uint8_t *data, int size) = 0;
-	virtual bool buffer_full() = 0;
+	char* blocking_flag;
+	bool eof;
+	datasink *sinks[MAX_STREAMS];
 };
 	
 class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
@@ -113,21 +124,22 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	
   	int audio_stream_nr();
 	int video_stream_nr();  
-    void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
-	void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
-	void on_source_close(void* clientdata);
+    //void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+	//void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+
 	
     datasink *m_sinks[MAX_STREAMS];
-  	RTSPClient *m_rtsp_client;
-	MediaSession *m_media_session;
-  	char* m_sdp;
-	int m_nstream;
-	int m_audio_stream;
-	int m_video_stream;		
-	unsigned char* m_audio_packet;
-	unsigned char* m_video_packet;
-	char* m_blocking_flag;
-	bool m_eof;
+	rtsp_context_t* m_context;
+  	//RTSPClient *m_rtsp_client;
+	//MediaSession *m_media_session;
+  	//char* m_sdp;
+	//int m_nstream;
+	//int m_audio_stream;
+	//int m_video_stream;		
+	//unsigned char* m_audio_packet;
+	//unsigned char* m_video_packet;
+	//char* m_blocking_flag;
+	//bool m_eof;
 };
 
 class live_ffmpeg_audio_datasource: 

@@ -52,14 +52,11 @@
 using namespace ambulant;
 using namespace net;
 
+
+
+
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
-:	m_rtsp_client(context->rtsp_client),
-	m_media_session(context->media_session),
-	m_sdp(context->sdp),
-	m_nstream(context->nstream),
-	m_audio_stream(context->audio_stream),
-	m_video_stream(context->video_stream),
-	m_eof(false)
+:	m_context(context)
 {
 }
 
@@ -73,6 +70,10 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->audio_stream = -1;
 	context->video_stream = -1;
 	context->nstream = 0;
+	context->blocking_flag = 0;
+	context->audio_packet = NULL;
+	context->video_packet = NULL;
+	
 	
 	// setup the basics.
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew();
@@ -158,64 +159,71 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
-	m_blocking_flag = 0;
-	if(!m_rtsp_client->playMediaSession(*m_media_session)) {
+	m_context->blocking_flag = 0;
+	if(!m_context->rtsp_client->playMediaSession(*m_context->media_session)) {
 		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) play failed");
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return 1;
 	}
 	
-	while(!m_eof) {
+	while(!m_context->eof) {
 	MediaSubsession* subsession;
-	MediaSubsessionIterator iter(*m_media_session);
+	MediaSubsessionIterator iter(*m_context->media_session);
 	// Only audio/video session need to apply for a job !
 	while ((subsession = iter.next()) != NULL) {
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
-			subsession->readSource()->getNextFrame(m_audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, NULL,  on_source_close,NULL);
+			subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,NULL);
 		} else if (strcmp(subsession->mediumName(), "video") == 0) {
-			subsession->readSource()->getNextFrame(m_video_packet, MAX_RTP_FRAME_SIZE, (afterGettingFunc) after_reading_audio, NULL, (onCloseFunc) on_source_close,NULL);
+			subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,NULL);
 		}
 	}
-	TaskScheduler& scheduler = m_media_session->envir().taskScheduler();
-	scheduler.doEventLoop(m_blocking_flag);
+	TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
+	scheduler.doEventLoop(m_context->blocking_flag);
 	}
 }
 
-void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+static void 
+after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
 {
-	if (data) {
+	rtsp_context_t* context = (rtsp_context_t*) data;
+	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
-		if(m_sink[m_audio_stream])) 
-			m_sink[m_audio_stream]->data_avail(rpts, (uint8_t*) data, sz));
-		m_blocking_flag = ~0;
+		if(context->sinks[context->audio_stream])
+			context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) data, sz);
+		context->blocking_flag = "1";
 		//XXX Do we need to free data here ?
 	}
 }	
 
-void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+static void 
+after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
 {
-	if (data) {
+	rtsp_context_t* context = (rtsp_context_t*) data;
+	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
-		if(m_sink[m_video_stream])) 
-			m_sink[m_video_stream]->data_avail(rpts, (uint8_t*) data, sz));
-		m_blocking_flag = ~0;
+		if(context->sinks[context->video_stream]) 
+			context->sinks[context->video_stream]->data_avail(rpts, (uint8_t*) data, sz);
+		context->blocking_flag = "1";
 		//XXX Do we need to free data here ?
 	}
 }
 
-void on_source_close(void* client_data) 
+static void 
+on_source_close(void* data) 
 {
-	m_eof = true;
-	m_blocking_flag = ~0;
+	rtsp_context_t* context = (rtsp_context_t*) data;
+	if (context) {
+		context->eof = true;
+		context->blocking_flag = "1";
+	}
 }
-
 
 //====================================== proof of concept ffmpeg datasources ==================
 live_ffmpeg_audio_datasource *
 live_ffmpeg_audio_datasource::new_live_ffmpeg_audio_datasource(
   		const net::url& url, 
   		AVFormatContext *context,
-		detail::ffmpeg_demux *thread)
+		rtsp_demux *thread)
 {
 	AVCodec *codec;
 	AVCodecContext *codeccontext;
