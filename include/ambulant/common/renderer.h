@@ -123,7 +123,7 @@ class active_renderer : public active_basic_renderer, public abstract_rendering_
 	virtual void pause() {}
 	virtual void resume() {}
 
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft) = 0;
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window) = 0;
 	
   protected:
 	virtual void readdone();

@@ -81,7 +81,7 @@ class none_active_renderer : public lib::active_renderer {
 	:	lib::active_renderer(context, cookie, node, evp, src, dest) {};
 	
 	void start(double where);
-	void redraw(const lib::screen_rect<int> &r, lib::passive_window *window, const lib::point &window_topleft);
+	void redraw(const lib::screen_rect<int> &r, lib::passive_window *window);
 	void stop();
 };
 

@@ -69,7 +69,7 @@ class passive_window;
 // the renderer.
 class abstract_rendering_source {
   public:
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft) = 0;
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window) = 0;
 };
 
 // abstract_rendering_surface is a pure virtual baseclass for a region of screenspace.
@@ -86,6 +86,7 @@ class abstract_rendering_surface {
 	virtual void need_redraw() = 0;
 
 	virtual const screen_rect<int>& get_rect() const = 0;
+	virtual const point &get_global_topleft() const = 0;
 };
 
 class layout_manager {

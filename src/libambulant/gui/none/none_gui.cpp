@@ -69,7 +69,7 @@ gui::none::none_active_renderer::start(double where)
 }
 
 void
-gui::none::none_active_renderer::redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft)
+gui::none::none_active_renderer::redraw(const screen_rect<int> &r, passive_window *window)
 {
 	lib::logger::get_logger()->trace("none_active_renderer.redraw(0x%x)", (void *)this);
 }
