@@ -58,6 +58,44 @@ using namespace net;
 #define AM_DBG if(0)
 #endif
 
+ffmpeg_codec_id* ambulant::net::ffmpeg_codec_id::m_uniqueinstance = NULL;
+
+ffmpeg_codec_id*
+ffmpeg_codec_id::instance()
+{
+	if (m_uniqueinstance == NULL) {
+        m_uniqueinstance = new ffmpeg_codec_id();
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_codec_id::instance() returning 0x%x", (void*) m_uniqueinstance);
+	}
+    return m_uniqueinstance;
+}
+
+void
+ffmpeg_codec_id::add_codec(const char* codec_name, CodecID id)
+{
+  std::string str(codec_name);
+  m_codec_id.insert(std::pair<std::string, CodecID>(str, id));
+}
+
+CodecID
+ffmpeg_codec_id::get_codec_id(const char* codec_name) 
+{
+	std::string str(codec_name);
+	std::map<std::string, CodecID>::iterator i;
+	i = m_codec_id.find(str);
+	if (i != m_codec_id.end()) {
+		return i->second;
+	}
+	
+	return CODEC_ID_NONE;
+}
+
+ffmpeg_codec_id::ffmpeg_codec_id()
+{
+	add_codec("MPA", CODEC_ID_MP3);
+	add_codec("MPA-ROBUST", CODEC_ID_MP3);
+	add_codec("X_MP3-DRAFT-00", CODEC_ID_MP3);
+}
 
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
 :	m_context(context)
@@ -107,6 +145,8 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->codec_name = NULL;
 	context->fmt = audio_format("live");
 	context->eof = false;
+	context->need_video = true;
+	context->need_audio = true;
 	
 	memset(context->sinks, 0, sizeof context->sinks);
 	
@@ -208,7 +248,7 @@ ambulant::net::rtsp_demux::codec_name()
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
-	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() called");
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() called (%d)", m_context->need_audio);
 	m_context->blocking_flag = 0;
 	if (m_context->media_session) {
 		if(!m_context->rtsp_client->playMediaSession(*m_context->media_session)) {
@@ -230,20 +270,28 @@ ambulant::net::rtsp_demux::run()
 		// Only audio/video session need to apply for a job !
 		while ((subsession = iter.next()) != NULL) {
 			if (strcmp(subsession->mediumName(), "audio") == 0) {
-				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an audio frame");
-				subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,m_context);
+				if(m_context->need_audio) {
+					AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an audio frame");
+					m_context->need_audio = false;
+					subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,m_context);
+				}
 			} else if (strcmp(subsession->mediumName(), "video") == 0) {
-				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an video frame");
-				subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,m_context);
+				if (m_context->need_video) {
+					AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an video frame");
+					m_context->need_video = false;
+					subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,m_context);
+				}
 			} else {
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
 			}
 		}
-		do {
-			std::cout << " waiting " << "/n";
-		} while (m_context->blocking_flag == 0);
-		//TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
-		//scheduler.doEventLoop(&m_context->blocking_flag);
+		//~ do {
+			//~ std::cout << " waiting " << "/n";
+		//~ } while (m_context->blocking_flag == 0);
+		AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() blocking_flag: 0x%x, %d, need_audio %d", &m_context->blocking_flag, m_context->blocking_flag, m_context->need_audio);		
+		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
+		scheduler.doEventLoop(&m_context->blocking_flag);
+		m_context->blocking_flag = 0;
 	}
 	
 }
@@ -260,11 +308,15 @@ after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval 
 	AM_DBG lib::logger::get_logger()->debug("after_reading_audio: audio data available (client data: 0x%x", data);
 	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
-		if(context->sinks[context->audio_stream])
+		if(context->sinks[context->audio_stream]) {
+			AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling data_avail");
 			context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) context->audio_packet, sz);
-		context->blocking_flag = ~0;
+			AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling data_avail done");
+		}
 		//XXX Do we need to free data here ?
 	}
+	context->blocking_flag = ~0;
+	context->need_audio = true;
 }	
 
 static void 
@@ -276,6 +328,7 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 		if(context->sinks[context->video_stream]) 
 			context->sinks[context->video_stream]->data_avail(rpts, (uint8_t*) context->video_packet , sz);
 		context->blocking_flag = ~0;
+		context->need_video = true;
 		//XXX Do we need to free data here ?
 	}
 }
@@ -476,7 +529,6 @@ live_audio_datasource::size() const
 audio_format&
 live_audio_datasource::get_audio_format()
 {
-#if 0
 	if (m_con) {
 		// Refresh info on audio format
 		m_fmt.samplerate = m_con->sample_rate;
@@ -484,7 +536,6 @@ live_audio_datasource::get_audio_format()
 		m_fmt.channels = m_con->channels;
 		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::select_decoder: rate=%d, bits=%d,channels=%d",m_fmt.samplerate, m_fmt.bits, m_fmt.channels);
 	}
-#endif
 	return m_fmt;
 }
 
