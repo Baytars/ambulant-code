@@ -57,6 +57,7 @@
 #define AM_DBG if(0)
 #endif
 
+#define DEFAULT_MAX_BUF_SIZE 4096
 
 // ***********************************  C++  CODE  ***********************************
 
@@ -67,79 +68,62 @@ using namespace ambulant;
 	
 net::databuffer::databuffer()
 {
-	m_size = 0;
 	m_used = 0;
+        m_size = 0;
+        m_rear = NULL;
+        m_max_size = DEFAULT_MAX_BUF_SIZE;
 	m_buffer = NULL;
+        m_buffer_full = false;
 }
 
 
-void net::databuffer::resize(int newsize)
+
+
+
+bool
+net::databuffer::is_full()
 {
-	int m_dummy;
-	char *m_newbuf;
-	m_newbuf = new char[newsize];
-	if (m_newbuf) {
-		// first copy the buffer
-		if (m_size > newsize) {
-			m_dummy = newsize;
-		} else { 
-			m_dummy = m_size;
-		}
-	
-		memcpy(m_newbuf, m_buffer, newsize);
-	
-		// delete the old buffer		
-		if (m_buffer) {
-				delete[] m_buffer;
-			}
-		m_size = newsize;
-		if (m_used > newsize) m_used = newsize;
-		m_buffer = m_newbuf;
-	}
+   return m_buffer_full;
 }
 
-net::databuffer::databuffer(int size)
+
+bool
+net::databuffer::not_empty()
 {
-m_size = 0;
-m_used = 0;
-m_buffer = new char[size];
-if (!m_buffer) {
-	lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", size);
-	} else {
-	m_size = size;
-	m_used = 0;
-	memset(m_buffer, 0, size);
-	}
+    if (m_used > 0) {
+        return true;
+    } else {
+        return false;
+    }
 }
+            
 
-// copy constructor
 
-net::databuffer::databuffer(databuffer& src)   // copy constructor
+net::databuffer::databuffer(int max_size)
 {
-int i;
-m_size = 0;
-m_used = 0;
-m_buffer = new char[src.m_size]; 
-if (!m_buffer) {
-	lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", src.m_size);
-	} else {
-	for (i=0;i<src.m_size;i++) {
-		m_buffer[i] = src.m_buffer[i];
-		}
-	m_size = src.m_size;
-	m_used = src.m_used;
-	}
+    m_used = 0;
+    m_size = 0;
+    m_rear = NULL;
+    m_front = NULL;
+    if (max_size > 0) {
+        m_max_size = max_size;
+    } else {
+        m_max_size = DEFAULT_MAX_BUF_SIZE;
+    }
+    m_buffer_full = false;
 }
 
 
 net::databuffer::~databuffer()
 {
 	if (m_buffer) {
-		delete [] m_buffer;
+		free(m_buffer);
 		m_used = 0;
 		m_size = 0;
+                m_rear = NULL;
+                m_front = NULL;
 		m_buffer = NULL;
-		}
+	}
 }
 
 int net::databuffer::used() const
@@ -163,46 +147,54 @@ if (verbose) {
  os << std::endl;
 }
 
-void net::databuffer::put_data(char *data, int size)
+
+
+void net::databuffer::prepare(char* in_ptr)
 {
-int dummy;
-
-dummy = m_used + size;
-
-if (dummy <= m_size) {
-	memcpy((m_buffer+m_used), data, size);
-        m_used = m_used +size;
-	} else {
-	lib::logger::get_logger()->error("databuffer::put_data(size=%d): no room", size);
-	}
-
+    if(!m_buffer_full) {
+        in_ptr = m_front;
+        m_buffer = (char*) realloc(m_buffer, m_size);
+        if (!m_buffer) {
+            lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
+        }
+    } else {
+        lib::logger::get_logger()->warn("databuffer::databuffer::prepare : buffer full but still trying to fill it ");
+    }
+    
 }
 
-void net::databuffer::shift_down(int pos)
+void net::databuffer::pushdata(int size)
 {
-
-if (pos <  m_used) {
-	memmove(m_buffer, (m_buffer+pos),  m_used-pos);
-	m_used =m_used-pos;
-    memset((m_buffer+m_used), 0, m_size-m_used);
-    } else if (pos == m_used) {
-    m_used=0;
-    memset(m_buffer, 0, m_size);
+    if(!m_buffer_full) {
+        m_size = m_size +size;
+        m_front += size;
+        m_used = m_front -m_rear;
+        m_buffer = (char*) realloc(m_buffer, m_size);
+         if (!m_buffer) {
+             lib::logger::get_logger()->fatal("databuffer::databuffer(size=%d): out of memory", m_size);
+         }
+        if(m_size > m_max_size) {
+            m_buffer_full = true;
+        }
     } else {
-	lib::logger::get_logger()->error("databuffer::shift_down(int pos=%d): pos larger then m_used(%d)", pos);
+        lib::logger::get_logger()->warn("databuffer::databuffer::pushdata : buffer full but still trying to fill it");
     }
 }
 
 
-void
-net::databuffer::get_data(char *data, int size)
+char *
+net::databuffer::get_read_ptr()
 {
-if (size <= m_used) {		
-	memcpy(data, m_buffer, size);
-	shift_down(size);
-	} else {
-		lib::logger::get_logger()->error("databuffer::get_data(size=%d): only %d available", size, m_used);
-	}
+return m_rear;
+}
+
+void
+net::databuffer::readdone(int size)
+{
+    if (size <= m_used) {
+        m_rear += size;
+        m_used = m_front - m_rear;
+    }
 }
 
 
@@ -280,19 +272,32 @@ net::active_datasource::filesize()
 			}
 }
 
+
+void
+net::active_datasource::read(char *data, int size)
+{
+    char* in_ptr;
+    if (size <= m_buffer->used()) {
+            in_ptr = m_buffer->get_read_ptr();
+            memcpy(in_ptr,data,size);
+            m_buffer->readdone(size);
+    }
+}
+
 void
 net::active_datasource::read_file()
 {
-  	char buf[BUFSIZ];
-  	int result; 	
+  	char *buf;
+  	int n; 	
 	if (m_stream >= 0) {
 
 		do {
-			result = ::read(m_stream, buf, sizeof(buf));
-			if (result >0) m_buffer->put_data(buf, result); 
-		} while (result > 0);
+                        m_buffer->prepare(buf);
+			n = ::read(m_stream, buf, BUFSIZ);
+			if (n >= 0) m_buffer->pushdata(n); 
+		} while (n > 0);
 
-		if (result < 0) {
+		if (n < 0) {
 			lib::logger::get_logger()->error("active_datasource.read_file(): %s", strerror(errno));
 			} 		
 	}
@@ -300,19 +305,21 @@ net::active_datasource::read_file()
   
   
 void
-net::active_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *readdone)
+net::active_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback)
  {
  	read_file();
+        if ( m_buffer->not_empty() ) {
  	AM_DBG m_buffer->dump(std::cout, false);
-	if (evp && readdone) {
+        if (evp && callback) {
 		AM_DBG lib::logger::get_logger()->trace("active_datasource.start: trigger readdone callback");
-		evp->add_event(readdone, 0, ambulant::lib::event_processor::high);
-	}
+		evp->add_event(callback, 0, ambulant::lib::event_processor::high);
+        }
+        }
 }
  
 void
-net::active_datasource::read(char *data, int size)
+net::active_datasource::readdone(int size)
 {
-	m_buffer->get_data(data, size);
+	m_buffer->readdone(size);
 }
 
