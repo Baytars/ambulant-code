@@ -307,6 +307,7 @@ class demux_video_datasource:
 	std::pair<timestamp_t, video_frame> m_old_frame;
 	detail::abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
+  	audio_datasource* m_audio_src;
 	lib::critical_section m_lock;
   
 };

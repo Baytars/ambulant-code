@@ -275,7 +275,7 @@ detail::ffmpeg_demux::ffmpeg_demux(AVFormatContext *con)
 		m_audio_fmt.samplerate = con->streams[audio_idx]->codec.sample_rate;
 		m_audio_fmt.channels = con->streams[audio_idx]->codec.channels;
 		m_audio_fmt.bits = 16;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): samplerate=%d, channels=%d", m_audio_fmt.samplerate, m_audio_fmt.channels  );
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): samplerate=%d, channels=%d", m_audio_fmt.samplerate, m_audio_fmt.channels  );
 	} 
 	m_video_fmt = video_format("ffmpeg");
 	int video_idx = video_stream_nr();
@@ -340,11 +340,11 @@ detail::ffmpeg_demux::cancel()
 int 
 detail::ffmpeg_demux::audio_stream_nr() 
 {
-	int stream_index;
-	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
-		if (m_con->streams[stream_index]->codec.codec_type == CODEC_TYPE_AUDIO)
-			return stream_index;
-	}
+	//~ int stream_index;
+	//~ for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
+		//~ if (m_con->streams[stream_index]->codec.codec_type == CODEC_TYPE_AUDIO)
+			//~ return stream_index;
+	//~ }
 	
 	return -1;
 }
@@ -424,7 +424,7 @@ detail::ffmpeg_demux::run()
 		assert(pkt->stream_index >= 0 && pkt->stream_index < MAX_STREAMS);
 		detail::datasink *sink = m_sinks[pkt->stream_index];
 		if (sink == NULL) {
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d", pkt->stream_index);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, 0x%x, %d)", pkt->stream_index, pkt->pts ,pkt->data, pkt->size);
 		} else {
 			AM_DBG lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink");
 			// Wait until there is room in the buffer
@@ -453,7 +453,7 @@ detail::ffmpeg_demux::run()
 					pts = (timestamp_t) round(((double) pkt->pts * (((double) num)*1000000)/den));
 #endif/*WITH_FFMPEG_0_4_9*/
 				}
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->data, pkt->size);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d)", pkt->stream_index, pkt->pts, pkt->data, pkt->size);
 				sink->data_avail(pts, pkt->data, pkt->size);
 			}
 		}
@@ -708,9 +708,14 @@ demux_video_datasource::demux_video_datasource(const net::url& url, detail::abst
 	m_src_end_of_file(false),
 	m_event_processor(NULL),
 	m_thread(thread),
-	m_client_callback(NULL)
+	m_client_callback(NULL),
+	m_audio_src(NULL)
 {	
 	m_thread->add_datasink(this, stream_index);
+	int audio_stream_idx = m_thread->audio_stream_nr();
+	if (audio_stream_idx >= 0) 
+		m_audio_src = new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
+	
 }
 
 demux_video_datasource::~demux_video_datasource()
@@ -790,11 +795,11 @@ demux_video_datasource::frame_done(timestamp_t pts, bool keepdata)
 
 	if (m_old_frame.second.data) {
 		free(m_old_frame.second.data);
-		/*AM_DBG*/  lib::logger::get_logger()->debug("demux_video_datasource::frame_done: free(0x%x)", m_old_frame.second.data);
+		AM_DBG  lib::logger::get_logger()->debug("demux_video_datasource::frame_done: free(0x%x)", m_old_frame.second.data);
 		m_old_frame.second.data = NULL;
 	}
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::frame_done(%d): removing frame with ts=%d", pts, element.first);
-	/*AM_DBG*/  lib::logger::get_logger()->debug("demux_video_datasource::frame_done: %lld 0x%x %d", element.first, element.second.data, element.second.size);
+	AM_DBG  lib::logger::get_logger()->debug("demux_video_datasource::frame_done: %lld 0x%x %d", element.first, element.second.data, element.second.size);
 	m_old_frame = element;
 	m_frames.pop();
 	if (!keepdata) {
@@ -818,7 +823,7 @@ demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 		vframe.data = frame_data;
 		vframe.size = sz;
 		m_frames.push(std::pair<timestamp_t, video_frame>(pts,vframe));
-		/*AM_DBG*/  lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): %lld 0x%x %d", pts, vframe.data, vframe.size);
+		AM_DBG  lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): %lld 0x%x %d", pts, vframe.data, vframe.size);
 	}		
 	if ( m_frames.size() || m_src_end_of_file  ) {
 		if ( m_client_callback ) {
@@ -875,7 +880,7 @@ demux_video_datasource::get_frame(timestamp_t *timestamp, int *size)
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_frame() (this=0x%x, size=%d", (void*) this, m_frames.size());
 	std::pair<timestamp_t, video_frame> frame;
 	frame = m_frames.front();
-	/*AM_DBG*/  lib::logger::get_logger()->debug("demux_video_datasource::get_frame(): %lld 0x%x %d", frame.first, frame.second.data, frame.second.size);
+	AM_DBG  lib::logger::get_logger()->debug("demux_video_datasource::get_frame(): %lld 0x%x %d", frame.first, frame.second.data, frame.second.size);
 	char *rv = (char*) frame.second.data;
 	*size = frame.second.size;
 	*timestamp = frame.first;
@@ -917,6 +922,7 @@ demux_video_datasource::height()
 bool 
 demux_video_datasource::has_audio()
 {
+	
 	if (m_thread->audio_stream_nr() >= 0)
 		return true;
 	else
@@ -927,11 +933,7 @@ demux_video_datasource::has_audio()
 audio_datasource*
 demux_video_datasource::get_audio_datasource()
 {
-	int audio_stream_idx = m_thread->audio_stream_nr();
-	if (audio_stream_idx >= 0) 
-		return new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
-	else
-		return NULL;
+		return m_audio_src;
 }
 
 std::pair<bool, double>
@@ -1144,7 +1146,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 		
 		while (sz > 0) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
-				lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con->codec %d ", m_con->codec);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con->codec %d ", m_con->codec);
 				len = avcodec_decode_video(m_con, frame, &got_pic, ptr, sz);
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video:, returned %d decoded bytes , %d left", len, sz);
 				if (len >= 0) {
@@ -1827,7 +1829,7 @@ ffmpeg_resample_datasource::data_avail()
 		m_in_fmt = m_src->get_audio_format();
 		assert(m_in_fmt.bits == 16);
 		assert(m_out_fmt.bits == 16);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_resample_datasource: initializing context: inrate, ch=%d, %d, outrate, ch=%d, %d", m_in_fmt.samplerate,  m_in_fmt.channels, m_out_fmt.samplerate,  m_out_fmt.channels);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource: initializing context: inrate, ch=%d, %d, outrate, ch=%d, %d", m_in_fmt.samplerate,  m_in_fmt.channels, m_out_fmt.samplerate,  m_out_fmt.channels);
 		m_resample_context = audio_resample_init(m_out_fmt.channels, m_in_fmt.channels, m_out_fmt.samplerate,m_in_fmt.samplerate);
 		m_context_set = true;
 	}
