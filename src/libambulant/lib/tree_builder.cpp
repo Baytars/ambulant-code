@@ -240,5 +240,5 @@ void
 lib::tree_builder::error(const sax_error& error) {
 	m_well_formed = false;
 	lib::logger::get_logger()->trace("%s, line %d, column %d: Parse error: %s", m_filename.c_str(), error.get_line(), error.get_column(), error.what());
-	lib::logger::get_logger()->error("%s: Error parsing document", m_filename.c_str());
+	lib::logger::get_logger()->error(gettext("%s: Error parsing document"), m_filename.c_str());
 }

@@ -143,7 +143,7 @@ initialize_logger()
 			[defaults setBool: YES forKey: @"welcomeDocumentSeen"];
 		}
 	} else {
-		ambulant::lib::logger::get_logger()->error("No Welcome.smil in application bundle");
+		ambulant::lib::logger::get_logger()->error(gettext("No Welcome.smil in application bundle"));
 	}
 	// Ask for notification when preferences change.
 #if 0
@@ -181,10 +181,10 @@ initialize_logger()
 		if (welcomeDoc) {
 			[welcomeDoc play: self];
 		} else {
-			ambulant::lib::logger::get_logger()->error("Welcome.smil could not be opened");
+			ambulant::lib::logger::get_logger()->error(gettext("Welcome.smil could not be opened"));
 		}
 	} else {
-		ambulant::lib::logger::get_logger()->error("No Welcome.smil in application bundle");
+		ambulant::lib::logger::get_logger()->error(gettext("No Welcome.smil in application bundle"));
 	}
 }
 
@@ -196,7 +196,7 @@ initialize_logger()
 	
 	if ((status=LSOpenCFURLRef(url, NULL)) != 0) {
 		ambulant::lib::logger::get_logger()->trace("Opening http://www.ambulantplayer.org: LSOpenCFURLRef error %d",  status);
-		ambulant::lib::logger::get_logger()->error("Cannot open http://www.ambulantplayer.org");
+		ambulant::lib::logger::get_logger()->error(gettext("Cannot open http://www.ambulantplayer.org"));
 	}
 }
 
