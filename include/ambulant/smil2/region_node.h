@@ -81,7 +81,7 @@ namespace smil2 {
 enum dimension_inheritance { di_none, di_parent, di_rootlayout };
 	
 
-class region_node : public common::region_info {
+class region_node : public common::animation_destination {
   public:
 	typedef lib::node_navigator<region_node> nnhelper;
 	typedef lib::node_navigator<const region_node> const_nnhelper;

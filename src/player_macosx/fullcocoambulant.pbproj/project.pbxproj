@@ -3220,6 +3220,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_LABEL = YES;
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				ZERO_LINK = NO;
 			};
@@ -3270,7 +3271,7 @@
 				HEADER_SEARCH_PATHS = "/Users/jack/src/ambulant/include /Users/jack/src/ambulant/third_party_packages/expat-unix/include /usr/local/include/SDL /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavcodec /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavformat";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = "/usr/lib/gcc/darwin/3.3 ../../installed/lib ../../third_party_packages/expat-unix/lib /Volumes/Vuur/Users/jack/src/ambulant-10.3/installed/lib /Volumes/sap-macosx/Users/jack/src/ambulant/src/libambulant/.libs /Volumes/sap-macosx/Users/jack/src/ambulant/src/libambulant /Users/jack/packages/ffmpeg-0.4.8/libavcodec /Users/jack/packages/ffmpeg-0.4.8/libavformat /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavcodec /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavformat";
+				LIBRARY_SEARCH_PATHS = "/usr/lib/gcc/darwin/3.3 ../../third_party_packages/expat-unix/lib ../../third_party_packages/ffmpeg-0.4.8/libavformat ../../third_party_packages/ffmpeg-0.4.8/libavcodec";
 				LIBRARY_STYLE = Static;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";

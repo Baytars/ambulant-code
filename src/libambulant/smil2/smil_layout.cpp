@@ -466,6 +466,12 @@ smil_layout_manager::get_region(const lib::node *n) {
 	return rn?rn->get_surface_template():NULL;
 }
 
+common::animation_destination *
+smil_layout_manager::get_animation_destination(const lib::node *n) {
+	region_node *rn = get_region_node_for(n, true);
+	return rn?rn->get_animation_destination():NULL;
+}
+
 // Helper function: decode pre-defined repoint names
 static bool
 decode_regpoint(common::regpoint_spec &pt, const char *name)
