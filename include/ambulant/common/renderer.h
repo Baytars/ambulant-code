@@ -324,7 +324,6 @@ class background_renderer : public bgrenderer {
 	void set_surface(surface *destination) { m_dst = destination; }
 	void user_event(const lib::point &where, int what = 0) {};
 	void transition_freeze_end(lib::screen_rect<int> area) {};
-	virtual void keep_as_background() {};
   protected:
 	const region_info *m_src;	///< Where we get our parameters (such as color) from.
 	surface *m_dst;				///< Where we should render to.
