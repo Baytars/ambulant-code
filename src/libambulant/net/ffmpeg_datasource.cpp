@@ -138,16 +138,22 @@ ffmpeg_video_datasource_factory::new_video_datasource(const net::url& url)
 		return NULL;
 	}
 	detail::ffmpeg_demux *thread = new detail::ffmpeg_demux(context);
-	video_datasource *ds = ffmpeg_video_datasource::new_ffmpeg_video_datasource(url, context, thread);
+	video_datasource *ds = demux_video_datasource::new_demux_video_datasource(url, thread);
+	video_datasource *dds = NULL;
+	if (ds) {
+		 video_format fmt = thread->get_video_format();
+		 dds = new ffmpeg_video_decoder_datasource(ds, fmt);
+	}
+
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory::new_video_datasource (ds = 0x%x)", (void*) ds);
 
-	if (ds == NULL) {
+	if ((dds == NULL)  || (ds == NULL)) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory::new_video_datasource: could not allocate ffmpeg_video_datasource");
 		thread->cancel();
 		return NULL;
 	}
 	//thread->start();
-	return ds;
+	return dds;		
 #else
 	return NULL;	
 #endif // WITH_FFMPEG_AVFORMAT
@@ -828,12 +834,41 @@ demux_video_datasource::get_video_format()
 	return m_thread->get_video_format();
 }
 
-audio_format&
-demux_video_datasource::get_audio_format()
-{
 
-	return m_thread->get_audio_format();
+int
+demux_video_datasource::width()
+{
+	video_format fmt = m_thread->get_video_format();
+	return fmt.width;
 }
+
+int
+demux_video_datasource::height()
+{
+	video_format fmt = m_thread->get_video_format();
+	return fmt.height;
+}
+
+bool 
+demux_video_datasource::has_audio()
+{
+	if (m_thread->audio_stream_nr() >= 0)
+		return true;
+	else
+		return false;
+}
+
+
+audio_datasource*
+demux_video_datasource::get_audio_datasource()
+{
+	int audio_stream_idx = m_thread->audio_stream_nr();
+	if (audio_stream_idx >= 0) 
+		return new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
+	else
+		return NULL;
+}
+
 std::pair<bool, double>
 demux_video_datasource::get_dur()
 {
@@ -851,8 +886,8 @@ demux_video_datasource::get_dur()
 // **************************** ffmpeg_video_decoder_datasource ********************
 
 
-video_datasource *
-ffmpeg_video_decoder_datasource::new_ffmpeg_video_decoder_datasource(const net::url& url, AVFormatContext *context, detail::ffmpeg_demux *thread)
+/* video_datasource *
+ffmpeg_video_decoder_datasource::new_ffmpeg_video_decoder_datasource(const net::url& url, detail::ffmpeg_demux *thread)
 {
 	AVCodec *codec;
 	AVCodecContext *codeccontext;
@@ -867,20 +902,7 @@ ffmpeg_video_decoder_datasource::new_ffmpeg_video_decoder_datasource(const net::
 
 	ffmpeg_init();
 
-	// Find the index of the video stream
-	for (stream_index=0; stream_index < context->nb_streams; stream_index++) {
-		if (context) {
-			if (context->streams[stream_index]->codec.codec_type == CODEC_TYPE_VIDEO)
-				break;
-		} else {
-			lib::logger::get_logger()->debug(gettext("ffmpeg_video_datasource::new_ffmpeg_video_datasource(): AVFormatContext is NULL "));
-			return NULL;
-		}
-	}
-	if (stream_index >= context->nb_streams) {
-		lib::logger::get_logger()->error(gettext("%s: no video streams in file"), url.get_url().c_str());
-		return NULL;
-	}
+	
 	
 	codeccontext = &context->streams[stream_index]->codec; 
 	codec = avcodec_find_decoder(codeccontext->codec_id);
@@ -897,23 +919,25 @@ ffmpeg_video_decoder_datasource::new_ffmpeg_video_decoder_datasource(const net::
 	thread->start();
 //	return new demux_video_datasource(url, thread, stream_index);
 	
-}
+} */
 
-ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(const net::url& url, detail::abstract_demux *thread, int stream_index)
-:	m_url(url),
-	m_stream_index(stream_index),
+ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasource* src, video_format fmt)
+:	m_src(src),
 	m_src_end_of_file(false),
 	m_event_processor(NULL),
-	m_thread(thread),
 	m_client_callback(NULL),
-    m_thread_started(false),
-	m_pts_last_frame(0.0),
-	m_last_p_pts(0.0)
+	m_pts_last_frame(0),
+	m_last_p_pts(0)
 {	
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::ffmpeg_video_datasource() (this = 0x%x)", (void*)this);
-	m_thread->add_datasink(this, m_stream_index);
 	
-	m_con = 
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::ffmpeg_video_datasource() (this = 0x%x)", (void*)this);
+	
+	ffmpeg_init();
+	//m_duration = m_src->get_dur();
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
+	if (!select_decoder(fmt))
+		lib::logger::get_logger()->error(gettext("ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
+	m_fmt = fmt;	
 }
 
 ffmpeg_video_decoder_datasource::~ffmpeg_video_decoder_datasource()
@@ -955,35 +979,16 @@ ffmpeg_video_decoder_datasource::stop()
 bool
 ffmpeg_video_decoder_datasource::has_audio()
 {		
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::has_audio");
-
-	if (m_src->audio_stream_nr() >= 0) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::has_audio TRUE");
-		return true;
-	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::has_audio FALSE");
-
-	return false;	
+	return m_src && m_src->has_audio();	
 }
 
 audio_datasource *
 ffmpeg_video_decoder_datasource::get_audio_datasource()
 {	
-	
-	net::audio_datasource *audio_ds;
-	
-	int stream_index = get_audio_stream_nr();
-
-	if (stream_index < 0 ) 
+	if (!m_src) 
 		return NULL;
-
-	
-	audio_ds = new demux_audio_datasource(m_url, m_thread, stream_index);
-	if (audio_ds) {
-		return new ffmpeg_decoder_datasource(audio_ds);
-	} else {
-		return NULL;
-	}
+	else
+		return m_src->get_audio_datasource();
 	
 }
 
@@ -1024,7 +1029,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 }
  
 void 
-ffmpeg_video_decoder_datasource::frame_done(double timestamp, bool keepdata)
+ffmpeg_video_decoder_datasource::frame_done(timestamp_t timestamp, bool keepdata)
 {
 	m_lock.enter();
 	if (m_frames.size() == 0) {
@@ -1034,7 +1039,7 @@ ffmpeg_video_decoder_datasource::frame_done(double timestamp, bool keepdata)
 	}
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.frame_done(%f)", timestamp);
 	while( m_frames.size() > 0 ) {
-		std::pair<double, char*> element = m_frames.front();
+		std::pair<timestamp_t, char*> element = m_frames.front();
 		if (element.first > timestamp)
 			break;
 		if (m_old_frame.second) {
@@ -1053,20 +1058,22 @@ ffmpeg_video_decoder_datasource::frame_done(double timestamp, bool keepdata)
 }
 
 
+
 int 
 ffmpeg_video_decoder_datasource::width()
 {
-	return m_video_fmt.width;
+	return m_fmt.width;
 }
 
 int 
 ffmpeg_video_decoder_datasource::height()
 {
-	return m_video_fmt.height;
+	return m_fmt.height;
 }
 
 //~ #undef AM_DBG
 //~ #define AM_DBG
+
 void 
 ffmpeg_video_decoder_datasource::data_avail()
 {
@@ -1080,7 +1087,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 	int num, den;
 	int framerate;
 	int framebase;
-	double pts, pts1;
+	timestamp_t pts, pts1;
     unsigned char* ptr;
 	double frame_delay;
 	
@@ -1090,17 +1097,17 @@ ffmpeg_video_decoder_datasource::data_avail()
 	
 	got_pic = 0;
 	
-	inbuf = m_src->get_frame(ipts,sz);
+	inbuf = (uint8_t*) m_src->get_frame(&ipts,&sz);
 	m_src_end_of_file = (sz == 0);
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail: %d bytes available", sz);
 	if(sz) {	
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:start decoding (0x%x) ", m_con->streams[m_stream_index]->codec);
-		assert(&m_con->streams[m_stream_index]->codec != NULL);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:start decoding (0x%x) ", m_con);
+		assert(&m_con != NULL);
 		ptr = inbuf;
 		
 		while (sz > 0) {
 				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
-				len = avcodec_decode_video(&m_con->streams[m_stream_index]->codec, frame, &got_pic, ptr, sz);	
+				len = avcodec_decode_video(m_con, frame, &got_pic, ptr, sz);	
 				if (len >= 0) {
 					assert(len <= sz);
 					ptr +=len;	
@@ -1108,15 +1115,15 @@ ffmpeg_video_decoder_datasource::data_avail()
 					if (got_pic) {
 						/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail: decoded picture, used %d bytes, %d left", len, sz);
 						// Setup the AVPicture for the format we want, plus the data pointer
-						width = m_con->streams[m_stream_index]->codec.width;
-						height = m_con->streams[m_stream_index]->codec.height;
+						width = m_fmt.width;
+						height = m_fmt.height;
 						m_size = width * height * 4;
 						char *framedata = (char*) malloc(m_size);
 						assert(framedata != NULL);
 						dst_pic_fmt = PIX_FMT_RGBA32;
 						dummy2 = avpicture_fill(&picture, (uint8_t*) framedata, dst_pic_fmt, width, height);
 						// The format we have is already in frame. Convert.
-						pic_fmt = m_con->streams[m_stream_index]->codec.pix_fmt;
+						pic_fmt = m_con->pix_fmt;
 						img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, width, height);
 						
 						// And convert the timestamp
@@ -1127,23 +1134,23 @@ ffmpeg_video_decoder_datasource::data_avail()
 						num = m_con->pts_num;
 						den = m_con->pts_den;
 #endif/*WITH_FFMPEG_0_4_9*/
-						framerate = m_con->streams[m_stream_index]->codec.frame_rate;
-						framebase = m_con->streams[m_stream_index]->codec.frame_rate_base;
+						framerate = m_con->frame_rate;
+						framebase = m_con->frame_rate_base;
 					
 					
 						pts = 0;
 						
 						if (ipts != AV_NOPTS_VALUE) {
 #ifdef	WITH_FFMPEG_0_4_9					
-							pts = (double) ipts / AV_TIME_BASE;							
+							pts = (timestamp_t) ((double) ipts / AV_TIME_BASE) * 1000000;							
 #else /*WITH_FFMPEG_0_4_9*/							
-							pts = (double) ipts * ((double) num)/den;
+							pts = (timestamp_t) ((double) ipts * ((double) num)/den) * 1000000;
 #endif/*WITH_FFMPEG_0_4_9*/
 						}
 						AM_DBG lib::logger::get_logger()->debug("pts seems to be : %f",pts);
 						pts1= pts;
 						
-						if (m_con->streams[m_stream_index]->codec.has_b_frames && frame->pict_type != FF_B_TYPE) {
+						if (m_con->has_b_frames && frame->pict_type != FF_B_TYPE) {
 							pts = m_last_p_pts;
 							m_last_p_pts = pts1;
 							AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:frame has B frames but this frame is no B frame  (this=0x%x) ", this);
@@ -1158,7 +1165,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 							} else {
 								frame_delay = 0;
 							}
-							pts = m_pts_last_frame + frame_delay;
+							pts = m_pts_last_frame + (timestamp_t) (frame_delay * 1000000);
 							m_pts_last_frame = pts;			
 							//~ if( frame.repeat_pict) {
 								//~ pts += frame.repeat_pict * (frame_delay * 0.5);
@@ -1184,16 +1191,16 @@ ffmpeg_video_decoder_datasource::data_avail()
 							}
 						}
 						// And store the data.
-						std::pair<double, char*> element(pts, framedata);
+						std::pair<timestamp_t, char*> element(pts, framedata);
 						m_frames.push(element);
 					} else {
 						AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail: incomplete picture, used %d bytes, %d left", len, sz);
 					}
 				} else {
-						lib::logger::get_logger()->error(gettext("%s: error decoding video frame"), m_url.get_url().c_str());
+						lib::logger::get_logger()->error(gettext("error decoding video frame"));
 					}
 		}
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:done decoding (0x%x) ", m_con->streams[m_stream_index]->codec);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource.data_avail:done decoding (0x%x) ", m_con);
 
   	}
 	if ( m_frames.size() || m_src_end_of_file  ) {
@@ -1241,35 +1248,14 @@ ffmpeg_video_decoder_datasource::buffer_full()
 }	
 
 
-int ffmpeg_video_decoder_datasource::get_audio_stream_nr()
-{
-
-	int stream_index;
-	
-	ffmpeg_init();
-	// Find the index of the audio stream
-	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
-		if (m_con->streams[stream_index]->codec.codec_type == CODEC_TYPE_AUDIO)
-			break;
-	}
-	
-	if (stream_index >= m_con->nb_streams) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource::get_audio_stream_nr(): no audio streams");
-		return -1;
-	} 
-	return stream_index;
-}
-
-
-
 
 char* 
-ffmpeg_video_decoder_datasource::get_frame(double *timestamp, int *size)
+ffmpeg_video_decoder_datasource::get_frame(timestamp_t *timestamp, int *size)
 {
 	m_lock.enter();
 	if( m_frames.size() > 0 ) {
 	//assert(m_frames.size() > 0);
-	std::pair<double, char*> element = m_frames.front();
+	std::pair<timestamp_t, char*> element = m_frames.front();
 	char *rv = element.second;
 	*timestamp = element.first;
 	*size = m_size;
@@ -1644,6 +1630,84 @@ ffmpeg_decoder_datasource::supported(const net::url& url)
 	AVCodec  *codec = avcodec_find_decoder_by_name(file_ext);
 	if (codec == NULL) lib::logger::get_logger()->trace("ffmpeg_decoder_datasource: no such decoder: \"%s\"", file_ext);
 	return codec != NULL;
+}
+
+
+bool 
+ffmpeg_video_decoder_datasource::select_decoder(const char* file_ext)
+{
+	AVCodec *codec = avcodec_find_decoder_by_name(file_ext);
+	if (codec == NULL) {
+			lib::logger::get_logger()->trace("ffmpeg_decoder_datasource.select_decoder: Failed to find codec for \"%s\"", file_ext);
+			lib::logger::get_logger()->error(gettext("No support for \"%s\" audio"));
+			return false;
+	}
+	m_con = avcodec_alloc_context();
+	
+	if(avcodec_open(m_con,codec) < 0) {
+			lib::logger::get_logger()->trace("ffmpeg_decoder_datasource.select_decoder: Failed to open avcodec for \"%s\"", file_ext);
+			lib::logger::get_logger()->error(gettext("No support for \"%s\" audio"));
+			return false;
+	}
+	return true;
+}
+
+bool 
+ffmpeg_video_decoder_datasource::select_decoder(video_format &fmt)
+{
+	if (fmt.name == "ffmpeg") {
+		AVCodecContext *enc = (AVCodecContext *)fmt.parameters;
+		if (enc == NULL) {
+				lib::logger::get_logger()->debug("Internal error: ffmpeg_decoder_datasource.select_decoder: Parameters missing for %s(0x%x)", fmt.name.c_str(), fmt.parameters);
+				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+				return false;
+		}
+		if (enc->codec_type != CODEC_TYPE_AUDIO) {
+				lib::logger::get_logger()->debug("Internal error: ffmpeg_decoder_datasource.select_decoder: Non-audio stream for %s(0x%x)", fmt.name.c_str(), enc->codec_type);
+				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+				return false;
+		}
+		AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+		if (codec == NULL) {
+				lib::logger::get_logger()->debug("Internal error: ffmpeg_decoder_datasource.select_decoder: Failed to find codec for %s(0x%x)", fmt.name.c_str(), fmt.parameters);
+				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+				return false;
+		}
+		m_con = avcodec_alloc_context();
+		
+		if(avcodec_open(m_con,codec) < 0) {
+				lib::logger::get_logger()->debug("Internal error: ffmpeg_decoder_datasource.select_decoder: Failed to open avcodec for %s(0x%x)", fmt.name.c_str(), fmt.parameters);
+				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+				return false;
+		}
+		return true;
+	} else if (fmt.name == "live") {
+		const char* codec_name = (char*) fmt.parameters;
+	
+		AM_DBG lib::logger::get_logger()->debug("ffmpe_decoder_datasource::selectdecoder(): audio codec : %s", codec_name);
+		ffmpeg_codec_id* codecid = ffmpeg_codec_id::instance();
+		AVCodec *codec = avcodec_find_decoder(codecid->get_codec_id(codec_name));
+		m_con = avcodec_alloc_context();	
+		
+		if( !codec) {
+			//lib::logger::get_logger()->error(gettext("%s: Audio codec %d(%s) not supported"), repr(url).c_str(), m_con->codec_id, m_con->codec_name);
+			return false;
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::selectdecoder(): codec found!");
+		}
+	
+		if((avcodec_open(m_con,codec) < 0) ) {
+			//lib::logger::get_logger()->error(gettext("%s: Cannot open audio codec %d(%s)"), repr(url).c_str(), m_con->codec_id, m_con->codec_name);
+			return false;
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(): succesfully opened codec");
+		}
+		
+		m_con->codec_type = CODEC_TYPE_AUDIO;
+		return true;
+	}
+	// Could add support here for raw mp3, etc.
+	return false;
 }
 
 // **************************** ffmpeg_resample_datasource *****************************
