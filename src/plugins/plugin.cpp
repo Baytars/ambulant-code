@@ -57,17 +57,56 @@
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
-//using namespace ambulant;
-//using namespace plugin;
+using namespace ambulant;
 
+class basic_plugin_factory : public common::playable_factory {
+  public:
 
+	basic_plugin_factory(net::datasource_factory *df)
+	:   m_datasource_factory(df) {}
+	~basic_plugin_factory() {};
+		
+	common::playable *new_playable(
+		common::playable_notification *context,
+		common::playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp);
+  private:
+	net::datasource_factory *m_datasource_factory;
+	
+};
 class init_plugin : public ambulant::common::init {
   public :
 	  virtual void register_factories(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df) {
 		  printf("HALLLLOOOOO\n");
-		  rf->add_factory(NULL);
+		  rf->add_factory(new basic_plugin_factory(df));
 	  }
 };
+
+
+common::playable* 
+basic_plugin_factory::new_playable(
+		common::playable_notification *context,
+		common::playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp)
+{
+	common::playable *rv;
+	
+	lib::xml_string tag = node->get_qname().second;
+	std::cout << "LIB LOGGER IS CALLED \n";
+    AM_DBG lib::logger::get_logger()->trace("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+	if ( tag == "audio") /*or any other tag ofcourse */ {
+		//rv = new plugin::basic_plugin(context, cookie, node, evp, m_datasource_factory);
+		rv = NULL;
+		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory: node 0x%x: returning basic_plugin 0x%x", (void *)node, (void *)rv);
+	} else {
+		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory : plugin does not support \"%s\"", tag.c_str());
+        return NULL;
+	}
+	return rv;
+}
+
 
 extern "C" ambulant::common::init* initialize()
 {
