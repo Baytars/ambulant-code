@@ -80,3 +80,79 @@ net::global_datasource_factory::new_datasource(const std::string &url)
     return NULL;
 }
 
+void
+net::global_datasource_factory::add_factory(datasource_factory *df)
+{
+	m_factories.push_back(df);
+}
+
+net::datasource*
+net::global_datasource_factory::new_datasource(const std::string &url, audio_context fmt)
+{
+    std::vector<datasource_factory *>::iterator i;
+    net::datasource *src;
+    
+    for(i=m_factories.begin(); i != m_factories.end(); i++) {
+        src = (*i)->new_datasource(url);
+        if (src) return src;
+    }
+	//XXXX Maybe the "raw" datasource should be the default or one that always has state end_of_file ?
+    return NULL;
+}
+
+void 
+net::global_audio_datasource_factory::add_raw_factory(datasource_factory *df)
+{
+	m_raw_factories.push_back(df);
+}
+
+void
+net::global_audio_datasource_factory::dd_decoder_factory(datasource_factory *df)
+{
+	m_decoder_factories.push_back(df);
+}
+
+void
+net::global_audio_datasource_factory::add_resample_factory(datasource_factory *df)
+{
+	m_resample_factories.push_back(df);
+}
+
+net::datasource* 
+net::global_audio_datasource_factory::new_datasource(const std::string& url, audio_contex fmt)
+{
+	std::vector<datasource_factory *>::iterator i;
+    net::datasource *raw_src;
+    net::datasource *dec_src;
+	net::datasource *res_src;
+	
+	// this should take care of rtp/rtsp datasources
+	for(i=m_raw_factories.begin(); i != m_factories.end(); i++) {
+        raw_src = (*i)->new_datasource(url,fmt);
+        if (raw_src) break;
+    }
+	// this should take care of realy raw datasources who don't care about the audio format.
+	if (!raw_src) {
+    	for(i=m_raw_factories.begin(); i != m_factories.end(); i++) {
+        	raw_src = (*i)->new_datasource(url);
+        	if (raw_src) break;
+    	}
+	}
+	
+	if (!raw_src) return m_default_factory;
+	
+	for(i=m_decoder_factories.begin(); i != m_factories.end(); i++) {
+        dec_src = (*i)->new_datasource(url, fmt, raw_src);
+        if (dec_src) break;
+    }
+	//XXX should we return the default here ?
+	if (!dec_src) return raw_src; 
+	// if we do it like this we don't need to supply the fmt to the decoder !
+	if (!dec_src->suport(fmt)) {
+		for(i=m_resample_factories.begin(); i != m_factories.end(); i++) {
+        	res_src = (*i)->new_datasource(url, fmt, dec_src);
+        	if (res_src) break;
+    	}
+	}
+}
+	
