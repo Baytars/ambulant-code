@@ -108,8 +108,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng125;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_AMBULANT;WITH_EXPAT"
-				RuntimeLibrary="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_AMBULANT;WITH_EXPAT;AMBULANT_BUILD_DLL"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -119,15 +119,17 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libambulant_sharedwin32.dll"
+				OutputFile="..\..\bin\win32\libambulant_shwin32.dll"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreDefaultLibraryNames="LIBC.lib"
-				ImportLibrary="$(OutDir)/libambulant_sharedwin32.lib"/>
+				OptimizeReferences="1"
+				ImportLibrary="..\..\lib\win32\libambulant_shwin32.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; ..\..\lib\win32"/>
+				CommandLine="copy &quot;$(TargetPath)&quot; ..\..\lib\win32"
+				ExcludedFromBuild="TRUE"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -170,11 +172,6 @@
 					</File>
 					<File
 						RelativePath=".\gui\none\none_gui.cpp">
-						<FileConfiguration
-							Name="ReleaseShlib|Win32">
-							<Tool
-								Name="VCCLCompilerTool"/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\gui\none\none_video_renderer.cpp">
@@ -537,9 +534,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\..\include\ambulant\common\factory.h">
-			</File>
-			<File
 				RelativePath="..\..\include\ambulant\version.h">
 			</File>
 			<Filter
@@ -871,6 +865,9 @@
 					Filter="">
 					<File
 						RelativePath="..\..\include\ambulant\common\embedder.h">
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\common\factory.h">
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\common\layout.h">

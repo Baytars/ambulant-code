@@ -60,7 +60,7 @@ namespace lib {
 /// API for the main synchronisation primitive.
 /// Do not use this class directly, in stead allocate
 /// objects of class critical section.
-class abstract_critical_section {
+class AMBULANTAPI abstract_critical_section {
   public:
 	virtual ~abstract_critical_section() {}
 	
