@@ -61,7 +61,6 @@ namespace gui {
 
 using namespace common;
 using namespace lib;
-//JNK using namespace net;
 
 namespace qt {
 
