@@ -86,7 +86,6 @@ class dg_window : public common::gui_window {
   	
 	void need_redraw(const lib::screen_rect<int>& r);
 	void redraw(const lib::screen_rect<int>& r);
-	void mouse_region_changed();
 	
 	const std::string& get_name() const { return m_name;}
 	region *get_region() { return m_rgn;}
