@@ -79,7 +79,7 @@ class cocoa_active_image_renderer : public active_final_renderer {
 		m_nsdata(NULL) {};
 	~cocoa_active_image_renderer();
 
-    void redraw(const screen_rect<int> &dirty, passive_window *window);
+    void redraw(const screen_rect<int> &dirty, abstract_window *window);
   private:
   	NSImage *m_image;
   	NSData *m_nsdata;

@@ -76,7 +76,7 @@ cocoa_active_text_renderer::~cocoa_active_text_renderer()
 }
 
 void
-cocoa_active_text_renderer::redraw(const screen_rect<int> &dirty, passive_window *window)
+cocoa_active_text_renderer::redraw(const screen_rect<int> &dirty, abstract_window *window)
 {
 	m_lock.enter();
 	const screen_rect<int> &r = m_dest->get_rect();
@@ -93,7 +93,7 @@ cocoa_active_text_renderer::redraw(const screen_rect<int> &dirty, passive_window
 		[m_layout_manager release];	// The textStorage will retain the layoutManager
 	}
 
-	cocoa_passive_window *cwindow = (cocoa_passive_window *)window;
+	cocoa_window *cwindow = (cocoa_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	screen_rect<int> window_rect = r;
 	window_rect.translate(m_dest->get_global_topleft());

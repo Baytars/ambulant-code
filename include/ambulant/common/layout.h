@@ -60,7 +60,30 @@ namespace ambulant {
 namespace lib {
 
 class node;
-class passive_window;
+class abstract_rendering_source; // forward
+
+// abstract_window is a virtual baseclass for GUI-dependent window classes.
+// It is the only interface that the ambulant core code uses to talk to the
+// GUI layer.
+class abstract_window {
+  protected:
+	abstract_window(abstract_rendering_source *region)
+	:   m_region(region) {};
+  public:
+	virtual ~abstract_window() { m_region = NULL; }
+	virtual void need_redraw(const screen_rect<int> &r) = 0;
+  protected:
+	abstract_rendering_source *m_region;
+};
+
+// window_factory is subclassed by the various GUI implementations.
+// It should create a GUI window, and set up for that GUI window to forward
+// its redraw requests to the given region.
+class window_factory {
+  public:
+	virtual ~window_factory() {}
+	virtual abstract_window *new_window(const std::string &name, size bounds, abstract_rendering_source *region) = 0;
+};
 
 // abstract_rendering_source is an pure virtual baseclass for renderers that
 // render to a region (as opposed to audio renderers, etc) and for subregions
@@ -69,7 +92,9 @@ class passive_window;
 // the renderer.
 class abstract_rendering_source {
   public:
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window) = 0;
+	virtual ~abstract_rendering_source() {};
+	
+	virtual void redraw(const screen_rect<int> &dirty, abstract_window *window) = 0;
 };
 
 // abstract_rendering_surface is a pure virtual baseclass for a region of screenspace.

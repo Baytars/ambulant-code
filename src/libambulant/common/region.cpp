@@ -84,7 +84,7 @@ lib::passive_region::show(active_region *cur)
 }
 
 void
-lib::passive_region::redraw(const screen_rect<int> &r, passive_window *window)
+lib::passive_region::redraw(const screen_rect<int> &r, abstract_window *window)
 {
 	AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x, ltrb=(%d, %d, %d, %d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	screen_rect<int> our_outer_rect = r & m_outer_bounds;
@@ -115,14 +115,22 @@ lib::passive_region::need_redraw(const screen_rect<int> &r)
 	m_parent->need_redraw(m_outer_bounds.outercoordinates(parent_rect));
 }
 
-void
-lib::passive_window::need_redraw(const screen_rect<int> &r)
+lib::passive_root_layout::passive_root_layout(const std::string &name, size bounds, window_factory *wf)
+:   passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), point(0, 0)),
+	m_gui_window(wf->new_window(name, bounds, this))
 {
-	AM_DBG lib::logger::get_logger()->trace("passive_window.need_redraw(0x%x)", (void *)this);
-	// XXXX This should be sent to the window interface. For now we short-circuit
-	// it ourselves.
-	screen_rect<int> redrawregion = r & m_inner_bounds;
-	redraw(redrawregion, this);
+}
+		
+lib::passive_root_layout::~passive_root_layout()
+{
+	delete m_gui_window;
+	m_gui_window = NULL;
+}
+
+void
+lib::passive_root_layout::need_redraw(const screen_rect<int> &r)
+{
+	m_gui_window->need_redraw(r);
 }
 
 void
@@ -135,7 +143,7 @@ lib::active_region::show(abstract_rendering_source *renderer)
 }
 
 void
-lib::active_region::redraw(const screen_rect<int> &r, passive_window *window)
+lib::active_region::redraw(const screen_rect<int> &r, abstract_window *window)
 {
 	if (m_renderer) {
 		AM_DBG lib::logger::get_logger()->trace("active_region.redraw(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);

@@ -91,7 +91,7 @@ class passive_region : public abstract_rendering_source {
 	virtual ~passive_region() {}
 	
 	virtual void show(active_region *cur);
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window);
+	virtual void redraw(const screen_rect<int> &dirty, abstract_window *window);
 
 	virtual passive_region *subregion(const std::string &name, screen_rect<int> bounds);
 	active_region *activate(const node *node);
@@ -121,33 +121,21 @@ class passive_region : public abstract_rendering_source {
   	std::vector<passive_region *>m_children;	// all subregions
 };
 
-#ifdef __OBJC__
-// This is a workaround for a problem when using gcc 3.3 to compile
-// ObjC++
-;
-#endif
-
-class passive_window : public passive_region {
+class passive_root_layout : public passive_region {
   public:
-  	passive_window(const std::string &name, size bounds)
-  	:	passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)),
-		point(0, 0)) {}
-  	virtual ~passive_window() {}
-  	
-	virtual void need_redraw(const screen_rect<int> &r);
+	passive_root_layout(const std::string &name, size bounds, window_factory *wf);
+	~passive_root_layout();
+	void need_redraw(const screen_rect<int> &r);
+  private:
+	abstract_window *m_gui_window;
 };
+
 
 #ifdef __OBJC__
 // This is a workaround for a problem when using gcc 3.3 to compile
 // ObjC++
 ;
 #endif
-
-class window_factory {
-  public:
-	virtual ~window_factory() {}
-	virtual passive_window *new_window(const std::string &name, size bounds) = 0;
-};
 
 class active_region : public abstract_rendering_surface, public abstract_rendering_source {
   public:
@@ -159,7 +147,7 @@ class active_region : public abstract_rendering_surface, public abstract_renderi
 	virtual ~active_region() {}
 	
 	virtual void show(abstract_rendering_source *renderer);
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window);
+	virtual void redraw(const screen_rect<int> &dirty, abstract_window *window);
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_redraw();
 	virtual void renderer_done();	
