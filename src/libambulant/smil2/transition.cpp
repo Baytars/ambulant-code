@@ -733,3 +733,67 @@ transition_engine_fade::compute()
 {
 	m_stepcount = 256;
 }
+
+
+#ifdef USE_SMIL21
+audio_transition_engine::audio_transition_engine(const lib::event_processor* evp)
+  :	m_event_proc(evp),
+	m_start_time(0),
+	m_startProgress(0),
+	m_endProgress(1),
+	m_dur(0),
+	m_intransition(NULL),
+	m_outtransition(NULL) {
+  AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::audio_transition_engine(0x%x",this);
+}
+
+void
+audio_transition_engine::get_transition_params(const lib::transition_info *info)
+{
+	  m_start_time  = m_event_proc->get_timer()->elapsed();
+	  m_dur		= info->m_dur;
+	  m_startProgress = info->m_startProgress;
+	  m_endProgress = info->m_endProgress;
+	  AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::get_transition_params(0x%x): m_start_time=%d  m_dur=%d m_startProgress=%f m_endProgress=%f",this,m_start_time,m_dur,m_startProgress,m_endProgress);
+}
+
+void
+audio_transition_engine::set_intransition(const lib::transition_info *info)
+{
+	get_transition_params(m_intransition = info);
+}
+
+void
+audio_transition_engine::start_outtransition(const lib::transition_info *info)
+{
+	get_transition_params(m_outtransition = info);
+}
+
+const double
+audio_transition_engine::get_volume(const double soundlevel) {
+	double progress;
+	lib::transition_info::time_type now;
+	if (m_dur == 0)
+		return soundlevel;
+	now = m_event_proc->get_timer()->elapsed();
+	if (m_intransition && now >= m_start_time + m_dur) {
+		m_intransition = NULL;
+		m_startProgress = 0;
+		m_endProgress = 1;
+	}
+	progress = ((double) (now - m_start_time) / m_dur)
+		* (m_endProgress - m_startProgress);
+	
+	progress += m_startProgress;
+	if (progress > m_endProgress) progress = m_endProgress;
+	if (progress < m_startProgress) progress = m_startProgress;
+	AM_DBG lib::logger::get_logger()->debug("audio_transition_engine::get_transition_volume(0x%x): soundlevel=%f m_intransition=0x%x  m_outtransition=0x%x now=%d indur=%d outdur=%d progress=%f",this,soundlevel,m_intransition,m_outtransition,now,m_intransition?m_intransition->m_dur:-317,m_outtransition?m_outtransition->m_dur:-318,progress);
+	double level;
+	if (m_outtransition)
+		level *= (1.0 - progress);
+	else
+		level *= progress;
+	return level;
+}
+
+#endif                                   
