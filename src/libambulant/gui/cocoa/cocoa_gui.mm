@@ -109,6 +109,14 @@ cocoa_window::need_redraw(const screen_rect<int> &r)
 }
 
 void
+cocoa_window::redraw_now()
+{
+	AmbulantView *my_view = (AmbulantView *)m_view;
+	[my_view performSelectorOnMainThread: @selector(syncDisplayIfNeeded:) 
+		withObject: nil waitUntilDone: YES];
+}
+
+void
 cocoa_window::redraw(const screen_rect<int> &r)
 {
 	AM_DBG logger::get_logger()->debug("cocoa_window::redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
@@ -305,6 +313,12 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 	NSRect my_rect = [arect rect];
 	[arect release];
 	[self setNeedsDisplayInRect: my_rect];
+}
+
+- (void) syncDisplayIfNeeded: (id) dummy
+{
+//	[self displayIfNeeded];
+	[self display];
 }
 
 - (void)drawRect:(NSRect)rect
