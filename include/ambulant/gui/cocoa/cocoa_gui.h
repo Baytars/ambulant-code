@@ -72,9 +72,11 @@ class cocoa_window : public lib::abstract_window {
   		m_view(_view) {};
   		
 	void need_redraw(const lib::screen_rect<int> &r);
-//	void need_events(lib::abstract_mouse_region *rgn);
-	void redraw(const lib::screen_rect<int> &r);
 	void mouse_region_changed();
+	
+	void redraw(const lib::screen_rect<int> &r);
+	void user_event(const lib::point &where);
+
 	void *view() { return m_view; }
 	const lib::abstract_mouse_region &get_mouse_region() { return m_region->get_mouse_region(); }
   private:

@@ -109,6 +109,13 @@ cocoa_window::redraw(const screen_rect<int> &r)
 }
 
 void
+cocoa_window::user_event(const point &where)
+{
+	AM_DBG logger::get_logger()->trace("cocoa_window::user_event(0x%x, (%d, %d))", (void *)this, where.x, where.y);
+	m_region->user_event(where);
+}
+
+void
 cocoa_window::mouse_region_changed()
 {
 	/*AM_DBG*/ logger::get_logger()->trace("cocoa_window::mouse_region_changed(0x%x)", (void *)this);
@@ -181,6 +188,7 @@ cocoa_window_factory::new_mouse_region()
     AM_DBG NSLog(@"AmbulantView.initWithFrame: self=0x%x", self);
     return self;
 }
+
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect
 {
 	float bot_delta = NSMaxY([self bounds]) - arect->bottom();
@@ -227,6 +235,8 @@ cocoa_window_factory::new_mouse_region()
 {
 	NSPoint where = [theEvent locationInWindow];
 	NSLog(@"mouseDown at (%f, %f)", where.x, where.y);
+	ambulant::lib::point amwhere = ambulant::lib::point((int)where.x, (int)where.y);
+	if (ambulant_window) ambulant_window->user_event(amwhere);
 }
 @end
 #endif // __OBJC__

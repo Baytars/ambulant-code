@@ -117,7 +117,7 @@ lib::active_renderer::stop()
 void
 lib::active_renderer::wantclicks(bool want)
 {
-	// m_dest->need_events(xxxx);
+	m_dest->need_events(want);
 }
 
 lib::active_final_renderer::~active_final_renderer()

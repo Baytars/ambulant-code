@@ -109,22 +109,26 @@ lib::passive_region::redraw(const screen_rect<int> &r, abstract_window *window)
 void
 lib::passive_region::user_event(const point &where)
 {
-	AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x)", (void *)this);
+	AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x, (%d, %d))", (void *)this, where.x, where.y);
 	// Test that it is in our area
-	if (!m_outer_bounds.contains(where))
+	if (!m_outer_bounds.contains(where)) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event: not in our bounds");
 		return;
+	}
 	// And test whether it is in our mouse area too
-	if (!m_mouse_region->contains(where))
+	if (!m_mouse_region->contains(where)) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event: not in our mouse region");
 		return;
+	}
 	// Convert to local coordinates
 	point our_point = where;
 	our_point -= m_outer_bounds.left_top();
 	
 	if (m_cur_active_region) {
-		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
+		/*AM_DBG*/ lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
 		m_cur_active_region->user_event(our_point);
 	} else {
-		AM_DBG lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
+		/*AM_DBG*/ lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
 	}
 	std::vector<passive_region *>::iterator i;
 	for(i=m_children.begin(); i<m_children.end(); i++) {
@@ -159,6 +163,11 @@ lib::passive_region::need_events(abstract_mouse_region *rgn)
 void
 lib::passive_region::mouse_region_changed()
 {
+//	// Check that we have a mouse region and a parent
+//	if (!m_mouse_region || !m_parent) {
+//		lib::logger::get_logger()->warn("mouse_region_changed: region %s is not a visual region", m_name.c_str());
+//		return;
+//	}
     // Clear the mouse region
     m_mouse_region->clear();
     // Fill with the union of the regions of all our children
@@ -170,8 +179,9 @@ lib::passive_region::mouse_region_changed()
     }
     // Convert to our parent coordinate space
     *m_mouse_region += m_outer_bounds.left_top();
-    // Tell our parent
-    m_parent->mouse_region_changed();
+    // Tell our parent, if we have one
+	AM_DBG lib::logger::get_logger()->trace("mouse_region_changed(0x%x): is_empty()=%d", (void*)this, (int)m_mouse_region->is_empty());
+    if (m_parent) m_parent->mouse_region_changed();
 }
 
 lib::passive_root_layout::passive_root_layout(const std::string &name, size bounds, window_factory *wf)
@@ -179,6 +189,7 @@ lib::passive_root_layout::passive_root_layout(const std::string &name, size boun
 {
 	m_mouse_region = wf->new_mouse_region();
 	m_gui_window = wf->new_window(name, bounds, this);
+	AM_DBG lib::logger::get_logger()->trace("passive_root_layout(0x%x, \"%s\"): window=0x%x, mouse_region=0x%x", (void *)this, m_name.c_str(), (void *)m_gui_window, (void *)m_mouse_region);
 }
 		
 lib::passive_root_layout::~passive_root_layout()
@@ -191,6 +202,13 @@ void
 lib::passive_root_layout::need_redraw(const screen_rect<int> &r)
 {
 	m_gui_window->need_redraw(r);
+}
+
+void
+lib::passive_root_layout::mouse_region_changed()
+{
+	lib::passive_region::mouse_region_changed();
+	m_gui_window->mouse_region_changed();
 }
 
 void
@@ -219,12 +237,12 @@ void
 lib::active_region::user_event(const point &where)
 {
 	if (m_renderer) {
-		AM_DBG lib::logger::get_logger()->trace("active_region.user_event(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
+		/*AM_DBG*/ lib::logger::get_logger()->trace("active_region.user_event(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
 		m_renderer->user_event(where);
 	} else {
 		// At this point we should have a renderer that draws the default background
 		// When that is implemented this trace message should turn into an error (or fatal).
-		AM_DBG lib::logger::get_logger()->error("active_region.user_event(0x%x) no renderer", (void *)this);
+		/*AM_DBG*/ lib::logger::get_logger()->error("active_region.user_event(0x%x) no renderer", (void *)this);
 	}
 }
 
@@ -243,9 +261,16 @@ lib::active_region::need_redraw()
 void
 lib::active_region::need_events(bool want)
 {
+	if (!m_mouse_region ) {
+		lib::logger::get_logger()->warn("mouse_region_changed: region %s is not a visual region", m_source->m_name.c_str());
+		return;
+	}
+	if (!want && m_mouse_region->is_empty())
+		return;
 	m_mouse_region->clear();
-        if (want) *m_mouse_region = m_source->m_inner_bounds;
-        m_source->mouse_region_changed();
+	if (want) *m_mouse_region = m_source->m_inner_bounds;
+	AM_DBG lib::logger::get_logger()->trace("active_region::need_events(%d): is_empty() is %d", (int)want, (int)m_mouse_region->is_empty());
+	m_source->mouse_region_changed();
 }
 
 void
@@ -254,4 +279,5 @@ lib::active_region::renderer_done()
 	m_renderer = NULL;
 	AM_DBG lib::logger::get_logger()->trace("active_region.done(0x%x, \"%s\")", (void *)this, m_source->m_name.c_str());
 	need_redraw();
+	need_events(false);
 }

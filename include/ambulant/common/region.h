@@ -142,6 +142,7 @@ class passive_root_layout : public passive_region {
 	passive_root_layout(const std::string &name, size bounds, window_factory *wf);
 	~passive_root_layout();
 	void need_redraw(const screen_rect<int> &r);
+	void mouse_region_changed();
   private:
 	abstract_window *m_gui_window;
 };
