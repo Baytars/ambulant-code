@@ -164,6 +164,7 @@ libambulant_la_SOURCES = \
 	net/stdio_datasource.cpp \
 	net/raw_video_datasource.cpp \
 	net/rtsp_datasource.cpp \
+	net/rtsp_factory.cpp \ 
 	net/datasource.cpp \
 	net/databuffer.cpp \
 	net/url.cpp \

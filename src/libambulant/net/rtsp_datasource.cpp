@@ -225,93 +225,7 @@ on_source_close(void* data)
 
 //====================================== proof of concept ffmpeg datasources ==================
 
-audio_datasource* 
-live_audio_datasource_factory::new_audio_datasource(const net::url& url, audio_format_choices fmts)
-{
-#ifdef WITH_FFMPEG_AVFORMAT
-	
-	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource_factory::new_audio_datasource(%s)", repr(url).c_str());
-	rtsp_context_t *context = rtsp_demux::supported(url);
-	if (!context) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: no support for %s", repr(url).c_str());
-		return NULL;
-	}
-	rtsp_demux *thread = new rtsp_demux(context);
-	int i = 0;
-	const char* codec_name;
-	MediaSubsession* subsession;
-	MediaSubsessionIterator iter(*context->media_session);
-	if (context->audio_stream) {
-		while ((subsession = iter.next()) != NULL) {
-			if (i == context->audio_stream) {
-				codec_name = subsession->codecName();
-			}
-		i++;
-		}
-	} else {
-		lib::logger::get_logger()->error(gettext("%s: no more audio streams"), url.get_url().c_str());
-		return NULL;
-	}
-	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::new_live_audio_datasource(): audio codec : %s", codec_name);
-	AVCodec *codec = avcodec_find_decoder_by_name(codec_name);
-	AVCodecContext *codeccontext = avcodec_alloc_context();
-	int stream_index;
-	if( !codec) {
-		lib::logger::get_logger()->error(gettext("%s: Audio codec %d(%s) not supported"), repr(url).c_str(), codeccontext->codec_id, codeccontext->codec_name);
-		return NULL;
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::new_live_ffmpeg_audio_datasource(): codec found!");
-	}
 
-	
-	if((!codec) || (avcodec_open(codeccontext,codec) < 0) ) {
-		lib::logger::get_logger()->error(gettext("%s: Cannot open audio codec %d(%s)"), repr(url).c_str(), codeccontext->codec_id, codeccontext->codec_name);
-		return NULL;
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::new_live_ffmpeg_audio_datasource(): succesfully opened codec");
-	}
-	audio_datasource *ds = live_audio_datasource::new_live_audio_datasource(url, codeccontext, thread);
-	if (ds == NULL) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory::new_video_datasource: could not allocate ffmpeg_video_datasource");
-		thread->cancel();
-		return NULL;
-	}
-	thread->start();
-	
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: parser ds = 0x%x", (void*)ds);
-	// XXXX This code should become generalized in datasource_factory
-	if (fmts.contains(ds->get_audio_format())) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: matches!");
-		return ds;
-	}
-	audio_datasource *dds = new ffmpeg_decoder_datasource(ds);
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: decoder ds = 0x%x", (void*)dds);
-	if (dds == NULL) {
-		int rem = ds->release();
-		assert(rem == 0);
-		return NULL;
-	}
-	if (fmts.contains(dds->get_audio_format())) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: matches!");
-		return dds;
-	}
-	audio_datasource *rds = new ffmpeg_resample_datasource(dds, fmts);
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: resample ds = 0x%x", (void*)rds);
-	if (rds == NULL)  {
-		int rem = dds->release();
-		assert(rem == 0);
-		return NULL;
-	}
-	if (fmts.contains(rds->get_audio_format())) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: matches!");
-		return rds;
-	}
-	lib::logger::get_logger()->error(gettext("%s: unable to create audio resampler"));
-	int rem = rds->release();
-	assert(rem == 0);
-#endif // WITH_FFMPEG_AVFORMAT
-	return NULL;	
-}
 
 
 live_audio_datasource *
@@ -330,6 +244,8 @@ live_audio_datasource::new_live_audio_datasource(
  	
 	return new live_audio_datasource(url, context, thread, stream_index);
 }
+
+
 
 live_audio_datasource::live_audio_datasource(const net::url& url, AVCodecContext *context,
 	rtsp_demux *thread, int stream_index)
