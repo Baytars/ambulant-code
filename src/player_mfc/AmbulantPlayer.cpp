@@ -279,4 +279,5 @@ void CAmbulantPlayerApp::OnViewLog()
 		m_logwindow = CLogWindow::GetLogWindowSingleton();
 	}
 	m_logwindow->ShowWindow(SW_SHOW);
+	m_logwindow->AppendText("Re-opened log window\r\n");
 }
