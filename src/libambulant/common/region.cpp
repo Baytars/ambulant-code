@@ -39,8 +39,9 @@ lib::passive_region::show(active_region *cur)
 void
 lib::passive_region::redraw(const screen_rect<int> &r)
 {
-	lib::logger::get_logger()->trace("passive_region.redraw(0x%x, ltrb=(%d, %d, %d, %d), bounds=(%d, %d, %d, %d))", (void *)this, r.left(), r.top(), r.right(), r.bottom(), m_bounds.left(), m_bounds.top(), m_bounds.right(), m_bounds.bottom());
-	screen_rect<int> our_rect = r & m_bounds;
+	lib::logger::get_logger()->trace("passive_region.redraw(0x%x, ltrb=(%d, %d, %d, %d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	screen_rect<int> our_outer_rect = r & m_outer_bounds;
+	screen_rect<int> our_rect = m_outer_bounds.outset(our_outer_rect);
 	if (our_rect.empty())
 		return;
 	lib::logger::get_logger()->trace("passive_region.redraw(0x%x, our_ltrb=(%d, %d, %d, %d))", (void *)this, our_rect.left(), our_rect.top(), our_rect.right(), our_rect.bottom());
@@ -63,7 +64,8 @@ lib::passive_region::need_redraw(const screen_rect<int> &r)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
-	m_parent->need_redraw(r);
+	r &= m_inner_bounds;
+	m_parent->need_redraw(m_outer_bounds.inset(r));
 }
 
 void
@@ -72,6 +74,7 @@ lib::passive_window::need_redraw(const screen_rect<int> &r)
 	lib::logger::get_logger()->trace("passive_window.need_redraw(0x%x)", (void *)this);
 	// XXXX This should be sent to the window interface. For now we short-circuit
 	// it ourselves.
+	r &= m_inner_bounds;
 	redraw(r);
 }
 
@@ -98,15 +101,13 @@ lib::active_region::redraw(const screen_rect<int> &r)
 void
 lib::active_region::need_redraw(const screen_rect<int> &r)
 {
-	// XXXX This should be sent to the window interface. For now we short-circuit
-	// it ourselves.
 	m_source->need_redraw(r);
 }
 
 void
 lib::active_region::need_redraw()
 {
-	need_redraw(m_source->m_bounds);
+	need_redraw(m_source->m_inner_bounds);
 }
 
 void
