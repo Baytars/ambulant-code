@@ -68,6 +68,7 @@ extern "C" {
 }
 	
 bool gui::sdl::sdl_active_audio_renderer::m_sdl_init;
+int	 gui::sdl::sdl_active_audio_renderer::m_mixed_channels = 0;
 
 gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
 	active_playable_events *context,
@@ -97,31 +98,19 @@ gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
        		return err;
     		} 
 		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): SDL init succes", (void *)this);	
-		m_audiospec = (SDL_AudioSpec*) malloc(sizeof(SDL_AudioSpec));
-		audiospec = (SDL_AudioSpec*) malloc(sizeof(SDL_AudioSpec));
-		audiospec->freq = rate;
-		// X : Audio format should be configurable	
-		audiospec->format = AUDIO_S16;
-		audiospec->userdata = this;
-		if (channels == 1) {
-			audiospec->channels = 1;
-		} else { // default is stereo
-			audiospec->channels = 2;
-		}
-		audiospec->samples = 8192;
-		audiospec->callback = cllback;   
+		m_rate = rate;
+    	m_channels = channels;
+    	m_bits = bits;
 		
-    	err = SDL_OpenAudio(audiospec, m_audiospec);
+		err = Mix_OpenAudio(m_rate, m_format, m_channels, m_buffer_size);
+		
     	if (err < 0) {
 			AM_DBG lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL open failed", (void *)this);
         	return err;
     	}
+		m_mixed_channels++;
+		err = Mix_AllocateChannels(m_mixed_channels);
 		m_sdl_init = true;
-    	m_rate = rate;
-    	m_channels = channels;
-    	m_bits = bits;
-		m_audiospec->userdata = this;
-		free(audiospec);
     } else {
         err = 0;
     }

@@ -99,11 +99,13 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	private:
 	
       static bool m_sdl_init;
+	  static int m_mixed_channels;
   	  int init(int rate, int bits, int channels);
       Mix_Chunk m_audio_chunck;
       int m_rate;
       int m_channels;
       int m_buffer_size = 4096;
+	  int m_mixed_channels;
 	  Uint16 m_audio_format = AUDIO_S16;
       event *m_playdone;
 };
