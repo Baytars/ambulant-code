@@ -182,9 +182,9 @@ net::passive_datasource::passive_datasource(const char *url)
 {
 	int m_len;
 	m_len = strlen(url);
-	m_url= new char[m_len];
+	m_url= new char[m_len+1];
 	if(m_url) {
-		std::memcpy(m_url,url,m_len);
+		std::memcpy(m_url,url,m_len+1);
 	}
 	else
 	{
