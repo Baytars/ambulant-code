@@ -1308,15 +1308,40 @@ ffmpeg_video_decoder_datasource::_buffer_full()
 char* 
 ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *size)
 {
+	// here we pay attention to now, the frame that is closest to now but just before is returned.
+	std::pair<timestamp_t, char*> frame, prev_frame;
 	char *rv = NULL;
 	*timestamp = 0;
 	*size = 0;
 	m_lock.enter();
 	if( m_frames.size() > 0 ) {
 		//assert(m_frames.size() > 0);
-		std::pair<timestamp_t, char*> element = m_frames.top();
-		rv = element.second;
-		*timestamp = element.first;
+		prev_frame.first = 0;
+		prev_frame.second = NULL;
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: prev_frame: prev_frame.first=%lld, second==0x%x",prev_frame.first, prev_frame.second);
+
+		frame = m_frames.top();
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
+		while (frame.first < now) {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding frame pts=%lld, now=%lld, data ptr = 0x%x",prev_frame.first, now, prev_frame.second);
+			if (prev_frame.second) {
+				free(prev_frame.second);
+				prev_frame.second = NULL;
+			}
+			prev_frame.first = frame.first;
+			prev_frame.second = frame.second;
+			m_frames.pop();
+			if (m_frames.size() == 0) {
+				prev_frame.first = 0;
+				prev_frame.second = NULL;
+				break;
+			}
+			frame = m_frames.top();
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: next frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
+		}
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: returning frame pts=%lld, now=%lld",prev_frame.first, now);
+		rv = prev_frame.second;
+		*timestamp = prev_frame.first;
 		*size = m_size;
 	}
 	m_lock.leave();

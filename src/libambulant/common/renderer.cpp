@@ -439,12 +439,12 @@ active_video_renderer::data_avail()
 	m_size.w = m_src->width();
 	m_size.h = m_src->height();
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail: size=(%d, %d)", m_size.w, m_size.h);
-	buf = m_src->get_frame(now(), &ts2, &size);
+	buf = m_src->get_frame((long long int) (round(now()*1000000)), &ts2, &size);
 	ts = ts2 / 1000000.0; // ts should be in seconds now !
 	displayed = false;
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail(buf = 0x%x) (ts=%f, now=%f):", (void *) buf,ts, now());	
 	if (m_is_playing && buf) {
-		if (ts <= now()) {
+		//if (ts <= now()) {
 			AM_DBG lib::logger::get_logger()->debug("**** (this = 0x%x) Calling show_frame() timestamp : %f, now = %f (located at 0x%x) ", (void *) this, ts, now(), (void *) buf);
 			show_frame(buf, size);
 			m_dest->need_redraw();
@@ -455,12 +455,12 @@ active_video_renderer::data_avail()
 				lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
 				m_src->start_frame (m_event_processor, e, ts2);
 			}
-		} else {
-			lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
-			event_time = (unsigned long int) round( 1 + ts*1000 - now()*1000); 
-			m_event_processor->add_event(e, event_time, lib::event_processor::med);
-		}
-	} else {
+		//} else {
+		//	lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
+		//	event_time = (unsigned long int) round( 1 + ts*1000 - now()*1000); 
+		//	m_event_processor->add_event(e, event_time, lib::event_processor::med);
+		//}
+	} else if(!m_is_playing) {
 		if (m_is_playing && !m_src->end_of_file()) {
 			lib::logger::get_logger()->debug("active_video_renderer::data_avial: No more data, but not end of file!");
 		}
@@ -469,6 +469,9 @@ active_video_renderer::data_avail()
 		m_lock.leave();
 		m_context->stopped(m_cookie, 0);
 		return;
+	} else {
+		lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
+		m_src->start_frame(m_event_processor, e,ts2);
 	}
-	m_lock.leave();
+		m_lock.leave();
 }
