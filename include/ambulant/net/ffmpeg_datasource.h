@@ -275,7 +275,7 @@ class demux_video_datasource:
   
     ~demux_video_datasource();
 
-    void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, double timestamp);
+    void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
     void stop();  
 	char* get_frame(timestamp_t *timestamp, int *size);
     void frame_done(timestamp_t timestamp, bool keepdata);
@@ -328,7 +328,7 @@ class ffmpeg_video_decoder_datasource:
   	int height();
 	audio_datasource *get_audio_datasource();
 
-    void start_frame(lib::event_processor *evp, lib::event *callback, double timestamp);  
+    void start_frame(lib::event_processor *evp, lib::event *callback, timestamp_t timestamp);  
 	void stop();  
 
     bool end_of_file();

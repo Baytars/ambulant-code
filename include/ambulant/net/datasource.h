@@ -270,7 +270,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// callback is scheduled through the event_processor.
 	/// The client is not interested in any frames with times earlier
 	/// than the given timestamp.
-	virtual void start_frame(lib::event_processor *evp, lib::event *callback, double timestamp) = 0;
+	virtual void start_frame(lib::event_processor *evp, lib::event *callback, timestamp_t timestamp) = 0;
 
 	/// Called by the client to indicate it wants no more data.
   	virtual void stop() = 0;
