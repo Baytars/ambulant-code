@@ -248,7 +248,7 @@ class demux_audio_datasource:
 	const net::url m_url;
 	//AVFormatContext *m_con;
 	int m_stream_index;
-	audio_format m_fmt;
+//	audio_format m_fmt;
 	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
 
@@ -300,7 +300,7 @@ class demux_video_datasource:
 	const net::url m_url;
 	//AVFormatContext *m_con;
 	int m_stream_index;
-	audio_format m_fmt;
+//	audio_format m_fmt;
 	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
 	std::queue<std::pair<timestamp_t, video_frame> > m_frames;
@@ -344,6 +344,7 @@ class ffmpeg_video_decoder_datasource:
   private:
 	int get_audio_stream_nr();
     bool _end_of_file();
+	bool _buffer_full();
 	video_datasource* m_src;
 	AVCodecContext *m_con;
 	int m_stream_index;
