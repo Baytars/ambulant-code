@@ -304,6 +304,9 @@
 				Name="common"
 				Filter="">
 				<File
+					RelativePath=".\common\plugin_engine.cpp">
+				</File>
+				<File
 					RelativePath=".\common\preferences.cpp">
 				</File>
 				<File
@@ -728,6 +731,9 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\common\player.h">
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\common\plugin_engine.h">
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\common\preferences.h">
