@@ -64,9 +64,17 @@ bool net::ffmpeg_audio_datasource::m_avcodec_open = false;
 
 #define INBUF_SIZE 4096
 
-net::ffmpeg_audio_datasource::ffmpeg_audio_datasource(abstract_active_datasource *const src, lib::event_processor *const evp) : m_event_processor(evp)
+net::ffmpeg_audio_datasource::ffmpeg_audio_datasource(abstract_active_datasource *const src, lib::event_processor *const evp)
+:	m_codec(NULL),
+	m_con(NULL),
+	m_event_processor(evp),
+	m_src(src),
+	m_inbuf(NULL),
+	m_outbuf(NULL),
+//	m_buffer
+	m_blocked_full(false),
+	m_client_waiting(false)
 {
-	m_src = src;
 	m_readdone = new readdone_callback(this, &net::ffmpeg_audio_datasource::callback);
 	init();
 }
@@ -126,7 +134,7 @@ net::ffmpeg_audio_datasource::callback()
 	size = m_src->size();
 	m_outbuf = (uint8_t*) m_buffer.prepare();
 	if(!m_codec_selected) {
-		select_decoder("mp3");
+		select_decoder("mp3"); // XXX should get from m_src
 		AM_DBG lib::logger::get_logger()->trace("ffmpeg_audio_datasource.callback : Selected the MP3 decoder");
 		m_codec_selected = true;
 	}
