@@ -276,10 +276,7 @@ void CAmbulantPlayerApp::OnPreferences()
 void CAmbulantPlayerApp::OnViewLog()
 {
 	if (m_logwindow == NULL) {
-		MessageBox(NULL, "Will Create log window", "AmbulantPlayer", MB_OK);
-		m_logwindow = new CLogWindow(NULL);
-		m_logwindow->Create(CLogWindow::IDD);
+		m_logwindow = CLogWindow::GetLogWindowSingleton();
 	}
-	MessageBox(NULL, "Will Show log window", "AmbulantPlayer", MB_OK);
 	m_logwindow->ShowWindow(SW_SHOW);
 }

@@ -14,6 +14,18 @@ CLogWindow::CLogWindow(CWnd* pParent /*=NULL*/)
 {
 }
 
+CLogWindow *CLogWindow::s_singleton = NULL;
+
+CLogWindow *
+CLogWindow::GetLogWindowSingleton()
+{
+	if (s_singleton == 0) {
+		s_singleton = new CLogWindow(NULL);
+		s_singleton->Create(IDD);
+	}
+	return s_singleton;
+}
+
 CLogWindow::~CLogWindow()
 {
 }

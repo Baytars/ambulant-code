@@ -231,7 +231,8 @@ CAPTION "AmbulantPlayer Log"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_RICHEDIT21,"RichEdit20A",ES_AUTOHSCROLL | 
-                    WS_BORDER | WS_TABSTOP,7,7,220,81
+                    ES_WANTRETURN | ES_NUMBER | WS_BORDER | WS_TABSTOP,7,7,
+                    279,81
 END
 
 
