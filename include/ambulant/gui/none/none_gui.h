@@ -72,12 +72,13 @@ class none_window_factory : public lib::window_factory {
 class none_active_renderer : public lib::active_renderer {
   public:
 	none_active_renderer(
-		lib::playable_events *context,
+		lib::playable_events<int> *context,
+		int cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
 		lib::passive_region *const dest)
-	:	lib::active_renderer(context, node, evp, src, dest) {};
+	:	lib::active_renderer(context, cookie, node, evp, src, dest) {};
 	
 	void start(double where);
 	void redraw(const lib::screen_rect<int> &r, lib::passive_window *window, const lib::point &window_topleft);
@@ -89,7 +90,8 @@ class none_renderer_factory : public lib::renderer_factory {
   	none_renderer_factory() {}
   	
 	lib::active_renderer *new_renderer(
-		lib::playable_events *context,
+		lib::playable_events<int> *context,
+		int cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,

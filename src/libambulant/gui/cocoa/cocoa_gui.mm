@@ -88,7 +88,8 @@ cocoa_passive_window::need_redraw(const screen_rect<int> &r)
 
 active_renderer *
 cocoa_renderer_factory::new_renderer(
-	playable_events *context,
+	playable_events<int> *context,
+	int cookie,
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
@@ -98,14 +99,16 @@ cocoa_renderer_factory::new_renderer(
 	
 	xml_string tag = node->get_qname().second;
 	if (tag == "img") {
-		rv = new cocoa_active_image_renderer(context, node, evp, src, dest);
+		rv = new cocoa_active_image_renderer(context, cookie, node, evp, src, dest);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_image_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "text") {
-		rv = new cocoa_active_text_renderer(context, node, evp, src, dest);
+		rv = new cocoa_active_text_renderer(context, cookie, node, evp, src, dest);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_text_renderer 0x%x", (void *)node, (void *)rv);
+#ifdef WITH_COCOA_AUDIO
 	} else if ( tag == "audio") {
-		rv = (active_renderer *)new cocoa_active_audio_renderer(context, node, evp, src);
+		rv = (active_renderer *)new cocoa_active_audio_renderer(context, cookie, node, evp, src);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_audio_renderer 0x%x", (void *)node, (void *)rv);
+#endif
 	} else {
 		// logger::get_logger()->error("cocoa_renderer_factory: no Cocoa renderer for tag \"%s\"", tag.c_str());
                 return NULL;
