@@ -51,7 +51,6 @@
 
 - (BOOL) validateMenuItem:(id)menuItem
 {
-	NSLog(@"validateMenuItem: %@\n", menuItem);
 	SEL theAction = [menuItem action];
 	if (theAction == @selector(play:)) {
 		if (myMainloop->is_running() && myMainloop->get_speed() == 1.0)
@@ -70,7 +69,7 @@
 			[menuItem setState: NSOnState];
 		else
 			[menuItem setState: NSOffState];
-		return myMainloop->is_running() && myMainloop->get_speed() == 1.0;
+		return myMainloop->is_running();
 	}
 	return NO;
 }
