@@ -91,8 +91,11 @@ class region_node : public common::region_info {
 	typedef lib::const_tree_iterator<region_node> const_iterator;
 	
 	// constructs a region node with local name and attrs
-	region_node(const lib::node *n);
+	region_node(const lib::node *n, dimension_inheritance di);
 	virtual ~region_node() {}
+	
+	// Initialize data structures from DOM node attributes.
+	bool fix_from_dom_node();
 		
 	// query for this region's rectangle
 	// the rectangle is evaluaded on the fly
@@ -166,6 +169,7 @@ class region_node : public common::region_info {
 	const lib::node *dom_node() const { return m_node; }
 
   private:
+	
 	const lib::node *m_node;
 	common::region_dim_spec m_rds;
 	dimension_inheritance m_dim_inherit;
