@@ -61,6 +61,7 @@
 
 #include <Cocoa/Cocoa.h>
 
+#define DUMP_IMAGES_FORMAT @"/tmp/amdump/ambulant_dump_%03d.tiff"
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -264,13 +265,21 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 
 - (void)drawRect:(NSRect)rect
 {
-    AM_DBG NSLog(@"AmbulantView.drawRect: self=0x%x", self);
+    AM_DBG NSLog(@"AmbulantView.drawRect: self=0x%x rect=(%f,%f,%f,%f)", self, NSMinX(rect), NSMinY(rect), NSMaxX(rect), NSMaxY(rect));
     if (!ambulant_window) {
         AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
     } else {
+#ifdef DUMP_IMAGES_FORMAT
+		rect = [self bounds];
+#endif
         ambulant::lib::screen_rect<int> arect = [self ambulantRectForNSRect: &rect];
         ambulant_window->redraw(arect);
     }
+#ifdef DUMP_IMAGES_FORMAT
+	// Debug code: dump the contents of the view into an image
+	static int seqnum = 1;
+	[self dumpToImageFile: [NSString stringWithFormat: DUMP_IMAGES_FORMAT, seqnum++]];
+#endif
 }
 
 - (void)setAmbulantWindow: (ambulant::gui::cocoa::cocoa_window *)window
@@ -341,6 +350,30 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 	if (ambulant_window) ambulant_window->user_event(amwhere, 1);
 	// XXX Set correct cursor
 	[[NSApplication sharedApplication] sendAction: SEL("fixMouse:") to: nil from: self];
+}
+
+- (void) dumpToImageFile: (NSString *)filename
+{
+	[self lockFocus];
+	NSBitmapImageRep *image = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [self bounds]];
+	[self unlockFocus];
+	NSData *tiffrep = [image TIFFRepresentation];
+	static NSData *oldtiffrep = NULL;
+	if (oldtiffrep && [oldtiffrep isEqualToData: tiffrep])
+		return;
+	[oldtiffrep release];
+	oldtiffrep = [tiffrep retain];
+	[tiffrep writeToFile: filename atomically: NO];
+	/*AM_DBG*/ NSLog(@"dumpToImageFile: created %@", filename);
+}
+
+- (BOOL)wantsDefaultClipping
+{
+#ifdef DUMP_IMAGES_FORMAT
+	return NO;
+#else
+	return YES;
+#endif
 }
 @end
 #endif // __OBJC__

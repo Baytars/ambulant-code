@@ -134,6 +134,8 @@ class cocoa_renderer_factory : public common::playable_factory {
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseMoved: (NSEvent *)theEvent;
 
+- (void)dumpToImageFile: (NSString *)filename;
+- (BOOL)wantsDefaultClipping;
 @end
 
 #endif // __OBJC__
