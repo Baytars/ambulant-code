@@ -84,11 +84,13 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	
 static void 
 on_source_close(void* data);
+
 namespace ambulant
 {
 
 namespace net
 {
+
 
 	
 class datasink {
@@ -146,12 +148,6 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	//bool m_eof;
 };
 
-
-class live_audio_datasource_factory : public audio_datasource_factory {
-  public:
-	~live_audio_datasource_factory() {};
-	audio_datasource* new_audio_datasource(const net::url& url, audio_format_choices fmts);
-};
 
 class live_audio_datasource: 
 	virtual public audio_datasource,

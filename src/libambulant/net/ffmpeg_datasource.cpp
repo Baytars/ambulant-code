@@ -77,19 +77,7 @@ typedef lib::no_arg_callback<ffmpeg_resample_datasource> resample_callback;
 
 
 // Static initializer function shared among ffmpeg classes
-static void 
-ffmpeg_init()
-{
-	static bool is_inited = false;
-	if (is_inited) return;
-	avcodec_init();
-#ifdef WITH_FFMPEG_AVFORMAT
-	av_register_all();
-#else
-	avcodec_register_all();
-#endif
-	is_inited = true;
-}
+
 
 // Hack, hack. Get extension of a URL.
 static const char *

@@ -71,7 +71,7 @@
 #include "ambulant/lib/xerces_parser.h"
 #endif
 
-#include "ambulant/net/rtsp_datasource.h"
+#include "ambulant/net/rtsp_factory.h"
 
 //#include "ambulant/lib/expat_parser.h"
 
