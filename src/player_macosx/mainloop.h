@@ -73,6 +73,6 @@ class mainloop : public ambulant::lib::ref_counted_obj {
 	double m_speed;
 	ambulant::lib::document *m_doc;
 	ambulant::common::abstract_player *m_player;
-	ambulant::common::global_renderer_factory *m_rf;
+	ambulant::common::global_playable_factory *m_rf;
 	ambulant::common::window_factory *m_wf;
 };

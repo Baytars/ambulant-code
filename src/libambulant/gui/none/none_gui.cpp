@@ -86,23 +86,22 @@ gui::none::none_active_renderer::stop()
 
 void
 gui::none::none_background_renderer::drawbackground(
-	const abstract_smil_region_info *src, 
+	const region_info *src, 
 	const screen_rect<int> &dirty, 
-	abstract_rendering_surface *dst, abstract_window *window)
+	surface *dst, abstract_window *window)
 {
 	lib::logger::get_logger()->trace("none_background_renderer.redraw(0x%x) from 0x%x to 0x%x", (void *)this, (void*)src, (void*)dst);
 }
 
 active_basic_renderer *
-gui::none::none_renderer_factory::new_renderer(
+gui::none::none_renderer_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *const evp,
-	net::passive_datasource *src,
-	abstract_rendering_surface *const dest)
+	net::passive_datasource *src)
 {
-	return new none_active_renderer(context, cookie, node, evp, src, dest);
+	return new none_active_renderer(context, cookie, node, evp, src);
 }
 
 abstract_bg_rendering_source *
@@ -112,7 +111,7 @@ gui::none::none_window_factory::new_background_renderer()
 }
 
 abstract_window *
-gui::none::none_window_factory::new_window(const std::string &name, size bounds, abstract_rendering_source *region)
+gui::none::none_window_factory::new_window(const std::string &name, size bounds, renderer *region)
 {
 	return new none_window(name, bounds, region);
 }

@@ -417,7 +417,7 @@ class passive_timeline : public lib::ref_counted_obj {
 	void build();
 	inline bool is_built() { return m_is_built; }
 	
-	active_timeline *activate(lib::event_processor *const evp, common::renderer_factory *rf, common::layout_manager *lm);
+	active_timeline *activate(lib::event_processor *const evp, common::playable_factory *rf, common::layout_manager *lm);
 
 #ifndef AMBULANT_NO_IOSTREAMS	
 	void dump(std::ostream& os);
@@ -458,7 +458,7 @@ class active_timeline : public common::playable_notification, public lib::ref_co
 		const detail::active_dependency_vector& dependencies,
 		const detail::active_action_vector& actions,
 		int nregion,
-		common::renderer_factory *rf,
+		common::playable_factory *rf,
 		common::layout_manager *lm);
 	
 	~active_timeline() {
@@ -489,12 +489,12 @@ class active_timeline : public common::playable_notification, public lib::ref_co
   	void ext_stop(int node_index);
   	
   	lib::event_processor * const m_event_processor;
-  	common::renderer_factory *m_renderer_factory;
+  	common::playable_factory *m_playable_factory;
     passive_timeline * const m_source;
 	common::layout_manager *m_layout_manager;
 	detail::active_dependency_vector m_dependencies;
 	const detail::active_action_vector& m_actions;
-	std::vector<common::active_basic_renderer *> m_renderers;
+	std::vector<common::playable *> m_playables;
 	lib::event *m_playdone;
 };
 

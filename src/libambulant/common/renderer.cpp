@@ -68,11 +68,10 @@ active_renderer::active_renderer(
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *const evp,
-	net::passive_datasource *src,
-	abstract_rendering_surface *const dest)
+	net::passive_datasource *src)
 :	active_basic_renderer(context, cookie, node, evp),
 	m_src(src?src->activate():NULL),
-	m_dest(dest)
+	m_dest(NULL)
 {
 }
 
@@ -141,12 +140,12 @@ active_final_renderer::readdone()
 	stopped_callback();
 }
 
-global_renderer_factory::global_renderer_factory()
+global_playable_factory::global_playable_factory()
 :   m_default_factory(new gui::none::none_renderer_factory())
 {
 }
 
-global_renderer_factory::~global_renderer_factory()
+global_playable_factory::~global_playable_factory()
 {
     // XXXX Should I delete the factories in m_factories? I think
     // so, but I'm not sure...
@@ -154,26 +153,25 @@ global_renderer_factory::~global_renderer_factory()
 }
     
 void
-global_renderer_factory::add_factory(renderer_factory *rf)
+global_playable_factory::add_factory(playable_factory *rf)
 {
     m_factories.push_back(rf);
 }
     
 active_basic_renderer *
-global_renderer_factory::new_renderer(
+global_playable_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *const evp,
-	net::passive_datasource *src,
-	abstract_rendering_surface *const dest)
+	net::passive_datasource *src)
 {
-    std::vector<renderer_factory *>::iterator i;
+    std::vector<playable_factory *>::iterator i;
     active_basic_renderer *rv;
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {
-        rv = (*i)->new_renderer(context, cookie, node, evp, src, dest);
+        rv = (*i)->new_playable(context, cookie, node, evp, src);
         if (rv) return rv;
     }
-    return m_default_factory->new_renderer(context, cookie, node, evp, src, dest);
+    return m_default_factory->new_playable(context, cookie, node, evp, src);
 }

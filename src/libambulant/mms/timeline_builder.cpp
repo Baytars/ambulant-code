@@ -125,10 +125,10 @@ mms_layout_manager::~mms_layout_manager()
 	m_audio_rgn = NULL;
 }
 
-common::abstract_rendering_surface *
-mms_layout_manager::get_rendering_surface(const lib::node *node)
+common::surface *
+mms_layout_manager::get_surface(const lib::node *node)
 {
-	common::abstract_rendering_surface *rgn;
+	common::surface *rgn;
 	lib::xml_string tag = node->get_qname().second;
 	if (tag == "img" || tag == "video") rgn = m_image_rgn->activate(node);
 	else if ( tag == "text") rgn = m_text_rgn->activate(node);

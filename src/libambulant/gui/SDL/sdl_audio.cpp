@@ -215,7 +215,7 @@ sdl_active_audio_renderer::sdl_active_audio_renderer(
 	const lib::node *node,
 	lib::event_processor *const evp,
 	net::passive_datasource *src)
-:	common::active_renderer(context, cookie, node, evp, src, NULL),
+:	common::active_renderer(context, cookie, node, evp, src),
     m_rate(44100),
     m_bits(16),
     m_channels(1),
