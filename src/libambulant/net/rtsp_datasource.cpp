@@ -1,4 +1,4 @@
-/*
+re/*
  * 
  * This file is part of Ambulant Player, www.ambulantplayer.org.
  * 
@@ -54,7 +54,9 @@ ambulant::net::rtsp_demux::rtsp_demux(net::url& url)
 	m_sip_client(NULL),
 	m_media_session(NULL),
 	m_sdp(NULL),
-	m_nstream(0)
+	m_nstream(0),
+	m_audio_stream(-1),
+	m_video_stream(-1)
 {
 	
 	// setup the basics.
@@ -105,15 +107,20 @@ ambulant::net::rtsp_demux::rtsp_demux(net::url& url)
 	unsigned int desired_buf_size;
 	MediaSubsession* subsession;
 	MediaSubsessionIterator iter(*m_media_session);
-	
 	// Only audio/video session need to apply for a job !
 	while ((subsession = iter.next()) != NULL) {
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
 			desired_buf_size = 100000;
-		} else if (strcmp(subsession->mediumName(), "audio") == 0) {
+			if (m_audio_stream < m_nstream) {
+				m_audio_stream = i;
+			}
+		} else if (strcmp(subsession->mediumName(), "video") == 0) {
 			desired_buf_size = 200000;
+			if (m_video_stream < m_nstream) {
+				m_video_stream = i;
+			}
 		}
-		
+		m_nstream++;
 		if (!subsession->initiate()) {
 			lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) failed to initiate subsession");
 			lib::logger::get_logger()->error("RTSP Connection Failed");
@@ -134,17 +141,53 @@ ambulant::net::rtsp_demux::rtsp_demux(net::url& url)
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
+	m_blocking_flag = 0;
 	if(!m_rtsp_client->playMediaSession(*m_media_session)) {
 		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) play failed");
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return -1;
+	}
 	
-		m_
-		TaskScheduler& scheduler =
+	while(!eof) {
+	MediaSubsession* subsession;
+	MediaSubsessionIterator iter(*m_media_session);
+	// Only audio/video session need to apply for a job !
+	while ((subsession = iter.next()) != NULL) {
+		if (strcmp(subsession->mediumName(), "audio") == 0) {
+			subsesion->readSource()->getNextFrame(m_audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, NULL, on_source_close,NULL);
+		} else if (strcmp(subsession->mediumName(), "video") == 0) {
+			subsesion->readSource()->getNextFrame(m_video_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, NULL, on_source_close,NULL);
+		}
+	}
+	TaskScheduler& scheduler = m_media_session->envir().taskScheduler();
+	scheduler.doEventLoop(m_blocking_flag);
+	}
 }
 
-void afterreading(void* clientData, unsigned frameSize,
-			 unsigned /*numTruncatedBytes*/,
-			 struct timeval presentationTime,
-			 unsigned /*durationInMicroseconds*/) {
-			 }
+void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+{
+	if (data) {
+		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
+		if(m_sink[m_audio_stream])) 
+			m_sink[m_audio_stream]->data_avail(rpts, (uint8_t*) data, sz));
+		m_blocking_flag = ~0;
+		//XXX Do we need to free data here ?
+	}
+}	
+
+void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+{
+	if (data) {
+		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
+		if(m_sink[m_video_stream])) 
+			m_sink[m_video_stream]->data_avail(rpts, (uint8_t*) data, sz));
+		m_blocking_flag = ~0;
+		//XXX Do we need to free data here ?
+	}
+}
+
+void on_source_close(void* client_data) 
+{
+	m_eof = true;
+	m_blocking_flag = ~0;
+}
