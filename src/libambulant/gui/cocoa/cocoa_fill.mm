@@ -141,7 +141,7 @@ cocoa_background_renderer::redraw(const lib::screen_rect<int> &dirty, common::gu
 	
 	cocoa_window *cwindow = (cocoa_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_bg_renderer::drawbackground: %d clearing to 0x%x", !m_src->get_transparent(), (long)m_src->get_bgcolor());
+	AM_DBG lib::logger::get_logger()->debug("cocoa_bg_renderer::drawbackground: %d clearing to 0x%x", !m_src->get_transparent(), (long)m_src->get_bgcolor());
 	screen_rect<int> dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
 	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
@@ -171,7 +171,7 @@ cocoa_background_renderer::keep_as_background()
 {
 	AM_DBG lib::logger::get_logger()->debug("cocoa_background_renderer::keep_as_background() called");
 	if (m_bgimage) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_background_renderer::keep_as_background: delete old m_image");
+		AM_DBG lib::logger::get_logger()->debug("cocoa_background_renderer::keep_as_background: delete old m_image");
 		[m_bgimage release];
 		m_bgimage = NULL;
 	}
