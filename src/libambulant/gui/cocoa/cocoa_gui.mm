@@ -26,7 +26,7 @@ class cocoa_active_text_renderer : active_final_renderer {
             m_text_storage(NULL) {};
         ~cocoa_active_text_renderer();
 	
-    void redraw(const screen_rect<int> &r);
+    void redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft);
   private:
     NSTextStorage *m_text_storage;
 	NSLayoutManager *m_layout_manager;
@@ -44,7 +44,7 @@ class cocoa_active_image_renderer : active_final_renderer {
 		m_nsdata(NULL) {};
 	~cocoa_active_image_renderer();
 
-    void redraw(const screen_rect<int> &r);
+    void redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft);
   private:
   	NSImage *m_image;
   	NSData *m_nsdata;
@@ -69,7 +69,7 @@ cocoa_active_text_renderer::~cocoa_active_text_renderer()
 }
 
 void
-cocoa_active_text_renderer::redraw(const screen_rect<int> &r)
+cocoa_active_text_renderer::redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft)
 {
 	logger::get_logger()->trace("cocoa_active_text_renderer.redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
         if (m_data && !m_text_storage) {
@@ -105,7 +105,7 @@ cocoa_active_image_renderer::~cocoa_active_image_renderer()
 }
 	
 void
-cocoa_active_image_renderer::redraw(const screen_rect<int> &r)
+cocoa_active_image_renderer::redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft)
 {
 	logger::get_logger()->trace("cocoa_active_image_renderer.redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	if (m_data && !m_image) {
@@ -179,6 +179,21 @@ cocoa_window_factory::new_window(const std::string &name, size bounds)
     NSLog(@"AmbulantView.initWithFrame: self=0x%x", self);
     return self;
 }
+- (NSRect) NSRectForAmbulantRect: (ambulant::lib::screen_rect<int> *)arect
+{
+	float bot_delta = NSMaxY([self bounds]) - arect->bottom();
+	return NSMakeRect(arect->left(), bot_delta, arect->width(), arect->height());
+}
+
+- (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (NSRect *)nsrect
+{
+	float top_delta = NSMaxY([self bounds]) - NSMaxY(*nsrect);
+	float rect_height = NSHeight(*nsrect);
+	ambulant::lib::screen_rect<int> arect = ambulant::lib::screen_rect<int>(
+                int(top_delta), int(NSMinY(*nsrect)),
+                int(top_delta+rect_height), int(NSMaxY(*nsrect)));
+	return arect;
+}
 
 - (void)drawRect:(NSRect)rect
 {
@@ -188,10 +203,8 @@ cocoa_window_factory::new_window(const std::string &name, size bounds)
         [[NSColor grayColor] set];
         NSRectFill([self bounds]);
     } else {
-        ambulant::lib::screen_rect<int> arect = ambulant::lib::screen_rect<int>(
-                int(NSMinX(rect)), int(NSMinY(rect)),
-                int(NSMaxX(rect)), int(NSMaxY(rect)));
-        ambulant_window->redraw(arect);
+        ambulant::lib::screen_rect<int> arect = [self ambulantRectForNSRect: &rect];
+        ambulant_window->redraw(arect, ambulant_window);
     }
 }
 

@@ -59,7 +59,7 @@ lib::active_renderer::readdone(lib::detail::readdone_callback_arg *dummy)
 }
 
 void
-lib::active_renderer::redraw(const screen_rect<int> &r)
+lib::active_renderer::redraw(const screen_rect<int> &r, passive_window *window, const point &window_topleft)
 {
 	lib::logger::get_logger()->trace("active_renderer.redraw(0x%x)", (void *)this);
 }
