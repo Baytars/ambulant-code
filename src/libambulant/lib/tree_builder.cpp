@@ -151,12 +151,13 @@ lib::tree_builder::start_element(const q_name_pair& qn, const q_attributes_list&
 		m_root = m_current = new node(qn, qattrs, m_context);
 	} else if(m_current != 0) {
 		node *p;
-		if (qn.second == "layout")
-			m_parsing_layout = true;
 		if (m_parsing_layout)
 			p = new region_node(qn, qattrs, m_context);
 		else
-			p = new node(qn, qattrs, m_context);		
+			p = new node(qn, qattrs, m_context);
+		// XXXX This should use schema:
+		if (qn.second == "layout")
+			m_parsing_layout = true;
 		m_current->append_child(p);
 		m_current = p;
 	} else
