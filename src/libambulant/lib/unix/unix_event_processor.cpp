@@ -16,8 +16,8 @@
 
 using namespace ambulant;
 
-lib::unix::event_processor::event_processor() 
-:   abstract_event_processor(lib::timer_factory(), new lib::critical_section())
+lib::unix::event_processor::event_processor(abstract_timer *t) 
+:   abstract_event_processor(t, new lib::critical_section())
 {
 	AM_DBG lib::logger::get_logger()->trace("event_processor 0x%x created", (void *)this);
 	if (pthread_mutex_init(&m_queue_mutex, NULL) < 0) {
@@ -77,7 +77,7 @@ lib::unix::event_processor::wakeup()
 }
 
 lib::event_processor *
-lib::event_processor_factory()
+lib::event_processor_factory(abstract_timer *t)
 {
-	return (event_processor *)new unix::event_processor();
+	return new unix::event_processor(t);
 }

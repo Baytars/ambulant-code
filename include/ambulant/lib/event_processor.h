@@ -53,7 +53,7 @@ namespace lib {
 
 class abstract_event_processor : public event_processor {
   public:
-	abstract_event_processor(timer *t, critical_section *pcs) 
+	abstract_event_processor(abstract_timer *t, critical_section *pcs) 
 	:	m_timer(t),
 		m_high_delta_timer(t), 
 		m_med_delta_timer(t), 
@@ -131,7 +131,7 @@ class abstract_event_processor : public event_processor {
 	virtual void wait_event() = 0;
 	
 	// the timer for this processor
-	timer *m_timer;
+	abstract_timer *m_timer;
 	
 	// high priority delta timer
 	delta_timer m_high_delta_timer;
@@ -147,7 +147,7 @@ class abstract_event_processor : public event_processor {
 };
 
 // Machine-dependent factory function
-event_processor *event_processor_factory();
+event_processor *event_processor_factory(abstract_timer *t);
 
 } // namespace lib
 
