@@ -137,25 +137,33 @@ qt_gui::~qt_gui() {
 	setCaption(QString::null);
 }
 
-void qt_gui::slot_about() {
+void 
+qt_gui::slot_about() {
 	QMessageBox::information(this, m_programfilename, about_text,
 				 QMessageBox::Ok | QMessageBox::Default
 				 );
 }
 
-bool checkFilename(QString filename, int mode) {
+bool 
+checkFilename(QString filename, int mode) {
 	QFile* file = new QFile(filename);
 	return file->open(mode);
 }
 
-bool qt_gui::openSMILfile(QString smilfilename, int mode) {
+void
+qt_gui::fileError(QString smilfilename) {
+ 	char buf[1024];
+	sprintf(buf, "Cannot open file \"%s\":\n%s\n",
+		(const char*) smilfilename, strerror(errno));
+	QMessageBox::information(this, m_programfilename, buf);
+}
+
+bool 
+qt_gui::openSMILfile(QString smilfilename, int mode) {
 	if (smilfilename.isNull())
 		return false;
 	if (! checkFilename(smilfilename, mode)) {
-		char buf[1024];
-		sprintf(buf, "Cannot open file \"%s\":\n%s\n",
-			(const char*) smilfilename, strerror(errno));
-		QMessageBox::information(this, m_programfilename, buf);
+		fileError(smilfilename);
 		return false;
 	}
 	char* filename = strdup(smilfilename);
@@ -183,7 +191,8 @@ bool qt_gui::openSMILfile(QString smilfilename, int mode) {
 	return true;
 }
 
-void qt_gui::slot_open() {
+void 
+qt_gui::slot_open() {
 	QString smilfilename =
 #ifndef QT_NO_FILEDIALOG
 		QFileDialog::getOpenFileName(
@@ -199,7 +208,8 @@ void qt_gui::slot_open() {
 	openSMILfile(smilfilename, IO_ReadOnly);
 }
 
-void qt_gui::slot_player_done() {
+void 
+qt_gui::slot_player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_player_done");
 	m_playmenu->setItemEnabled(m_pause_id, false);
 	m_playmenu->setItemEnabled(m_play_id, true);
@@ -208,17 +218,20 @@ void qt_gui::slot_player_done() {
 			    this, SLOT(slot_player_done()));
 }
 
-void qt_gui::need_redraw (const void* r, void* w, const void* pt) {
+void 
+qt_gui::need_redraw (const void* r, void* w, const void* pt) {
 	AM_DBG printf("qt_gui::need_redraw(0x%x)-r=(0x%x)\n",
 	(void *)this,r);
 }
 
-void qt_gui::player_done() {
+void 
+qt_gui::player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "player_done");
 	emit signal_player_done();
 }
 
-void qt_gui::slot_play() {
+void 
+qt_gui::slot_play() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_play");
 	if (m_smilfilename == NULL || m_mainloop == NULL) {
 		QMessageBox::information(
@@ -249,7 +262,8 @@ void qt_gui::slot_play() {
 	}
 }
 
-void qt_gui::slot_pause() {
+void 
+qt_gui::slot_pause() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_pause");
 	if (! m_pausing) {
 		m_pausing = true;
@@ -259,7 +273,8 @@ void qt_gui::slot_pause() {
 	}
 }
 
-void qt_gui::slot_stop() {
+void 
+qt_gui::slot_stop() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_stop");
 	m_mainloop->stop();
 	m_playmenu->setItemEnabled(m_pause_id, false);
@@ -267,7 +282,8 @@ void qt_gui::slot_stop() {
 	m_playing = false;
 }
 
-void qt_gui::slot_quit() {
+void
+qt_gui::slot_quit() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_quit");
 	if (m_mainloop)	{
 	  m_mainloop->stop();
@@ -278,7 +294,23 @@ void qt_gui::slot_quit() {
 	qApp->quit();
 }
 
-int main (int argc, char*argv[]) {
+#ifdef QT_NO_FILEDIALOG		/* Assume embedded Qt */
+void 
+qt_gui::setDocument(const QString& applnk_filename) {
+	AM_DBG printf("%s-%s(%s)\n", m_programfilename, "qt_gui::setDocument", *applnk_filename);
+	DocLnk* dl = new DocLnk(applnk_filename);
+	QString data;
+
+	FileManager fm;
+	if ( ! fm.loadFile(*dl, data)) {
+		fileError(applnk_filename);
+		return;
+	}
+}
+	
+#endif/*QT_NO_FILEDIALOG*/
+int
+main (int argc, char*argv[]) {
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
 	QApplication myapp(argc, argv);
 #else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
@@ -293,7 +325,7 @@ int main (int argc, char*argv[]) {
 	/* Fire */
 	myapp.setMainWidget(mywidget);
 #else /*QT_NO_FILEDIALOG*/   /* Assume embedded Qt */
-	myapp.showMainWidget(mywidget);
+	myapp.showMainDocumentWidget(mywidget);
 #endif/*QT_NO_FILEDIALOG*/
 	mywidget->show();
 //	myapp.processEvents();
