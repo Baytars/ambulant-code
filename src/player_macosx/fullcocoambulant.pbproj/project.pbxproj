@@ -331,6 +331,7 @@
 				042AF8FD053C2F020010C447,
 				042AF8FE053C2F020010C447,
 				042AF8FF053C2F020010C447,
+				04D59EF705AE0C5E0045E53C,
 			);
 			isa = PBXGroup;
 			path = common;
@@ -1866,6 +1867,20 @@
 			settings = {
 			};
 		};
+		04D59EF705AE0C5E0045E53C = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = region_node.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		04D59EF805AE0C5E0045E53C = {
+			fileRef = 04D59EF705AE0C5E0045E53C;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 //040
 //041
 //042
@@ -2419,6 +2434,7 @@
 				044C06EE05986EB300592A78,
 				041E39A305A083A2009C0962,
 				04C641BC05AAFB3D00250A48,
+				04D59EF805AE0C5E0045E53C,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2448,9 +2464,9 @@
 			};
 		};
 		8D15AC360486D014006FF6A4 = {
+			explicitFileType = text.plist;
 			fileEncoding = 4;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist;
 			path = Info.plist;
 			refType = 4;
 			sourceTree = "<group>";

@@ -83,6 +83,7 @@ namespace ambulant {
 
 namespace lib {
 
+class region_node;
 // Interface accesible to nodes.
 class node_context {
   public:
@@ -123,6 +124,11 @@ class document : public node_context {
 		return m_root?m_root->locate_node(path):0;
 	}
 	
+	// Get (and set) the layout section of the document
+	region_node *get_layout() { return m_layout; }
+	const region_node *get_layout() const { return m_layout; }
+	void set_layout(region_node *layout) { m_layout = layout; }
+	
 	// Returns the source url of this document
 	const ambulant::net::url& get_src_url() const { return m_src_url;}
 	
@@ -139,6 +145,9 @@ class document : public node_context {
 	// the root of this document
 	node *m_root;
 	
+	// the layout section of this document
+	region_node *m_layout;
+	
 	// the external source url
 	ambulant::net::url m_src_url;
 	
@@ -149,6 +158,7 @@ class document : public node_context {
 	
 	// document namespaces registry
 	nscontext m_namespaces;
+	
 };
 
 
