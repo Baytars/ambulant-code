@@ -86,6 +86,9 @@ char *welcome_locations[] = {
 	"../Extras/Welcome/Welcome.smil",
 	"/usr/local/lib/ambulant/Welcome/Welcome.smil",
 	"/usr/share/doc/ambulant-1.0/Extras/Welcome/Welcome.smil",
+#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
+	"/home/zaurus/Documents/Welcome/Welcome.smil",
+#endif/*QT_NO_FILEDIALOG*/
 	NULL
 };
 
