@@ -66,7 +66,7 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_active_text_renderer : public active_final_renderer {
+class cocoa_active_text_renderer : public renderer_playable_dsall {
   public:
 	cocoa_active_text_renderer(
 		playable_notification *context,
@@ -74,7 +74,7 @@ class cocoa_active_text_renderer : public active_final_renderer {
 		const lib::node *node,
 		event_processor *evp,
 		net::datasource_factory *df)
-	:   active_final_renderer(context, cookie, node, evp, df),
+	:   renderer_playable_dsall(context, cookie, node, evp, df),
             m_text_storage(NULL) {};
         ~cocoa_active_text_renderer();
 	

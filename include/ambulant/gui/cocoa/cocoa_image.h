@@ -67,7 +67,7 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_active_image_renderer : public active_final_renderer {
+class cocoa_active_image_renderer : public renderer_playable_dsall {
   public:
 	cocoa_active_image_renderer(
 		playable_notification *context,
@@ -75,20 +75,25 @@ class cocoa_active_image_renderer : public active_final_renderer {
 		const lib::node *node,
 		event_processor *evp,
 		net::datasource_factory *df)
-	:	active_final_renderer(context, cookie, node, evp, df),
+	:	renderer_playable_dsall(context, cookie, node, evp, df),
 		m_image(NULL),
 		m_nsdata(NULL),
+		m_intransition(NULL),
+		m_outtransition(NULL),
 		m_trans_engine(NULL) {};
 	~cocoa_active_image_renderer();
 
 	void start(double where);
     void redraw(const screen_rect<int> &dirty, gui_window *window);
+	void set_intransition(lib::transition_info *info) { m_intransition = info; }
 	void start_outtransition(lib::transition_info *info);
   private:
 	void transition_step();
 	
   	NSImage *m_image;
   	NSData *m_nsdata;
+	lib::transition_info *m_intransition;
+	lib::transition_info *m_outtransition;
 	smil2::transition_engine *m_trans_engine;
 	critical_section m_lock;
 };
