@@ -106,7 +106,7 @@ class region_node : public common::animation_destination {
 	// Tie together region and surface_template trees
 	void set_surface_template(common::surface_template *surf) { m_surface_template = surf; }
 	common::surface_template *get_surface_template() { return m_surface_template; }
-	common::animation_notification *get_animation_notification(const lib::node *node) { return NULL /* m_surface_template */; };
+	common::animation_notification *get_animation_notification() { return m_surface_template; };
 	common::animation_destination *get_animation_destination() { return this; };
 	
 	// query for this region's rectangle
