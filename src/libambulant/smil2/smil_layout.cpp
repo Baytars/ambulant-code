@@ -69,30 +69,6 @@
 using namespace ambulant;
 using namespace smil2;
 
-// Helper function: get region_dim value from an attribute
-static common::region_dim
-get_regiondim_attr(const lib::node *rn, char *attrname)
-{
-	const char *attrvalue = rn->get_attribute(attrname);
-	common::region_dim rd;
-	if (attrvalue == NULL || *attrvalue == '\0') {
-		// pass: region_dim are initialized as auto
-	} else {
-		int ivalue;
-		char *endptr;
-		ivalue = strtol(attrvalue, &endptr, 10);
-		if (*endptr == '\0' || strcmp(endptr, "px") == 0) {
-			rd = ivalue;
-		} else if (*endptr == '%') {
-			double fvalue;
-			fvalue = ivalue / 100.0;
-			rd = fvalue;
-		} else {
-			lib::logger::get_logger()->error("smil_layout_manager: cannot parse %s=\"%s\"", attrname, attrvalue);
-		}
-	}
-	return rd;
-}
 
 smil_layout_manager::smil_layout_manager(common::window_factory *wf,lib::document *doc)
 :   m_schema(common::schema::get_instance())
@@ -153,81 +129,22 @@ smil_layout_manager::fix_document_layout(lib::document *doc)
 			level++;
 			if (level == 0) continue; // Skip layout section itself
 			lib::node *n = pair.second;
-			region_node *rn = new region_node(n);
-			// XXXX Tie into tree and set layout
-			// For every node in the layout section we fill in the dimensions
-			AM_DBG lib::logger::get_logger()->trace("smil_layout_manager: adjusting %s %s", n->get_local_name().c_str(), n->get_attribute("id"));
-			common::region_dim_spec& rds = rn->rds();
-			rds.left = get_regiondim_attr(n, "left");
-			rds.width = get_regiondim_attr(n, "width");
-			rds.right = get_regiondim_attr(n, "right");
-			rds.top = get_regiondim_attr(n, "top");
-			rds.height = get_regiondim_attr(n, "height");
-			rds.bottom = get_regiondim_attr(n, "bottom");
-#if !defined(AMBULANT_NO_IOSTREAMS) && !defined(AMBULANT_NO_OPERATORS_IN_NAMESPACE)
-			AM_DBG {
-				lib::logger::ostream os = lib::logger::get_logger()->trace_stream();
-				// XXXX Why the &^%$#%& can't we use os << rds << lib::endl ??!??
-				os << "smil_layout_manager: result=(" 
-					<< rds.left << ", " << rds.width << ", " << rds.right << ", "
-					<< rds.top << ", " << rds.height << ", " << rds.bottom << ")" << lib::endl;
-			}
-#endif
-			
-			// Next, we set the inheritance
+			// Find inheritance type
 			common::layout_type tp = m_schema->get_layout_type(n->get_qname());
+			dimension_inheritance di;
 			if (tp == common::l_rootlayout || tp == common::l_toplayout) {
-				rn->set_dimension_inheritance(di_none);
+				di = di_none;
 			} else if (level == 1) {
 				// Toplevel region node
-				rn->set_dimension_inheritance(di_rootlayout);
+				di = di_rootlayout;
 			} else {
 				// lower-level region node
-				rn->set_dimension_inheritance(di_parent);
+				di = di_parent;
 			}
-			// Next we set background color
-			const char *bgcolor_attr = n->get_attribute("backgroundColor");
-			if (bgcolor_attr == NULL) bgcolor_attr = n->get_attribute("background-color");
-			if (bgcolor_attr == NULL) bgcolor_attr = "transparent";
-			lib::color_t bgcolor = lib::to_color(0, 0, 0);
-			bool transparent = true, inherit = false;
-			if (strcmp(bgcolor_attr, "transparent") == 0) transparent = true;
-			else if (strcmp(bgcolor_attr, "inherit") == 0) inherit = true;
-			else if (!lib::is_color(bgcolor_attr)) lib::logger::get_logger()->error("Invalid color: %s", bgcolor_attr);
-			else {
-				bgcolor = lib::to_color(bgcolor_attr);
-				transparent = false;
-			}
-			AM_DBG lib::logger::get_logger()->trace("Background color 0x%x %d %d", (int)bgcolor, (int)transparent, (int)inherit);
-			rn->set_bgcolor(bgcolor, transparent, inherit);
-			// showBackground
-			const char *sbg_attr = n->get_attribute("showBackground");
-			if (sbg_attr) {
-				if (strcmp(sbg_attr, "whenActive") == 0) rn->set_showbackground(false);
-				else if (strcmp(sbg_attr, "always") == 0) rn->set_showbackground(true);
-				else lib::logger::get_logger()->error("Invalid showBackground value: %s", sbg_attr);
-			}
-			// And fit
-			const char *fit_attr = n->get_attribute("fit");
-			common::fit_t fit = common::fit_hidden;
-			if (fit_attr) {
-				if (strcmp(fit_attr, "fill") == 0) fit = common::fit_fill;
-				else if (strcmp(fit_attr, "hidden") == 0) fit = common::fit_hidden;
-				else if (strcmp(fit_attr, "meet") == 0) fit = common::fit_meet;
-				else if (strcmp(fit_attr, "scroll") == 0) fit = common::fit_scroll;
-				else if (strcmp(fit_attr, "slice") == 0) fit = common::fit_slice;
-				else lib::logger::get_logger()->error("Invalid fit value: %s", fit_attr);
-			}
-			rn->set_fit(fit);
-			// And finally z-index.
-			// XXXX Note that the implementation of z-index isn't 100% correct SMIL 2.0:
-			// we interpret missing z-index as zero, but the standard says "auto" which is
-			// slightly different.
-			const char *z_attr = n->get_attribute("z-index");
-			common::zindex_t z = 0;
-			if (z_attr) z = strtol(z_attr, NULL, 10);
-			AM_DBG lib::logger::get_logger()->trace("z-index=%d", z);
-			rn->set_zindex(z);
+
+			region_node *rn = new region_node(n, di);
+			rn->fix_from_dom_node();
+			// XXXX Tie into tree and set layout
 		} else {
 			level--;
 		}
