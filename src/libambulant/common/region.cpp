@@ -73,6 +73,7 @@ lib::passive_region *
 lib::passive_region::subregion(const abstract_smil_region_info *info)
 {
 	screen_rect<int> bounds = info->get_screen_rect();
+	/*AM_DBG*/ lib::logger::get_logger()->trace("subbregion %s: ltrb=(%d, %d, %d, %d)", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom());
 	point topleft = m_window_topleft + bounds.left_top();
 	passive_region *rv = new passive_region(info->get_name(), this, bounds, topleft, info);
 	m_children.push_back(rv);
