@@ -4,10 +4,21 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/common/playable.h"
 
+namespace ambulant {
+
+namespace common {
+	
 struct factories {
-	datasource_factory *m_df;
-	playable_factory   *m_rf;
-}
+	net::datasource_factory  *df;
+	common::global_playable_factory *rf;
+	ambulant::common::window_factory *wf;
+};
+
+
+} // end namespaces
+} // end namespaces
+
+
 	
 
 
