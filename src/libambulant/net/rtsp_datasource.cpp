@@ -62,7 +62,8 @@ using namespace net;
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
 :	m_context(context)
 {
-	m_context->fmt.parameters = (void*) m_context->codec_name;
+	m_context->audio_fmt.parameters = (void*) m_context->audio_codec_name;
+	m_context->video_fmt.parameters = (void*) m_context->video_codec_name;
 }
 
 
@@ -105,8 +106,10 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	if (!context->video_packet) {
 		return NULL;		
 	}
-	context->codec_name = NULL;
-	context->fmt = audio_format("live");
+	context->audio_codec_name = NULL;
+	context->video_codec_name = NULL;
+	context->audio_fmt = audio_format("live");
+	context->video_fmt = video_format("live");
 	context->eof = false;
 	context->need_video = true;
 	context->need_audio = true;
@@ -169,9 +172,9 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 			if (context->audio_stream < 0) {
 				
 				context->audio_stream = context->nstream;
-				context->codec_name = subsession->codecName();
-				context->fmt.channels = subsession->numChannels() + 1;
-				context->fmt.bits = 16;
+				context->audio_codec_name = subsession->codecName();
+				context->audio_fmt.channels = subsession->numChannels() + 1;
+				context->audio_fmt.bits = 16;
 				//context->fmt.samplerate = subsession->rtpSource()->timestampFrequency();
 				
 			}
@@ -179,6 +182,10 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 			desired_buf_size = 200000;
 			if (context->video_stream < 0) {
 				context->video_stream = context->nstream;
+				context->video_codec_name = subsession->codecName();
+				context->video_fmt.framerate = subsession->videoFPS();
+				context->video_fmt.width = subsession->videoWidth();
+				context->video_fmt.height = subsession->videoHeight();
 			}
 		}
 		context->nstream++;

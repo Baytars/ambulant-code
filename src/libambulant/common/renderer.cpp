@@ -373,6 +373,8 @@ active_video_renderer::get_dur()
 	return rv;
 }
 
+
+
 // now() returns the time in seconds !
 double
 active_video_renderer::now() 
@@ -419,6 +421,7 @@ void
 active_video_renderer::data_avail()
 {
 	m_lock.enter();
+	long long int ts2;
 	double ts;
 	char *buf = NULL;
 	int size;
@@ -436,7 +439,8 @@ active_video_renderer::data_avail()
 	m_size.w = m_src->width();
 	m_size.h = m_src->height();
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail: size=(%d, %d)", m_size.w, m_size.h);
-	buf = m_src->get_frame(&ts, &size);
+	buf = m_src->get_frame(&ts2, &size);
+	ts = ts2 / 1000000.0; // ts should be in seconds now !
 	displayed = false;
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail(buf = 0x%x) (ts=%f, now=%f):", (void *) buf,ts, now());	
 	if (m_is_playing && buf) {
@@ -445,7 +449,7 @@ active_video_renderer::data_avail()
 			show_frame(buf, size);
 			m_dest->need_redraw();
 			displayed = true;
-			m_src->frame_done(ts, true);
+			m_src->frame_done(ts2, true);
 			if (!m_src->end_of_file()) {
 				lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
 				m_src->start_frame (m_event_processor, e, ts);

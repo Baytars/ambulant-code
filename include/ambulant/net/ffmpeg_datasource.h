@@ -100,13 +100,13 @@ ffmpeg_init()
 struct video_frame {
 	char* data;
 	int	  size;
-}
+};
 
 namespace ambulant
 {
 
 namespace net
-{
+{  
 
 class ffmpeg_codec_id {
   public:
@@ -175,11 +175,11 @@ class abstract_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	//virtual int samplerate() = 0;
 	//virtual int channels() = 0;
 	virtual audio_format& get_audio_format() = 0;
+	virtual video_format& get_video_format() = 0;
+	virtual bool end_of_file();
 	
   protected:
 	virtual unsigned long run() = 0;
-  	audio_format m_fmt;
-  
 };
 
 
@@ -197,12 +197,15 @@ class ffmpeg_demux : public abstract_demux {
     // XXX this should also be timestamp_t instead of double
   	double duration();
   	int nstreams();
-    audio_format& get_audio_format() { return m_fmt; };
-  	
+  
+    audio_format& get_audio_format() { return m_audio_fmt; };
+  	video_format& get_video_format() { return m_video_fmt; };
 	void cancel();
   protected:
 	unsigned long run();
   private:
+	audio_format m_audio_fmt;
+  	video_format m_video_fmt;
     datasink *m_sinks[MAX_STREAMS];
 	AVFormatContext *m_con;
 	int m_nstream;
@@ -262,7 +265,7 @@ class demux_video_datasource:
 	virtual public lib::ref_counted_obj
 {
   public:
-	 static demux_video_datasource *new_demux_audio_datasource(
+	 static demux_video_datasource *new_demux_video_datasource(
   		const net::url& url, detail::abstract_demux *thread);
   	
   		demux_video_datasource(
@@ -272,9 +275,9 @@ class demux_video_datasource:
   
     ~demux_video_datasource();
 
-    void start_frame(lib::event_processor *evp, lib::event *callback);
-	void stop();  
-
+    void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, double timestamp);
+    void stop();  
+	char* get_frame(timestamp_t *timestamp, int *size);
     void frame_done(timestamp_t timestamp, bool keepdata);
     void data_avail(timestamp_t pts, uint8_t *data, int size);
     bool end_of_file();
@@ -299,7 +302,7 @@ class demux_video_datasource:
 	audio_format m_fmt;
 	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
-	std::queue<std::pair<timestamp_t, video_frame> m_frames;
+	std::queue<std::pair<timestamp_t, video_frame> > m_frames;
 	std::pair<timestamp_t, video_frame> m_old_frame;
 	detail::abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client

@@ -90,11 +90,6 @@ namespace ambulant
 namespace net
 {
 
-
-
-
-	
-
 struct rtsp_context_t {
 	RTSPClient* rtsp_client;
   	MediaSession* media_session;
@@ -108,8 +103,11 @@ struct rtsp_context_t {
 	int nstream;
 	char blocking_flag;
 	bool eof;
-	const char* codec_name;
-	audio_format fmt;	
+	const char* audio_codec_name;
+	const char* video_codec_name;
+	
+	audio_format audio_fmt;	
+	video_format video_fmt;
 	detail::datasink *sinks[MAX_STREAMS];
 };
 	
@@ -127,62 +125,14 @@ class rtsp_demux : public detail::abstract_demux {
 	int video_stream_nr() { return m_context->video_stream; };  
 	int nstreams() { return m_context->nstream; };
 	double duration(){ return 0.0; };
-	audio_format& get_audio_format() { return m_context->fmt; };
-	
+	audio_format& get_audio_format() { return m_context->audio_fmt; };
+	video_format& get_video_format() { return m_context->video_fmt; };
+
   protected:
 	unsigned long run();
   private:	
 	rtsp_context_t* m_context;
 };
-
-
-//~ class live_audio_datasource: 
-	//~ virtual public audio_datasource,
-	//~ public datasink,
-	//~ virtual public lib::ref_counted_obj {
-  //~ public:
-	 //~ static live_audio_datasource *new_live_audio_datasource(
-  		//~ const net::url& url, 
-  		//~ AVCodecContext *context,
-		//~ rtsp_demux *thread);
-  	
-  	//~ live_audio_datasource(
-  		//~ const net::url& url, 
-  		//~ AVCodecContext *context,
-		//~ rtsp_demux *thread, 
-  		//~ int stream_index);
-  
-    //~ ~live_audio_datasource();
-
-    //~ void start(lib::event_processor *evp, lib::event *callback);
-	//~ void stop();  
-
-    //~ void readdone(int len);
-    //~ void data_avail(double pts, uint8_t *data, int size);
-    //~ bool end_of_file();
-	//~ bool buffer_full();
-		
-	//~ char* get_read_ptr();
-	//~ int size() const;   
-	//~ audio_format& get_audio_format();
-
-	//~ std::pair<bool, double> get_dur();
-
-  //~ private:
-    //~ bool _end_of_file();
-	//~ const net::url m_url;
-	//~ AVCodecContext *m_con;
-	//~ int m_stream_index;
-	//~ audio_format m_fmt;
-	//~ bool m_src_end_of_file;
-    //~ lib::event_processor *m_event_processor;
-
-	//~ databuffer m_buffer;
-	//~ rtsp_demux *m_thread;
-	//~ lib::event *m_client_callback;  // This is our calllback to the client
-	//~ lib::critical_section m_lock;
-  
-//~ };
 
 
 }
