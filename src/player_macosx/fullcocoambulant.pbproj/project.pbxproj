@@ -145,6 +145,20 @@
 			settings = {
 			};
 		};
+		042528340591088C004905EC = {
+			expectedFileType = sourcecode.c.h;
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = cocoa_mouse.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		042528350591088C004905EC = {
+			fileRef = 042528340591088C004905EC;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		042AF8D7053C2EBD0010C447 = {
 			children = (
 				042AF8DC053C2EBD0010C447,
@@ -1068,6 +1082,7 @@
 				042239C30536F4760010C447,
 				042239C40536F4760010C447,
 				042239C50536F4760010C447,
+				042528340591088C004905EC,
 			);
 			isa = PBXGroup;
 			path = cocoa;
@@ -2096,6 +2111,7 @@
 				045FCEAC058F36A300FCC836,
 				045FCEAD058F36A300FCC836,
 				045FCEAE058F36A300FCC836,
+				042528350591088C004905EC,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
