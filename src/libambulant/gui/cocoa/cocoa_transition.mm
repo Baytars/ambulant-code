@@ -66,12 +66,12 @@ namespace gui {
 namespace cocoa {
 
 void
-cocoa_transition_engine_fade::update()
+cocoa_transition_blitclass_fade::update()
 {
 	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
 	AmbulantView *view = (AmbulantView *)window->view();
 	NSImage *newsrc = [view getTransitionNewSource];
-	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine_fade::update(%f)", m_progress);
+	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_blitclass_fade::update(%f)", m_progress);
 	const lib::screen_rect<int> &r =  m_dst->get_rect();
 	lib::screen_rect<int> dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
@@ -83,14 +83,14 @@ cocoa_transition_engine_fade::update()
 }
 
 void
-cocoa_transition_engine_barwipe::update()
+cocoa_transition_blitclass_r1r2::update()
 {
 	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
 	AmbulantView *view = (AmbulantView *)window->view();
 
 	NSImage *oldsrc = [view getTransitionOldSource];
 	NSImage *newsrc = [view getTransitionNewSource];
-	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine_barwipe::update(%f)", m_progress);
+	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_blitclass_r1r2::update(%f)", m_progress);
 	lib::screen_rect<int> oldrect_whole = m_oldrect;
 	lib::screen_rect<int> newrect_whole = m_newrect;
 	oldrect_whole.translate(m_dst->get_global_topleft());
@@ -130,7 +130,15 @@ cocoa_transition_engine(common::surface *dst, bool is_outtrans, lib::transition_
 	case lib::barWipe:
 		rv = new cocoa_transition_engine_barwipe();
 		break;
+	case lib::boxWipe:
+		rv = new cocoa_transition_engine_boxwipe();
+		break;
+	case lib::barnDoorWipe:
+		rv = new cocoa_transition_engine_barndoorwipe();
+		break;
 	default:
+		lib::logger::get_logger()->warn("cocoa_transition_engine: transition type %s not yet implemented",
+			repr(info->m_type).c_str());
 		rv = NULL;
 	}
 	if (rv)

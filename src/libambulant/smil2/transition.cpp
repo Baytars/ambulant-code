@@ -142,6 +142,7 @@ transition_engine_fade::compute()
 void
 transition_engine_barwipe::compute()
 {
+	// XXX Only does horizontal left-to-right at the moment
 	lib::screen_rect<int> dstrect = m_dst->get_rect();
 	int xmid = dstrect.m_left + int(m_progress*(dstrect.m_right - dstrect.m_left) + 0.5);
 	int ymid = dstrect.m_top + int(m_progress*(dstrect.m_bottom - dstrect.m_top) + 0.5);
@@ -151,5 +152,31 @@ transition_engine_barwipe::compute()
 	m_newrect = lib::screen_rect<int>(
 		lib::point(dstrect.m_left, dstrect.m_top),
 		lib::point(xmid, dstrect.m_bottom));
+}
+
+void
+transition_engine_boxwipe::compute()
+{
+	// XXX Only does box from topleft right now
+	lib::screen_rect<int> dstrect = m_dst->get_rect();
+	int xmid = dstrect.m_left + int(m_progress*(dstrect.m_right - dstrect.m_left) + 0.5);
+	int ymid = dstrect.m_top + int(m_progress*(dstrect.m_bottom - dstrect.m_top) + 0.5);
+	m_oldrect = dstrect;
+	m_newrect = lib::screen_rect<int>(
+		lib::point(dstrect.m_left, dstrect.m_top),
+		lib::point(xmid, ymid));
+}
+
+void
+transition_engine_barndoorwipe::compute()
+{
+	// XXX Only does horizontal right now
+	lib::screen_rect<int> dstrect = m_dst->get_rect();
+	int xmid = dstrect.m_left + int((dstrect.m_right - dstrect.m_left)/2.0 + 0.5);
+	int half_width = int(m_progress*(xmid - dstrect.m_left) + 0.5);
+	m_oldrect = dstrect;
+	m_newrect = lib::screen_rect<int>(
+		lib::point(xmid-half_width, dstrect.m_top),
+		lib::point(xmid+half_width, dstrect.m_bottom));
 }
 

@@ -62,15 +62,31 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_transition_engine_fade : public smil2::transition_engine_fade {
+class cocoa_transition_blitclass_fade : virtual public smil2::transition_blitclass_fade {
   protected:
 	void update();
 };
 
-class cocoa_transition_engine_barwipe : public smil2::transition_engine_barwipe {
+class cocoa_transition_blitclass_r1r2 : virtual public smil2::transition_blitclass_r1r2 {
   protected:
 	void update();
 };
+
+class cocoa_transition_engine_fade : 
+	virtual public cocoa_transition_blitclass_fade,
+	virtual public smil2::transition_engine_fade {};
+	
+class cocoa_transition_engine_barwipe :
+	virtual public cocoa_transition_blitclass_r1r2,
+	virtual public smil2::transition_engine_barwipe {};
+
+class cocoa_transition_engine_boxwipe :
+	virtual public cocoa_transition_blitclass_r1r2,
+	virtual public smil2::transition_engine_boxwipe {};
+
+class cocoa_transition_engine_barndoorwipe :
+	virtual public cocoa_transition_blitclass_r1r2,
+	virtual public smil2::transition_engine_barndoorwipe {};
 
 smil2::transition_engine *cocoa_transition_engine(
 	common::surface *dst, bool is_outtrans, lib::transition_info *info);

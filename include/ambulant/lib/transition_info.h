@@ -99,6 +99,8 @@ enum transition_type {
 	slideWipe,
 	fade
 };
+
+std::string repr(transition_type t);
 	
 class transition_info {
   public:

@@ -90,16 +90,52 @@ class transition_engine {
 	double m_time2progress;
 };
 
-class transition_engine_fade : public transition_engine {
+class transition_blitclass_r1r2 : public transition_engine {
+  protected:
+	lib::screen_rect<int> m_oldrect, m_newrect;
+};
+
+class transition_blitclass_r1r2r3r4 : public transition_engine {
+  protected:
+	lib::screen_rect<int> m_oldsrcrect, m_olddstrect, m_newsrcrect, m_newdstrect;
+};
+
+class transition_blitclass_rlistr2 : public transition_engine {
+  protected:
+};
+
+class transition_blitclass_polyr2 : public transition_engine {
+  protected:
+};
+
+class transition_blitclass_polylistr2 : public transition_engine {
+  protected:
+};
+
+class transition_blitclass_fade : public transition_engine {
+  protected:
+};
+
+/////////////////////////////
+
+class transition_engine_fade : virtual public transition_blitclass_fade {
   protected:
 	void compute();
 };
 
-class transition_engine_barwipe : public transition_engine {
+class transition_engine_barwipe : virtual public transition_blitclass_r1r2 {
   protected:
     void compute();
+};
+
+class transition_engine_boxwipe : virtual public transition_blitclass_r1r2 {
   protected:
-	lib::screen_rect<int> m_oldrect, m_newrect;
+    void compute();
+};
+
+class transition_engine_barndoorwipe : virtual public transition_blitclass_r1r2 {
+  protected:
+    void compute();
 };
 
 } // namespace smil2
