@@ -82,8 +82,8 @@ gui::none::none_active_renderer::stop()
 
 active_renderer *
 gui::none::none_renderer_factory::new_renderer(
-	lib::playable_events<int> *context,
-	int cookie,
+	lib::active_playable_events *context,
+	active_playable_events::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *const evp,
 	net::passive_datasource *src,
