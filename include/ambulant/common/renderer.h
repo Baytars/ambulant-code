@@ -158,6 +158,7 @@ class active_renderer : public active_basic_renderer {
 	virtual void user_event(const lib::point &where) { clicked_callback(); }
 	virtual void set_surface(surface *dest) { m_dest = dest; }
 	virtual surface *get_surface() { return m_dest;}
+	virtual renderer *get_renderer() const { return this; }
 	
   protected:
 	virtual void readdone();
