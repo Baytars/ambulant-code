@@ -49,6 +49,7 @@
 #define __SDL_AUDIO__
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <iostream>
 
 #include "ambulant/common/region.h"
@@ -58,7 +59,6 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/asb.h"
-
 
 namespace ambulant {
 using namespace lib;
@@ -100,10 +100,11 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	
       static bool m_sdl_init;
   	  int init(int rate, int bits, int channels);
-      SDL_AudioSpec *m_audiospec;
+      Mix_Chunk m_audio_chunck;
       int m_rate;
       int m_channels;
-      int m_bits;
+      int m_buffer_size = 4096;
+	  Uint16 m_audio_format = AUDIO_S16;
       event *m_playdone;
 };
 
