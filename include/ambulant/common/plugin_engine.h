@@ -64,7 +64,7 @@ namespace plugin {
 
 class plugin_engine {
   public:
-	 plugin_engine();
+	 plugin_engine(common::global_playable_factory* rf, net::datasource_factory *df);
 	~plugin_engine() {};
 	
   private:

@@ -52,11 +52,12 @@
 #include<dlfcn.h>
 #include<stdlib.h>
 #include<dirent.h>
+#include<string.h>
 
 
 
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -64,12 +65,13 @@
 using namespace ambulant;
 
 
-plugin::plugin_engine::plugin_engine()
+plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::datasource_factory* df)
 {
 	int nr_of_files;
+	char filename[1024];
 
 	void *handle;
-	typedef void (*initfunctype)(common::global_playable_factory* rf, net::datasource_factory df);
+	typedef void (*initfunctype)(common::global_playable_factory* rf, net::datasource_factory* df);
 	initfunctype init;
 	
 	
@@ -77,6 +79,7 @@ plugin::plugin_engine::plugin_engine()
 	
 	dirent **namelist;
 	m_plugindir = getenv("AMB_PLUGIN_DIR");
+	AM_DBG lib::logger::get_logger()->trace("plugin_engine::Scaning plugin directory : %s", m_plugindir);
 
 	if (m_plugindir != NULL) {
 		nr_of_files = scandir(m_plugindir, &namelist, NULL, NULL);
@@ -88,12 +91,16 @@ plugin::plugin_engine::plugin_engine()
       			//only normal files, not dots (. and ..)
       			if (strcmp(namelist[nr_of_files]->d_name, ".")  &&
 	          		strcmp(namelist[nr_of_files]->d_name, "..")) { 
-					handle = dlopen(namelist[nr_of_files]->d_name, RTLD_LAZY);
+					strcpy(filename,m_plugindir);
+					strcat(filename,namelist[nr_of_files]->d_name);
+					handle = dlopen(filename, RTLD_LAZY);
 				  	if (handle) {
+  						AM_DBG lib::logger::get_logger()->error("plugin_playable_factory::reading plugin SUCCES [ %s ]",filename);
 						init = (initfunctype) dlsym(handle,"initialize");
-						(*init)(common::global_playable_factory* rf, net::datasource_factory df);
+						(*init)(rf, df);
 		  			} else {
-						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",namelist[nr_of_files]);
+						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",filename);
+						lib::logger::get_logger()->error("Reading plugin failed because : %s", dlerror());
 					}
 			}
 			free(namelist[nr_of_files]);
