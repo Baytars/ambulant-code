@@ -58,7 +58,7 @@
 #include "ambulant/lib/callback.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/lib/event_processor.h"
-#include "ambulant/common/layout.h"
+#include "ambulant/lib/layout.h"
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/playable.h"
 
