@@ -126,12 +126,13 @@ basic_plugin::basic_plugin(
 	net::datasource_factory *df) 
 :	common::playable_imp(context, cookie, node, evp)
 {
-	std::cout << "PLUGIN CREATED\n";
+
 }
 
 void
 basic_plugin::data_avail()
 {
+
 }
 
 void

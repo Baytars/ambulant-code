@@ -50,7 +50,7 @@
 #include "ambulant/lib/logger.h"
 #include"ambulant/common/plugin_init.h"
 
-#include<dlfcn.h>
+//#include<dlfcn.h>
 #include<stdlib.h>
 #include<dirent.h>
 #include<string.h>
@@ -124,7 +124,7 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, net::d
 						}
 		  			} else {
 						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",filename);
-						lib::logger::get_logger()->error("Reading plugin failed because : %s\n\n", dlerror());
+						lib::logger::get_logger()->error("Reading plugin failed because : %s\n\n", lt_dlerror());
 					}
 			}
 			free(namelist[nr_of_files]);
