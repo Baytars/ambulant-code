@@ -52,6 +52,22 @@
 #include "mainloop.h"
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 
+#include "ambulant/common/embedder.h"
+#include "ambulant/net/url.h"
+
+class document_embedder : public ambulant::common::embedder {
+  public:
+	document_embedder(id mydocument)
+	:   m_mydocument(mydocument) {}
+
+	// common:: embedder interface
+	void show_file(const ambulant::net::url& href);
+	void close(ambulant::common::player *p);
+	void open(ambulant::net::url newdoc, bool start, ambulant::common::player *old=NULL);
+  private:
+	id m_mydocument;
+};
+
 @interface MyDocument : NSDocument
 {
     IBOutlet id view;
@@ -61,6 +77,7 @@
 //    void *window_factory;
 	mainloop *myMainloop;
 	NSTimer *uitimer;
+	document_embedder *embedder;
 }
 - (BOOL) validateUIItem:(id)UIItem;
 - (BOOL) validateMenuItem:(id)menuItem;
@@ -71,6 +88,7 @@
 - (void *)view;
 - (void)startPlay: (id)dummy;
 - (void)close;
+- (void)close: (id)dummy;
 - (void)fixMouse: (id)dummy;
 - (void)resetMouse: (id)dummy;
 
