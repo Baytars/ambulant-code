@@ -72,6 +72,8 @@
 #include "ambulant/lib/textptr.h"
 #include "ambulant/lib/transition_info.h"
 
+#include "ambulant/common/plugin_engine.h"
+
 #include "ambulant/smil2/transition.h"
 
 // Players
@@ -109,7 +111,11 @@ gui::dg::dg_player::dg_player(const net::url& u)
 	// Fill the factory object
 	m_factory.rf = (global_playable_factory*) this->get_playable_factory();
 	m_factory.df = NULL;
-	m_factory.wf = this->get_window_factory(); 
+	m_factory.wf = this->get_window_factory();
+
+	// Load the plugins
+	common::plugin_engine *pf = common::plugin_engine::get_plugin_engine();
+	pf->add_plugins(&m_factory);
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
