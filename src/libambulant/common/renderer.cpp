@@ -87,6 +87,11 @@ active_renderer::start(double t)
 	os << *m_node;
 	AM_DBG lib::logger::get_logger()->trace("active_renderer.start(0x%x, %s)", (void *)this, os.str().c_str());
 #endif
+	if (!m_dest) {
+		lib::logger::get_logger()->error("active_renderer.start: no destination surface");
+		stopped_callback();
+		return;
+	}
 	m_dest->show(this);
 	if (m_src) {
 		lib::event *e = new readdone_callback(this, &active_renderer::readdone);
@@ -101,7 +106,8 @@ void
 active_renderer::readdone()
 {
 	AM_DBG lib::logger::get_logger()->trace("active_renderer.readdone(0x%x, size=%d)", (void *)this, m_src->size());
-	m_dest->need_redraw();
+	if (m_dest)
+		m_dest->need_redraw();
 	stopped_callback();
 }
 
@@ -109,14 +115,16 @@ void
 active_renderer::stop()
 {
 	// XXXX Need to handle case that no data (or not all data) has come in yet
-	m_dest->renderer_done();
+	if (m_dest)
+		m_dest->renderer_done();
 	AM_DBG lib::logger::get_logger()->trace("active_renderer.stop(0x%x)", (void *)this);
 }
 
 void
 active_renderer::wantclicks(bool want)
 {
-	m_dest->need_events(want);
+	if (m_dest)
+		m_dest->need_events(want);
 }
 
 active_final_renderer::~active_final_renderer()
@@ -136,7 +144,8 @@ active_final_renderer::readdone()
 #endif
 	}
 	m_src->read((char *)m_data, m_data_size);
-	m_dest->need_redraw();
+	if (m_dest)
+		m_dest->need_redraw();
 	stopped_callback();
 }
 
