@@ -70,6 +70,8 @@ class cocoa_renderer_factory : lib::renderer_factory {
 }
 
 - (void)setAmbulantWindow: (ambulant::lib::passive_window *)window;
+- (NSRect) NSRectForAmbulantRect: (ambulant::lib::screen_rect<int> *)arect;
+- (ambulant::lib::screen_rect<int>) ambulantRectForNSRect: (NSRect *)nsrect;
 @end
 
 #endif // __OBJC__
