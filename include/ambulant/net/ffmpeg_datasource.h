@@ -51,6 +51,8 @@
 #define AMBULANT_NET_FFMPEG_DATASOURCE_H
 
 
+#include <vector>
+#include <queue>
 
 #include "ambulant/config/config.h"
 #include "ambulant/lib/callback.h"
@@ -312,8 +314,15 @@ class demux_video_datasource:
   
 };
 
+typedef std::pair<timestamp_t, char*> qelt;
 
-
+#if 0
+struct pts_comparison {
+	bool operator () (const std::pair<timestamp_t, video_frame> left, const std::pair<timestamp_t, video_frame> right) {
+    	return left.first > right.first;
+  	}
+};
+#endif
 
 class ffmpeg_video_decoder_datasource:
 	virtual public video_datasource,
@@ -352,8 +361,8 @@ class ffmpeg_video_decoder_datasource:
   	video_format m_fmt;
  	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
-	std::queue<std::pair<timestamp_t, char*> > m_frames;
-	std::pair<timestamp_t, char*> m_old_frame;
+	std::priority_queue<qelt, std::vector<qelt>, std::greater<qelt> > m_frames;
+	qelt m_old_frame;
 	int m_size;		// NOTE: this assumes all decoded frames are the same size!
 //	databuffer m_buffer;
 	detail::ffmpeg_demux *m_thread;
