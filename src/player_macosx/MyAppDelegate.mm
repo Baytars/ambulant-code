@@ -50,6 +50,8 @@
 #import "MyDocument.h"
 #import "LogController.h"
 #import "mypreferences.h"
+#import <CoreFoundation/CoreFoundation.h>
+#include <locale.h>
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -91,7 +93,7 @@ show_message(const char *format, va_list args)
 		withObject: message waitUntilDone: YES];
 }
 
-void
+bool
 initialize_logger()
 {
 	// Connect logger to our message displayer and output processor
@@ -116,12 +118,28 @@ initialize_logger()
 	// Install our preferences handler
 	mypreferences::install_singleton();
 	// Install our logger
-	initialize_logger();
+	if (initialize_logger() ) {
+		// Show the logger window immedeately if log level is DEBUG
+		[self showLogWindow: self];
+	}
 	// Initialize the gettext library
+	CFLocaleRef userLocaleRef = CFLocaleCopyCurrent();
+	NSString *userLocaleName = (NSString *)CFLocaleGetIdentifier(userLocaleRef);
+	const char *locale = [userLocaleName cString];
+	const char *unix_locale = getenv("LANG");
+	if (unix_locale == NULL || *unix_locale == '\0') {
+		setlocale(LC_MESSAGES, locale);
+		setenv("LANG", locale, 1);
+	} else if (strcmp(locale, unix_locale) != 0) {
+		ambulant::lib::logger::get_logger()->warn("MacOS System Preferences locale: \"%s\", Unix locale: LANG=\"%s\"", locale, unix_locale);
+	}
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
-	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
-	lib::logger::get_logger()->debug(gettext("Ambulant Player: built on %s for Macintosh/Cocoa"), __DATE__);
+	ambulant::lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
+	ambulant::lib::logger::get_logger()->debug(gettext("Ambulant Player: built on %s for Macintosh/Cocoa"), __DATE__);
+#if ENABLE_NLS
+	ambulant::lib::logger::get_logger()->debug(gettext("Ambulant Player: localization enabled (english; user requested %s)"), locale);
+#endif
 
 	// Initialize the default system test settings
 	NSBundle *thisBundle = [NSBundle bundleForClass:[self class]];
