@@ -69,16 +69,12 @@ using namespace ambulant;
 net::databuffer::databuffer()
 {
 	m_used = 0;
-        m_size = 0;
-        m_rear = NULL;
-        m_max_size = DEFAULT_MAX_BUF_SIZE;
+    m_size = 0;
+    m_rear = NULL;
+    m_max_size = DEFAULT_MAX_BUF_SIZE;
 	m_buffer = NULL;
-        m_buffer_full = false;
+    m_buffer_full = false;
 }
-
-
-
-
 
 bool
 net::databuffer::is_full()
@@ -292,9 +288,9 @@ net::active_datasource::read_file()
 	if (m_stream >= 0) {
 
 		do {
-                        m_buffer->prepare(buf);
-			n = ::read(m_stream, buf, BUFSIZ);
-			if (n >= 0) m_buffer->pushdata(n); 
+            	m_buffer->prepare(buf);
+				n = ::read(m_stream, buf, BUFSIZ);
+				if (n >= 0) m_buffer->pushdata(n); 
 		} while (n > 0);
 
 		if (n < 0) {
@@ -302,19 +298,21 @@ net::active_datasource::read_file()
 			} 		
 	}
 }
-  
+ 
+char* 
+net::active_datasource::read_ptr()
+{
+	return m_buffer->get_read_ptr();
+}
   
 void
 net::active_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback)
  {
  	read_file();
-        if ( m_buffer->not_empty() ) {
- 	AM_DBG m_buffer->dump(std::cout, false);
-        if (evp && callback) {
-		AM_DBG lib::logger::get_logger()->trace("active_datasource.start: trigger readdone callback");
-		evp->add_event(callback, 0, ambulant::lib::event_processor::high);
-        }
-        }
+        	if (evp && callback) {
+				AM_DBG lib::logger::get_logger()->trace("active_datasource.start: trigger readdone callback");
+				evp->add_event(callback, 0, ambulant::lib::event_processor::high);
+        	}
 }
  
 void

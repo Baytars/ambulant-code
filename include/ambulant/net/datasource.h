@@ -186,6 +186,7 @@ public:
 
 	//  Get data from buffer and put 'size' bytes in buffer.
 	void read(char *data, int size);
+	char * read_ptr();
 
 	// Return the amount of data currently in buffer.
 	int size() const;
