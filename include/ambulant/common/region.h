@@ -73,7 +73,7 @@ class passive_window;
 // NOTE: the "bounds" rectangles are currently all with respect
 // to the parent, and in a coordinate system where (0,0) is the
 // topleft point in the rectangle.
-class passive_region : public abstract_rendering_source {
+class passive_region : public abstract_rendering_surface, public abstract_rendering_source {
   public:
 	friend class active_region;
 	
@@ -124,7 +124,8 @@ class passive_region : public abstract_rendering_source {
 		m_parent(parent),
 		m_cur_active_region(NULL),
 		m_mouse_region(NULL),
-		m_info(info)
+		m_info(info),
+		m_bg_renderer(NULL)
         {
 			if (parent && parent->m_mouse_region) {
 				m_mouse_region = parent->m_mouse_region->clone();
@@ -133,7 +134,16 @@ class passive_region : public abstract_rendering_source {
         }
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_events(abstract_mouse_region *rgn);
+  private:
+	// This is part of the abstract_rendering_surface interface that we don't export
+	void show(abstract_rendering_source *renderer) {abort();};
+	void renderer_done() {abort();};
+	void need_redraw() {abort();};
+	void need_events(bool want) {abort();};
 
+
+	void draw_background();
+  protected:
   	std::string m_name;					// for debugging XXXX do lazy
   	screen_rect<int> m_inner_bounds;	// region rectangle (0, 0) based XXXX do lazy
   	screen_rect<int> m_outer_bounds;	// region rectangle in parent coordinate space XXXX do lazy
@@ -143,6 +153,7 @@ class passive_region : public abstract_rendering_source {
   	std::vector<passive_region *>m_children;	// all subregions XXXX z-order
 	abstract_mouse_region *m_mouse_region;   // The area in which we want mouse clicks
 	const abstract_smil_region_info *m_info;	// Information such as z-order, etc.
+	abstract_bg_rendering_source *m_bg_renderer;  // Background renderer
 };
 
 class passive_root_layout : public passive_region {
@@ -170,7 +181,7 @@ class active_region : public abstract_rendering_surface, public abstract_renderi
 	:	m_source(source),
 		m_node(node),
 		m_renderer(NULL),
-                m_mouse_region(NULL)
+		m_mouse_region(NULL)
         {
 			if (source->m_mouse_region) {
 				m_mouse_region = source->m_mouse_region->clone();
@@ -202,7 +213,7 @@ class active_region : public abstract_rendering_surface, public abstract_renderi
 	passive_region *const m_source;
 	const node *m_node;
 	abstract_rendering_source *m_renderer;
-        abstract_mouse_region *m_mouse_region;   // The area in which we want mouse clicks
+	abstract_mouse_region *m_mouse_region;   // The area in which we want mouse clicks
 };
 
 } // namespace lib

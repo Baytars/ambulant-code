@@ -100,7 +100,7 @@ gui::none::none_renderer_factory::new_renderer(
 	return new none_active_renderer(context, cookie, node, evp, src, dest);
 }
 
-lib::abstract_rendering_source *
+lib::abstract_bg_rendering_source *
 gui::none::none_renderer_factory::new_background_renderer(
 	const lib::abstract_smil_region_info *info,
 	lib::abstract_rendering_surface *const dest)

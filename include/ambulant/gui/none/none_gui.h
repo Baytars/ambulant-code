@@ -104,7 +104,7 @@ class none_active_renderer : public lib::active_renderer {
 	void stop();
 };
 
-class none_background_renderer : public lib::abstract_rendering_source {
+class none_background_renderer : public lib::abstract_bg_rendering_source {
   public:
 	none_background_renderer(
 		const lib::abstract_smil_region_info *info,
@@ -132,7 +132,7 @@ class none_renderer_factory : public lib::renderer_factory {
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
 		lib::abstract_rendering_surface *const dest);
-	lib::abstract_rendering_source *new_background_renderer(
+	lib::abstract_bg_rendering_source *new_background_renderer(
 		const lib::abstract_smil_region_info *info,
 		lib::abstract_rendering_surface *const dest);
 };

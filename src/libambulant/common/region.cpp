@@ -108,11 +108,25 @@ lib::passive_region::redraw(const screen_rect<int> &r, abstract_window *window)
 		m_cur_active_region->redraw(our_rect, window);
 	} else {
 		AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x) no active region", (void *)this);
+		draw_background();
 	}
+	// XXXX Should go per z-order value
 	std::vector<passive_region *>::iterator i;
 	for(i=m_children.begin(); i<m_children.end(); i++) {
 		AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x) -> child 0x%x", (void *)this, (void *)(*i));
 		(*i)->redraw(our_rect, window);
+	}
+}
+
+void
+lib::passive_region::draw_background()
+{
+	// Do a quick return if we have nothing to draw
+	if (m_info == NULL) return;
+	if (m_info->get_transparent()) return;
+	// Now we should make sure we have a background renderer
+	if (!m_bg_renderer) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region::draw_background(0x%x): allocate bg_renderer", (void *)this);
 	}
 }
 

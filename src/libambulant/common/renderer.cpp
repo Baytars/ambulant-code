@@ -178,13 +178,13 @@ lib::global_renderer_factory::new_renderer(
     return m_default_factory->new_renderer(context, cookie, node, evp, src, dest);
 }
 
-lib::abstract_rendering_source *
+lib::abstract_bg_rendering_source *
 lib::global_renderer_factory::new_background_renderer(
 	const abstract_smil_region_info *info,
 	abstract_rendering_surface *const dest)
 {
     std::vector<renderer_factory *>::iterator i;
-    lib::abstract_rendering_source *rv;
+    lib::abstract_bg_rendering_source *rv;
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {
         rv = (*i)->new_background_renderer(info, dest);
