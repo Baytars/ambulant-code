@@ -68,12 +68,13 @@ namespace cocoa {
 class cocoa_active_image_renderer : public active_final_renderer {
   public:
 	cocoa_active_image_renderer(
-		playable_events *context,
+		playable_events<int> *context,
+		int cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
 		passive_region *const dest)
-	:	active_final_renderer(context, node, evp, src, dest),
+	:	active_final_renderer(context, cookie, node, evp, src, dest),
 		m_image(NULL),
 		m_nsdata(NULL) {};
 	~cocoa_active_image_renderer();

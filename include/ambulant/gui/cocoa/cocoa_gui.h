@@ -92,7 +92,8 @@ class cocoa_renderer_factory : public lib::renderer_factory {
   	cocoa_renderer_factory() {}
   	
 	lib::active_renderer *new_renderer(
-		lib::playable_events *context,
+		lib::playable_events<int> *context,
+		int cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,

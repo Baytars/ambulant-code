@@ -68,7 +68,8 @@ namespace cocoa {
 class cocoa_active_audio_renderer : public active_basic_renderer, public timer_events {
   public:
 	cocoa_active_audio_renderer(
-		playable_events *context,
+		playable_events<int> *context,
+		int cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src);

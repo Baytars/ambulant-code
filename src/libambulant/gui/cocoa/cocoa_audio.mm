@@ -65,11 +65,12 @@ namespace gui {
 namespace cocoa {
 
 cocoa_active_audio_renderer::cocoa_active_audio_renderer(
-	playable_events *context,
+	playable_events<int> *context,
+	int cookie,
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src)
-:	active_basic_renderer(context, node, evp),
+:	active_basic_renderer(context, cookie, node, evp),
 	m_url(src->get_url()),
 	m_sound(NULL)
 {
