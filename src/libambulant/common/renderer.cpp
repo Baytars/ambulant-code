@@ -439,7 +439,7 @@ active_video_renderer::data_avail()
 	m_size.w = m_src->width();
 	m_size.h = m_src->height();
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail: size=(%d, %d)", m_size.w, m_size.h);
-	buf = m_src->get_frame(&ts2, &size);
+	buf = m_src->get_frame(now(), &ts2, &size);
 	ts = ts2 / 1000000.0; // ts should be in seconds now !
 	displayed = false;
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail(buf = 0x%x) (ts=%f, now=%f):", (void *) buf,ts, now());	
