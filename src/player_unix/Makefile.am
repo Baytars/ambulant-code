@@ -63,7 +63,8 @@ LDADD = $(top_builddir)/src/libambulant/.libs/libambulant_qt.a	\
 
 AM_LDFLAGS=$(extra_arts_ldflags)				\
 	   $(extra_sdl_ldflags)					\
-	   $(extra_ffmpeg_ldflags)
+	   $(extra_ffmpeg_ldflags)				\
+	   -lltdl		 
  
 AM_CPPFLAGS = $(extra_arts_DEFINES)				\
 	      $(extra_sdl_DEFINES)				\

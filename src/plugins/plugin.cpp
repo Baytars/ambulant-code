@@ -45,7 +45,6 @@
  * which carries forward this exception. 
  * 
  */
-#include "plugin.h"
 #include "ambulant/common/renderer.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/unix/unix_mtsync.h"
@@ -59,81 +58,10 @@
 
 using namespace ambulant;
 
-static plugin::test P();
-
-
-ambulant::common::playable_factory* create_factory(ambulant::net::datasource_factory* df)
+extern "C" {
+void initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
 {
-	return new plugin::basic_plugin_factory(df);
+	printf("HELLOOOOO rf=0x%x df=0x%x\n", rf, df);
+	rf->add_factory(NULL);
 }
-	
-
-common::playable* 
-plugin::basic_plugin_factory::new_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp)
-{
-	common::playable *rv;
-	
-	lib::xml_string tag = node->get_qname().second;
-	std::cout << "LIB LOGGER IS CALLED \n";
-    //AM_DBG lgr->trace("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
-	if ( tag == "audio") /*or any other tag ofcourse */ {
-		//rv = new plugin::basic_plugin(context, cookie, node, evp, m_datasource_factory);
-		rv = NULL;
-		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory: node 0x%x: returning basic_plugin 0x%x", (void *)node, (void *)rv);
-	} else {
-		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory : plugin does not support \"%s\"", tag.c_str());
-        return NULL;
-	}
-	return rv;
-}
-
-
-//~ void 
-//~ plugin::basic_plugin::show_frame(char* frame, int size)
-//~ {
-	//~ // private method - no locks
-	//~ lib::logger::get_logger ()->trace("**** DISPLAYED");
-//~ }
-
-
-
-plugin::basic_plugin::basic_plugin(
-	common::playable_notification *context,
-    common::playable_notification::cookie_type cookie,
-    const lib::node *node,
-    lib::event_processor *evp,
-	net::datasource_factory *df) 
-:	common::playable_imp(context, cookie, node, evp)
-{
-	std::cout << "PLUGIN CREATED\n";
-}
-
-void
-plugin::basic_plugin::data_avail()
-{
-}
-
-void
-plugin::basic_plugin::start(double t)
-{
-}
-
-
-void 
-plugin::basic_plugin::stop()
-{
-}
-
-void 
-plugin::basic_plugin::pause()
-{
-}
-
-void 
-plugin::basic_plugin::resume()
-{
 }
