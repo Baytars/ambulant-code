@@ -106,7 +106,7 @@ ambulant::net::rtsp_demux::rtsp_demux(net::url& url)
 	MediaSubsession* subsession;
 	MediaSubsessionIterator iter(*m_media_session);
 	
-	// Only audio/video session need to apply for job !
+	// Only audio/video session need to apply for a job !
 	while ((subsession = iter.next()) != NULL) {
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
 			desired_buf_size = 100000;
@@ -134,3 +134,17 @@ ambulant::net::rtsp_demux::rtsp_demux(net::url& url)
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
+	if(!m_rtsp_client->playMediaSession(*m_media_session)) {
+		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) play failed");
+		lib::logger::get_logger()->error("playing RTSP connection failed");
+		return -1;
+	
+		m_
+		TaskScheduler& scheduler =
+}
+
+void afterreading(void* clientData, unsigned frameSize,
+			 unsigned /*numTruncatedBytes*/,
+			 struct timeval presentationTime,
+			 unsigned /*durationInMicroseconds*/) {
+			 }
