@@ -182,7 +182,7 @@ cocoa_window_factory::new_window(const std::string &name, size bounds, renderer 
 	// And set the window size
 	[view setAmbulantWindow: window];
 	/*AM_DBG*/ NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
-	NSSize cocoa_size = NSMakeSize(bounds.w + [view bounds].origin.x, bounds.h + [view bounds].origin.y);
+	NSSize cocoa_size = NSMakeSize(bounds.w + [view frame].origin.x, bounds.h + [view frame].origin.y);
 	[[view window] setContentSize: cocoa_size];
 	/*AM_DBG*/ NSLog(@"Size changed on %@ to (%f, %f)", [view window], cocoa_size.width, cocoa_size.height);
 	AM_DBG NSLog(@"Calling mouse_region_changed");
