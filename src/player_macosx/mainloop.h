@@ -57,7 +57,7 @@
 
 class mainloop : public ambulant::lib::ref_counted_obj {
   public:
-	mainloop(const char *filename, ambulant::common::window_factory *wf);
+	mainloop(const char *filename, ambulant::common::window_factory *wf, bool use_mms);
 	~mainloop();
 	
 	// The callback member function.
@@ -67,8 +67,8 @@ class mainloop : public ambulant::lib::ref_counted_obj {
 	
 	void run();
 	void set_speed(double speed);
-	double get_speed() const { return m_speed; };
-	bool is_running() const { return m_running; };
+	double get_speed() const { return m_speed; }
+	bool is_running() const { return m_running; }
 	
   private:
   	bool m_running;
