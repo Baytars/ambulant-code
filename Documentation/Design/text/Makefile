@@ -11,15 +11,18 @@ PYTHON=python
 
 .SUFFIXES: .txt .html .tex .pdf
 
-all: $(ALL_HTML) all.pdf
+all: $(ALL_HTML) ambulantdesign.pdf
 
 clean:
-	-rm all.txt all.tex all.aux all.idx all.idg all.ilg all.ind all.log all.out all.toc $(ALL_HTML) all.pdf
+	-rm ambulantdesign.txt ambulantdesign.tex ambulantdesign.aux ambulantdesign.idx
+	-rm ambulantdesign.idg ambulantdesign.ilg ambulantdesign.ind ambulantdesign.log
+	-rm ambulantdesign.out ambulantdesign.toc ambulantdesign.pdf
+	-rm $(ALL_HTML)
 	
-all.pdf: all.txt
+ambulantdesign.pdf: ambulantdesign.txt
 
-all.txt: head_latex.txt $(ALL) diagrams.txt
-	cat head_latex.txt $(ALL) diagrams.txt > all.txt
+ambulantdesign.txt: head_latex.txt $(ALL) diagrams.txt
+	cat head_latex.txt $(ALL) diagrams.txt > ambulantdesign.txt
 
 .txt.html:
 	cat head_html.txt $< $*_tail.txt | $(PYTHON) $(REST2HTML) > $@
@@ -28,4 +31,6 @@ all.txt: head_latex.txt $(ALL) diagrams.txt
 	$(PYTHON) $(REST2LATEX) --use-latex-toc=USE_LATEX_TOC $< $@
 	
 .tex.pdf:
+	$(PDFLATEX) $< 
+	$(PDFLATEX) $< 
 	$(PDFLATEX) $< 
