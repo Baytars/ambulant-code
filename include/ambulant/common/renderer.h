@@ -173,6 +173,8 @@ class active_final_renderer : public active_renderer {
 
 
 // Foctory class for renderers.
+class abstract_smil_region_info;
+
 class renderer_factory {
   public:
 	virtual ~renderer_factory() {};
@@ -183,6 +185,9 @@ class renderer_factory {
 		event_processor *const evp,
 		net::passive_datasource *src,
 		abstract_rendering_surface *const dest) = 0;
+	virtual abstract_rendering_source *new_background_renderer(
+		const abstract_smil_region_info *info,
+		abstract_rendering_surface *const dest) { return NULL; };
 };
 
 class global_renderer_factory : public renderer_factory {
@@ -198,6 +203,9 @@ class global_renderer_factory : public renderer_factory {
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
+		abstract_rendering_surface *const dest);
+	abstract_rendering_source *new_background_renderer(
+		const abstract_smil_region_info *info,
 		abstract_rendering_surface *const dest);
   private:
     std::vector<renderer_factory *> m_factories;
