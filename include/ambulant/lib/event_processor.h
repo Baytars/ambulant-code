@@ -30,6 +30,9 @@ class event_processor {
 	
 	// serves waiting events 
 	virtual void serve_events() = 0;
+
+	// Get the underlying timer
+	virtual abstract_timer *get_timer() const = 0;
 };
 
 } // namespace lib
@@ -65,6 +68,8 @@ class abstract_event_processor : public event_processor {
 		delete m_timer;
 		delete m_delta_timer_cs;
 	}
+	
+	abstract_timer *get_timer() const { return m_timer; }
 	
 	void add_event(event *pe, time_type t, event_priority priority = low) {
 		m_delta_timer_cs->enter();

@@ -9,6 +9,7 @@
  */
 
 #include "ambulant/lib/timer.h"
+#include "ambulant/lib/logger.h"
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -16,24 +17,32 @@
 
 using namespace ambulant;
 
-lib::abstract_timer::abstract_timer_vector::iterator
-lib::abstract_timer::add_dependent(abstract_timer *child)
+lib::abstract_timer_client::client_index
+lib::abstract_timer_client::add_dependent(abstract_timer_client *child)
 {
-	lib::abstract_timer::abstract_timer_vector::iterator rv = m_dependents.end();
-	m_dependents.push_back(child);
-	return rv;
+	std::pair<client_index, bool> rv = m_dependents.insert(child);
+	if (!rv.second)
+		lib::logger::get_logger()->fatal("abstract_timer_client::add_dependent: child already added");
+	return rv.first;
 }
 
 void
-lib::abstract_timer::remove_dependent(abstract_timer_vector::iterator pos)
+lib::abstract_timer_client::remove_dependent(client_index pos)
 {
 	m_dependents.erase(pos);
 }
 
 void
-lib::abstract_timer::speed_changed()
+lib::abstract_timer_client::remove_dependent(abstract_timer_client *child)
 {
-	abstract_timer_vector::iterator i;
+	if (!m_dependents.erase(child))
+		lib::logger::get_logger()->fatal("abstract_timer_client::remove_dependent: child not present");
+}
+
+void
+lib::abstract_timer_client::speed_changed()
+{
+	client_index i;
 	for (i=m_dependents.begin(); i != m_dependents.end(); i++)
 		(*i)->speed_changed();
 }
@@ -69,6 +78,7 @@ lib::timer::set_speed(double speed)
 {
 	re_epoch();
 	m_speed = speed;
+	speed_changed();
 }
 
 double
