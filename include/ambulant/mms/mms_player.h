@@ -62,7 +62,7 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/mms/timelines.h"
-#include "ambulant/common/renderer.h"
+#include "ambulant/common/playable.h"
 
 namespace ambulant {
 

@@ -50,6 +50,7 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/asb.h"
 #include "ambulant/common/player.h"
+#include "ambulant/common/renderer.h"
 #include "ambulant/lib/document.h"
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 

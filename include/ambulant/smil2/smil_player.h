@@ -62,25 +62,26 @@
 #include "ambulant/lib/timer.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/event.h"
-#include "ambulant/lib/document.h"
 #include "ambulant/smil2/time_node.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/player.h"
 #include "ambulant/common/layout.h"
-#include "ambulant/common/renderer.h"
 #include <map>
 
 namespace ambulant {
+namespace lib {
+class document;
+class node;
+class timer;
+} // namespace lib
+
+namespace common {
+class abstract_player;
+class window_factory;
+class playable_factory;
+} // namespace common
 
 namespace smil2 {
-
-class lib::document;
-class lib::node;
-class lib::logger;
-class common::window_factory;
-class common::playable_factory;
-class common::active_basic_renderer;
-class common::layout_manager;
 
 class smil_player : public common::abstract_player, public time_node_context, public common::playable_notification {
   public:

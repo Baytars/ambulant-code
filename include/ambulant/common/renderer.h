@@ -189,19 +189,6 @@ class active_final_renderer : public active_renderer {
 	unsigned m_data_size;
 };
 
-
-
-// Foctory class for renderers.
-class playable_factory {
-  public:
-	virtual ~playable_factory() {};
-	virtual playable *new_playable(
-		playable_notification *context,
-		playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp) = 0;
-};
-
 class global_playable_factory : public playable_factory {
   public:
     global_playable_factory();
