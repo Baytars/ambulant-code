@@ -58,75 +58,172 @@
 using namespace ambulant;
 
 using namespace lib;
+/*
+preference_entry preference_table = {
+  {"AMBULANT_USE_PARSER",
+   { "any", "xerces", "expat" }, "any", STRING, &m_parser_id },
+  {"AMBULANT_DO_VALIDATION",
+   { "false", "true" }, "false", BOOL, & m_do_validation },
+  NULL
+};
+*/
+preference_entry::preference_entry(std::string name,
+				   datatype type,
+				   void* store,
+				   std::string* valid_val) {
+	pref_name  = name;
+	pref_type  = type;
+	pref_store = store;
+	pref_valid_val = valid_val;
+}
+
+// valid values for preferences
+// string arrays are terminated by the empty string
+static std::string valid_parsers[] = {"any", "expat", "xerces", ""};
+static std::string valid_schemes[] = {"never", "always", "auto",""};
+static std::string valid_bools[] = {"false", "true", ""};
+
+// ADD_PREF - add a new preference to the static preference table
+#define ADD_PREF(X...) s_preference_table->push_back(new preference_entry(X))
+
+unix_preferences::unix_preferences() {
+	set_preferences_singleton(this);
+	std::string id = "unix_preferences::unix_preferences";
+	AM_DBG logger::get_logger()->debug("%s", id.c_str());
+	s_preference_table = new std::vector<preference_entry*>();
+
+	ADD_PREF("AMBULANT_LOG_LEVEL", INT, 
+	     &m_log_level, NULL);
+	ADD_PREF("AMBULANT_USE_PARSER", STRING, 
+	     &m_parser_id, valid_parsers);
+	ADD_PREF("AMBULANT_VALIDATION_SCHEME", STRING,
+	     &m_validation_scheme, valid_schemes);
+	ADD_PREF("AMBULANT_DO_VALIDATION", BOOL,
+	     &m_do_validation, valid_bools);
+	ADD_PREF("AMBULANT_DO_NAMESPACES", BOOL,
+	     &m_do_namespaces, valid_bools);
+	ADD_PREF("AMBULANT_DO_SCHEMA", BOOL,
+	     &m_do_schema, valid_bools);
+	ADD_PREF("AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING", BOOL, 
+	     &m_validation_schema_full_checking, valid_bools);
+}
+
+unix_preferences::~unix_preferences() {
+	for (preference_iterator pritr = s_preference_table->begin();
+	     pritr != s_preference_table->end(); pritr++) {
+		delete *pritr;
+	}
+	delete s_preference_table;
+	s_preference_table = NULL;
+}
+
 
 bool
 unix_preferences::load_preferences() {
-	AM_DBG logger::get_logger()->debug("unix_preferences::load_preferences");
-	set_preferences_singleton(this);
+	std::string id = "unix_preferences::load_preferences";
+	AM_DBG logger::get_logger()->debug("%s", id.c_str());
+
 	return load_preferences_from_file ()
 		&& load_preferences_from_environment();
 }
 
 bool
-unix_preferences::load_preferences_from_environment() {
-	std::string id = "unix_preferences::load_preferences_from_environment";
-	AM_DBG logger::get_logger()->debug("%s", id.c_str());
-
-	char *parser = getenv("AMBULANT_USE_PARSER");
-	if (parser != NULL) {
-		if (strcasecmp(parser, "expat") == 0
-		    || strcasecmp(parser, "xerces") == 0)
-			m_parser_id = parser;
-		else {
-			lib::logger::get_logger()->error("Unknown parser in environment: AMBULANT_USE_PARSER=%s", parser);
-			parser = NULL;
+unix_preferences::load_preference(std::string name, std::string value) {
+	lib::logger* log =lib::logger::get_logger();
+	std::string id = "unix_preferences::load_preference";
+	bool found = false;
+	AM_DBG log->debug("%s(%s=%s)", id.c_str(), 
+			  name.c_str(), value.c_str());
+	
+	if (name == "")
+		return false;
+	for (preference_iterator pritr = s_preference_table->begin();
+	     pritr != s_preference_table->end(); pritr++) {
+		preference_entry* pe = *pritr;
+		AM_DBG logger::get_logger()->debug("%s pe=%s", 
+						   id.c_str(), 
+						   pe->pref_name.c_str());
+		if (name == pe->pref_name) {
+			found = true;
+			// optionally check value given
+			if (pe->pref_valid_val != NULL) {
+				std::string* vv = pe->pref_valid_val;
+				while ( ! (*vv == "")) {
+					if (*vv == value)
+						break;
+					vv++;
+				}
+				if (*vv == "") {
+					log->error("%s %s=%s",
+						   "Invalid value for",
+						   pe->pref_name.c_str(),
+						   value.c_str());					
+					log->error("Valid values are:");
+					vv = pe->pref_valid_val;
+					while ( ! vv->empty()) {
+						log->error("%s",
+							  vv->c_str());
+						vv++;
+					}
+					break;
+				}
+			}
+			switch (pe->pref_type) {
+			case STRING:
+			  *(std::string*)pe->pref_store = value;
+			  break;
+			case INT:
+			  *(int*)pe->pref_store = atoi(value.c_str());
+			  break;
+			case BOOL:
+			  *(bool*)pe->pref_store =
+			    value == "true" ? true : false;
+			  break;
+			default:
+			  break;
+			}
+			break; 
 		}
 	}
-	if (parser == NULL)
-		m_parser_id = "any";
-	char *validation_scheme = getenv("AMBULANT_VALIDATION_SCHEME");
-	if (validation_scheme != NULL) {
-		if (strcasecmp(validation_scheme,"always") == 0
-		    || strcasecmp(validation_scheme,"auto") == 0
-		    || strcasecmp(validation_scheme,"never") == 0) {
-			m_validation_scheme = validation_scheme;
-		} else {
-		  lib::logger::get_logger()->error("Unknown validation scheme in environment: AMBULANT_VALIDATION_SCHEME=%s", validation_scheme);
-			validation_scheme = NULL;
+	if ( ! found ) {
+		log->error("Invalid preference name %s.", name.c_str());
+		log->error("Valid preference names  are:");
+		for (preference_iterator pritr = s_preference_table->begin();
+		     pritr != s_preference_table->end(); pritr++) {
+			preference_entry* pe = *pritr;
+			log->error("%s", pe->pref_name.c_str());
 		}
 	}
-	if (validation_scheme != NULL) {
-		validation_scheme = "never";
-	}
-	char *do_namespaces = getenv("AMBULANT_DO_NAMESPACES");
-	if (do_namespaces != NULL 
-	    && strcasecmp(do_namespaces,"false") != 0)
-		m_do_namespaces = true;
-	char *do_schema = getenv("AMBULANT_DO_SCHEMA");
-	if (do_schema != NULL && strcasecmp(do_schema,"false") != 0)
-		m_do_schema = true;
-	char *do_validation = getenv("AMBULANT_DO_VALIDATION");
-	if (do_validation != NULL
-	    && strcasecmp(do_validation,"false") != 0)
-		m_do_validation = true;
-	char *validation_schema_full_checking =
-		getenv("AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING");
-	if (validation_schema_full_checking != NULL
-	    && strcasecmp(validation_schema_full_checking,"false") != 0)
-		m_validation_schema_full_checking = true;
 	return true;
 }
 
 bool
+unix_preferences::load_preferences_from_environment() {
+	// return true when no error
+	std::string id = "unix_preferences::load_preferences_from_environment";
+	AM_DBG logger::get_logger()->debug("%s()", id.c_str());
+	bool rv = true;
+	for (preference_iterator pritr = s_preference_table->begin();
+	     pritr != s_preference_table->end(); pritr++) {
+		preference_entry* pe = *pritr;
+		std::string value(getenv(pe->pref_name.c_str()));
+		rv &= load_preference(pe->pref_name, value);
+	}
+	return rv;
+}
+
+bool
 unix_preferences::load_preferences_from_file() {
+	// return true when no error
 	std::string id = "unix_preferences::load_preferences_from_file";
 	AM_DBG logger::get_logger()->debug("%s()", id.c_str());
-	FILE* preferences_filep = open__preferences_file("r");
+	FILE* preferences_filep = open_preferences_file("r");
 	char buf[m_bufsize], * s = buf;
 	int lineno = 0;
+	bool rv = true;
 	
 	if (preferences_filep == NULL)
-		return true;
+		return false;
 	
 	while (s = fgets(buf, m_bufsize, preferences_filep)) {
 		lineno++;
@@ -138,48 +235,87 @@ unix_preferences::load_preferences_from_file() {
 			logger::get_logger()->error("%s(%s): %s %d - %s",
 						    id.c_str(),
 						    m_preferences_filename.c_str(),
-						    "line",
+						    "line", lineno,
 						    "malformed");
 			return false;
 		}
-		std::string ssn = name;
-		if (ssn == "AMBULANT_USE_PARSER")
-			m_parser_id = value;
-		else if (ssn == "AMBULANT_VALIDATION_SCHEME")
-			m_validation_scheme = value;
-		else if (ssn == "AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING")
-			m_validation_schema_full_checking =
-		        	value == "true" ? true : false;
+		std::string s_name  = name;
+		std::string s_value = value;
+		rv &= load_preference(s_name, s_value);
 	}
-	return true;
+	return rv;
 }
-
+	
 bool
 unix_preferences::save_preferences() {
-	AM_DBG logger::get_logger()->debug("unix_preferences::save_preferences()");
-	FILE* preferences_filep = open__preferences_file("w");
+	std::string id = "unix_preferences::save_preferences";
+	AM_DBG logger::get_logger()->debug("%s()", id.c_str());
+	FILE* preferences_filep = open_preferences_file("w");
 	
 	if (preferences_filep == NULL) {
 		close(creat(m_preferences_filename.c_str(), 0666));
-		preferences_filep = open__preferences_file("w");
+		preferences_filep = open_preferences_file("w");
 		if (preferences_filep == NULL) {
-			logger::get_logger()->error("unix_preferences::save_preferences(): cannot open %s for writing", m_preferences_filename.c_str());
+			logger::get_logger()->error
+				("%s(%s): %s",
+				 id.c_str(),
+				 m_preferences_filename.c_str(),
+				 "cannot open for writing");
 			return false;
 		}
 	}
-#define S(name,value) (void) fprintf(preferences_filep,"%s=%s\n",name,value);
-	S("# Ambulant Preferences", "Temporary format");
-	S("AMBULANT_USE_PARSER", m_parser_id.c_str());
-	S("AMBULANT_VALIDATION_SCHEME", m_validation_scheme.c_str());
-	S("AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING",
-	  m_validation_schema_full_checking ? "true" : "false");
+
+// OI - output int value
+#define OI(N,I) (void) fprintf(preferences_filep,"%s=%d\n",N,I);
+// OS - output atring value
+#define OS(N,S) (void) fprintf(preferences_filep,"%s=%s\n",N,S);
+	OS("# Ambulant Preferences", "Temporary format. DO NOT EDIT this file !");
+	for (preference_iterator pritr = s_preference_table->begin();
+	     pritr != s_preference_table->end(); pritr++) {
+		preference_entry* pe = *pritr;
+		switch(pe->pref_type) {
+		case BOOL:
+			OS(pe->pref_name.c_str(),
+			    *(bool*)pe->pref_store == false ?
+			    "false" : "true");
+			break;
+		case INT:
+			OI(pe->pref_name.c_str(), *(int*)pe->pref_store);
+			break;
+		case STRING:
+			OS(pe->pref_name.c_str(),
+			   ((std::string*)pe->pref_store)->c_str());
+			break;
+		default:
+			break;
+		}
+	}
 	return true;
 }
  
 FILE* 
-unix_preferences::open__preferences_file(std::string mode) {
-	AM_DBG logger::get_logger()->debug("unix_preferences::open_preferences_file(%s,%s)", m_preferences_filename.c_str(), mode.c_str());
-	FILE* preferences_filep = fopen(m_preferences_filename.c_str(), mode.c_str());
+unix_preferences::open_preferences_file(std::string mode) {
+	std::string id = "unix_preferences::open_preferences";
+	if (m_home == "") {
+		m_home = std::string(getenv("$HOME"));
+		if (m_home != "") {
+		  m_preferences_filename = 
+		    m_home+"/"+m_ambulant_home+"/"
+		    + m_preferences_filename;
+		}
+	}
+	if (m_home == "") {
+		logger::get_logger()->error("%s(): %s",
+					    id.c_str(),
+					    "no value for $HOME");
+		return NULL;
+	}
+	AM_DBG logger::get_logger()->debug("%s(%s,%s)",
+					   id.c_str(),
+					   m_preferences_filename.c_str(),
+					   mode.c_str());
+	FILE* preferences_filep = fopen(m_preferences_filename.c_str(),
+					mode.c_str());
 	return preferences_filep;
 }
 
@@ -190,8 +326,10 @@ unix_preferences::get_preference(char* buf, char**namep, char** valuep) {
 	if (!*s)
 		*namep = *valuep = NULL;
 	else {
-		*s = '\0';
+		*(s-1) = '\0';
 		*namep = buf;
 		*valuep = s;
 	}
+	while (strlen(s) && isspace(s[strlen(s)-1]))
+	        s[strlen(s)-1] = '\0';
 }
