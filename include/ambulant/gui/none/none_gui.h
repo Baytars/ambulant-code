@@ -105,7 +105,7 @@ class none_playable : public common::active_playable {
 	void resume() {};
 	void wantclicks(bool want) {};
   private:
-	lib::node *m_node;
+	const lib::node *m_node;
 };
 
 class none_background_renderer : public common::abstract_bg_rendering_source {
