@@ -183,7 +183,7 @@ lib::tree_builder::reset() {
 		m_xmlparser = new expat_parser(this, this);
 #endif /*WITH_EXPAT*/
 	if (m_xmlparser == NULL) {
-        	lib::logger::get_logger()->fatal(gettext("Could not create any XML parser (configuration error?)"gettext();
+        	lib::logger::get_logger()->fatal(gettext("Could not create any XML parser (configuration error?)"));
 	}
 }
 
