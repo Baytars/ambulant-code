@@ -199,7 +199,7 @@ class ffmpeg_demux : public abstract_demux {
   	int nstreams();
   
     audio_format& get_audio_format() { return m_audio_fmt; };
-  	video_format& get_video_format() { return m_video_fmt; };
+  	video_format& get_video_format();
 	void cancel();
   protected:
 	unsigned long run();
