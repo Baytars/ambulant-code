@@ -281,6 +281,8 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
     lib::event_processor *m_event_processor;
   	datasource* m_src;
 
+	std::pair<bool, double> m_duration;
+	
 	databuffer m_buffer;
 	bool m_blocked_full;
 		
