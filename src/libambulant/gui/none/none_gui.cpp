@@ -93,15 +93,14 @@ gui::none::none_background_renderer::drawbackground(
 	lib::logger::get_logger()->trace("none_background_renderer.redraw(0x%x) from 0x%x to 0x%x", (void *)this, (void*)src, (void*)dst);
 }
 
-active_basic_renderer *
+playable *
 gui::none::none_renderer_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *const evp,
-	net::passive_datasource *src)
+	lib::event_processor *evp)
 {
-	return new none_active_renderer(context, cookie, node, evp, src);
+	return new none_active_renderer(context, cookie, node, evp);
 }
 
 abstract_bg_rendering_source *

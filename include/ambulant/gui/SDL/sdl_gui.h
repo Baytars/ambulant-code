@@ -70,12 +70,11 @@ class sdl_renderer_factory : public common::playable_factory {
 	sdl_renderer_factory();
 	~sdl_renderer_factory();
 		
-	common::active_renderer *new_playable(
+	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src);
+		lib::event_processor *evp);
 	
 };
 

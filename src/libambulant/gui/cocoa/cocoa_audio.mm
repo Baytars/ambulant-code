@@ -69,10 +69,9 @@ cocoa_active_audio_renderer::cocoa_active_audio_renderer(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	event_processor *const evp,
-	net::passive_datasource *src)
+	event_processor *evp)
 :	active_basic_renderer(context, cookie, node, evp),
-	m_url(src->get_url()),
+	m_url(node->get_url("src")),
 	m_sound(NULL)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

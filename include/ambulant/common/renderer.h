@@ -142,8 +142,7 @@ class active_renderer : public active_basic_renderer {
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src);
+		lib::event_processor *evp);
 		
 	~active_renderer() {}
 	
@@ -158,7 +157,7 @@ class active_renderer : public active_basic_renderer {
 	virtual void user_event(const lib::point &where) { clicked_callback(); }
 	virtual void set_surface(surface *dest) { m_dest = dest; }
 	virtual surface *get_surface() { return m_dest;}
-	virtual renderer *get_renderer() const { return this; }
+	virtual renderer *get_renderer() { return this; }
 	
   protected:
 	virtual void readdone();
@@ -178,9 +177,8 @@ class active_final_renderer : public active_renderer {
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src)
-	:	active_renderer(context, cookie, node, evp, src),
+		lib::event_processor *evp)
+	:	active_renderer(context, cookie, node, evp),
 		m_data(NULL),
 		m_data_size(0) {};
 	virtual ~active_final_renderer();
@@ -194,17 +192,14 @@ class active_final_renderer : public active_renderer {
 
 
 // Foctory class for renderers.
-class region_info;
-
 class playable_factory {
   public:
 	virtual ~playable_factory() {};
-	virtual active_basic_renderer *new_playable(
+	virtual playable *new_playable(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src) = 0;
+		lib::event_processor *evp) = 0;
 };
 
 class global_playable_factory : public playable_factory {
@@ -214,12 +209,11 @@ class global_playable_factory : public playable_factory {
     
     void add_factory(playable_factory *rf);
     
-    active_basic_renderer *new_playable(
+    playable *new_playable(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src);
+		lib::event_processor *evp);
   private:
     std::vector<playable_factory *> m_factories;
     playable_factory *m_default_factory;

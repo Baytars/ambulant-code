@@ -202,11 +202,7 @@ void
 timeline_builder::build_leaf(const lib::node& n)
 {
 	// For now we create a region per node
-	net::passive_datasource *src = NULL;
-	std::string url = n.get_url("src");
-	if (url != "")
-		src = new net::passive_datasource(url.c_str());
-	timeline_node *transitions = m_timeline->add_node(&n, src);
+	timeline_node *transitions = m_timeline->add_node(&n);
 	timeline_node_transition *tmp;
 	
 	// This code is valid for leafs without explicit or implicit

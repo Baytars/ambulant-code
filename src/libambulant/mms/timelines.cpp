@@ -501,14 +501,6 @@ passive_timeline::add_node(const lib::node *the_node)
 	return rv;
 }
 
-timeline_node *
-passive_timeline::add_node(const lib::node *the_node, net::passive_datasource *the_datasource)
-{
-	timeline_node *rv = new timeline_node(the_node, the_datasource);
-	m_timeline_nodes.push_back(rv);
-	return rv;
-}
-
 timeline_delay *
 passive_timeline::add_delay(int timeout)
 {
@@ -711,10 +703,9 @@ active_timeline::ext_preroll(int node_index)
 		return;
 	}
 	timeline_node *tln = m_source->m_timeline_nodes[node_index];
-	net::passive_datasource *the_datasource = tln->m_datasource;
 	const lib::node *the_node = tln->m_node;
 	common::playable *pl = m_playable_factory->new_playable(
-		this, node_index, the_node, m_event_processor, the_datasource);
+		this, node_index, the_node, m_event_processor);
 	// Connect the playable/renderer to its output surface, if applicable
 	if (pl) {
 		common::renderer *rend = pl->get_renderer();
