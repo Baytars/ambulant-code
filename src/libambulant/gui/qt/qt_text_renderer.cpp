@@ -54,7 +54,7 @@
 #include "ambulant/gui/qt/qt_renderer.h"
 #include "ambulant/gui/qt/qt_text_renderer.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -95,7 +95,30 @@ qt_active_text_renderer::redraw(const lib::screen_rect<int> &r,
 		ambulant_qt_window* aqw = (ambulant_qt_window*) w;
 		QPainter paint;
 		paint.begin(aqw->ambulant_pixmap());
-//		paint.eraseRect(L,T,W,H);
+#define JUNK
+#ifdef	JUNK
+		// background drawing
+		const common::region_info *info = m_dest->get_info();
+		AM_DBG lib::logger::get_logger()->trace(
+		       "qt_active_text_renderer.redraw(0x%x):info=0x%x",
+		       this, info);
+		if (info && !info->get_transparent()) {
+			// XXXX Fill with background color
+			lib::color_t bgcolor = info->get_bgcolor();
+			AM_DBG lib::logger::get_logger()->trace(
+				"qt_active_text_renderer.redraw:"
+				" clearing to 0x%x", (long)bgcolor);
+			QColor bgc = QColor(lib::redc(bgcolor),
+					    lib::greenc(bgcolor),
+					    lib::bluec(bgcolor));
+			AM_DBG lib::logger::get_logger()->trace(
+				"qt_active_fill_renderer.redraw(0x%x,"
+				" local_ltrb=(%d,%d,%d,%d)",
+				(void *)this, L,T,W,H);
+			paint.setBrush(bgc);
+			paint.drawRect(L,T,W,H);
+		}
+#endif/*JUNK*/
 // QtE		paint.drawText(L,T,W,H, Qt::AlignAuto, m_text_storage);
 		paint.setPen(Qt::black);
 		paint.drawText(L,T,W,H,

@@ -62,6 +62,7 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/renderer.h"
+#include "ambulant/common/region_info.h"
 #include "ambulant/gui/none/none_gui.h"
 
 namespace ambulant {
