@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2004-09-16 23:21+0200\n"
 "PO-Revision-Date: 2004-09-12 15:09+0200\n"
 "Last-Translator: Jack Jansen <Jack.Jansen@cwi.nl>\n"
-"Language-Team: English <Jack.Jansen@cwi.nl>\n"
+"Language-Team: Dutch <Jack.Jansen@cwi.nl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ascii\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,32 +19,32 @@ msgstr ""
 #: src/libambulant/lib/tree_builder.cpp:122
 #, c-format
 msgid "Failed to read file: %s"
-msgstr ""
+msgstr "Bestand kan niet gelezen worden: %s"
 
 #: src/libambulant/lib/tree_builder.cpp:138
 #, c-format
 msgid "Failed to read URL: %s"
-msgstr ""
+msgstr "Netwerk locatie kan niet gelezen worden: %s"
 
 #: src/libambulant/lib/tree_builder.cpp:143
 #, c-format
 msgid "Failed to parse document: %s"
-msgstr ""
+msgstr "Document kan niet geparseerd worden: %s"
 
 #: src/libambulant/lib/tree_builder.cpp:186
 msgid "Could not create any XML parser (configuration error?)"
-msgstr ""
+msgstr "Geen enkele XML parser gevonden (configuratiefout?)"
 
 #: src/player_macosx/mainloop.cpp:150
 #, c-format
 msgid "%s: Cannot build DOM tree"
-msgstr ""
+msgstr "DOM-tree kan niet gebouwd worden: %s"
 
 #: src/player_macosx/mainloop.cpp:181
 #, c-format
 msgid "%s: Cannot open"
-msgstr ""
+msgstr "Bestand kan niet geopend worden: %s"
 
 #: src/player_macosx/mainloop.cpp:214
 msgid "Cannot play document: no player"
-msgstr ""
+msgstr "Document kan niet gespeeld worden: geen speler"
