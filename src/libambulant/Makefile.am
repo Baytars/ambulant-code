@@ -7,10 +7,10 @@ liveincludes = -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicU
 			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/include \
 			   -I/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/include
 
-livelibs	= -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/libliveMedia.a \
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/libBasicUsageEnvironment.a\
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/libgroupsock.a \
-			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/libUsageEnvironment.a
+livelibs	= -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/liveMedia/ -lliveMedia \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/groupsock/ -lgroupsock  \
+			  -L/ufs/dbenden/Ambulant/ambulant/third_party_packages/live/UsageEnvironment/ -lUsageEnvironment
 
 if WITH_EXPAT
 expat_parser_source = lib/expat_parser.cpp
