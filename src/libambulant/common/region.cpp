@@ -125,10 +125,10 @@ lib::passive_region::user_event(const point &where)
 	our_point -= m_outer_bounds.left_top();
 	
 	if (m_cur_active_region) {
-		/*AM_DBG*/ lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
 		m_cur_active_region->user_event(our_point);
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
+		AM_DBG lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
 	}
 	std::vector<passive_region *>::iterator i;
 	for(i=m_children.begin(); i<m_children.end(); i++) {
@@ -237,12 +237,12 @@ void
 lib::active_region::user_event(const point &where)
 {
 	if (m_renderer) {
-		/*AM_DBG*/ lib::logger::get_logger()->trace("active_region.user_event(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
+		AM_DBG lib::logger::get_logger()->trace("active_region.user_event(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
 		m_renderer->user_event(where);
 	} else {
 		// At this point we should have a renderer that draws the default background
 		// When that is implemented this trace message should turn into an error (or fatal).
-		/*AM_DBG*/ lib::logger::get_logger()->error("active_region.user_event(0x%x) no renderer", (void *)this);
+		AM_DBG lib::logger::get_logger()->error("active_region.user_event(0x%x) no renderer", (void *)this);
 	}
 }
 
