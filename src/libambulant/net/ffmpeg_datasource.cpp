@@ -1022,7 +1022,8 @@ ffmpeg_video_datasource::get_dur()
 	m_lock.enter();
 	if (m_con && m_con->duration >= 0) {
 		rv = std::pair<bool, double>(true, m_con->duration / (double)AV_TIME_BASE);
-		lib::logger::get_logger()->debug("ffmpeg_audio_datasource::get_dur: duration=%f", rv.second);
+		//rv = std::pair<bool, double>(true, 0.0);
+		lib::logger::get_logger()->debug("ffmpeg_video_datasource::get_dur: duration=%f", rv.second);
 	}
 	m_lock.leave();
 	return rv;
@@ -1625,5 +1626,3 @@ ffmpeg_resample_datasource::get_dur()
 	m_lock.leave();
 	return rv;
 }
-
-
