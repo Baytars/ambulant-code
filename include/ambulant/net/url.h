@@ -149,6 +149,8 @@ class url {
 	string get_file() const;
 	
 	string get_url() const;
+
+	operator string() const { return get_url(); }
 	
 	url join_to_base(const url &base) const;
 		
