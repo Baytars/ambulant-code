@@ -5,12 +5,31 @@ packages, patched and ready to build, see the toplevel README file (section
 
 Here is a list of the packages, where they come from, plus the versions:
 
+***** Win32 *****
+
 expat-win32:
 	Windows only.
 	
 	James Clark's expat XML parser library, version 1.95.7. Download 
 	via <http://expat.sourceforge.net>. Installed with the win32 binary installer 
 	(it seems to be difficult to build from the source).
+
+
+xerces-win32:
+	windows only.
+	
+	Download xerces-C++ Version 2.5.0 Source Release from
+	<http://xml.apache.org> and extract xerces-c-src_2_5_0 and put its 
+	content in the directory .../ambulant/third_party_packages/
+	
+	Next read the Readme.html included in the xerces distribution and follow the MSVC Version 7
+	buil instructions. After building xerces copy xerces-c_2_6.dll and xerces-depcom_2_6.dll to 
+	ambulant/bin/win32 and the xerces-c_2.lib and xerces-depdom_2.lib to ambulant/lib.win32.
+
+	But I don't want any xerces!
+	If you want to compile AmbulantPlayer without xerces support use the Ambulant-win32-noxerces.sln
+	
+***** Unix *****
 	
 expat-unix:
 	Linux and Mac OS X.
@@ -40,8 +59,8 @@ xerces-unix:
 	For this release you need to build xerces from source, you cannot
 	use a pre-installed xerces.
 	
-	Download xerces-C++ Version 2.5.0 Source Release from
-	<http://xml.apache.org> and extract xerces-c-src_2_5_0 in
+	Download xerces-C++ Version 2.6.0 Source Release from
+	<http://xml.apache.org> and extract xerces-c-src_2_6_0 in
 	the directory .../ambulant/third_party_packages/xerces-unix.
 	
 	Next, follow the instructions for building xerces, open Readme.html
