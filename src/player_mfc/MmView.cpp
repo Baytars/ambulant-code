@@ -199,10 +199,15 @@ MmView::MmView()
 #else
 	lib::logger::get_logger()->set_ostream(new logwindow_ostream());
 #endif // WITHOUT_LOG_WINDOW
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: built on %s for Windows/MFC"), __DATE__);
+#if USE_NLS
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: localization enabled (english)"));
+#endif
 #ifdef AM_PLAYER_DG
-	lib::logger::get_logger()->trace("Ambulant: using DG Player");
+	lib::logger::get_logger()->debug("Ambulant Player: using DG Player");
 #else
-	lib::logger::get_logger()->trace("Ambulant: using DX Player");
+	lib::logger::get_logger()->debug("Ambulant Player: using DX Player");
 #endif
 }
 
@@ -442,7 +447,6 @@ void MmView::OnViewLog() {
 		m_logwindow = CLogWindow::GetLogWindowSingleton();
 	}
 	m_logwindow->ShowWindow(SW_SHOW);
-	m_logwindow->AppendText("Re-opened log window\r\n");
 #endif
 }
 
