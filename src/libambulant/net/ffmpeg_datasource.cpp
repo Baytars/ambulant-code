@@ -275,6 +275,7 @@ detail::ffmpeg_demux::ffmpeg_demux(AVFormatContext *con)
 		m_audio_fmt.samplerate = con->streams[audio_idx]->codec.sample_rate;
 		m_audio_fmt.channels = con->streams[audio_idx]->codec.channels;
 		m_audio_fmt.bits = 16;
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): samplerate=%d, channels=%d", m_audio_fmt.samplerate, m_audio_fmt.channels  );
 	} 
 	m_video_fmt = video_format("ffmpeg");
 	int video_idx = video_stream_nr();
@@ -371,6 +372,15 @@ int
 detail::ffmpeg_demux::nstreams()
 {
 	return m_con->nb_streams;
+}
+
+video_format& 
+detail::ffmpeg_demux::get_video_format() 
+{ 
+	
+	if (m_video_fmt.width == 0) m_video_fmt.width = m_con->streams[video_stream_nr()]->codec.width;
+	if (m_video_fmt.height == 0) m_video_fmt.height = m_con->streams[video_stream_nr()]->codec.height;
+	return m_video_fmt; 
 }
 
 void 
@@ -1721,6 +1731,8 @@ ffmpeg_video_decoder_datasource::select_decoder(video_format &fmt)
 				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 				return false;
 		}
+		if (fmt.width == 0) fmt.width = m_con->width;
+		if (fmt.height == 0) fmt.width = m_con->height;
 		return true;
 	} else if (fmt.name == "live") {
 		const char* codec_name = (char*) fmt.parameters;
@@ -1815,7 +1827,7 @@ ffmpeg_resample_datasource::data_avail()
 		m_in_fmt = m_src->get_audio_format();
 		assert(m_in_fmt.bits == 16);
 		assert(m_out_fmt.bits == 16);
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource: initializing context: inrate, ch=%d, %d, outrate, ch=%d, %d", m_in_fmt.samplerate,  m_in_fmt.channels, m_out_fmt.samplerate,  m_out_fmt.channels);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_resample_datasource: initializing context: inrate, ch=%d, %d, outrate, ch=%d, %d", m_in_fmt.samplerate,  m_in_fmt.channels, m_out_fmt.samplerate,  m_out_fmt.channels);
 		m_resample_context = audio_resample_init(m_out_fmt.channels, m_in_fmt.channels, m_out_fmt.samplerate,m_in_fmt.samplerate);
 		m_context_set = true;
 	}
