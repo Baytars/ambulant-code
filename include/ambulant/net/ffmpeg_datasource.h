@@ -291,7 +291,8 @@ class demux_video_datasource:
 	char* get_read_ptr();
 	int size() const;   
 	audio_format& get_audio_format();
-
+	video_format& get_video_format();
+	
 	std::pair<bool, double> get_dur();
 
   private:
@@ -311,17 +312,14 @@ class demux_video_datasource:
 };
 
 
-class ffmpeg_video_datasource:
+class ffmpeg_video_decoder_datasource:
 	virtual public video_datasource,
 	public detail::datasink,
 	virtual public lib::ref_counted_obj {
   public:
-	 static ffmpeg_video_datasource *new_ffmpeg_video_datasource(
-		const net::url& url, AVFormatContext *context,
-		detail::ffmpeg_demux *thread);
-
-	 ffmpeg_video_datasource(const net::url& url, AVFormatContext *context,
-		detail::ffmpeg_demux *thread, int stream_index);
+	 ffmpeg_video_decoder_datasource(const net::url& url, datasource *src);
+	 ffmpeg_video_decoder_datasource(video_datasource *src);
+	 
     ~ffmpeg_video_datasource();
 
 	bool has_audio();
@@ -336,7 +334,7 @@ class ffmpeg_video_datasource:
 	char* get_frame(double *timestamp, int *size);
 	void frame_done(double timestamp, bool keepdata);
 	
-    void data_avail(int64_t ipts, uint8_t *data, int size);
+    void data_avail();
 	bool buffer_full();
 	std::pair<bool, double> get_dur();
 
@@ -379,7 +377,7 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 		
 	char* get_read_ptr();
 	int size() const;   
-	
+	1
 	std::pair<bool, double> get_dur();
 	audio_format& get_audio_format();
 	bool select_decoder(const char* file_ext);
