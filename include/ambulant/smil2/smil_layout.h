@@ -57,8 +57,6 @@
 
 #include "ambulant/lib/node.h"
 #include "ambulant/common/layout.h"
-#include "ambulant/common/region.h"
-//#include "ambulant/smil2/region_node.h"
 
 namespace ambulant {
 
@@ -78,13 +76,14 @@ class smil_layout_manager : public common::layout_manager {
 	common::surface *get_default_rendering_surface(const lib::node *n);
 	void build_layout_tree(common::window_factory *wf, const region_node *layout_root);
 
-	common::passive_root_layout *create_top_region(common::window_factory *wf, 
+	common::surface_template *create_top_surface(common::window_factory *wf, 
 		const region_node *rn, common::renderer *bgrenderer);
 	
 	const common::schema *m_schema;
-	std::vector<common::passive_root_layout*> m_rootlayouts;
-	std::map<std::string, common::passive_region*> m_id2region;
-	std::multimap<std::string, common::passive_region*> m_name2region;
+	common::surface_factory *m_surface_factory;
+	std::vector<common::surface_template*> m_rootlayouts;
+	std::map<std::string, common::surface_template*> m_id2surface;
+	std::multimap<std::string, common::surface_template*> m_name2surface;
 };
 
 } // namespace smil2
