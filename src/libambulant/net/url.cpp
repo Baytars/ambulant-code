@@ -57,6 +57,7 @@
 #include "ambulant/net/url.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/string_util.h"
+#include "ambulant/lib/filesys.h"
  
 #include <string>
 #if !defined(AMBULANT_NO_IOSTREAMS) && !defined(AMBULANT_NO_STRINGSTREAM)
@@ -106,7 +107,7 @@ void net::url::init_statics() {
 	static handler_pair h8 = {"\\n", &url::set_from_wince_path};
  	s_handlers.push_back(&h8);
 	
-	static handler_pair h9 = {"n", &url::set_from_relative_path};
+	static handler_pair h9 = {"", &url::set_from_relative_path};
  	s_handlers.push_back(&h9);
 	
 	/*
@@ -128,7 +129,7 @@ void net::url::set_from_spec(const string& spec) {
 	std::list<handler_pair*>::iterator it;
 	for(it=s_handlers.begin();it!=s_handlers.end();it++) {
 		handler_pair *ph = (*it);
-		if(lib::starts_with(sig, ph->first)) {
+		if(*(ph->first) == '\0' || lib::starts_with(sig, ph->first)) {
 			//HANDLER h = (*it).second;
 			(this->*(ph->second))(sc, ph->first);
 			return;
@@ -200,6 +201,7 @@ void net::url::set_from_relative_path(lib::scanner& sc, const std::string& pat) 
 	m_host = "";
 	m_port = 0;
 	set_parts(sc, pat);
+	AM_DBG lib::logger::get_logger()->trace("url::set_from_relative_path: \"%s\" -> \"%s\"", pat.c_str(), m_path.c_str());
 }
 
 void net::url::set_parts(lib::scanner& sc, const std::string& pat) {
@@ -222,7 +224,7 @@ bool net::url::is_local_file() const
 		return true;
 	if (!m_absolute) {
 		// We're not sure.
-		lib::logger::get_logger()->warn("url::is_local_file: assume True for relative url: \"%s\"", repr(*this).c_str);
+		lib::logger::get_logger()->warn("url::is_local_file: assume True for relative url: \"%s\"", repr(*this).c_str());
 		return true;
 	}
 	return false;
@@ -235,6 +237,30 @@ std::string net::url::get_url() const
 		lib::logger::get_logger()->warn("url::get_url(): URL not absolute: \"%s\"", rv.c_str());
 	return rv;
 }
+
+net::url net::url::join_to_base(const net::url &base) const
+{
+	// Note: this hasn't been checked against RFCxxxx. We pick up protocol, host, port
+	// and initial pathname from base. Alll other items from base are ignored.
+	if (m_absolute) return *this;
+	std::string basepath = base.get_file();
+	std::string newpath = get_file();
+	if (newpath[0] != '/') {
+		// New_path is not absolute. Prepend base of basepath
+		// newpath = lib::filesys::join(lib::filesys::get_base(basepath, "/"), newpath, "/");
+		newpath = lib::filesys::join(basepath, newpath, "/");
+	}
+	AM_DBG lib::logger::get_logger()->trace("url::join_to_base: old \"%s\" base \"%s\" newpath \"%s\"",
+		repr(*this).c_str(), repr(base).c_str(), newpath.c_str());
+	return net::url(
+		base.get_protocol(),
+		base.get_host(),
+		base.get_port(),
+		newpath,
+		m_query,
+		m_ref);
+}
+	
 
 ///////////////
 // module private static initializer

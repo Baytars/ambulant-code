@@ -149,6 +149,8 @@ class url {
 	string get_file() const;
 	
 	string get_url() const;
+	
+	url join_to_base(const url &base) const;
 		
  	static void init_statics();
  	
@@ -212,7 +214,9 @@ url::url(const string& protocol, const string& host,
 :	m_protocol(protocol),
 	m_host(host),
 	m_port(0),
-	m_path(path) {
+	m_path(path)
+{
+	m_absolute = (m_protocol != "");
 }
 
 inline		
@@ -221,7 +225,9 @@ url::url(const string& protocol, const string& host, int port,
 :	m_protocol(protocol),
 	m_host(host),
 	m_port(short_type(port)),
-	m_path(path) {
+	m_path(path)
+{
+	m_absolute = (m_protocol != "");
 }
 
 inline
@@ -232,7 +238,9 @@ url::url(const string& protocol, const string& host, int port,
 	m_port(short_type(port)),
 	m_path(path), 
 	m_query(query), 
-	m_ref(ref) {
+	m_ref(ref)
+{
+	m_absolute = (m_protocol != "");
 }
 
 inline 
