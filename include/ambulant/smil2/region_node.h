@@ -166,6 +166,7 @@ class region_node : public common::region_info {
 	region_node *append_child(region_node *child) {return nnhelper::append_child(this, child);}
 	void get_children(std::list<region_node*>& l) { nnhelper::get_children(this, l); }
 	region_node *get_first_child(const char *name);
+	const region_node *get_first_child(const char *name) const;
 	
 	const lib::node *dom_node() const { return m_node; }
 
