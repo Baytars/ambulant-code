@@ -45,7 +45,7 @@
  * which carries forward this exception.
  *
  */
- #ifndef __SDL_AUDIO__
+#ifndef __SDL_AUDIO__
 #define __SDL_AUDIO__
 
 #include <SDL.h>
@@ -65,7 +65,21 @@ using namespace lib;
     namespace gui {
         namespace sdl {
 
-//bool m_sdl_init = false;
+//~ struct channel {
+	//~ int channel_nr;
+	//~ bool free;
+//~ };
+			
+//~ class audio_channel {
+  //~ public:
+    //~ audio_channel() {};
+	//~ ~audio_channel() {};
+	//~ int get_channel();		
+	//~ void free_channel();
+  //~ private:
+	//~ static channel* m_channel_list;
+//~ };
+	  
 
 class sdl_active_audio_renderer : public active_renderer, public timer_events {
   public:
@@ -85,9 +99,9 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
   
  
       void start(double where);
-      void stop() {};
-      void pause() {};
-      void resume() {};
+      void stop();
+      void pause();
+      void resume();
 	  void freeze() {};
       void speed_changed() {};
       void readdone();
@@ -100,13 +114,17 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	
       static bool m_sdl_init;
 	  static int m_mixed_channels;
+	  static int m_channels_open;
+	
   	  int init(int rate, int bits, int channels);
       Mix_Chunk m_audio_chunck;
+	  int m_use_channel;
       int m_rate;
+	  int m_bits;
       int m_channels;
-      int m_buffer_size = 4096;
-	  int m_mixed_channels;
-	  Uint16 m_audio_format = AUDIO_S16;
+      int m_buffer_size;
+	  int m_channel_used;
+	  Uint16 m_audio_format;
       event *m_playdone;
 };
 
