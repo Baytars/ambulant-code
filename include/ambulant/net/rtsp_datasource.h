@@ -136,7 +136,7 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	//void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
 
 	
-    datasink *m_sinks[MAX_STREAMS];
+    //datasink *m_sinks[MAX_STREAMS];
 	rtsp_context_t* m_context;
   	//RTSPClient *m_rtsp_client;
 	//MediaSession *m_media_session;
