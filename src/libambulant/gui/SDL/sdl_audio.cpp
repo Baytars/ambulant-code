@@ -232,6 +232,14 @@ gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
 	m_is_playing(false),
 	m_is_paused(false),
 	m_read_ptr_called(false),
+#ifdef USE_SMIL21
+	m_start_time(0),
+	m_startProgress(0),
+	m_endProgress(1),
+	m_dur(0),
+	m_intransition(NULL),
+	m_outtransition(NULL),
+#endif
 	m_volcount(0)
 {
 	AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::sdl_active_audio_renderer() -> 0x%x",  this);
@@ -283,7 +291,6 @@ gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
 	}
 }
 
-
 gui::sdl::sdl_active_audio_renderer::~sdl_active_audio_renderer()
 {
 	m_lock.enter();
@@ -302,6 +309,30 @@ gui::sdl::sdl_active_audio_renderer::~sdl_active_audio_renderer()
 	m_is_playing = false;
 	m_lock.leave();
 }
+#ifdef USE_SMIL21
+
+void
+gui::sdl::sdl_active_audio_renderer::get_transition_params(const lib::transition_info *info)
+{
+	  m_start_time  = m_event_processor->get_timer()->elapsed();
+	  m_dur		= info->m_dur;
+	  m_startProgress = info->m_startProgress;
+	  m_endProgress = info->m_endProgress;
+	  AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::get_transition_params(0x%x): m_start_time=%d  m_dur=%d m_startProgress=%f m_endProgress=%f",this,m_start_time,m_dur,m_startProgress,m_endProgress);
+}
+
+void
+gui::sdl::sdl_active_audio_renderer::set_intransition(const lib::transition_info *info)
+{
+	get_transition_params(m_intransition = info);
+}
+
+void
+gui::sdl::sdl_active_audio_renderer::start_outtransition(const lib::transition_info *info)
+{
+	get_transition_params(m_outtransition = info);
+}
+#endif
 
 int
 gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
@@ -327,6 +358,29 @@ gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 			double leftlevel, rightlevel;
 			const common::region_info *info = m_dest->get_info();
 			leftlevel = rightlevel = info->get_soundlevel();
+#ifdef USE_SMIL21
+			if (m_dur && (m_intransition || m_outtransition)) {
+			  	double progress;
+				lib::transition_info::time_type now;
+				now = m_event_processor->get_timer()->elapsed();
+				if (m_intransition && now >= m_start_time + m_dur) {
+					m_intransition = NULL;
+					m_startProgress = 0;
+					m_endProgress = 1;
+				}
+				progress = ((double) (now - m_start_time) / m_dur)
+					* (m_endProgress - m_startProgress);
+				if (m_outtransition) {
+					progress = m_endProgress - progress;
+				} else {
+					progress = m_startProgress + progress;
+				}
+				if (progress > m_endProgress) progress = m_endProgress;
+				if (progress < m_startProgress) progress = m_startProgress;
+				AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer::get_data(0x%x): m_intransition=0x%x  m_outtransition=0x%x now=%d indur=%d outdur=%d progress=%f",this,m_intransition,m_outtransition,now,m_intransition?m_intransition->m_dur:-317,m_outtransition?m_outtransition->m_dur:-318,progress);
+				leftlevel = rightlevel = leftlevel * progress;
+			}
+#endif
 #ifdef USE_SMIL21
 			common::sound_alignment align = info->get_soundalign();
 			if (align == common::sa_left) {
