@@ -303,7 +303,7 @@ detail::ffmpeg_demux::run()
 		
 		pkt->pts = 0;
 		// Read a packet
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet started");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run:  started");
 		int ret = av_read_packet(m_con, pkt);
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned %d", ret);
 		if (ret < 0) break;
