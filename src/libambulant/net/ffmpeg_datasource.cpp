@@ -52,7 +52,7 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/net/url.h"
 #include <map>
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif 
@@ -1312,7 +1312,7 @@ ffmpeg_video_datasource::get_dur()
 
 ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(const net::url& url, datasource *const src)
 :	m_con(NULL),
-	m_fmt(audio_format(0, 0, 0)),
+	m_fmt(audio_format(0,0,0)),
 	m_event_processor(NULL),
 	m_src(src),
 	m_duration(false, 0),
@@ -1328,7 +1328,7 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(const net::url& url, dataso
 
 ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource *const src)
 :	m_con(NULL),
-	m_fmt(audio_format(0, 0, 0)),
+	m_fmt(audio_format(0,0,0)),
 	m_event_processor(NULL),
 	m_src(src),
 	m_duration(false, 0),
@@ -1341,6 +1341,8 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource *const src
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 	if (!select_decoder(fmt))
 		lib::logger::get_logger()->error(gettext("ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
+	m_fmt = fmt;
+	
 }
 
 ffmpeg_decoder_datasource::~ffmpeg_decoder_datasource()
@@ -1634,13 +1636,14 @@ ffmpeg_decoder_datasource::get_audio_format()
 	}
 #endif
 	if (m_fmt.samplerate == 0) {
-		lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_audio_format: samplerate not set, guessing 44100");
-		m_fmt.samplerate = 44100;
+		lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_audio_format: samplerate not set, asking ffmpeg");
+		m_fmt.samplerate = m_con->sample_rate;
 	}
 	if (m_fmt.channels == 0) {
 		lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_audio_format: channels not set, guessing 2");
-		m_fmt.channels = 2;
+		m_fmt.channels = m_con->channels;
 	}
+	
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_audio_format: rate=%d, bits=%d,channels=%d",m_fmt.samplerate, m_fmt.bits, m_fmt.channels);
 	return m_fmt;
 }
