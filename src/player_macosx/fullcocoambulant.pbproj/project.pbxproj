@@ -5,6 +5,20 @@
 	};
 	objectVersion = 39;
 	objects = {
+		041485070532E37A001276A4 = {
+			expectedFileType = sourcecode.cpp.cpp;
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = timer.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		041485080532E37A001276A4 = {
+			fileRef = 041485070532E37A001276A4;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		0420AEEC052DBC850010C447 = {
 			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
@@ -113,6 +127,7 @@
 				0444D332051F2EEF0010C447,
 				0444D333051F2EEF0010C447,
 				0444D334051F2EEF0010C447,
+				041485070532E37A001276A4,
 				0444D335051F2EEF0010C447,
 				0444D336051F2EEF0010C447,
 			);
@@ -1421,6 +1436,8 @@
 //2A3
 //2A4
 		2A37F4A9FDCFA73011CA2CEA = {
+			buildSettings = {
+			};
 			buildStyles = (
 				4A9504D0FFE6A4CB11CA0CBA,
 				4A9504D1FFE6A4CB11CA0CBA,
@@ -1833,6 +1850,7 @@
 				0444D3D3051F2EF00010C447,
 				0444D3D4051F2EF00010C447,
 				046718F105219EFA0010C447,
+				041485080532E37A001276A4,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "mainloop.h"
+#include "ambulant/lib/timer.h"
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 
 void
@@ -30,7 +31,7 @@ mainloop::run(const char *filename, ambulant::lib::window_factory *wf)
 		(lib::renderer_factory *)new ambulant::gui::cocoa::cocoa_renderer_factory());
 	if (!a) return;
 	
-	lib::event_processor *processor = lib::event_processor_factory();
+	lib::event_processor *processor = lib::event_processor_factory(lib::realtime_timer_factory());
 
 	typedef lib::no_arg_callback<mainloop> callback;
 	lib::event *ev = new callback(this, &mainloop::player_done_callback);
