@@ -156,8 +156,8 @@ class renderer_playable_ds : public renderer_playable {
 		else assert(0);
 	}
 	
-  protected:
 	virtual void readdone() = 0;
+  protected:
 
   	net::datasource *m_src;
 };
