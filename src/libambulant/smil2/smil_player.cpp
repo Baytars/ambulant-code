@@ -468,7 +468,7 @@ void smil_player::destroy_playable(common::playable *np, const lib::node *n) {
 	if (rem) m_logger->warn("smil_player::destroy_playable: playable 0x%x still has refcount of %d", np, rem);
 }
 
-void smil_player::show_link(const lib::node *n, const std::string& href, src_playstate srcstate, dst_playstate dststate) {
+void smil_player::show_link(const lib::node *n, const net::url& href, src_playstate srcstate, dst_playstate dststate) {
 	if(srcstate == src_replace && !href.empty() && href[0] == '#') {
 		// This is an internal hyperjump
 		const lib::node *target = m_doc->get_node(href.c_str()+1);
