@@ -7,14 +7,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: AmbulantPlayer 1.1\n"
-"Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2004-09-17 00:16+0200\n"
+"POT-Creation-Date: 2004-09-17 11:35+0200\n"
 "PO-Revision-Date: 2004-09-12 15:09+0200\n"
 "Last-Translator: Jack Jansen <Jack.Jansen@cwi.nl>\n"
 "Language-Team: Dutch <Jack.Jansen@cwi.nl>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
 
 #: src/libambulant/gui/SDL/sdl_audio.cpp:109
 msgid "Cannot initialize SDL audio library"
@@ -219,6 +219,16 @@ msgstr "Bestand kan niet geopend worden: %s"
 msgid "Cannot play document: no player"
 msgstr "Document kan niet gespeeld worden: geen speler"
 
+#: src/player_unix/qt_gui.cpp:403 src/player_macosx/MyAppDelegate.mm:123
+#, c-format
+msgid "Ambulant Player: compile time version %s, runtime version %s"
+msgstr "Ambulant Player: gebouwd voor versie %s, draait met versie %s"
+
+#: src/player_unix/qt_gui.cpp:404
+#, c-format
+msgid "Ambulant Player: built on %s for Unix/Qt"
+msgstr "Ambulant Player: gebouwd op %s voor Unix/Qt"
+
 #: src/libambulant/gui/cocoa/cocoa_gui.mm:209
 msgid "Unsupported: AmbulantPlayer cannot open second toplevel window yet"
 msgstr "Openen van meerdere vensters nog niet ondersteund door AmbulantPlayer"
@@ -233,16 +243,21 @@ msgstr "Geen correcte internetlocatie (URL): %s"
 msgid "%s: cannot open movie"
 msgstr "Videobestand kan niet geopend worden: %s"
 
-#: src/player_macosx/MyAppDelegate.mm:146
-#: src/player_macosx/MyAppDelegate.mm:187
+#: src/player_macosx/MyAppDelegate.mm:124
+#, c-format
+msgid "Ambulant Player: built on %s for Macintosh/Cocoa"
+msgstr "Ambulant Player: gebouwd op %s voor Macintosh/Cocoa"
+
+#: src/player_macosx/MyAppDelegate.mm:149
+#: src/player_macosx/MyAppDelegate.mm:190
 msgid "No Welcome.smil in application bundle"
 msgstr "Applicatie bevat geen Welcome.smil"
 
-#: src/player_macosx/MyAppDelegate.mm:184
+#: src/player_macosx/MyAppDelegate.mm:187
 msgid "Welcome.smil could not be opened"
 msgstr "Welcome.smil kan niet geopend worden"
 
-#: src/player_macosx/MyAppDelegate.mm:199
+#: src/player_macosx/MyAppDelegate.mm:202
 msgid "Cannot open http://www.ambulantplayer.org"
 msgstr "Kan http://www.ambulantplayer.org niet openen"
 
