@@ -121,6 +121,9 @@ class databuffer
 	
 	// returns the amount of bytes that are used.
 	int used() const;
+        bool is_full() const;
+        bool not_empty() const;
+        
 };
 
 inline std::ostream& operator<<(std::ostream& os, const databuffer& n) {
@@ -171,8 +174,13 @@ public:
 	~active_datasource();
 
 
-	void start(ambulant::lib::event_processor *evp,ambulant::lib::event *readdone);
+	void start(ambulant::lib::event_processor *evp,ambulant::lib::event *callback);
 
+        // a readdone cal is made by the client if he is ready with len bytes of data.
+        void readdone(int len);
+        void callback();
+
+        bool EOF();
 
 	//  Get data from buffer and put 'size' bytes in buffer.
 	void read(char *data, int size);
