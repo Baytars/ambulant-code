@@ -76,8 +76,6 @@ class cocoa_active_fill_renderer : public active_basic_renderer {
 		event_processor *evp)
 	:	active_basic_renderer(context, cookie, node, evp),
 		m_dest(NULL),
-		m_intransition(NULL),
-		m_outtransition(NULL),
 		m_trans_engine(NULL),
 		m_playing(false) {};
 	~cocoa_active_fill_renderer();

@@ -50,29 +50,31 @@
  * @$Id$ 
  */
 
-#include "ambulant/lib/logger.h"
-#include "ambulant/lib/node.h"
-#include "ambulant/lib/transition_info.h"
+#ifndef AMBULANT_GUI_COCOA_COCOA_TRANSITION_H
+#define AMBULANT_GUI_COCOA_COCOA_TRANSITION_H
 
-//#define AM_DBG
+#include "ambulant/smil2/transition.h"
+#include "ambulant/common/layout.h"
 
-#ifndef AM_DBG
-#define AM_DBG if(0)
-#endif
+namespace ambulant {
 
-using namespace ambulant;
-using namespace lib;
+namespace gui {
 
-transition_info *
-transition_info::from_node(node *n)
-{
-	// Placeholder
-	transition_info *rv = new transition_info();
-	rv->m_type = fade;
-	rv->m_subtype = "";
-	rv->m_dur = 2000;
-	rv->m_startProgress = 0.0;
-	rv->m_endProgress = 1.0;
-	rv->m_reverse = false;
-	return rv;
-}
+namespace cocoa {
+
+class cocoa_transition_engine : public smil2::transition_engine {
+  public:
+	cocoa_transition_engine(common::surface *dst, bool is_outtrans, lib::transition_info *info);
+	~cocoa_transition_engine();
+	void update();
+  private:
+	common::surface *m_dst;
+};
+
+} // namespace cocoa
+
+} // namespace gui
+ 
+} // namespace ambulant
+
+#endif // AMBULANT_GUI_COCOA_COCOA_TRANSITION_H

@@ -50,29 +50,55 @@
  * @$Id$ 
  */
 
+#include "ambulant/gui/cocoa/cocoa_transition.h"
+#include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/lib/logger.h"
-#include "ambulant/lib/node.h"
-#include "ambulant/lib/transition_info.h"
 
-//#define AM_DBG
-
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
 
-using namespace ambulant;
-using namespace lib;
+namespace ambulant {
 
-transition_info *
-transition_info::from_node(node *n)
+namespace gui {
+
+namespace cocoa {
+
+cocoa_transition_engine::cocoa_transition_engine(common::surface *dst, bool outtrans, lib::transition_info *info)
+:   smil2::transition_engine(outtrans, info),
+	m_dst(dst)
 {
-	// Placeholder
-	transition_info *rv = new transition_info();
-	rv->m_type = fade;
-	rv->m_subtype = "";
-	rv->m_dur = 2000;
-	rv->m_startProgress = 0.0;
-	rv->m_endProgress = 1.0;
-	rv->m_reverse = false;
-	return rv;
+	AM_DBG lib::logger::get_logger()->trace("cocoa_transition_engine::cocoa_transition_engine()");
 }
+
+cocoa_transition_engine::~cocoa_transition_engine()
+{
+	AM_DBG lib::logger::get_logger()->trace("cocoa_transition_engine::~cocoa_transition_engine()");
+}
+
+void
+cocoa_transition_engine::update()
+{
+	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
+	AmbulantView *view = (AmbulantView *)window->view();
+	NSImage *src = [view getTransitionSurface];
+	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine::update(%f)", m_progress);
+	// This is a fade:
+	const lib::screen_rect<int> &r =  m_dst->get_rect();
+	lib::screen_rect<int> dstrect_whole = r;
+	dstrect_whole.translate(m_dst->get_global_topleft());
+	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
+	NSPoint cocoa_dstpoint = NSMakePoint(NSMinX(cocoa_dstrect_whole), NSMinY(cocoa_dstrect_whole));
+	[src compositeToPoint: cocoa_dstpoint 
+		fromRect: cocoa_dstrect_whole
+		operation: NSCompositeSourceOver
+		fraction: m_progress];
+}
+
+} // namespace cocoa
+
+} // namespace gui
+
+} //namespace ambulant
+

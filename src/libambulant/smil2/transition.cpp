@@ -62,10 +62,8 @@
 using namespace ambulant;
 using namespace smil2;
 
-transition_engine::transition_engine(void *srcdst, void *othersrc, bool outtrans, lib::transition_info *info)
-:   m_srcdst(srcdst),
-	m_othersrc(othersrc),
-	m_outtrans(outtrans),
+transition_engine::transition_engine(bool outtrans, lib::transition_info *info)
+:   m_outtrans(outtrans),
 	m_info(info),
 	m_begin_time(0)
 {
@@ -103,7 +101,14 @@ transition_engine::step(lib::transition_info::time_type now)
 	AM_DBG lib::logger::get_logger()->trace("transition_engine::step(%d)", now);
 	m_progress = (now-m_begin_time) * m_time2progress;
 	if (m_progress > m_info->m_endProgress) m_progress = 1.0;
-	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::step(%d): %f%%", now-m_begin_time, m_progress*100);
+	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::step: delta_t=%d, progress=%f%%", now-m_begin_time, m_progress*100);
+	update();
+}
+
+void
+transition_engine::update()
+{
+	/*AM_DBG*/ lib::logger::get_logger()->trace("transition_engine::update()");
 }
 
 bool
@@ -115,5 +120,5 @@ transition_engine::is_done()
 lib::transition_info::time_type
 transition_engine::next_step_delay()
 {
-	return 0;
+	return 500; // Show something every half second
 }

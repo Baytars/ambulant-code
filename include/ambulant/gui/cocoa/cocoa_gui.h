@@ -80,6 +80,7 @@ class cocoa_window : public common::abstract_window {
 
 	void *view() { return m_view; }
 	const common::gui_region &get_mouse_region() { return m_region->get_mouse_region(); }
+	
   private:
     void *m_view;
 };
@@ -121,7 +122,11 @@ class cocoa_renderer_factory : public common::playable_factory {
 @interface AmbulantView : NSView
 {
     ambulant::gui::cocoa::cocoa_window *ambulant_window;
+	NSImage *transition_surface;
+	int transition_count;
 }
+
+- (id)initWithFrame:(NSRect)frameRect;
 
 - (void)setAmbulantWindow: (ambulant::gui::cocoa::cocoa_window *)window;
 - (void)ambulantWindowClosed;
@@ -136,6 +141,11 @@ class cocoa_renderer_factory : public common::playable_factory {
 
 - (void)dumpToImageFile: (NSString *)filename;
 - (BOOL)wantsDefaultClipping;
+
+- (void) incrementTransitionCount;
+- (void) decrementTransitionCount;
+- (NSImage *)getTransitionSurface;
+- (NSImage *)getTransitionSource;
 @end
 
 #endif // __OBJC__

@@ -62,18 +62,17 @@ namespace smil2 {
 
 class transition_engine {
   public:
-	transition_engine(void *srcdst, void *othersrc, bool is_outtrans, lib::transition_info *info);
-	~transition_engine();
+	transition_engine(bool is_outtrans, lib::transition_info *info);
+	virtual ~transition_engine();
 	
 	void begin(lib::transition_info::time_type now);
 	void end();
 	
 	void step(lib::transition_info::time_type now);
+	virtual void update();
 	bool is_done();
 	lib::transition_info::time_type next_step_delay();
-  private:
-	void *m_srcdst;
-	void *m_othersrc;
+  protected:
 	bool m_outtrans;
 	lib::transition_info *m_info;
 	lib::transition_info::time_type m_begin_time;

@@ -195,6 +195,9 @@ class surface {
 	
 	// Get object holding SMIL region parameters for querying
 	virtual const region_info *get_info() const = 0;
+	
+	// Get the OS window for this surface
+	virtual abstract_window *get_abstract_window() = 0;
 };
 
 // window_factory is subclassed by the various GUI implementations.
