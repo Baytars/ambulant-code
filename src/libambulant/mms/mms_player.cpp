@@ -64,18 +64,17 @@ using namespace ambulant;
 using namespace mms;
 
 common::player *
-common::create_mms_player(lib::document *doc, common::window_factory *wf, common::playable_factory *rf)
+common::create_mms_player(lib::document *doc, common::factories *factory)
 {
-	return new mms_player(doc, wf, rf);
+	return new mms_player(doc, factory);
 }
 
-mms_player::mms_player(lib::document *doc, common::window_factory *wf, common::playable_factory *rf)
+mms_player::mms_player(lib::document *doc, common::factories* factory)
 :	m_doc(doc),
 	m_tree(doc->get_root()),
 	m_timer(new lib::timer(lib::realtime_timer_factory(), 0.0)),
 	m_event_processor(lib::event_processor_factory(m_timer)),
-	m_window_factory(wf),
-	m_playable_factory(rf)
+	m_factory(NULL)
 {
 }
 
@@ -163,4 +162,3 @@ mms_player::build_timeline()
 	timeline_builder builder = timeline_builder(m_window_factory, *playroot);
 	return builder.build();
 }
-

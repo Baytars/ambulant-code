@@ -52,7 +52,7 @@
 #ifndef PLUGIN_FACTORY_H
 #define PLUGIN_FACTORY_H
 
-
+#include "ambulant/common/factory.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/renderer.h"
 #include <ltdl.h>
@@ -65,7 +65,7 @@ namespace plugin {
 
 class plugin_engine {
   public:
-	 plugin_engine(common::factories *factory);
+	 plugin_engine(common::factories *factory); 
 	~plugin_engine() {};
 	
   private:
