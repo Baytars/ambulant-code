@@ -204,7 +204,7 @@ qt_mainloop::create_document(const char *filename)
 		url = url.join_to_base(cwd_url);
 		AM_DBG lib::logger::get_logger()->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
 	}
-	int size = net::read_data_from_url(url, m_df, &data);
+	int size = net::read_data_from_url(url, m_factory->df, &data);
 	if (size < 0) {
 		lib::logger::get_logger()->error("Cannot open %s", filename);
 		return NULL;
@@ -226,8 +226,11 @@ qt_mainloop::~qt_mainloop()
 		delete m_player;
 	}
 	m_player = NULL;
-	if (m_rf) delete m_rf;
-	m_rf = NULL;
+	if (m_factory->rf) delete m_factory->rf;
+	m_factory->rf = NULL;
+	
+	if (m_factory->df) delete m_factory->df;
+	m_factory->df = NULL;
 	// m_wf Window factory is owned by caller
 //	m_wf = NULL;
 }

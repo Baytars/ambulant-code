@@ -95,7 +95,7 @@ class player {
 };
 
 // Factory functions - should these be here?
-player *create_mms_player(lib::document *doc, window_factory *wf, playable_factory *rf);
+player *create_mms_player(lib::document *doc, common::factories* factory);
 player *create_smil2_player(lib::document *doc, common::factories* factory, common::embedder *sys);
 
 } // namespace common
