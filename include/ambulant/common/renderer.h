@@ -70,7 +70,67 @@ namespace ambulant {
 
 namespace common {
 
+// A helper class implementing some of the common code for playables
+class playable_imp : public playable {
+  public:
+	playable_imp(
+		playable_notification *context,
+		cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor* evp) 
+	:	m_context(context), 
+		m_cookie(cookie),
+		m_node(node),
+		m_event_processor(evp) {
+	}
 
+	// common::playable interface
+	void pause() {}
+	void resume() {}
+	void seek(double where) {}
+	void wantclicks(bool want) { m_wantclicks = want;}
+	void preroll(double when, double where, double how_much) {}
+	std::pair<bool, double> get_dur() { return std::pair<bool, double>(true, 0);}
+	const cookie_type& get_cookie() const { return m_cookie;}
+  protected:
+    playable_notification *m_context;
+    cookie_type m_cookie;
+	const lib::node	*m_node;
+	lib::event_processor *m_event_processor;
+	bool m_wantclicks;
+};
+
+// An alt inline direct base for renderer playables.
+class renderer_playable : public playable_imp, public renderer {
+  public:
+	renderer_playable(
+		playable_notification *context,
+		cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor* evp) 
+	:	playable_imp(context, cookie, node, evp),
+		m_dest(0),
+		m_alignment(0),
+		m_activated(false) {
+	}
+			
+	// common::renderer interface
+	void set_surface(common::surface *dest) { m_dest = dest;}
+	void set_alignment(common::alignment *align) { m_alignment = align; }
+	void set_intransition(lib::transition_info *info) {  }
+	void start_outtransition(lib::transition_info *info) {  }
+	surface *get_surface() { return m_dest;}
+	void user_event(const lib::point &where, int what) {}
+	renderer *get_renderer() { return this; }
+	void transition_freeze_end(lib::screen_rect<int> r) { m_context->transitioned(m_cookie); }
+	
+  protected:
+	surface *m_dest;
+	alignment *m_alignment;
+	bool m_activated;
+};
+
+#if 0
 class active_playable : public playable {
   public:
     active_playable(playable_notification *context, const cookie_type cookie)
@@ -98,14 +158,8 @@ class active_playable : public playable {
     cookie_type m_cookie;
 };
 
-class active_basic_renderer : public active_playable, public renderer {
+class active_basic_renderer : public playable_imp, public renderer {
   public:
-#if 0
-  	active_basic_renderer()
-  	:	active_playable((playable_notification *)NULL, 0),
-		m_node(NULL),
-		m_event_processor(NULL) {};
-#endif
 	active_basic_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
@@ -121,61 +175,55 @@ class active_basic_renderer : public active_playable, public renderer {
 	const lib::node *m_node;
 	lib::event_processor *const m_event_processor;
 };
+#endif
 
-class active_renderer : public active_basic_renderer {
+class renderer_playable_ds : public renderer_playable {
   public:
-	active_renderer(
+	renderer_playable_ds(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *evp,
 		net::datasource_factory *df);
 		
-	virtual ~active_renderer();
+	virtual ~renderer_playable_ds();
 	
 	virtual void start(double where);
-	virtual void freeze() {}
+//	virtual void freeze() {}
 	virtual void stop();
-	virtual void pause() {}
-	virtual void resume() {}
-	virtual void wantclicks(bool want);
+//	virtual void pause() {}
+//	virtual void resume() {}
+//	virtual void wantclicks(bool want);
 
 	virtual void redraw(const lib::screen_rect<int> &dirty, gui_window *window) = 0;
-	virtual void user_event(const lib::point &where, int what = 0) { user_event_callback(what); }
-	virtual void set_surface(surface *dest) { m_dest = dest; }
-	virtual void set_alignment(alignment *align) { m_alignment = align; }
-	virtual void set_intransition(lib::transition_info *info) { m_intransition = info; }
-	virtual void start_outtransition(lib::transition_info *info);
-	virtual surface *get_surface() { return m_dest;}
-	virtual renderer *get_renderer() { return this; }
-	void transition_freeze_end(lib::screen_rect<int> r) { m_context->transitioned(m_cookie); }
-	virtual void readdone() {};
+	void user_event(const lib::point &where, int what = 0) {
+		if (what == user_event_click) m_context->clicked(m_cookie, 0);
+		else if (what == user_event_mouse_over) m_context->pointed(m_cookie, 0);
+		else assert(0);
+	}
 	
   protected:
+	virtual void readdone() = 0;
 
   	net::datasource *m_src;
-	surface *m_dest;
-	alignment *m_alignment;
-	lib::transition_info *m_intransition, *m_outtransition;
-//	lib::event *m_readdone;
 };
 
-// active_final_renderer is a handy subclass of active_renderer:
+// renderer_playable_dsall is a handy subclass of renderer_playable_ds:
 // it waits until all data is available, reads it, and then calls
 // need_redraw on the region. If you subclass this you only
 // need to add a redraw method.
-class active_final_renderer : public active_renderer {
+class renderer_playable_dsall : public renderer_playable_ds {
   public:
-	active_final_renderer(
+	renderer_playable_dsall(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *evp,
 		net::datasource_factory *df)
-	:	active_renderer(context, cookie, node, evp, df),
+	:	renderer_playable_ds(context, cookie, node, evp, df),
 		m_data(NULL),
 		m_data_size(0) {};
-	virtual ~active_final_renderer();
+	virtual ~renderer_playable_dsall();
 	
   protected:
 	void readdone();
@@ -201,7 +249,7 @@ class global_playable_factory : public playable_factory {
 };
 
 
-class active_video_renderer : public common::active_basic_renderer {
+class active_video_renderer : public common::renderer_playable {
   public:
 	active_video_renderer(
     common::playable_notification *context,
@@ -219,36 +267,21 @@ class active_video_renderer : public common::active_basic_renderer {
 	
 	virtual void show_frame(char* frame, int size) {};
     virtual void redraw(const lib::screen_rect<int> &dirty, common::gui_window *window);
-	virtual void wantclicks(bool want) {};
-    virtual void user_event(const lib::point &where, int what=0) {};
 	
 	void start(double where);
     void stop() { m_is_playing = false; };
     void pause();
     void resume();
-	void freeze() {};
-    void speed_changed() {};
     void data_avail();
-	void playdone() {};
-
-	virtual void set_surface(common::surface *dest);
-	void set_alignment(alignment *align) { m_alignment = align; };
-	void set_intransition(lib::transition_info *info) {  }
-	void start_outtransition(lib::transition_info *info) {  }
-	virtual common::surface *get_surface();
-	virtual renderer *get_renderer();
-	void transition_freeze_end(lib::screen_rect<int> r) { m_context->transitioned(m_cookie); }
+//	void playdone() {};
 	
 		
   protected:
-	surface *m_dest;
-	alignment *m_alignment;
 	lib::size m_size;
   
   private:
 	  typedef lib::no_arg_callback <active_video_renderer > dataavail_callback;
 	  double now();
-	  lib::event_processor* m_evp;
   	  net::video_datasource* m_src; 
  	  unsigned long int m_epoch;
 	  bool m_is_playing;
@@ -273,53 +306,6 @@ class background_renderer : public bgrenderer {
 	surface *m_dst;
 };
 
-// An alt inline direct base for renderer playables.
-class renderer_playable : public playable, public renderer {
-  public:
-	renderer_playable(
-		playable_notification *context,
-		cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor* evp) 
-	:	m_context(context), 
-		m_cookie(cookie),
-		m_node(node),
-		m_event_processor(evp),
-		m_dest(0),
-		m_alignment(0),
-		m_activated(false), 
-		m_wantclicks(false) {
-	}
-		
-	// common::playable interface
-	void pause() {}
-	void resume() {}
-	void seek(double where) {}
-	void wantclicks(bool want) { m_wantclicks = want;}
-	void preroll(double when, double where, double how_much) {}
-	std::pair<bool, double> get_dur() { return std::pair<bool, double>(true, 0);}
-	const cookie_type& get_cookie() const { return m_cookie;}
-	
-	// common::renderer interface
-	void set_surface(common::surface *dest) { m_dest = dest;}
-	void set_alignment(common::alignment *align) { m_alignment = align; }
-	void set_intransition(lib::transition_info *info) {  }
-	void start_outtransition(lib::transition_info *info) {  }
-	surface *get_surface() { return m_dest;}
-	void user_event(const lib::point &where, int what) {}
-	renderer *get_renderer() { return this; }
-	void transition_freeze_end(lib::screen_rect<int> r) { m_context->transitioned(m_cookie); }
-	
-  protected:
-    playable_notification *m_context;
-    cookie_type m_cookie;
-	const lib::node	*m_node;
-	lib::event_processor *m_event_processor;
-	surface *m_dest;
-	alignment *m_alignment;
-	bool m_activated;
-	bool m_wantclicks;
-};
 
 } // namespace common
  

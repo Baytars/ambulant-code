@@ -80,7 +80,7 @@ class none_window_factory : public common::window_factory {
 	common::bgrenderer *new_background_renderer(common::region_info *src);
 };
 
-class none_playable : public common::active_playable {
+class none_playable : public common::playable_imp {
   public:
 	none_playable(
 		common::playable_notification *context,
@@ -92,16 +92,11 @@ class none_playable : public common::active_playable {
 #else
 		common::playable_notification::cookie_type cookie,
 #endif
-		const lib::node *node);
+		const lib::node *node,
+		lib::event_processor *evp);
 	
 	void start(double where);
-	void redraw(const lib::screen_rect<int> &r, common::gui_window *window);
 	void stop();
-	void pause() {};
-	void resume() {};
-	void wantclicks(bool want) {};
-  private:
-	const lib::node *m_node;
 };
 
 class none_background_renderer : public common::background_renderer {
