@@ -76,7 +76,7 @@ class qt_renderer : public renderer_playable_dsall {
 		playable_notification::cookie_type cookie,
 		const node *node,
 		event_processor *evp,
-		common::factory *factory)
+		common::factories *factory)
 	:	renderer_playable_dsall(context, cookie, node, evp, factory),
 		m_intransition(NULL),
 		m_outtransition(NULL),

@@ -80,7 +80,7 @@ class qt_active_text_renderer : public qt_renderer {
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
     	lib::event_processor *const evp,
-    	common::factory *factory)
+    	common::factories *factory)
 :	qt_renderer(context, cookie, node, evp, factory),
  	m_text_storage(NULL){
 	}

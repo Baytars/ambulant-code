@@ -86,7 +86,7 @@ class sdl_active_audio_renderer : public common::playable_imp /*, public lib::ti
     common::playable_notification::cookie_type cookie,
     const lib::node *node,
     lib::event_processor *evp,
-  	common::factories factory,
+  	common::factories *factory,
 	net::audio_datasource *ds);
   
   	~sdl_active_audio_renderer();

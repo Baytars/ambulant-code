@@ -77,12 +77,12 @@ int filter(const struct dirent* filen)
 	return 0;
 }
 
-plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, common::factories* factory)
+plugin::plugin_engine::plugin_engine(common::factories* factory)
 {
 	int nr_of_files;
 	int errors;
 	char filename[1024];
-	typedef void (*initfunctype)(ambulant::common::factories* rf, ambulant::net::datasource_factory* df);
+	typedef void (*initfunctype)(ambulant::common::factories* factory);
 	lt_dlhandle handle;
 	
 	initfunctype init;
@@ -122,7 +122,7 @@ plugin::plugin_engine::plugin_engine(common::global_playable_factory* rf, common
 						if (!init) {
 							lib::logger::get_logger()->error("plugin_engine: no initialize routine");
 						} else {
-							(*init)(rf,df);
+							(*init)(factory);
 						}
 		  			} else {
 						lib::logger::get_logger()->error("plugin_engine: Error reading plugin %s",filename);

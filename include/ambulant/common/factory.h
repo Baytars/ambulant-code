@@ -50,22 +50,18 @@
 
 #include "ambulant/net/datasource.h"
 #include "ambulant/common/playable.h"
-#include "ambulant/common/renderer.h"
 #include "ambulant/common/layout.h"
 
 namespace ambulant {
 
 namespace common {
 
+class global_playable_factory;
 	
 struct factories {
-//	net::datasource_factory  *df;
-//	common::playable_factory *rf;
-	//ambulant::common::window_factory *wf;
-	
-	ambulant::common::global_playable_factory *m_rf;
-	ambulant::common::window_factory *m_wf;
-	ambulant::net::datasource_factory *m_df;
+	ambulant::common::global_playable_factory *rf;
+	ambulant::common::window_factory *wf;
+	ambulant::net::datasource_factory *df;
 };
 
 
