@@ -48,8 +48,9 @@
 
 #include "ambulant/lib/logger.h"
 #include "unix_preferences.h"
+#include <fcntl.h>
  
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -60,8 +61,16 @@ using namespace lib;
 
 bool
 unix_preferences::load_preferences() {
-	AM_DBG logger::get_logger()->debug("unix_preferences::load_preferences()");
+	AM_DBG logger::get_logger()->debug("unix_preferences::load_preferences");
 	set_preferences_singleton(this);
+	return load_preferences_from_file ()
+		&& load_preferences_from_environment();
+}
+
+bool
+unix_preferences::load_preferences_from_environment() {
+	std::string id = "unix_preferences::load_preferences_from_environment";
+	AM_DBG logger::get_logger()->debug("%s", id.c_str());
 
 	char *parser = getenv("AMBULANT_USE_PARSER");
 	if (parser != NULL) {
@@ -101,7 +110,7 @@ unix_preferences::load_preferences() {
 	    && strcasecmp(do_validation,"false") != 0)
 		m_do_validation = true;
 	char *validation_schema_full_checking =
-		getenv("AMBULANT_VALIDATION_SCHEMA_FULL_CHECKING");
+		getenv("AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING");
 	if (validation_schema_full_checking != NULL
 	    && strcasecmp(validation_schema_full_checking,"false") != 0)
 		m_validation_schema_full_checking = true;
@@ -109,7 +118,80 @@ unix_preferences::load_preferences() {
 }
 
 bool
+unix_preferences::load_preferences_from_file() {
+	std::string id = "unix_preferences::load_preferences_from_file";
+	AM_DBG logger::get_logger()->debug("%s()", id.c_str());
+	FILE* preferences_filep = open__preferences_file("r");
+	char buf[m_bufsize], * s = buf;
+	int lineno = 0;
+	
+	if (preferences_filep == NULL)
+		return true;
+	
+	while (s = fgets(buf, m_bufsize, preferences_filep)) {
+		lineno++;
+		if (*s == '#')
+			continue;
+		char* name; char* value;
+		get_preference(s, &name, &value);
+		if (name == NULL) {
+			logger::get_logger()->error("%s(%s): %s %d - %s",
+						    id.c_str(),
+						    m_preferences_filename.c_str(),
+						    "line",
+						    "malformed");
+			return false;
+		}
+		std::string ssn = name;
+		if (ssn == "AMBULANT_USE_PARSER")
+			m_parser_id = value;
+		else if (ssn == "AMBULANT_VALIDATION_SCHEME")
+			m_validation_scheme = value;
+		else if (ssn == "AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING")
+			m_validation_schema_full_checking =
+		        	value == "true" ? true : false;
+	}
+	return true;
+}
+
+bool
 unix_preferences::save_preferences() {
+	AM_DBG logger::get_logger()->debug("unix_preferences::save_preferences()");
+	FILE* preferences_filep = open__preferences_file("w");
+	
+	if (preferences_filep == NULL) {
+		close(creat(m_preferences_filename.c_str(), 0666));
+		preferences_filep = open__preferences_file("w");
+		if (preferences_filep == NULL) {
+			logger::get_logger()->error("unix_preferences::save_preferences(): cannot open %s for writing", m_preferences_filename.c_str());
+			return false;
+		}
+	}
+#define S(name,value) (void) fprintf(preferences_filep,"%s=%s\n",name,value);
+	S("# Ambulant Preferences", "Temporary format");
+	S("AMBULANT_USE_PARSER", m_parser_id.c_str());
+	S("AMBULANT_VALIDATION_SCHEME", m_validation_scheme.c_str());
+	S("AMBULANT_DO_VALIDATION_SCHEMA_FULL_CHECKING",
+	  m_validation_schema_full_checking ? "true" : "false");
 	return true;
 }
  
+FILE* 
+unix_preferences::open__preferences_file(std::string mode) {
+	AM_DBG logger::get_logger()->debug("unix_preferences::open_preferences_file(%s,%s)", m_preferences_filename.c_str(), mode.c_str());
+	FILE* preferences_filep = fopen(m_preferences_filename.c_str(), mode.c_str());
+	return preferences_filep;
+}
+
+void 
+unix_preferences::get_preference(char* buf, char**namep, char** valuep) {
+	char* s = buf;
+	while (*s && *s++ != '=');
+	if (!*s)
+		*namep = *valuep = NULL;
+	else {
+		*s = '\0';
+		*namep = buf;
+		*valuep = s;
+	}
+}
