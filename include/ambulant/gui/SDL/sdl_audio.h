@@ -57,9 +57,9 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/gui/none/none_gui.h"
 #include "ambulant/net/datasource.h"
-#ifdef WITH_FFMPEG
-#include "ambulant/net/ffmpeg_datasource.h"
-#endif
+//#ifdef WITH_FFMPEG
+//#include "ambulant/net/ffmpeg_datasource.h"
+//#endif
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/asb.h"
 
@@ -101,9 +101,7 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	void playdone();
 		  
   private:
-#ifdef WITH_FFMPEG
-	net::ffmpeg_audio_datasource *m_audio_src;
-#endif
+	net::abstract_audio_datasource *m_audio_src;
  	int inc_channels();
 	int init(int rate, int bits, int channels);
     static bool m_sdl_init;
