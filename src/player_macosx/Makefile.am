@@ -5,6 +5,15 @@ EXTRA_DIST=MyAmbulantView.mm MyDocument.mm mainloop.cpp MyAppDelegate.m main.m \
 	Info.plist version.plist \
 	cocoambulant.pbproj fullcocoambulant.pbproj
 
+if WITH_SDL
+extra_sdl_LDADD=$(top_builddir)/src/libambulant/.libs/libambulant_sdl.a
+extra_sdl_DEFINES=-DWITH_SDL
+extra_sdl_ldflags= `sdl-config --libs` -lSDL_mixer
+else
+extra_sdl_ldflags=
+extra_sdl_DEFINES=
+endif
+
 # Building a MacOSX .app bundle is a bit tricky.
 noinst_PROGRAMS = cocoambulant_executable
 cocoambulant_executable_SOURCES= \
@@ -30,11 +39,13 @@ cocoambulant_bundle: cocoambulant_executable
 	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) cocoambulant_executable `pwd`/cocoambulant.app/Contents/MacOS/cocoambulant
 	
 LDADD = $(top_builddir)/src/libambulant/.libs/libambulant.a \
+	$(extra_sdl_LDADD) \
 	$(top_builddir)/src/libambulant/.libs/libambulant_cocoa.a \
 	$(EXPAT_PREFIX)/lib/libexpat.a -lstdc++
-AM_LDFLAGS=-framework Cocoa
+AM_LDFLAGS=$(extra_sdl_ldflags) -framework Cocoa
 
-INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include -I$(EXPAT_PREFIX)/include 
+INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include -I$(EXPAT_PREFIX)/include \
+	$(extra_sdl_DEFINES)
 
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
