@@ -70,6 +70,8 @@ class preferences {
 	static void set_preferences_singleton(preferences *prefs);
 
   public:
+	bool m_welcome_seen;
+
 	int m_log_level;
 
 	std::string m_parser_id;

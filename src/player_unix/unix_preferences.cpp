@@ -50,7 +50,7 @@
 #include "unix_preferences.h"
 #include <fcntl.h>
  
-#define AM_DBG
+// #define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -92,6 +92,8 @@ unix_preferences::unix_preferences() {
 	AM_DBG logger::get_logger()->debug("%s", id.c_str());
 	s_preference_table = new std::vector<preference_entry*>();
 
+	ADD_PREF("AMBULANT_WELCOME_SEEN", BOOL,
+	     &m_welcome_seen, valid_bools);
 	ADD_PREF("AMBULANT_LOG_LEVEL", INT, 
 	     &m_log_level, NULL);
 	ADD_PREF("AMBULANT_USE_PARSER", STRING, 
@@ -124,7 +126,7 @@ unix_preferences::load_preferences() {
 	AM_DBG logger::get_logger()->debug("%s", id.c_str());
 
 	return load_preferences_from_file ()
-		&& load_preferences_from_environment();
+	       || load_preferences_from_environment();
 }
 
 bool
@@ -157,12 +159,12 @@ unix_preferences::load_preference(std::string name, std::string value) {
 					log->error("%s %s=%s",
 						   "Invalid value for",
 						   pe->pref_name.c_str(),
-						   value.c_str());					
+						   value.c_str());
 					log->error("Valid values are:");
 					vv = pe->pref_valid_val;
 					while ( ! vv->empty()) {
 						log->error("%s",
-							  vv->c_str());
+							   vv->c_str());
 						vv++;
 					}
 					break;
@@ -170,17 +172,17 @@ unix_preferences::load_preference(std::string name, std::string value) {
 			}
 			switch (pe->pref_type) {
 			case STRING:
-			  *(std::string*)pe->pref_store = value;
-			  break;
+				*(std::string*)pe->pref_store = value;
+				break;
 			case INT:
-			  *(int*)pe->pref_store = atoi(value.c_str());
-			  break;
+				*(int*)pe->pref_store = atoi(value.c_str());
+				break;
 			case BOOL:
-			  *(bool*)pe->pref_store =
-			    value == "true" ? true : false;
-			  break;
+				*(bool*)pe->pref_store =
+					value == "true" ? true : false;
+				break;
 			default:
-			  break;
+				break;
 			}
 			break; 
 		}
@@ -206,8 +208,13 @@ unix_preferences::load_preferences_from_environment() {
 	for (preference_iterator pritr = s_preference_table->begin();
 	     pritr != s_preference_table->end(); pritr++) {
 		preference_entry* pe = *pritr;
-		std::string value(getenv(pe->pref_name.c_str()));
-		rv &= load_preference(pe->pref_name, value);
+		char* v = getenv(pe->pref_name.c_str());
+		if (v != NULL) {
+			std::string value(v);
+			rv &= load_preference(pe->pref_name, value);
+		} else  {
+			rv = false;
+		}
 	}
 	return rv;
 }
@@ -253,16 +260,7 @@ unix_preferences::save_preferences() {
 	FILE* preferences_filep = open_preferences_file("w");
 	
 	if (preferences_filep == NULL) {
-		close(creat(m_preferences_filename.c_str(), 0666));
-		preferences_filep = open_preferences_file("w");
-		if (preferences_filep == NULL) {
-			logger::get_logger()->error
-				("%s(%s): %s",
-				 id.c_str(),
-				 m_preferences_filename.c_str(),
-				 "cannot open for writing");
-			return false;
-		}
+		return false;
 	}
 
 // OI - output int value
@@ -295,20 +293,19 @@ unix_preferences::save_preferences() {
  
 FILE* 
 unix_preferences::open_preferences_file(std::string mode) {
-	std::string id = "unix_preferences::open_preferences";
+	std::string id = "unix_preferences::open_preferences_file";
 	if (m_home == "") {
-		m_home = std::string(getenv("$HOME"));
-		if (m_home != "") {
-		  m_preferences_filename = 
-		    m_home+"/"+m_ambulant_home+"/"
-		    + m_preferences_filename;
+		char* home_dir = getenv("HOME");
+		if (home_dir != NULL) {
+			m_home = std::string(home_dir);
+			m_ambulant_home = m_home+"/"+m_ambulant_home;
+			m_preferences_filename = 
+			  m_ambulant_home+"/"+m_preferences_filename;
+		} else {
+			logger::get_logger()->error
+			 	("HOME environment variable not set");
+			return NULL;
 		}
-	}
-	if (m_home == "") {
-		logger::get_logger()->error("%s(): %s",
-					    id.c_str(),
-					    "no value for $HOME");
-		return NULL;
 	}
 	AM_DBG logger::get_logger()->debug("%s(%s,%s)",
 					   id.c_str(),
@@ -316,6 +313,28 @@ unix_preferences::open_preferences_file(std::string mode) {
 					   mode.c_str());
 	FILE* preferences_filep = fopen(m_preferences_filename.c_str(),
 					mode.c_str());
+	if (preferences_filep == NULL) {
+		struct stat statbuf;
+		// create directory "$HOME/.ambulant" unless it exists
+		if (stat(m_ambulant_home.c_str(), &statbuf) < 0
+		    && mkdir(m_ambulant_home.c_str(), 0755) < 0) {
+			logger::get_logger()->error
+				("mkdir(\"%s\") failed: %s",
+				 m_ambulant_home.c_str(),
+				 strerror(errno));
+			return NULL;
+		}
+		preferences_filep = fopen(m_preferences_filename.c_str(),
+					  mode.c_str());
+		if (preferences_filep == NULL) {
+			logger::get_logger()->error
+				("fopen(\"%s\",\"%s\") failed: %s",
+				 m_preferences_filename.c_str(),
+				 mode.c_str(),
+				 strerror(errno));
+			return NULL;
+		}
+	}
 	return preferences_filep;
 }
 

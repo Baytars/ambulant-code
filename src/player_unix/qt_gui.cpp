@@ -435,16 +435,14 @@ main (int argc, char*argv[]) {
 				mywidget->slot_play();
 		}
 	} else {
-		char fnbuf[1024];
-	  	snprintf(fnbuf, 1024, "%s/.ambulant_welcomeSeen",
-			 getenv("HOME"));
-		if (access(fnbuf, 0) < 0) {
+		preferences* prefs = preferences::get_preferences();
+		if ( ! prefs->m_welcome_seen) {
 			char *welcome_doc = find_welcome_doc();
 			if (welcome_doc
 			&& mywidget->openSMILfile(welcome_doc,
 						  IO_ReadOnly)) {
 				mywidget->slot_play();
-		  		close(creat(fnbuf, 0666));
+				prefs->m_welcome_seen = true;
 			}
 		}
 		exec_flag = true;
