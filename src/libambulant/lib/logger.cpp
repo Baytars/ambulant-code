@@ -51,6 +51,9 @@
  */
 
 #include "ambulant/lib/logger.h"
+#if 1
+#include "ambulant/lib/win32/win32_asb.h"
+#endif
 
 #include <map>
 
@@ -273,11 +276,11 @@ void lib::logger::log_cstr(int level, const char *buf) {
 		return;
 		
 	if(level == LEVEL_SHOW) {
-		if (m_show_message)
+		// These we prefer to display as a dialog
+		if (m_show_message) {
 			(*m_show_message)(buf);
-		else
-			show_message(buf);
-		return;
+			return;
+		}
 	} 
 	if(m_pos == 0) {
 		// Not set and no stdio
@@ -319,10 +322,13 @@ void lib::logger::log_cstr(int level, const char *buf) {
 	os.flush();
 	m_cs.leave();
 	if (level >= LEVEL_ERROR) {
+		// These we would like to additionally show as a dialog
+#if 0
 		if (m_show_message)
 			(*m_show_message)(buf);
-		else
-			show_message(buf);
+#else
+		lib::win32::show_message(buf);
+#endif
 	}
 }
 
