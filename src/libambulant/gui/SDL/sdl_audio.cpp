@@ -326,7 +326,8 @@ gui::sdl::sdl_active_audio_renderer::set_intransition(const lib::transition_info
  	if (m_transition_engine)
 		delete m_transition_engine;
 	m_intransition = info;
-	m_transition_engine = new smil2::audio_transition_engine(m_event_processor, true, info);
+	m_transition_engine = new smil2::audio_transition_engine();
+	m_transition_engine->init(m_event_processor, false, info);
 }
 
 void
@@ -334,7 +335,8 @@ gui::sdl::sdl_active_audio_renderer::start_outtransition(const lib::transition_i
  	if (m_transition_engine)
 		delete m_transition_engine;
 	m_outtransition = info;
-	m_transition_engine = new smil2::audio_transition_engine(m_event_processor, false, info);
+	m_transition_engine = new smil2::audio_transition_engine();
+	m_transition_engine->init(m_event_processor, true, info);
 }
 #endif
 
@@ -561,7 +563,8 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 		register_renderer(this);
 #ifdef USE_SMIL21
 		if (m_intransition && ! m_transition_engine) {
-			m_transition_engine = new smil2::audio_transition_engine(m_event_processor, true, m_intransition);
+			m_transition_engine = new smil2::audio_transition_engine();
+			m_transition_engine->init(m_event_processor, false, m_intransition);
 		}
 #endif                                   
 	} else {
