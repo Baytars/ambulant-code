@@ -55,12 +55,10 @@
 // LiveMedia includes
 #include "BasicUsageEnvironment.hh"
 #include "liveMedia.hh"
-#include "GroupsockHelper.hh"
+
 
 #include "avcodec.h"
-#ifdef WITH_FFMPEG_AVFORMAT
 #include "avformat.h"
-#endif // WITH_FFMPEG_AVFORMAT
 #include "common.h"
 
 #include "ambulant/config/config.h"
@@ -110,21 +108,27 @@ struct rtsp_context_t {
 	int nstream;
 	char* blocking_flag;
 	bool eof;
+	const char* codec_name;
+	int nchannels;
+	int nsamples_per_sec;
+	int bits_per_sample;	
 	datasink *sinks[MAX_STREAMS];
 };
 	
 class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
   public:
 	rtsp_demux(rtsp_context_t* context);
-	~rtsp_demux();
+	~rtsp_demux() {};
 	
 	static rtsp_context_t* supported(const net::url& url);
 	
 	void add_datasink(datasink *parent, int stream_index);
 	void remove_datasink(int stream_index);
-	void cancel();
+	void cancel() {};
   	int audio_stream_nr() { return m_context->audio_stream; };
 	int video_stream_nr() { return m_context->video_stream; };  
+	const char* codec_name(); 
+	
   protected:
 	unsigned long run();
   private:	

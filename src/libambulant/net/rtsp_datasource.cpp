@@ -48,6 +48,7 @@
 
 #include "ambulant/net/rtsp_datasource.h"
 #include "ambulant/lib/logger.h"
+#include "GroupsockHelper.hh"
 
 using namespace ambulant;
 using namespace net;
@@ -61,7 +62,34 @@ using namespace net;
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
 :	m_context(context)
 {
+	std::cout <<"demuxer context " << context << "\n";
+	std::cout <<"demuxer m_context " << m_context << "\n";
+	std::cout <<"demuxer MEDIA_SESSION " << context->media_session << "\n";
+	std::cout <<"demuxer m_MEDIA_SESSION " << m_context->media_session << "\n";
+	memset(m_sinks, 0, sizeof m_sinks);
 }
+
+
+void 
+ambulant::net::rtsp_demux::add_datasink(datasink *parent, int stream_index)
+{
+	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
+	assert(m_sinks[stream_index] == 0);
+	m_sinks[stream_index] = parent;
+	m_context->nstream++;
+}
+
+void
+ambulant::net::rtsp_demux::remove_datasink(int stream_index)
+{
+	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
+	assert(m_sinks[stream_index] != 0);
+	m_sinks[stream_index] = 0;
+	m_context->nstream--;
+	if (m_context->nstream <= 0) cancel();
+}
+
+
 
 rtsp_context_t*
 ambulant::net::rtsp_demux::supported(const net::url& url) 
@@ -76,6 +104,7 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->blocking_flag = 0;
 	context->audio_packet = NULL;
 	context->video_packet = NULL;
+	context->codec_name = NULL;
 	
 	
 	// setup the basics.
@@ -116,6 +145,7 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	}
 	
 	context->media_session = MediaSession::createNew(*env, context->sdp);
+	std::cout << "MEDIA_SESSION <<" << context->media_session <<"\n";
 	if (!context->media_session) {
 		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) failed to create  a MediaSession");
 		lib::logger::get_logger()->error("RTSP Connection Failed");		
@@ -132,7 +162,9 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
 			desired_buf_size = 100000;
 			if (context->audio_stream < 0) {
+				std::cout << "context->nstream = " << context->nstream << "\n";
 				context->audio_stream = context->nstream;
+				context->codec_name = subsession->codecName();
 			}
 		} else if (strcmp(subsession->mediumName(), "video") == 0) {
 			desired_buf_size = 200000;
@@ -156,10 +188,16 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 			return NULL;
 		}
 	}
+	
+	return context;
 		
 }
 
-
+const char*
+ambulant::net::rtsp_demux::codec_name()
+{
+	return m_context->codec_name;
+}
 
 unsigned long 
 ambulant::net::rtsp_demux::run() 
@@ -185,6 +223,7 @@ ambulant::net::rtsp_demux::run()
 	TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
 	scheduler.doEventLoop(m_context->blocking_flag);
 	}
+	
 }
 
 static void 
@@ -239,9 +278,7 @@ live_audio_datasource::new_live_audio_datasource(
 	ffmpeg_init();
 	// Find the index of the audio stream
 	int stream_index = thread->audio_stream_nr();
-	
-
- 	
+	std::cout << "audio_stream_nr : " << stream_index << "\n";
 	return new live_audio_datasource(url, context, thread, stream_index);
 }
 
@@ -258,7 +295,7 @@ live_audio_datasource::live_audio_datasource(const net::url& url, AVCodecContext
 	m_thread(thread),
 	m_client_callback(NULL)
 {	
-//	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: rate=%d, channels=%d", context->streams[m_stream_index]->codec.sample_rate, context->streams[m_stream_index]->codec.channels);
+	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: rate=%d, channels=%d", context->streams[m_stream_index]->codec.sample_rate, context->streams[m_stream_index]->codec.channels);
 //	m_fmt.parameters = (void *)&context->streams[m_stream_index]->codec;
 	m_thread->add_datasink(this, stream_index);
 }
