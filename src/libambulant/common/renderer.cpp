@@ -67,12 +67,18 @@ active_renderer::active_renderer(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *const evp,
-	net::passive_datasource *src)
+	lib::event_processor *evp)
 :	active_basic_renderer(context, cookie, node, evp),
-	m_src(src?src->activate():NULL),
+	m_src(NULL),
 	m_dest(NULL)
 {
+	// XXXX m_src = passive_datasource(node->get_url("src"))->activate()
+	std::string url = node->get_url("src");
+	if (url != "") {
+		net::passive_datasource *psrc = new net::passive_datasource(url.c_str());
+		if (psrc)
+			m_src = psrc->activate();
+	}
 }
 
 void
@@ -167,20 +173,19 @@ global_playable_factory::add_factory(playable_factory *rf)
     m_factories.push_back(rf);
 }
     
-active_basic_renderer *
+playable *
 global_playable_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *const evp,
-	net::passive_datasource *src)
+	lib::event_processor *evp)
 {
     std::vector<playable_factory *>::iterator i;
-    active_basic_renderer *rv;
+    playable *rv;
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {
-        rv = (*i)->new_playable(context, cookie, node, evp, src);
+        rv = (*i)->new_playable(context, cookie, node, evp);
         if (rv) return rv;
     }
-    return m_default_factory->new_playable(context, cookie, node, evp, src);
+    return m_default_factory->new_playable(context, cookie, node, evp);
 }

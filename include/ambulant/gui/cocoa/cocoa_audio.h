@@ -75,8 +75,7 @@ class cocoa_active_audio_renderer :
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		event_processor *const evp,
-		net::passive_datasource *src);
+		event_processor *evp);
 	~cocoa_active_audio_renderer();
 
 	void start(double where);

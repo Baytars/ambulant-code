@@ -362,11 +362,7 @@ class timeline_node {
 
   	// XXXX Note: I think node, datasource and region need to be refcounted.
 	timeline_node(const lib::node *the_node)
-	:	m_node(the_node),
-		m_datasource(NULL) {};
-	timeline_node(const lib::node *the_node, net::passive_datasource *the_datasource)
-	:	m_node(the_node),
-		m_datasource(the_datasource) {};
+	:	m_node(the_node) {};
 
 	timeline_node_transition *add_transition();
 	
@@ -383,7 +379,6 @@ class timeline_node {
 #endif
   private:
   	const lib::node *m_node;
-  	net::passive_datasource *m_datasource;
   	std::vector<timeline_node_transition*> m_transitions;
 };
 
@@ -411,7 +406,6 @@ class passive_timeline : public lib::ref_counted_obj {
 
 	// Methods used while building the passive timeline
 	timeline_node *add_node(const lib::node *the_node);
-	timeline_node *add_node(const lib::node *the_node, net::passive_datasource *the_datasource);
 	timeline_delay *add_delay(int timeout);
 	
 	void build();

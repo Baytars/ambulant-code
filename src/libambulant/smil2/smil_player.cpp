@@ -296,9 +296,6 @@ void smil_player::on_char(int ch) {
 
 common::playable *
 smil_player::create_playable(const lib::node *n) {
-	net::passive_datasource *src = 0;
-	std::string url = n->get_url("src");
-	if (url != "") src = new net::passive_datasource(url.c_str());
 	int nid = n->get_numid();
 	surface *surf = m_layout_manager->get_surface(n);
 	if(true) {
@@ -309,7 +306,7 @@ smil_player::create_playable(const lib::node *n) {
 			::repr(surf->get_global_topleft()).c_str()
 			);
 	}
-	common::playable *rv = m_rf->new_playable(this, nid, n, m_event_processor, src);
+	common::playable *rv = m_rf->new_playable(this, nid, n, m_event_processor);
 	// And connect it to the rendering surface
 	if (rv) {
 		common::renderer *rend = rv->get_renderer();

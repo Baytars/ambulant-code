@@ -95,9 +95,8 @@ class none_active_renderer : public common::active_renderer {
 		common::playable_notification::cookie_type cookie,
 #endif
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src)
-	:	common::active_renderer(context, cookie, node, evp, src) {};
+		lib::event_processor *evp)
+	:	common::active_renderer(context, cookie, node, evp) {};
 	
 	void start(double where);
 	void redraw(const lib::screen_rect<int> &r, common::abstract_window *window);
@@ -118,12 +117,11 @@ class none_renderer_factory : public common::playable_factory {
   public:
   	none_renderer_factory() {}
   	
-	common::active_basic_renderer *new_playable(
+	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor *const evp,
-		net::passive_datasource *src);
+		lib::event_processor *evp);
 };
 
 } // namespace none

@@ -133,29 +133,28 @@ cocoa_window::mouse_region_changed()
 	[my_window invalidateCursorRectsForView: my_view];
 }
 
-active_basic_renderer *
+playable *
 cocoa_renderer_factory::new_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	event_processor *const evp,
-	net::passive_datasource *src)
+	event_processor *evp)
 {
 	active_basic_renderer *rv;
 	
 	xml_string tag = node->get_qname().second;
 	if (tag == "img") {
-		rv = new cocoa_active_image_renderer(context, cookie, node, evp, src);
+		rv = new cocoa_active_image_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_image_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "text") {
-		rv = new cocoa_active_text_renderer(context, cookie, node, evp, src);
+		rv = new cocoa_active_text_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_text_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "brush") {
-		rv = new cocoa_active_fill_renderer(context, cookie, node, evp, src);
+		rv = new cocoa_active_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_fill_renderer 0x%x", (void *)node, (void *)rv);
 #ifdef WITH_COCOA_AUDIO
 	} else if ( tag == "audio") {
-		rv = new cocoa_active_audio_renderer(context, cookie, node, evp, src);
+		rv = new cocoa_active_audio_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->trace("cocoa_renderer_factory: node 0x%x: returning cocoa_active_audio_renderer 0x%x", (void *)node, (void *)rv);
 #endif
 	} else {

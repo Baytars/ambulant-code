@@ -158,7 +158,7 @@ class playable : virtual public lib::ref_counted {
 	// The cookie was provided to this playable when it was constructed.
 	virtual const cookie_type& get_cookie() const = 0;
 	
-	virtual renderer *get_renderer() const { return (renderer *)NULL; }
+	virtual renderer *get_renderer() { return (renderer *)NULL; }
 };
 
 

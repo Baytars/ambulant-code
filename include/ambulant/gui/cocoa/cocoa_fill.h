@@ -72,8 +72,7 @@ class cocoa_active_fill_renderer : public active_basic_renderer {
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		event_processor *const evp,
-		net::passive_datasource *src)
+		event_processor *evp)
 	:	active_basic_renderer(context, cookie, node, evp),
 		m_dest(NULL),
 		m_playing(false) {};
