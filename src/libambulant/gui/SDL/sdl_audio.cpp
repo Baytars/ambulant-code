@@ -53,6 +53,7 @@
 
 #include "ambulant/gui/SDL/sdl_audio.h"
 
+
 namespace ambulant {
 
 using namespace lib;
