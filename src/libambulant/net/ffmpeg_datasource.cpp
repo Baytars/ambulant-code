@@ -983,7 +983,11 @@ char*
 ffmpeg_video_datasource::get_frame(double *timestamp, int *size)
 {
 	m_lock.enter();
-	assert(m_frames.size() > 0);
+	//assert(m_frames.size() > 0);
+	if (m_frames.size() <= 0) {
+	  m_lock.leave();
+	  return NULL;
+	}
 	std::pair<double, char*> element = m_frames.front();
 	char *rv = element.second;
 	*timestamp = element.first;

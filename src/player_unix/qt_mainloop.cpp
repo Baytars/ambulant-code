@@ -144,7 +144,7 @@ qt_mainloop::qt_mainloop(qt_gui* parent) :
 		new common::global_playable_factory(); 
 		
 	AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: Starting the plugin engine");
-	plugin::plugin_engine *m_pf = new plugin::plugin_engine(m_rf,m_df);
+	//plugin::plugin_engine *m_pf = new plugin::plugin_engine(m_rf,m_df);
 	
 #ifdef WITH_SDL
 
