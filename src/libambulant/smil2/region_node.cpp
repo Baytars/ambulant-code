@@ -267,3 +267,20 @@ region_node::set_bgcolor(lib::color_t c, bool transparent, bool inherit) {
 	m_transparent = transparent;
 	m_inherit_bgcolor = inherit;
 }
+
+// I don't like it that we need this one...
+region_node* 
+region_node::get_first_child(const char *name) {
+	region_node *e = down();
+	if(!e) return 0;
+	if(e->m_node->get_local_name() == name) return e;
+	e = e->next();
+	while(e != 0) {
+		if(e->m_node->get_local_name() == name) 
+			return e;
+		e = e->next();
+	}
+	return 0;
+}
+
+
