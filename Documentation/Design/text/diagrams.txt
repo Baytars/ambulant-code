@@ -12,123 +12,211 @@ overall structure diagram
 
 .. _overall-structure-diagram-section:
 
-.. image:: ../models/overall.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/overall.pdf}
 
 dataflow diagram
 ----------------
 
 .. _dataflow-diagram-section:
 
-.. image:: ../models/dataflow.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/dataflow.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for player
 ----------------------
 
 .. _UML-diagram-for-player-section:
 
-.. image:: ../models/player.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/player.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for parser
 ----------------------
 
 .. _UML-diagram-for-parser-section:
 
-.. image:: ../models/parser.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/parser.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for datasource
 --------------------------
 
 .. _UML-diagram-for-datasource-section:
 
-.. image:: ../models/datasource.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/datasource.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML state diagram for datasource
 --------------------------------
 
 .. _UML-state-diagram-for-datasource-section:
 
-.. image:: ../models/datasource_state.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/datasource_state.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for playable
 ------------------------
 
 .. _UML-diagram-for-playable-section:
 
-.. image:: ../models/playable.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/playable.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML state diagram for playable
 ------------------------------
 
 .. _UML-state-diagram-for-playable-section:
 
-.. image:: ../models/playable_state.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/playable_state.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for renderer_playable
 ---------------------------------
 
 .. _UML-diagram-for-renderer_playable-section:
 
-.. image:: ../models/renderer.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/renderer.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for layout
 ----------------------
 
 .. _UML-diagram-for-layout-section:
 
-.. image:: ../models/layout.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/layout.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for region
 ----------------------
 
 .. _UML-diagram-for-region-section:
 
-.. image:: ../models/region.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/region.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for window
 ----------------------
 
 .. _UML-diagram-for-window-section:
 
-.. image:: ../models/windows.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/windows.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for animation
 -------------------------
 
 .. _UML-diagram-for-animation-section:
 
-.. image:: ../models/animation.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/animation.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for clocks
 ----------------------
 
 .. _UML-diagram-for-clocks-section:
 
-.. image:: ../models/clocks.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/clocks.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for event processor
 -------------------------------
 
 .. _UML-diagram-for-event-processor-section:
 
-.. image:: ../models/event_processor.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/event_processor.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for document
 ------------------------
 
 .. _UML-diagram-for-document-section:
 
-.. image:: ../models/document.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/document.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for node
 --------------------
 
 .. _UML-diagram-for-node-section:
 
-.. image:: ../models/node.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/node.pdf}
+   %
+
+.. comment to work around rest bug
 
 UML diagram for transitions
 ---------------------------
 
 .. _UML-diagram-for-transitions-section:
 
-.. image:: ../models/transition.pdf
+.. raw:: latex
+
+   \includegraphics[width=\linewidth]{../models/transition.pdf}
+   %
+
+.. comment to work around rest bug
+
