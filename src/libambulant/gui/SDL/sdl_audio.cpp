@@ -276,7 +276,7 @@ gui::sdl::sdl_active_audio_renderer::playdone()
 	assert(m_channel_used >= 0);
 	AM_DBG lib::logger::get_logger()->trace("Unlocking channel %d", m_channel_used);
 	unlock_channel(m_channel_used);
-	if ((m_src->size() == 0) && (m_src->end_of_file())) {
+	if ((m_audio_src->size() == 0) && (m_audio_src->end_of_file())) {
 	AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::stopped_callback() this = (x%x)",this);
 	stopped_callback();
 	}
@@ -340,10 +340,10 @@ gui::sdl::sdl_active_audio_renderer::readdone()
 		}
 	}
 	
-	if (((m_src->size() > 0) ) || (!m_src->end_of_file()) ) {
-		AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::%d bytes still in buffer, EOF : %d",m_src->size(), m_src->end_of_file());
-		AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::m_src->start(..) this = (x%x)",this);
-		m_src->start(m_event_processor, m_readdone);
+	if (((m_audio_src->size() > 0) ) || (!m_audio_src->end_of_file()) ) {
+		AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::readdone(): %d bytes still in buffer, EOF : %d",m_audio_src->size(), m_audio_src->end_of_file());
+		AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::readdone(): m_audio_src->start(0x%x, 0x%x) this = (x%x)", (void*)m_event_processor, (void*)m_readdone, this);
+		m_audio_src->start(m_event_processor, m_readdone);
 	}
 
 }	
@@ -436,6 +436,7 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 	AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer.start(0x%x, %s)", (void *)this, os.str().c_str());
 	if (m_audio_src) {
 		init(m_rate, m_bits, m_channels);
+		AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer::start(): m_src->start(0x%x, 0x%x) this = (x%x)", (void*)m_event_processor, (void*)m_readdone, this);
 		m_audio_src->start(m_event_processor, m_readdone);		
 	} else {
 		lib::logger::get_logger()->error("active_renderer.start: no datasource");
