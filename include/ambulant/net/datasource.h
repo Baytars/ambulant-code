@@ -265,7 +265,6 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	
 	/// Returns an audio_datasource object for the audio data.
 	virtual audio_datasource *get_audio_datasource() = 0;
-	
 	/// Called by the client to indicate it wants a new frame.
 	/// When the data is available (or end of file reached) exactly one
 	/// callback is scheduled through the event_processor.
@@ -294,6 +293,8 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// If keepdata is set the actual storage for a frame with an exact
 	/// timestamp match is not freed.
   	virtual void frame_done(timestamp_t timestamp, bool keepdata) = 0;
+	
+
 };
 
 /// Interface to create a datasource for a given URL.
