@@ -162,7 +162,7 @@ void* get_ptr(int channel_nr)
 	return NULL;
 }
 
-// returns a channel number and locks it or returns -1 if there are no free channels, -2 if the channel does not exist.
+// returns a channel number and locks it or returns -1 if there are no free channels or the channel does not exist.
 int free_channel()
 {
 	int i;
@@ -171,9 +171,8 @@ int free_channel()
 		if(m_channel_list.m_list[i].m_free == true) {
 			return m_channel_list.m_list[i].m_channel_nr;
 		}
-		return -1;
 	}
-	return -2;
+	return -1;
 }
 
  
@@ -271,6 +270,7 @@ void
 gui::sdl::sdl_active_audio_renderer::readdone()
 {
 	int result;
+	
 	m_audio_chunck.allocated = 0;
 	m_audio_chunck.volume = 128;
 	m_audio_chunck.abuf = (Uint8*) m_src->read_ptr();
@@ -288,9 +288,9 @@ gui::sdl::sdl_active_audio_renderer::readdone()
 				lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): failed memory allocation ", (void *)this);	
 			}
 			m_channel_used = free_channel();
-		}
-		lock_channel((void*) this, m_channel_used);
-		AM_DBG lib::logger::get_logger()->trace("New Channel : %d", m_channel_used);
+		}	
+		lock_channel((void*) this, m_channel_used);	
+		AM_DBG lib::logger::get_logger()->trace("New Channel : %d, %d", m_channel_used);
 		result = Mix_PlayChannel(m_channel_used,&m_audio_chunck, 0);
 	} else {
 		AM_DBG lib::logger::get_logger()->trace("PLAYING USING CHANNEL : %d", m_channel_used);	
@@ -336,7 +336,7 @@ gui::sdl::sdl_active_audio_renderer::callback(void *userdata, Uint8 *stream, int
 bool
 gui::sdl::sdl_active_audio_renderer::is_paused()
 {
-	if( SDL_audiostatus() == SDL_AUDIO_PAUSED ) {
+	if( Mix_Paused(m_channel_used) == 1) {
 		return true;
 	} else {
 		return false;
@@ -346,7 +346,7 @@ gui::sdl::sdl_active_audio_renderer::is_paused()
 bool
 gui::sdl::sdl_active_audio_renderer::is_stopped()
 {
-	if( SDL_audiostatus() == SDL_AUDIO_STOPPED ) {
+	if( Mix_Playing(m_channel_used) == 0 ) {
 		return true;
 	} else {
 		return false;
@@ -356,30 +356,30 @@ gui::sdl::sdl_active_audio_renderer::is_stopped()
 bool
 gui::sdl::sdl_active_audio_renderer::is_playing()
 {
-	//if( SDL_audiostatus() == SDL_AUDIO_PLAYING ) {
-	//	return true;
-	//} else {
-	//	return false;
-	//}
+	if( Mix_Playing(m_channel_used) == 1 ) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
 void
 gui::sdl::sdl_active_audio_renderer::stop()
 {
-	//SDL_PauseAudio(1);
+	Mix_HaltChannel(m_channel_used);
 }
 
 void
 gui::sdl::sdl_active_audio_renderer::pause()
 {
-	//SDL_PauseAudio(1);
+	Mix_Pause(m_channel_used);
 }
 
 void
 gui::sdl::sdl_active_audio_renderer::resume()
 {
-	//SDL_PauseAudio(0);
+	Mix_Resume(m_channel_used);
 }
 
 
@@ -396,7 +396,6 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 	if (m_src) {
 		init(m_rate, m_bits, m_channels);
 		m_src->start(m_event_processor, m_readdone);
-		//SDL_PauseAudio(0);
 	} else {
 		lib::logger::get_logger()->error("active_renderer.start: no datasource");
 		if (m_playdone) {
@@ -405,10 +404,5 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 	}
 }
 
-//~ void
-//~ gui::sdl::sdl_active_audio_renderer::playdone(int channel)
-//~ {
-//~ m_channels_open--;
-//~ }
 
 }// end namespace ambulant
