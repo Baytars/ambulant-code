@@ -53,10 +53,15 @@
 #define PLUGIN_FACTORY_H
 
 
+/* Disable plugins for Zaurus etc. */
+#define	WITH_PLUGINS
+//#undef  WITH_PLUGINS
+
 #include "ambulant/common/playable.h"
 #include "ambulant/common/renderer.h"
+#ifdef	WITH_PLUGINS
 #include <ltdl.h>
-
+#endif/*WITH_PLUGINS*/
  
 namespace ambulant {
 namespace plugin {
