@@ -70,9 +70,9 @@ lib::passive_region::subregion(const std::string &name, screen_rect<int> bounds)
 }
 
 lib::active_region *
-lib::passive_region::activate(event_processor *const evp, const node *node)
+lib::passive_region::activate(const node *node)
 {
-	active_region *rv = new lib::active_region(evp, this, node);
+	active_region *rv = new lib::active_region(this, node);
 	return rv;
 }
 

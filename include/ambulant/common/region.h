@@ -94,7 +94,7 @@ class passive_region {
 	virtual void redraw(const screen_rect<int> &dirty, passive_window *window);
 
 	virtual passive_region *subregion(const std::string &name, screen_rect<int> bounds);
-	active_region *activate(event_processor *const evp, const node *node);
+	active_region *activate(const node *node);
 	
 	const screen_rect<int>& get_rect() const { return m_inner_bounds; }
 	const screen_rect<int>& get_rect_outer() const { return m_outer_bounds; }
@@ -150,11 +150,9 @@ class window_factory {
 
 class active_region : public rendering_surface {
   public:
-	active_region(event_processor *const evp,
-		passive_region *const source,
+	active_region(passive_region *const source,
 		const node *node)
-	:	// m_event_processor(evp),
-		m_source(source),
+	:	m_source(source),
 		m_node(node),
 		m_renderer(NULL) {}
 	virtual ~active_region() {}
@@ -169,7 +167,6 @@ class active_region : public rendering_surface {
 	const passive_region* get_parent() const { return m_source->get_parent(); }
 	
   protected:
-//  	event_processor *const m_event_processor;
 	passive_region *const m_source;
 	const node *m_node;
 	active_renderer *m_renderer;
