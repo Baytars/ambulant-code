@@ -171,7 +171,6 @@ bool
 abstract_event_processor::serve_event(delta_timer& dt, std::queue<event*> *qp)
 // serve a single event from a delta_timer run queue
 // return true if an event was served
-
 {
 	bool must_serve = ! qp->empty();
 	if (must_serve) {
