@@ -315,6 +315,25 @@ class demux_video_datasource:
 };
 
 typedef std::pair<timestamp_t, char*> qelt;
+class frame_qelt {
+  public:
+	frame_qelt(timestamp_t timestamp, char* data);
+  	~frame_qelt() { if (data) free(data);
+					data = NULL; };
+  	
+	timestamp_t timestamp() { return frame.first; };
+  	char* frame_data() { return frame.second; };
+  	
+	// This is a strange < !!! (it's more a > :-) )
+  	bool operator< (const frame_qelt & left) const {
+		return left.frame.first < frame.first;
+	}
+	
+  protected:
+	std::pair<timestamp_t, char*> frame;
+};
+
+
 
 #if 0
 struct pts_comparison {
@@ -361,7 +380,7 @@ class ffmpeg_video_decoder_datasource:
   	video_format m_fmt;
  	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
-	std::priority_queue<qelt, std::vector<qelt>, std::greater<qelt> > m_frames;
+	std::priority_queue<frame_qelt> m_frames;
 	qelt m_old_frame;
 	int m_size;		// NOTE: this assumes all decoded frames are the same size!
 //	databuffer m_buffer;

@@ -445,7 +445,7 @@ active_video_renderer::data_avail()
 	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::data_avail(buf = 0x%x) (ts=%f, now=%f):", (void *) buf,ts, now());	
 	if (m_is_playing && buf) {
 		//if (ts <= now()) {
-			AM_DBG lib::logger::get_logger()->debug("**** (this = 0x%x) Calling show_frame() timestamp : %f, now = %f (located at 0x%x) ", (void *) this, ts, now(), (void *) buf);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("**** (this = 0x%x) Calling show_frame() timestamp : %f, now = %f (located at 0x%x) ", (void *) this, ts, now(), (void *) buf);
 			show_frame(buf, size);
 			m_dest->need_redraw();
 			displayed = true;
@@ -470,8 +470,10 @@ active_video_renderer::data_avail()
 		m_context->stopped(m_cookie, 0);
 		return;
 	} else {
-		lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
-		m_src->start_frame(m_event_processor, e,ts2);
+		if (!m_src->end_of_file()) {
+			lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
+			m_src->start_frame(m_event_processor, e,ts2);
+		}
 	}
 		m_lock.leave();
 }
