@@ -111,6 +111,9 @@ class gui_window {
 	/// Signals that rectangle r may need to be redrawn.
 	virtual void need_redraw(const lib::screen_rect<int> &r) = 0;
 	
+	/// Do any pending redraws right now
+	virtual void redraw_now() = 0;
+	
 	/// Signals whether the core is interesting in mouse events and others.
 	virtual void need_events(bool want) = 0;
   protected:

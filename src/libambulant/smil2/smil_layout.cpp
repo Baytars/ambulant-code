@@ -626,7 +626,7 @@ class bgimage_loader : public lib::ref_counted_obj, public common::playable_noti
 	bgimage_loader(const lib::node *layout_root, common::playable_factory *pf);
 	~bgimage_loader();
 	
-	void run();
+	void run(smil_layout_manager *layout_mgr);
 	
 	/// playable_notification interface: 
 	void started(cookie_type n, double t = 0) {};
@@ -637,13 +637,14 @@ class bgimage_loader : public lib::ref_counted_obj, public common::playable_noti
 	void pointed(cookie_type n, double t = 0) {};
 	void transitioned(cookie_type n, double t = 0) {};
   private:
-	int m_rendercount;
 	const lib::node *m_layout_root;
 	common::playable_factory *m_pf;
 	lib::timer *m_timer;
 	lib::event_processor *m_event_processor;
 	std::vector<lib::node*> m_nodes;
-	std::vector<common::playable*> m_playables;
+	std::map<int, common::playable*> m_playables;
+	std::vector<common::playable*> m_old_playables;
+	std::set<common::gui_window*> m_gui_windows;
 
 	lib::critical_section m_lock;
 	lib::condition m_condition;
@@ -653,13 +654,12 @@ void
 smil_layout_manager::load_bgimages(const lib::node *layout_root, common::playable_factory *pf)
 {
 	bgimage_loader *loader = new bgimage_loader(layout_root, pf);
-	loader->run();
+	loader->run(this);
 	loader->release();
 }
 
 bgimage_loader::bgimage_loader(const lib::node *layout_root, common::playable_factory *pf)
-:	m_rendercount(0),
-	m_layout_root(layout_root),
+:	m_layout_root(layout_root),
 	m_pf(pf),
 	m_timer(new lib::timer(lib::realtime_timer_factory(), 1.0, false)),
 	m_event_processor(NULL)
@@ -670,19 +670,31 @@ bgimage_loader::bgimage_loader(const lib::node *layout_root, common::playable_fa
 bgimage_loader::~bgimage_loader()
 {
 	m_lock.enter();
+	std::set<common::gui_window*>::iterator iw;
+	/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::~bgimage_loader(): sync redraw");
+	for (iw=m_gui_windows.begin(); iw != m_gui_windows.end(); iw++) 
+		(*iw)->redraw_now();
+	
+	/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::~bgimage_loader(): delete playables");
+	std::vector<common::playable*>::iterator ip;
+	for (ip=m_old_playables.begin(); ip != m_old_playables.end(); ip++) {
+		(*ip)->stop();
+		(*ip)->release();
+	}
+
+	/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::~bgimage_loader(): delete nodes");
 	std::vector<lib::node*>::iterator in;
 	for (in=m_nodes.begin(); in != m_nodes.end(); in++)
 		delete *in;
-	std::vector<common::playable*>::iterator ip;
-	for (ip=m_playables.begin(); ip != m_playables.end(); ip++)
-		delete *ip;
+
+	/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::~bgimage_loader(): delete event processor");
 	delete m_event_processor;
 	delete m_timer;
 	m_lock.leave();
 }
 
 void
-bgimage_loader::run()
+bgimage_loader::run(smil_layout_manager *layout_mgr)
 {
 	m_lock.enter();
 	lib::logger::get_logger()->debug("load_bgimages: loading background images");
@@ -692,12 +704,14 @@ bgimage_loader::run()
 	// want a background image.
 	lib::node::const_iterator it;
 	lib::node::const_iterator end = m_layout_root->end();
+	const lib::node_context *context = m_layout_root->get_context();
 	for(it = m_layout_root->begin(); it != end; it++) {
 		if (!(*it).first) continue;
-		const char *bgimage = (*it).second->get_attribute("backgroundImage");
+		const lib::node *rn = (*it).second;
+		const char *bgimage = rn->get_attribute("backgroundImage");
 		if (bgimage == NULL) continue;
 		// XXX TODO: repeat
-		lib::logger::get_logger()->debug("load_bgimages: should load bgimage %s", bgimage);
+		lib::logger::get_logger()->debug("load_bgimages: load bgimage %s", bgimage);
 		const char *attrs[7], **attrp = attrs;
 		*attrp++ = "src";
 		*attrp++ = bgimage;
@@ -705,16 +719,33 @@ bgimage_loader::run()
 		*attrp++ = "never";
 		// XXX TODO: tiling
 		*attrp++ = NULL;
-		lib::node *n = new lib::node("img", attrs);
+		lib::node *n = new lib::node("img", attrs, context);
 		
 		// Create the renderer
 		if (n) {
-			common::playable *p = m_pf->new_playable(this, 0, n, m_event_processor);
+			cookie_type p_index = (cookie_type)m_playables.size();
+			common::playable *p = m_pf->new_playable(this, p_index, n, m_event_processor);
 			if (p) {
+				// Now tell the renderer where to render to, and remember the
+				// toplevel gui_window so we can synchronise the redraws before
+				// zapping the whole bgimage_loader and other objects.
+				common::surface *surf = layout_mgr->get_surface(rn);
+				if (surf) {
+					common::renderer *r = p->get_renderer();
+					if (r) {
+						r->set_surface(surf);
+						common::gui_window *w = surf->get_gui_window();
+						if (w && !m_gui_windows.count(w))
+							m_gui_windows.insert(w);
+					} else {
+						lib::logger::get_logger()->debug("bgimage_loader: no renderer");
+					}
+				} else {
+					lib::logger::get_logger()->debug("bgimage_loader: no surface");
+				}
 				// Remember renderer and node.
-				m_rendercount++;
 				m_nodes.push_back(n);
-				m_playables.push_back(p);
+				m_playables[p_index] = p;
 				// And start it
 				m_lock.leave();
 				p->start(0);
@@ -724,9 +755,9 @@ bgimage_loader::run()
 			}
 		}
 	}
-	if (m_rendercount) {
+	if (m_playables.size()) {
 		// All the renderers are started. Wait for everything to finish.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::run: waiting for %d renderers", m_rendercount);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::run: waiting for %d renderers", m_playables.size());
 		m_lock.leave();
 		m_condition.wait(-1, m_lock);
 	}
@@ -738,13 +769,16 @@ bgimage_loader::stopped(cookie_type n, double t)
 {
 	/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::stopped() called");
 	m_lock.enter();
-	assert(m_rendercount > 0);
-	m_rendercount--;
-	if (m_rendercount == 0)	{
-		/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::stopped: signalling condition");
-		m_condition.signal();
-	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::stopped: %d more renderers", m_rendercount);
+	if (m_playables.count(n) > 0) {
+		common::playable *p = m_playables[n];		
+		m_old_playables.push_back(p);
+		m_playables.erase(n);
+		if (m_playables.size() == 0)	{
+			/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::stopped: signalling condition");
+			m_condition.signal();
+		} else {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("bgimage_loader::stopped: %d more renderers", m_playables.size());
+		}
 	}
 	m_lock.leave();
 }
