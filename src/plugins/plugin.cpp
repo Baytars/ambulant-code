@@ -7,7 +7,7 @@ using namespace ambulant;
 void 
 plugin::initialize(common::global_playable_factory* rf, net::datasource_factory df)
 {
-	rf->add_factory(new /*playable_factory(df)*/);
+	//rf->add_factory(new /*playable_factory(df)*/);
 }
 	
 common::playable* 

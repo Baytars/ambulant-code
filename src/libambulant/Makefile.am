@@ -123,6 +123,7 @@ libambulant_la_SOURCES = \
 	common/schema.cpp \
 	common/smil_alignment.cpp \
 	common/smil_handler.cpp \
+	common/plugin_engine.cpp \
 	\
 	smil2/animate_a.cpp \
 	smil2/animate_e.cpp \
@@ -149,9 +150,7 @@ libambulant_la_SOURCES = \
 	gui/none/none_area.cpp \
 	gui/none/none_gui.cpp \
 	gui/none/none_video_renderer.cpp \
-	gui/none/none_factory.cpp \
-	\
-	plugin/plugin_engine.cpp
+	gui/none/none_factory.cpp
 
 ## EXTRA_DIST= \
 ## 	gui/cocoa/cocoa_fill.m gui/cocoa/cocoa_fill.mm \

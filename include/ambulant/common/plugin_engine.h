@@ -52,18 +52,17 @@
 #ifndef PLUGIN_FACTORY_H
 #define PLUGIN_FACTORY_H
 
+
+#include "ambulant/common/playable.h"
+#include "ambulant/common/renderer.h"
+
  
 namespace ambulant {
 namespace plugin {
 
-	
-struct plugin {
-	std::string ext;
-	std::string mime;
-	void* handle;
-};
 
-class plugin_engine :  public common::playable_factory{
+
+class plugin_engine {
   public:
 	 plugin_engine();
 	~plugin_engine() {};
@@ -74,6 +73,6 @@ class plugin_engine :  public common::playable_factory{
 
 }
 } //end namespaces
-} 
+
 
 #endif /* _PLUGIN_FACTORY_H */
