@@ -153,7 +153,7 @@ xerces_sax_parser::set_content_handler(sax_content_handler *h) {
 
 void
 xerces_sax_parser::set_error_handler(sax_error_handler *h) {
-		m_error_handler = h;
+	m_error_handler = h;
 }
 
 void
@@ -168,7 +168,24 @@ xerces_sax_parser::startElement(const XMLCh* const name,
 	XMLString::release(&cname);
 }
    
+void 
+xerces_sax_parser::warning(const SAXParseException& exception) {
+	m_logger->warn("*** Warning ");
+	throw exception;
+}
 
+void 
+xerces_sax_parser::error(const SAXParseException& exception) {
+        m_logger->error("*** Error ");
+	throw exception;
+}
+
+void
+xerces_sax_parser::fatalError(const SAXParseException& exception)  {
+	m_logger->error("***** Fatal error ");
+	throw exception;
+}
+	
 void
 xerces_sax_parser::endElement(const XMLCh* const name) {
 	char *cname = XMLString::transcode(name);
