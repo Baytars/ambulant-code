@@ -49,16 +49,7 @@
 #define __SDL__
 
 #include <iostream>
-
-
-#include "ambulant/common/region.h"
-#include "ambulant/common/renderer.h"
-#include "ambulant/lib/logger.h"
-#include "ambulant/gui/none/none_gui.h"
-#include "ambulant/net/datasource.h"
-#include "ambulant/lib/event_processor.h"
-#include "ambulant/lib/asb.h"
-
+#include "ambulant/common/playable.h"
 
 namespace ambulant {
 namespace gui {

@@ -54,7 +54,7 @@
 #define AMBULANT_GUI_COCOA_COCOA_GUI_H
 
 #include "ambulant/common/layout.h"
-#include "ambulant/common/renderer.h"
+#include "ambulant/common/playable.h"
 #ifdef __OBJC__
 #include <Cocoa/Cocoa.h>
 #endif
