@@ -584,7 +584,7 @@ demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 	// XXX timestamp is ignored, for now
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", sz, pts);
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", sz, pts);
 	if(sz && !m_buffer.buffer_full()){
 		uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(sz);
 		if (outbuf) {
@@ -815,7 +815,7 @@ demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 	m_lock.enter();
 
 	m_src_end_of_file = (sz == 0);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): recieving data sz=%d ,eof=%d", sz, m_src_end_of_file);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::data_avail(): recieving data sz=%d ,eof=%d", sz, m_src_end_of_file);
 	if(sz > 0) {
 		char* frame_data = (char*) malloc(sz);
 		assert(frame_data);
@@ -855,10 +855,10 @@ demux_video_datasource::_end_of_file()
 {
 	// private method - no need to lock
 	if (m_frames.size()) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() returning false (still %d frames in local buffer)",m_frames.size());
+		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() returning false (still %d frames in local buffer)",m_frames.size());
 		return false;
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() no frames in buffer returning %d", m_src_end_of_file);
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::_end_of_file() no frames in buffer returning %d", m_src_end_of_file);
 	return m_src_end_of_file;
 }
 
@@ -1151,14 +1151,15 @@ ffmpeg_video_decoder_datasource::data_avail()
 		
 		while (sz > 0) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con->codec %d ", m_con->codec);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con: 0x%x, gotpic = %d, sz = %d ", m_con, got_pic, sz);
 				len = avcodec_decode_video(m_con, frame, &got_pic, ptr, sz);
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video:, returned %d decoded bytes , %d left", len, sz);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video:, returned %d decoded bytes , %d left, gotpic = %d, ipts = %lld", len, sz - len, got_pic, ipts);
 				if (len >= 0) {
 					assert(len <= sz);
 					ptr +=len;	
 					sz -= len;
 					if (got_pic) {
+						AM_DBG lib::logger::get_logger()->debug("pts seems to be : %lld",ipts);
 						AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoded picture, used %d bytes, %d left", len, sz);
 						// Setup the AVPicture for the format we want, plus the data pointer
 						width = m_fmt.width;
@@ -1181,7 +1182,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 						pts = ipts;
 						
 
-						/*AM_DBG*/ lib::logger::get_logger()->debug("pts seems to be : %f",pts / 1000000.0);
+						AM_DBG lib::logger::get_logger()->debug("pts seems to be : %f",pts / 1000000.0);
 						pts1 = pts;
 						
 						if (m_con->has_b_frames && frame->pict_type != FF_B_TYPE) {
@@ -1234,11 +1235,10 @@ ffmpeg_video_decoder_datasource::data_avail()
 				} else {
 					lib::logger::get_logger()->error(gettext("error decoding video frame"));
 				}
-				m_src->frame_done(0, false);
 
 		} // End of while loop
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
-
+		m_src->frame_done(0, false);
   	}
 	lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): m_frames.size() returns %d, (eof=%d)", m_frames.size(), m_src->end_of_file());
 	if ( m_frames.size() || m_src->end_of_file()  ) {
@@ -1276,7 +1276,7 @@ ffmpeg_video_decoder_datasource::_end_of_file()
 {
 	// private method - no need to lock
 	if (m_frames.size() > 0)  {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_end_of_file() returning false (still %d frames in local buffer)", m_frames.size());
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_end_of_file() returning false (still %d frames in local buffer)", m_frames.size());
 			return false;
 	}
 	return m_src->end_of_file();
