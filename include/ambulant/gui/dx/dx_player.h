@@ -130,8 +130,8 @@ class dx_player :
 	////////////////////
 	// common::window_factory implementation
 	
-	common::abstract_window *new_window(const std::string& name, 
-		lib::size bounds, common::surface_source *src);
+	common::gui_window *new_window(const std::string& name, 
+		lib::size bounds, common::gui_events *src);
 		
 	common::gui_region *new_mouse_region();
 	
@@ -168,8 +168,8 @@ class dx_player :
 	void on_done();
 	
   private:
-	common::abstract_window* get_window(const lib::node* n);
-	common::abstract_window* get_window(HWND hwnd);
+	common::gui_window* get_window(const lib::node* n);
+	common::gui_window* get_window(HWND hwnd);
 
 	std::string m_url;
 	smil2::smil_player *m_player;
