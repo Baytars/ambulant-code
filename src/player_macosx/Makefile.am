@@ -126,6 +126,7 @@ LDADD = $(top_builddir)/src/libambulant/.libs/libambulant.a \
 	$(extra_ffmpeg_LDADD) \
 	$(extra_expat_LDADD) \
 	$(extra_xerces_LDADD) \
+	$(LIBINTL) \
 	$(top_builddir)/src/libambulant/.libs/libambulant_cocoa.a \
     -lstdc++
 AM_LDFLAGS=$(extra_sdl_ldflags) $(extra_ffmpeg_ldflags) -framework Cocoa -framework QuickTime
