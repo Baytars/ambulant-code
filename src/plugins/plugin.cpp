@@ -46,7 +46,6 @@
  * 
  */
 
-#include "ambulant/common/plugin_init.h"
 #include "ambulant/common/renderer.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/unix/unix_mtsync.h"
@@ -75,13 +74,26 @@ class basic_plugin_factory : public common::playable_factory {
 	net::datasource_factory *m_datasource_factory;
 	
 };
-class init_plugin : public ambulant::common::init {
-  public :
-	  virtual void register_factories(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df) {
-		  printf("HALLLLOOOOO\n");
-		  rf->add_factory(new basic_plugin_factory(df));
-	  }
+
+class basic_plugin : public common::playable_imp 
+{
+  public:
+  basic_plugin(
+    common::playable_notification *context,
+    common::playable_notification::cookie_type cookie,
+    const lib::node *node,
+    lib::event_processor *evp,
+	net::datasource_factory *df);
+
+  	~basic_plugin() {};
+	
+    void data_avail();
+	void start(double where);
+    void stop();
+    void pause();
+    void resume();
 };
+
 
 
 common::playable* 
@@ -94,21 +106,57 @@ basic_plugin_factory::new_playable(
 	common::playable *rv;
 	
 	lib::xml_string tag = node->get_qname().second;
-	std::cout << "LIB LOGGER IS CALLED \n";
     AM_DBG lib::logger::get_logger()->trace("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "audio") /*or any other tag ofcourse */ {
-		//rv = new plugin::basic_plugin(context, cookie, node, evp, m_datasource_factory);
-		rv = NULL;
-		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory: node 0x%x: returning basic_plugin 0x%x", (void *)node, (void *)rv);
+		rv = new basic_plugin(context, cookie, node, evp, m_datasource_factory);
+		//rv = NULL;
+		AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory: node 0x%x: returning basic_plugin 0x%x", (void *)node, (void *)rv);
 	} else {
-		//AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory : plugin does not support \"%s\"", tag.c_str());
+		AM_DBG lib::logger::get_logger()->trace("basic_plugin_factory : plugin does not support \"%s\"", tag.c_str());
         return NULL;
 	}
 	return rv;
 }
 
-
-extern "C" ambulant::common::init* initialize()
+basic_plugin::basic_plugin(
+	common::playable_notification *context,
+    common::playable_notification::cookie_type cookie,
+    const lib::node *node,
+    lib::event_processor *evp,
+	net::datasource_factory *df) 
+:	common::playable_imp(context, cookie, node, evp)
 {
-	return new init_plugin;
+	std::cout << "PLUGIN CREATED\n";
+}
+
+void
+basic_plugin::data_avail()
+{
+}
+
+void
+basic_plugin::start(double t)
+{
+}
+
+
+void 
+basic_plugin::stop()
+{
+}
+
+void 
+basic_plugin::pause()
+{
+}
+
+void 
+basic_plugin::resume()
+{
+}
+
+
+extern "C" void initialize(ambulant::common::global_playable_factory* rf, ambulant::net::datasource_factory* df)
+{	
+	rf->add_factory(new basic_plugin_factory(df));
 }
