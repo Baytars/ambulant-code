@@ -62,10 +62,7 @@ using namespace net;
 ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context)
 :	m_context(context)
 {
-	std::cout <<"demuxer context " << context << "\n";
-	std::cout <<"demuxer m_context " << m_context << "\n";
-	std::cout <<"demuxer MEDIA_SESSION " << context->media_session << "\n";
-	std::cout <<"demuxer m_MEDIA_SESSION " << m_context->media_session << "\n";
+	std::cout <<"blocking_flag :" << &context->blocking_flag << "\n";
 	memset(m_sinks, 0, sizeof m_sinks);
 }
 
@@ -102,11 +99,17 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context->video_stream = -1;
 	context->nstream = 0;
 	context->blocking_flag = 0;
-	context->audio_packet = NULL;
-	context->video_packet = NULL;
+	context->audio_packet = (unsigned char*) malloc(MAX_RTP_FRAME_SIZE);
+	if (!context->audio_packet) {
+		return NULL;		
+	}
+	context->video_packet = (unsigned char*) malloc(MAX_RTP_FRAME_SIZE);
+	if (!context->video_packet) {
+		return NULL;		
+	}
 	context->codec_name = NULL;
 	context->fmt = audio_format("live");
-	
+	context->eof = false;
 	
 	
 	
@@ -208,26 +211,44 @@ ambulant::net::rtsp_demux::codec_name()
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() called");
 	m_context->blocking_flag = 0;
-	if(!m_context->rtsp_client->playMediaSession(*m_context->media_session)) {
-		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url) play failed");
+	if (m_context->media_session) {
+		if(!m_context->rtsp_client->playMediaSession(*m_context->media_session)) {
+			lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() play failed");
+			lib::logger::get_logger()->error("playing RTSP connection failed");
+			return 1;
+		}
+	} else {
+		lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() m_context->media_session = NULL RTSP play failed !");
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return 1;
 	}
 	
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() starting the loop ");
+
 	while(!m_context->eof) {
-	MediaSubsession* subsession;
-	MediaSubsessionIterator iter(*m_context->media_session);
-	// Only audio/video session need to apply for a job !
-	while ((subsession = iter.next()) != NULL) {
-		if (strcmp(subsession->mediumName(), "audio") == 0) {
-			subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,NULL);
-		} else if (strcmp(subsession->mediumName(), "video") == 0) {
-			subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,NULL);
+		MediaSubsession* subsession;
+		MediaSubsessionIterator iter(*m_context->media_session);
+		// Only audio/video session need to apply for a job !
+		while ((subsession = iter.next()) != NULL) {
+			if (strcmp(subsession->mediumName(), "audio") == 0) {
+				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an audio frame");
+				subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio, m_context,  on_source_close ,NULL);
+			} else if (strcmp(subsession->mediumName(), "video") == 0) {
+				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() Calling getNextFrame for an video frame");
+				subsession->readSource()->getNextFrame(m_context->video_packet, MAX_RTP_FRAME_SIZE, after_reading_video, m_context, on_source_close,NULL);
+			} else {
+				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
+			}
 		}
-	}
-	TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
-	scheduler.doEventLoop(m_context->blocking_flag);
+		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
+		//if (m_context->blocking_flag) {
+			scheduler.doEventLoop(&m_context->blocking_flag);
+		//} else {
+ 		//	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() blocking_flag == NULL ");
+		//}
+
 	}
 	
 }
@@ -235,12 +256,16 @@ ambulant::net::rtsp_demux::run()
 static void 
 after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
 {
-	rtsp_context_t* context = (rtsp_context_t*) data;
+	rtsp_context_t* context = NULL;
+	if (data) {
+		context = (rtsp_context_t*) data;
+	} 
+	lib::logger::get_logger()->debug("after_reading_audio: audio data available (client data: 0x%x", data);
 	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
 		if(context->sinks[context->audio_stream])
-			context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) data, sz);
-		context->blocking_flag = "1";
+			//context->sinks[context->audio_stream]->data_avail(rpts, (uint8_t*) context->audio_packet, sz);
+		context->blocking_flag = ~0;
 		//XXX Do we need to free data here ?
 	}
 }	
@@ -252,8 +277,8 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	if (context) {
 		double rpts = pts.tv_sec +  (pts.tv_usec / 1000000.0);
 		if(context->sinks[context->video_stream]) 
-			context->sinks[context->video_stream]->data_avail(rpts, (uint8_t*) data, sz);
-		context->blocking_flag = "1";
+			context->sinks[context->video_stream]->data_avail(rpts, (uint8_t*) context->video_packet , sz);
+		context->blocking_flag = ~0;
 		//XXX Do we need to free data here ?
 	}
 }
@@ -264,7 +289,7 @@ on_source_close(void* data)
 	rtsp_context_t* context = (rtsp_context_t*) data;
 	if (context) {
 		context->eof = true;
-		context->blocking_flag = "1";
+		context->blocking_flag = ~0;
 	}
 }
 
@@ -303,7 +328,7 @@ live_audio_datasource::live_audio_datasource(const net::url& url, AVCodecContext
 	m_thread(thread),
 	m_client_callback(NULL)
 {	
-	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: rate=%d, channels=%d", context->channels);
+	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::live_audio_datasource: channels=%d", context->channels);
     m_fmt.parameters = (void *) context;
 	m_thread->add_datasink(this, stream_index);
 }
@@ -357,6 +382,7 @@ live_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib:
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 		}
 	} else {
+		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource::start(): no data available");
 		// We have no data available. Start our source, and in our data available callback we
 		// will signal the client.
 		m_client_callback = callbackk;

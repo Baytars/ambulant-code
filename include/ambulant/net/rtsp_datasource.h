@@ -106,7 +106,7 @@ struct rtsp_context_t {
 	unsigned char* audio_packet;
 	unsigned char* video_packet;
 	int nstream;
-	char* blocking_flag;
+	char blocking_flag;
 	bool eof;
 	const char* codec_name;
 	audio_format fmt;	
