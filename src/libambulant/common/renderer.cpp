@@ -450,6 +450,7 @@ active_video_renderer::data_avail()
 			m_dest->need_redraw();
 			displayed = true;
 			m_src->frame_done(ts2, true);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("active_video_renderer::data_avail m_src->end_of_file() returns %d", m_src->end_of_file());
 			if (!m_src->end_of_file()) {
 				lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
 				m_src->start_frame (m_event_processor, e, ts2);
