@@ -97,9 +97,7 @@ class databuffer
 	long int m_used;							
 	
 	bool m_buffer_full;
- 
-	// shift down all data above pos
-	void shift_down(int pos);										
+							
  public:
 	// constructors
 	databuffer();				
@@ -180,10 +178,11 @@ public:
 	void start(ambulant::lib::event_processor *evp,ambulant::lib::event *callback);
 
         // a readdone cal is made by the client if he is ready with len bytes of data.
-        void readdone(int len);
-        void callback();
-
-        bool end_of_file();
+    void readdone(int len);
+    void callback();
+    bool end_of_file();
+	
+		
 
 	//  Get data from buffer and put 'size' bytes in buffer.
 	void read(char *data, int size);
