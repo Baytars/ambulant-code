@@ -149,7 +149,9 @@ libambulant_la_SOURCES = \
 	gui/none/none_area.cpp \
 	gui/none/none_gui.cpp \
 	gui/none/none_video_renderer.cpp \
-	gui/none/none_factory.cpp
+	gui/none/none_factory.cpp \
+	\
+	plugin/plugin_engine.cpp
 
 ## EXTRA_DIST= \
 ## 	gui/cocoa/cocoa_fill.m gui/cocoa/cocoa_fill.mm \
