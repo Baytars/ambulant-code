@@ -73,6 +73,7 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/net/ffmpeg_datasource.h"
 
+#include <map>
 
 static void 
 after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
@@ -88,6 +89,19 @@ namespace ambulant
 
 namespace net
 {
+
+class ffmpeg_codec_id {
+  public:
+	static ffmpeg_codec_id* instance();
+  	~ffmpeg_codec_id() {};
+
+	void add_codec(const char* codec_name, 	CodecID id);
+	CodecID get_codec_id(const char* codec_name);
+  private:
+	ffmpeg_codec_id(); 
+	static ffmpeg_codec_id* m_uniqueinstance;
+	std::map<std::string, CodecID> m_codec_id;		  
+};
 
 
 	
@@ -105,6 +119,8 @@ struct rtsp_context_t {
 	int video_stream;
 	unsigned char* audio_packet;
 	unsigned char* video_packet;
+	bool need_audio;
+	bool need_video;
 	int nstream;
 	char blocking_flag;
 	bool eof;
@@ -126,6 +142,7 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
   	int audio_stream_nr() { return m_context->audio_stream; };
 	int video_stream_nr() { return m_context->video_stream; };  
 	const char* codec_name(); 
+	CodecID get_codec_id();
 	
   protected:
 	unsigned long run();
