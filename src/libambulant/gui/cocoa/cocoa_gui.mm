@@ -181,10 +181,10 @@ cocoa_window_factory::new_window(const std::string &name, size bounds, renderer 
 	AmbulantView *view = window->view();
 	// And set the window size
 	[view setAmbulantWindow: window];
-	/*AM_DBG*/ NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
+	AM_DBG NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
 	NSSize cocoa_size = NSMakeSize(bounds.w + [view frame].origin.x, bounds.h + [view frame].origin.y);
 	[[view window] setContentSize: cocoa_size];
-	/*AM_DBG*/ NSLog(@"Size changed on %@ to (%f, %f)", [view window], cocoa_size.width, cocoa_size.height);
+	AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", [view window], cocoa_size.width, cocoa_size.height);
 	AM_DBG NSLog(@"Calling mouse_region_changed");
 	window->mouse_region_changed();
 	[[view window] makeKeyAndOrderFront: view];
@@ -216,7 +216,7 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 {
     [super initWithFrame:frameRect];
     ambulant_window = NULL;
-    /*AM_DBG*/ NSLog(@"AmbulantView.initWithFrame: self=0x%x, rect=(%f, %f, %f, %f)", self, NSMinX(frameRect), NSMinY(frameRect), NSWidth(frameRect), NSHeight(frameRect));
+    AM_DBG NSLog(@"AmbulantView.initWithFrame: self=0x%x, rect=(%f, %f, %f, %f)", self, NSMinX(frameRect), NSMinY(frameRect), NSWidth(frameRect), NSHeight(frameRect));
     return self;
 }
 
