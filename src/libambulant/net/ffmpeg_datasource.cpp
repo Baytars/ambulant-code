@@ -143,6 +143,11 @@ ffmpeg_video_datasource_factory::new_video_datasource(const net::url& url)
 		return NULL;
 	}
 	detail::ffmpeg_demux *thread = new detail::ffmpeg_demux(context);
+	if (thread->video_stream_nr() < 0) {
+		thread->cancel();
+		lib::logger::get_logger()->debug("ffmpeg_video_datasource_factory: No video stream in %s", repr(url).c_str());
+		return NULL;
+	}
 	video_datasource *ds = demux_video_datasource::new_demux_video_datasource(url, thread);
 	video_datasource *dds = NULL;
 	thread->start();
@@ -264,12 +269,20 @@ detail::ffmpeg_demux::ffmpeg_demux(AVFormatContext *con)
 	m_nstream(0)
 {
 	m_audio_fmt = audio_format("ffmpeg");
-	m_audio_fmt.parameters = (void *)&con->streams[audio_stream_nr()]->codec;
-	m_audio_fmt.samplerate = con->streams[audio_stream_nr()]->codec.sample_rate;
-	m_audio_fmt.channels = con->streams[audio_stream_nr()]->codec.channels;
-	m_audio_fmt.bits = 16; 
+	int audio_idx = audio_stream_nr();
+	if ( audio_idx >= 0) {
+		m_audio_fmt.parameters = (void *)&con->streams[audio_idx]->codec;
+		m_audio_fmt.samplerate = con->streams[audio_idx]->codec.sample_rate;
+		m_audio_fmt.channels = con->streams[audio_idx]->codec.channels;
+		m_audio_fmt.bits = 16;
+	} 
 	m_video_fmt = video_format("ffmpeg");
-	m_video_fmt.parameters = (void *)&con->streams[video_stream_nr()]->codec;
+	int video_idx = video_stream_nr();
+	if (video_idx >= 0) {
+		m_video_fmt.parameters = (void *)&con->streams[video_stream_nr()]->codec;
+	} else {
+		m_video_fmt.parameters = NULL;
+	}
 	m_video_fmt.framerate = 0;
 	m_video_fmt.width = 0;
 	m_video_fmt.height = 0;
@@ -460,7 +473,7 @@ demux_audio_datasource::new_demux_audio_datasource(
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource::new_ffmpeg_audio_datasource()");
 	// Find the index of the audio stream
 	stream_index = thread->audio_stream_nr();
-	
+	assert(stream_index >= 0);
 	
 	if (stream_index >= thread->nstreams()) {
 		lib::logger::get_logger()->error(gettext("%s: no more audio streams"), url.get_url().c_str());
@@ -665,7 +678,7 @@ demux_video_datasource::new_demux_video_datasource(
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::new_demux_video_datasource()");
 	// Find the index of the audio stream
 	stream_index = thread->video_stream_nr();
-	
+	assert(stream_index >= 0);
 	
 	if (stream_index >= thread->nstreams()) {
 		lib::logger::get_logger()->error(gettext("%s: no more audio streams"), url.get_url().c_str());
@@ -1105,6 +1118,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 	if(sz) {	
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:start decoding (0x%x) ", m_con);
 		assert(&m_con != NULL);
+		assert(inbuf);
+		assert(sz < 1000000); // XXXX This is soft, and probably incorrect. Remove when it fails.
 		ptr = inbuf;
 		
 		while (sz > 0) {
@@ -1670,7 +1685,7 @@ ffmpeg_video_decoder_datasource::select_decoder(video_format &fmt)
 				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 				return false;
 		}
-		lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource.select_decoder: enc->codec_id = 0x%x", enc->codec_id);
+		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.select_decoder: enc->codec_id = 0x%x", enc->codec_id);
 		AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 		//AVCodec *codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
 		if (codec == NULL) {
