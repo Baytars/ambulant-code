@@ -120,7 +120,8 @@ cocoa_window::mouse_region_changed()
 {
 	/*AM_DBG*/ logger::get_logger()->trace("cocoa_window::mouse_region_changed(0x%x)", (void *)this);
 	AmbulantView *my_view = (AmbulantView *)m_view;
-	[[my_view window] invalidateCursorRectsForView: my_view];
+        NSWindow *my_window = [my_view window];
+	[my_window invalidateCursorRectsForView: my_view];
 }
 
 active_renderer *
@@ -162,6 +163,7 @@ cocoa_window_factory::new_window(const std::string &name, size bounds, abstract_
 	[view setAmbulantWindow: window];
 	NSLog(@"Calling mouse_region_changed");
 	window->mouse_region_changed();
+        [[view window] makeKeyAndOrderFront: view];
 	return (abstract_window *)window;
 }
 
@@ -228,7 +230,7 @@ cocoa_window_factory::new_mouse_region()
 		want_events = !mrgn.is_empty();
 	}
 	NSLog(@"resetCursorRects wantevents=%d", (int)want_events);
-	/*DBG*/[self addCursorRect: [self visibleRect] cursor: [NSCursor pointingHandCursor]];
+	if (want_events) [self addCursorRect: [self visibleRect] cursor: [NSCursor pointingHandCursor]];
 }
 
 - (void)mouseDown: (NSEvent *)theEvent
