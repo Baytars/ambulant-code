@@ -7,128 +7,128 @@ Diagrams
 This section has UML diagrams (and some non-UML diagrams) that explain the
 interaction between various parts of Ambulant Player.
 
-.. _overall-structure-diagram-section:
-
 overall structure diagram
 -------------------------
 
-.. image:: ../models/overall.pdf
+.. _overall-structure-diagram-section:
 
-.. _dataflow-diagram-section:
+.. image:: ../models/overall.pdf
 
 dataflow diagram
 ----------------
 
-.. image:: ../models/dataflow.pdf
+.. _dataflow-diagram-section:
 
-.. _UML-diagram-for-player-section:
+.. image:: ../models/dataflow.pdf
 
 UML diagram for player
 ----------------------
 
-.. image:: ../models/player.pdf
+.. _UML-diagram-for-player-section:
 
-.. _UML-diagram-for-parser-section:
+.. image:: ../models/player.pdf
 
 UML diagram for parser
 ----------------------
 
-.. image:: ../models/parser.pdf
+.. _UML-diagram-for-parser-section:
 
-.. _UML-diagram-for-datasource-section:
+.. image:: ../models/parser.pdf
 
 UML diagram for datasource
 --------------------------
 
-.. image:: ../models/datasource.pdf
+.. _UML-diagram-for-datasource-section:
 
-.. _UML-state-diagram-for-datasource-section:
+.. image:: ../models/datasource.pdf
 
 UML state diagram for datasource
 --------------------------------
 
-.. image:: ../models/datasource_state.pdf
+.. _UML-state-diagram-for-datasource-section:
 
-.. _UML-diagram-for-playable-section:
+.. image:: ../models/datasource_state.pdf
 
 UML diagram for playable
 ------------------------
 
-.. image:: ../models/playable.pdf
+.. _UML-diagram-for-playable-section:
 
-.. _UML-state-diagram-for-playable-section:
+.. image:: ../models/playable.pdf
 
 UML state diagram for playable
 ------------------------------
 
-.. image:: ../models/playable_state.pdf
+.. _UML-state-diagram-for-playable-section:
 
-.. _UML-diagram-for-renderer_playable-section:
+.. image:: ../models/playable_state.pdf
 
 UML diagram for renderer_playable
 ---------------------------------
 
-.. image:: ../models/renderer.pdf
+.. _UML-diagram-for-renderer_playable-section:
 
-.. _UML-diagram-for-layout-section:
+.. image:: ../models/renderer.pdf
 
 UML diagram for layout
 ----------------------
 
-.. image:: ../models/layout.pdf
+.. _UML-diagram-for-layout-section:
 
-.. _UML-diagram-for-region-section:
+.. image:: ../models/layout.pdf
 
 UML diagram for region
 ----------------------
 
-.. image:: ../models/region.pdf
+.. _UML-diagram-for-region-section:
 
-.. _UML-diagram-for-window-section:
+.. image:: ../models/region.pdf
 
 UML diagram for window
 ----------------------
 
-.. image:: ../models/windows.pdf
+.. _UML-diagram-for-window-section:
 
-.. _UML-diagram-for-animation-section:
+.. image:: ../models/windows.pdf
 
 UML diagram for animation
 -------------------------
 
-.. image:: ../models/animation.pdf
+.. _UML-diagram-for-animation-section:
 
-.. _UML-diagram-for-clocks-section:
+.. image:: ../models/animation.pdf
 
 UML diagram for clocks
 ----------------------
 
-.. image:: ../models/clocks.pdf
+.. _UML-diagram-for-clocks-section:
 
-.. _UML-diagram-for-event-processor-section:
+.. image:: ../models/clocks.pdf
 
 UML diagram for event processor
 -------------------------------
 
-.. image:: ../models/event_processor.pdf
+.. _UML-diagram-for-event-processor-section:
 
-.. _UML-diagram-for-document-section:
+.. image:: ../models/event_processor.pdf
 
 UML diagram for document
 ------------------------
 
-.. image:: ../models/document.pdf
+.. _UML-diagram-for-document-section:
 
-.. _UML-diagram-for-node-section:
+.. image:: ../models/document.pdf
 
 UML diagram for node
 --------------------
 
-.. image:: ../models/node.pdf
+.. _UML-diagram-for-node-section:
 
-.. _UML-diagram-for-transitions-section:
+.. image:: ../models/node.pdf
 
 UML diagram for transitions
 ---------------------------
+
+.. _UML-diagram-for-transitions-section:
 
 .. image:: ../models/transition.pdf

@@ -4,12 +4,6 @@
    
 .. raw:: latex
 
-   \begin{titlepage}
-   \begin{center}
-   {\Large Ambulant Player Design Documentation}
-   \end{center}
-   \end{titlepage}
-   
    \tableofcontents
    %
    
