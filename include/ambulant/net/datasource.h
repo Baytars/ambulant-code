@@ -92,9 +92,9 @@ class databuffer
 	char* m_rear;
 	char* m_front; 
 	
-	long int m_size;  			
- 	long int m_max_size; 														 
-	long int m_used;							
+	unsigned long int m_size;  			
+ 	unsigned long int m_max_size; 														 
+	unsigned long int m_used;							
 	
 	bool m_buffer_full;
 							
@@ -121,7 +121,7 @@ class databuffer
  	bool is_full();
     bool not_empty();
 	void readdone(int size);
-	void prepare(char* in_ptr);
+	char * prepare();
 	void pushdata(int size);
     char* get_read_ptr();
 	
@@ -201,6 +201,7 @@ private:
     passive_datasource *m_source;
 	int m_filesize;
 	int m_stream;
+	bool m_end_of_file;
 	void filesize();
     void read_file();
 
