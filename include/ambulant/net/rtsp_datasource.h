@@ -62,14 +62,14 @@ namespace net
 
  
 typedef rtsp_packet_t {
-	char* data;
+	unsigned char* data;
 	int data_sz;
 	double pts;	
 }
 
 class datasink {
   public:
-    virtual void data_avail(int64_t pts, uint8_t *data, int size) = 0;
+    virtual void data_avail(double` pts, uint8_t *data, int size) = 0;
 	virtual bool buffer_full() = 0;
 };
 	
@@ -86,17 +86,24 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
   protected:
 	unsigned long run();
   private:
-	 
-    void after_reading(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
-	void on_close(void* clientdata);
 	
-  
+	int audio_stream_nr();
+	int video_stream_nr();  
+    void after_reading_audio(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+	void after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval pts, unsigned duration);
+	void on_source_close(void* clientdata);
+	
+    
     datasink *m_sinks[MAX_STREAMS];
   	RTSPClient* m_rtsp_client;
   	MediaSession* m_media_session;
   	char* m_sdp;
 	int m_nstream;
-	char blockingflag;
+	int m_audio_stream;
+	int m_video_stream;		
+	unsigned char* m_audio_packet;
+	unsigned char* m_video_packet;
+	char m_blockingflag;
 };
 
 }
