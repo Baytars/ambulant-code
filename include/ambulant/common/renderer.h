@@ -185,7 +185,7 @@ class renderer_factory {
 		event_processor *const evp,
 		net::passive_datasource *src,
 		abstract_rendering_surface *const dest) = 0;
-	virtual abstract_rendering_source *new_background_renderer(
+	virtual abstract_bg_rendering_source *new_background_renderer(
 		const abstract_smil_region_info *info,
 		abstract_rendering_surface *const dest) { return NULL; };
 };
@@ -204,7 +204,7 @@ class global_renderer_factory : public renderer_factory {
 		event_processor *const evp,
 		net::passive_datasource *src,
 		abstract_rendering_surface *const dest);
-	abstract_rendering_source *new_background_renderer(
+	abstract_bg_rendering_source *new_background_renderer(
 		const abstract_smil_region_info *info,
 		abstract_rendering_surface *const dest);
   private:
