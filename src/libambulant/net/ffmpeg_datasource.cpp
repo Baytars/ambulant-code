@@ -65,7 +65,7 @@
 #endif
 
 // How many video frames we would like to buffer at most
-#define MAX_VIDEO_FRAMES 25
+#define MAX_VIDEO_FRAMES 250
 
 // Bug workaround: define RESAMPLE_READ_ALL to let the resampler
 // collect all data before calling the client callback
@@ -866,7 +866,7 @@ bool
 demux_video_datasource::buffer_full()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size());
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size(), MAX_VIDEO_FRAMES);
 	bool rv = (m_frames.size() > MAX_VIDEO_FRAMES);
 	m_lock.leave();
 	return rv;
@@ -1309,7 +1309,7 @@ char*
 ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *size)
 {
 	// here we pay attention to now, the frame that is closest to now but just before is returned.
-	std::pair<timestamp_t, char*> frame, prev_frame;
+	frame_qelt* frame, prev_frame;
 	char *rv = NULL;
 	*timestamp = 0;
 	*size = 0;
@@ -1318,28 +1318,27 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 		//assert(m_frames.size() > 0);
 		prev_frame.first = 0;
 		prev_frame.second = NULL;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: prev_frame: prev_frame.first=%lld, second==0x%x",prev_frame.first, prev_frame.second);
-
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: prev_frame: prev_frame.first=%lld, second==0x%x",prev_frame.first, prev_frame.second);
 		frame = m_frames.top();
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
-		while (frame.first < now) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding frame pts=%lld, now=%lld, data ptr = 0x%x",prev_frame.first, now, prev_frame.second);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
+		while (frame.first < now || m_frames.size() == 0) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding frame pts=%lld, now=%lld, data ptr = 0x%x",prev_frame.first, now, prev_frame.second);		
 			if (prev_frame.second) {
 				free(prev_frame.second);
 				prev_frame.second = NULL;
 			}
 			prev_frame.first = frame.first;
 			prev_frame.second = frame.second;
-			m_frames.pop();
 			if (m_frames.size() == 0) {
 				prev_frame.first = 0;
 				prev_frame.second = NULL;
 				break;
 			}
+			m_frames.pop();
 			frame = m_frames.top();
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: next frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: next frame: frame.first=%lld, second==0x%x",frame.first, frame.second);
 		}
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: returning frame pts=%lld, now=%lld",prev_frame.first, now);
+		AM_DBG if (prev_frame.first != 0) lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: returning frame pts=%lld, date ptr=0x%x, still %d frames in the queue",prev_frame.first, prev_frame.second, m_frames.size());
 		rv = prev_frame.second;
 		*timestamp = prev_frame.first;
 		*size = m_size;
