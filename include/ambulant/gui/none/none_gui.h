@@ -72,8 +72,8 @@ class none_window_factory : public lib::window_factory {
 class none_active_renderer : public lib::active_renderer {
   public:
 	none_active_renderer(
-		lib::playable_events<int> *context,
-		int cookie,
+		lib::active_playable_events *context,
+		lib::active_playable_events::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,
@@ -90,8 +90,8 @@ class none_renderer_factory : public lib::renderer_factory {
   	none_renderer_factory() {}
   	
 	lib::active_renderer *new_renderer(
-		lib::playable_events<int> *context,
-		int cookie,
+		lib::active_playable_events *context,
+		lib::active_playable_events::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
 		net::passive_datasource *src,

@@ -88,8 +88,8 @@ cocoa_passive_window::need_redraw(const screen_rect<int> &r)
 
 active_renderer *
 cocoa_renderer_factory::new_renderer(
-	playable_events<int> *context,
-	int cookie,
+	active_playable_events *context,
+	active_playable_events::cookie_type cookie,
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,

@@ -66,10 +66,10 @@ namespace ambulant {
 
 namespace lib {
 
-class active_basic_renderer : public active_playable<int> {
+class active_basic_renderer : public active_playable {
   public:
   	active_basic_renderer()
-  	:	active_playable<int>((playable_events<int> *)NULL, 0),
+  	:	active_playable((active_playable_events *)NULL, 0),
 		m_node(NULL),
 		m_event_processor(NULL) {};
 //  	active_basic_renderer(const ambulant::lib::active_basic_renderer& src)
@@ -77,11 +77,11 @@ class active_basic_renderer : public active_playable<int> {
 //  		m_node(src.m_node),
 //  		m_playdone(src.m_playdone) {}
 	active_basic_renderer(
-		playable_events<int> *context,
-		int cookie,
+		active_playable_events *context,
+		active_playable_events::cookie_type cookie,
 		const node *node,
 		event_processor *const evp)
-	:   active_playable<int>(context, cookie),
+	:   active_playable(context, cookie),
 		m_node(node),
 		m_event_processor(evp) {};
 		
@@ -106,8 +106,8 @@ class active_renderer : public active_basic_renderer, public ref_counted_obj {
   		m_dest(0),
   		m_readdone(src.m_readdone) {}
 	active_renderer(
-		playable_events<int> *context,
-		int cookie,
+		active_playable_events *context,
+		active_playable_events::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
@@ -138,8 +138,8 @@ class active_renderer : public active_basic_renderer, public ref_counted_obj {
 class active_final_renderer : public active_renderer {
   public:
 	active_final_renderer(
-		playable_events<int> *context,
-		int cookie,
+		active_playable_events *context,
+		active_playable_events::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
@@ -162,8 +162,8 @@ class renderer_factory {
   public:
 	virtual ~renderer_factory() {}
 	virtual active_renderer *new_renderer(
-		playable_events<int> *context,
-		int cookie,
+		active_playable_events *context,
+		active_playable_events::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,
@@ -178,8 +178,8 @@ class global_renderer_factory : public renderer_factory {
     void add_factory(renderer_factory *rf);
     
     active_renderer *new_renderer(
-		playable_events<int> *context,
-		int cookie,
+		active_playable_events *context,
+		active_playable_events::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
 		net::passive_datasource *src,

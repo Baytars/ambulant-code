@@ -63,8 +63,8 @@ using namespace ambulant;
 typedef lib::no_arg_callback<lib::active_renderer> readdone_callback;
 
 lib::active_renderer::active_renderer(
-	playable_events<int> *context,
-	int cookie,
+	active_playable_events *context,
+	active_playable_events::cookie_type cookie,
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
@@ -148,8 +148,8 @@ lib::global_renderer_factory::add_factory(renderer_factory *rf)
     
 lib::active_renderer *
 lib::global_renderer_factory::new_renderer(
-	playable_events<int> *context,
-	int cookie,
+	active_playable_events *context,
+	active_playable_events::cookie_type cookie,
 	const node *node,
 	event_processor *const evp,
 	net::passive_datasource *src,
