@@ -354,7 +354,7 @@ gui::sdl::sdl_active_audio_renderer::get_data_done(int size)
 		}
 		m_lock.leave();
 		if (m_context) {
-			//XYZZY m_context->stopped(m_cookie, 0);
+			m_context->stopped(m_cookie, 0);
 		} else {
 			AM_DBG lib::logger::get_logger()->trace("sdl_active_audio_renderer(0x%x): m_context is  NULL", (void*)this);
 		}
@@ -436,7 +436,7 @@ gui::sdl::sdl_active_audio_renderer::stop()
 		m_lock.leave();
 		unregister_renderer(this);
 		// XXX Should we call stopped_callback?
-		//XYZZY m_context->stopped(m_cookie, 0);
+		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
 	}
 	m_is_playing = false;
@@ -482,11 +482,10 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 		m_is_paused = false;
 		m_lock.leave();
 		register_renderer(this);
-		m_context->stopped(m_cookie, 0); //XYZZY Debugging non-navigation
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("sdl_active_audio_renderer.start: no datasource");
 		m_lock.leave();
-		//XYZZY m_context->stopped(m_cookie, 0);
+		m_context->stopped(m_cookie, 0);
 	}
 }
 
@@ -499,7 +498,6 @@ gui::sdl::sdl_active_audio_renderer::seek(double where)
 std::pair<bool, double> 
 gui::sdl::sdl_active_audio_renderer::get_dur()
 {
-	//DBG return std::pair<bool, double>(true, 7);
 	std::pair<bool, double> rv(false, 0.0);
 	m_lock.enter();
 	if (m_audio_src)
@@ -507,4 +505,3 @@ gui::sdl::sdl_active_audio_renderer::get_dur()
 	m_lock.leave();
 	return rv;
 }
-

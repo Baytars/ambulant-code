@@ -562,7 +562,7 @@ ffmpeg_audio_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_audio_datasource::get_dur()
 {
-	return std::pair<bool, double>(true, 0.0);
+	return std::pair<bool, double>(false, 0.0);
 }
 
 // **************************** ffmpeg_video_datasource *****************************
@@ -1011,7 +1011,7 @@ ffmpeg_video_datasource::get_frame(double *timestamp, int *size)
 std::pair<bool, double>
 ffmpeg_video_datasource::get_dur()
 {
-	return std::pair<bool, double>(true, 0.0);
+	return std::pair<bool, double>(false, 0.0);
 }
 
 #endif // WITH_FFMPEG_AVFORMAT
@@ -1332,7 +1332,7 @@ ffmpeg_decoder_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_decoder_datasource::get_dur()
 {
-	return std::pair<bool, double>(true, 0.0);
+	return std::pair<bool, double>(false, 0.0);
 }
 
 bool
@@ -1604,7 +1604,7 @@ ffmpeg_resample_datasource::start(ambulant::lib::event_processor *evp, ambulant:
 std::pair<bool, double>
 ffmpeg_resample_datasource::get_dur()
 {
-	std::pair<bool, double> rv(true, 0.0);
+	std::pair<bool, double> rv(false, 0.0);
 	m_lock.enter();
 	if (m_src)
 		rv = m_src->get_dur();
