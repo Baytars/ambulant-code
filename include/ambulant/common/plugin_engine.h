@@ -54,8 +54,8 @@
 
 
 /* Disable plugins for Zaurus etc. */
-#define	WITH_PLUGINS
-//#undef  WITH_PLUGINS
+//#define	WITH_PLUGINS
+#undef  WITH_PLUGINS
 
 #include "ambulant/common/playable.h"
 #include "ambulant/common/renderer.h"

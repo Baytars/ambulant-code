@@ -63,7 +63,7 @@
   /* Assume embedded Qt */
 #include <qpe/qpeapplication.h>
 #include <qpe/applnk.h>
-#include <qpe/filemanager.h>
+#include <fileselector.h>
 #endif/*QT_NO_FILEDIALOG*/
 #include <qcursor.h>
 #include <qdial.h>
@@ -128,10 +128,17 @@ class qt_gui : public QWidget {
 	Qt::CursorShape m_cursor_shape;
 #else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
+	FileSelector*m_fileselector;
+	const DocLnk m_selectedDocLnk;
 #endif/*QT_NO_FILEDIALOG*/
 	void	     fileError(QString smilfilename);
 
   public slots:
+#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
+	void setDocument(const QString&);
+	void slot_file_selected(const DocLnk&);
+	void slot_close_fileselector();
+#endif/*QT_NO_FILEDIALOG*/
 	void slot_play();
 
   private slots:
