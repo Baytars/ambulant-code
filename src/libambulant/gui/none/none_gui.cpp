@@ -81,7 +81,7 @@ gui::none::none_active_renderer::stop()
 	lib::logger::get_logger()->trace("none_active_renderer.stop(0x%x)", (void *)this);
 }
 
-active_renderer *
+active_basic_renderer *
 gui::none::none_renderer_factory::new_renderer(
 	lib::active_playable_events *context,
 	active_playable_events::cookie_type cookie,

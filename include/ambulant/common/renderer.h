@@ -68,7 +68,7 @@ namespace ambulant {
 
 namespace lib {
 
-class active_basic_renderer : public active_playable {
+class active_basic_renderer : public active_playable, public abstract_rendering_source {
   public:
   	active_basic_renderer()
   	:	active_playable((active_playable_events *)NULL, 0),
@@ -94,9 +94,16 @@ class active_basic_renderer : public active_playable {
   	event_processor *const m_event_processor;
 };
 
-;
+// Mixin for audio renderers and such, to be used with either active_basic_renderer
+// or active_renderer
 
-class active_renderer : public active_basic_renderer, public abstract_rendering_source, public ref_counted_obj {
+class nonvisual_renderer_mixin {
+	void wantclicks(bool want) {};
+	void user_event(const point &where) {};
+	void redraw(const screen_rect<int> &dirty, abstract_window *window) {};
+};
+
+class active_renderer : public active_basic_renderer, public ref_counted_obj {
   public:
   	active_renderer()
   	:	active_basic_renderer(NULL, 0, NULL, NULL),
@@ -165,7 +172,7 @@ class active_final_renderer : public active_renderer {
 class renderer_factory {
   public:
 	virtual ~renderer_factory() {};
-	virtual active_renderer *new_renderer(
+	virtual active_basic_renderer *new_renderer(
 		active_playable_events *context,
 		active_playable_events::cookie_type cookie,
 		const node *node,
@@ -181,7 +188,7 @@ class global_renderer_factory : public renderer_factory {
     
     void add_factory(renderer_factory *rf);
     
-    active_renderer *new_renderer(
+    active_basic_renderer *new_renderer(
 		active_playable_events *context,
 		active_playable_events::cookie_type cookie,
 		const node *node,
