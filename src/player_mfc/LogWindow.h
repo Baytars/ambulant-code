@@ -7,8 +7,11 @@ class CLogWindow : public CDialog
 {
 	DECLARE_DYNAMIC(CLogWindow)
 
-public:
+private:
 	CLogWindow(CWnd* pParent = NULL);   // standard constructor
+	static CLogWindow *s_singleton;
+public:
+	static CLogWindow *GetLogWindowSingleton();
 	virtual ~CLogWindow();
 
 // Dialog Data

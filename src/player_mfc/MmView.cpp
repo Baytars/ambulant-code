@@ -190,7 +190,7 @@ MmView::MmView()
 	m_timer_id = 0;
 	m_cursor_id = 0;
 	m_autoplay = true;
-//	lib::logger::get_logger()->set_show_message(lib::win32::show_message);
+	lib::logger::get_logger()->set_show_message(lib::win32::show_message);
 	lib::logger::get_logger()->set_std_ostream(log_os);
 #ifdef AM_PLAYER_DG
 	lib::logger::get_logger()->trace("Ambulant: using DG Player");
