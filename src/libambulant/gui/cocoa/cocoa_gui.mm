@@ -61,9 +61,10 @@
 
 #include <Cocoa/Cocoa.h>
 
-// Define this for debugging: on every redraw we dump the view contents
-// to an image file
-//#define DUMP_IMAGES_FORMAT @"/tmp/amdump/ambulant_dump_%03d.tiff"
+// Defines for image dump debugging
+#define DUMP_IMAGES_FORMAT @"/tmp/amdump/ambulant_dump_%03d_%s.tiff"
+//#define DUMP_REDRAW
+//#define DUMP_TRANSITION
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -286,19 +287,13 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 	if (!ambulant_window) {
         AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
     } else {
-#ifdef DUMP_IMAGES_FORMAT
-		// If we want to dump images we always redraw the whole view
-		rect = [self bounds];
-#else
 		// If we have seen transitions we always redraw the whole view
 		if (transition_count) rect = [self bounds];
-#endif
         ambulant::lib::screen_rect<int> arect = [self ambulantRectForNSRect: &rect];
         ambulant_window->redraw(arect);
-#ifdef DUMP_IMAGES_FORMAT
+#ifdef DUMP_REDRAW
 		// Debug code: dump the contents of the view into an image
-		static int seqnum = 1;
-		[self dumpToImageFile: [NSString stringWithFormat: DUMP_IMAGES_FORMAT, seqnum++]];
+		[self dumpToImageID: "redraw"];
 #endif
     }
 	redraw_lock.leave();
@@ -374,19 +369,21 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 	[[NSApplication sharedApplication] sendAction: SEL("fixMouse:") to: nil from: self];
 }
 
-- (void) dumpToImageFile: (NSString *)filename
+- (void) dumpToImageID: (char *)ident
 {
 	[self lockFocus];
 	NSBitmapImageRep *image = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [self bounds]];
 	[self unlockFocus];
+	[self dump: image toImageID: ident];
+}
+
+- (void) dump: (id)image toImageID: (char *)ident
+{
+	static int seqnum = 0;
+	NSString *filename = [NSString stringWithFormat: DUMP_IMAGES_FORMAT, seqnum++, ident];
 	NSData *tiffrep = [image TIFFRepresentation];
-	static NSData *oldtiffrep = NULL;
-	if (oldtiffrep && [oldtiffrep isEqualToData: tiffrep])
-		return;
-	[oldtiffrep release];
-	oldtiffrep = [tiffrep retain];
 	[tiffrep writeToFile: filename atomically: NO];
-	/*AM_DBG*/ NSLog(@"dumpToImageFile: created %@", filename);
+	/*AM_DBG*/ NSLog(@"dump:toImageFile: created %@", filename);
 }
 
 - (BOOL)wantsDefaultClipping
@@ -416,18 +413,40 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 {
 	if (!transition_surface) {
 		// It does not exist yet. Create it.
-		transition_surface = [self getTransitionSource];
+		transition_surface = [self getTransitionOldSource];
 	}
 	return transition_surface;
 }
 
-- (NSImage *)getTransitionSource
+- (NSImage *)getTransitionOldSource
 {
 	NSRect bounds = [self bounds];
 	NSSize size = NSMakeSize(NSWidth(bounds), NSHeight(bounds));
 	NSImage *rv = [[NSImage alloc] initWithSize: size];
+	[rv setFlipped: YES];
+	[self lockFocus];
 	NSBitmapImageRep *bits = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [self bounds]];
+	[self unlockFocus];
 	[rv addRepresentation: bits];
+#ifdef DUMP_TRANSITION
+	[self dump: rv toImageID: "oldsrc"];
+#endif
+	return rv;
+}
+
+- (NSImage *)getTransitionNewSource
+{
+	NSRect bounds = [self bounds];
+	NSSize size = NSMakeSize(NSWidth(bounds), NSHeight(bounds));
+	NSImage *rv = [[NSImage alloc] initWithSize: size];
+	[rv setFlipped: YES];
+	[transition_surface lockFocus];
+	NSBitmapImageRep *bits = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [self bounds]];
+	[transition_surface unlockFocus];
+	[rv addRepresentation: bits];
+#ifdef DUMP_TRANSITION
+	[self dump: rv toImageID: "newsrc"];
+#endif
 	return rv;
 }
 

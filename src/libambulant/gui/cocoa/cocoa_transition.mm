@@ -82,15 +82,29 @@ cocoa_transition_engine::update()
 {
 	cocoa_window *window = (cocoa_window *)m_dst->get_abstract_window();
 	AmbulantView *view = (AmbulantView *)window->view();
-	NSImage *src = [view getTransitionSurface];
+#ifdef COPYOLDSOURCE
+	NSImage *oldsrc = [view getTransitionOldSource];
+#endif
+	NSImage *newsrc = [view getTransitionNewSource];
 	/*AM_DBG*/ lib::logger::get_logger()->trace("cocoa_transition_engine::update(%f)", m_progress);
 	// This is a fade:
 	const lib::screen_rect<int> &r =  m_dst->get_rect();
 	lib::screen_rect<int> dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
 	NSRect cocoa_dstrect_whole = [view NSRectForAmbulantRect: &dstrect_whole];
-	NSPoint cocoa_dstpoint = NSMakePoint(NSMinX(cocoa_dstrect_whole), NSMinY(cocoa_dstrect_whole));
-	[src compositeToPoint: cocoa_dstpoint 
+//	NSPoint cocoa_dstpoint = NSMakePoint(NSMinX(cocoa_dstrect_whole), NSMinY(cocoa_dstrect_whole));
+
+#ifdef COPYOLDSOURCE
+	// Debug: fill with purple
+	[[NSColor purpleColor] set];
+	NSRectFill(cocoa_dstrect_whole);
+
+	[oldsrc drawInRect: cocoa_dstrect_whole 
+		fromRect: cocoa_dstrect_whole
+		operation: NSCompositeCopy
+		fraction: 1.0];
+#endif
+	[newsrc drawInRect: cocoa_dstrect_whole 
 		fromRect: cocoa_dstrect_whole
 		operation: NSCompositeSourceOver
 		fraction: m_progress];
