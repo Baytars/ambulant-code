@@ -118,7 +118,7 @@ cocoa_window::user_event(const point &where)
 void
 cocoa_window::mouse_region_changed()
 {
-	/*AM_DBG*/ logger::get_logger()->trace("cocoa_window::mouse_region_changed(0x%x)", (void *)this);
+	AM_DBG logger::get_logger()->trace("cocoa_window::mouse_region_changed(0x%x)", (void *)this);
 	AmbulantView *my_view = (AmbulantView *)m_view;
         NSWindow *my_window = [my_view window];
 	[my_window invalidateCursorRectsForView: my_view];
