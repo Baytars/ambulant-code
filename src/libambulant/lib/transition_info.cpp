@@ -52,6 +52,7 @@
 
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/node.h"
+#include "ambulant/lib/parselets.h"
 #include "ambulant/lib/transition_info.h"
 
 //#define AM_DBG
@@ -62,6 +63,23 @@
 
 using namespace ambulant;
 using namespace lib;
+
+transition_info::time_type
+transition_info::get_trans_dur(const node *n) const
+{
+	if(!n) return 0;
+	const char *p = n->get_attribute("dur");
+	if(!p) return 1000;  // XXX What is the correct way to say "1 second"?
+	std::string sdur = trim(p);
+	clock_value_p pl;
+	std::string::const_iterator b = sdur.begin();
+	std::string::const_iterator e = sdur.end();
+	std::ptrdiff_t d = pl.parse(b, e);
+	if(d == -1) {
+		return 0;
+	}
+	return pl.m_result;
+}
 
 transition_info *
 transition_info::from_node(const node *n)
@@ -178,4 +196,3 @@ ambulant::lib::repr(transition_type t)
 	default: return "<unknown transition type>";
 	}
 }
-

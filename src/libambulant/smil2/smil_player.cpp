@@ -240,7 +240,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 }
 // Request to start the playable of the node.
 // When trans is not null the playable should transition in 
-void smil_player::start_playable(const lib::node *n, double t, const lib::node *trans) {
+void smil_player::start_playable(const lib::node *n, double t, const lib::transition_info *trans) {
 	AM_DBG lib::logger::get_logger()->debug("smil_player::start_playable(0x%x, %f)", (void*)n, t);
 	common::playable *np = create_playable(n);
 	if (trans) {
@@ -249,8 +249,7 @@ void smil_player::start_playable(const lib::node *n, double t, const lib::node *
 			const char *pid = n->get_attribute("id");
 			m_logger->trace("smil_player::start_playable: node %s has transition but is not visual", pid?pid:"no-id");
 		} else {
-			lib::transition_info *transinfo = lib::transition_info::from_node(trans);
-			rend->set_intransition(transinfo);
+			rend->set_intransition(trans);
 		}
 	}
 	np->start(t);
