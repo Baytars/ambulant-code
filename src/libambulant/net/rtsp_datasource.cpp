@@ -167,11 +167,11 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		if (strcmp(subsession->mediumName(), "audio") == 0) {
 			desired_buf_size = 100000;
 			if (context->audio_stream < 0) {
+				
 				context->audio_stream = context->nstream;
 				context->codec_name = subsession->codecName();
 				context->fmt.channels = subsession->numChannels() + 1;
 				context->fmt.bits = 16;
-				context->fmt.samplerate = 0;
 				//context->fmt.samplerate = subsession->rtpSource()->timestampFrequency();
 				
 			}
@@ -244,7 +244,7 @@ ambulant::net::rtsp_demux::run()
 				AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() not interested in this data");
 			}
 		}
-
+		
 		AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() blocking_flag: 0x%x, %d, need_audio %d", &m_context->blocking_flag, m_context->blocking_flag, m_context->need_audio);		
 		TaskScheduler& scheduler = m_context->media_session->envir().taskScheduler();
 		scheduler.doEventLoop(&m_context->blocking_flag);

@@ -97,6 +97,11 @@ ffmpeg_init()
 	is_inited = true;
 }
 
+struct video_frame {
+	char* data;
+	int	  size;
+}
+
 namespace ambulant
 {
 
@@ -251,33 +256,34 @@ class demux_audio_datasource:
   
 };
 
-
-class ffmpeg_audio_datasource: 
-	virtual public audio_datasource,
+class demux_video_datasource: 
+	virtual public video_datasource,
 	public detail::datasink,
 	virtual public lib::ref_counted_obj
 {
   public:
-	 static ffmpeg_audio_datasource *new_ffmpeg_audio_datasource(
-  		const net::url& url, 
-  		AVFormatContext *context,
-		detail::ffmpeg_demux *thread);
+	 static demux_video_datasource *new_demux_audio_datasource(
+  		const net::url& url, detail::abstract_demux *thread);
   	
-  	ffmpeg_audio_datasource(
+  		demux_video_datasource(
   		const net::url& url, 
-  		AVFormatContext *context,
-		detail::ffmpeg_demux *thread, 
+  		detail::abstract_demux *thread, 
   		int stream_index);
   
-    ~ffmpeg_audio_datasource();
+    ~demux_video_datasource();
 
-    void start(lib::event_processor *evp, lib::event *callback);
+    void start_frame(lib::event_processor *evp, lib::event *callback);
 	void stop();  
 
-    void readdone(int len);
-    void data_avail(int64_t pts, uint8_t *data, int size);
+    void frame_done(timestamp_t timestamp, bool keepdata);
+    void data_avail(timestamp_t pts, uint8_t *data, int size);
     bool end_of_file();
 	bool buffer_full();
+  	int width();
+  	int height();
+  
+    bool has_audio();
+  	audio_datasource* get_audio_datasource();
 		
 	char* get_read_ptr();
 	int size() const;   
@@ -288,18 +294,19 @@ class ffmpeg_audio_datasource:
   private:
     bool _end_of_file();
 	const net::url m_url;
-	AVFormatContext *m_con;
+	//AVFormatContext *m_con;
 	int m_stream_index;
 	audio_format m_fmt;
 	bool m_src_end_of_file;
     lib::event_processor *m_event_processor;
-
-	databuffer m_buffer;
-	detail::ffmpeg_demux *m_thread;
+	std::queue<std::pair<timestamp_t, video_frame> m_frames;
+	std::pair<timestamp_t, video_frame> m_old_frame;
+	detail::abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;
   
 };
+
 
 class ffmpeg_video_datasource:
 	virtual public video_datasource,
