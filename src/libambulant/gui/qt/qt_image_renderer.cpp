@@ -57,7 +57,7 @@
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/smil_alignment.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -133,6 +133,7 @@ qt_active_image_renderer::redraw(const lib::screen_rect<int> &dirty,
 		"qt_active_image_renderer.redraw: info=0x%x", info);
 	QPainter paint;
 	paint.begin(aqw->ambulant_pixmap());
+#ifdef	JUNK
 	// background drawing
 	if (info && !info->get_transparent()) {
 	// First find our whole area (which we have to clear to 
@@ -154,6 +155,7 @@ qt_active_image_renderer::redraw(const lib::screen_rect<int> &dirty,
 		paint.setBrush(bgc);
 		paint.drawRect(L,T,W,H);
 	}
+#endif/*JUNK*/
 	if (m_image_loaded) {
 		QSize qsize = aqw->ambulant_pixmap()->size();
 		lib::size srcsize = lib::size(qsize.width(), qsize.height());
