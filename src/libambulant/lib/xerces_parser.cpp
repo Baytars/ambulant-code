@@ -62,12 +62,12 @@ using namespace lib;
 
 
 
-lib::xml_parser*
+xml_parser*
 lib::xerces_factory::new_parser(
 		sax_content_handler* content_handler, 
 		sax_error_handler* error_handler) 
 {
-	return new lib::xerces_parser(content_handler, error_handler);
+	return new xerces_sax_parser(content_handler, error_handler);
 }
 
 

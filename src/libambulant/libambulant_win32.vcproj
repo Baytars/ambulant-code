@@ -64,8 +64,8 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng125;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_AMBULANT;WITH_EXPAT"
+				AdditionalIncludeDirectories="&quot;..\..\third_party_packages\xerces-c-src_2_6_0\src&quot;;..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng125;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_AMBULANT;WITH_XERCES"
 				RuntimeLibrary="0"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -257,6 +257,9 @@
 				</File>
 				<File
 					RelativePath=".\lib\tree_builder.cpp">
+				</File>
+				<File
+					RelativePath=".\lib\xerces_parser.cpp">
 				</File>
 				<Filter
 					Name="win32"
