@@ -156,7 +156,7 @@ active_final_renderer::readdone()
 }
 
 global_playable_factory::global_playable_factory()
-:   m_default_factory(new gui::none::none_renderer_factory())
+:   m_default_factory(new gui::none::none_playable_factory())
 {
 }
 
