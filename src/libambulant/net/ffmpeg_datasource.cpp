@@ -562,8 +562,14 @@ ffmpeg_audio_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_audio_datasource::get_dur()
 {
-	if (m_con) lib::logger::get_logger()->debug("ffmpeg_audio_datasource::get_dur: duration=%f", (double)m_con->duration);
-	return std::pair<bool, double>(false, 0.0);
+	std::pair<bool, double> rv(false, 0.0);
+	m_lock.enter();
+	if (m_con && m_con->duration >= 0) {
+		rv = std::pair<bool, double>(true, m_con->duration / (double)AV_TIME_BASE);
+		lib::logger::get_logger()->debug("ffmpeg_audio_datasource::get_dur: duration=%f", rv.second);
+	}
+	m_lock.leave();
+	return rv;
 }
 
 // **************************** ffmpeg_video_datasource *****************************
@@ -1012,8 +1018,14 @@ ffmpeg_video_datasource::get_frame(double *timestamp, int *size)
 std::pair<bool, double>
 ffmpeg_video_datasource::get_dur()
 {
-	if (m_con) lib::logger::get_logger()->debug("ffmpeg_video_datasource::get_dur: duration=%f", (double)m_con->duration);
-	return std::pair<bool, double>(false, 0.0);
+	std::pair<bool, double> rv(false, 0.0);
+	m_lock.enter();
+	if (m_con && m_con->duration >= 0) {
+		rv = std::pair<bool, double>(true, m_con->duration / (double)AV_TIME_BASE);
+		lib::logger::get_logger()->debug("ffmpeg_audio_datasource::get_dur: duration=%f", rv.second);
+	}
+	m_lock.leave();
+	return rv;
 }
 
 #endif // WITH_FFMPEG_AVFORMAT
@@ -1025,6 +1037,7 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(const net::url& url, dataso
 	m_fmt(audio_format(0, 0, 0)),
 	m_event_processor(NULL),
 	m_src(src),
+	m_duration(false, 0),
 	m_client_callback(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource() -> 0x%x m_buffer=0x%x", (void*)this, (void*)&m_buffer);
@@ -1040,18 +1053,17 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource *const src
 	m_fmt(audio_format(0, 0, 0)),
 	m_event_processor(NULL),
 	m_src(src),
+	m_duration(false, 0),
 	m_client_callback(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource() -> 0x%x m_buffer=0x%x", (void*)this, (void*)&m_buffer);
 	ffmpeg_init();
 	audio_format fmt = src->get_audio_format();
+	m_duration = src->get_dur();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 	if (!select_decoder(fmt))
 		lib::logger::get_logger()->error(gettext("ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
 }
-
-  
-
 
 ffmpeg_decoder_datasource::~ffmpeg_decoder_datasource()
 {
@@ -1334,8 +1346,7 @@ ffmpeg_decoder_datasource::get_audio_format()
 std::pair<bool, double>
 ffmpeg_decoder_datasource::get_dur()
 {
-//	if (m_con) lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::get_dur: duration=%f", (double)m_con->duration);
-	return std::pair<bool, double>(false, 0.0);
+	return m_duration;
 }
 
 bool
