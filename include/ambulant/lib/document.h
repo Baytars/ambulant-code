@@ -189,7 +189,8 @@ class document : public node_context {
  
 } // namespace ambulant
 
-#if !defined(AMBULANT_PLATFORM_WIN32_WCE)
+//#if !defined(AMBULANT_PLATFORM_WIN32_WCE)
+#if 0
 inline std::string repr(const ambulant::lib::custom_test& t) {
 	std::string s;
 	return s << '(' << t.idd << ", state:" << t.state << ", override:" << t.override << ", \'" << t.title << "\')";
