@@ -54,6 +54,7 @@
 #include "ambulant/gui/cocoa/cocoa_audio.h"
 #include "ambulant/gui/cocoa/cocoa_text.h"
 #include "ambulant/gui/cocoa/cocoa_image.h"
+#include "ambulant/gui/cocoa/cocoa_mouse.h"
 #include "ambulant/lib/mtsync.h"
 
 #include <Cocoa/Cocoa.h>
@@ -153,6 +154,12 @@ cocoa_window_factory::new_window(const std::string &name, size bounds, abstract_
 	[view setAmbulantWindow: window];
 	return window;
 }
+
+abstract_mouse_region *
+cocoa_window_factory::new_mouse_region()
+{
+	return new cocoa_mouse_region();
+};
 
 
 } // namespace cocoa

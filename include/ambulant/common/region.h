@@ -119,8 +119,10 @@ class passive_region : public abstract_rendering_source {
 		m_cur_active_region(NULL),
                 m_mouse_region(NULL)
         {
-            m_mouse_region = parent->m_mouse_region->clone();
-            m_mouse_region->clear();    
+			if (parent) {
+				m_mouse_region = parent->m_mouse_region->clone();
+				m_mouse_region->clear();
+			}
         }
 	virtual void need_redraw(const screen_rect<int> &r);
 	virtual void need_events(abstract_mouse_region *rgn);
@@ -160,8 +162,10 @@ class active_region : public abstract_rendering_surface, public abstract_renderi
 		m_renderer(NULL),
                 m_mouse_region(NULL)
         {
-            m_mouse_region = source->m_mouse_region->clone();
-            m_mouse_region->clear();
+			if (source->m_mouse_region) {
+				m_mouse_region = source->m_mouse_region->clone();
+				m_mouse_region->clear();
+			}
         }
 	virtual ~active_region() {}
 	

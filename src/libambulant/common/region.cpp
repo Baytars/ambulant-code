@@ -177,6 +177,7 @@ lib::passive_region::mouse_region_changed()
 lib::passive_root_layout::passive_root_layout(const std::string &name, size bounds, window_factory *wf)
 :   passive_region(name, NULL, screen_rect<int>(point(0, 0), size(bounds.w, bounds.h)), point(0, 0))
 {
+	m_mouse_region = wf->new_mouse_region();
 	m_gui_window = wf->new_window(name, bounds, this);
 }
 		
