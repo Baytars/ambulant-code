@@ -56,7 +56,7 @@
 #include "ambulant/lib/colors.h"
 #include "ambulant/lib/logger.h"
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -284,12 +284,12 @@ qt_transition_blitclass_poly::update()
 	setup_transition(m_outtrans, aqw, &qpm, &npm);
 	QImage img1 = qpm->convertToImage();
 	QImage img2 = npm->convertToImage();
-	std::vector<point>::iterator newpoint;
 	QPointArray qpa;
 	int idx = 0;
+	std::vector<point>::iterator newpoint;
 	for( newpoint=m_newpolygon.begin();
 	     newpoint != m_newpolygon.end(); newpoint++) {
-		point p = *newpoint;
+	    	point p = *newpoint;
 		qpa.putPoints(idx++, 1, p.x, p.y);
 	}
 	QRegion qreg(qpa, true);
