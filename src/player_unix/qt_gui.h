@@ -129,9 +129,6 @@ class qt_gui : public QWidget {
 
 public slots:
 	void slot_play();
-#ifdef QT_NO_FILEDIALOG		/* Assume embedded Qt */
-	void setDocument(const QString& applnk_filename);
-#endif/*QT_NO_FILEDIALOG*/
 
 private slots:
 	void slot_about();

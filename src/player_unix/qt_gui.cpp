@@ -294,23 +294,9 @@ qt_gui::slot_quit() {
 	qApp->quit();
 }
 
-#ifdef QT_NO_FILEDIALOG		/* Assume embedded Qt */
-void 
-qt_gui::setDocument(const QString& applnk_filename) {
-	AM_DBG printf("%s-%s(%s)\n", m_programfilename, "qt_gui::setDocument", *applnk_filename);
-	DocLnk* dl = new DocLnk(applnk_filename);
-	QString data;
-
-	FileManager fm;
-	if ( ! fm.loadFile(*dl, data)) {
-		fileError(applnk_filename);
-		return;
-	}
-}
-	
-#endif/*QT_NO_FILEDIALOG*/
 int
 main (int argc, char*argv[]) {
+	FILE* DBG = fopen("/tmp/ambulant.dbg", "w");
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
 	QApplication myapp(argc, argv);
 #else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
@@ -321,17 +307,27 @@ main (int argc, char*argv[]) {
 	qt_gui* mywidget = new qt_gui(argv[0], argc > 1 ? argv[1] : "");
 #ifndef QT_NO_FILEDIALOG     /* Assume plain Qt */
 	mywidget->setGeometry(750, 50, 320, 240);
-//	mywidget->setBackgroundMode(Qt::NoBackground);
-	/* Fire */
+	mywidget->setBackgroundMode(Qt::NoBackground);
 	myapp.setMainWidget(mywidget);
 #else /*QT_NO_FILEDIALOG*/   /* Assume embedded Qt */
-	myapp.showMainDocumentWidget(mywidget);
+//	mywidget->setBackgroundMode(QWidget::NoBackground);
+	myapp.showMainWidget(mywidget);
 #endif/*QT_NO_FILEDIALOG*/
 	mywidget->show();
-//	myapp.processEvents();
+	
+	fprintf(DBG, "argc=%d argv[0]=%s\n", argc, argv[0]);
 	if (argc > 1) {
-	    mywidget->openSMILfile(argv[1], IO_ReadOnly);
+	  char last[6];
+	  char*str = argv[argc-1];
+	  int len = strlen(str);
+	  strcpy(last, &str[len-5]);
+	  fprintf(DBG, "%s %s %d\n", str, last, strcpy(last, ".smil"));
+	  if (strcmp(last, ".smil") == 0
+	      || strcmp(&last[1], ".smi") == 0
+	      || strcmp(&last[1], ".sml") == 0) {
+	    mywidget->openSMILfile(argv[argc-1], IO_ReadOnly);
 	    mywidget->slot_play();
+	  }
 	}
 	myapp.exec();
 	std::cout << "Exiting program" << std::endl;
