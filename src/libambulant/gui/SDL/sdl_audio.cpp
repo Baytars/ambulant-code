@@ -58,18 +58,14 @@ namespace ambulant {
 
 using namespace lib;
 
-extern "C" {
-	void cllback(void *userdata, Uint8 *stream, int len)
-	{
-		gui::sdl::sdl_active_audio_renderer* dummy;
-		dummy = (gui::sdl::sdl_active_audio_renderer*) userdata; 
-		dummy->callback(userdata, stream, len);	
-	};
-}
-	
-bool gui::sdl::sdl_active_audio_renderer::m_sdl_init;
-int	 gui::sdl::sdl_active_audio_renderer::m_mixed_channels = 0;
 
+	
+bool gui::sdl::sdl_active_audio_renderer::m_sdl_init = false;
+int	 gui::sdl::sdl_active_audio_renderer::m_mixed_channels = 0;
+int	 gui::sdl::sdl_active_audio_renderer::m_channels_open = 0;
+
+
+	
 gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
 	active_playable_events *context,
 	active_playable_events::cookie_type cookie,
@@ -81,20 +77,19 @@ gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
     m_rate = 44100;
     m_channels = 1;
     m_bits=16;
-	m_audiospec=NULL;
+	m_audio_format = AUDIO_S16;
+	m_buffer_size = 4096;
+	m_channel_used =0;	
 }
 
 int
 gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
 {
-	
-	
-	SDL_AudioSpec *audiospec;
     int err = 0;
     if (!m_sdl_init) {	
   		err = SDL_Init(SDL_INIT_AUDIO /*| SDL_INIT_NOPARACHUTE*/);
 		if (err < 0) {
-        	AM_DBG lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL init failed", (void *)this);
+        	lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL init failed", (void *)this);
        		return err;
     		} 
 		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): SDL init succes", (void *)this);	
@@ -102,15 +97,20 @@ gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
     	m_channels = channels;
     	m_bits = bits;
 		
-		err = Mix_OpenAudio(m_rate, m_format, m_channels, m_buffer_size);
-		
+		err = Mix_OpenAudio(m_rate, m_audio_format, m_channels, m_buffer_size);
+			
     	if (err < 0) {
-			AM_DBG lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL open failed", (void *)this);
+			lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL open failed", (void *)this);
         	return err;
     	}
-		m_mixed_channels++;
-		err = Mix_AllocateChannels(m_mixed_channels);
-		m_sdl_init = true;
+		m_channels_open++;
+		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): open channels %d", (void *)this, m_channels_open++ );	
+		if (m_channels_open > m_mixed_channels) {
+			m_mixed_channels++;
+			err = Mix_AllocateChannels(m_mixed_channels);
+			AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): increasing mix channels by 1", (void *)this);	
+		}
+//		m_sdl_init = true;
     } else {
         err = 0;
     }
@@ -122,16 +122,38 @@ gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
 
 gui::sdl::sdl_active_audio_renderer::~sdl_active_audio_renderer()
 {
-	free(m_audiospec);
-	m_sdl_init = false;
-	SDL_CloseAudio();
-	SDL_Quit();
+	m_channels_open--;
+	Mix_CloseAudio();
 }
+
+
+
 
 
 void
 gui::sdl::sdl_active_audio_renderer::readdone()
 {
+	int result;
+	m_audio_chunck.allocated = 0;
+	m_audio_chunck.volume = 128;
+	m_audio_chunck.abuf = (Uint8*) m_src->read_ptr();
+	
+	m_audio_chunck.alen = m_src->size();
+	if (m_channel_used == 0) {
+		result = Mix_PlayChannel(-1, &m_audio_chunck, 0);
+	} else {
+		result = Mix_PlayChannel(m_channel_used, &m_audio_chunck, 0);
+	}
+	
+	if (result < 0) {
+		lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): Failed to play sound", (void *)this);	
+		AM_DBG printf("Mix_PlayChannel: %s\n",Mix_GetError());
+	} else {
+		if(m_channel_used == 0) {
+			m_channel_used = result;
+		}
+	}
+	
     if (!m_src->end_of_file()) {
 		m_src->start(m_event_processor, m_readdone);
 	} else {
@@ -229,8 +251,6 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
             stopped_callback();
         }
 	}
-    
-
 }
 
 }// end namespace ambulant
