@@ -60,25 +60,19 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/asb.h"
 
+ 
 namespace ambulant {
 using namespace lib;
     namespace gui {
         namespace sdl {
 
-//~ struct channel {
-	//~ int channel_nr;
-	//~ bool free;
-//~ };
-			
-//~ class audio_channel {
-  //~ public:
-    //~ audio_channel() {};
-	//~ ~audio_channel() {};
-	//~ int get_channel();		
-	//~ void free_channel();
-  //~ private:
-	//~ static channel* m_channel_list;
-//~ };
+ 
+ 
+ 
+ 
+ 
+
+
 	  
 
 class sdl_active_audio_renderer : public active_renderer, public timer_events {
@@ -109,14 +103,13 @@ class sdl_active_audio_renderer : public active_renderer, public timer_events {
 	  void wantclicks(bool want) {};
       void user_event(const point &where) {};
   	  void callback(void *userdata, Uint8 *stream, int len);
+	  void playdone();
 		  
 	private:
-	
+	  int inc_channels();
+	  int init(int rate, int bits, int channels);
       static bool m_sdl_init;
 	  static int m_mixed_channels;
-	  static int m_channels_open;
-	
-  	  int init(int rate, int bits, int channels);
       Mix_Chunk m_audio_chunck;
 	  int m_use_channel;
       int m_rate;

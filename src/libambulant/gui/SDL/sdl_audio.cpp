@@ -52,17 +52,144 @@
 #endif
 
 #include "ambulant/gui/SDL/sdl_audio.h"
-
+#include "malloc.h"
 
 namespace ambulant {
 
 using namespace lib;
+	
+extern "C" {
+struct channel {
+	int m_channel_nr;
+	bool m_free;
+	void* m_ptr;
+ };
+ 
+ struct channel_list {
+	 int m_channels_open;
+	 channel* m_list;
+ };
+ 
+channel_list m_channel_list;
+
+void dump_channel_list() {
+int i; 
+for(i=0;i < m_channel_list.m_channels_open; i++) {
+		std::cout << m_channel_list.m_list[i].m_channel_nr  << " , " <<
+		m_channel_list.m_list[i].m_free << " , " <<
+		m_channel_list.m_list[i].m_ptr << std::endl;
+	}
+}
+ 
+void init_channel_list(int nr_channels)
+{
+	int i;
+	
+	m_channel_list.m_channels_open = nr_channels;
+	m_channel_list.m_list = (channel*) malloc(nr_channels*sizeof(channel)); 
+	for(i=0;i < m_channel_list.m_channels_open; i++) {
+		m_channel_list.m_list[i].m_channel_nr = i;
+		m_channel_list.m_list[i].m_free = true;
+		m_channel_list.m_list[i].m_ptr = NULL;
+	}
+}
 
 
+// returns 0 on succes and -1 on a memory allocation error.
+int resize_channel_list(int nr_channels)
+{
+	channel* ptr;
+	int i;
+	
+	ptr = (channel*) realloc(m_channel_list.m_list, nr_channels*sizeof(channel));
+	if (ptr) {
+		m_channel_list.m_list = ptr;
+		if (nr_channels > m_channel_list.m_channels_open) {
+			for(i = m_channel_list.m_channels_open; i < nr_channels; i++) {
+				m_channel_list.m_list[i].m_channel_nr = i;
+				m_channel_list.m_list[i].m_free = true;
+				m_channel_list.m_list[i].m_ptr = NULL;
+			}
+		}
+		m_channel_list.m_channels_open = nr_channels;
+		return 0;
+	}
+	return -1;
+}
+
+void free_channel_list()
+{
+	free(m_channel_list.m_list);
+	m_channel_list.m_list = NULL;
+	m_channel_list.m_channels_open = 0;
+}
+
+// returns zero if succesfull, -1 if the channel is alreay locked, -2 if channel_nr is to big.
+int lock_channel(void* ptr, int channel_nr)
+{
+	if(channel_nr < m_channel_list.m_channels_open) {
+		if (m_channel_list.m_list[channel_nr].m_free == false) {
+				return -1;
+		}
+		m_channel_list.m_list[channel_nr].m_free = false;
+		m_channel_list.m_list[channel_nr].m_ptr = ptr;
+	} else {
+		return -2;
+	}
+	return 0;
+}
+
+int unlock_channel(int channel_nr)
+{
+	if(channel_nr < m_channel_list.m_channels_open) {
+		m_channel_list.m_list[channel_nr].m_free = true;
+		m_channel_list.m_list[channel_nr].m_ptr = NULL;
+	} else {
+		return -2;
+	}
+	return 0;
+}
+
+// Returns pointer to an sdl_active_audio_renderer, or NULL incase the channel is not in use or does not exist.
+void* get_ptr(int channel_nr)
+{
+	if(channel_nr < m_channel_list.m_channels_open) {
+		if (m_channel_list.m_list[channel_nr].m_free == true) {
+				return NULL;
+		}
+		return m_channel_list.m_list[channel_nr].m_ptr;
+	}
+	return NULL;
+}
+
+// returns a channel number and locks it or returns -1 if there are no free channels, -2 if the channel does not exist.
+int free_channel()
+{
+	int i;
+	int err;
+	for(i=0;i < m_channel_list.m_channels_open; i++) {
+		if(m_channel_list.m_list[i].m_free == true) {
+			return m_channel_list.m_list[i].m_channel_nr;
+		}
+		return -1;
+	}
+	return -2;
+}
+
+ 
+
+void channel_done(int channel)
+{
+        gui::sdl::sdl_active_audio_renderer* dummy;
+        dummy = (gui::sdl::sdl_active_audio_renderer*) get_ptr(channel);
+        dummy->playdone();
+}
+
+} //end extern "C"
 	
 bool gui::sdl::sdl_active_audio_renderer::m_sdl_init = false;
 int	 gui::sdl::sdl_active_audio_renderer::m_mixed_channels = 0;
-int	 gui::sdl::sdl_active_audio_renderer::m_channels_open = 0;
+
 
 
 	
@@ -79,7 +206,7 @@ gui::sdl::sdl_active_audio_renderer::sdl_active_audio_renderer(
     m_bits=16;
 	m_audio_format = AUDIO_S16;
 	m_buffer_size = 4096;
-	m_channel_used =0;	
+	m_channel_used = 0;	
 }
 
 int
@@ -92,41 +219,51 @@ gui::sdl::sdl_active_audio_renderer::init(int rate, int bits, int channels)
         	lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL init failed", (void *)this);
        		return err;
     		} 
-		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): SDL init succes", (void *)this);	
-		m_rate = rate;
-    	m_channels = channels;
-    	m_bits = bits;
-		
-		err = Mix_OpenAudio(m_rate, m_audio_format, m_channels, m_buffer_size);
-			
-    	if (err < 0) {
-			lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL open failed", (void *)this);
-        	return err;
-    	}
-		m_channels_open++;
-		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): open channels %d", (void *)this, m_channels_open++ );	
-		if (m_channels_open > m_mixed_channels) {
-			m_mixed_channels++;
-			err = Mix_AllocateChannels(m_mixed_channels);
-			AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): increasing mix channels by 1", (void *)this);	
-		}
-//		m_sdl_init = true;
+		m_sdl_init = true;
+		m_mixed_channels=16;
+		err = Mix_AllocateChannels(m_mixed_channels);
+		Mix_ChannelFinished(channel_done);
+		init_channel_list(m_mixed_channels);
+			dump_channel_list();
+		AM_DBG lib::logger::get_logger()->trace("sdl_active_renderer.init(0x%x): SDL init succes", (void *)this);			
     } else {
         err = 0;
     }
-	
-    return err;
+	m_rate = rate;
+    m_channels = channels;
+    m_bits = bits;
+	err = Mix_OpenAudio(m_rate, m_audio_format, m_channels, m_buffer_size);
+	if (err < 0) {
+		lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): SDL open failed", (void *)this);
+    	return err;
+	}
+		
+   return err;
 }
 
- 
+int
+gui::sdl::sdl_active_audio_renderer::inc_channels()
+{
+	m_mixed_channels += 16;
+	int err;
+	err = Mix_AllocateChannels(m_mixed_channels);
+	err = resize_channel_list(m_mixed_channels);
+	return err;
+}
+
 
 gui::sdl::sdl_active_audio_renderer::~sdl_active_audio_renderer()
 {
-	m_channels_open--;
-	Mix_CloseAudio();
+	
+	
 }
 
-
+void
+gui::sdl::sdl_active_audio_renderer::playdone()
+{
+	AM_DBG lib::logger::get_logger()->trace("Unlocking channel %d", m_channel_used);
+	unlock_channel(m_channel_used);
+}
 
 
 
@@ -139,9 +276,24 @@ gui::sdl::sdl_active_audio_renderer::readdone()
 	m_audio_chunck.abuf = (Uint8*) m_src->read_ptr();
 	
 	m_audio_chunck.alen = m_src->size();
+	AM_DBG lib::logger::get_logger()->trace("STARTING TO PLAY");	
+
 	if (m_channel_used == 0) {
-		result = Mix_PlayChannel(-1, &m_audio_chunck, 0);
+		m_channel_used = free_channel();
+		AM_DBG lib::logger::get_logger()->trace("free_channel() returned  : %d", m_channel_used);
+		if (m_channel_used < 0) {
+			result = inc_channels();
+			if( result < 0) 
+			{	
+				lib::logger::get_logger()->error("sdl_active_renderer.init(0x%x): failed memory allocation ", (void *)this);	
+			}
+			m_channel_used = free_channel();
+		}
+		lock_channel((void*) this, m_channel_used);
+		AM_DBG lib::logger::get_logger()->trace("New Channel : %d", m_channel_used);
+		result = Mix_PlayChannel(m_channel_used,&m_audio_chunck, 0);
 	} else {
+		AM_DBG lib::logger::get_logger()->trace("PLAYING USING CHANNEL : %d", m_channel_used);	
 		result = Mix_PlayChannel(m_channel_used, &m_audio_chunck, 0);
 	}
 	
@@ -204,30 +356,30 @@ gui::sdl::sdl_active_audio_renderer::is_stopped()
 bool
 gui::sdl::sdl_active_audio_renderer::is_playing()
 {
-	if( SDL_audiostatus() == SDL_AUDIO_PLAYING ) {
-		return true;
-	} else {
-		return false;
-	}
+	//if( SDL_audiostatus() == SDL_AUDIO_PLAYING ) {
+	//	return true;
+	//} else {
+	//	return false;
+	//}
 }
 
 
 void
 gui::sdl::sdl_active_audio_renderer::stop()
 {
-	SDL_PauseAudio(1);
+	//SDL_PauseAudio(1);
 }
 
 void
 gui::sdl::sdl_active_audio_renderer::pause()
 {
-	SDL_PauseAudio(1);
+	//SDL_PauseAudio(1);
 }
 
 void
 gui::sdl::sdl_active_audio_renderer::resume()
 {
-	SDL_PauseAudio(0);
+	//SDL_PauseAudio(0);
 }
 
 
@@ -244,7 +396,7 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
 	if (m_src) {
 		init(m_rate, m_bits, m_channels);
 		m_src->start(m_event_processor, m_readdone);
-		SDL_PauseAudio(0);
+		//SDL_PauseAudio(0);
 	} else {
 		lib::logger::get_logger()->error("active_renderer.start: no datasource");
 		if (m_playdone) {
@@ -252,5 +404,11 @@ gui::sdl::sdl_active_audio_renderer::start(double where)
         }
 	}
 }
+
+//~ void
+//~ gui::sdl::sdl_active_audio_renderer::playdone(int channel)
+//~ {
+//~ m_channels_open--;
+//~ }
 
 }// end namespace ambulant
