@@ -264,6 +264,7 @@ qt_window_factory::new_window (const std::string &name,
  	ambulant_qt_window * aqw = new ambulant_qt_window(name, r, region);
 	qt_ambulant_widget * qaw = new qt_ambulant_widget(name, r, m_parent_widget);
 #ifndef	QT_NO_FILEDIALOG     /* Assume plain Qt */
+	qaw->setBackgroundMode(Qt::NoBackground);
 	if (qApp == NULL || qApp->mainWidget() == NULL) {
 		lib::logger::get_logger()->error("qt_window_factory::new_window (0x%x) %s",
 			(void*) this,
@@ -271,6 +272,7 @@ qt_window_factory::new_window (const std::string &name,
 	}
 	qApp->mainWidget()->resize(bounds.w + m_p.x, bounds.h + m_p.y);
 #else	/*QT_NO_FILEDIALOG*/  /* Assume embedded Qt */
+	qaw->setBackgroundMode(QWidget::NoBackground);
 	/* No resize implemented for embedded Qt */
 #endif	/*QT_NO_FILEDIALOG*/
 	aqw->set_ambulant_widget(qaw);
