@@ -53,6 +53,8 @@
 #ifndef AMBULANT_LIB_ABSTRACT_MTSYNC_H
 #define AMBULANT_LIB_ABSTRACT_MTSYNC_H
 
+#include "ambulant/config/config.h"
+
 namespace ambulant {
 
 namespace lib {
