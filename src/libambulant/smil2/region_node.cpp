@@ -50,83 +50,95 @@
  * @$Id$ 
  */
 
-// A utility for building a dom tree
-// from a file or a string.
-// Uses expat parser as the xml parser
-// and nodes from node.h
+#include "ambulant/common/region_eval.h"
+#include "ambulant/smil2/region_node.h"
 
-#ifndef AMBULANT_LIB_TREE_BUILDER_H
-#define AMBULANT_LIB_TREE_BUILDER_H
+using namespace ambulant;
+using namespace smil2;
 
-#include "ambulant/config/config.h"
-
-#include "ambulant/lib/sax_handler.h"
-#include "ambulant/lib/expat_parser.h"
-#include "ambulant/lib/node.h"
-
-#include <string>
-
-namespace ambulant {
-
-namespace lib {
-
-class node_context;
-
-class tree_builder : 
-	public sax_content_handler, 
-	public sax_error_handler {
-
-  ///////////////
-  public:
-	tree_builder(node_context *context = 0);
-	
-	~tree_builder();
-
-	// build tree functions
-	bool build_tree_from_file(const char *filename);
-	bool build_tree_from_str(const std::string& str);
-
-	// check result of build tree functions
-	bool was_well_formed() const {return m_well_formed;}
-	
-	// get a pointer to the root node
-	// use detach() to become owner
-	node* get_tree() { return m_root;}
-	const node* get_tree() const { return m_root;}
-	
-	// call this function to get the tree and become owner
-	node* detach();
-
-	// set ready to build next xml tree
-	void reset();
-	
-	///////////////
-	// sax_content_handler interface	
-	virtual void start_document();
-	virtual void end_document();
-	virtual void start_element(const q_name_pair& qn, const q_attributes_list& qattrs);
-	virtual void end_element(const q_name_pair& qn);
-	virtual void start_prefix_mapping(const xml_string& prefix, const xml_string& uri);
-	virtual void end_prefix_mapping(const xml_string& prefix);
-	virtual void characters(const char *buf, size_t len);
-	
-	///////////////
-	// sax_error_handler interface	
-	virtual void error(const sax_error& error);
-	
-  ///////////////
-  private:
-	expat_parser *m_xmlparser;
-	node *m_root;
-	node *m_current;
-	bool m_well_formed;
-	node_context *m_context;
-};
-
-
-} // namespace lib
+region_node::region_node(const lib::node *n)
+:	m_node(n),
+	m_dim_inherit(di_parent),
+	m_fit(common::fit_hidden),
+	m_zindex(0),
+	m_bgcolor(lib::to_color(0,0,0)),
+	m_transparent(true),
+	m_showbackground(true),
+	m_inherit_bgcolor(false) {}
  
-} // namespace ambulant
+lib::basic_rect<int>
+region_node::get_rect() const {
+	const region_node *inherit_region = NULL;
+	const region_node *parent_node = up();
+	switch(m_dim_inherit) {
+	  case di_parent:
+		if (parent_node)
+			inherit_region = parent_node;
+		break;
+	  case di_region_attribute:
+	    inherit_region = NULL; // XXXX
+		break;
+	  case di_rootlayout:
+		{
+			const region_node *root_node = get_root();
+			const region_node *rootlayout_node = root_node->get_first_child("root-layout");
+			if (rootlayout_node)
+				inherit_region = rootlayout_node;
+		}
+		break;
+	  case di_none:
+		break;
+	}
+	if(inherit_region == NULL) {
+		int w = m_rds.width.get_as_int();
+		int h = m_rds.height.get_as_int();
+		
+		return lib::basic_rect<int, int>(lib::basic_size<int>(w, h)); 
+	}
+	lib::basic_rect<int> rc = inherit_region->get_rect();
+	common::region_evaluator re(rc.w, rc.h);
+	re.set(m_rds);
+	return re.get_rect();
+}
+ 
+lib::screen_rect<int>
+region_node::get_screen_rect() const {
+	return lib::screen_rect<int>(get_rect());
+}
 
-#endif // AMBULANT_LIB_TREE_BUILDER_H
+std::string
+region_node::get_name() const {
+	const char *pid = m_node->get_attribute("id");
+	if (pid) return pid;
+	return "";
+}
 
+lib::color_t
+region_node::get_bgcolor() const
+{
+	if(m_inherit_bgcolor) {
+		const region_node *parent_node = up();
+		if (parent_node)
+			return parent_node->get_bgcolor();
+	}
+	return m_bgcolor;
+}
+
+bool
+region_node::get_transparent() const
+{
+	return m_transparent;
+}
+
+bool
+region_node::get_showbackground() const
+{
+	return m_showbackground;
+}
+
+void
+region_node::set_bgcolor(lib::color_t c, bool transparent, bool inherit) { 
+	m_bgcolor = c;
+	m_transparent = transparent;
+	m_inherit_bgcolor = inherit;
+}
