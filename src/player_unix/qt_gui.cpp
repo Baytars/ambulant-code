@@ -171,8 +171,6 @@ qt_gui::qt_gui(const char* title,
 						   SLOT(slot_open()));
 		int url_id = filemenu->insertItem(gettext("Open &URL..."), this, 
 						  SLOT(slot_open_url()));
-		int reload_id = filemenu->insertItem(gettext("&Reload..."), this, 
-						     SLOT(slot_reload()));
 #ifdef QT_NO_FILEDIALOG	/* Assume embedded Qt */
 		// Disable unavailable menu entries
 		filemenu->setItemEnabled(open_id, true);
@@ -205,10 +203,7 @@ qt_gui::qt_gui(const char* title,
 				     SLOT(showFullScreen()));
 		viewmenu->insertItem(gettext("&Window"), this,SLOT(showNormal()));
 		viewmenu->insertSeparator();
-		viewmenu->insertItem(gettext("&Load settings..."), this,
-				     SLOT(slot_load_settings()));
 #ifdef	WITH_QT_LOGGER
-		viewmenu->insertSeparator();
 		viewmenu->insertItem(gettext("&Log Window..."), this,
 				     SLOT(slot_logger_window()));
 #endif/*WITH_QT_LOGGER*/
@@ -229,11 +224,7 @@ qt_gui::qt_gui(const char* title,
 		m_menubar->insertItem(gettext("&Help"), helpmenu);
 		m_menubar->setGeometry(0,0,320,20);
 		m_o_x = 0;
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
 		m_o_y = 27;
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-		m_o_y = 20;
-#endif/*QT_NO_FILEDIALOG*/
 	}
 	QObject::connect(this, SIGNAL(signal_player_done()),
 			    this, SLOT(slot_player_done()));
@@ -353,21 +344,23 @@ qt_gui::slot_open() {
 				 gettext("open file dialog"),
 				 gettext("Double Click a file to open")
 				 );
-	if (openSMILfile(smilfilename, IO_ReadOnly))
-		slot_play();
+	openSMILfile(smilfilename, IO_ReadOnly);
+	slot_play();
 #else	/*QT_NO_FILEDIALOG*/	
 	if (m_fileselector == NULL) {
-		QString mimeTypes("application/smil;");
-		m_fileselector = new FileSelector(mimeTypes, NULL,
-						  "slot_open", false);
-		m_fileselector->resize(240, 280);
+	  QString mimeTypes("application/smil;");
+	  m_fileselector = new FileSelector(mimeTypes, NULL,
+					    "slot_open", false);
+	  m_fileselector->resize(240, 280);
+	  QObject::connect(m_fileselector, 
+			   SIGNAL(fileSelected(const DocLnk&)),
+			   this, 
+			   SLOT(slot_file_selected(const DocLnk&)));
+	  QObject::connect(m_fileselector, SIGNAL(closeMe()), 
+			   this, SLOT(slot_close_fileselector()));
 	} else {
-		m_fileselector->reread();
+	  m_fileselector->reread();
 	}
-	QObject::connect(m_fileselector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(slot_file_selected(const DocLnk&)));
-	QObject::connect(m_fileselector, SIGNAL(closeMe()), 
-			 this, SLOT(slot_close_fileselector()));
 	m_fileselector->show();
 #endif	/*QT_NO_FILEDIALOG*/
 }
@@ -376,8 +369,8 @@ qt_gui::slot_open() {
 void
 qt_gui::setDocument(const QString& smilfilename) {
 #ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	if (openSMILfile(smilfilename, IO_ReadOnly))
-		slot_play();
+	openSMILfile(smilfilename, IO_ReadOnly);
+	slot_play();
 #endif/*QT_NO_FILEDIALOG*/
 }
 
@@ -388,72 +381,15 @@ qt_gui::slot_file_selected(const DocLnk& selected_file) {
 	QString smilfilename = *smilfilepointer;
 	delete smilfilepointer;
 	m_fileselector->hide();
-	if (openSMILfile(smilfilename, IO_ReadOnly))
-		slot_play();
+	openSMILfile(smilfilename, IO_ReadOnly);
+	slot_play();
 #endif/*QT_NO_FILEDIALOG*/
 }
-
 void
 qt_gui::slot_close_fileselector()
 {
 #ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	m_fileselector->hide();
-#endif/*QT_NO_FILEDIALOG*/
-}
-
-void
-qt_gui::slot_settings_selected(const DocLnk& selected_file) {
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	QString* smilsettingspointer = new QString(selected_file.file());
-	QString smilsettingsname = *smilsettingspointer;
-	delete smilsettingspointer;
-	m_settings_selector->hide();
-
-	if (openSMILfile(m_smilfilename, IO_ReadOnly))
-		slot_play();
-#endif/*QT_NO_FILEDIALOG*/
-}
-void
-qt_gui::slot_close_settings_selector()
-{
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	m_settings_selector->hide();
-#endif/*QT_NO_FILEDIALOG*/
-}
-
-void 
-qt_gui::slot_load_settings() {
-	if (m_playing)
-		slot_stop();
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-	QString settings_filename =
-		QFileDialog::getOpenFileName(
-				 ".", // Initial dir
-				 gettext("Settings files (*.xml)"), // file types
-				 this,
-				 gettext("open settings file dialog"),
-				 gettext("Double Click a settings file to open")
-				 );
-	smil2::test_attrs::load_test_attrs(settings_filename.ascii());
-	if (openSMILfile(m_smilfilename, IO_ReadOnly))
-		slot_play();
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-	/* TBD embedded Qt settings file dialog XXXX */
-	printf("1.m_settings_selector =0x%x\n",m_settings_selector );
-	if (m_settings_selector == NULL) {
-		QString mimeTypes("text/xml;");
-		m_settings_selector = new FileSelector(mimeTypes, NULL,
-						       "slot_open", false);
-		printf("2.m_settings_selector =0x%x\n",m_settings_selector );
-		m_settings_selector->resize(240, 280);
-	} else {
-		m_settings_selector->reread();
-	}
-	QObject::connect(m_settings_selector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(slot_settings_selected(const DocLnk&)));
-	QObject::connect(m_settings_selector, SIGNAL(closeMe()), 
-			 this, SLOT(slot_close_settings_selector()));
-	m_settings_selector->show();
 #endif/*QT_NO_FILEDIALOG*/
 }
 
@@ -505,16 +441,14 @@ qt_gui::player_done() {
 	emit signal_player_done();
 }
 
-void
-no_fileopen_infodisplay(QWidget* w, const char* caption) {
-	QMessageBox::information(w,caption,gettext("No file open: Please first select File->Open"));
-}
-
 void 
 qt_gui::slot_play() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_play");
-	if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
-		no_fileopen_infodisplay(this, m_programfilename);
+	if (m_smilfilename == NULL || m_mainloop == NULL
+	    || ! m_mainloop->is_open()) {
+		QMessageBox::information(
+			this, m_programfilename,
+			gettext("No file open: Please first select File->Open"));
 		return;
 	}
 	if (!m_playing) {
@@ -539,16 +473,6 @@ qt_gui::slot_pause() {
 		m_playmenu->setItemEnabled(m_pause_id, false);
 		m_playmenu->setItemEnabled(m_play_id, true);
 		m_mainloop->set_speed(0);
-	}
-}
-
-void 
-qt_gui::slot_reload() {
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_reload");
-	if (openSMILfile(m_smilfilename, IO_ReadOnly)) {
-		slot_play();
-	} else {
-		no_fileopen_infodisplay(this, m_programfilename);
 	}
 }
 
@@ -640,13 +564,14 @@ qt_gui::customEvent(QCustomEvent* e) {
 			m_mainloop->player_start(&msg[4], start, old);
 		}
 		break;
-	case qt_logger::CUSTOM_LOGMESSAGE:
 #ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-		qt_logger::get_qt_logger()->get_logger_window()->append(msg);
-#else /*QT_NO_FILEDIALOG*/
-/* No logger window on an embedded system, logging there on file */
-#endif/*QT_NO_FILEDIALOG*/
+	case qt_logger::CUSTOM_LOGMESSAGE:
+		qt_logger::get_qt_logger()->
+			get_logger_window()->append(msg);
 		break;
+#else /*QT_NO_FILEDIALOG*/
+/* No logger window on an embedded system, logging there on "stdout" */
+#endif/*QT_NO_FILEDIALOG*/
 	case ambulant::lib::logger::LEVEL_FATAL:
 		QMessageBox::critical(NULL, "AmbulantPlayer", msg);
 		break;
@@ -692,7 +617,6 @@ qt_gui::internal_message(int level, char* msg) {
 int
 main (int argc, char*argv[]) {
 
-//#undef	ENABLE_NLS
 #ifdef	ENABLE_NLS
 	// Load localisation database
 	bool private_locale = false;
@@ -785,6 +709,8 @@ main (int argc, char*argv[]) {
 		std::string error_message = gettext("Cannot open: ");
 		error_message = error_message + "\"" + argv[1] + "\"";
 		std::cerr << error_message << std::endl;
+		lib::logger::get_logger()->error
+		  ((const char*)error_message.c_str());
 		myapp.exec();
 	}
 	delete mywidget;
