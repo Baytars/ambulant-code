@@ -107,12 +107,71 @@ lib::passive_region::redraw(const screen_rect<int> &r, abstract_window *window)
 }
 
 void
+lib::passive_region::user_event(const point &where)
+{
+	AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x)", (void *)this);
+	point our_point = where;
+	// Test that it is in our active area
+#if 0
+	screen_rect<int> our_outer_rect = r & m_outer_bounds;
+	screen_rect<int> our_rect = m_outer_bounds.innercoordinates(our_outer_rect);
+	if (our_rect.empty())
+		return;
+	AM_DBG lib::logger::get_logger()->trace("passive_region.redraw(0x%x, our_ltrb=(%d, %d, %d, %d))", (void *)this, our_rect.left(), our_rect.top(), our_rect.right(), our_rect.bottom());
+		
+#endif
+	if (m_cur_active_region) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)m_cur_active_region);
+		m_cur_active_region->user_event(our_point);
+	} else {
+		AM_DBG lib::logger::get_logger()->error("passive_region.user_event(0x%x) no active region", (void *)this);
+	}
+	std::vector<passive_region *>::iterator i;
+	for(i=m_children.begin(); i<m_children.end(); i++) {
+		AM_DBG lib::logger::get_logger()->trace("passive_region.user_event(0x%x) -> child 0x%x", (void *)this, (void *)(*i));
+		(*i)->user_event(our_point);
+	}
+}
+
+void
 lib::passive_region::need_redraw(const screen_rect<int> &r)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
 	screen_rect<int> parent_rect = r & m_inner_bounds;
 	m_parent->need_redraw(m_outer_bounds.outercoordinates(parent_rect));
+}
+
+void
+lib::passive_region::need_events(abstract_mouse_region *rgn)
+{
+	if (!m_parent)
+		return;   // Audio region or some such
+	// Clip to our inner rect
+        *rgn &= m_inner_bounds;
+        // Convert to parent coordinate space
+        *rgn += m_outer_bounds.left_top();
+        if (m_mouse_region) delete m_mouse_region;
+        m_mouse_region = rgn;
+        m_parent->mouse_region_changed();
+}
+
+void
+lib::passive_region::mouse_region_changed()
+{
+    // Clear the mouse region
+    m_mouse_region->clear();
+    // Fill with the union of the regions of all our children
+    if (m_cur_active_region)
+        *m_mouse_region |= m_cur_active_region->get_mouse_region();
+    std::vector<passive_region *>::iterator i;
+    for(i=m_children.begin(); i<m_children.end(); i++) {
+        *m_mouse_region |= (*i)->get_mouse_region();
+    }
+    // Convert to our parent coordinate space
+    *m_mouse_region += m_outer_bounds.left_top();
+    // Tell our parent
+    m_parent->mouse_region_changed();
 }
 
 lib::passive_root_layout::passive_root_layout(const std::string &name, size bounds, window_factory *wf)
@@ -156,6 +215,19 @@ lib::active_region::redraw(const screen_rect<int> &r, abstract_window *window)
 }
 
 void
+lib::active_region::user_event(const point &where)
+{
+	if (m_renderer) {
+		AM_DBG lib::logger::get_logger()->trace("active_region.redraw(0x%x) -> renderer 0x%x", (void *)this, (void *)m_renderer);
+		m_renderer->user_event(where);
+	} else {
+		// At this point we should have a renderer that draws the default background
+		// When that is implemented this trace message should turn into an error (or fatal).
+		AM_DBG lib::logger::get_logger()->error("active_region.redraw(0x%x) no renderer", (void *)this);
+	}
+}
+
+void
 lib::active_region::need_redraw(const screen_rect<int> &r)
 {
 	m_source->need_redraw(r);
@@ -165,6 +237,14 @@ void
 lib::active_region::need_redraw()
 {
 	need_redraw(m_source->m_inner_bounds);
+}
+
+void
+lib::active_region::need_events(bool want)
+{
+	m_mouse_region->clear();
+        if (want) *m_mouse_region = m_source->m_inner_bounds;
+        m_source->mouse_region_changed();
 }
 
 void
