@@ -33,7 +33,6 @@ AC_CONFIG_FILES([Makefile
 	include/ambulant/gui/arts/Makefile
 	include/ambulant/gui/SDL/Makefile
 	include/ambulant/gui/qsound/Makefile
-	include/ambulant/plugin/Makefile
 	third_party_packages/Makefile])
 #
 # Find expat

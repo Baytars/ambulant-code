@@ -46,11 +46,14 @@
  *
  */
  
-#include"ambulant/plugin/plugin_factory.h"
+#include"ambulant/common/plugin_engine.h"
 #include "ambulant/lib/logger.h"
 
 #include<dlfcn.h>
 #include<stdlib.h>
+#include<dirent.h>
+
+
 
 
 //#define AM_DBG
@@ -61,18 +64,20 @@
 using namespace ambulant;
 
 
-plugin::plugin_engine()
+plugin::plugin_engine::plugin_engine()
 {
 	int nr_of_files;
-	plugin *plgin;
+
 	void *handle;
-	void (*init);
+	typedef void (*initfunctype)(common::global_playable_factory* rf, net::datasource_factory df);
+	initfunctype init;
+	
 	
 
 	
-	struc dirent **namelist;
+	dirent **namelist;
 	m_plugindir = getenv("AMB_PLUGIN_DIR");
-	plgin = new plugin;
+
 	if (m_plugindir != NULL) {
 		nr_of_files = scandir(m_plugindir, &namelist, NULL, NULL);
 		if (nr_of_files < 0) {
@@ -85,8 +90,8 @@ plugin::plugin_engine()
 	          		strcmp(namelist[nr_of_files]->d_name, "..")) { 
 					handle = dlopen(namelist[nr_of_files]->d_name, RTLD_LAZY);
 				  	if (handle) {
-						init = dlsym(handle,"initialize");
-						(*init)();
+						init = (initfunctype) dlsym(handle,"initialize");
+						(*init)(common::global_playable_factory* rf, net::datasource_factory df);
 		  			} else {
 						lib::logger::get_logger()->error("plugin_playable_factory::Error reading plugin %s",namelist[nr_of_files]);
 					}
