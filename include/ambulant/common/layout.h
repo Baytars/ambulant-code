@@ -67,6 +67,7 @@ class document;
 namespace common {
 
 class region_info;
+class animation_destination;
 class renderer; // forward
 class surface; // forward
 class surface_source; // forward
@@ -156,6 +157,13 @@ class alignment {
 	virtual lib::point get_surface_fixpoint(lib::size surface_size) const = 0;
 };
 
+// animation_notification is where an animator will send a notification when it
+// is has changed parameters on an animation destination.
+class animation_notification {
+  public:
+	virtual void animated() = 0;
+};
+
 // surface is a pure virtual baseclass for a region of screenspace.
 // It is the only interface that renderers use when talking to regions, and regions
 // use when talking to their parent regions.
@@ -214,6 +222,8 @@ class layout_manager {
   public:
 	virtual ~layout_manager() {};
 	virtual surface *get_surface(const lib::node *node) = 0;
+	virtual animation_notification *get_animation_notification(const lib::node *node) = 0;
+	virtual animation_destination *get_animation_destination(const lib::node *node) = 0;
 };
 
 // XXX These should be elsewhere

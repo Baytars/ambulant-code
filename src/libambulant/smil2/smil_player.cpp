@@ -339,7 +339,6 @@ smil_player::new_playable(const lib::node *n) {
 	int nid = n->get_numid();
 	std::string tag = n->get_local_name();
 	const char *pid = n->get_attribute("id");
-	const char *reg = n->get_attribute("region");
 	
 	surface *surf = m_layout_manager->get_surface(n);
 	AM_DBG m_logger->trace("%s[%s].new_playable  rect%s at %s", tag.c_str(), (pid?pid:"no-id"),
