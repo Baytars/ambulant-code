@@ -62,11 +62,6 @@
 #ifdef WITH_SDL
 #include "ambulant/gui/SDL/sdl_gui.h"
 #endif
-#ifdef WITH_MMS_PLAYER
-#include "ambulant/mms/mms_player.h"
-#else
-#include "ambulant/smil2/smil_player.h"
-#endif
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -102,9 +97,9 @@ mainloop::mainloop(const char *filename, ambulant::common::window_factory *wf)
 		return;
 	}
 #ifdef WITH_MMS_PLAYER
-	m_player = new mms::mms_player(m_doc, m_wf, m_rf);
+	m_player = common::create_mms_player(m_doc, m_wf, m_rf);
 #else
-	m_player = new smil2::smil_player(m_doc, m_wf, m_rf);
+	m_player = common::create_smil2_player(m_doc, m_wf, m_rf);
 #endif
 }
 
