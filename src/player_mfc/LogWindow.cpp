@@ -6,8 +6,17 @@
 #include "LogWindow.h"
 #include ".\logwindow.h"
 
+// logwindow_ostream implementation
 
-// PreferencesDlg dialog
+int
+logwindow_ostream::write(const char *cstr)
+{
+	CLogWindow *lwin = CLogWindow::GetLogWindowSingleton();
+	lwin->AppendText(cstr);
+	return 1;
+}
+
+// CLogWindow dialog
 
 IMPLEMENT_DYNAMIC(CLogWindow, CDialog)
 CLogWindow::CLogWindow(CWnd* pParent /*=NULL*/)
@@ -49,7 +58,7 @@ END_MESSAGE_MAP()
 // CLogWindow message handlers
 
 void
-CLogWindow::AppendText(char *data)
+CLogWindow::AppendText(const char *data)
 {
 	m_richedit.SetSel(-1, -1);
 	m_richedit.ReplaceSel(data);
