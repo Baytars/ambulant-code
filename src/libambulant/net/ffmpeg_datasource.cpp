@@ -50,6 +50,7 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/net/url.h"
+#include <math.h>
 #include <map>
 
 
@@ -65,7 +66,7 @@
 #endif
 
 // How many video frames we would like to buffer at most
-#define MAX_VIDEO_FRAMES 250
+#define MAX_VIDEO_FRAMES 25
 
 // Bug workaround: define RESAMPLE_READ_ALL to let the resampler
 // collect all data before calling the client callback
@@ -430,9 +431,8 @@ detail::ffmpeg_demux::run()
 			// Wait until there is room in the buffer
 			//while (sink->buffer_full() && !exit_requested()) {
 			while (sink && sink->buffer_full() && !exit_requested()) {
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space");
-				sleep(1);   // This is overdoing it
-				
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space");
+				usleep(100000);   // This is overdoing it
 				sink = m_sinks[pkt->stream_index];
 			}
 			if (sink && !exit_requested()) {
@@ -1309,7 +1309,7 @@ char*
 ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *size)
 {
 	// here we pay attention to now, the frame that is closest to now but just before is returned.
-	frame_qelt* frame, prev_frame;
+	qelt frame, prev_frame;
 	char *rv = NULL;
 	*timestamp = 0;
 	*size = 0;
