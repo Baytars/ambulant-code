@@ -56,7 +56,7 @@ class active_renderer : public ref_counted {
 	~active_renderer() {}
 	
 	virtual void start(event *playdone);
-	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft);
+	virtual void redraw(const screen_rect<int> &dirty, passive_window *window, const point &window_topleft) = 0;
 	virtual void stop();
 	
 	////////////////////////
