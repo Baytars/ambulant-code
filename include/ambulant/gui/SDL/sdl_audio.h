@@ -121,7 +121,7 @@ class sdl_active_audio_renderer : public common::playable_imp /*, public lib::ti
 	bool m_is_playing;
 	bool m_is_paused;
 	bool m_audio_started;
-  // class methods and attributes:
+  	// class methods and attributes:
 	static int init();
  	static void register_renderer(sdl_active_audio_renderer *rnd);
  	static void unregister_renderer(sdl_active_audio_renderer *rnd);
