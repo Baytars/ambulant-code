@@ -81,6 +81,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <map>
 
 static void 
 ffmpeg_init()
@@ -102,7 +103,18 @@ namespace ambulant
 namespace net
 {
 
+class ffmpeg_codec_id {
+  public:
+	static ffmpeg_codec_id* instance();
+  	~ffmpeg_codec_id() {};
 
+	void add_codec(const char* codec_name, 	CodecID id);
+	CodecID get_codec_id(const char* codec_name);
+  private:
+	ffmpeg_codec_id(); 
+	static ffmpeg_codec_id* m_uniqueinstance;
+	std::map<std::string, CodecID> m_codec_id;		  
+};
 
 	
 class ffmpeg_audio_datasource_factory : public audio_datasource_factory {
@@ -140,7 +152,7 @@ namespace detail {
 
 class datasink {
   public:
-    virtual void data_avail(int64_t pts, uint8_t *data, int size) = 0;
+    virtual void data_avail(timestamp_t pts, uint8_t *data, int size) = 0;
 	virtual bool buffer_full() = 0;
 };
 	
@@ -154,10 +166,15 @@ class abstract_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	virtual int audio_stream_nr() = 0;
 	virtual int video_stream_nr() = 0;
 	virtual int nstreams() = 0;
-	virtual timestamp_t duration() = 0;
+	virtual double duration() = 0;
+	//virtual int samplerate() = 0;
+	//virtual int channels() = 0;
+	virtual audio_format& get_audio_format() = 0;
 	
   protected:
 	virtual unsigned long run() = 0;
+  	audio_format m_fmt;
+  
 };
 
 
@@ -172,8 +189,10 @@ class ffmpeg_demux : public abstract_demux {
 	void remove_datasink(int stream_index);
     int audio_stream_nr();
   	int video_stream_nr();
-  	timestamp_t duration();
+    // XXX this should also be timestamp_t instead of double
+  	double duration();
   	int nstreams();
+    audio_format& get_audio_format() { return m_fmt; };
   	
 	void cancel();
   protected:
@@ -206,7 +225,7 @@ class demux_audio_datasource:
 	void stop();  
 
     void readdone(int len);
-    void data_avail(int64_t pts, uint8_t *data, int size);
+    void data_avail(timestamp_t pts, uint8_t *data, int size);
     bool end_of_file();
 	bool buffer_full();
 		

@@ -62,10 +62,8 @@ namespace ambulant {
 namespace net {
 
 	
-// this is what we want long long int for timestamp_t
-//typedef  long long int timestamp_t;
-// but for now we use double
-typedef double timestamp_t;
+
+typedef long long int timestamp_t;
 
 	
 /// This struct completely describes an audio format.
