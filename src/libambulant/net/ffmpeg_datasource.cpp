@@ -80,6 +80,7 @@ net::ffmpeg_datasource_factory::new_datasource(const std::string& url, audio_con
 	return NULL;	
 }
 
+
 		
 net::ffmpeg_audio_datasource::ffmpeg_audio_datasource(datasource *const src, lib::event_processor *const evp)
 :	m_codec(NULL),
@@ -175,7 +176,6 @@ net::ffmpeg_audio_datasource::callback()
 		}
 	}
 	if (m_con) {
-		
 		size = m_src->size();
 		while (size > 0 && !m_buffer.buffer_full()) {
 			m_inbuf = (uint8_t*) m_src->get_read_ptr();
@@ -269,6 +269,11 @@ net::ffmpeg_audio_datasource::select_decoder(char* file_ext)
 	if (m_codec == NULL) {
 			lib::logger::get_logger()->error("ffmpeg_audio_datasource.select_decoder : Failed to open codec");
 	}
+	m_con = avcodec_alloc_context();
+	
+	if(avcodec_open(m_con,m_codec) < 0) {
+			lib::logger::get_logger()->error("ffmpeg_audio_datasource.select_decoder : Failed to open avcodec");
+	}	
 }
 
 int 

@@ -119,9 +119,7 @@ class ffmpeg_audio_datasource: virtual public audio_datasource, virtual public l
   private:
 
   	AVCodec  *m_codec;
-  	AVCodec  *m_codec_enc;
     AVCodecContext *m_con;
-	AVCodecContext *m_con_enc;  
     lib::event_processor *const m_event_processor;
 //    lib::event *m_readdone;		// This is the callback our source makes to us
   	datasource* m_src;
@@ -129,9 +127,54 @@ class ffmpeg_audio_datasource: virtual public audio_datasource, virtual public l
 	uint8_t* m_inbuf;
 	uint8_t* m_outbuf;
 	databuffer m_buffer;
-  	databuffer m_dummy_buffer;
+  	//databuffer m_dummy_buffer;
 	bool m_blocked_full;
 	
+	lib::event *m_client_callback;  // This is our calllback to the client
+	lib::critical_section m_lock;
+};
+
+class ffmpeg_resample_datasource: virtual public audio_datasource, virtual public lib::ref_counted_obj {
+  public:
+	 ffmpeg_resample_datasource(datasource *const src, lib::event_processor *const evp);
+    ~ffmpeg_resample_datasource();
+     
+		  
+    void start(lib::event_processor *evp, lib::event *callback);  
+
+    void readdone(int len);
+    void callback();
+  
+    bool end_of_file();
+	bool buffer_full();
+		
+	char* get_read_ptr();
+	int size() const;   
+	
+  	int set_input_format(net::audio_context fmt);
+  	int set_output_format(net::audio_context fmt);
+  
+    
+	int get_input_format(net::audio_context &fmt);  
+  	int get_output_format(net::audio_context &fmt);
+  	
+  protected:
+	int init(); 
+  	
+	  
+  private:
+  	datasource* m_src;
+	
+  	ReSampleContext *m_resample_context;
+  
+	uint8_t* m_inbuf;
+	uint8_t* m_outbuf;
+	databuffer m_buffer;
+  	
+  	bool m_blocked_full;
+	
+    lib::event_processor *const m_event_processor;
+//   lib::event *m_readdone;		// This is the callback our source makes to us
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;
 };
