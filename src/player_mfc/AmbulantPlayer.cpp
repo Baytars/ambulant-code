@@ -82,7 +82,6 @@ BEGIN_MESSAGE_MAP(CAmbulantPlayerApp, CWinApp)
 	ON_COMMAND_EX_RANGE(ID_FILE_MRU_FILE1, ID_FILE_MRU_FILE1+16, OnOpenRecentFile)
 	ON_COMMAND(ID_FILE_OPENURL, OnFileOpenurl)
 	ON_COMMAND(ID_FILE_PREFERENCES, OnPreferences)
-	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
 END_MESSAGE_MAP()
 
 
@@ -271,13 +270,4 @@ void CAmbulantPlayerApp::OnPreferences()
 {
 	PreferencesDlg dlg;
 	if(dlg.DoModal() != IDOK) return;
-}
-
-void CAmbulantPlayerApp::OnViewLog()
-{
-	if (m_logwindow == NULL) {
-		m_logwindow = CLogWindow::GetLogWindowSingleton();
-	}
-	m_logwindow->ShowWindow(SW_SHOW);
-	m_logwindow->AppendText("Re-opened log window\r\n");
 }

@@ -105,8 +105,6 @@ public:
 	afx_msg void OnFileOpenurl();
 	afx_msg void OnPreferences();
 	afx_msg void OnViewLog();
-private:
-	CLogWindow *m_logwindow;
 };
 
 extern CAmbulantPlayerApp theApp;

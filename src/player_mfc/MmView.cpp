@@ -55,7 +55,7 @@
 
 #include "MmDoc.h"
 #include "MmView.h"
-
+#include "LogWindow.h"
 
 #include <fstream>
 #include <string>
@@ -83,6 +83,7 @@
 #define new DEBUG_NEW
 #endif
 
+#ifdef WITHOUT_LOG_WINDOW
 const TCHAR log_name[] = "amlog.txt";
 
 static std::string get_log_filename() {
@@ -94,7 +95,7 @@ static std::string get_log_filename() {
 	text_strcat(buf, log_name);
 	return std::string(ambulant::lib::textptr(buf).str());
 }
-
+#endif // WITHOUT_LOG_WINDOW
 
 static TCHAR *get_directory(const TCHAR *fn) {
 	static TCHAR buf[_MAX_PATH];
@@ -105,8 +106,10 @@ static TCHAR *get_directory(const TCHAR *fn) {
 	return buf;
 }
 
+#ifdef WITHOUT_LOG_WINDOW
 std::ofstream 
 log_os(get_log_filename().c_str());
+#endif
 
 // The handle of the single instance
 static HWND s_hwnd;
@@ -165,7 +168,7 @@ BEGIN_MESSAGE_MAP(MmView, CView)
 	ON_COMMAND(ID_VIEW_SOURCE, OnViewSource)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SOURCE, OnUpdateViewSource)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_LOG, OnUpdateViewLog)
-//	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
+	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
 	ON_MESSAGE(WM_SET_CLIENT_RECT, OnSetClientRect)
 	ON_COMMAND(ID_VIEW_TESTS, OnOpenFilter)
 	ON_COMMAND(ID_VIEW_FILTER, OnViewFilter)
@@ -191,7 +194,11 @@ MmView::MmView()
 	m_cursor_id = 0;
 	m_autoplay = true;
 	lib::logger::get_logger()->set_show_message(lib::win32::show_message);
+#ifdef WITHOUT_LOG_WINDOW
 	lib::logger::get_logger()->set_std_ostream(log_os);
+#else
+	lib::logger::get_logger()->set_ostream(new logwindow_ostream());
+#endif // WITHOUT_LOG_WINDOW
 #ifdef AM_PLAYER_DG
 	lib::logger::get_logger()->trace("Ambulant: using DG Player");
 #else
@@ -418,6 +425,8 @@ void MmView::OnUpdateViewSource(CCmdUI *pCmdUI) {
 }
 
 void MmView::OnViewLog() {
+#ifdef WITHOUT_LOG_WINDOW
+	// Logging to file: open the file in notepad.
 	TCHAR buf[_MAX_PATH];
 	GetModuleFileName(NULL, buf, _MAX_PATH);
 	TCHAR *p1 = text_strrchr(buf,TCHAR('\\'));
@@ -427,6 +436,14 @@ void MmView::OnViewLog() {
 	CString cmd = TEXT("Notepad.exe ");
 	cmd += buf;
 	WinExec(cmd, SW_SHOW);
+#else
+	// Logging to a window: show the window.
+	if (m_logwindow == NULL) {
+		m_logwindow = CLogWindow::GetLogWindowSingleton();
+	}
+	m_logwindow->ShowWindow(SW_SHOW);
+	m_logwindow->AppendText("Re-opened log window\r\n");
+#endif
 }
 
 void MmView::OnUpdateViewLog(CCmdUI *pCmdUI) {
