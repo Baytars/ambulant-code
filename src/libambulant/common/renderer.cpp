@@ -23,11 +23,12 @@ lib::active_renderer::active_renderer(event_processor *const evp,
 	m_src(src?src->activate():NULL),
 	m_dest(dest->activate(evp, node)),
 	m_node(node),
-	m_readdone(new readdone_callback(this, &lib::active_renderer::readdone, 
-					new lib::detail::readdone_callback_arg())),
+	m_readdone(NULL),
 	m_playdone(NULL),
 	m_refcount(1)
-{	
+{
+	m_readdone = new readdone_callback(this, &lib::active_renderer::readdone, 
+					new lib::detail::readdone_callback_arg());
 }
 
 void
