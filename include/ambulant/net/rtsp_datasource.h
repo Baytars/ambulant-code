@@ -142,24 +142,33 @@ class rtsp_demux : public lib::unix::thread, public lib::ref_counted_obj {
 	//bool m_eof;
 };
 
-class live_ffmpeg_audio_datasource: 
+
+class live_audio_datasource_factory : public audio_datasource_factory {
+  public:
+	~ffmpeg_audio_datasource_factory() {};
+	audio_datasource* new_audio_datasource(const net::url& url, audio_format_choices fmts);
+};
+
+
+
+class live_audio_datasource: 
 	virtual public audio_datasource,
 	public datasink,
 	virtual public lib::ref_counted_obj
 {
   public:
-	 static live_ffmpeg_audio_datasource *new_live_ffmpeg_audio_datasource(
+	 static live_audio_datasource *new_live_audio_datasource(
   		const net::url& url, 
-  		AVFormatContext *context,
+  		rtsp_context_t *context,
 		rtsp_demux *thread);
   	
-  	live_ffmpeg_audio_datasource(
+  	live_audio_datasource(
   		const net::url& url, 
-  		AVFormatContext *context,
+  		rtsp_context_t *context,
 		rtsp_demux *thread, 
   		int stream_index);
   
-    ~live_ffmpeg_audio_datasource();
+    ~live_audio_datasource();
 
     void start(lib::event_processor *evp, lib::event *callback);
 	void stop();  
@@ -178,7 +187,7 @@ class live_ffmpeg_audio_datasource:
   private:
     bool _end_of_file();
 	const net::url m_url;
-	AVFormatContext *m_con;
+	rtsp_context_t *m_con;
 	int m_stream_index;
 	audio_format m_fmt;
 	bool m_src_end_of_file;
@@ -189,55 +198,6 @@ class live_ffmpeg_audio_datasource:
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;
   
-};
-
-class live_ffmpeg_video_datasource:
-	virtual public video_datasource,
-	public datasink,
-	virtual public lib::ref_counted_obj {
-  public:
-	 static live_ffmpeg_video_datasource *new_live_ffmpeg_video_datasource(
-		const net::url& url, AVFormatContext *context,
-		rtsp_demux *thread);
-
-	 live_ffmpeg_video_datasource(const net::url& url, AVFormatContext *context,
-		rtsp_demux *thread, int stream_index);
-    ~live_ffmpeg_video_datasource();
-
-	bool has_audio();
-    int width();
-  	int height();
-	audio_datasource *get_audio_datasource();
-
-    void start_frame(lib::event_processor *evp, lib::event *callback, double timestamp);  
-	void stop();  
-
-    bool end_of_file();
-	char* get_frame(double *timestamp, int *size);
-	void frame_done(double timestamp, bool keepdata);
-	
-    void data_avail(int64_t ipts, uint8_t *data, int size);
-	bool buffer_full();
-	std::pair<bool, double> get_dur();
-
-  private:
-	int get_audio_stream_nr();
-    bool _end_of_file();
-	const net::url m_url;
-	AVFormatContext *m_con;
-	int m_stream_index;
-	bool m_src_end_of_file;
-    lib::event_processor *m_event_processor;
-	std::queue<std::pair<double, char*> > m_frames;
-	std::pair<double, char*> m_old_frame;
-	int m_size;		// NOTE: this assumes all decoded frames are the same size!
-//	databuffer m_buffer;
-	rtsp_demux *m_thread;
-	lib::event *m_client_callback;  // This is our calllback to the client
-  	bool m_thread_started;
-  	double m_pts_last_frame;
-  	double m_last_p_pts;
-    lib::critical_section m_lock;
 };
 
 
