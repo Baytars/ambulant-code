@@ -131,7 +131,7 @@ class active_renderer : public active_basic_renderer {
 		lib::event_processor *evp,
 		net::datasource_factory *df);
 		
-	~active_renderer() {}
+	virtual ~active_renderer();
 	
 	virtual void start(double where);
 	virtual void freeze() {}
@@ -143,8 +143,8 @@ class active_renderer : public active_basic_renderer {
 	virtual void redraw(const lib::screen_rect<int> &dirty, abstract_window *window) = 0;
 	virtual void user_event(const lib::point &where, int what = 0) { user_event_callback(what); }
 	virtual void set_surface(surface *dest) { m_dest = dest; }
-	virtual void set_intransition(lib::transition_info *info) {  }
-	virtual void set_outtransition(lib::transition_info *info) {  }
+	virtual void set_intransition(lib::transition_info *info) { m_intransition = info; }
+	virtual void set_outtransition(lib::transition_info *info) { m_outtransition = info; }
 	virtual surface *get_surface() { return m_dest;}
 	virtual renderer *get_renderer() { return this; }
 	virtual void readdone() {};
@@ -153,6 +153,7 @@ class active_renderer : public active_basic_renderer {
 
   	net::datasource *m_src;
 	surface *m_dest;
+	lib::transition_info *m_intransition, *m_outtransition;
 //	lib::event *m_readdone;
 };
 

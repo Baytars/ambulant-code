@@ -244,6 +244,15 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 #ifdef __OBJC__
 @implementation AmbulantView
 
+- (id)initWithFrame:(NSRect)frameRect
+{
+	[super initWithFrame: frameRect];
+	ambulant_window = NULL;
+	transition_surface = NULL;
+	transition_count = 0;
+	return self;
+}
+
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::screen_rect<int> *)arect
 {
 #ifdef USE_COCOA_BOTLEFT
@@ -278,7 +287,11 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
         AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
     } else {
 #ifdef DUMP_IMAGES_FORMAT
+		// If we want to dump images we always redraw the whole view
 		rect = [self bounds];
+#else
+		// If we have seen transitions we always redraw the whole view
+		if (transition_count) rect = [self bounds];
 #endif
         ambulant::lib::screen_rect<int> arect = [self ambulantRectForNSRect: &rect];
         ambulant_window->redraw(arect);
@@ -381,9 +394,43 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 #ifdef DUMP_IMAGES_FORMAT
 	return NO;
 #else
-	return YES;
+	return (transition_count == 0);
 #endif
 }
+
+- (void) incrementTransitionCount
+{
+	transition_count++;
+	/*AM_DBG*/ NSLog(@"incrementTransitionCount: count=%d", transition_count);
+}
+
+- (void) decrementTransitionCount
+{
+	assert(transition_count > 0);
+	transition_count--;
+	/*AM_DBG*/ NSLog(@"decrementTransitionCount: count=%d", transition_count);
+	// XXXX Should we delete transition_surface?
+}
+
+- (NSImage *)getTransitionSurface
+{
+	if (!transition_surface) {
+		// It does not exist yet. Create it.
+		transition_surface = [self getTransitionSource];
+	}
+	return transition_surface;
+}
+
+- (NSImage *)getTransitionSource
+{
+	NSRect bounds = [self bounds];
+	NSSize size = NSMakeSize(NSWidth(bounds), NSHeight(bounds));
+	NSImage *rv = [[NSImage alloc] initWithSize: size];
+	NSBitmapImageRep *bits = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [self bounds]];
+	[rv addRepresentation: bits];
+	return rv;
+}
+
 @end
 #endif // __OBJC__
 
