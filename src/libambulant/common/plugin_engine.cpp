@@ -101,6 +101,9 @@ plugin_engine::plugin_engine()
 void
 plugin_engine::collect_plugin_directories()
 {
+	char *plugindir = getenv("AMBULANT_PLUGIN_DIR");
+	if (plugindir)
+		m_plugindirs.push_back(plugindir);
     m_plugindirs.push_back("/Users/jack/src/ambulant/build-gcc3/src/plugins/.libs/");
 }
 
