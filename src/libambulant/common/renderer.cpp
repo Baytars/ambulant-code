@@ -317,7 +317,7 @@ void
 active_video_renderer::start (double where = 1)
 {
 	m_lock.enter();
-	int w;
+	long long int w;
 
 	if (m_audio_renderer) 
 		m_audio_renderer->start(where);
@@ -329,9 +329,9 @@ active_video_renderer::start (double where = 1)
 	m_timer = lib::realtime_timer_factory();
 #endif
 	m_epoch = m_timer->elapsed();
-	w = (int) round (where);
+	w = (long long int) round (where*1000000);
 	lib::event * e = new dataavail_callback (this, &active_video_renderer::data_avail);
-	AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%d) (this = 0x%x) ", w, (void *) this);
+	AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%lld) (this = 0x%x) ", w, (void *) this);
 	if (!m_src) {
 		lib::logger::get_logger()->trace("active_video_renderer.start: no datasource, skipping media item");
 		m_context->stopped(m_cookie, 0);
@@ -341,10 +341,10 @@ active_video_renderer::start (double where = 1)
 	if (m_dest) {
 		m_dest->show(this);
 	} else {
-		AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%d) (this = 0x%x) m_dest == NULL", w, (void *) this);
+		AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%lld) (this = 0x%x) m_dest == NULL", w, (void *) this);
 	}
 	m_src->start_frame (m_event_processor, e, w);
-	AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%d) (this = 0x%x) m_src(0x%x)->start called", w, (void *) this, (void*) m_src);
+	AM_DBG lib::logger::get_logger ()->debug ("active_video_renderer::start(%lld) (this = 0x%x) m_src(0x%x)->start called", w, (void *) this, (void*) m_src);
 	m_lock.leave();
 }
 
