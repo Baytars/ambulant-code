@@ -53,7 +53,7 @@
 #ifndef AMBULANT_GUI_NONE_NONE_GUI_H
 #define AMBULANT_GUI_NONE_NONE_GUI_H
 
-#include "ambulant/common/layout.h"
+#include "ambulant/lib/layout.h"
 #include "ambulant/common/renderer.h"
 
 namespace ambulant {
