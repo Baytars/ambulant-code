@@ -87,28 +87,27 @@ typedef char bytes;
 class databuffer  
 {
  private: 
-     // duh, pointer to the buffer.
-	char *m_buffer; 			
-		     
-	// the size of the bufer.
-	int m_size;  			
+    
+	char* m_buffer; 			
+	char* m_rear;
+	char* m_front; 
 	
-	// how many bytes are in the buffer 														 
-	int m_used;							
-										
+	long int m_size;  			
+ 	long int m_max_size; 														 
+	long int m_used;							
+	
+	bool m_buffer_full;
+ 
 	// shift down all data above pos
 	void shift_down(int pos);										
  public:
 	// constructors
 	databuffer();				
-	databuffer(int size);	
-
-	databuffer(databuffer& buf);    	  
+	databuffer(int max_size);	
 	
 	// destructor
 	~databuffer();
-	
-	void resize(int newsize);
+
 	
 	// show information about the buffer, if verbose is true the buffer is dumped to cout;
 	void dump(std::ostream& os, bool verbose) const;		
@@ -121,9 +120,13 @@ class databuffer
 	
 	// returns the amount of bytes that are used.
 	int used() const;
-        bool is_full() const;
-        bool not_empty() const;
-        
+ 	bool is_full();
+    bool not_empty();
+	void readdone(int size);
+	void prepare(char* in_ptr);
+	void pushdata(int size);
+    char* get_read_ptr()   ;
+	
 };
 
 inline std::ostream& operator<<(std::ostream& os, const databuffer& n) {
@@ -180,7 +183,7 @@ public:
         void readdone(int len);
         void callback();
 
-        bool EOF();
+        bool end_of_file();
 
 	//  Get data from buffer and put 'size' bytes in buffer.
 	void read(char *data, int size);
