@@ -42,6 +42,7 @@ class event_processor {
 // abstract_event_processor
 
 #include <queue>
+#include <cassert>
 
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/delta_timer.h"

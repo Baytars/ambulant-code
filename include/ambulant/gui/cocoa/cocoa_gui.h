@@ -27,9 +27,9 @@ namespace cocoa {
 
 class cocoa_passive_window : public lib::passive_window {
   public:
-  	cocoa_passive_window(const std::string &name, lib::size bounds, void *view)
+  	cocoa_passive_window(const std::string &name, lib::size bounds, void *_view)
   	:	lib::passive_window(name, bounds),
-  		m_view(view) {}
+  		m_view(_view) {}
   		
 	void need_redraw(const lib::screen_rect<int> &r);
 	void *view() { return m_view; }

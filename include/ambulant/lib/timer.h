@@ -13,6 +13,8 @@
 #ifndef AMBULANT_LIB_TIMER_H
 #define AMBULANT_LIB_TIMER_H
 
+#include <vector>
+
 namespace ambulant {
 
 namespace lib {
@@ -21,6 +23,7 @@ class abstract_timer {
   public:
 	// this timer time type (assumed in msecs)
 	typedef unsigned long time_type;
+	typedef std::vector<abstract_timer *> abstract_timer_vector;
 	
 	virtual ~abstract_timer() {}
 		
@@ -28,6 +31,16 @@ class abstract_timer {
 	// e.g. return (time_now>ref_time)?time_now - ref_time:0;
 	virtual time_type elapsed() const = 0;
 	virtual void set_speed(double speed) = 0;
+	virtual double get_realtime_speed() const = 0;
+	
+  protected:
+	// A child clock can call add_dependent to have calls that change
+	// timing (such as set_speed) forwarded to it
+	abstract_timer_vector::iterator add_dependent(abstract_timer *child);
+	void remove_dependent(abstract_timer_vector::iterator pos);
+	virtual void speed_changed();
+	
+    std::vector<abstract_timer *> m_dependents;
 };
 
 // Note: timer objects are not refcounted, because it is assumed that
@@ -44,6 +57,7 @@ class timer : public abstract_timer {
 	// e.g. return (time_now>ref_time)?time_now - ref_time:0;
 	time_type elapsed() const;
 	void set_speed(double speed);
+	double lib::timer::get_realtime_speed() const;
   private:
 	void re_epoch();
 	

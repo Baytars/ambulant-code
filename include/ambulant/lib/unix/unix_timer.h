@@ -30,6 +30,7 @@ class unix_timer : public ambulant::lib::abstract_timer  {
 	
 	time_type elapsed() const;
 	void set_speed(double speed);
+	double get_realtime_speed() const { return 1.0; }
   private:
 	static time_type os_millitime();
 };
