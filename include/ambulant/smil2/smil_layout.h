@@ -58,17 +58,13 @@
 #include "ambulant/lib/node.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/region.h"
-#include "ambulant/common/region_node.h"
+//#include "ambulant/smil2/region_node.h"
 
 namespace ambulant {
 
 namespace smil2 {
 
-class common::passive_region;
-class common::passive_root_layout;
-class common::schema;
-class lib::document;
-class common::region_node;
+class region_node;
 
 class smil_layout_manager : public common::layout_manager {
   public:
@@ -80,10 +76,10 @@ class smil_layout_manager : public common::layout_manager {
 	void fix_document_layout(lib::document *doc);
 	
 	common::surface *get_default_rendering_surface(const lib::node *n);
-	void build_layout_tree(common::window_factory *wf, const lib::node *layout_root);
+	void build_layout_tree(common::window_factory *wf, const region_node *layout_root);
 
 	common::passive_root_layout *create_top_region(common::window_factory *wf, 
-		const common::region_node *rn, common::renderer *bgrenderer);
+		const region_node *rn, common::renderer *bgrenderer);
 	
 	const common::schema *m_schema;
 	std::vector<common::passive_root_layout*> m_rootlayouts;
