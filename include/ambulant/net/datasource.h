@@ -281,7 +281,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// Return the current video frame.
 	/// Should only be called from the callback routine.
 	/// The timestamp of the frame and the size of the data are also returned.
-  	virtual char* get_frame(timestamp_t *timestamp, int *size) = 0; 
+  	virtual char* get_frame(timestamp_t now, timestamp_t *timestamp, int *size) = 0; 
 
 	/// Returns the width of the image returned by get_frame.
 	virtual int width() = 0;

@@ -873,8 +873,10 @@ demux_video_datasource::buffer_full()
 }	
 
 char*
-demux_video_datasource::get_frame(timestamp_t *timestamp, int *size)
+demux_video_datasource::get_frame(timestamp_t now,timestamp_t *timestamp, int *size)
 {
+	
+	// We ignore now here and always return a the oldest frame in the queue.
 	m_lock.enter();
 	if (m_frames.size() == 0) {
 		m_lock.leave();
@@ -1139,7 +1141,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 	
 	got_pic = 0;
 	
-	inbuf = (uint8_t*) m_src->get_frame(&ipts,&sz);
+	inbuf = (uint8_t*) m_src->get_frame(0, &ipts,&sz);
 	
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
 	while(inbuf && sz ) {	
@@ -1304,7 +1306,7 @@ ffmpeg_video_decoder_datasource::_buffer_full()
 
 
 char* 
-ffmpeg_video_decoder_datasource::get_frame(timestamp_t *timestamp, int *size)
+ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *size)
 {
 	char *rv = NULL;
 	*timestamp = 0;
