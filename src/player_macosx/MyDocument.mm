@@ -84,7 +84,7 @@ void
 document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common::player *old)
 {
 	if (old) {
-		/*AM_DBG*/ NSLog(@"performSelectorOnMainThread: close: on 0x%x", (void*)m_mydocument);
+		AM_DBG NSLog(@"performSelectorOnMainThread: close: on 0x%x", (void*)m_mydocument);
 		[m_mydocument performSelectorOnMainThread: @selector(close:) withObject: nil waitUntilDone: NO];
 	}
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -267,7 +267,6 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void)close
 {
-	/*AM_DBG*/ NSLog(@"close, self=0x%x", (void*)self);
 	[self stop: self];
 	play_button = nil;
 	stop_button = nil;
@@ -281,7 +280,6 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void)close: (id)dummy
 {
-	/*AM_DBG*/ NSLog(@"close: self=0x%x", (void*)self);
 	[self close];
 }
 
