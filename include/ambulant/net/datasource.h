@@ -62,6 +62,13 @@ namespace ambulant {
 
 namespace net {
 	
+
+struct audio_formats {
+	std::vector<int> samplerate;
+	std::vector<int> channels;
+	std::vector<int> bits;
+}	
+	
 struct audio_context {
 	std::string format;
 	int sample_rate;
