@@ -88,10 +88,10 @@ smil_layout_manager::smil_layout_manager(common::factories *factory,lib::documen
 #endif USE_SMIL21
 {
 	// First find the correct layout section to use.
-	lib::node *layout_section = get_document_layout(doc);
+	m_layout_section = get_document_layout(doc);
 
 	// Then scan the DOM tree and create our own tree of region_node objects
-	build_layout_tree(layout_section);
+	build_layout_tree(m_layout_section);
 	
 	// Next we create the region_nodes for body nodes that need one (subregion
 	// positioning, etc)
@@ -106,11 +106,6 @@ smil_layout_manager::smil_layout_manager(common::factories *factory,lib::documen
 		AM_DBG lib::logger::get_logger()->debug("smil_layout_manager: no rootLayouts, creating one");
 		create_top_surface(factory->wf, NULL, NULL);
 	}
-	
-#ifdef USE_SMIL21
-	if (m_uses_bgimages)
-		load_bgimages(layout_section, (common::playable_factory *)factory->rf);
-#endif
 }
 
 smil_layout_manager::~smil_layout_manager()
@@ -651,9 +646,10 @@ class bgimage_loader : public lib::ref_counted_obj, public common::playable_noti
 };
 
 void
-smil_layout_manager::load_bgimages(const lib::node *layout_root, common::playable_factory *pf)
+smil_layout_manager::load_bgimages(common::playable_factory *pf)
 {
-	bgimage_loader *loader = new bgimage_loader(layout_root, pf);
+	if (!m_uses_bgimages) return;
+	bgimage_loader *loader = new bgimage_loader(m_layout_section, pf);
 	loader->run(this);
 	loader->release();
 }
