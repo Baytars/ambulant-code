@@ -220,7 +220,12 @@ ambulant_qt_window::need_redraw(const lib::screen_rect<int> &r)
 	qApp->wakeUpGuiThread();
 #endif	/*QT_NO_FILEDIALOG*/
 }
-  
+
+void
+ambulant_qt_window::redraw_now()
+{
+}
+
 void
 ambulant_qt_window::mouse_region_changed()
 {
