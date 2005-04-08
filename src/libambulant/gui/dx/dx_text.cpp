@@ -192,6 +192,8 @@ void gui::dx::dx_text_renderer::redraw(const lib::screen_rect<int>& dirty, commo
 		
 	// Finally blit img_rect_dirty to img_reg_rc_dirty
 	v->draw(m_text->get_ddsurf(), text_rc, reg_rc, true, tr);
+
+	if (m_erase_never) m_dest->keep_as_background();
 }
 
  

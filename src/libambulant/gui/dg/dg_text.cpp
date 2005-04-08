@@ -148,6 +148,8 @@ void gui::dg::dg_text_renderer::redraw(const lib::screen_rect<int> &dirty, commo
 	lib::point pt = m_dest->get_global_topleft();
 	rc.translate(pt);
 	if(!m_text.empty()) v->draw(m_text, rc);
+
+	if (m_erase_never) m_dest->keep_as_background();
 }
 
  

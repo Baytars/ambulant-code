@@ -202,6 +202,8 @@ void gui::dg::dg_img_renderer::redraw(const lib::screen_rect<int>& dirty, common
 	// Finally blit img_rect_dirty to img_reg_rc_dirty
 	v->draw(m_image->get_dibsurf(), img_rect_dirty, img_reg_rc_dirty, 
 		m_image->is_transparent(), m_image->get_transp_color());
+
+	if (m_erase_never) m_dest->keep_as_background();
 }
 
 
