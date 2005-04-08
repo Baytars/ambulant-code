@@ -137,6 +137,9 @@ void gui::dg::dg_img_renderer::start(double t) {
 	// Request a redraw
 	// Currently done by show()
 	// m_dest->need_redraw();
+
+	// Notify scheduler that we're done playing
+	m_context->stopped(m_cookie);
 }
 
 void gui::dg::dg_img_renderer::stop() {

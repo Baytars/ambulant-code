@@ -116,6 +116,9 @@ void gui::dg::dg_text_renderer::start(double t) {
 		
 	// Request a redraw
 	//m_dest->need_redraw();
+
+	// Notify scheduler that we're done playing
+	m_context->stopped(m_cookie);
 }
 
 void gui::dg::dg_text_renderer::stop() {
