@@ -225,7 +225,7 @@ void gui::dx::dx_img_renderer::redraw(const lib::screen_rect<int>& dirty, common
 	} else {
 		v->draw(m_image->get_ddsurf(), img_rect_dirty, img_reg_rc_dirty, m_image->is_transparent(), tr);
 	}
-	
+	if (m_erase_never) m_dest->keep_as_background();
 }
 
 
