@@ -579,7 +579,7 @@ void gui::dx::dx_player::show_file(const net::url& href) {
 }
 
 
-void gui::dx::dx_player::done(player *p) {
+void gui::dx::dx_player::done(common::player *p) {
 	m_timer->pause();
 	m_update_event = 0;
 	clear_transitions();
@@ -598,11 +598,11 @@ void gui::dx::dx_player::done(player *p) {
 	}
 }
 
-void gui::dx::dx_player::close(player *p) {
+void gui::dx::dx_player::close(common::player *p) {
 	PostMessage(get_main_window(), WM_CLOSE, 0, 0);
 }
 
-void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, player *old) {
+void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player *old) {
 	std::string urlstr = newdoc.get_url();
 	if(old) {
 		// Replace the current document
