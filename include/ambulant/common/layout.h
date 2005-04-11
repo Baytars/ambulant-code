@@ -74,6 +74,11 @@ class surface; // forward
 class gui_events; // forward
 class factories;
 
+#ifdef USE_SMIL21
+typedef std::pair<lib::rect, lib::screen_rect<int> > tile_position;
+typedef std::vector<tile_position> tile_positions;
+#endif
+
 /// Determine how to align an image in a region.
 class alignment {
   public:
@@ -228,6 +233,12 @@ class surface {
 #ifdef USE_SMIL21
 	/// Get the outermost surface for this surface.
 	virtual surface *get_top_surface() = 0;
+
+	/// Return true if the image needs to be tiled
+	virtual bool is_tiled() const = 0;
+	
+	/// Given image size and region rectangle return a list of (srcrect, dstrect).
+	virtual tile_positions get_tiles(lib::size image_size, lib::screen_rect<int> surface_rect) const = 0;
 #endif
 	
 	/// Get the OS window for this surface.
