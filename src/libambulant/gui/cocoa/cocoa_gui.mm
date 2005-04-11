@@ -549,7 +549,7 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 #ifdef USE_SMIL21
 - (void) startScreenTransition
 {
-	/*AM_DBG*/ NSLog(@"startScreenTransition");
+	AM_DBG NSLog(@"startScreenTransition");
 	if (fullscreen_count)
 		NSLog(@"Warning: multiple Screen transitions in progress");
 	fullscreen_count++;
@@ -568,7 +568,7 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 - (void) screenTransitionStep: (ambulant::smil2::transition_engine *)engine
 		elapsed: (ambulant::lib::transition_info::time_type)now
 {
-	/*AM_DBG*/ NSLog(@"screenTransitionStep %d", (int)now);
+	AM_DBG NSLog(@"screenTransitionStep %d", (int)now);
 	assert(fullscreen_count > 0);
 	fullscreen_engine = engine;
 	fullscreen_now = now;
@@ -596,7 +596,6 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 		// Just starting a new fullscreen transition. Get the
 		// background bits from the snapshot saved during the previous
 		// redraw.
-//		/*AM_DBG*/ NSLog(@"_screenTransitionPostRedraw: save old bits");
 		fullscreen_oldimage = fullscreen_previmage;
 		fullscreen_previmage = NULL;
 	}
@@ -615,7 +614,7 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 			fraction: 1.0];
 		fullscreen_engine->step(fullscreen_now);
 	} else {
-		/*AM_DBG*/ NSLog(@"_screenTransitionPostRedraw: no screen transition engine");
+		AM_DBG NSLog(@"_screenTransitionPostRedraw: no screen transition engine");
 //		[[self getTransitionNewSource] compositeToPoint: NSZeroPoint
 //			operation: NSCompositeCopy];
 		[[self getTransitionNewSource] drawInRect: bounds
