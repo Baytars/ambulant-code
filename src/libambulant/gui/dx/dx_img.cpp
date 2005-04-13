@@ -183,10 +183,34 @@ void gui::dx::dx_img_renderer::redraw(const lib::screen_rect<int>& dirty, common
 		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer::redraw NOT: no image or cannot play %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
 		return;
 	}
+
+	lib::rect img_rect1;
+	lib::screen_rect<int> img_reg_rc;
+	lib::size srcsize = m_image->get_size();
+#ifdef USE_SMIL21
+	// This code could be neater: it could share quite a bit with the
+	// code blow (for non-tiled images). Also, support for tiled images
+	// is specifically geared toward background images: stuff like the
+	// dirty region and transitions are ignored.
+	if (m_dest->is_tiled()) {
+		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer.redraw: drawing tiled image");
+		img_reg_rc = m_dest->get_rect();
+		img_reg_rc.translate(m_dest->get_global_topleft());
+		common::tile_positions tiles = m_dest->get_tiles(srcsize, img_reg_rc);
+		common::tile_positions::iterator it;
+		for(it=tiles.begin(); it!=tiles.end(); it++) {
+			img_rect1 = (*it).first;
+			img_reg_rc = (*it).second;
+			v->draw(m_image->get_ddsurf(), img_rect1, img_reg_rc, m_image->is_transparent());
+		}
+
+		if (m_erase_never) m_dest->keep_as_background();
+		return;
+	}
+#endif
 	
 	// Get fit rectangles
-	lib::rect img_rect1;
-	lib::screen_rect<int> img_reg_rc = m_dest->get_fit_rect(m_image->get_size(), &img_rect1, m_alignment);
+	img_reg_rc = m_dest->get_fit_rect(srcsize, &img_rect1, m_alignment);
 	
 	// Use one type of rect to do op
 	lib::screen_rect<int> img_rect(img_rect1);
