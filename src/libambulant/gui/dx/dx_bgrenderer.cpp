@@ -76,7 +76,7 @@ gui::dx::dx_bgrenderer::~dx_bgrenderer() {
 }
 
 void gui::dx::dx_bgrenderer::keep_as_background() {
-	AM_DBG lib::logger::get_logger()->debug("xg_bgrenderer::keep_as_background(0x%x)", this);
+	AM_DBG lib::logger::get_logger()->debug("dx_bgrenderer::keep_as_background(0x%x)", this);
 
 	dx_window *dxwindow = (dx_window *)m_dst->get_gui_window();
 	viewport *v = dxwindow->get_viewport();	
@@ -100,12 +100,14 @@ void gui::dx::dx_bgrenderer::redraw(const lib::screen_rect<int> &dirty, common::
 	if (m_bg_image) {
 		screen_rect<int> dstrect_whole = m_dst->get_rect();
 		dstrect_whole.translate(m_dst->get_global_topleft());
+		AM_DBG lib::logger::get_logger()->debug("dx_bgrenderer::redraw: clear to image");
 		v->draw(m_bg_image, dstrect_whole);	
 	} else {
 		lib::screen_rect<int> rc = dirty;
 		lib::point pt = m_dst->get_global_topleft();
 		rc.translate(pt);
 		if(v && m_src && !m_src->get_transparent()) {
+			AM_DBG lib::logger::get_logger()->debug("dx_bgrenderer::redraw: clear to color");
 			v->clear(rc, m_src->get_bgcolor());
 		}
 	}
