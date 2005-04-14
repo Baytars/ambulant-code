@@ -63,6 +63,10 @@ namespace gui {
 
 namespace qt {
 
+/// Debug function that dumps a pixmap to a file. An incrementing
+/// count is appended to the filenname, and an extension added.
+void dumpPixmap(QPixmap* qpm, std::string filename);
+
 class qt_ambulant_widget;
 
 class ambulant_qt_window : public common::gui_window {

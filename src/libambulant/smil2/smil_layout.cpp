@@ -85,7 +85,7 @@ smil_layout_manager::smil_layout_manager(common::factories *factory,lib::documen
 	m_layout_tree(NULL)
 #ifdef USE_SMIL21
 	,m_uses_bgimages(false)
-#endif USE_SMIL21
+#endif
 {
 	// First find the correct layout section to use.
 	m_layout_section = get_document_layout(doc);
@@ -648,7 +648,8 @@ class bgimage_loader : public lib::ref_counted_obj, public common::playable_noti
 void
 smil_layout_manager::load_bgimages(common::playable_factory *pf)
 {
-	if (!m_uses_bgimages) return;
+//	if (!m_uses_bgimages) return;
+//	abort();
 	bgimage_loader *loader = new bgimage_loader(m_layout_section, pf);
 	loader->run(this);
 	loader->release();
