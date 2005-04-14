@@ -299,7 +299,9 @@ region_node::fix_from_dom_node()
 	// backgroundRepeat
 	const char *bgrepeat_attr = m_node->get_attribute("backgroundRepeat");
 	
-	if (bgrepeat_attr == NULL || strcmp(bgrepeat_attr, "repeat") == 0) {
+	if (bgrepeat_attr == NULL) {
+		m_tiling = common::tiling_default;
+	} else if (strcmp(bgrepeat_attr, "repeat") == 0) {
 		m_tiling = common::tiling_both;
 	} else if (strcmp(bgrepeat_attr, "repeatX") == 0) {
 		m_tiling = common::tiling_horizontal;

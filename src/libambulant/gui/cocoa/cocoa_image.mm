@@ -112,7 +112,10 @@ cocoa_image_renderer::redraw_body(const screen_rect<int> &dirty, gui_window *win
 	screen_rect<int> dstrect;
 	NSRect cocoa_dstrect;
 #ifdef USE_SMIL21
-	if (m_dest->is_tiled()) {
+	// While rendering background images only, check for tiling. This code is
+	// convoluted, it knows that the node and the region we're painting to are
+	// really the same node.
+	if (m_node->get_attribute("backgroundRepeat") && m_dest->is_tiled()) {
 		AM_DBG lib::logger::get_logger()->debug("cocoa_image_renderer.redraw: drawing tiled image");
 		dstrect = m_dest->get_rect();
 		dstrect.translate(m_dest->get_global_topleft());
