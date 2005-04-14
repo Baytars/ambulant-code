@@ -707,14 +707,17 @@ bgimage_loader::run(smil_layout_manager *layout_mgr)
 		const lib::node *rn = (*it).second;
 		const char *bgimage = rn->get_attribute("backgroundImage");
 		if (bgimage == NULL) continue;
-		// XXX TODO: repeat
+		const char *bgrepeat = rn->get_attribute("backgroundRepeat");
 		lib::logger::get_logger()->debug("load_bgimages: load bgimage %s", bgimage);
 		const char *attrs[7], **attrp = attrs;
 		*attrp++ = "src";
 		*attrp++ = bgimage;
 		*attrp++ = "erase";
 		*attrp++ = "never";
-		// XXX TODO: tiling
+		if (bgrepeat) {
+			*attrp++ = "backgroundRepeat";
+			*attrp++ = bgrepeat;
+		}
 		*attrp++ = NULL;
 		lib::node *n = new lib::node("img", attrs, context);
 		

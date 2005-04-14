@@ -189,10 +189,12 @@ void gui::dx::dx_img_renderer::redraw(const lib::screen_rect<int>& dirty, common
 	lib::size srcsize = m_image->get_size();
 #ifdef USE_SMIL21
 	// This code could be neater: it could share quite a bit with the
-	// code blow (for non-tiled images). Also, support for tiled images
+	// code below (for non-tiled images). Also, support for tiled images
 	// is specifically geared toward background images: stuff like the
 	// dirty region and transitions are ignored.
-	if (m_dest->is_tiled()) {
+	// Also, it knows that the node and the region we're painting to are
+	// really the same node.
+	if (m_node->get_attribute("backgroundRepeat") && m_dest->is_tiled()) {
 		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer.redraw: drawing tiled image");
 		img_reg_rc = m_dest->get_rect();
 		img_reg_rc.translate(m_dest->get_global_topleft());
