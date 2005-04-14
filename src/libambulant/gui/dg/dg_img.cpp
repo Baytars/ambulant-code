@@ -189,7 +189,7 @@ void gui::dg::dg_img_renderer::redraw(const lib::screen_rect<int>& dirty, common
 		for(it=tiles.begin(); it!=tiles.end(); it++) {
 			img_rect1 = (*it).first;
 			img_reg_rc = (*it).second;
-			v->draw(m_image->get_ddsurf(), img_rect1, img_reg_rc, m_image->is_transparent());
+			v->draw(m_image->get_dibsurf(), img_rect1, img_reg_rc, m_image->is_transparent());
 		}
 
 		if (m_erase_never) m_dest->keep_as_background();
