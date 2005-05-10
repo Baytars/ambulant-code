@@ -224,6 +224,8 @@ ambulant_qt_window::need_redraw(const lib::screen_rect<int> &r)
 void
 ambulant_qt_window::redraw_now()
 {
+	AM_DBG lib::logger::get_logger()->debug("ambulant_qt_window::redraw_now()");
+	m_ambulant_widget->repaint(false);
 }
 
 void
