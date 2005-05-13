@@ -142,12 +142,11 @@ void
 qt_transition_renderer::stop()
 {
 	// private method - no locking
-	if (m_trans_engine) {
-		delete m_trans_engine;
-		m_trans_engine = NULL;
-	}
+	if (!m_trans_engine) return;
+	delete m_trans_engine;
+	m_trans_engine = NULL;
 #ifdef USE_SMIL21
-	if (m_fullscreen) {
+	if (m_fullscreen && m_view) {
 		((ambulant_qt_window*)m_view)->endScreenTransition();
 	}
 #endif
@@ -164,10 +163,6 @@ qt_transition_renderer::redraw_pre(gui_window *window)
 	AM_DBG logger::get_logger()->debug("qt_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d) gui_window=0x%x qpm=0x%x",(void*)this,r.left(),r.top(),r.right(),r.bottom(),window,aqw->get_ambulant_pixmap());
 
 	QPixmap *surf = NULL;
-	if (m_trans_engine && m_trans_engine->is_done()) {
-		delete m_trans_engine;
-		m_trans_engine = NULL;
-	}
 	// See whether we're in a transition
 	if (m_trans_engine
 #ifdef USE_SMIL21
@@ -203,48 +198,34 @@ qt_transition_renderer::redraw_post(gui_window *window)
 		aqw->reset_ambulant_surface();
 	}
 	if(m_trans_engine) {
-		if(m_trans_engine->is_done()) {
-			// If the transition is done clean it up and signal that
-			// freeze_transition can end for our peer renderers.
-			// Note that we have to do this through an event because of 
-			// locking issues.
-			AM_DBG logger::get_logger()->debug("qt_renderer.redraw: m_trans_engine->is_done()");
+		if (m_trans_engine->is_done()) {
 			typedef lib::no_arg_callback<qt_transition_renderer> stop_transition_callback;
 			lib::event *ev = new stop_transition_callback(this, &qt_transition_renderer::stop);
-			m_event_processor->add_event(ev, 0, lib::event_processor::low);
-		
+			m_event_processor->add_event(ev, 0, lib::event_processor::med);
+#ifdef USE_SMIL21
+			if (m_fullscreen)
+				aqw->screenTransitionStep(NULL, 0);
+#endif
 		} else {
 			if ( 1 /* XXX was: surf */) {
 				lib::transition_info::time_type now = m_event_processor->get_timer()->elapsed();
 				AM_DBG logger::get_logger()->debug("qt_renderer.redraw: drawing to view");
-#ifdef USE_SMIL21
+	#ifdef USE_SMIL21
 				if (m_fullscreen) {
 					aqw->screenTransitionStep (m_trans_engine, now);
 				} else {
 					m_trans_engine->step(now);
 				}
-#else
+	#else
 				m_trans_engine->step(now);
-#endif
+	#endif
 				typedef no_arg_callback<qt_transition_renderer>transition_callback;
 				event *ev = new transition_callback (this, &qt_transition_renderer::transition_step);
 				transition_info::time_type delay = m_trans_engine->next_step_delay();
 				if (delay < 33) delay = 33; // XXX band-aid
-//				delay = 1000;
+	//				delay = 1000;
 				AM_DBG logger::get_logger()->debug("qt_transition_renderer.redraw: now=%d, schedule step for %d",m_event_processor->get_timer()->elapsed(),m_event_processor->get_timer()->elapsed()+delay);
 				m_event_processor->add_event(ev, delay, event_processor::low);
-			}
-			// Finally, if the transition is done clean it up and signal that freeze_transition
-			// can end for our peer renderers.
-			// Note that we have to do this through an event because of locking issues.
-			if (m_trans_engine && m_trans_engine->is_done()) {
-				typedef lib::no_arg_callback<qt_transition_renderer> stop_transition_callback;
-				lib::event *ev = new stop_transition_callback(this, &qt_transition_renderer::stop);
-				m_event_processor->add_event(ev, 0, lib::event_processor::med);
-#ifdef USE_SMIL21
-				if (m_fullscreen)
-					aqw->screenTransitionStep(NULL, 0);
-#endif
 			}
 		}
 	}

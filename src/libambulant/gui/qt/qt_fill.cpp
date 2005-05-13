@@ -247,12 +247,12 @@ qt_background_renderer::redraw(const lib::screen_rect<int> &dirty,
 		    H = dstrect_whole.height();
 		// XXXX Fill with background color
 		lib::color_t bgcolor = m_src->get_bgcolor();
-		/*AM_DBG*/ lib::logger::get_logger()->debug("qt_background_renderer::redraw: clearing to %x, local_ltwh(%d,%d,%d,%d)",(long)bgcolor,L,T,W,H);
+		AM_DBG lib::logger::get_logger()->debug("qt_background_renderer::redraw: clearing to %x, local_ltwh(%d,%d,%d,%d)",(long)bgcolor,L,T,W,H);
 		QColor bgc = QColor(lib::redc(bgcolor),lib::greenc(bgcolor),lib::bluec(bgcolor));
 		paint.setBrush(bgc);
 		paint.drawRect(L,T,W,H);
 		if (m_background_pixmap) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("qt_background_renderer::redraw: drawing pixmap");
+			AM_DBG lib::logger::get_logger()->debug("qt_background_renderer::redraw: drawing pixmap");
 			paint.drawPixmap(L, T, *m_background_pixmap);
 		}
 		paint.flush();
@@ -263,7 +263,7 @@ qt_background_renderer::redraw(const lib::screen_rect<int> &dirty,
 void
 qt_background_renderer::keep_as_background()
 {
-	/*AM_DBG*/ lib::logger::get_logger()->debug("qt_background_renderer::keep_as_background(0x%x) called", (void *)this);
+	AM_DBG lib::logger::get_logger()->debug("qt_background_renderer::keep_as_background(0x%x) called", (void *)this);
 	const lib::screen_rect<int> &r = m_dst->get_rect();
 	ambulant_qt_window* aqw = (ambulant_qt_window*) m_dst->get_gui_window();
 	lib::screen_rect<int> dstrect_whole = r;
