@@ -1228,10 +1228,10 @@ ffmpeg_video_decoder_datasource::data_avail()
 		ptr = inbuf;
 		
 		while (sz > 0) {
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con: 0x%x, gotpic = %d, sz = %d ", m_con, got_pic, sz);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con: 0x%x, gotpic = %d, sz = %d ", m_con, got_pic, sz);
 				len = avcodec_decode_video(m_con, frame, &got_pic, ptr, sz);
-				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video:, returned %d decoded bytes , %d left, gotpic = %d, ipts = %lld", len, sz - len, got_pic, ipts);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video:, returned %d decoded bytes , %d left, gotpic = %d, ipts = %lld", len, sz - len, got_pic, ipts);
 				if (len >= 0) {
 					assert(len <= sz);
 					ptr +=len;	
