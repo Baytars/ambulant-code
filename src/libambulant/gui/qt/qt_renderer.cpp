@@ -128,7 +128,7 @@ qt_transition_renderer::start_outtransition(const lib::transition_info *info)
 		m_view = m_transition_dest->get_gui_window();
 		m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
 #ifdef USE_SMIL21
-		m_fullscreen = m_intransition->m_scope == scope_screen;
+		m_fullscreen = m_outtransition->m_scope == scope_screen;
 		if (m_fullscreen) {
 			((ambulant_qt_window*)m_view)->startScreenTransition();
 		}
