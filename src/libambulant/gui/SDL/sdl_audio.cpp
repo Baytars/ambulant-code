@@ -352,10 +352,12 @@ gui::sdl::sdl_active_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 	m_lock.enter();
 	
 	// turned this of because I think here also happends a get_read_ptr when it should not
-	assert(m_is_playing);
+	//XXXX sometimes we get this one in News when changing video itmes
+	// assert(m_is_playing);
 	int rv;
 	*ptr = NULL;
-	if (m_is_paused||!m_audio_src) {
+//XXXX	if (m_is_paused||!m_audio_src) { 
+	if (m_is_paused||!m_audio_src || ! m_is_playing) {
 		rv = 0;
 		m_read_ptr_called = false;
 	} else {
