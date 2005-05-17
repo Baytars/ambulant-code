@@ -903,9 +903,9 @@ demux_video_datasource::get_frame(timestamp_t now,timestamp_t *timestamp, int *s
 	// We ignore now here and always return a the oldest frame in the queue.
 	m_lock.enter();
 	if (m_frames.size() == 0) {
-		m_lock.leave();
 		*timestamp = 0;
 		*size = 0;
+		m_lock.leave();
 		return NULL;
 	}
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_frame() (this=0x%x, size=%d", (void*) this, m_frames.size());
