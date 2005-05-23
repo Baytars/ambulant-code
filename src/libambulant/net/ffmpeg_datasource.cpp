@@ -1150,8 +1150,9 @@ ffmpeg_video_decoder_datasource::frame_done(timestamp_t timestamp, bool keepdata
 {
 	m_lock.enter();
 	if (m_frames.size() == 0) {
-		lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource.readdone: frame_done() called with no current frames");
-		lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
+		// Since we remove frames from the queue in _pop_top_frame at the moment we retrieve a frame, the situation with 0 frames in our queue is legit.
+		//lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource.frame_done: frame_done() called with no current frames");
+		//lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
 		m_lock.leave();
 		return;
 	}
