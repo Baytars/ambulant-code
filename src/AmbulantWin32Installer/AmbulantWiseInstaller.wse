@@ -114,7 +114,7 @@ item: Remark
 end
 item: Set Variable
   Variable=MAINDIR
-  Value=AmbulantPlayer-1.4.1
+  Value=AmbulantPlayer-1.4
   Flags=10000000
 end
 item: Remark
