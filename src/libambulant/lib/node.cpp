@@ -51,7 +51,7 @@
  */
 
 #include "ambulant/lib/node.h"
-
+#if !WITH_EXTERNAL_DOM
 // find_if, etc
 #include <algorithm>
 
@@ -336,7 +336,7 @@ lib::node::append_child(node* child) {
 		
 lib::node* 
 lib::node::append_child(const char *name) { 
-	return append_child(new node(name));
+	return append_child(node_factory(name));
 }
 
 lib::node* 
@@ -387,7 +387,7 @@ void lib::node::set_namespace(const xml_string& ns) {
 // create a deep copy of this
 lib::node* 
 lib::node::clone() const {
-	node* c = new node(this);
+	node* c = node_factory(this);
 	const node *e = down();
 	if(e != 0) {
 		c->append_child(e->clone());
@@ -639,3 +639,4 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 	os << "</" + pe->get_local_name() << ">";
 }
 #endif // AMBULANT_NO_IOSTREAMS
+#endif // !WITH_EXTERNAL_DOM
