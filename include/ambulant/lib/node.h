@@ -94,6 +94,9 @@
 #define V_END
 #define V_INIT(x) x
 #endif
+#ifndef NODE_BASECLASS
+#define NODE_BASECLASS
+#endif
 
 namespace ambulant {
 
@@ -106,7 +109,7 @@ class node_context;
 /// be compatible with a bit of glue code.
 /// The parent of each node is also its owner and container.
 
-class node {
+class node NODE_BASECLASS {
 
   public:
   
@@ -364,6 +367,7 @@ class node {
 #endif
 };
 
+#ifndef SKIP_NODE_FACTORIES
 #if WITH_EXTERNAL_DOM
 // Factory functions
 node *node_factory(const char *local_name, const char **attrs = 0, const node_context *ctx = 0);
@@ -413,6 +417,7 @@ node_factory(const node* other)
 	return new node(other);
 }
 #endif // WITH_EXTERNAL_DOM
+#endif // SKIP_NODE_FACTORIES
 
 } // namespace lib
  
