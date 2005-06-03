@@ -50,8 +50,28 @@
  * @$Id$ 
  */
 
+#if WITH_EXTERNAL_DOM
+// Serious preprocessor trickery.
+// First we import node.h to get the virtual base class
 #include "ambulant/lib/node.h"
-#if !WITH_EXTERNAL_DOM
+
+// Now we include it again, but with a couple of defines to make
+// it define a new, non-virtual class node_impl
+#undef VIRTUAL
+#undef V_END
+#undef V_INIT(x)
+#undef AMBULANT_LIB_NODE_H
+#define SKIP_NODE_FACTORIES
+class node_virtual : public ambulant::lib::node {
+};
+#define NODE_BASECLASS : node_virtual
+#define node node_impl
+#undef WITH_EXTERNAL_DOM
+#define SKIP_NODE_FACTORIES
+#define DEFINE_NODE_FACTORIES_HERE
+#endif // WITH_EXTERNAL_DOM
+
+#include "ambulant/lib/node.h"
 // find_if, etc
 #include <algorithm>
 
@@ -77,6 +97,7 @@
 #include <stdio.h> 
 
 using namespace ambulant;
+
 
 // This module starts with a set of private node visitors
 // and continues with the implementation of lib::node.
@@ -336,7 +357,7 @@ lib::node::append_child(node* child) {
 		
 lib::node* 
 lib::node::append_child(const char *name) { 
-	return append_child(node_factory(name));
+	return append_child(node(name));
 }
 
 lib::node* 
@@ -387,7 +408,7 @@ void lib::node::set_namespace(const xml_string& ns) {
 // create a deep copy of this
 lib::node* 
 lib::node::clone() const {
-	node* c = node_factory(this);
+	node* c = node(this);
 	const node *e = down();
 	if(e != 0) {
 		c->append_child(e->clone());
@@ -639,4 +660,36 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 	os << "</" + pe->get_local_name() << ">";
 }
 #endif // AMBULANT_NO_IOSTREAMS
-#endif // !WITH_EXTERNAL_DOM
+
+#ifdef DEFINE_NODE_FACTORIES_HERE
+#undef node
+namespace ambulant {
+namespace lib {
+/// Construct a new, unconnected, node.
+/// Note: attrs are as per expat parser
+/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
+node *
+node_factory(const xml_string& local_name, const char **attrs, const node_context *ctx)
+{
+	return new node_impl(local_name, attrs, ctx);
+}
+
+/// Construct a new, unconnected, node.
+/// Note: attrs are as per expat parser
+/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
+node *
+node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
+{
+	return new node_impl(qn, qattrs, ctx);
+}
+
+// shallow copy from other.
+inline node *
+node_factory(const node* other)
+{
+	return new node_impl(other);
+}
+}
+}
+#endif
+
