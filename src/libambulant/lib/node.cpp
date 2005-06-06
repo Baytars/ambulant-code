@@ -62,9 +62,8 @@
 #undef V_INIT(x)
 #undef AMBULANT_LIB_NODE_H
 #define SKIP_NODE_FACTORIES
-class node_virtual : public ambulant::lib::node {
-};
-#define NODE_BASECLASS : node_virtual
+typedef ambulant::lib::node node_virtual;
+#define NODE_BASECLASS : public node_virtual
 #define node node_impl
 #undef WITH_EXTERNAL_DOM
 #define SKIP_NODE_FACTORIES
@@ -248,8 +247,8 @@ lib::node::get_last_child() const {
 	return node_navigator<const node>::last_child(this);
 }
 
-void lib::node::get_children(std::list<const node*>& l) const {
-	node_navigator<const node>::get_children(this, l);
+void lib::node::get_children(std::list<const node_virtual*>& l) const {
+	node_navigator<const node_virtual>::get_children(this, l);
 }
 
 ///////////////////////////////
@@ -307,11 +306,13 @@ lib::node::locate_node(const char *path) {
 	return n;
 }
 
+#if 0
 void lib::node::find_nodes_with_name(const xml_string& name, std::list<node*>& lst) {
 	iterator last = end(); // call once
 	for(iterator it = begin(); it != last; it++)
 		if((*it).first && (*it).second->get_local_name() == name) lst.push_back((*it).second);
 }
+#endif
 
 lib::node* 
 lib::node::get_root() { 
@@ -357,7 +358,7 @@ lib::node::append_child(node* child) {
 		
 lib::node* 
 lib::node::append_child(const char *name) { 
-	return append_child(node(name));
+	return append_child(new node(name));
 }
 
 lib::node* 
@@ -408,7 +409,7 @@ void lib::node::set_namespace(const xml_string& ns) {
 // create a deep copy of this
 lib::node* 
 lib::node::clone() const {
-	node* c = node(this);
+	node* c = new node(this);
 	const node *e = down();
 	if(e != 0) {
 		c->append_child(e->clone());
@@ -662,13 +663,19 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 #endif // AMBULANT_NO_IOSTREAMS
 
 #ifdef DEFINE_NODE_FACTORIES_HERE
-#undef node
 namespace ambulant {
 namespace lib {
+// Factory functions
+node_virtual *
+node_factory(const char *local_name, const char **attrs, const node_context *ctx)
+{
+	return new node_impl(local_name, attrs, ctx);
+}
+
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node *
+node_virtual *
 node_factory(const xml_string& local_name, const char **attrs, const node_context *ctx)
 {
 	return new node_impl(local_name, attrs, ctx);
@@ -677,19 +684,53 @@ node_factory(const xml_string& local_name, const char **attrs, const node_contex
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node *
+node_virtual *
 node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
 {
 	return new node_impl(qn, qattrs, ctx);
 }
 
 // shallow copy from other.
-inline node *
-node_factory(const node* other)
+node_virtual *
+node_factory(const node_virtual* other)
 {
-	return new node_impl(other);
+	return new node_impl(dynamic_cast<const node_impl*>(other));
 }
+
+// And a few more methods
+void
+lib::node::down(node_virtual *n)
+{
+	down(dynamic_cast<node_impl*>(n));
 }
+
+void
+lib::node::up(node_virtual *n)
+{
+	up(dynamic_cast<node_impl*>(n));
 }
+
+void
+lib::node::next(node_virtual *n)
+{
+	next(dynamic_cast<node_impl*>(n));
+}
+
+node*
+lib::node::append_child(node_virtual* child)
+{
+	return append_child(dynamic_cast<node_impl*>(child));
+}
+
+std::ostream& operator<<(std::ostream& os, const node_virtual& n)
+{
+	return os << *dynamic_cast<const node_impl*>(&n);
+}
+
+#undef node
+lib::node::~node() {}
+
+} // namespace lib
+} // namespace ambulant
 #endif
 

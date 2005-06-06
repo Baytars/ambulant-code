@@ -88,7 +88,7 @@
 #if WITH_EXTERNAL_DOM
 #define VIRTUAL virtual
 #define V_END = 0
-#define V_INIT(x) ;
+#define V_INIT(x) = 0;
 #else
 #define VIRTUAL
 #define V_END
@@ -144,7 +144,7 @@ class node NODE_BASECLASS {
 	/// Destruct this node and its contents.
 	/// If this node is part of a tree, detach it first
 	/// and then delete the node and its contents.
-	virtual ~node() V_END;
+	virtual ~node();
 
 
 	/// Return first child of this node.
@@ -168,12 +168,21 @@ class node NODE_BASECLASS {
 
 	/// Set first child of this node.
 	VIRTUAL void down(node *n)  V_INIT({ m_child = n;})
+#ifdef SKIP_NODE_FACTORIES
+	void down(node_virtual *n);
+#endif
 	
 	/// Set parent of this node.
 	VIRTUAL void up(node *n)  V_INIT({ m_parent = n;})
+#ifdef SKIP_NODE_FACTORIES
+	void up(node_virtual *n);
+#endif
 	
 	/// Set next sibling of this node.
 	VIRTUAL void next(node *n)  V_INIT({ m_next = n;})
+#ifdef SKIP_NODE_FACTORIES
+	void next(node_virtual *n);
+#endif
 	
 	/// Returns the previous sibling node 
 	/// or null when this is the first child.
@@ -184,7 +193,11 @@ class node NODE_BASECLASS {
 	VIRTUAL const node* get_last_child() const V_END;
 	
 	/// Appends the children of this node (if any) to the provided list.
+#ifdef SKIP_NODE_FACTORIES
+	void get_children(std::list<const node_virtual*>& l) const;
+#else
 	VIRTUAL void get_children(std::list<const node*>& l) const V_END;
+#endif
 
 	///////////////////////////////
 	// search operations 
@@ -199,8 +212,13 @@ class node NODE_BASECLASS {
 	/// Find the first direct child with the given tag.
 	VIRTUAL const node *get_first_child(const char *name) const V_END;
 	
+#if 0
 	/// Find all descendants with the given tag.
 	VIRTUAL void find_nodes_with_name(const xml_string& name, std::list<node*>& list) V_END;
+#ifdef SKIP_NODE_FACTORIES
+	void find_nodes_with_name(const xml_string& name, std::list<node_virtual*>& list);
+#endif
+#endif
 	
 	/// Find the root of the tree to which this node belongs.
 	VIRTUAL node* get_root() V_END;
@@ -224,6 +242,9 @@ class node NODE_BASECLASS {
 	
 	/// Append a child node to this node.
 	VIRTUAL node* append_child(node* child) V_END;
+#ifdef SKIP_NODE_FACTORIES
+	node* append_child(node_virtual* child);
+#endif
 		
 	
 	/// Append a new child node with the given name to this node.
@@ -300,7 +321,11 @@ class node NODE_BASECLASS {
 
 	/// Fills in a map with node ids.
 	/// the map may be used for retreiving nodes from their id.
-	VIRTUAL void create_idmap(std::map<std::string, node*>& m) const V_END; 
+#ifdef SKIP_NODE_FACTORIES
+	void create_idmap(std::map<std::string, node_impl*>& m) const;
+#else
+//	VIRTUAL void create_idmap(std::map<std::string, node*>& m) const V_END;
+#endif
 	
 	/// Returns a "friendly" path desription of this node.
 	VIRTUAL std::string get_path_display_desc() const V_END;
@@ -354,7 +379,7 @@ class node NODE_BASECLASS {
 	// a magic id
 	int m_numid;
 	
-	const node& operator =(const node& o);
+//	const node& operator =(const node& o);
 	
   private:
 	// tree bonds
