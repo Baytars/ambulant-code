@@ -58,8 +58,6 @@
 namespace ambulant {
 	
 namespace lib {
-class node;
-
 	
 enum transition_type {
 	barWipe,
