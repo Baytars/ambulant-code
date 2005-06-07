@@ -50,26 +50,6 @@
  * @$Id$ 
  */
 
-#if WITH_EXTERNAL_DOM
-// Serious preprocessor trickery.
-// First we import node.h to get the virtual base class
-#include "ambulant/lib/node.h"
-
-// Now we include it again, but with a couple of defines to make
-// it define a new, non-virtual class node_impl
-#undef VIRTUAL
-#undef V_END
-#undef V_INIT(x)
-#undef AMBULANT_LIB_NODE_H
-#define SKIP_NODE_FACTORIES
-typedef ambulant::lib::node node_virtual;
-#define NODE_BASECLASS : public node_virtual
-#define node node_impl
-#undef WITH_EXTERNAL_DOM
-#define SKIP_NODE_FACTORIES
-#define DEFINE_NODE_FACTORIES_HERE
-#endif // WITH_EXTERNAL_DOM
-
 #include "ambulant/lib/node.h"
 // find_if, etc
 #include <algorithm>
@@ -178,7 +158,7 @@ class attr_collector {
 // lib::node implementation
 
 // static 
-int lib::node::node_counter = 0;
+int lib::node_impl::node_counter = 0;
 
 //////////////////////
 // Node constructors
@@ -186,7 +166,7 @@ int lib::node::node_counter = 0;
 // Note: attrs are as per expat parser
 // e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
 
-lib::node::node(const char *local_name, const char **attrs, const node_context *ctx)
+lib::node_impl::node_impl(const char *local_name, const char **attrs, const node_context *ctx)
 :	m_qname("",(local_name?local_name:"error")),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
@@ -194,7 +174,7 @@ lib::node::node(const char *local_name, const char **attrs, const node_context *
 	m_numid = ++node_counter;
 }
 
-lib::node::node(const xml_string& local_name, const char **attrs, const node_context *ctx)
+lib::node_impl::node_impl(const xml_string& local_name, const char **attrs, const node_context *ctx)
 :   m_qname("", local_name),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
@@ -202,14 +182,14 @@ lib::node::node(const xml_string& local_name, const char **attrs, const node_con
 	m_numid = ++node_counter;
 }
 
-lib::node::node(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
+lib::node_impl::node_impl(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
 :	m_qname(qn), m_qattrs(qattrs), m_context(ctx),
 	m_parent(0), m_next(0), m_child(0){
 	m_numid = ++node_counter;
 }
 
 // shallow copy from other
-lib::node::node(const node* other)
+lib::node_impl::node_impl(const node_impl* other)
 :   m_qname(other->get_qname()),
 	m_qattrs(other->get_attrs()),
 	m_data(other->get_data()),
@@ -221,9 +201,9 @@ lib::node::node(const node* other)
 //////////////////////
 // Node destructor
 
-lib::node::~node() { 
+lib::node_impl::~node_impl() { 
 	node_counter--;
-	node_navigator<node>::delete_tree(this); 
+	node_navigator<node_impl>::delete_tree(this); 
 }
 
 ///////////////////////////////
@@ -237,26 +217,26 @@ lib::node::~node() {
 ///////////////////////////////
 // deduced navigation
 
-const lib::node* 
-lib::node::previous() const { 
-	return node_navigator<const node>::previous(this); 
+const lib::node_impl* 
+lib::node_impl::previous() const { 
+	return node_navigator<const node_impl>::previous(this); 
 }
 
-const lib::node* 
-lib::node::get_last_child() const { 
-	return node_navigator<const node>::last_child(this);
+const lib::node_impl* 
+lib::node_impl::get_last_child() const { 
+	return node_navigator<const node_impl>::last_child(this);
 }
 
-void lib::node::get_children(std::list<const node_virtual*>& l) const {
-	node_navigator<const node_virtual>::get_children(this, l);
+void lib::node_impl::get_children(std::list<const node_interface*>& l) const {
+	node_navigator<const node_interface>::get_children(this, l);
 }
 
 ///////////////////////////////
 // search operations 
 
-lib::node* 
-lib::node::get_first_child(const char *name) {
-	node *e = down();
+lib::node_impl* 
+lib::node_impl::get_first_child(const char *name) {
+	node_impl *e = down();
 	if(!e) return 0;
 	if(e->m_qname.second == name) return e;
 	e = e->next();
@@ -268,9 +248,9 @@ lib::node::get_first_child(const char *name) {
 	return 0;
 }
 
-const lib::node* 
-lib::node::get_first_child(const char *name) const {
-	const node *e = down();
+const lib::node_impl* 
+lib::node_impl::get_first_child(const char *name) const {
+	const node_impl *e = down();
 	if(!e) return 0;
 	if(e->m_qname.second == name) return e;
 	e = e->next();
@@ -282,13 +262,13 @@ lib::node::get_first_child(const char *name) const {
 	return 0;
 }
 
-lib::node* 
-lib::node::locate_node(const char *path) {
+lib::node_impl* 
+lib::node_impl::locate_node(const char *path) {
 	if(!path || !path[0]) {
 		return this;
 	}
 	tokens_vector v(path, "/");
-	node *n = 0;
+	node_impl *n = 0;
 	tokens_vector::iterator it = v.begin();
 	if(path[0] == '/') { // or v.at(0) is empty
 		// absolute
@@ -307,19 +287,19 @@ lib::node::locate_node(const char *path) {
 }
 
 #if 0
-void lib::node::find_nodes_with_name(const xml_string& name, std::list<node*>& lst) {
+void lib::node_impl::find_nodes_with_name(const xml_string& name, std::list<node*>& lst) {
 	iterator last = end(); // call once
 	for(iterator it = begin(); it != last; it++)
 		if((*it).first && (*it).second->get_local_name() == name) lst.push_back((*it).second);
 }
 #endif
 
-lib::node* 
-lib::node::get_root() { 
-	return node_navigator<node>::get_root(this); 
+lib::node_impl* 
+lib::node_impl::get_root() { 
+	return node_navigator<node_impl>::get_root(this); 
 }
 
-inline std::string get_path_desc_comp(const lib::node *n) {
+inline std::string get_path_desc_comp(const lib::node_impl *n) {
 	std::string sbuf;
 	const char *pid = n->get_attribute("id");
 	sbuf += n->get_local_name();
@@ -327,12 +307,12 @@ inline std::string get_path_desc_comp(const lib::node *n) {
 	return sbuf;
 }
 
-std::string lib::node::get_path_display_desc() const {
+std::string lib::node_impl::get_path_display_desc() const {
 	std::string sbuf;
-	std::list<const node*> path;
-	node_navigator<const node>::get_path(this, path);
+	std::list<const node_impl*> path;
+	node_navigator<const node_impl>::get_path(this, path);
 	int nc = 0;
-	std::list<const node*>::reverse_iterator it = path.rbegin();
+	std::list<const node_impl*>::reverse_iterator it = path.rbegin();
 	sbuf += get_path_desc_comp(this);it++;nc++;
 	for(;it != path.rend() && nc<3;it++) {
 		std::string ln = (*it)->get_local_name();
@@ -351,34 +331,34 @@ std::string lib::node::get_path_display_desc() const {
 ///////////////////////
 // build tree functions
 	
-lib::node* 
-lib::node::append_child(node* child) { 
-	return node_navigator<node>::append_child(this, child);
+lib::node_impl* 
+lib::node_impl::append_child(node_impl* child) { 
+	return node_navigator<node_impl>::append_child(this, child);
 }
 		
-lib::node* 
-lib::node::append_child(const char *name) { 
-	return append_child(new node(name));
+lib::node_impl* 
+lib::node_impl::append_child(const char *name) { 
+	return append_child(new node_impl(name));
 }
 
-lib::node* 
-lib::node::detach() { 
-	return node_navigator<node>::detach(this); 
+lib::node_impl* 
+lib::node_impl::detach() { 
+	return node_navigator<node_impl>::detach(this); 
 }
 	
-void lib::node::append_data(const char *data, size_t len) { 
+void lib::node_impl::append_data(const char *data, size_t len) { 
 	if(len>0) m_data.append(data, len);
 }
 
-void lib::node::append_data(const char *c_str) { 
+void lib::node_impl::append_data(const char *c_str) { 
 	if(c_str == 0 || c_str[0] == 0) return;
 	m_data.append(c_str, strlen(c_str));
 }
 
-void lib::node::append_data(const xml_string& str)
+void lib::node_impl::append_data(const xml_string& str)
 	{ m_data += str;}
 
-void lib::node::set_attribute(const char *name, const char *value){ 
+void lib::node_impl::set_attribute(const char *name, const char *value){ 
 	if(name && name[0]) {
 		q_name_pair qn("", name);
 		q_attribute_pair qattr(qn, (value?value:""));
@@ -386,7 +366,7 @@ void lib::node::set_attribute(const char *name, const char *value){
 	}
 }
 
-void lib::node::set_attribute(const char *name, const xml_string& value) {
+void lib::node_impl::set_attribute(const char *name, const xml_string& value) {
 	if(name && name[0]) {
 		q_name_pair qn("", name);
 		q_attribute_pair qattr(qn, value);
@@ -396,21 +376,21 @@ void lib::node::set_attribute(const char *name, const xml_string& value) {
 
 // Note: attrs are as per expat parser
 // e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-void lib::node::set_attributes(const char **attrs) {
+void lib::node_impl::set_attributes(const char **attrs) {
 	if(attrs == 0) return;
 	for(int i=0;attrs[i];i+=2)
 		set_attribute(attrs[i], attrs[i+1]);
 }
 	
-void lib::node::set_namespace(const xml_string& ns) {
+void lib::node_impl::set_namespace(const xml_string& ns) {
 	m_qname.first = ns;
 }
 
 // create a deep copy of this
-lib::node* 
-lib::node::clone() const {
-	node* c = new node(this);
-	const node *e = down();
+lib::node_impl* 
+lib::node_impl::clone() const {
+	node_impl* c = new node_impl(this);
+	const node_impl *e = down();
 	if(e != 0) {
 		c->append_child(e->clone());
 		e = e->next();
@@ -427,20 +407,20 @@ lib::node::clone() const {
 // some are inline
 
 lib::xml_string 
-lib::node::get_trimmed_data() const { 
+lib::node_impl::get_trimmed_data() const { 
 	return trim(m_data);
 }
 
 #ifndef _WIN32_WCE
 bool 
-lib::node::has_graph_data() const { 
+lib::node_impl::has_graph_data() const { 
 	if(m_data.empty()) return false;
 	return std::find_if(m_data.begin(), m_data.end(), isgraph) != m_data.end();
 }
 #endif
 
 const char *
-lib::node::get_attribute(const char *name) const {
+lib::node_impl::get_attribute(const char *name) const {
 	if(!name || !name[0]) return 0;
 	q_attributes_list::const_iterator it;
 	for(it = m_qattrs.begin(); it != m_qattrs.end(); it++)
@@ -449,13 +429,13 @@ lib::node::get_attribute(const char *name) const {
 }
 
 const char *
-lib::node::get_attribute(const std::string& name) const {
+lib::node_impl::get_attribute(const std::string& name) const {
 	return get_attribute(name.c_str());
 }
 
 // returns the resolved url of an attribute
 net::url 
-lib::node::get_url(const char *attrname) const {
+lib::node_impl::get_url(const char *attrname) const {
 	const char *rurl = get_attribute(attrname);
 	if(!rurl) return net::url();
 	net::url url(rurl);
@@ -463,9 +443,9 @@ lib::node::get_url(const char *attrname) const {
 }
 
 const char *
-lib::node::get_container_attribute(const char *name) const {
+lib::node_impl::get_container_attribute(const char *name) const {
 	if(!name || !name[0]) return 0;
-	const node *n = this;
+	const node_impl *n = this;
 	const char *p = 0;
 	while(n->up()) {
 		n = n->up();
@@ -480,7 +460,7 @@ lib::node::get_container_attribute(const char *name) const {
 // string repr
 
 lib::xml_string 
-lib::node::xmlrepr() const {
+lib::node_impl::xmlrepr() const {
 	xml_string s(m_qname.second);
 	q_attributes_list::const_iterator it = m_qattrs.begin();
 	while(it!=m_qattrs.end()) {
@@ -494,7 +474,7 @@ lib::node::xmlrepr() const {
 	return s;
 }
 
-std::string lib::node::get_sig() const {
+std::string lib::node_impl::get_sig() const {
 	std::string s = m_qname.second;
 	s += '[';
 	const char *pid = get_attribute("id");
@@ -504,7 +484,7 @@ std::string lib::node::get_sig() const {
 }
 
 unsigned int 
-lib::node::size() const {
+lib::node_impl::size() const {
 	const_iterator it;
 	const_iterator e = end();
 	unsigned int count = 0;
@@ -515,9 +495,9 @@ lib::node::size() const {
 
 #ifndef AMBULANT_NO_IOSTREAMS
 lib::xml_string 
-lib::node::to_string() const {
+lib::node_impl::to_string() const {
 	std::ostringstream os;
-	output_visitor<node> visitor(os);
+	output_visitor<node_impl> visitor(os);
 	const_iterator it;
 	const_iterator e = end();
 	for(it = begin(); it != e; it++) visitor(*it);
@@ -527,9 +507,9 @@ lib::node::to_string() const {
 	
 #ifndef AMBULANT_NO_IOSTREAMS
 lib::xml_string 
-lib::node::to_trimmed_string() const {
+lib::node_impl::to_trimmed_string() const {
 	std::ostringstream os;
-	trimmed_output_visitor<node> visitor(os);
+	trimmed_output_visitor<node_impl> visitor(os);
 	const_iterator it;
 	const_iterator e = end();
 	for(it = begin(); it != e; it++) visitor(*it);
@@ -538,16 +518,16 @@ lib::node::to_trimmed_string() const {
 #endif
 
 
-void lib::node::create_idmap(std::map<std::string, node*>& m) const {
-	attr_collector<node> visitor(m);
+void lib::node_impl::create_idmap(std::map<std::string, node_impl*>& m) const {
+	attr_collector<node_impl> visitor(m);
 	const_iterator it;
 	const_iterator e = end();
 	for(it = begin(); it != e; it++) visitor(*it);
 }
 
 #ifndef AMBULANT_NO_IOSTREAMS
-void lib::node::dump(std::ostream& os) const {
-	output_visitor<ambulant::lib::node> visitor(os);
+void lib::node_impl::dump(std::ostream& os) const {
+	output_visitor<ambulant::lib::node_impl> visitor(os);
 	const_iterator it;
 	const_iterator e = end();
 	for(it = begin(); it != e; it++) visitor(*it);
@@ -556,7 +536,7 @@ void lib::node::dump(std::ostream& os) const {
 
 
 #ifndef AMBULANT_NO_IOSTREAMS
-std::ostream& operator<<(std::ostream& os, const ambulant::lib::node& n) {
+std::ostream& operator<<(std::ostream& os, const ambulant::lib::node_impl& n) {
 	os << "node(" << (void *)&n << ", \"" << n.get_qname() << "\"";
 	std::string url = repr(n.get_url("src"));
 	if (url != "")
@@ -662,11 +642,18 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 }
 #endif // AMBULANT_NO_IOSTREAMS
 
-#ifdef DEFINE_NODE_FACTORIES_HERE
+#ifdef WITH_EXTERNAL_DOM
+
+// If we are building a player with an (optional) external DOM implementation
+// we need to define a couple more things:
+// - factory functions (which are defined inline for non-external DOM builds)
+// - a couple of methods that accept node_interface parameters and do
+//   dynamic typechecks that the arguments are actually node_impl's.
+
 namespace ambulant {
 namespace lib {
 // Factory functions
-node_virtual *
+node_interface *
 node_factory(const char *local_name, const char **attrs, const node_context *ctx)
 {
 	return new node_impl(local_name, attrs, ctx);
@@ -675,7 +662,7 @@ node_factory(const char *local_name, const char **attrs, const node_context *ctx
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node_virtual *
+node_interface *
 node_factory(const xml_string& local_name, const char **attrs, const node_context *ctx)
 {
 	return new node_impl(local_name, attrs, ctx);
@@ -684,51 +671,48 @@ node_factory(const xml_string& local_name, const char **attrs, const node_contex
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node_virtual *
+node_interface *
 node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
 {
 	return new node_impl(qn, qattrs, ctx);
 }
 
 // shallow copy from other.
-node_virtual *
-node_factory(const node_virtual* other)
+node_interface *
+node_factory(const node_interface* other)
 {
 	return new node_impl(dynamic_cast<const node_impl*>(other));
 }
 
 // And a few more methods
 void
-lib::node::down(node_virtual *n)
+lib::node_impl::down(node_interface *n)
 {
 	down(dynamic_cast<node_impl*>(n));
 }
 
 void
-lib::node::up(node_virtual *n)
+lib::node_impl::up(node_interface *n)
 {
 	up(dynamic_cast<node_impl*>(n));
 }
 
 void
-lib::node::next(node_virtual *n)
+lib::node_impl::next(node_interface *n)
 {
 	next(dynamic_cast<node_impl*>(n));
 }
 
-node*
-lib::node::append_child(node_virtual* child)
+node_interface*
+lib::node_impl::append_child(node_interface* child)
 {
 	return append_child(dynamic_cast<node_impl*>(child));
 }
 
-std::ostream& operator<<(std::ostream& os, const node_virtual& n)
+std::ostream& operator<<(std::ostream& os, const node_interface& n)
 {
 	return os << *dynamic_cast<const node_impl*>(&n);
 }
-
-#undef node
-lib::node::~node() {}
 
 } // namespace lib
 } // namespace ambulant

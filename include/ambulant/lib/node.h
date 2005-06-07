@@ -86,16 +86,6 @@
 
 // If we are using an external DOM the nodes are virtual
 #if WITH_EXTERNAL_DOM
-#define VIRTUAL virtual
-#define V_END = 0
-#define V_INIT(x) = 0;
-#else
-#define VIRTUAL
-#define V_END
-#define V_INIT(x) x
-#endif
-#ifndef NODE_BASECLASS
-#define NODE_BASECLASS
 #endif
 
 namespace ambulant {
@@ -103,9 +93,226 @@ namespace ambulant {
 namespace lib {
 
 class custom_test;
-class node;
+class node_context;
 
-#ifndef SKIP_NODE_FACTORIES
+/// Simple tree node with tag, data and attributes.
+/// The node trees are not fully DOM compliant, but should
+/// be compatible with a bit of glue code.
+/// The parent of each node is also its owner and container.
+
+class node_interface {
+
+  public:
+  
+	///////////////////////////////
+	// tree iterators
+	typedef tree_iterator<node_interface> iterator;
+	typedef const_tree_iterator<node_interface> const_iterator;
+	
+	/// Destruct this node and its contents.
+	/// If this node is part of a tree, detach it first
+	/// and then delete the node and its contents.
+	virtual ~node_interface();
+
+
+	/// Return first child of this node.
+	virtual const node_interface *down() const = 0;
+	
+	/// Return parent of this node.
+	virtual const node_interface *up() const = 0;
+	
+	/// Return next sibling of this node.
+	virtual const node_interface *next() const = 0;
+
+	/// Return first child of this node.
+	virtual node_interface *down()  = 0;
+	
+	/// Return parent of this node.
+	virtual node_interface *up()  = 0;
+	
+	/// Return next sibling of this node.
+	virtual node_interface *next()  = 0;
+
+
+	/// Set first child of this node.
+	virtual void down(node_interface *n)  = 0;
+	
+	/// Set parent of this node.
+	virtual void up(node_interface *n)  = 0;
+	
+	/// Set next sibling of this node.
+	virtual void next(node_interface *n)  = 0;
+	
+	/// Returns the previous sibling node 
+	/// or null when this is the first child.
+	virtual const node_interface* previous() const = 0;
+	
+	/// Returns the last child 
+	/// or null when this has not any children.
+	virtual const node_interface* get_last_child() const = 0;
+	
+	/// Appends the children of this node (if any) to the provided list.
+	virtual void get_children(std::list<const node_interface*>& l) const = 0;
+
+	///////////////////////////////
+	// search operations 
+	// this section should be extented to allow for XPath selectors
+
+	/// Find a node given a path of the form tag/tag/tag.
+	virtual node_interface* locate_node(const char *path) = 0;
+	
+	/// Find the first direct child with the given tag.
+	virtual node_interface *get_first_child(const char *name) = 0;
+	
+	/// Find the first direct child with the given tag.
+	virtual const node_interface *get_first_child(const char *name) const = 0;
+	
+#if 0
+	/// Find all descendants with the given tag.
+	virtual void find_nodes_with_name(const xml_string& name, std::list<node_interface*>& list) = 0;
+#endif
+	
+	/// Find the root of the tree to which this node belongs.
+	virtual node_interface* get_root() = 0;
+	
+	/// Get an attribute from this node or its nearest ancestor that has the attribute.
+	virtual const char *get_container_attribute(const char *name) const = 0;
+	///////////////////////////////
+	// iterators
+
+	/// Return iterator for this node and its subtree.
+    iterator begin() { return iterator(this);}
+
+	/// Return iterator for this node and its subtree.
+    const_iterator begin() const { return const_iterator(this);}
+
+    iterator end() { return iterator(0);}
+    const_iterator end() const { return const_iterator(0);}
+
+	///////////////////////
+	// build tree functions
+	
+	/// Append a child node to this node.
+	virtual node_interface* append_child(node_interface* child) = 0;		
+	
+	/// Append a new child node with the given name to this node.
+	virtual node_interface* append_child(const char *name) = 0;
+
+	/// Detach this node and its subtree from its parent tree.
+	virtual node_interface* detach() = 0;
+	
+	/// Create a deep copy of this node and its subtree.
+	virtual node_interface* clone() const = 0;
+	
+	/// Append data to the data of this node.
+	virtual void append_data(const char *data, size_t len) = 0;
+	
+	/// Append c_str to the data of this node.
+	virtual void append_data(const char *c_str) = 0;
+	
+	/// Append str to the data of this node.
+	virtual void append_data(const xml_string& str) = 0;
+
+	/// Add an attribute/value pair.
+	virtual void set_attribute(const char *name, const char *value) = 0;
+
+	/// Add an attribute/value pair.
+	virtual void set_attribute(const char *name, const xml_string& value) = 0;
+
+	/// Set a number of attribute/value pairs.
+	/// Note: attrs are as per expat parser
+	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
+	virtual void set_attributes(const char **attrs) = 0;
+	
+	/// Set the namespace for this node.
+	virtual void set_namespace(const xml_string& ns) = 0;
+	
+	/////////////////////
+	// data queries
+
+	/// Return the namespace part of the tag for this node.
+	virtual const xml_string& get_namespace() const = 0;
+	
+	/// Return the local part of the tag for this node.
+	virtual const xml_string& get_local_name() const = 0;
+	
+	/// Return namespace and local part of the tag for this node.
+	virtual const q_name_pair& get_qname() const = 0;
+	
+	/// Return the unique numeric ID for this node.
+	virtual int get_numid() const = 0;
+	
+	/// Return the data for this node.
+	virtual const xml_string& get_data() const = 0;
+	
+	/// Return the trimmed data for this node.
+	virtual xml_string get_trimmed_data() const = 0;
+
+	virtual bool has_graph_data() const = 0;
+	
+	/// Return the value for the given attribute.
+	virtual const char *get_attribute(const char *name) const = 0;
+	
+	/// Return the value for the given attribute.
+	virtual const char *get_attribute(const std::string& name) const = 0;
+	
+	/// Return the value for the given attribute, interpreted as a URL.
+	/// Relative URLs are resolved against the document base URL, if possible.
+	virtual net::url get_url(const char *attrname) const = 0;
+	
+	/// Return a reference to all attributes.
+	virtual const q_attributes_list& get_attrs() const = 0;
+	
+
+	/// Return the number of nodes of the xml (sub-)tree starting at this node.
+	virtual unsigned int size() const = 0;
+
+	/// Fills in a map with node ids.
+	/// the map may be used for retreiving nodes from their id.
+#if 0
+	virtual void create_idmap(std::map<std::string, node_interface*>& m) const = 0;
+#endif
+	
+	/// Returns a "friendly" path desription of this node.
+	virtual std::string get_path_display_desc() const = 0;
+	
+	/// Return a friendly string describing this node.
+	/// The string will be of a form similar to \<tag id="...">
+	virtual std::string get_sig() const = 0;
+	
+	/////////////////////
+	// string repr
+	
+	/// Return the
+	virtual xml_string xmlrepr() const = 0;
+	virtual xml_string to_string() const = 0;
+	virtual xml_string to_trimmed_string() const = 0;
+	
+#ifndef AMBULANT_NO_IOSTREAMS
+	virtual void dump(std::ostream& os) const = 0;
+#endif
+
+	/////////////////////
+	// node context
+	
+	/// Return the node_context for this node.
+	virtual const node_context* get_context() const = 0;
+	
+	/// Set the node_context for this node.
+	virtual void set_context(node_context *c) = 0;
+};
+
+// Typedef trickery. Most of the code refers to "node", but this can be one of two things:
+// - If we're not using an external DOM they get "node_impl", with inline methods and other
+//   performance optimizations
+// - If we are using an external DOM they get the abstract node_interface.
+#if WITH_EXTERNAL_DOM
+typedef node_interface node;
+#else
+#include "ambulant/lib/node_impl.h"
+typedef node_impl node;
+#endif
+
 /// Interface of document class accesible to nodes.
 class node_context {
   public:
@@ -131,315 +338,26 @@ class node_context {
 	virtual const node* 
 	get_node(const std::string& idd) const = 0;
 };
-#endif
 
-/// Simple tree node with tag, data and attributes.
-/// The node trees are not fully DOM compliant, but should
-/// be compatible with a bit of glue code.
-/// The parent of each node is also its owner and container.
-
-class node NODE_BASECLASS {
-
-  public:
-  
-	///////////////////////////////
-	// tree iterators
-	typedef tree_iterator<node> iterator;
-	typedef const_tree_iterator<node> const_iterator;
-	
-#if !WITH_EXTERNAL_DOM
-	///////////////////////////////
-	// Constructors
-	
-	/// Construct a new, unconnected, node.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	node(const char *local_name, const char **attrs = 0, const node_context *ctx = 0);
-
-	/// Construct a new, unconnected, node.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	node(const xml_string& local_name, const char **attrs = 0, const node_context *ctx = 0);
-
-	/// Construct a new, unconnected, node.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	node(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx = 0);
-	
-	// shallow copy from other.
-	node(const node* other);
-#endif
-
-	/// Destruct this node and its contents.
-	/// If this node is part of a tree, detach it first
-	/// and then delete the node and its contents.
-	virtual ~node();
-
-
-	/// Return first child of this node.
-	VIRTUAL const node *down() const V_INIT({ return m_child;})
-	
-	/// Return parent of this node.
-	VIRTUAL const node *up() const V_INIT({ return m_parent;})
-	
-	/// Return next sibling of this node.
-	VIRTUAL const node *next() const V_INIT({ return m_next;})
-
-	/// Return first child of this node.
-	VIRTUAL node *down()  V_INIT({ return m_child;})
-	
-	/// Return parent of this node.
-	VIRTUAL node *up()  V_INIT({ return m_parent;})
-	
-	/// Return next sibling of this node.
-	VIRTUAL node *next()  V_INIT({ return m_next;})
-
-
-	/// Set first child of this node.
-	VIRTUAL void down(node *n)  V_INIT({ m_child = n;})
-#ifdef SKIP_NODE_FACTORIES
-	void down(node_virtual *n);
-#endif
-	
-	/// Set parent of this node.
-	VIRTUAL void up(node *n)  V_INIT({ m_parent = n;})
-#ifdef SKIP_NODE_FACTORIES
-	void up(node_virtual *n);
-#endif
-	
-	/// Set next sibling of this node.
-	VIRTUAL void next(node *n)  V_INIT({ m_next = n;})
-#ifdef SKIP_NODE_FACTORIES
-	void next(node_virtual *n);
-#endif
-	
-	/// Returns the previous sibling node 
-	/// or null when this is the first child.
-	VIRTUAL const node* previous() const V_END;
-	
-	/// Returns the last child 
-	/// or null when this has not any children.
-	VIRTUAL const node* get_last_child() const V_END;
-	
-	/// Appends the children of this node (if any) to the provided list.
-#ifdef SKIP_NODE_FACTORIES
-	void get_children(std::list<const node_virtual*>& l) const;
-#else
-	VIRTUAL void get_children(std::list<const node*>& l) const V_END;
-#endif
-
-	///////////////////////////////
-	// search operations 
-	// this section should be extented to allow for XPath selectors
-
-	/// Find a node given a path of the form tag/tag/tag.
-	VIRTUAL node* locate_node(const char *path) V_END;
-	
-	/// Find the first direct child with the given tag.
-	VIRTUAL node *get_first_child(const char *name) V_END;
-	
-	/// Find the first direct child with the given tag.
-	VIRTUAL const node *get_first_child(const char *name) const V_END;
-	
-#if 0
-	/// Find all descendants with the given tag.
-	VIRTUAL void find_nodes_with_name(const xml_string& name, std::list<node*>& list) V_END;
-#ifdef SKIP_NODE_FACTORIES
-	void find_nodes_with_name(const xml_string& name, std::list<node_virtual*>& list);
-#endif
-#endif
-	
-	/// Find the root of the tree to which this node belongs.
-	VIRTUAL node* get_root() V_END;
-	
-	/// Get an attribute from this node or its nearest ancestor that has the attribute.
-	VIRTUAL const char *get_container_attribute(const char *name) const V_END;
-	///////////////////////////////
-	// iterators
-
-	/// Return iterator for this node and its subtree.
-    iterator begin() { return iterator(this);}
-
-	/// Return iterator for this node and its subtree.
-    const_iterator begin() const { return const_iterator(this);}
-
-    iterator end() { return iterator(0);}
-    const_iterator end() const { return const_iterator(0);}
-
-	///////////////////////
-	// build tree functions
-	
-	/// Append a child node to this node.
-	VIRTUAL node* append_child(node* child) V_END;
-#ifdef SKIP_NODE_FACTORIES
-	node* append_child(node_virtual* child);
-#endif
-		
-	
-	/// Append a new child node with the given name to this node.
-	VIRTUAL node* append_child(const char *name) V_END;
-
-	/// Detach this node and its subtree from its parent tree.
-	VIRTUAL node* detach() V_END;
-	
-	/// Create a deep copy of this node and its subtree.
-	VIRTUAL node* clone() const V_END;
-	
-	/// Append data to the data of this node.
-	VIRTUAL void append_data(const char *data, size_t len) V_END;
-	
-	/// Append c_str to the data of this node.
-	VIRTUAL void append_data(const char *c_str) V_END;
-	
-	/// Append str to the data of this node.
-	VIRTUAL void append_data(const xml_string& str) V_END;
-
-	/// Add an attribute/value pair.
-	VIRTUAL void set_attribute(const char *name, const char *value) V_END;
-
-	/// Add an attribute/value pair.
-	VIRTUAL void set_attribute(const char *name, const xml_string& value) V_END;
-
-	/// Set a number of attribute/value pairs.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	VIRTUAL void set_attributes(const char **attrs) V_END;
-	
-	/// Set the namespace for this node.
-	VIRTUAL void set_namespace(const xml_string& ns) V_END;
-	
-	/////////////////////
-	// data queries
-
-	/// Return the namespace part of the tag for this node.
-	VIRTUAL const xml_string& get_namespace() const V_INIT({ return m_qname.first;})
-	
-	/// Return the local part of the tag for this node.
-	VIRTUAL const xml_string& get_local_name() const V_INIT({ return m_qname.second;})
-	
-	/// Return namespace and local part of the tag for this node.
-	VIRTUAL const q_name_pair& get_qname() const V_INIT({ return m_qname;})
-	
-	/// Return the unique numeric ID for this node.
-	VIRTUAL int get_numid() const V_INIT({return m_numid;})
-	
-	/// Return the data for this node.
-	VIRTUAL const xml_string& get_data() const V_INIT({ return m_data;})
-	
-	/// Return the trimmed data for this node.
-	VIRTUAL xml_string get_trimmed_data() const V_END;
-
-	VIRTUAL bool has_graph_data() const V_END;
-	
-	/// Return the value for the given attribute.
-	VIRTUAL const char *get_attribute(const char *name) const V_END;
-	
-	/// Return the value for the given attribute.
-	VIRTUAL const char *get_attribute(const std::string& name) const V_END;
-	
-	/// Return the value for the given attribute, interpreted as a URL.
-	/// Relative URLs are resolved against the document base URL, if possible.
-	VIRTUAL net::url get_url(const char *attrname) const V_END;
-	
-	/// Return a reference to all attributes.
-	VIRTUAL const q_attributes_list& get_attrs() const V_INIT({ return m_qattrs;})
-	
-
-	/// Return the number of nodes of the xml (sub-)tree starting at this node.
-	VIRTUAL unsigned int size() const V_END;
-
-	/// Fills in a map with node ids.
-	/// the map may be used for retreiving nodes from their id.
-#ifdef SKIP_NODE_FACTORIES
-	void create_idmap(std::map<std::string, node_impl*>& m) const;
-#else
-//	VIRTUAL void create_idmap(std::map<std::string, node*>& m) const V_END;
-#endif
-	
-	/// Returns a "friendly" path desription of this node.
-	VIRTUAL std::string get_path_display_desc() const V_END;
-	
-	/// Return a friendly string describing this node.
-	/// The string will be of a form similar to \<tag id="...">
-	VIRTUAL std::string get_sig() const V_END;
-	
-	/////////////////////
-	// string repr
-	
-	/// Return the
-	VIRTUAL xml_string xmlrepr() const V_END;
-	VIRTUAL xml_string to_string() const V_END;
-	VIRTUAL xml_string to_trimmed_string() const V_END;
-	
-#ifndef AMBULANT_NO_IOSTREAMS
-	VIRTUAL void dump(std::ostream& os) const V_END;
-#endif
-
-	/////////////////////
-	// node context
-	
-	/// Return the node_context for this node.
-	VIRTUAL const node_context* get_context() const V_INIT({ return m_context;})
-	
-	/// Set the node_context for this node.
-	VIRTUAL void set_context(node_context *c) V_INIT({ m_context = c;})
-	
-#if !WITH_EXTERNAL_DOM
-	/// Return the next unique ID.
-	VIRTUAL static int get_node_counter() V_INIT({return node_counter;})
-	
-  /////////////
-  protected:
-	// node data 
-	// sufficient for a generic xml element
-	
-	// the qualified name of this element as std::pair
-	q_name_pair m_qname;
-	
-	// the qualified name of this element as std::pair
-	q_attributes_list m_qattrs;
-	
-	// the text data of this node
-	xml_string m_data;
-	
-	// the context of this node
-	const node_context *m_context;
-	
-	// a magic id
-	int m_numid;
-	
-//	const node& operator =(const node& o);
-	
-  private:
-	// tree bonds
-	node *m_parent;
-	node *m_next;
-	node *m_child;
-	
-	// verifier
-	static int node_counter;
-#endif
-};
-
-#ifndef SKIP_NODE_FACTORIES
 #if WITH_EXTERNAL_DOM
-// Factory functions
-node *node_factory(const char *local_name, const char **attrs = 0, const node_context *ctx = 0);
+// Factory functions. These are defined in node.cpp, and will return
+// node_impl objects.
+node_interface *node_factory(const char *local_name, const char **attrs = 0, const node_context *ctx = 0);
 
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node *node_factory(const xml_string& local_name, const char **attrs = 0, const node_context *ctx = 0);
+node_interface *node_factory(const xml_string& local_name, const char **attrs = 0, const node_context *ctx = 0);
 
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node *node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx = 0);
+node_interface *node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx = 0);
 
 // shallow copy from other.
-node *node_factory(const node* other);
+node_interface *node_factory(const node* other);
 #else
-// Factory functions
+// Factory functions. These call node_impl constructors directly.
 inline node *
 node_factory(const char *local_name, const char **attrs = 0, const node_context *ctx = 0)
 {
@@ -471,7 +389,6 @@ node_factory(const node* other)
 	return new node(other);
 }
 #endif // WITH_EXTERNAL_DOM
-#endif // SKIP_NODE_FACTORIES
 
 } // namespace lib
  
