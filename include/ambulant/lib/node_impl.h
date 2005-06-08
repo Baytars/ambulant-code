@@ -124,26 +124,20 @@ class node_impl : public node_interface {
 	/// Set first child of this node.
 	void down(node_impl *n)  { m_child = n;}
 
-#ifdef WITH_EXTERNAL_DOM
 	/// Set first child of this node, after dynamic typecheck
 	void down(node_interface *n);
-#endif
 	
 	/// Set parent of this node.
 	void up(node_impl *n)  { m_parent = n;}
 
-#ifdef WITH_EXTERNAL_DOM
 	/// Set parent of this node, after dynamic typecheck
 	void up(node_interface *n);
-#endif
 	
 	/// Set next sibling of this node.
 	void next(node_impl *n)  { m_next = n;}
 
-#ifdef WITH_EXTERNAL_DOM
 	/// Set next sibling of this node, after dynamic typecheck
 	void next(node_interface *n);
-#endif
 	
 	/// Returns the previous sibling node 
 	/// or null when this is the first child.
@@ -154,8 +148,7 @@ class node_impl : public node_interface {
 	const node_impl* get_last_child() const;
 	
 	/// Appends the children of this node (if any) to the provided list.
-	void get_children(std::list<const node_interface*>& l) const;
-/// XXX	void get_children(std::list<const node_impl*>& l) const;
+	void get_children(std::list<const node*>& l) const;
 
 	///////////////////////////////
 	// search operations 
@@ -193,10 +186,8 @@ class node_impl : public node_interface {
 	/// Append a child node to this node.
 	node_impl* append_child(node_impl* child);
 
-#ifdef WITH_EXTERNAL_DOM
 	/// Append a child node to this node, after dynamic typecheck
-	node_impl* append_child(node_interface* child);
-#endif
+	node_interface* append_child(node_interface* child);
 
 	/// Append a new child node with the given name to this node.
 	node_impl* append_child(const char *name);
@@ -337,5 +328,7 @@ class node_impl : public node_interface {
 	static int node_counter;
 };
 
+} // namespace lib
+} // namespace ambulant
 
 #endif // AMBULANT_LIB_NODE_IMPL_H

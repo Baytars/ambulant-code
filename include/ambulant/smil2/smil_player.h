@@ -57,6 +57,7 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/event.h"
 #include "ambulant/lib/mtsync.h"
+#include "ambulant/lib/node.h"
 #include "ambulant/smil2/time_node.h"
 #include "ambulant/smil2/test_attrs.h"
 #include "ambulant/smil2/time_nctx.h"
@@ -70,7 +71,6 @@
 namespace ambulant {
 namespace lib {
 class document;
-class node;
 class timer;
 } // namespace lib
 

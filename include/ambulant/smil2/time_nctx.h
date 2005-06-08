@@ -54,6 +54,7 @@
 #define AMBULANT_SMIL2_TIME_NCTX_H
 
 #include "ambulant/config/config.h"
+#include "ambulant/lib/node.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/smil2/smil_time.h"
 
@@ -62,7 +63,6 @@
 namespace ambulant {
 
 namespace lib {
-	class node;
 	class timer;
 }
 

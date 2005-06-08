@@ -51,6 +51,8 @@
  */
 
 #include "ambulant/lib/node.h"
+#include "ambulant/lib/node_impl.h"
+
 // find_if, etc
 #include <algorithm>
 
@@ -227,8 +229,8 @@ lib::node_impl::get_last_child() const {
 	return node_navigator<const node_impl>::last_child(this);
 }
 
-void lib::node_impl::get_children(std::list<const node_interface*>& l) const {
-	node_navigator<const node_interface>::get_children(this, l);
+void lib::node_impl::get_children(std::list<const lib::node*>& l) const {
+	node_navigator<const lib::node>::get_children(this, l);
 }
 
 ///////////////////////////////
@@ -534,6 +536,45 @@ void lib::node_impl::dump(std::ostream& os) const {
 }
 #endif
 
+void
+lib::node_impl::down(lib::node_interface *n)
+{
+#ifdef WITH_EXTERNAL_DOM
+	down(dynamic_cast<node_impl*>(n));
+#else
+	assert(0);
+#endif
+}
+
+void
+lib::node_impl::up(lib::node_interface *n)
+{
+#ifdef WITH_EXTERNAL_DOM
+	up(dynamic_cast<node_impl*>(n));
+#else
+	assert(0);
+#endif
+}
+
+void
+lib::node_impl::next(lib::node_interface *n)
+{
+#ifdef WITH_EXTERNAL_DOM
+	next(dynamic_cast<node_impl*>(n));
+#else
+	assert(0);
+#endif
+}
+
+lib::node_interface*
+lib::node_impl::append_child(lib::node_interface* child)
+{
+#ifdef WITH_EXTERNAL_DOM
+	return append_child(dynamic_cast<node_impl*>(child));
+#else
+	assert(0);
+#endif
+}
 
 #ifndef AMBULANT_NO_IOSTREAMS
 std::ostream& operator<<(std::ostream& os, const ambulant::lib::node_impl& n) {
@@ -653,7 +694,7 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 namespace ambulant {
 namespace lib {
 // Factory functions
-node_interface *
+lib::node_interface *
 node_factory(const char *local_name, const char **attrs, const node_context *ctx)
 {
 	return new node_impl(local_name, attrs, ctx);
@@ -662,7 +703,7 @@ node_factory(const char *local_name, const char **attrs, const node_context *ctx
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node_interface *
+lib::node_interface *
 node_factory(const xml_string& local_name, const char **attrs, const node_context *ctx)
 {
 	return new node_impl(local_name, attrs, ctx);
@@ -671,45 +712,20 @@ node_factory(const xml_string& local_name, const char **attrs, const node_contex
 /// Construct a new, unconnected, node.
 /// Note: attrs are as per expat parser
 /// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-node_interface *
+lib::node_interface *
 node_factory(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
 {
 	return new node_impl(qn, qattrs, ctx);
 }
 
 // shallow copy from other.
-node_interface *
-node_factory(const node_interface* other)
+lib::node_interface *
+node_factory(const lib::node_interface* other)
 {
 	return new node_impl(dynamic_cast<const node_impl*>(other));
 }
 
-// And a few more methods
-void
-lib::node_impl::down(node_interface *n)
-{
-	down(dynamic_cast<node_impl*>(n));
-}
-
-void
-lib::node_impl::up(node_interface *n)
-{
-	up(dynamic_cast<node_impl*>(n));
-}
-
-void
-lib::node_impl::next(node_interface *n)
-{
-	next(dynamic_cast<node_impl*>(n));
-}
-
-node_interface*
-lib::node_impl::append_child(node_interface* child)
-{
-	return append_child(dynamic_cast<node_impl*>(child));
-}
-
-std::ostream& operator<<(std::ostream& os, const node_interface& n)
+std::ostream& operator<<(std::ostream& os, const lib::node_interface& n)
 {
 	return os << *dynamic_cast<const node_impl*>(&n);
 }
