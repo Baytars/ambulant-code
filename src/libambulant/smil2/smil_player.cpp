@@ -92,6 +92,7 @@ smil_player::smil_player(lib::document *doc, common::factories *factory, common:
 :	m_doc(doc),
 	m_factory(factory),
 	m_system(sys),
+	m_feedback_handler(0),
 	m_animation_engine(0),
 	m_root(0),
 	m_dom2tn(0),
