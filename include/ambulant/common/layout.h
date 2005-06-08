@@ -55,12 +55,11 @@
 
 #include <string>
 #include "ambulant/lib/gtypes.h"
-//#include "ambulant/lib/node.h"
+#include "ambulant/lib/node.h"
 
 namespace ambulant {
 
 namespace lib {
-class node;
 class document;
 class transition_info;
 } // namespace lib

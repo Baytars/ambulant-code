@@ -83,17 +83,19 @@
 #endif/*AMBULANT_NO_OSTREAM*/
 #endif
 
-
-// If we are using an external DOM the nodes are virtual
-#if WITH_EXTERNAL_DOM
-#endif
-
 namespace ambulant {
 
 namespace lib {
 
 class custom_test;
 class node_context;
+class node_interface;
+class node_impl;
+#if WITH_EXTERNAL_DOM
+typedef node_interface node;
+#else
+typedef node_impl node;
+#endif
 
 /// Simple tree node with tag, data and attributes.
 /// The node trees are not fully DOM compliant, but should
@@ -112,7 +114,7 @@ class node_interface {
 	/// Destruct this node and its contents.
 	/// If this node is part of a tree, detach it first
 	/// and then delete the node and its contents.
-	virtual ~node_interface();
+	virtual ~node_interface() {}
 
 
 	/// Return first child of this node.
@@ -152,7 +154,7 @@ class node_interface {
 	virtual const node_interface* get_last_child() const = 0;
 	
 	/// Appends the children of this node (if any) to the provided list.
-	virtual void get_children(std::list<const node_interface*>& l) const = 0;
+	virtual void get_children(std::list<const node*>& l) const = 0;
 
 	///////////////////////////////
 	// search operations 
@@ -309,7 +311,11 @@ class node_interface {
 #if WITH_EXTERNAL_DOM
 typedef node_interface node;
 #else
+} // namespace lib 
+} // namespace ambulant
 #include "ambulant/lib/node_impl.h"
+namespace ambulant {
+namespace lib {
 typedef node_impl node;
 #endif
 
