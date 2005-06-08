@@ -166,6 +166,7 @@ class smil_player : public common::player, public time_node_context, public comm
 	virtual void cancel_all_events() { m_event_processor->cancel_all_events();}
 	virtual bool wait_for_eom() const { return m_eom_flag;}
 	virtual void set_wait_for_eom(bool b) { m_eom_flag = b;}
+	virtual void set_feedback_handler(common::player_feedback *h) { m_feedback_handler = h; }
 	
 	// Export the layout functionality for those who need it
 	virtual smil_layout_manager *get_layout() { return m_layout_manager;}
@@ -198,6 +199,7 @@ class smil_player : public common::player, public time_node_context, public comm
 	//common::window_factory *m_wf;
 	//common::playable_factory *m_pf;
 	common::embedder *m_system;
+	common::player_feedback *m_feedback_handler;
 	animation_engine *m_animation_engine;
 	time_node* m_root;
 	std::map<int, time_node*> *m_dom2tn;

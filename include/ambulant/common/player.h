@@ -72,6 +72,15 @@ class embedder;
 /// Current state of the player.
 enum play_state {ps_idle, ps_playing, ps_pausing, ps_done};
 
+/// Interface for getting feedback from the player.
+/// The player will call methods here so a UI can synchronise
+/// any external views with what the player is doing.
+class player_feedback {
+  public:
+	virtual void started(const lib::node *n) = 0;
+	virtual void stopped(const lib::node *n) = 0;
+};
+
 /// Baseclass for all players.
 /// This is the API an embedding program would use to control the
 /// player, to implement things like the "Play" command in the GUI.
@@ -116,7 +125,13 @@ class player {
 	
 	/// Set desired cursor.
 	virtual void set_cursor(int cursor) {}
-		
+
+	/// Set the feedback handler.
+	virtual void set_feedback(player_feedback *fb) {}
+	
+	/// Tell the player to start playing a specific node.
+	/// Return true if successfull. 
+	virtual bool goto_node(lib::node *n) { return false; }
 //	void set_speed(double speed);
 //	double get_speed() const;
 };
