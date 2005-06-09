@@ -573,6 +573,7 @@ lib::node_impl::append_child(lib::node_interface* child)
 	return append_child(dynamic_cast<node_impl*>(child));
 #else
 	assert(0);
+	return NULL;
 #endif
 }
 
