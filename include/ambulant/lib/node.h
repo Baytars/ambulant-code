@@ -250,7 +250,9 @@ class node_interface {
 	/// Return the trimmed data for this node.
 	virtual xml_string get_trimmed_data() const = 0;
 
+#if 0
 	virtual bool has_graph_data() const = 0;
+#endif
 	
 	/// Return the value for the given attribute.
 	virtual const char *get_attribute(const char *name) const = 0;
@@ -262,16 +264,17 @@ class node_interface {
 	/// Relative URLs are resolved against the document base URL, if possible.
 	virtual net::url get_url(const char *attrname) const = 0;
 	
+#if 0
 	/// Return a reference to all attributes.
 	virtual const q_attributes_list& get_attrs() const = 0;
-	
+#endif	
 
 	/// Return the number of nodes of the xml (sub-)tree starting at this node.
 	virtual unsigned int size() const = 0;
 
+#if 0
 	/// Fills in a map with node ids.
 	/// the map may be used for retreiving nodes from their id.
-#if 0
 	virtual void create_idmap(std::map<std::string, node_interface*>& m) const = 0;
 #endif
 	
@@ -287,13 +290,10 @@ class node_interface {
 	
 	/// Return the
 	virtual xml_string xmlrepr() const = 0;
+#if 0
 	virtual xml_string to_string() const = 0;
 	virtual xml_string to_trimmed_string() const = 0;
-	
-#ifndef AMBULANT_NO_IOSTREAMS
-	virtual void dump(std::ostream& os) const = 0;
-#endif
-
+#endif	
 	/////////////////////
 	// node context
 	
