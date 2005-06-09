@@ -86,7 +86,7 @@ class smil_layout_manager;
 class animation_engine;
 class scheduler;
 
-class smil_player : public common::player, public time_node_context, public common::playable_notification {
+class smil_player : public common::player, public common::player_feedback, public time_node_context, public common::playable_notification {
   public:
 	typedef time_traits::value_type time_value_type;
 	
@@ -166,8 +166,14 @@ class smil_player : public common::player, public time_node_context, public comm
 	virtual void cancel_all_events() { m_event_processor->cancel_all_events();}
 	virtual bool wait_for_eom() const { return m_eom_flag;}
 	virtual void set_wait_for_eom(bool b) { m_eom_flag = b;}
-	virtual void set_feedback_handler(common::player_feedback *h) { m_feedback_handler = h; }
 	
+	// Feedback stuff
+	void set_feedback(common::player_feedback *h) { m_feedback_handler = h; }
+	void node_started(lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_started(n); }
+	void node_stopped(lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_stopped(n); }
+	
+	virtual bool goto_node(const lib::node *n);
+
 	// Export the layout functionality for those who need it
 	virtual smil_layout_manager *get_layout() { return m_layout_manager;}
 	

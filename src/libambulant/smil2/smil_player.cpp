@@ -555,10 +555,7 @@ void smil_player::show_link(const lib::node *n, const net::url& href, src_playst
 		std::string anchor = href.get_ref();
 		const lib::node *target = m_doc->get_node(anchor);
 		if(target) {
-			std::map<int, time_node*>::iterator it = m_dom2tn->find(target->get_numid());
-			if(it != m_dom2tn->end()) {
-				m_scheduler->start((*it).second);
-			}
+			goto_node(target);
 		} else {
 			m_logger->error(gettext("Link destination not found: %s"), href.get_url().c_str());
 		}
@@ -587,6 +584,16 @@ void smil_player::show_link(const lib::node *n, const net::url& href, src_playst
 	} else {
 		m_system->open(href, dststate == dst_play, to_replace);
 	}
+}
+
+bool smil_player::goto_node(const lib::node *target)
+{
+	std::map<int, time_node*>::iterator it = m_dom2tn->find(target->get_numid());
+	if(it != m_dom2tn->end()) {
+		m_scheduler->start((*it).second);
+		return true;
+	}
+	return false;
 }
 
 std::string smil_player::get_pointed_node_str() const {
