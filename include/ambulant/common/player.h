@@ -77,8 +77,8 @@ enum play_state {ps_idle, ps_playing, ps_pausing, ps_done};
 /// any external views with what the player is doing.
 class player_feedback {
   public:
-	virtual void started(const lib::node *n) = 0;
-	virtual void stopped(const lib::node *n) = 0;
+	virtual void node_started(lib::node *n) = 0;
+	virtual void node_stopped(lib::node *n) = 0;
 };
 
 /// Baseclass for all players.
@@ -130,7 +130,7 @@ class player {
 	virtual void set_feedback(player_feedback *fb) {}
 	
 	/// Tell the player to start playing a specific node.
-	/// Return true if successfull. 
+	/// Return true if successful. 
 	virtual bool goto_node(lib::node *n) { return false; }
 //	void set_speed(double speed);
 //	double get_speed() const;

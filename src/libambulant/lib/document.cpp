@@ -146,6 +146,7 @@ lib::document::create_from_string(common::factories* factory, const std::string&
 lib::document* 
 lib::document::create_from_tree(common::factories* factory, lib::node *root, const net::url& u) {
 	document *d = new document(root, false);
+	d->set_root(root); // This fills the id2node map and such
 	d->set_src_url(u);
 	return d;
 }
