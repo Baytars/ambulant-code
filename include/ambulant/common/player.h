@@ -131,7 +131,7 @@ class player {
 	
 	/// Tell the player to start playing a specific node.
 	/// Return true if successful. 
-	virtual bool goto_node(lib::node *n) { return false; }
+	virtual bool goto_node(const lib::node *n) { return false; }
 //	void set_speed(double speed);
 //	double get_speed() const;
 };

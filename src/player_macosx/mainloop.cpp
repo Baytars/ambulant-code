@@ -49,7 +49,7 @@
 
 //#define WITH_NONE_VIDEO
 //#define WITH_FFMPEG_VIDEO
-#define TEST_PLAYBACK_FEEDBACK
+//#define TEST_PLAYBACK_FEEDBACK
 
 #include <iostream>
 #include <ApplicationServices/ApplicationServices.h>
@@ -194,7 +194,7 @@ mainloop::mainloop(const char *filename, ambulant::common::window_factory *wf,
 #if 1
 	const std::string& id = url.get_ref();
 	if (id != "") {
-		ambulant::lib::node *node = m_doc->get_node(id);
+		const ambulant::lib::node *node = m_doc->get_node(id);
 		if (!node) {
 			lib::logger::get_logger()->warn(gettext("%s: node ID not found"), id.c_str());
 		} else {
@@ -272,7 +272,7 @@ mainloop::play()
 		bool ok = m_player->goto_node(m_goto_node);
 		if (!ok)
 			ambulant::lib::logger::get_logger()->trace("mainloop::run: goto_node failed");
-	}
+	} 
 	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::run(): returning");
 }
 
