@@ -68,7 +68,8 @@ namespace ambulant {
 namespace lib {
 
 /// Information on custom test used in the document.
-struct custom_test {
+class custom_test {
+  public:
 	std::string idd;
 	std::string title;
 	bool state;
