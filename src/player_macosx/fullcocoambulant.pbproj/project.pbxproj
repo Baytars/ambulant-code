@@ -188,6 +188,7 @@
 				041613FB072078C400A8B0B6,
 				042125B207A7DFD300D20F9D,
 				0415816A08564CFC0052FA10,
+				0423C2AF0858DA1000D89497,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1074,6 +1075,7 @@
 				04161457072078C400A8B0B6,
 				042125AF07A7DFBE00D20F9D,
 				042125D807A7EBF900D20F9D,
+				0423C2AA0858D9E000D89497,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1816,6 +1818,46 @@
 			settings = {
 			};
 		};
+		0423C2A80858D9E000D89497 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = node_dummy.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		0423C2A90858D9E000D89497 = {
+			fileRef = 0423C2A80858D9E000D89497;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		0423C2AA0858D9E000D89497 = {
+			fileRef = 0423C2A80858D9E000D89497;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		0423C2AE0858DA1000D89497 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = node_dummy.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		0423C2AF0858DA1000D89497 = {
+			fileRef = 0423C2AE0858DA1000D89497;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		0423C2B00858DA1000D89497 = {
+			fileRef = 0423C2AE0858DA1000D89497;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		0427B21F0625FCF20071CD58 = {
 			isa = PBXFileReference;
 			lastKnownFileType = archive.ar;
@@ -2387,6 +2429,7 @@
 				04382B6505D7AEE600CFA029,
 				04382B6605D7AEE600CFA029,
 				04382B6705D7AEE600CFA029,
+				0423C2AE0858DA1000D89497,
 			);
 			isa = PBXGroup;
 			path = lib;
@@ -3426,6 +3469,7 @@
 				0444D32C051F2EEF0010C447,
 				04984765058DE42400D855A9,
 				0444D32D051F2EEF0010C447,
+				0423C2A80858D9E000D89497,
 				044C06DB05986D0D00592A78,
 				04984769058DE47100D855A9,
 				041485070532E37A001276A4,
@@ -5763,6 +5807,7 @@
 				04A107730748E0A6002EA347,
 				042125B107A7DFD300D20F9D,
 				0418F4610855E4E8004CAF9C,
+				0423C2B00858DA1000D89497,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5900,6 +5945,7 @@
 				041614870720838000A8B0B6,
 				042125AE07A7DFBE00D20F9D,
 				042125D707A7EBF900D20F9D,
+				0423C2A90858D9E000D89497,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
