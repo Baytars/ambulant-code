@@ -477,11 +477,15 @@ lib::node_impl::xmlrepr() const {
 }
 
 std::string lib::node_impl::get_sig() const {
-	std::string s = m_qname.second;
-	s += '[';
+	std::string s = "<";
+	s += m_qname.second;
 	const char *pid = get_attribute("id");
-	s += (pid?pid:"no-id");
-	s += ']';
+	if (pid) {
+		s += " id=\"";
+		s += pid;
+		s += "\"";
+	}
+	s += ">";
 	return s;
 }
 
@@ -539,7 +543,7 @@ void lib::node_impl::dump(std::ostream& os) const {
 void
 lib::node_impl::down(lib::node_interface *n)
 {
-#ifdef WITH_EXTERNAL_DOM
+#if WITH_EXTERNAL_DOM
 	down(dynamic_cast<node_impl*>(n));
 #else
 	assert(0);
@@ -549,7 +553,7 @@ lib::node_impl::down(lib::node_interface *n)
 void
 lib::node_impl::up(lib::node_interface *n)
 {
-#ifdef WITH_EXTERNAL_DOM
+#if WITH_EXTERNAL_DOM
 	up(dynamic_cast<node_impl*>(n));
 #else
 	assert(0);
@@ -559,7 +563,7 @@ lib::node_impl::up(lib::node_interface *n)
 void
 lib::node_impl::next(lib::node_interface *n)
 {
-#ifdef WITH_EXTERNAL_DOM
+#if WITH_EXTERNAL_DOM
 	next(dynamic_cast<node_impl*>(n));
 #else
 	assert(0);
@@ -569,7 +573,7 @@ lib::node_impl::next(lib::node_interface *n)
 lib::node_interface*
 lib::node_impl::append_child(lib::node_interface* child)
 {
-#ifdef WITH_EXTERNAL_DOM
+#if WITH_EXTERNAL_DOM
 	return append_child(dynamic_cast<node_impl*>(child));
 #else
 	assert(0);
@@ -684,7 +688,7 @@ void trimmed_output_visitor<Node>::write_end_tag_with_children(const Node*& pe) 
 }
 #endif // AMBULANT_NO_IOSTREAMS
 
-#ifdef WITH_EXTERNAL_DOM
+#if WITH_EXTERNAL_DOM
 
 // If we are building a player with an (optional) external DOM implementation
 // we need to define a couple more things:
