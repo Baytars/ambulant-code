@@ -153,10 +153,17 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
     def outputCheckNewArg(self):
         Output('if (itself == NULL)')
         OutLbrace()
-        Output('PyErr_SetString(PyExc_RuntimeError, "cannot wrap NULL");')
-        Output('return NULL;')
+        Output('Py_INCREF(Py_None);')
+        Output('return Py_None;')
         OutRbrace()
         # XXX Add refcount, if needed
+        
+    def outputCheckConvertArg(self):
+        Output('if (v == Py_None)')
+        OutLbrace()
+        Output('*p_itself = NULL;')
+        Output('return 1;')
+        OutRbrace()
         
     def outputStructMembers(self):
         GlobalObjectDefinition.outputStructMembers(self)
