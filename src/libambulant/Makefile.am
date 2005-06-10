@@ -27,10 +27,10 @@ endif
 
 if WITH_EXPAT
 expat_parser_source = lib/expat_parser.cpp
-
+expatlibs = $(EXPAT_LIBS)
 else
 expat_parser_source = 
-
+expatlibs =
 endif
 
 if WITH_XERCES_BUILTIN
@@ -152,6 +152,7 @@ AM_CPPFLAGS = \
 
 AM_LDFLAGS= \
 	-export-dynamic $(LIBLTDL) \
+	$(expatlibs) \
 	$(livelibs)
 
 libambulant_la_SOURCES = \
