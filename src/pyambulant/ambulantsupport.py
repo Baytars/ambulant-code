@@ -102,6 +102,10 @@ int CFObj_Convert(PyObject *v, CFTypeRef *p_itself)
         return 1;
 }
 #endif
+
+// Declare initambulant as a C external:
+
+extern "C" void initambulant(); 
 """
 
 initstuff = """

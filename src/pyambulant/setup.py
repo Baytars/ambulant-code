@@ -7,6 +7,7 @@ setup(name='ambulant',
         Extension('ambulant',
             ['ambulantmodule.cpp'],
             libraries=['ambulant'],
+            extra_link_args=['-framework', 'CoreFoundation'],
 #            include_dirs=['/usr/local/include'],
 #            library_dirs=['../../build-gcc3/src/libambulant/.libs']
         )
