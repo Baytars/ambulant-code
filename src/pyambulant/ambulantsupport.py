@@ -32,6 +32,9 @@ includestuff = """
 #include "ambulant/lib/system.h"
 #include "ambulant/lib/timer.h"
 
+#include "ambulant/common/embedder.h"
+#include "ambulant/common/layout.h"
+
 #include "ambulant/common/player.h"
 
 /*
@@ -229,97 +232,7 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 module = Module(MODNAME, MODPREFIX, includestuff, finalstuff, initstuff, variablestuff)
 functions = []
 
-# From lib/node.h:
-
-class NodeObjectDefinition(MyGlobalObjectDefinition):
-    pass
-Node_object = NodeObjectDefinition('Node', 'NodeObj', 'ambulant::lib::node_interface*')
-Node_methods = []
-module.addobject(Node_object)
-
-class NodeContextObjectDefinition(MyGlobalObjectDefinition):
-    pass
-NodeContext_object = NodeContextObjectDefinition('NodeContext', 'NodeContextObj', 'ambulant::lib::node_context*')
-NodeContext_methods = []
-module.addobject(NodeContext_object)
-
-# From lib/document.h:
-class DocumentObjectDefinition(MyGlobalObjectDefinition):
-    basetype = "NodeContext_Type"
-    pass
-Document_object = DocumentObjectDefinition('Document', 'DocumentObj', 'ambulant::lib::document*')
-Document_methods = []
-module.addobject(Document_object)
-
-# From lib/event.h:
-class EventObjectDefinition(MyGlobalObjectDefinition):
-    pass
-Event_object = EventObjectDefinition('Event', 'EventObj', 'ambulant::lib::event*')
-Event_methods = []
-module.addobject(Event_object)
-
-# From lib/event_processor.h:
-class EventProcessorObjectDefinition(MyGlobalObjectDefinition):
-    pass
-EventProcessor_object = EventProcessorObjectDefinition('EventProcessor', 'EventProcessorObj', 'ambulant::lib::event_processor*')
-EventProcessor_methods = []
-module.addobject(EventProcessor_object)
-
-### From lib/mtsync.h:
-##class CriticalSectionObjectDefinition(MyGlobalObjectDefinition):
-##    pass
-##CriticalSection_object = CriticalSectionObjectDefinition('CriticalSection', 'CriticalSectionObj', 'ambulant::lib::critical_section*')
-##CriticalSection_methods = []
-##module.addobject(CriticalSection_object)
-##
-##class ConditionObjectDefinition(MyGlobalObjectDefinition):
-##    pass
-##Condition_object = ConditionObjectDefinition('Condition', 'ConditionObj', 'ambulant::lib::condition*')
-##Condition_methods = []
-##module.addobject(Condition_object)
-
-# From lib/parser_factory.h:
-class ParserFactoryObjectDefinition(MyGlobalObjectDefinition):
-    pass
-ParserFactory_object = ParserFactoryObjectDefinition('ParserFactory', 'ParserFactoryObj', 'ambulant::lib::parser_factory*')
-ParserFactory_methods = []
-module.addobject(ParserFactory_object)
-
-# From lib/sax_handler.h:
-class XmlParserObjectDefinition(MyGlobalObjectDefinition):
-    pass
-XmlParser_object = XmlParserObjectDefinition('XmlParser', 'XmlParserObj', 'ambulant::lib::xml_parser*')
-XmlParser_methods = []
-module.addobject(XmlParser_object)
-
-# From lib/system.h:
-class SystemObjectDefinition(MyGlobalObjectDefinition):
-    pass
-System_object = SystemObjectDefinition('System', 'SystemObj', 'ambulant::lib::system*')
-System_methods = []
-module.addobject(System_object)
-
-# From lib/timer.h:
-class TimerEventsObjectDefinition(MyGlobalObjectDefinition):
-    pass
-TimerEvents_object = TimerEventsObjectDefinition('TimerEvents', 'TimerEventsObj', 'ambulant::lib::timer_events*')
-TimerEvents_methods = []
-module.addobject(TimerEvents_object)
-
-class AbstractTimerObjectDefinition(MyGlobalObjectDefinition):
-    pass
-AbstractTimer_object = AbstractTimerObjectDefinition('AbstractTimer', 'AbstractTimerObj', 'ambulant::lib::abstract_timer*')
-AbstractTimer_methods = []
-module.addobject(AbstractTimer_object)
-
-
-# From common/player.h:
-class PlayerObjectDefinition(MyGlobalObjectDefinition):
-    pass
-Player_object = PlayerObjectDefinition('Player', 'PlayerObj', 'ambulant::common::player*')
-Player_methods = []
-module.addobject(Player_object)
-
+execfile("ambulantobjgen.py")
 
 # Create the generator classes used to populate the lists
 Function = FunctionGenerator
