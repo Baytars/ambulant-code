@@ -43,6 +43,7 @@ endif
 
 if WITH_COCOA
 toolkit_cocoa_libraries = libambulant_cocoa.la
+platlibs = -framework CoreFoundation
 libambulant_cocoa_la_SOURCES = \
 	gui/cocoa/cocoa_fill.m \
 	gui/cocoa/cocoa_gui.m \
@@ -55,6 +56,7 @@ libambulant_cocoa_la_SOURCES = \
 	gui/cocoa/cocoa_dsvideo.m
 else
 toolkit_cocoa_libraries =
+platlibs =
 endif
 
 if WITH_QT
@@ -153,7 +155,8 @@ AM_CPPFLAGS = \
 AM_LDFLAGS= \
 	-export-dynamic $(LIBLTDL) \
 	$(expatlibs) \
-	$(livelibs)
+	$(livelibs) \
+	$(platlibs)
 
 libambulant_la_SOURCES = \
 	get_version.cpp \

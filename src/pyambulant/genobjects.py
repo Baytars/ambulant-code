@@ -45,8 +45,28 @@ OBJECTS=[
 	("SurfaceFactory", "ambulant::common::surface_factory", None),
 	("LayoutManager", "ambulant::common::layout_manager", None),
 	
+	"common/playable.h",
+	("Playable", "ambulant::common::playable", None), # XXX Refcounted
+	("PlayableNotification", "ambulant::common::playable_notification", None), 
+	("PlayableFactory", "ambulant::common::playable_factory", None),
+	
 	"common/player.h",
+	("PlayerFeedback", "ambulant::common::player_feedback", None),
 	("Player", "ambulant::common::player", None),
+	
+	"common/region_info.h",
+	("RegionInfo", "ambulant::common::region_info", None),
+	("AnimationDestination", "ambulant::common::animation_destination", "RegionInfo_Type"),
+	
+	"net/datasource.h",
+	("Datasource", "ambulant::net::datasource", None), # XXX Refcounted
+	("AudioDatasource", "ambulant::net::audio_datasource", "Datasource_Type"), # XXX Refcounted
+	("VideoDatasource", "ambulant::net::video_datasource", None), # XXX Refcounted
+	("RawDatasourceFactory", "ambulant::net::raw_datasource_factory", None),
+	("AudioDatasourceFactory", "ambulant::net::audio_datasource_factory", None),
+	("VideoDatasourceFactory", "ambulant::net::video_datasource_factory", None),
+	("AudioParserFinder", "ambulant::net::audio_parser_finder", None),
+	("AudioFilterFinder", "ambulant::net::audio_filter_finder", None),
 ]
 
 out = open('ambulantobjgen.py', 'w')
