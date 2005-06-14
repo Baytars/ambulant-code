@@ -90,6 +90,69 @@ ambulant_url_Convert(PyObject *v, ambulant::net::url *p_itself)
     return 1;
 }
 
+
+// XXX Not good: passing by value!
+PyObject *ambulant_screen_rect_New(ambulant::lib::screen_rect_int itself)
+{
+    return Py_BuildValue("llll", itself.left(), itself.top(), itself.right(), itself.bottom());
+}
+
+int
+ambulant_screen_rect_Convert(PyObject *v, ambulant::lib::screen_rect_int *p_itself)
+{
+    int l, t, r, b;
+    
+    if (!PyArg_Parse(v, "llll", &l, &t, &r, &b))
+        return 0;
+    p_itself->set_coord(l, t, r, b);
+    return 1;
+}
+
+// XXX Not good: passing by value!
+PyObject *ambulant_rect_New(ambulant::lib::rect itself)
+{
+    return Py_BuildValue("llll", itself.left(), itself.top(), itself.right(), itself.bottom());
+}
+
+int
+ambulant_rect_Convert(PyObject *v, ambulant::lib::rect *p_itself)
+{
+    int l, t, r, b;
+    
+    if (!PyArg_Parse(v, "llll", &l, &t, &r, &b))
+        return 0;
+    p_itself = ambulant::lib::rect(
+                ambulant::lib::point(l, t),
+                ambulant::lib::point(r, b));
+    return 1;
+}
+
+PyObject *ambulant_point_New(ambulant::lib::point itself)
+{
+    return Py_BuildValue("ll", itself.x, itself.y);
+}
+
+int
+ambulant_point_Convert(PyObject *v, ambulant::lib::point *p_itself)
+{
+    if (!PyArg_Parse(v, "ll", &p_itself->x, &p_itself->y))
+        return 0;
+    return 1;
+}
+
+PyObject *ambulant_size_New(ambulant::lib::size itself)
+{
+    return Py_BuildValue("ll", itself.w, itself.h);
+}
+
+int
+ambulant_size_Convert(PyObject *v, ambulant::lib::size *p_itself)
+{
+    if (!PyArg_Parse(v, "ll", &p_itself->w, &p_itself->h))
+        return 0;
+    return 1;
+}
+
 """
 
 finalstuff = """
@@ -156,6 +219,22 @@ InBuffer = VarInputBufferType('char', 'size_t', 'l')
 
 # Ambulant-specific
 net_url = OpaqueByValueType("ambulant::net::url", "ambulant_url")
+screen_rect_int = OpaqueByValueType("ambulant::lib::screen_rect_int", "ambulant_screen_rect")
+rect = OpaqueByValueType("ambulant::lib::rect", "ambulant_rect")
+point = OpaqueByValueType("ambulant::lib::point", "ambulant_point")
+size = OpaqueByValueType("ambulant::lib::size", "ambulant_size")
+zindex_t = Type("ambulant::common::zindex_t", "l")
+cookie_type = Type("ambulant::common::playable::cookie_type", "l")
+color_t = Type("ambulant::lib::color_t", "l") # XXXX Split into RGB
+event_priority = Type("ambulant::lib::event_priority", "l")
+timestamp_t = Type("ambulant::net::timestamp_t", "L")
+time_type = Type("ambulant::lib::abstract_timer::time_type", "l")
+tiling = Type("ambulant::common::tiling", "l")
+fit_t = Type("ambulant::common::fit_t", "l")
+sound_alignment = Type("ambulant::common::sound_alignment", "l")
+alignment = Type("ambulant::common::alignment", "l")
+
+
 ##Boolean = Type("Boolean", "l")
 ##CFTypeID = Type("CFTypeID", "l") # XXXX a guess, seems better than OSTypeType.
 ##CFHashCode = Type("CFHashCode", "l")
@@ -281,8 +360,24 @@ execfile("ambulantobjgen.py")
 
 # Some type synonyms
 node_interface_ptr = node_ptr
+lib_node_ptr = node_ptr
 const_node_interface_ptr = const_node_ptr
 methods_node_interface = methods_node
+
+lib_event_processor_ptr = event_processor_ptr
+abstract_event_processor_ptr = event_processor_ptr
+methods_abstract_event_processor = methods_event_processor
+
+lib_event_ptr = event_ptr
+lib_timer_ptr = abstract_timer_ptr
+lib_screen_rect_int = screen_rect_int
+lib_point = point
+lib_size = size
+lib_color_t = color_t
+lib_rect = rect
+common_zindex_t = zindex_t
+const_cookie_type_ref = cookie_type
+
 # Do the type tests
 execfile("ambulanttypetest.py")
 
@@ -298,7 +393,13 @@ execfile(INPUTFILE)
 # add the populated lists to the generator groups
 # (in a different wordl the scan program would generate this)
 for f in functions: module.add(f)
-for f in methods_node: node_object.add(f)
+
+for name, object in locals().items():
+    if name[-7:] == '_object':
+        methodlist_name = 'methods_' + name[:-7]
+        methodlist = locals()[methodlist_name]
+        for f in methodlist:
+            object.add(f)
 
 ##for f in CFTypeRef_methods: CFTypeRef_object.add(f)
 ##for f in CFArrayRef_methods: CFArrayRef_object.add(f)

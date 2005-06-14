@@ -139,54 +139,13 @@ f = CxxMethodGenerator(void, 'wait_event',
 )
 methods_abstract_event_processor.append(f)
 
-f = CxxMethodGenerator(xml_parser_ptr, 'new_parser',
-    (sax_content_handler_ptr, 'content_handler', InMode),
-    (sax_error_handler_ptr, 'error_handler', InMode),
-)
-methods_parser_factory.append(f)
-
 f = CxxMethodGenerator(std_string, 'get_parser_name',
 )
 methods_parser_factory.append(f)
 
-f = CxxMethodGenerator(void, 'start_document',
-)
-methods_sax_content_handler.append(f)
-
-f = CxxMethodGenerator(void, 'end_document',
-)
-methods_sax_content_handler.append(f)
-
-f = CxxMethodGenerator(void, 'end_element',
-    (q_name_pair, 'qn', InMode+RefMode),
-)
-methods_sax_content_handler.append(f)
-
-f = CxxMethodGenerator(void, 'characters',
-    (char_ptr, 'buf', InMode),
-    (size_t, 'len', InMode),
-)
-methods_sax_content_handler.append(f)
-
-f = CxxMethodGenerator(void, 'error',
-    (sax_error, 'error', InMode+RefMode),
-)
-methods_sax_error_handler.append(f)
-
 f = CxxMethodGenerator(bool, 'parse',
-    (char_ptr, 'buf', InMode),
-    (size_t, 'len', InMode),
+    (InBuffer, 'buf', InMode),
     (bool, 'final', InMode),
-)
-methods_xml_parser.append(f)
-
-f = CxxMethodGenerator(void, 'set_content_handler',
-    (sax_content_handler_ptr, 'h', InMode),
-)
-methods_xml_parser.append(f)
-
-f = CxxMethodGenerator(void, 'set_error_handler',
-    (sax_error_handler_ptr, 'h', InMode),
 )
 methods_xml_parser.append(f)
 
@@ -262,16 +221,6 @@ f = CxxMethodGenerator(void, 'set_alignment',
 )
 methods_renderer.append(f)
 
-f = CxxMethodGenerator(void, 'set_intransition',
-    (lib_transition_info_ptr, 'info', InMode),
-)
-methods_renderer.append(f)
-
-f = CxxMethodGenerator(void, 'start_outtransition',
-    (lib_transition_info_ptr, 'info', InMode),
-)
-methods_renderer.append(f)
-
 f = CxxMethodGenerator(void, 'keep_as_background',
 )
 methods_bgrenderer.append(f)
@@ -290,24 +239,18 @@ f = CxxMethodGenerator(void, 'transition_done',
 )
 methods_surface.append(f)
 
-f = CxxMethodGenerator(const_lib_screen_rect_int_ref, 'get_rect',
+f = CxxMethodGenerator(screen_rect_int, 'get_rect',
 )
 methods_surface.append(f)
 
 f = CxxMethodGenerator(lib_screen_rect_int, 'get_fit_rect',
     (lib_size, 'src_size', InMode+RefMode),
-    (lib_rect_ptr, 'out_src_rect', InMode),
-    (alignment_ptr, 'align', InMode),
+    (lib_rect, 'out_src_rect', OutMode),
+    (alignment, 'align', OutMode),
 )
 methods_surface.append(f)
 
 f = CxxMethodGenerator(bool, 'is_tiled',
-)
-methods_surface.append(f)
-
-f = CxxMethodGenerator(tile_positions, 'get_tiles',
-    (lib_size, 'image_size', InMode),
-    (lib_screen_rect_int, 'surface_rect', InMode),
 )
 methods_surface.append(f)
 
@@ -493,12 +436,6 @@ f = CxxMethodGenerator(tiling, 'get_tiling',
 )
 methods_region_info.append(f)
 
-f = CxxMethodGenerator(region_dim, 'get_region_dim',
-    (std_string, 'which', InMode+RefMode),
-    (bool, 'fromdom', InMode),
-)
-methods_animation_destination.append(f)
-
 f = CxxMethodGenerator(color_t, 'get_region_color',
     (std_string, 'which', InMode+RefMode),
     (bool, 'fromdom', InMode),
@@ -517,12 +454,6 @@ methods_animation_destination.append(f)
 
 f = CxxMethodGenerator(sound_alignment, 'get_region_soundalign',
     (bool, 'fromdom', InMode),
-)
-methods_animation_destination.append(f)
-
-f = CxxMethodGenerator(void, 'set_region_dim',
-    (std_string, 'which', InMode+RefMode),
-    (region_dim, 'rd', InMode+RefMode),
 )
 methods_animation_destination.append(f)
 
@@ -551,18 +482,10 @@ f = CxxMethodGenerator(bool, 'end_of_file',
 )
 methods_datasource.append(f)
 
-f = CxxMethodGenerator(char_ptr, 'get_read_ptr',
-)
-methods_datasource.append(f)
-
 f = CxxMethodGenerator(void, 'readdone',
     (int, 'len', InMode),
 )
 methods_datasource.append(f)
-
-f = CxxMethodGenerator(audio_format_ref, 'get_audio_format',
-)
-methods_audio_datasource.append(f)
 
 f = CxxMethodGenerator(void, 'read_ahead',
     (timestamp_t, 'time', InMode),
@@ -588,13 +511,6 @@ f = CxxMethodGenerator(void, 'start_frame',
 )
 methods_video_datasource.append(f)
 
-f = CxxMethodGenerator(char_ptr, 'get_frame',
-    (timestamp_t, 'now', InMode),
-    (timestamp_t_ptr, 'timestamp', InMode),
-    (int_ptr, 'size', InMode),
-)
-methods_video_datasource.append(f)
-
 f = CxxMethodGenerator(int, 'width',
 )
 methods_video_datasource.append(f)
@@ -613,27 +529,6 @@ f = CxxMethodGenerator(datasource_ptr, 'new_raw_datasource',
     (net_url, 'url', InMode+RefMode),
 )
 methods_raw_datasource_factory.append(f)
-
-f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_datasource',
-    (net_url, 'url', InMode+RefMode),
-    (audio_format_choices, 'fmt', InMode),
-    (timestamp_t, 'clip_begin', InMode),
-    (timestamp_t, 'clip_end', InMode),
-)
-methods_audio_datasource_factory.append(f)
-
-f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_parser',
-    (net_url, 'url', InMode+RefMode),
-    (audio_format_choices, 'hint', InMode),
-    (audio_datasource_ptr, 'src', InMode),
-)
-methods_audio_parser_finder.append(f)
-
-f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_filter',
-    (audio_datasource_ptr, 'src', InMode),
-    (audio_format_choices, 'fmts', InMode),
-)
-methods_audio_filter_finder.append(f)
 
 f = CxxMethodGenerator(video_datasource_ptr, 'new_video_datasource',
     (net_url, 'url', InMode+RefMode),
