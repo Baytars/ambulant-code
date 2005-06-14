@@ -1,6 +1,10 @@
 all: ambulantmodule.so
 
-ambulantobjgen.py ambulantincludegen.py: genobjects.py
+clean:
+	rm ambulantobjgen.py ambulantincludegen.py ambulantmodule.cpp
+	rm -r build
+	
+ambulantobjgen.py ambulantincludegen.py: genobjects.py 
 	python genobjects.py
 	
 ambulantmodule.cpp: ambulantscan.py ambulantsupport.py ambulantgen.py ambulantobjgen.py ambulantincludegen.py

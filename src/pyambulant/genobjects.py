@@ -15,7 +15,7 @@ OBJECTS=[
 	("node", "ambulant::lib::node", None),
 	
 	"lib/document.h",
-	("document", "ambulant::lib::document", "document_Type"),
+	("document", "ambulant::lib::document", "node_context_Type"),
 	
 	"lib/event.h",
 	("event", "ambulant::lib::event", None),
