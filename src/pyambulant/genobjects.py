@@ -74,11 +74,12 @@ OBJECTS=[
 ]
 
 out = open('ambulantobjgen.py', 'w')
+incout = open('ambulantincludegen.py', 'w')
 for item in OBJECTS:
 	if type(item) == type(""):
 		print >>out, "# From %s:" % item
 		inc = '#include "ambulant/%s"' % item
-		print >>out, 'includestuff = includestuff + \'' + inc + '\\n\''
+		print >>incout, 'includestuff = includestuff + \'' + inc + '\\n\''
 		continue
 	pname, cname, bname = item
 	if bname:

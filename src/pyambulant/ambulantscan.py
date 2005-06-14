@@ -224,6 +224,8 @@ class MyScanner(CxxScanner):
             "set_attributes",       # string list, too difficult
             "get_read_ptr", # Does not translate to Python
             "get_frame", # Doable, with size in the arglist
+            "wakeup", # XXX private/protected
+            "wait_event", # XXX private/protected
             
         ]
 
@@ -253,7 +255,20 @@ class MyScanner(CxxScanner):
         ]
 
     def makegreylist(self):
-        return []
+        return [
+            ('#ifdef USE_SMIL21',
+              [
+                'get_top_surface',
+                'is_tiled',
+                'get_tiles',
+                'get_soundalign',
+                'get_tiling',
+                'initialize',
+                'get_region_soundalign',
+                'set_region_soundalign',
+              ]
+            ),
+        ]
 
     def makerepairinstructions(self):
         return [
@@ -297,13 +312,9 @@ class MyScanner(CxxScanner):
             ),
             ('get_fit_rect',
               [
-                ('lib_size', '*', '*'),
                 ('lib_rect_ptr', 'out_src_rect', 'InMode'),
-                ('alignment_ptr', 'align', 'InMode'),
               ], [
-                ('lib_size', '*', '*'),
                 ('lib_rect', 'out_src_rect', 'OutMode'),
-                ('alignment', 'align', 'OutMode'),
               ]
             )
 

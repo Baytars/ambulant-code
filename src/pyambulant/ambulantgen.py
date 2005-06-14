@@ -131,14 +131,6 @@ f = CxxMethodGenerator(void, 'stop_processor_thread',
 )
 methods_event_processor.append(f)
 
-f = CxxMethodGenerator(void, 'wakeup',
-)
-methods_abstract_event_processor.append(f)
-
-f = CxxMethodGenerator(void, 'wait_event',
-)
-methods_abstract_event_processor.append(f)
-
 f = CxxMethodGenerator(std_string, 'get_parser_name',
 )
 methods_parser_factory.append(f)
@@ -246,11 +238,12 @@ methods_surface.append(f)
 f = CxxMethodGenerator(lib_screen_rect_int, 'get_fit_rect',
     (lib_size, 'src_size', InMode+RefMode),
     (lib_rect, 'out_src_rect', OutMode),
-    (alignment, 'align', OutMode),
+    (alignment_ptr, 'align', InMode),
 )
 methods_surface.append(f)
 
 f = CxxMethodGenerator(bool, 'is_tiled',
+    condition='#ifdef USE_SMIL21',
 )
 methods_surface.append(f)
 
@@ -350,6 +343,7 @@ f = CxxMethodGenerator(void, 'node_stopped',
 methods_player_feedback.append(f)
 
 f = CxxMethodGenerator(void, 'initialize',
+    condition='#ifdef USE_SMIL21',
 )
 methods_player.append(f)
 
@@ -429,10 +423,12 @@ f = CxxMethodGenerator(double, 'get_soundlevel',
 methods_region_info.append(f)
 
 f = CxxMethodGenerator(sound_alignment, 'get_soundalign',
+    condition='#ifdef USE_SMIL21',
 )
 methods_region_info.append(f)
 
 f = CxxMethodGenerator(tiling, 'get_tiling',
+    condition='#ifdef USE_SMIL21',
 )
 methods_region_info.append(f)
 
@@ -454,6 +450,7 @@ methods_animation_destination.append(f)
 
 f = CxxMethodGenerator(sound_alignment, 'get_region_soundalign',
     (bool, 'fromdom', InMode),
+    condition='#ifdef USE_SMIL21',
 )
 methods_animation_destination.append(f)
 
@@ -475,6 +472,7 @@ methods_animation_destination.append(f)
 
 f = CxxMethodGenerator(void, 'set_region_soundalign',
     (sound_alignment, 'sa', InMode),
+    condition='#ifdef USE_SMIL21',
 )
 methods_animation_destination.append(f)
 
