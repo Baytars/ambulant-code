@@ -222,7 +222,7 @@ f = CxxMethodGenerator(void, 'animated',
 methods_animation_notification.append(f)
 
 f = CxxMethodGenerator(void, 'need_redraw',
-    (lib_screen_rect<int>, 'r', InMode+RefMode),
+    (lib_screen_rect_int, 'r', InMode+RefMode),
 )
 methods_gui_window.append(f)
 
@@ -236,7 +236,7 @@ f = CxxMethodGenerator(void, 'need_events',
 methods_gui_window.append(f)
 
 f = CxxMethodGenerator(void, 'redraw',
-    (lib_screen_rect<int>, 'dirty', InMode+RefMode),
+    (lib_screen_rect_int, 'dirty', InMode+RefMode),
     (gui_window_ptr, 'window', InMode),
 )
 methods_gui_events.append(f)
@@ -248,7 +248,7 @@ f = CxxMethodGenerator(void, 'user_event',
 methods_gui_events.append(f)
 
 f = CxxMethodGenerator(void, 'transition_freeze_end',
-    (lib_screen_rect<int>, 'area', InMode),
+    (lib_screen_rect_int, 'area', InMode),
 )
 methods_gui_events.append(f)
 
@@ -290,13 +290,24 @@ f = CxxMethodGenerator(void, 'transition_done',
 )
 methods_surface.append(f)
 
+f = CxxMethodGenerator(const_lib_screen_rect_int_ref, 'get_rect',
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(lib_screen_rect_int, 'get_fit_rect',
+    (lib_size, 'src_size', InMode+RefMode),
+    (lib_rect_ptr, 'out_src_rect', InMode),
+    (alignment_ptr, 'align', InMode),
+)
+methods_surface.append(f)
+
 f = CxxMethodGenerator(bool, 'is_tiled',
 )
 methods_surface.append(f)
 
 f = CxxMethodGenerator(tile_positions, 'get_tiles',
     (lib_size, 'image_size', InMode),
-    (lib_screen_rect<int>, 'surface_rect', InMode),
+    (lib_screen_rect_int, 'surface_rect', InMode),
 )
 methods_surface.append(f)
 
@@ -439,6 +450,10 @@ f = CxxMethodGenerator(bool, 'goto_node',
 methods_player.append(f)
 
 f = CxxMethodGenerator(std_string, 'get_name',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(screen_rect_int, 'get_screen_rect',
 )
 methods_region_info.append(f)
 

@@ -111,6 +111,8 @@ class node_interface {
 	typedef tree_iterator<node_interface> iterator;
 	typedef const_tree_iterator<node_interface> const_iterator;
 	
+	typedef std::list<const node*> const_node_list;
+	
 	/// Destruct this node and its contents.
 	/// If this node is part of a tree, detach it first
 	/// and then delete the node and its contents.
@@ -154,7 +156,7 @@ class node_interface {
 	virtual const node_interface* get_last_child() const = 0;
 	
 	/// Appends the children of this node (if any) to the provided list.
-	virtual void get_children(std::list<const node*>& l) const = 0;
+	virtual void get_children(const_node_list& l) const = 0;
 
 	///////////////////////////////
 	// search operations 
@@ -322,6 +324,7 @@ typedef node_impl node;
 /// Interface of document class accesible to nodes.
 class node_context {
   public:
+	typedef std::map<std::string, custom_test> custom_test_map;
 	
 	virtual void 
 	set_prefix_mapping(const std::string& prefix, const std::string& uri) = 0;
@@ -334,7 +337,7 @@ class node_context {
 	resolve_url(const net::url& rurl) const = 0;
 	
 	/// Returns name-indexed mapping of all custom tests used.
-	virtual const std::map<std::string, custom_test>* 
+	virtual const custom_test_map*
 	get_custom_tests() const = 0;
 
 	/// Return the root of the document
