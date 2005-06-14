@@ -207,6 +207,8 @@ class CxxScanner(Scanner):
         if self.in_class_defn:
             classname = self.namespaces[-1]
             classname = self.pythonizename(classname)
+            if classname in self.blacklisttypes:
+                return None, None
             return "CxxMethodGenerator", "methods_%s" % classname
         return "FunctionGenerator", "functions"
        
@@ -220,6 +222,8 @@ class MyScanner(CxxScanner):
             "to_string",
             "to_trimmed_string",
             "set_attributes",       # string list, too difficult
+            "get_read_ptr", # Does not translate to Python
+            "get_frame", # Doable, with size in the arglist
             
         ]
 
@@ -229,11 +233,23 @@ class MyScanner(CxxScanner):
             "q_attributes_list_ref",
             "const_q_name_pair",
             "const_q_name_pair_ref",
+            "q_name_pair",
             "node_list", # XXX For now
             "xml_string", # XXX For now
             "const_xml_string_ref", # XXX For now
             "const_custom_test_map_ptr", # XXX For now 
             "const_q_attributes_list_ref",  # XXX For now
+            "transition_info_ptr",
+            "lib_transition_info_ptr",
+            "sax_content_handler",
+            "sax_content_handler_ptr",
+            "sax_error_handler_ptr",
+            "sax_error",
+            "audio_format_choices", # XXX For now
+            "audio_format_ref", # XXX For now
+            "region_dim", # XXX For now
+            "tile_positions",
+            
         ]
 
     def makegreylist(self):
@@ -266,12 +282,30 @@ class MyScanner(CxxScanner):
             ),
             (
               [
-                ('char_ptr', 'data', 'InMode'),
+                ('char_ptr', '*', 'InMode'),
                 ('size_t', '*', 'InMode')
               ],[
                 ('InBuffer', '*', 'InMode'),
                ]
             ),
+            (
+              [
+                ('const_lib_screen_rect_int_ref', '*', 'ReturnMode')
+              ], [
+                ('screen_rect_int', '*', 'ReturnMode+RefMode')
+              ]
+            ),
+            ('get_fit_rect',
+              [
+                ('lib_size', '*', '*'),
+                ('lib_rect_ptr', 'out_src_rect', 'InMode'),
+                ('alignment_ptr', 'align', 'InMode'),
+              ], [
+                ('lib_size', '*', '*'),
+                ('lib_rect', 'out_src_rect', 'OutMode'),
+                ('alignment', 'align', 'OutMode'),
+              ]
+            )
 
         ]        
 if __name__ == "__main__":

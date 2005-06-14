@@ -64,7 +64,7 @@ OBJECTS=[
 	
 	"net/datasource.h",
 	("datasource", "ambulant::net::datasource", None), # XXX Refcounted
-	("audio_datasource", "ambulant::net::audio_datasource", "Datasource_Type"), # XXX Refcounted
+	("audio_datasource", "ambulant::net::audio_datasource", "datasource_Type"), # XXX Refcounted
 	("video_datasource", "ambulant::net::video_datasource", None), # XXX Refcounted
 	("raw_datasource_factory", "ambulant::net::raw_datasource_factory", None),
 	("audio_datasource_factory", "ambulant::net::audio_datasource_factory", None),
