@@ -35,11 +35,11 @@ def main():
         scanner.close()
         print "=== Testing definitions output code ==="
         if defsoutput: execfile(defsoutput, {}, {})
-    print "=== Done scanning and generating, now importing the generated code... ==="
+    print "=== Done scanning and generating, now importing the generated code ==="
     exec "import ambulantsupport"
     print "=== Done.  It's up to you to compile it now! ==="
 
-class MyScanner(Scanner):
+class CxxScanner(Scanner):
     def __init__(self, input=None, output=None, defsoutput=None):
         Scanner.__init__(self, input, output, defsoutput)
         self.initnamespaces()
@@ -61,6 +61,13 @@ class MyScanner(Scanner):
     def modifyarg(self, type, name, mode):
         if type[:6] == "const_":
             type = type[6:]
+            # Note that const ref and const ptr parameters stay InMode
+            if type[-4:] == '_ref':
+                type = type[:-4]
+                mode = mode + "+RefMode"
+        elif type[-4:] == '_ref':
+            type = type[:-4]
+            mode = "OutMode+RefMode"
         elif type in self.inherentpointertypes:
             mode = "OutMode"
         if type[-4:] == "_far":
@@ -201,5 +208,69 @@ class MyScanner(Scanner):
             return "CxxMethodGenerator", "methods_%s" % classname
         return "FunctionGenerator", "functions"
        
+class MyScanner(CxxScanner):
+    def makeblacklistnames(self):
+        return [
+            # node.h
+            "find_nodes_with_name",
+            "has_graph_data",
+            "create_idmap",
+            "to_string",
+            "to_trimmed_string",
+            "set_attributes",       # string list, too difficult
+            
+        ]
+
+    def makeblacklisttypes(self):
+        return [
+            "q_attributes_list",
+            "q_attributes_list_ref",
+            "const_q_name_pair",
+            "const_q_name_pair_ref",
+            "node_list", # XXX For now
+            "xml_string", # XXX For now
+            "const_xml_string_ref", # XXX For now
+            "const_custom_test_map_ptr", # XXX For now 
+            "const_q_attributes_list_ref",  # XXX For now
+        ]
+
+    def makegreylist(self):
+        return []
+
+    def makerepairinstructions(self):
+        return [
+            ('set_attribute',
+              [
+                ('char_ptr', '*', '*'),
+                ('char_ptr', '*', '*')
+              ],[
+                ('stringptr', '*', '*'),
+                ('stringptr', '*', '*')
+              ]
+            ),
+            ('locate_node',
+              [
+                ('char_ptr', '*', '*')
+              ],[
+                ('stringptr', '*', '*')
+              ]
+            ),
+            ('get_url',
+              [
+                ('char_ptr', '*', '*')
+              ],[
+                ('stringptr', '*', '*')
+              ]
+            ),
+            (
+              [
+                ('char_ptr', 'data', 'InMode'),
+                ('size_t', '*', 'InMode')
+              ],[
+                ('InBuffer', '*', 'InMode'),
+               ]
+            ),
+
+        ]        
 if __name__ == "__main__":
     main()

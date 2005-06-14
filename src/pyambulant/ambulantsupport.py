@@ -38,7 +38,7 @@ includestuff = """
 #include "ambulant/common/player.h"
 
 /*
-** Parse/generate CFRange records
+** Parse/generate various objects
 */
 PyObject *bool_New(bool itself)
 {
@@ -54,6 +54,39 @@ bool_Convert(PyObject *v, bool *p_itself)
     int istrue = PyObject_IsTrue(v);
     if (istrue < 0) return 0;
     *p_itself = (istrue > 0);
+    return 1;
+}
+
+// XXX Not good: passing by value!
+PyObject *cxx_std_string_New(std::string itself)
+{
+    return PyString_FromString(itself.c_str());
+}
+
+int
+cxx_std_string_Convert(PyObject *v, std::string *p_itself)
+{
+    char *cstr = PyString_AsString(v);
+    if (cstr == NULL) return 0;
+    *p_itself = cstr;
+    return 1;
+}
+
+
+// XXX Not good: passing by value!
+PyObject *ambulant_url_New(ambulant::net::url itself)
+{
+    return PyString_FromString(itself.get_url().c_str());
+}
+
+int
+ambulant_url_Convert(PyObject *v, ambulant::net::url *p_itself)
+{
+    char *cstr = PyString_AsString(v);
+    if (cstr == NULL) return 0;
+    std::string cxxstr = cstr;
+    ambulant::net::url url(cxxstr);
+    *p_itself = url;
     return 1;
 }
 
@@ -115,6 +148,14 @@ variablestuff="""
 """
 
 bool = OpaqueByValueType("bool", "bool")
+size_t = Type("size_t", "l")
+unsigned_int = Type("unsigned int", "l")
+std_string = OpaqueByValueType("std::string", "cxx_std_string")
+
+InBuffer = VarInputBufferType('char', 'size_t', 'l')
+
+# Ambulant-specific
+net_url = OpaqueByValueType("ambulant::net::url", "ambulant_url")
 ##Boolean = Type("Boolean", "l")
 ##CFTypeID = Type("CFTypeID", "l") # XXXX a guess, seems better than OSTypeType.
 ##CFHashCode = Type("CFHashCode", "l")
@@ -238,6 +279,13 @@ functions = []
 
 execfile("ambulantobjgen.py")
 
+# Some type synonyms
+node_interface_ptr = node_ptr
+const_node_interface_ptr = const_node_ptr
+methods_node_interface = methods_node
+# Do the type tests
+execfile("ambulanttypetest.py")
+
 # Create the generator classes used to populate the lists
 Function = FunctionGenerator
 Method = CxxMethodGenerator
@@ -250,7 +298,8 @@ execfile(INPUTFILE)
 # add the populated lists to the generator groups
 # (in a different wordl the scan program would generate this)
 for f in functions: module.add(f)
-for f in Player_methods: Player_object.add(f)
+for f in methods_node: node_object.add(f)
+
 ##for f in CFTypeRef_methods: CFTypeRef_object.add(f)
 ##for f in CFArrayRef_methods: CFArrayRef_object.add(f)
 ##for f in CFMutableArrayRef_methods: CFMutableArrayRef_object.add(f)

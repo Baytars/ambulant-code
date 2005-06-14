@@ -1,17 +1,21 @@
 FORMAT="""class %(pname)sObjectDefinition(MyGlobalObjectDefinition):
     %(bname)s
+    
 %(pname)s_object = %(pname)sObjectDefinition('%(pname)s', '%(pname)sObj', '%(cname)s*')
-%(pname)s_methods = []
+methods_%(pname)s = []
 module.addobject(%(pname)s_object)
+
+%(pname)s_ptr = OpaqueByValueType('%(cname)s*', '%(pname)sObj')
+const_%(pname)s_ptr = OpaqueByValueType('const %(cname)s*', '%(pname)sObj')
 """
 
 OBJECTS=[
 	"lib/node.h",
-	("node", "ambulant::lib::node", None),
 	("node_context", "ambulant::lib::node_context", None),
+	("node", "ambulant::lib::node", None),
 	
 	"lib/document.h",
-	("document", "ambulant::lib::document", "NodeContext_Type"),
+	("document", "ambulant::lib::document", "document_Type"),
 	
 	"lib/event.h",
 	("event", "ambulant::lib::event", None),
@@ -37,11 +41,11 @@ OBJECTS=[
 	("animation_notification", "ambulant::common::animation_notification", None),
 	("gui_window", "ambulant::common::gui_window", None),
 	("gui_events", "ambulant::common::gui_events", None),
-	("renderer", "ambulant::common::renderer", "GuiEvents_Type"),
-	("bgrenderer", "ambulant::common::bgrenderer", "GuiEvents_Type"),
+	("renderer", "ambulant::common::renderer", "gui_events_Type"),
+	("bgrenderer", "ambulant::common::bgrenderer", "gui_events_Type"),
 	("surface", "ambulant::common::surface", None),
 	("window_factory", "ambulant::common::window_factory", None),
-	("surface_template", "ambulant::common::surface_template", "AnimationNotification_Type"),
+	("surface_template", "ambulant::common::surface_template", "animation_notification_Type"),
 	("surface_factory", "ambulant::common::surface_factory", None),
 	("layout_manager", "ambulant::common::layout_manager", None),
 	
@@ -56,7 +60,7 @@ OBJECTS=[
 	
 	"common/region_info.h",
 	("region_info", "ambulant::common::region_info", None),
-	("animation_destination", "ambulant::common::animation_destination", "RegionInfo_Type"),
+	("animation_destination", "ambulant::common::animation_destination", "region_info_Type"),
 	
 	"net/datasource.h",
 	("datasource", "ambulant::net::datasource", None), # XXX Refcounted
