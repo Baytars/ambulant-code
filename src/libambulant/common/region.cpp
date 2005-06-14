@@ -447,7 +447,7 @@ passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_s
 }
 
 lib::screen_rect_int 
-passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, common::alignment *align) const
+passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, const common::alignment *align) const
 {
 	if (align == NULL)
 		return get_fit_rect_noalign(src_size, out_src_rect);

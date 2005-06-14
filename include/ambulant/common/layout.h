@@ -224,7 +224,7 @@ class surface {
 	/// Determine where to draw an image.
 	/// For a given image size, return portion of source image to display, and where
 	/// to display it. The renderer must do the scaling.
-	virtual lib::screen_rect_int get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, alignment *align) const = 0;
+	virtual lib::screen_rect_int get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, const alignment *align) const = 0;
 	
 	/// Get object holding SMIL region parameters for querying.
 	virtual const region_info *get_info() const = 0;
