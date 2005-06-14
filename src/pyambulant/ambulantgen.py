@@ -102,3 +102,526 @@ f = CxxMethodGenerator(const_node_ptr, 'get_node',
 )
 methods_node_context.append(f)
 
+f = CxxMethodGenerator(void, 'fire',
+)
+methods_event.append(f)
+
+f = CxxMethodGenerator(void, 'add_event',
+    (event_ptr, 'pe', InMode),
+    (time_type, 't', InMode),
+    (event_priority, 'priority', InMode),
+)
+methods_event_processor.append(f)
+
+f = CxxMethodGenerator(void, 'cancel_all_events',
+)
+methods_event_processor.append(f)
+
+f = CxxMethodGenerator(bool, 'cancel_event',
+    (event_ptr, 'pe', InMode),
+    (event_priority, 'priority', InMode),
+)
+methods_event_processor.append(f)
+
+f = CxxMethodGenerator(void, 'serve_events',
+)
+methods_event_processor.append(f)
+
+f = CxxMethodGenerator(void, 'stop_processor_thread',
+)
+methods_event_processor.append(f)
+
+f = CxxMethodGenerator(void, 'wakeup',
+)
+methods_abstract_event_processor.append(f)
+
+f = CxxMethodGenerator(void, 'wait_event',
+)
+methods_abstract_event_processor.append(f)
+
+f = CxxMethodGenerator(xml_parser_ptr, 'new_parser',
+    (sax_content_handler_ptr, 'content_handler', InMode),
+    (sax_error_handler_ptr, 'error_handler', InMode),
+)
+methods_parser_factory.append(f)
+
+f = CxxMethodGenerator(std_string, 'get_parser_name',
+)
+methods_parser_factory.append(f)
+
+f = CxxMethodGenerator(void, 'start_document',
+)
+methods_sax_content_handler.append(f)
+
+f = CxxMethodGenerator(void, 'end_document',
+)
+methods_sax_content_handler.append(f)
+
+f = CxxMethodGenerator(void, 'end_element',
+    (q_name_pair, 'qn', InMode+RefMode),
+)
+methods_sax_content_handler.append(f)
+
+f = CxxMethodGenerator(void, 'characters',
+    (char_ptr, 'buf', InMode),
+    (size_t, 'len', InMode),
+)
+methods_sax_content_handler.append(f)
+
+f = CxxMethodGenerator(void, 'error',
+    (sax_error, 'error', InMode+RefMode),
+)
+methods_sax_error_handler.append(f)
+
+f = CxxMethodGenerator(bool, 'parse',
+    (char_ptr, 'buf', InMode),
+    (size_t, 'len', InMode),
+    (bool, 'final', InMode),
+)
+methods_xml_parser.append(f)
+
+f = CxxMethodGenerator(void, 'set_content_handler',
+    (sax_content_handler_ptr, 'h', InMode),
+)
+methods_xml_parser.append(f)
+
+f = CxxMethodGenerator(void, 'set_error_handler',
+    (sax_error_handler_ptr, 'h', InMode),
+)
+methods_xml_parser.append(f)
+
+f = CxxMethodGenerator(void, 'show_file',
+    (net_url, 'href', InMode+RefMode),
+)
+methods_system.append(f)
+
+f = CxxMethodGenerator(void, 'speed_changed',
+)
+methods_timer_events.append(f)
+
+f = CxxMethodGenerator(time_type, 'elapsed',
+)
+methods_abstract_timer.append(f)
+
+f = CxxMethodGenerator(double, 'get_realtime_speed',
+)
+methods_abstract_timer.append(f)
+
+f = CxxMethodGenerator(lib_point, 'get_image_fixpoint',
+    (lib_size, 'image_size', InMode),
+)
+methods_alignment.append(f)
+
+f = CxxMethodGenerator(lib_point, 'get_surface_fixpoint',
+    (lib_size, 'surface_size', InMode),
+)
+methods_alignment.append(f)
+
+f = CxxMethodGenerator(void, 'animated',
+)
+methods_animation_notification.append(f)
+
+f = CxxMethodGenerator(void, 'need_redraw',
+    (lib_screen_rect<int>, 'r', InMode+RefMode),
+)
+methods_gui_window.append(f)
+
+f = CxxMethodGenerator(void, 'redraw_now',
+)
+methods_gui_window.append(f)
+
+f = CxxMethodGenerator(void, 'need_events',
+    (bool, 'want', InMode),
+)
+methods_gui_window.append(f)
+
+f = CxxMethodGenerator(void, 'redraw',
+    (lib_screen_rect<int>, 'dirty', InMode+RefMode),
+    (gui_window_ptr, 'window', InMode),
+)
+methods_gui_events.append(f)
+
+f = CxxMethodGenerator(void, 'user_event',
+    (lib_point, 'where', InMode+RefMode),
+    (int, 'what', InMode),
+)
+methods_gui_events.append(f)
+
+f = CxxMethodGenerator(void, 'transition_freeze_end',
+    (lib_screen_rect<int>, 'area', InMode),
+)
+methods_gui_events.append(f)
+
+f = CxxMethodGenerator(void, 'set_surface',
+    (surface_ptr, 'destination', InMode),
+)
+methods_renderer.append(f)
+
+f = CxxMethodGenerator(void, 'set_alignment',
+    (alignment_ptr, 'align', InMode),
+)
+methods_renderer.append(f)
+
+f = CxxMethodGenerator(void, 'set_intransition',
+    (lib_transition_info_ptr, 'info', InMode),
+)
+methods_renderer.append(f)
+
+f = CxxMethodGenerator(void, 'start_outtransition',
+    (lib_transition_info_ptr, 'info', InMode),
+)
+methods_renderer.append(f)
+
+f = CxxMethodGenerator(void, 'keep_as_background',
+)
+methods_bgrenderer.append(f)
+
+f = CxxMethodGenerator(void, 'show',
+    (gui_events_ptr, 'renderer', InMode),
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(void, 'renderer_done',
+    (gui_events_ptr, 'renderer', InMode),
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(void, 'transition_done',
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(bool, 'is_tiled',
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(tile_positions, 'get_tiles',
+    (lib_size, 'image_size', InMode),
+    (lib_screen_rect<int>, 'surface_rect', InMode),
+)
+methods_surface.append(f)
+
+f = CxxMethodGenerator(void, 'window_done',
+    (std_string, 'name', InMode+RefMode),
+)
+methods_window_factory.append(f)
+
+f = CxxMethodGenerator(void, 'start',
+    (double, 't', InMode),
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'stop',
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'pause',
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'resume',
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'seek',
+    (double, 't', InMode),
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'wantclicks',
+    (bool, 'want', InMode),
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'preroll',
+    (double, 'when', InMode),
+    (double, 'where', InMode),
+    (double, 'how_much', InMode),
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(const_cookie_type_ref, 'get_cookie',
+)
+methods_playable.append(f)
+
+f = CxxMethodGenerator(void, 'started',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'stopped',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'stalled',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'unstalled',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'clicked',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'pointed',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'transitioned',
+    (cookie_type, 'n', InMode),
+    (double, 't', InMode),
+)
+methods_playable_notification.append(f)
+
+f = CxxMethodGenerator(void, 'node_started',
+    (lib_node_ptr, 'n', InMode),
+)
+methods_player_feedback.append(f)
+
+f = CxxMethodGenerator(void, 'node_stopped',
+    (lib_node_ptr, 'n', InMode),
+)
+methods_player_feedback.append(f)
+
+f = CxxMethodGenerator(void, 'initialize',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(lib_timer_ptr, 'get_timer',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(lib_event_processor_ptr, 'get_evp',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(bool, 'is_playing',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(bool, 'is_pausing',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(bool, 'is_done',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(int, 'get_cursor',
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(void, 'set_cursor',
+    (int, 'cursor', InMode),
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(void, 'set_feedback',
+    (player_feedback_ptr, 'fb', InMode),
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(bool, 'goto_node',
+    (lib_node_ptr, 'n', InMode),
+)
+methods_player.append(f)
+
+f = CxxMethodGenerator(std_string, 'get_name',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(fit_t, 'get_fit',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(color_t, 'get_bgcolor',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(bool, 'get_transparent',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(zindex_t, 'get_zindex',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(bool, 'get_showbackground',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(bool, 'is_subregion',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(double, 'get_soundlevel',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(sound_alignment, 'get_soundalign',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(tiling, 'get_tiling',
+)
+methods_region_info.append(f)
+
+f = CxxMethodGenerator(region_dim, 'get_region_dim',
+    (std_string, 'which', InMode+RefMode),
+    (bool, 'fromdom', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(color_t, 'get_region_color',
+    (std_string, 'which', InMode+RefMode),
+    (bool, 'fromdom', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(zindex_t, 'get_region_zindex',
+    (bool, 'fromdom', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(double, 'get_region_soundlevel',
+    (bool, 'fromdom', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(sound_alignment, 'get_region_soundalign',
+    (bool, 'fromdom', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(void, 'set_region_dim',
+    (std_string, 'which', InMode+RefMode),
+    (region_dim, 'rd', InMode+RefMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(void, 'set_region_color',
+    (std_string, 'which', InMode+RefMode),
+    (lib_color_t, 'clr', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(void, 'set_region_zindex',
+    (common_zindex_t, 'z', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(void, 'set_region_soundlevel',
+    (double, 'level', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(void, 'set_region_soundalign',
+    (sound_alignment, 'sa', InMode),
+)
+methods_animation_destination.append(f)
+
+f = CxxMethodGenerator(bool, 'end_of_file',
+)
+methods_datasource.append(f)
+
+f = CxxMethodGenerator(char_ptr, 'get_read_ptr',
+)
+methods_datasource.append(f)
+
+f = CxxMethodGenerator(void, 'readdone',
+    (int, 'len', InMode),
+)
+methods_datasource.append(f)
+
+f = CxxMethodGenerator(audio_format_ref, 'get_audio_format',
+)
+methods_audio_datasource.append(f)
+
+f = CxxMethodGenerator(void, 'read_ahead',
+    (timestamp_t, 'time', InMode),
+)
+methods_audio_datasource.append(f)
+
+f = CxxMethodGenerator(timestamp_t, 'get_clip_end',
+)
+methods_audio_datasource.append(f)
+
+f = CxxMethodGenerator(timestamp_t, 'get_clip_begin',
+)
+methods_audio_datasource.append(f)
+
+f = CxxMethodGenerator(bool, 'has_audio',
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(void, 'start_frame',
+    (lib_event_processor_ptr, 'evp', InMode),
+    (lib_event_ptr, 'callback', InMode),
+    (timestamp_t, 'pts', InMode),
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(char_ptr, 'get_frame',
+    (timestamp_t, 'now', InMode),
+    (timestamp_t_ptr, 'timestamp', InMode),
+    (int_ptr, 'size', InMode),
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(int, 'width',
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(int, 'height',
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(void, 'frame_done',
+    (timestamp_t, 'timestamp', InMode),
+    (bool, 'keepdata', InMode),
+)
+methods_video_datasource.append(f)
+
+f = CxxMethodGenerator(datasource_ptr, 'new_raw_datasource',
+    (net_url, 'url', InMode+RefMode),
+)
+methods_raw_datasource_factory.append(f)
+
+f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_datasource',
+    (net_url, 'url', InMode+RefMode),
+    (audio_format_choices, 'fmt', InMode),
+    (timestamp_t, 'clip_begin', InMode),
+    (timestamp_t, 'clip_end', InMode),
+)
+methods_audio_datasource_factory.append(f)
+
+f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_parser',
+    (net_url, 'url', InMode+RefMode),
+    (audio_format_choices, 'hint', InMode),
+    (audio_datasource_ptr, 'src', InMode),
+)
+methods_audio_parser_finder.append(f)
+
+f = CxxMethodGenerator(audio_datasource_ptr, 'new_audio_filter',
+    (audio_datasource_ptr, 'src', InMode),
+    (audio_format_choices, 'fmts', InMode),
+)
+methods_audio_filter_finder.append(f)
+
+f = CxxMethodGenerator(video_datasource_ptr, 'new_video_datasource',
+    (net_url, 'url', InMode+RefMode),
+)
+methods_video_datasource_factory.append(f)
+
