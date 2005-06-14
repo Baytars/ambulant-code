@@ -13,18 +13,18 @@ DO_SCAN=True
 def main():
     input = [
         AMBULANT+ "lib/node.h",
-#        AMBULANT+ "lib/document.h",
-#        AMBULANT+ "lib/event.h",
-#        AMBULANT+ "lib/event_processor.h",
-#        AMBULANT+ "lib/parser_factory.h",
-#        AMBULANT+ "lib/sax_handler.h",
-#        AMBULANT+ "lib/system.h",
-#        AMBULANT+ "lib/timer.h",
-#        AMBULANT+ "common/layout.h",
-#        AMBULANT+ "common/playable.h",
-#        AMBULANT+ "common/player.h",
-#        AMBULANT+ "common/region_info.h",
-#        AMBULANT+ "net/datasource.h",
+        AMBULANT+ "lib/document.h",
+        AMBULANT+ "lib/event.h",
+        AMBULANT+ "lib/event_processor.h",
+        AMBULANT+ "lib/parser_factory.h",
+        AMBULANT+ "lib/sax_handler.h",
+        AMBULANT+ "lib/system.h",
+        AMBULANT+ "lib/timer.h",
+        AMBULANT+ "common/layout.h",
+        AMBULANT+ "common/playable.h",
+        AMBULANT+ "common/player.h",
+        AMBULANT+ "common/region_info.h",
+        AMBULANT+ "net/datasource.h",
             ]
     if DO_SCAN:
         output = "ambulantgen.py"
@@ -43,6 +43,8 @@ class CxxScanner(Scanner):
     def __init__(self, input=None, output=None, defsoutput=None):
         Scanner.__init__(self, input, output, defsoutput)
         self.initnamespaces()
+        #self.debug = 1
+        #self.silent = 0
         
     def initnamespaces(self):
         self.namespaces = []
@@ -82,11 +84,11 @@ class CxxScanner(Scanner):
                         r"(?P<type>[a-zA-Z0-9_*:& \t]*[a-zA-Z0-9_*&])" + \
                         r"\s+"
         self.name_pat = r"(?P<name>[a-zA-Z0-9_]+)\s*"
-        self.args_pat = r"\((?P<args>([^\(;=\)]+|\([^\(;=\)]*\))*)\)"
+        self.args_pat = r"\((?P<args>([^\(;\)]+|\([^\(;\)]*\))*)\)"
         self.whole_pat = self.type_pat + self.name_pat + self.args_pat
         self.sym_pat = r"^[ \t]*(?P<name>[a-zA-Z0-9_]+)[ \t]*=" + \
                        r"[ \t]*(?P<defn>[-0-9_a-zA-Z'\"\(][^\t\n,;}]*),?"
-        self.asplit_pat = r"^(?P<type>.*[^a-zA-Z0-9_])(?P<name>[a-zA-Z0-9_]+)(?P<array>\[\])?$"
+        self.asplit_pat = r"^(?P<type>[^=]*[^a-zA-Z0-9_])(?P<name>[a-zA-Z0-9_]+)(?P<array>\[\])?(?P<initializer>\s*=[a-zA-Z0-9_ ]+)?$"
         self.comment1_pat = r"(?P<rest>.*)//.*"
         # note that the next pattern only removes comments that are wholly within one line
         self.comment2_pat = r"(?P<rest1>.*)/\*.*\*/(?P<rest2>.*)"
