@@ -7,66 +7,66 @@ module.addobject(%(pname)s_object)
 
 OBJECTS=[
 	"lib/node.h",
-	("Node", "ambulant::lib::node", None),
-	("NodeContext", "ambulant::lib::node_context", None),
+	("node", "ambulant::lib::node", None),
+	("node_context", "ambulant::lib::node_context", None),
 	
 	"lib/document.h",
-	("Document", "ambulant::lib::document", "NodeContext_Type"),
+	("document", "ambulant::lib::document", "NodeContext_Type"),
 	
 	"lib/event.h",
-	("Event", "ambulant::lib::event", None),
+	("event", "ambulant::lib::event", None),
 	
 	"lib/event_processor.h",
-	("EventProcessor", "ambulant::lib::event_processor", None),
+	("event_processor", "ambulant::lib::event_processor", None),
 	
 	"lib/parser_factory.h",
-	("ParserFactory", "ambulant::lib::parser_factory", None),
+	("parser_factory", "ambulant::lib::parser_factory", None),
 	
 	"lib/sax_handler.h",
-	("XmlParser", "ambulant::lib::xml_parser", None),
+	("xml_parser", "ambulant::lib::xml_parser", None),
 	
 	"lib/system.h",
-	("System", "ambulant::lib::system", None),
+	("system", "ambulant::lib::system", None),
 	
 	"lib/timer.h",
-	("TimerEvents", "ambulant::lib::timer_events", None),
-	("AbstractTimer", "ambulant::lib::abstract_timer", None),
+	("timer_events", "ambulant::lib::timer_events", None),
+	("abstract_timer", "ambulant::lib::abstract_timer", None),
 	
 	"common/layout.h",
-	("Alignment", "ambulant::common::alignment", None),
-	("AnimationNotification", "ambulant::common::animation_notification", None),
-	("GuiWindow", "ambulant::common::gui_window", None),
-	("GuiEvents", "ambulant::common::gui_events", None),
-	("Renderer", "ambulant::common::renderer", "GuiEvents_Type"),
-	("BgRenderer", "ambulant::common::bgrenderer", "GuiEvents_Type"),
-	("Surface", "ambulant::common::surface", None),
-	("WindowFactory", "ambulant::common::window_factory", None),
-	("SurfaceTemplate", "ambulant::common::surface_template", "AnimationNotification_Type"),
-	("SurfaceFactory", "ambulant::common::surface_factory", None),
-	("LayoutManager", "ambulant::common::layout_manager", None),
+	("alignment", "ambulant::common::alignment", None),
+	("animation_notification", "ambulant::common::animation_notification", None),
+	("gui_window", "ambulant::common::gui_window", None),
+	("gui_events", "ambulant::common::gui_events", None),
+	("renderer", "ambulant::common::renderer", "GuiEvents_Type"),
+	("bgrenderer", "ambulant::common::bgrenderer", "GuiEvents_Type"),
+	("surface", "ambulant::common::surface", None),
+	("window_factory", "ambulant::common::window_factory", None),
+	("surface_template", "ambulant::common::surface_template", "AnimationNotification_Type"),
+	("surface_factory", "ambulant::common::surface_factory", None),
+	("layout_manager", "ambulant::common::layout_manager", None),
 	
 	"common/playable.h",
-	("Playable", "ambulant::common::playable", None), # XXX Refcounted
-	("PlayableNotification", "ambulant::common::playable_notification", None), 
-	("PlayableFactory", "ambulant::common::playable_factory", None),
+	("playable", "ambulant::common::playable", None), # XXX Refcounted
+	("playable_notification", "ambulant::common::playable_notification", None), 
+	("playable_factory", "ambulant::common::playable_factory", None),
 	
 	"common/player.h",
-	("PlayerFeedback", "ambulant::common::player_feedback", None),
-	("Player", "ambulant::common::player", None),
+	("player_feedback", "ambulant::common::player_feedback", None),
+	("player", "ambulant::common::player", None),
 	
 	"common/region_info.h",
-	("RegionInfo", "ambulant::common::region_info", None),
-	("AnimationDestination", "ambulant::common::animation_destination", "RegionInfo_Type"),
+	("region_info", "ambulant::common::region_info", None),
+	("animation_destination", "ambulant::common::animation_destination", "RegionInfo_Type"),
 	
 	"net/datasource.h",
-	("Datasource", "ambulant::net::datasource", None), # XXX Refcounted
-	("AudioDatasource", "ambulant::net::audio_datasource", "Datasource_Type"), # XXX Refcounted
-	("VideoDatasource", "ambulant::net::video_datasource", None), # XXX Refcounted
-	("RawDatasourceFactory", "ambulant::net::raw_datasource_factory", None),
-	("AudioDatasourceFactory", "ambulant::net::audio_datasource_factory", None),
-	("VideoDatasourceFactory", "ambulant::net::video_datasource_factory", None),
-	("AudioParserFinder", "ambulant::net::audio_parser_finder", None),
-	("AudioFilterFinder", "ambulant::net::audio_filter_finder", None),
+	("datasource", "ambulant::net::datasource", None), # XXX Refcounted
+	("audio_datasource", "ambulant::net::audio_datasource", "Datasource_Type"), # XXX Refcounted
+	("video_datasource", "ambulant::net::video_datasource", None), # XXX Refcounted
+	("raw_datasource_factory", "ambulant::net::raw_datasource_factory", None),
+	("audio_datasource_factory", "ambulant::net::audio_datasource_factory", None),
+	("video_datasource_factory", "ambulant::net::video_datasource_factory", None),
+	("audio_parser_finder", "ambulant::net::audio_parser_finder", None),
+	("audio_filter_finder", "ambulant::net::audio_filter_finder", None),
 ]
 
 out = open('ambulantobjgen.py', 'w')
