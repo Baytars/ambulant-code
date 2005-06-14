@@ -1,9 +1,9 @@
 all: ambulantmodule.so
 
-ambulantobjgen.py: genobjects.py
+ambulantobjgen.py ambulantincludegen.py: genobjects.py
 	python genobjects.py
 	
-ambulantmodule.cpp: ambulantscan.py ambulantsupport.py ambulantgen.py ambulantobjgen.py
+ambulantmodule.cpp: ambulantscan.py ambulantsupport.py ambulantgen.py ambulantobjgen.py ambulantincludegen.py
 	python ambulantscan.py
 
 ambulantmodule.so: ambulantmodule.cpp setup.py
