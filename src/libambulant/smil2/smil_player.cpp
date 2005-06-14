@@ -522,7 +522,7 @@ smil_player::new_playable(const lib::node *n) {
 		if (rend) {
 			AM_DBG m_logger->debug("smil_player::new_playable: surface  set,rend = 0x%x, np = 0x%x", (void*) rend, (void*) np);
 			rend->set_surface(surf);
-			alignment *align = m_layout_manager->get_alignment(n);
+			const alignment *align = m_layout_manager->get_alignment(n);
 			rend->set_alignment(align);
 		} else {
 			AM_DBG m_logger->debug("smil_player::new_playable: surface not set because rend == NULL");
