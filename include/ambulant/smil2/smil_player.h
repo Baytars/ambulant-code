@@ -169,8 +169,8 @@ class smil_player : public common::player, public common::player_feedback, publi
 	
 	// Feedback stuff
 	void set_feedback(common::player_feedback *h) { m_feedback_handler = h; }
-	void node_started(lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_started(n); }
-	void node_stopped(lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_stopped(n); }
+	void node_started(const lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_started(n); }
+	void node_stopped(const lib::node *n) { if (m_feedback_handler) m_feedback_handler->node_stopped(n); }
 	
 	virtual bool goto_node(const lib::node *n);
 

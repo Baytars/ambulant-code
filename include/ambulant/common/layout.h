@@ -160,7 +160,7 @@ class renderer : public gui_events {
 	virtual void set_surface(surface *destination) = 0;
 	
 	/// Use alignment align for image display.
-	virtual void set_alignment(alignment *align) = 0;
+	virtual void set_alignment(const alignment *align) = 0;
 	
 	/// Apply an inTransition when starting playback.
 	virtual void set_intransition(const lib::transition_info *info) = 0;

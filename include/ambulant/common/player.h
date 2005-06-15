@@ -77,8 +77,8 @@ enum play_state {ps_idle, ps_playing, ps_pausing, ps_done};
 /// any external views with what the player is doing.
 class player_feedback {
   public:
-	virtual void node_started(lib::node *n) = 0;
-	virtual void node_stopped(lib::node *n) = 0;
+	virtual void node_started(const lib::node *n) = 0;
+	virtual void node_stopped(const lib::node *n) = 0;
 };
 
 /// Baseclass for all players.
