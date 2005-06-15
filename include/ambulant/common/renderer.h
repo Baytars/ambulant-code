@@ -122,7 +122,7 @@ class renderer_playable : public playable_imp, public renderer {
 			
 	// common::renderer interface
 	void set_surface(common::surface *dest) { m_dest = dest;}
-	void set_alignment(common::alignment *align) { m_alignment = align; }
+	void set_alignment(const common::alignment *align) { m_alignment = align; }
 	surface *get_surface() { return m_dest;}
 	virtual void user_event(const lib::point &where, int what = 0);	
 	renderer *get_renderer() { return this; }
@@ -132,7 +132,7 @@ class renderer_playable : public playable_imp, public renderer {
 	
   protected:
 	surface *m_dest;		///< The surface we should render to.
-	alignment *m_alignment;	///< The image alignment to use when rendering.
+	const alignment *m_alignment;	///< The image alignment to use when rendering.
 	bool m_activated;		///< True when playing
 	bool m_erase_never;		///< True if erase="never" is specified on the node
 };
