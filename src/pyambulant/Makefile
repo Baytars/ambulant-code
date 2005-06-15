@@ -1,8 +1,8 @@
 all: ambulantmodule.so
 
 clean:
-	rm ambulantobjgen.py ambulantincludegen.py ambulantmodule.cpp
-	rm -r build
+	rm -f ambulantobjgen.py ambulantincludegen.py ambulantmodule.cpp
+	rm -fr build
 	
 ambulantobjgen.py ambulantincludegen.py: genobjects.py 
 	python genobjects.py
