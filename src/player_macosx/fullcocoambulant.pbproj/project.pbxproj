@@ -39,8 +39,8 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				HEADER_SEARCH_PATHS = "/Users/jack/src/ambulant/include /Users/jack/src/ambulant/third_party_packages/expat-unix/include /usr/local/include/SDL /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavcodec /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavformat";
-				INFOPLIST_FILE = /Users/jack/src/ambulant/src/player_macosx/Info.plist;
+				HEADER_SEARCH_PATHS = "../../include ../../third_party_packages/expat-unix/include /usr/local/include/SDL ../../third_party_packages/ffmpeg-0.4.8/libavcodec ../../third_party_packages/ffmpeg-0.4.8/libavformat";
+				INFOPLIST_FILE = ../../src/player_macosx/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "/usr/lib/gcc/darwin/3.3 ../../third_party_packages/expat-unix/lib ../../third_party_packages/ffmpeg-0.4.8/libavformat ../../third_party_packages/ffmpeg-0.4.8/libavcodec";
 				LIBRARY_STYLE = Static;
@@ -1956,9 +1956,9 @@
 			);
 			isa = PBXGroup;
 			name = include;
-			path = /Users/jack/src/ambulant/include;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../include;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		04382ABA05D7AEE600CFA029 = {
 			children = (
@@ -3949,9 +3949,9 @@
 			);
 			isa = PBXGroup;
 			name = Welcome;
-			path = /Users/jack/src/ambulant/Extras/Welcome;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../Extras/Welcome;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		045F4C6D0609E00D0061DCA5 = {
 			fileEncoding = 30;
@@ -4531,9 +4531,9 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			name = plugin_engine.h;
-			path = /Users/jack/src/ambulant/include/ambulant/common/plugin_engine.h;
-			refType = 0;
-			sourceTree = "<absolute>";
+			path = ../../include/ambulant/common/plugin_engine.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
 		};
 		04B9F60B070050FB00B78CC4 = {
 			fileRef = 04B9F60A070050FB00B78CC4;
@@ -5596,10 +5596,10 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				HEADER_SEARCH_PATHS = "/Users/jack/src/ambulant/include /Users/jack/src/ambulant/third_party_packages/expat-unix/include /usr/local/include/SDL /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavcodec /Users/jack/src/ambulant/third_party_packages/ffmpeg-0.4.8/libavformat";
+				HEADER_SEARCH_PATHS = "../../include ../../third_party_packages/expat-unix/include /usr/local/include/SDL ../../third_party_packages/ffmpeg-0.4.8/libavcodec ../../third_party_packages/ffmpeg-0.4.8/libavformat ../../third_party_packages/xerces-unix/include";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = "/usr/lib/gcc/darwin/3.3 ../../third_party_packages/expat-unix/lib ../../third_party_packages/ffmpeg-0.4.8/libavformat ../../third_party_packages/ffmpeg-0.4.8/libavcodec";
+				LIBRARY_SEARCH_PATHS = "/usr/lib/gcc/darwin/3.3 ../../third_party_packages/expat-unix/lib ../../third_party_packages/ffmpeg-0.4.8/libavformat ../../third_party_packages/ffmpeg-0.4.8/libavcodec ../../third_party_packages/xerces-unix/lib";
 				LIBRARY_STYLE = Static;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
