@@ -1,10 +1,10 @@
 Ambulant Player README
 ======================
 
-This directory contains version 1.4.2 of the Ambulant Player,
-a playback engine for SMIL documents. This release supports SMIL 2.1 RC.
+This directory contains version 1.4.4 of the Ambulant Player,
+a playback engine for SMIL documents. This release supports SMIL 2.1 PR.
 The Ambulant homepage at <http://www.ambulantplayer.org> has more information,
-also on exploring SMIL 2.1 RC.
+also on exploring SMIL 2.1 PR.
 
 Ambulant consists of a core library implementing the engine,
 a number of GUI-toolkit specific libraries implementing renderers,
