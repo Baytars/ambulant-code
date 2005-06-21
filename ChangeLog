@@ -1,23 +1,141 @@
-2005-05-23 16:22  koelimoe
+2005-06-20 14:44  jackjansen
 
-	* Updated the Changelog
+	* Updated for new (june 13) DTDs.
 
-2005-05-23 16:15  koelimoe
+2005-06-20 13:20  jackjansen
+
+	* Get the default for backgroundRepeat (repeat) work correctly.
+
+2005-06-20 13:19  jackjansen
+
+	* Somehow the paths got absolute. Made them relative again.
+
+2005-06-09 11:54  jackjansen
+
+	* Forgot to check these in
+
+2005-06-06 11:42  jackjansen
+
+	* Added a note about platform-specific ifdefs.
+
+2005-06-02 16:52  jackjansen
+
+	* Todays mods caused all images to be drawn tiled (and transitions
+	  to be disabled). This was a bit too much of a good thing:-)
+
+2005-06-02 16:46  jackjansen
+
+	* Added a note about installing gettext on MacOSX.
+
+2005-06-02 14:48  jackjansen
+
+	* Fixed backgroundLayout=none and inherit and
+	  bachgroundRepeat=inherit, for Windows only.
+
+2005-05-28 23:39  jackjansen
+
+	* Added note about --with-xerces and --with-live when building
+	  source distribution.
+
+2005-05-27 14:04  jackjansen
+
+	* Added 1.4.1.
+
+2005-05-27 13:59  jackjansen
+
+	* Changed install folder back to 1.4 (was 1.4.1), I don't think we
+	  want micro release numbers here.
+
+2005-05-27 13:36  jackjansen
+
+	* - Fixed bug that opening URLs didn't work anymore (either from
+	  dialog or command line) - In the process, added a heuristic to
+	  determine whether a given string is a URL or a Windows filename.
+
+2005-05-25 23:42  jackjansen
+
+	* Found and fixed the bug that disabled quicktime support.
+
+2005-05-23 16:40  koelimoe
+
+	*  updated change log
+
+2005-05-23 16:36  koelimoe
 
 	* updated version numbers
 
-2005-05-23 16:14  koelimoe
+2005-05-23 14:32  keesblom
 
-	* added some assertion
+	* Disable dumpPixmap(), doesn't compile on Zaurus
 
-2005-05-12 15:48  koelimoe
+2005-05-23 11:48  koelimoe
 
-	* added asserts and a read_ahead method for the video_demuxer
+	* minor fix, got rid of the warning in
+	  ffmpeg_video_datasource::frame_done.
 
-2005-05-11 15:58  koelimoe
+2005-05-18 17:40  keesblom
 
-	* added read_ahead methods to the audio and video datasources. the
-	  demuxers start to read data on a start(_frame) or read_ahead call
+	* Added a test in register_renderer() to prevent multiple
+	  registration of the same renderer. Re-enabled assertion
+	  m_is_playing in get_data()
+
+2005-05-17 17:27  keesblom
+
+	* Implemented "backgroundRepeat"
+
+2005-05-17 15:56  keesblom
+
+	* For active_video_renderer::pause() and resume() added a test on
+	  m_is_playing because sometimes (News) there are
+	  active_video_renderers in the playables list which are created
+	  but not yet started, so they don't have a m_timer yet...
+
+2005-05-17 15:40  keesblom
+
+	* sdl_audio.cpp: changed assertion into do-nothing code if false
+	  ffmpeg_datasource.cpp: refined locking
+
+2005-05-13 14:21  keesblom
+
+	* Stupid error in start_outtransition caused core dump.  Turned off
+	  some debug in ffmped_datasource.cpp
+
+2005-05-13 11:30  jackjansen
+
+	* GCC 3.4 works.
+
+2005-05-13 11:29  jackjansen
+
+	* Fixed crash because transition cleanup was a bit unorganized.
+
+2005-05-12 17:34  keesblom
+
+	* Full screen transitions on Linux work now but there is a core
+	  dump at the end
+
+2005-05-12 11:15  jackjansen
+
+	* Changed SMIL 2.0 to SMIL 2.1CR.
+
+2005-05-10 15:30  jackjansen
+
+	* Background image redraw works. Tiling doesn't (yet).
+
+2005-05-10 13:32  keesblom
+
+	* Missing return caused core dump because return value was
+	  undefined.
+
+2005-05-09 11:56  keesblom
+
+	* Calling pthread_cond_timedwait() with NULL pointer for the
+	  abstime parameter caused core dump, use pthread_cond_wait in that
+	  case Improved debug messages in qt_fill.cpp
+
+2005-05-02 17:42  keesblom
+
+	* Modification for Fedora Core 3 (gcc 3.4.3)
+
 
 2005-05-10 13:23  keesblom
 
