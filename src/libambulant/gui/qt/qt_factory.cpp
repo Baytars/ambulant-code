@@ -54,6 +54,9 @@
 #include "ambulant/gui/qt/qt_factory.h"
 #include "ambulant/gui/qt/qt_includes.h"
 #include "ambulant/gui/qt/qt_image_renderer.h"
+#ifdef	WITH_QT_HTML_WIDGET
+#include "ambulant/gui/qt/qt_html_renderer.h"
+#endif/*WITH_QT_HTML_WIDGET*/
 #include "ambulant/gui/qt/qt_text_renderer.h"
 #include "ambulant/gui/qt/qt_video_renderer.h"
 
@@ -420,6 +423,12 @@ qt_renderer_factory::new_playable(
 						 evp, m_factory);
 		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_text_renderer 0x%x",
 			(void*) node, (void*) rv);
+#ifdef	WITH_QT_HTML_WIDGET
+	} else if ( tag == "html") {
+		rv = new qt_html_renderer(context, cookie, node, evp, m_factory);
+		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_html_renderer 0x%x",
+			(void*) node, (void*) rv);
+#endif/*WITH_QT_HTML_WIDGET*/
 	} else {
 		return NULL;
 	}
