@@ -390,7 +390,8 @@ AC_ARG_WITH(qtthmlwidget,
      ])
 AM_CONDITIONAL(WITH_QT_HTML_WIDGET, test x$qtthmlwidget = xtrue)
  if test x$qtthmlwidget = xtrue; then
-      CXXFLAGS="$CXXFLAGS -DWITH_QT_HTML_WIDGET -I/usr/include/kde"
+      CFLAGS="$CFLAGS -DWITH_QT_HTML_WIDGET -I/usr/include/kde"
+       LIBS="$LIBS -lkdecore -lkhtml"
    fi
 AC_MSG_RESULT($qtthmlwidget)
 #
