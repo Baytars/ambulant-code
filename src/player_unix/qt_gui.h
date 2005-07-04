@@ -95,10 +95,14 @@
 class qt_mainloop;
 
 #ifdef	WITH_QT_HTML_WIDGET
-class qt_gui : public KMainWindow {
+#define qt_gui_BASE KMainWindow
+//class qt_gui : public KMainWindow {
 #else /*WITH_QT_HTML_WIDGET*/
-//class qt_gui : public QWidget {
+#define qt_gui_BASE QWidget
+////class qt_gui : public QWidget {
 #endif/*WITH_QT_HTML_WIDGET*/
+
+ class qt_gui : public qt_gui_BASE {
 
    Q_OBJECT
 

@@ -63,9 +63,6 @@ static const char* time_containers[] = {
 };
 static const char* discrete_leafs[] = {
 	"text", "img", "ref", "brush"
-#ifdef	WITH_QT_HTML_WIDGET
-	, "html"
-#endif/*WITH_QT_HTML_WIDGET*/
 };
 
 static const char* continuous_leafs[] = {

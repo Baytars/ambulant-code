@@ -419,15 +419,21 @@ qt_renderer_factory::new_playable(
 		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_fill_renderer 0x%x", 
 			(void*) node, (void*) rv);
 	} else if ( tag == "text") {
+#ifdef	WITH_QT_HTML_WIDGET
+		const char* src = net::url(node->get_url("src")).get_url().c_str();
+		int srclen = strlen(src);
+		if ((srclen>3 && strcasecmp(&src[srclen-4],".htm")==0)
+		|| (srclen>4 && strcasecmp(&src[srclen-5],".html")==0)) {
+			rv = new qt_html_renderer(context, cookie, node, evp, m_factory);
+			AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_html_renderer 0x%x", (void*) node, (void*) rv);
+		} else {
+#endif/*WITH_QT_HTML_WIDGET*/
 		rv = new qt_active_text_renderer(context, cookie, node,
 						 evp, m_factory);
 		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_text_renderer 0x%x",
 			(void*) node, (void*) rv);
 #ifdef	WITH_QT_HTML_WIDGET
-	} else if ( tag == "html") {
-		rv = new qt_html_renderer(context, cookie, node, evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_html_renderer 0x%x",
-			(void*) node, (void*) rv);
+		}
 #endif/*WITH_QT_HTML_WIDGET*/
 	} else {
 		return NULL;
