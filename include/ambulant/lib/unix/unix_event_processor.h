@@ -72,7 +72,7 @@ namespace unix {
 typedef ambulant::lib::unix::critical_section unix_cs;
 
 class event_processor : 
-  public ambulant::lib::abstract_event_processor,
+  public ambulant::lib::event_processor_impl,
   public ambulant::lib::unix::thread {
 
   public:
