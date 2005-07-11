@@ -187,13 +187,6 @@ class basic_rect {
 	T x, y;
 	S w, h;
 	
-#if 0
-	basic_rect(S _w, S _h) 
-	:	x(0), y(0), w(_w), h(_h) {}
-	
-	basic_rect(T _x, T _y, S _w, S _h) 
-	:	x(_x), y(_y), w(_w), h(_h) {}
-#endif
 	basic_rect() : x(0), y(0), w(0), h(0) {}
 		 
 	basic_rect(const basic_rect<T, S>& o) 
