@@ -95,6 +95,12 @@ class timer {
 class timer_control : public timer {
   public:	
 	
+	/// Returns the zero-based elapsed time.
+	/// Does not take periodicity into account.
+	virtual time_type elapsed() const = 0;
+
+	// Returns the zero-based time elapsed for the provided parent elapsed time.
+	virtual time_type elapsed(time_type pt) const = 0;
 	
 	/// Starts ticking at t (t>=0).
 	virtual void start(time_type t = 0) = 0;
@@ -169,6 +175,9 @@ class timer_control_impl : public timer_control, public timer_events {
 	/// Does not take periodicity into account.
 	time_type elapsed() const;
 	
+	// Returns the zero-based time elapsed for the provided parent elapsed time.
+	time_type elapsed(time_type pt) const;
+		
 	/// Starts ticking at t (t>=0).
 	void start(time_type t = 0);
 	
@@ -209,9 +218,6 @@ class timer_control_impl : public timer_control, public timer_events {
 	/// Receives timer_events notifications.
 	void speed_changed();
 	
-//	// Returns the zero-based time elapsed for the provided parent elapsed time.
-//	time_type elapsed(time_type pt) const;
-//	
 //	/// Return the current elapsed time. 
 //	/// If this is a periodic timer this returns the
 //	/// elapsed time within the current period.
