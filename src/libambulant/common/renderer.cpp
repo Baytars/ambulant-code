@@ -290,7 +290,7 @@ common::get_global_playable_factory()
 }
 
 void 
-video_renderer::redraw(const lib::screen_rect_int &dirty, common::gui_window *window)
+video_renderer::redraw(const lib::rect &dirty, common::gui_window *window)
 {
 	AM_DBG lib::logger::get_logger ()->debug("video_renderer::redraw (this = 0x%x)", (void *) this);
 }

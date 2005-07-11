@@ -362,9 +362,9 @@ region_node::get_rect() const {
 	return re.get_rect();
 }
  
-lib::screen_rect_int
+lib::rect
 region_node::get_screen_rect() const {
-	return lib::screen_rect_int(get_rect());
+	return lib::rect(get_rect());
 }
 
 std::string

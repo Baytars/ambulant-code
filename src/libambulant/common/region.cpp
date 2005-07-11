@@ -85,7 +85,7 @@ smil_surface_factory::new_topsurface(
 }
 
 
-passive_region::passive_region(const std::string &name, passive_region *parent, screen_rect_int bounds,
+passive_region::passive_region(const std::string &name, passive_region *parent, rect bounds,
 	const region_info *info, bgrenderer *bgrenderer)
 :	m_name(name),
 	m_bounds_inited(true),
@@ -126,7 +126,7 @@ passive_region::~passive_region()
 common::surface_template *
 passive_region::new_subsurface(const region_info *info, bgrenderer *bgrenderer)
 {
-	screen_rect_int bounds = info->get_screen_rect();
+	rect bounds = info->get_screen_rect();
 	zindex_t z = info->get_zindex();
 	AM_DBG lib::logger::get_logger()->debug("subbregion %s: ltrb=(%d, %d, %d, %d), z=%d", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), z);
 	passive_region *rv = new passive_region(info->get_name(), this, bounds, info, bgrenderer);
@@ -205,11 +205,11 @@ passive_region::keep_as_background()
 }
 
 void
-passive_region::redraw(const lib::screen_rect_int &r, gui_window *window)
+passive_region::redraw(const lib::rect &r, gui_window *window)
 {
 	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
-	screen_rect_int our_outer_rect = r & m_outer_bounds;
-	screen_rect_int our_rect = m_outer_bounds.innercoordinates(our_outer_rect);
+	rect our_outer_rect = r & m_outer_bounds;
+	rect our_rect = m_outer_bounds.innercoordinates(our_outer_rect);
 	if (our_rect.empty()) {
 	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) returning: nothing to draw", (void *)this, m_name.c_str());
 		return;
@@ -269,7 +269,7 @@ passive_region::redraw(const lib::screen_rect_int &r, gui_window *window)
 }
 
 void
-passive_region::draw_background(const lib::screen_rect_int &r, gui_window *window)
+passive_region::draw_background(const lib::rect &r, gui_window *window)
 {
 	// Now we should make sure we have a background renderer
 	if (!m_bg_renderer) {
@@ -312,11 +312,11 @@ passive_region::user_event(const lib::point &where, int what)
 }
 
 void
-passive_region::need_redraw(const lib::screen_rect_int &r)
+passive_region::need_redraw(const lib::rect &r)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
-	screen_rect_int parent_rect = r & m_inner_bounds;
+	rect parent_rect = r & m_inner_bounds;
 	m_parent->need_redraw(m_outer_bounds.outercoordinates(parent_rect));
 }
 
@@ -349,7 +349,7 @@ passive_region::need_bounds()
 	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds(%s, 0x%x)", m_name.c_str(), (void*)this);
 	if (m_info) m_outer_bounds = m_info->get_screen_rect();
 	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds: %d %d %d %d", 
-		m_outer_bounds.m_left, m_outer_bounds.m_top, m_outer_bounds.m_right, m_outer_bounds.m_bottom);
+		m_outer_bounds.left(), m_outer_bounds.top(), m_outer_bounds.right(), m_outer_bounds.bottom());
 	m_inner_bounds = m_outer_bounds.innercoordinates(m_outer_bounds);
 	m_window_topleft = m_outer_bounds.left_top();
 	if (m_parent) m_window_topleft += m_parent->get_global_topleft();
@@ -375,7 +375,7 @@ passive_region::clear_cache()
 }
 
 
-lib::screen_rect_int 
+lib::rect 
 passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_src_rect) const
 {
 	const_cast<passive_region*>(this)->need_bounds();
@@ -404,7 +404,7 @@ passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_s
 	  case fit_hidden:
 		// Don't scale at all
 		*out_src_rect = lib::rect(lib::point(0, 0), lib::size(min_width, min_height));
-		return screen_rect_int(lib::point(0, 0), lib::point(min_width, min_height));
+		return rect(lib::point(0, 0), lib::size(min_width, min_height));
 	  case fit_meet:
 		// Scale to make smallest edge fit (showing some background color)
 		scale = std::min(scale_width, scale_height);
@@ -426,10 +426,10 @@ passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_s
 	int proposed_width = std::min((int)(scale*(image_width+0.5)), region_width);
 	int proposed_height = std::min((int)(scale*(image_height+0.5)), region_height);
 	*out_src_rect = lib::rect(lib::point(0, 0), lib::size((int)(proposed_width/scale), (int)(proposed_height/scale)));
-	return screen_rect_int(lib::point(0, 0), lib::point(proposed_width, proposed_height));
+	return rect(lib::point(0, 0), lib::size(proposed_width, proposed_height));
 }
 
-lib::screen_rect_int 
+lib::rect 
 passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, const common::alignment *align) const
 {
 	if (align == NULL)
@@ -528,7 +528,7 @@ passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect,
 	AM_DBG lib::logger::get_logger()->debug("get_fit_rect: scale_hor=%f, scale_vert=%f", scale_horizontal, scale_vertical);
 	if (scale_horizontal == 0 || scale_vertical == 0) {
 		*out_src_rect = lib::rect(point(0,0), size(0,0));
-		return lib::screen_rect_int(point(0,0), point(0,0));
+		return lib::rect(point(0,0), size(0,0));
 	}
 	// Convert the image fixpoint to scaled coordinates
 	int x_image_scaled = (int)((xy_image.x * scale_horizontal) + 0.5);
@@ -572,9 +572,9 @@ passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect,
 	*out_src_rect = lib::rect(
 		point(x_image_for_region_left, y_image_for_region_top),
 		size(x_image_for_region_right-x_image_for_region_left, y_image_for_region_bottom-y_image_for_region_top));
-	return lib::screen_rect_int(
+	return lib::rect(
 		point(x_region_for_image_left, y_region_for_image_top),
-		point(x_region_for_image_right, y_region_for_image_bottom));
+		size(x_region_for_image_right-x_region_for_image_left, y_region_for_image_bottom-y_region_for_image_top));
 }
 
 #ifdef USE_SMIL21
@@ -587,7 +587,7 @@ passive_region::is_tiled() const
 }
 
 tile_positions
-passive_region::get_tiles(lib::size image_size, lib::screen_rect_int surface_rect) const
+passive_region::get_tiles(lib::size image_size, lib::rect surface_rect) const
 {
 	assert(is_tiled());
 	
@@ -609,7 +609,7 @@ passive_region::get_tiles(lib::size image_size, lib::screen_rect_int surface_rec
 			int w = std::min<int>(width, max_x-x);
 			int h = std::min<int>(height, max_y-y);
 			rect srcrect(point(0, 0), size(w, h));
-			screen_rect_int dstrect(point(x, y), size(w, h));
+			rect dstrect(point(x, y), size(w, h));
 			rv.push_back(common::tile_position(srcrect, dstrect));
 		}
 	}
@@ -618,7 +618,7 @@ passive_region::get_tiles(lib::size image_size, lib::screen_rect_int surface_rec
 #endif
 
 void 
-passive_region::transition_done(lib::screen_rect_int area)
+passive_region::transition_done(lib::rect area)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
@@ -627,7 +627,7 @@ passive_region::transition_done(lib::screen_rect_int area)
 }
 
 void 
-passive_region::transition_freeze_end(lib::screen_rect_int r)
+passive_region::transition_freeze_end(lib::rect r)
 {
 	AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
 	r &= m_outer_bounds;
@@ -677,7 +677,7 @@ passive_region::del_subregion(zindex_t z, passive_region *rgn)
 }
 
 passive_root_layout::passive_root_layout(const region_info *info, lib::size bounds, bgrenderer *bgrenderer, window_factory *wf)
-:   passive_region(info?info->get_name():"topLayout", NULL, screen_rect_int(point(0, 0), bounds), info, bgrenderer)
+:   passive_region(info?info->get_name():"topLayout", NULL, rect(point(0, 0), bounds), info, bgrenderer)
 {
 	m_gui_window = wf->new_window(m_name, bounds, this);
 	AM_DBG lib::logger::get_logger()->debug("passive_root_layout(0x%x, \"%s\"): window=0x%x", (void *)this, m_name.c_str(), (void *)m_gui_window);
@@ -692,7 +692,7 @@ passive_root_layout::~passive_root_layout()
 }
 
 void
-passive_root_layout::need_redraw(const lib::screen_rect_int &r)
+passive_root_layout::need_redraw(const lib::rect &r)
 {
 	if (m_gui_window)
 		m_gui_window->need_redraw(r);

@@ -252,7 +252,7 @@ class basic_rect {
 	/// Get coordinates of a rectangle p in a base setup by this rectangle.
 	basic_rect<T, S> innercoordinates(const basic_rect<T, S>& p) const {
 		basic_rect<T, S> rv = p;
-		rv &= this;
+		rv &= *this;
 		rv.translate(left_top());
 		return rv;
 	}
@@ -262,7 +262,7 @@ class basic_rect {
 	basic_rect<T, S> outercoordinates(const basic_rect<T, S>& p) const {
 		basic_rect<T, S> rv = p;
 		rv.translate(-left_top());
-		rv &= this;
+		rv &= *this;
 		return rv;
 	}
 	
@@ -615,7 +615,7 @@ inline std::string repr(const ambulant::lib::basic_size<unsigned int>& z) {
 	return s << '(' << z.w << ", " << z.h << ')';
 }
 
-inline std::string repr(const ambulant::lib::screen_rect_int& r) {
+inline std::string repr(const ambulant::lib::rect& r) {
 	std::string s;
 	return s << '(' << r.left() << ", " << r.top() << ", " << r.right() << ", " << r.bottom() << ')';
 }
@@ -623,7 +623,7 @@ inline std::string repr(const ambulant::lib::screen_rect_int& r) {
 #else 
 inline std::string repr(const ambulant::lib::basic_point<int>& p) { return "";}
 inline std::string repr(const ambulant::lib::basic_size<unsigned int>& z) { return "";}
-inline std::string repr(const ambulant::lib::screen_rect_int& r) {return "";}
+inline std::string repr(const ambulant::lib::rect& r) {return "";}
 #endif
 
 

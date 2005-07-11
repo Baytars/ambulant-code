@@ -126,7 +126,7 @@ class renderer_playable : public playable_imp, public renderer {
 	surface *get_surface() { return m_dest;}
 	virtual void user_event(const lib::point &where, int what = 0);	
 	renderer *get_renderer() { return this; }
-	void transition_freeze_end(lib::screen_rect_int r) { m_context->transitioned(m_cookie); }
+	void transition_freeze_end(lib::rect r) { m_context->transitioned(m_cookie); }
 	virtual void start(double t);
 	virtual void stop();
 	
@@ -164,7 +164,7 @@ class renderer_playable_ds : public renderer_playable {
 //	virtual void resume() {}
 //	virtual void wantclicks(bool want);
 
-	virtual void redraw(const lib::screen_rect_int &dirty, gui_window *window) = 0;
+	virtual void redraw(const lib::rect &dirty, gui_window *window) = 0;
 	/// Called whenever data is available.
 	virtual void readdone() = 0;
   protected:
@@ -279,7 +279,7 @@ class video_renderer : public common::renderer_playable {
 	
 	/// Display video data.
 	virtual void show_frame(const char* frame, int size) {};
-    virtual void redraw(const lib::screen_rect_int &dirty, common::gui_window *window);
+    virtual void redraw(const lib::rect &dirty, common::gui_window *window);
 	
 	void start(double where);
     void stop();
@@ -325,7 +325,7 @@ class background_renderer : public bgrenderer {
 	virtual ~background_renderer() {}
 	void set_surface(surface *destination) { m_dst = destination; }
 	void user_event(const lib::point &where, int what = 0) {};
-	void transition_freeze_end(lib::screen_rect_int area) {};
+	void transition_freeze_end(lib::rect area) {};
   protected:
 	const region_info *m_src;	///< Where we get our parameters (such as color) from.
 	surface *m_dst;				///< Where we should render to.

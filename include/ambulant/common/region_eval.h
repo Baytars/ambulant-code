@@ -215,9 +215,9 @@ class region_evaluator {
 	}
 	
 	/// Evaluate (if needed) and return rectangle.
-	screen_rect_int get_screen_rect() {
-		return screen_rect_int(point(get_left(), get_top()),
-			point(get_left()+get_width(), get_top()+get_height()));
+	rect get_screen_rect() {
+		return rect(point(get_left(), get_top()),
+			size(get_width(), get_height()));
 	}
 	
 	/// Evaluate (if needed) and return (left, top) point.
