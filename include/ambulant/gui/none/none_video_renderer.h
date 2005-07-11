@@ -55,7 +55,7 @@ namespace ambulant {
 namespace gui {
 namespace none {	  
 
-class none_video_renderer : public common::active_video_renderer {
+class none_video_renderer : public common::video_renderer {
   public:
     none_video_renderer(
     common::playable_notification *context,
@@ -63,7 +63,7 @@ class none_video_renderer : public common::active_video_renderer {
     const lib::node *node,
     lib::event_processor *evp,
 	common::factories *factory)
-	:   common::active_video_renderer(context, cookie, node, evp, factory)
+	:   common::video_renderer(context, cookie, node, evp, factory)
 	{ }
 
   	~none_video_renderer() {};

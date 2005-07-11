@@ -67,7 +67,7 @@ namespace gui {
 namespace cocoa {
 
 class cocoa_dsvideo_renderer : 
-	public common::active_video_renderer {
+	public common::video_renderer {
   public:
 	cocoa_dsvideo_renderer(
 		playable_notification *context,

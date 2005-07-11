@@ -118,11 +118,11 @@ public:
 	
 
 
-class active_datasource : virtual public datasource, virtual public lib::ref_counted_obj {
+class posix_datasource : virtual public datasource, virtual public lib::ref_counted_obj {
   public:
-	active_datasource();
-	active_datasource(passive_datasource *const source, int file);
-  	~active_datasource();
+	posix_datasource();
+	posix_datasource(passive_datasource *const source, int file);
+  	~posix_datasource();
   	
   	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback);
 	void stop();
@@ -137,8 +137,8 @@ class active_datasource : virtual public datasource, virtual public lib::ref_cou
   
 	void read(char *data, int size);
   	
-  	friend inline std::ostream& operator<<(std::ostream& os, const active_datasource& n) {
-		os << "active_datasource(" << (void *)&n << ", source=" << (void *)n.m_source << ")";
+  	friend inline std::ostream& operator<<(std::ostream& os, const posix_datasource& n) {
+		os << "posix_datasource(" << (void *)&n << ", source=" << (void *)n.m_source << ")";
 		return os;
 	}
   private: 

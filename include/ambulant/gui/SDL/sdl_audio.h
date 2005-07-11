@@ -76,17 +76,17 @@ namespace ambulant {
 namespace gui {
 namespace sdl {	  
 
-class sdl_active_audio_renderer : public common::renderer_playable {
+class sdl_audio_renderer : public common::renderer_playable {
 
   public:
-	sdl_active_audio_renderer(
+	sdl_audio_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *evp,
 	common::factories *factory);
 
-	sdl_active_audio_renderer(
+	sdl_audio_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
@@ -94,7 +94,7 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 	common::factories *factory,
 	net::audio_datasource *ds);
   
-	~sdl_active_audio_renderer();
+	~sdl_audio_renderer();
 
 	  
 	bool is_paused();
@@ -144,14 +144,14 @@ class sdl_active_audio_renderer : public common::renderer_playable {
 #endif
 	// class methods and attributes:
 	static int init();
- 	static void register_renderer(sdl_active_audio_renderer *rnd);
- 	static void unregister_renderer(sdl_active_audio_renderer *rnd);
+ 	static void register_renderer(sdl_audio_renderer *rnd);
+ 	static void unregister_renderer(sdl_audio_renderer *rnd);
     static bool m_sdl_init;
 	static Uint16 m_sdl_format;
 	static net::audio_format m_ambulant_format;
     static int m_buffer_size;
 	static lib::critical_section m_static_lock;
-	static std::list<sdl_active_audio_renderer *>m_renderers;
+	static std::list<sdl_audio_renderer *>m_renderers;
 };
 
 } // end namespace sdl
