@@ -94,7 +94,7 @@ passive_datasource::activate()
 	
 	in = open(m_filename.c_str(), O_RDONLY);
 	if (in >= 0) {
-		return new active_datasource(this, in);
+		return new posix_datasource(this, in);
 	} else {
 		lib::logger::get_logger()->trace(gettext("%s: Cannot open: %s"),  m_filename.c_str(), strerror(errno));
 	}
@@ -107,17 +107,17 @@ passive_datasource::~passive_datasource()
 	AM_DBG lib::logger::get_logger()->debug("passive_datasource::~passive_datasource(0x%x)", (void*)this);
 }
 
-// *********************** active_datasource ***********************************************
+// *********************** posix_datasource ***********************************************
 
 
-active_datasource::active_datasource(passive_datasource *const source, int file)
+posix_datasource::posix_datasource(passive_datasource *const source, int file)
 :	m_buffer(NULL),
 	m_source(source),
 	m_filesize(0),
 	m_stream(file),
 	m_end_of_file(false)
 {
-	AM_DBG lib::logger::get_logger()->debug("active_datasource::active_datasource(0x%x, %d)->0x%x", (void*)source, file, (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("posix_datasource::posix_datasource(0x%x, %d)->0x%x", (void*)source, file, (void*)this);
 	m_source->add_ref();
 	if (file >= 0) {
 		filesize();
@@ -125,7 +125,7 @@ active_datasource::active_datasource(passive_datasource *const source, int file)
 		m_buffer = new databuffer(m_filesize);
 		if (!m_buffer) {
 			m_buffer = NULL;
- 			lib::logger::get_logger()->fatal("active_datasource(): out of memory");
+ 			lib::logger::get_logger()->fatal("posix_datasource(): out of memory");
 		}
 		//AM_DBG m_buffer->dump(std::cout, false);
 	}
@@ -133,12 +133,12 @@ active_datasource::active_datasource(passive_datasource *const source, int file)
 
 
 void
-active_datasource::callback()
+posix_datasource::callback()
 {
 }
 
 bool
-active_datasource::end_of_file()
+posix_datasource::end_of_file()
 {
 	bool rv;
 	m_lock.enter();
@@ -148,7 +148,7 @@ active_datasource::end_of_file()
 }
 
 bool
-active_datasource::_end_of_file()
+posix_datasource::_end_of_file()
 {
 	bool rv;
 	// private method - no need to lock
@@ -159,11 +159,11 @@ active_datasource::_end_of_file()
 	return rv;
 }
 
-active_datasource::~active_datasource()
+posix_datasource::~posix_datasource()
 {
 	stop();
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("active_datasource::stop(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("posix_datasource::stop(0x%x)", (void*)this);
 	if (m_buffer) {
 		delete m_buffer;
 		m_buffer = NULL;
@@ -175,12 +175,12 @@ active_datasource::~active_datasource()
 }
 
 void
-active_datasource::stop()
+posix_datasource::stop()
 {
 }
 
 int
-active_datasource::size() const
+posix_datasource::size() const
 {
 	// const method - cannot use the lock.
 	int rv = m_buffer->size();
@@ -188,7 +188,7 @@ active_datasource::size() const
 }
 
 void
-active_datasource::filesize()
+posix_datasource::filesize()
 {
 	// private method - no need to lock
  	using namespace std;
@@ -198,14 +198,14 @@ active_datasource::filesize()
 		m_filesize=lseek(m_stream, 0, SEEK_END); 		
 	 	dummy=lseek(m_stream, 0, SEEK_SET);						
 	} else {
- 		lib::logger::get_logger()->fatal("active_datasource.filesize(): no file openXX");
+ 		lib::logger::get_logger()->fatal("posix_datasource.filesize(): no file openXX");
 		m_filesize = 0;
 	}
 }
 
 
 void
-active_datasource::read(char *data, int sz)
+posix_datasource::read(char *data, int sz)
 {
 	m_lock.enter();
     char* in_ptr;
@@ -218,21 +218,21 @@ active_datasource::read(char *data, int sz)
 }
 
 void
-active_datasource::read_file()
+posix_datasource::read_file()
 {
 	// private method - no need to lock
   	char *buf;
   	int n; 	
-	//AM_DBG lib::logger::get_logger()->debug("active_datasource.readfile: start reading file ");
+	//AM_DBG lib::logger::get_logger()->debug("posix_datasource.readfile: start reading file ");
 	if (m_stream >= 0) {
 		do {
-		//AM_DBG lib::logger::get_logger()->debug("active_datasource.readfile: getting buffer pointer");
+		//AM_DBG lib::logger::get_logger()->debug("posix_datasource.readfile: getting buffer pointer");
             buf = m_buffer->get_write_ptr(BUFSIZ);
-			//AM_DBG lib::logger::get_logger()->debug("active_datasource.readfile: buffer ptr : %x", buf);
+			//AM_DBG lib::logger::get_logger()->debug("posix_datasource.readfile: buffer ptr : %x", buf);
 			if (buf) {
-				//AM_DBG lib::logger::get_logger()->debug("active_datasource.readfile: start reading %d bytes", BUFSIZ);
+				//AM_DBG lib::logger::get_logger()->debug("posix_datasource.readfile: start reading %d bytes", BUFSIZ);
 				n = ::read(m_stream, buf, BUFSIZ);
-				//AM_DBG lib::logger::get_logger()->debug("active_datasource.readfile: done reading %d bytes", n);
+				//AM_DBG lib::logger::get_logger()->debug("posix_datasource.readfile: done reading %d bytes", n);
 				if (n > 0) m_buffer->pushdata(n); 
 			}
 		
@@ -246,7 +246,7 @@ active_datasource::read_file()
 }
  
 char* 
-active_datasource::get_read_ptr()
+posix_datasource::get_read_ptr()
 {
 	m_lock.enter();
 	char *rv = m_buffer->get_read_ptr();
@@ -255,14 +255,14 @@ active_datasource::get_read_ptr()
 }
   
 void
-active_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *cbevent)
+posix_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::event *cbevent)
  {
 	m_lock.enter();
  	if (! _end_of_file() ) read_file();
 	
 	if (m_buffer->size() > 0 ) {
     	if (evp && cbevent) {
-			AM_DBG lib::logger::get_logger()->debug("active_datasource.start: trigger readdone callback (x%x)", cbevent);
+			AM_DBG lib::logger::get_logger()->debug("posix_datasource.start: trigger readdone callback (x%x)", cbevent);
 			evp->add_event(cbevent, 0, ambulant::lib::event_processor::med);
     	}
 	}
@@ -270,7 +270,7 @@ active_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib::eve
 }
  
 void
-active_datasource::readdone(int sz)
+posix_datasource::readdone(int sz)
 {
 	m_lock.enter();
 	m_buffer->readdone(sz);

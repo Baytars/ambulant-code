@@ -251,22 +251,22 @@ class empty_playable_notification : public playable_notification {
 /// baseclass to use. It handles reading the video file (through
 /// a video_datasource object), calls show_frame for every frame,
 /// and splitting out the optional audio track and handing it to
-/// an audio playable. active_video_renderer will also control
+/// an audio playable. video_renderer will also control
 /// the audio playable, forwarding play/stop/pause calls that it
 /// receives to the audio_playable too.
 ///
 /// So, the only thing you need to provide are a show_frame
 /// and a redraw function.
-class active_video_renderer : public common::renderer_playable {
+class video_renderer : public common::renderer_playable {
   public:
-	active_video_renderer(
+	video_renderer(
     common::playable_notification *context,
     common::playable_notification::cookie_type cookie,
     const lib::node *node,
     lib::event_processor *evp,
 	common::factories *factory);
 
-  	virtual ~active_video_renderer();
+  	virtual ~video_renderer();
 	
 	/// Return true if video is paused.
   	bool is_paused() { return m_is_paused; };
@@ -298,7 +298,7 @@ class active_video_renderer : public common::renderer_playable {
   	common::playable *m_audio_renderer;	///< the audio playable.
   	empty_playable_notification m_playable_notification;
   private:
-	  typedef lib::no_arg_callback <active_video_renderer > dataavail_callback;
+	  typedef lib::no_arg_callback <video_renderer > dataavail_callback;
 	  double now();
 	  lib::abstract_timer *m_timer;
  	  unsigned long int m_epoch;
