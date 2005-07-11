@@ -146,22 +146,6 @@ cocoa_text_renderer::redraw_body(const screen_rect_int &dirty, gui_window *windo
 	screen_rect_int dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
 	NSRect cocoa_dstrect = [view NSRectForAmbulantRect: &dstrect];
-#if 0
-	// XXXX WRONG! This is the info for the region, not for the node!
-	const region_info *info = m_dest->get_info();
-	// First find our whole area
-	if (info && !info->get_transparent()) {
-		// XXXX Fill with background color
-		color_t bgcolor = info->get_bgcolor();
-		AM_DBG lib::logger::get_logger()->debug("cocoa_text_renderer.redraw: clearing to 0x%x", (long)bgcolor);
-		NSColor *cocoa_bgcolor = [NSColor colorWithCalibratedRed:redf(bgcolor)
-					green:greenf(bgcolor)
-					blue:bluef(bgcolor)
-					alpha:1.0];
-		[cocoa_bgcolor set];
-		NSRectFill(cocoa_dstrect);
-	}
-#endif
 	if (m_text_storage && m_layout_manager) {
 		NSPoint origin = NSMakePoint(NSMinX(cocoa_dstrect), NSMinY(cocoa_dstrect));
 		NSSize size = NSMakeSize(NSWidth(cocoa_dstrect), NSHeight(cocoa_dstrect));

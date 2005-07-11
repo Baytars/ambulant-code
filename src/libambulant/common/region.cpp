@@ -271,23 +271,6 @@ passive_region::redraw(const lib::screen_rect_int &r, gui_window *window)
 void
 passive_region::draw_background(const lib::screen_rect_int &r, gui_window *window)
 {
-#if 0
-	// Do a quick return if we have nothing to draw
-	if (m_info == NULL) {
-		AM_DBG lib::logger::get_logger()->debug("draw_background %s: no m_info", m_name.c_str());
-		return;
-	}
-	AM_DBG lib::logger::get_logger()->debug("draw_background %s: color=0x%x, transparent=%x, showbg=%d, renderer=0x%x",
-		m_name.c_str(), (int)m_info->get_bgcolor(), (int)m_info->get_transparent(), (int)m_info->get_showbackground(), (void*)m_bg_renderer);
-	if (m_info->get_transparent()) {
-		AM_DBG lib::logger::get_logger()->debug("draw_background %s: transparent", m_name.c_str());
-		return;
-	}
-	if (!m_info->get_showbackground()) {
-		AM_DBG lib::logger::get_logger()->debug("draw_background %s: showbackground is false", m_name.c_str());
-		return;
-	}
-#endif
 	// Now we should make sure we have a background renderer
 	if (!m_bg_renderer) {
 		AM_DBG lib::logger::get_logger()->debug("draw_background %s: no m_bg_renderer", m_name.c_str());

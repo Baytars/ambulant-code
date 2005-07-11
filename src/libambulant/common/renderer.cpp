@@ -397,6 +397,10 @@ video_renderer::start (double where = 1)
 #if 0
 	m_timer = m_event_processor->get_timer();
 #else
+	// This is a workaround for a bug: the "normal" timer
+	// can be set back in time sometimes, and the video renderer
+	// does not like that. For now use a private timer, will
+	// have to be fixed eventually.
 	m_timer = lib::realtime_timer_factory();
 #endif
 	m_epoch = m_timer->elapsed();
