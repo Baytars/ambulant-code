@@ -96,9 +96,9 @@ class event_processor {
 
 
 /////////////////////////////////////////////////
-// abstract_event_processor
+// event_processor_impl
 
-// abstract_event_processor is not the owner of abstract_timer.
+// event_processor_impl is not the owner of abstract_timer.
 
 
 #include <queue>
@@ -116,12 +116,14 @@ namespace ambulant {
 namespace lib {
 
 /// Implementation of event_processor (with a badly chosen name).
-/// This is actually a concrete implementation of the
-/// event_processor interface.
-class abstract_event_processor : public event_processor {
+/// This is the machine-independent portion of the event_processor.
+/// There is a machine-dependent companion class that glues
+/// this together with a (machine-dependent) thread to get the
+/// complete behaviour.
+class event_processor_impl : public event_processor {
   public:
- 	abstract_event_processor(abstract_timer *t);	
-	~abstract_event_processor();	
+ 	event_processor_impl(abstract_timer *t);	
+	~event_processor_impl();	
 	abstract_timer *get_timer() const;
 	
 	void add_event(event *pe, time_type t, event_priority priority);
@@ -166,7 +168,7 @@ class abstract_event_processor : public event_processor {
 	critical_section m_delta_timer_cs;  
 };
 
-// Machine-dependent factory function
+/// Machine-dependent factory function
 AMBULANTAPI event_processor *event_processor_factory(abstract_timer *t);
 
 } // namespace lib
