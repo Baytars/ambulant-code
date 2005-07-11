@@ -64,7 +64,7 @@
 using namespace ambulant;
 using namespace lib;
 
-event_processor_impl::event_processor_impl(abstract_timer *t) 
+event_processor_impl::event_processor_impl(timer *t) 
 	:	m_timer(t),
 		m_high_delta_timer(t), 
 		m_med_delta_timer(t), 
@@ -75,7 +75,7 @@ event_processor_impl::~event_processor_impl() {
 		// the timer is not owned by this
 }
 
-abstract_timer *
+timer *
 event_processor_impl::get_timer() const { return m_timer; }
 
 void 

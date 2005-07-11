@@ -83,7 +83,7 @@ class event_processor {
 	virtual void serve_events() = 0;
 
 	// Get the underlying timer.
-	virtual abstract_timer *get_timer() const = 0;
+	virtual timer *get_timer() const = 0;
 	
 	// Stop this event processor (stops the underlying thread).
 	virtual void stop_processor_thread() = 0;
@@ -98,7 +98,7 @@ class event_processor {
 /////////////////////////////////////////////////
 // event_processor_impl
 
-// event_processor_impl is not the owner of abstract_timer.
+// event_processor_impl is not the owner of timer.
 
 
 #include <queue>
@@ -122,9 +122,9 @@ namespace lib {
 /// complete behaviour.
 class event_processor_impl : public event_processor {
   public:
- 	event_processor_impl(abstract_timer *t);	
+ 	event_processor_impl(timer *t);	
 	~event_processor_impl();	
-	abstract_timer *get_timer() const;
+	timer *get_timer() const;
 	
 	void add_event(event *pe, time_type t, event_priority priority);
 	bool cancel_event(event *pe, event_priority priority = low);
@@ -141,7 +141,7 @@ class event_processor_impl : public event_processor {
 	virtual void wait_event() = 0;
 
 	// the timer for this processor
-	abstract_timer *m_timer;
+	timer *m_timer;
 
  private:
 	// check, if needed, with a delta_timer to fill its run queue
@@ -169,7 +169,7 @@ class event_processor_impl : public event_processor {
 };
 
 /// Machine-dependent factory function
-AMBULANTAPI event_processor *event_processor_factory(abstract_timer *t);
+AMBULANTAPI event_processor *event_processor_factory(timer *t);
 
 } // namespace lib
 
