@@ -95,7 +95,7 @@ class dg_transition {
 };
 
 dg_transition *make_transition(lib::transition_type id, 
-	common::playable *playable, lib::timer *timer);
+	common::playable *playable, lib::timer_control *timer);
 	
 smil2::blitter_type get_transition_blitter_type(lib::transition_type id);
 

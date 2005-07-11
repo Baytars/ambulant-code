@@ -65,7 +65,7 @@
 
 using namespace ambulant;
 
-lib::win32::event_processor::event_processor(abstract_timer *t) 
+lib::win32::event_processor::event_processor(timer *t) 
 :   lib::event_processor_impl(t),
 	m_wait_event(0) {
 	m_wait_event = CreateEvent(NULL, TRUE, FALSE, NULL);

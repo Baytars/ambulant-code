@@ -72,12 +72,12 @@ using namespace smil2;
 // Module private definitions
 
 struct transition_factory {
-	virtual gui::dx::dx_transition *new_transition(common::playable *playable, lib::timer *timer) = 0;
+	virtual gui::dx::dx_transition *new_transition(common::playable *playable, lib::timer_control *timer) = 0;
 };
 
 template <class T>
 struct trfact : public transition_factory {
-	gui::dx::dx_transition *new_transition(common::playable *playable, lib::timer *timer) 
+	gui::dx::dx_transition *new_transition(common::playable *playable, lib::timer_control *timer) 
 	{ return new gui::dx::dx_transition_engine<T>(playable, timer);}
 };
 
@@ -161,7 +161,7 @@ static transition_factories transition_factories_inst;
 // Public interface
 
 gui::dx::dx_transition *gui::dx::make_transition(lib::transition_type id, 
-	common::playable *playable, lib::timer *timer) {
+	common::playable *playable, lib::timer_control *timer) {
 	std::map<lib::transition_type, transition_factory*>& m = 
 		transition_factories_inst.trfactmap;
 	std::map<lib::transition_type, transition_factory*>::iterator it = m.find(id);

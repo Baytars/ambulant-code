@@ -99,7 +99,7 @@ class dx_transition {
 };
 
 dx_transition *make_transition(lib::transition_type id, 
-	common::playable *playable, lib::timer *timer);
+	common::playable *playable, lib::timer_control *timer);
 	
 smil2::blitter_type get_transition_blitter_type(lib::transition_type id);
 
@@ -123,7 +123,7 @@ class transition_engine_adapter : public T {
 template<class T>
 class dx_transition_engine : public dx_transition {
   public:
-	dx_transition_engine(common::playable *playable, lib::timer *timer)
+	dx_transition_engine(common::playable *playable, lib::timer_control *timer)
 	:	/* m_playable(playable),*/ m_timer(timer) {
 		m_engine = new transition_engine_adapter<T>();
 	}
@@ -199,7 +199,7 @@ class dx_transition_engine : public dx_transition {
 		
 	transition_engine_adapter<T> *m_engine;
 //	common::playable *m_playable;
-	lib::timer *m_timer;
+	lib::timer_control *m_timer;
 };
 
 

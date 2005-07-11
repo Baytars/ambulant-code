@@ -96,14 +96,12 @@ lib::timer_control_impl::elapsed() const
 	return m_local_epoch + apply_speed_manip(m_parent->elapsed() - m_parent_epoch);
 }
 
-#if 0
 lib::timer_control_impl::time_type
 lib::timer_control_impl::elapsed(time_type pe) const
 {
 	if(!m_running) return m_local_epoch;
 	return m_local_epoch + apply_speed_manip(pe - m_parent_epoch);
 }
-#endif
 
 void lib::timer_control_impl::start(time_type t /* = 0 */) {
 	m_parent_epoch = m_parent->elapsed();
