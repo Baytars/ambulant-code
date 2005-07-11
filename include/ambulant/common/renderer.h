@@ -300,7 +300,7 @@ class video_renderer : public common::renderer_playable {
   private:
 	  typedef lib::no_arg_callback <video_renderer > dataavail_callback;
 	  double now();
-	  lib::abstract_timer *m_timer;
+	  lib::timer *m_timer;
  	  unsigned long int m_epoch;
 	  bool m_is_playing;
 	  bool m_is_paused;
