@@ -409,14 +409,14 @@ qt_renderer_factory::new_playable(
 	lib::xml_string tag = node->get_qname().second;
 	common::playable* rv;
 	if (tag == "img") {
- 		rv = new qt_active_image_renderer(context, cookie, node,
+ 		rv = new qt_image_renderer(context, cookie, node,
 						  evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_image_renderer 0x%x", 
+		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_image_renderer 0x%x", 
 			(void*) node, (void*) rv);
 	} else if (tag == "brush") {
  		rv = new qt_fill_renderer(context, cookie, node,
 					  evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_fill_renderer 0x%x", 
+		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_fill_renderer 0x%x", 
 			(void*) node, (void*) rv);
 	} else if ( tag == "text") {
 #ifdef	WITH_QT_HTML_WIDGET
@@ -428,9 +428,9 @@ qt_renderer_factory::new_playable(
 			AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_html_renderer 0x%x", (void*) node, (void*) rv);
 		} else {
 #endif/*WITH_QT_HTML_WIDGET*/
-		rv = new qt_active_text_renderer(context, cookie, node,
+		rv = new qt_text_renderer(context, cookie, node,
 						 evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_active_text_renderer 0x%x",
+		AM_DBG lib::logger::get_logger()->debug("qt_renderer_factory: node 0x%x: returning qt_text_renderer 0x%x",
 			(void*) node, (void*) rv);
 #ifdef	WITH_QT_HTML_WIDGET
 		}
@@ -492,7 +492,7 @@ qt_video_factory::new_playable(
 	lib::xml_string tag = node->get_qname().second;
     AM_DBG lib::logger::get_logger()->debug("qt_video_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "video") {
-	  rv = new qt_active_video_renderer(context, cookie, node, evp, m_factory);
+	  rv = new qt_video_renderer(context, cookie, node, evp, m_factory);
 		AM_DBG lib::logger::get_logger()->debug("qt_video_factory: node 0x%x: returning qt_video_renderer 0x%x", (void *)node, (void *)rv);
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("qt_video_factory: no renderer for tag \"%s\"", tag.c_str());
