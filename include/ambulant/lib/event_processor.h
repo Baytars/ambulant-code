@@ -115,7 +115,7 @@ namespace ambulant {
 
 namespace lib {
 
-/// Implementation of event_processor (with a badly chosen name).
+/// Implementation of event_processor.
 /// This is the machine-independent portion of the event_processor.
 /// There is a machine-dependent companion class that glues
 /// this together with a (machine-dependent) thread to get the
