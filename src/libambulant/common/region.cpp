@@ -81,7 +81,7 @@ smil_surface_factory::new_topsurface(
 		rect rect = info->get_rect();
 		bounds = lib::size(rect.width(), rect.height());
 	}
-	return new passive_root_layout(info, bounds, bgrend, wf);
+	return new toplevel_surface_impl(info, bounds, bgrend, wf);
 }
 
 
@@ -677,39 +677,39 @@ surface_impl::del_subregion(zindex_t z, surface_impl *rgn)
 	m_children_cs.leave();
 }
 
-passive_root_layout::passive_root_layout(const region_info *info, lib::size bounds, bgrenderer *bgrenderer, window_factory *wf)
+toplevel_surface_impl::toplevel_surface_impl(const region_info *info, lib::size bounds, bgrenderer *bgrenderer, window_factory *wf)
 :   surface_impl(info?info->get_name():"topLayout", NULL, rect(point(0, 0), bounds), info, bgrenderer)
 {
 	m_gui_window = wf->new_window(m_name, bounds, this);
-	AM_DBG lib::logger::get_logger()->debug("passive_root_layout(0x%x, \"%s\"): window=0x%x", (void *)this, m_name.c_str(), (void *)m_gui_window);
+	AM_DBG lib::logger::get_logger()->debug("toplevel_surface_impl(0x%x, \"%s\"): window=0x%x", (void *)this, m_name.c_str(), (void *)m_gui_window);
 }
 		
-passive_root_layout::~passive_root_layout()
+toplevel_surface_impl::~toplevel_surface_impl()
 {
-	AM_DBG lib::logger::get_logger()->debug("~passive_root_layout(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("~toplevel_surface_impl(0x%x)", (void*)this);
 	if (m_gui_window)
 		delete m_gui_window;
 	m_gui_window = NULL;
 }
 
 void
-passive_root_layout::need_redraw(const lib::rect &r)
+toplevel_surface_impl::need_redraw(const lib::rect &r)
 {
 	if (m_gui_window)
 		m_gui_window->need_redraw(r);
 	else {
-		lib::logger::get_logger()->debug("passive_root_layout::need_redraw: m_gui_window == NULL");
+		lib::logger::get_logger()->debug("toplevel_surface_impl::need_redraw: m_gui_window == NULL");
 		lib::logger::get_logger()->warn(gettext("Programmer error encountered, will attempt to continue"));
 	}
 }
 
 void
-passive_root_layout::need_events(bool want)
+toplevel_surface_impl::need_events(bool want)
 {
 	if (m_gui_window)
 		m_gui_window->need_events(want);
 	else {
-		lib::logger::get_logger()->trace("passive_root_layout::need_events: m_gui_window == NULL");
+		lib::logger::get_logger()->trace("toplevel_surface_impl::need_events: m_gui_window == NULL");
 		lib::logger::get_logger()->warn(gettext("Programmer error encountered, will attempt to continue"));
 	}
 }
