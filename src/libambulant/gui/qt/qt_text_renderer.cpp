@@ -98,7 +98,7 @@ qt_text_renderer::~qt_text_renderer() {
 }
 
 void
-qt_text_renderer::redraw_body(const lib::screen_rect<int> &r,
+qt_text_renderer::redraw_body(const lib::rect &r,
 				     common::gui_window* w) {
 // No m_lock needed, protected by base class
 	const lib::point p = m_dest->get_global_topleft();
