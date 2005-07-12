@@ -142,10 +142,10 @@ class surface_impl : public surface_template, public surface, public gui_events 
 	bgrenderer *m_bg_renderer;			// Background renderer
 };
 
-class passive_root_layout : public surface_impl {
+class toplevel_surface_impl : public surface_impl {
   public:
-	passive_root_layout(const region_info *info, size bounds, bgrenderer *bgrenderer, window_factory *wf);
-	~passive_root_layout();
+	toplevel_surface_impl(const region_info *info, size bounds, bgrenderer *bgrenderer, window_factory *wf);
+	~toplevel_surface_impl();
 	
 	void need_redraw(const rect &r);
 	void need_events(bool want);
