@@ -65,7 +65,7 @@ namespace common {
 class passive_region;
 }}
 
-typedef ambulant::common::passive_region region;
+typedef ambulant::common::surface_impl region;
 
 namespace ambulant {
 

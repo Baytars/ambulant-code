@@ -85,7 +85,7 @@ smil_surface_factory::new_topsurface(
 }
 
 
-passive_region::passive_region(const std::string &name, passive_region *parent, rect bounds,
+surface_impl::surface_impl(const std::string &name, surface_impl *parent, rect bounds,
 	const region_info *info, bgrenderer *bgrenderer)
 :	m_name(name),
 	m_bounds_inited(true),
@@ -101,12 +101,12 @@ passive_region::passive_region(const std::string &name, passive_region *parent, 
 	if (m_bg_renderer) {
 		m_bg_renderer->set_surface(this);
 	}
-	if (!m_info) lib::logger::get_logger()->debug("passive_region(): m_info==NULL for \"%s\"", name.c_str());
+	if (!m_info) lib::logger::get_logger()->debug("surface_impl(): m_info==NULL for \"%s\"", name.c_str());
 }
 
-passive_region::~passive_region()
+surface_impl::~surface_impl()
 {
-	AM_DBG lib::logger::get_logger()->debug("~passive_region(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("~surface_impl(0x%x)", (void*)this);
 	m_parent = NULL;
 	std::list<gui_events*>::reverse_iterator ari;
 	for(ari=m_renderers.rbegin(); ari!=m_renderers.rend(); ari++) {
@@ -124,12 +124,12 @@ passive_region::~passive_region()
 }
 
 common::surface_template *
-passive_region::new_subsurface(const region_info *info, bgrenderer *bgrenderer)
+surface_impl::new_subsurface(const region_info *info, bgrenderer *bgrenderer)
 {
 	rect bounds = info->get_rect();
 	zindex_t z = info->get_zindex();
 	AM_DBG lib::logger::get_logger()->debug("subbregion %s: ltrb=(%d, %d, %d, %d), z=%d", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), z);
-	passive_region *rv = new passive_region(info->get_name(), this, bounds, info, bgrenderer);
+	surface_impl *rv = new surface_impl(info->get_name(), this, bounds, info, bgrenderer);
 	AM_DBG lib::logger::get_logger()->debug("subbregion: returning 0x%x", (void*)rv);
 	m_children_cs.enter();
 	m_active_children[zindex_t(z)].push_back(rv);
@@ -139,15 +139,15 @@ passive_region::new_subsurface(const region_info *info, bgrenderer *bgrenderer)
 }
 
 common::surface *
-passive_region::activate()
+surface_impl::activate()
 {
 	return this;
 }
 
 void
-passive_region::animated()
+surface_impl::animated()
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region::animated(%s, 0x%x)", m_name.c_str(), (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl::animated(%s, 0x%x)", m_name.c_str(), (void*)this);
 	clear_cache();
 // XXX: Temporary: What should be redrawn is the union of the area before and after
 #ifndef AMBULANT_PLATFORM_WIN32
@@ -158,12 +158,12 @@ passive_region::animated()
 }
 
 void
-passive_region::show(gui_events *cur)
+surface_impl::show(gui_events *cur)
 {
 	m_children_cs.enter();
 	m_renderers.push_back(cur);
 	m_children_cs.leave();
-	AM_DBG lib::logger::get_logger()->debug("passive_region[0x%x].show(0x%x)", (void *)this, (void *)cur);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].show(0x%x)", (void *)this, (void *)cur);
 	
 	if(m_parent) {
 		m_parent->add_subregion(m_info->get_zindex(), this);
@@ -172,16 +172,16 @@ passive_region::show(gui_events *cur)
 }
 
 void
-passive_region::renderer_done(gui_events *cur)
+surface_impl::renderer_done(gui_events *cur)
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
 	
 	m_children_cs.enter();
 	std::list<gui_events*>::iterator i = m_renderers.end();
 	for(i=m_renderers.begin(); i!=m_renderers.end(); i++)
 		if ((*i) == cur) break;
 	if (i == m_renderers.end()) {
-		lib::logger::get_logger()->trace("passive_region[0x%x].renderer_done(0x%x): not found in %d active renderers!",
+		lib::logger::get_logger()->trace("surface_impl[0x%x].renderer_done(0x%x): not found in %d active renderers!",
 			(void *)this, (void*)cur, m_renderers.size());
 	} else {
 		m_renderers.erase(i);
@@ -196,7 +196,7 @@ passive_region::renderer_done(gui_events *cur)
 }
 
 void
-passive_region::keep_as_background()
+surface_impl::keep_as_background()
 {
 	if (m_info->is_subregion())
 		m_parent->keep_as_background();
@@ -205,13 +205,13 @@ passive_region::keep_as_background()
 }
 
 void
-passive_region::redraw(const lib::rect &r, gui_window *window)
+surface_impl::redraw(const lib::rect &r, gui_window *window)
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
 	rect our_outer_rect = r & m_outer_bounds;
 	rect our_rect = m_outer_bounds.innercoordinates(our_outer_rect);
 	if (our_rect.empty()) {
-	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) returning: nothing to draw", (void *)this, m_name.c_str());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) returning: nothing to draw", (void *)this, m_name.c_str());
 		return;
 	}
 	// For now: if we are going to redraw anything we have to redraw everything (sigh).
@@ -219,7 +219,7 @@ passive_region::redraw(const lib::rect &r, gui_window *window)
 	
 	////////////////
 	// Draw the content of this
-	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s, our_ltrb=(%d, %d, %d, %d)) ->draw_background", (void *)this, m_name.c_str(), our_rect.left(), our_rect.top(), our_rect.right(), our_rect.bottom());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s, our_ltrb=(%d, %d, %d, %d)) ->draw_background", (void *)this, m_name.c_str(), our_rect.left(), our_rect.top(), our_rect.right(), our_rect.bottom());
 	
 	// First the background
 	draw_background(our_rect, window);	
@@ -233,7 +233,7 @@ passive_region::redraw(const lib::rect &r, gui_window *window)
 	
 	std::list<gui_events*>::iterator ar;
 	for (ar=m_renderers.begin(); ar!=m_renderers.end(); ar++) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
 		(*ar)->redraw(our_rect, window);
 	}
 		
@@ -242,9 +242,9 @@ passive_region::redraw(const lib::rect &r, gui_window *window)
 		children_list_t& cl = (*it1).second;
 		for(children_list_t::iterator it2=cl.begin();it2!=cl.end();it2++) {
 			
-			AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) ->subregion 0x%x", (void *)this, m_name.c_str(), (void *)(*it2));
+			AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) ->subregion 0x%x", (void *)this, m_name.c_str(), (void *)(*it2));
 			if (!(*it2)->get_info()->is_subregion()) {
-				AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x): subregion 0x%x is not a subregion", (void*)this, (void*)(*it2));
+				AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x): subregion 0x%x is not a subregion", (void*)this, (void*)(*it2));
 				//(*it2)->redraw(our_rect, window);
 			}
 			(*it2)->redraw(our_rect, window);
@@ -255,21 +255,21 @@ passive_region::redraw(const lib::rect &r, gui_window *window)
 	// XXXX Should go per z-order value
 	
 	for(children_map_t::iterator it2=m_active_children.begin();it2!=m_active_children.end();it2++) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) examining next z-order list", (void*)this, m_name.c_str());
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) examining next z-order list", (void*)this, m_name.c_str());
 		children_list_t& cl = (*it2).second;
 		for(children_list_t::iterator it3=cl.begin();it3!=cl.end();it3++) {
 			if(!(*it3)->get_info()->is_subregion()) {
-				AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) -> child 0x%x", (void *)this, m_name.c_str(), (void *)(*it3));
+				AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) -> child 0x%x", (void *)this, m_name.c_str(), (void *)(*it3));
 				(*it3)->redraw(our_rect, window);
 			}
 		}
 	}
-	AM_DBG lib::logger::get_logger()->debug("passive_region.redraw(0x%x %s) returning", (void*)this, m_name.c_str());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) returning", (void*)this, m_name.c_str());
 	m_children_cs.leave();
 }
 
 void
-passive_region::draw_background(const lib::rect &r, gui_window *window)
+surface_impl::draw_background(const lib::rect &r, gui_window *window)
 {
 	// Now we should make sure we have a background renderer
 	if (!m_bg_renderer) {
@@ -281,12 +281,12 @@ passive_region::draw_background(const lib::rect &r, gui_window *window)
 }
 
 void
-passive_region::user_event(const lib::point &where, int what)
+surface_impl::user_event(const lib::point &where, int what)
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region.user_event(0x%x, (%d, %d))", (void *)this, where.x, where.y);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.user_event(0x%x, (%d, %d))", (void *)this, where.x, where.y);
 	// Test that it is in our area
 	if (!m_outer_bounds.contains(where)) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.user_event: not in our bounds");
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.user_event: not in our bounds");
 		return;
 	}
 	// Convert to local coordinates
@@ -296,7 +296,7 @@ passive_region::user_event(const lib::point &where, int what)
 	std::list<gui_events*>::reverse_iterator ari;
 	m_children_cs.enter();
 	for (ari=m_renderers.rbegin(); ari!=m_renderers.rend(); ari++) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.user_event(0x%x) ->active 0x%x", (void *)this, (void *)(*ari));
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.user_event(0x%x) ->active 0x%x", (void *)this, (void *)(*ari));
 		(*ari)->user_event(our_point, what);
 	}
 	children_map_t::reverse_iterator it1;
@@ -304,7 +304,7 @@ passive_region::user_event(const lib::point &where, int what)
 		children_list_t& cl = (*it1).second;
 		children_list_t::iterator it2;
 		for(it2=cl.begin();it2!=cl.end();it2++) {
-			AM_DBG lib::logger::get_logger()->debug("passive_region.user_event(0x%x) -> child 0x%x,z=%d", (void *)this, (void *)(*it2), (*it1).first);
+			AM_DBG lib::logger::get_logger()->debug("surface_impl.user_event(0x%x) -> child 0x%x,z=%d", (void *)this, (void *)(*it2), (*it1).first);
 			(*it2)->user_event(our_point, what);
 		}
 	}
@@ -312,9 +312,9 @@ passive_region::user_event(const lib::point &where, int what)
 }
 
 void
-passive_region::need_redraw(const lib::rect &r)
+surface_impl::need_redraw(const lib::rect &r)
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region[0x%x].need_redraw(xywh=%d,%d,%d,%d)", (void*)this, r.left(), r.top(), r.width(), r.height());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].need_redraw(xywh=%d,%d,%d,%d)", (void*)this, r.left(), r.top(), r.width(), r.height());
 	if (!m_parent)
 		return;   // Audio region or some such
 	rect parent_rect = r & m_inner_bounds;
@@ -322,13 +322,13 @@ passive_region::need_redraw(const lib::rect &r)
 }
 
 void
-passive_region::need_redraw()
+surface_impl::need_redraw()
 {
 	need_redraw(m_inner_bounds);
 }
 
 void
-passive_region::need_events(bool want)
+surface_impl::need_events(bool want)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
@@ -337,19 +337,19 @@ passive_region::need_events(bool want)
 }
 
 const lib::point &
-passive_region::get_global_topleft() const
+surface_impl::get_global_topleft() const
 {
-	const_cast<passive_region*>(this)->need_bounds();
+	const_cast<surface_impl*>(this)->need_bounds();
 	return m_window_topleft;
 }
 
 void
-passive_region::need_bounds()
+surface_impl::need_bounds()
 {
 	if (m_bounds_inited) return;
-	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds(%s, 0x%x)", m_name.c_str(), (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl::need_bounds(%s, 0x%x)", m_name.c_str(), (void*)this);
 	if (m_info) m_outer_bounds = m_info->get_rect();
-	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds: %d %d %d %d", 
+	AM_DBG lib::logger::get_logger()->debug("surface_impl::need_bounds: %d %d %d %d", 
 		m_outer_bounds.left(), m_outer_bounds.top(), m_outer_bounds.right(), m_outer_bounds.bottom());
 	m_inner_bounds = m_outer_bounds.innercoordinates(m_outer_bounds);
 	m_window_topleft = m_outer_bounds.left_top();
@@ -358,9 +358,9 @@ passive_region::need_bounds()
 }
 
 void
-passive_region::clear_cache()
+surface_impl::clear_cache()
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region::clear_cache(%s, 0x%x)", m_name.c_str(), (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl::clear_cache(%s, 0x%x)", m_name.c_str(), (void*)this);
 	m_bounds_inited = false;
 	// Better be safe than sorry: clear caches for all child regions
 	m_children_cs.enter();
@@ -377,9 +377,9 @@ passive_region::clear_cache()
 
 
 lib::rect 
-passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_src_rect) const
+surface_impl::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_src_rect) const
 {
-	const_cast<passive_region*>(this)->need_bounds();
+	const_cast<surface_impl*>(this)->need_bounds();
 	const int image_width = src_size.w;
 	const int image_height = src_size.h;
 	const int region_width = m_inner_bounds.width();
@@ -431,12 +431,12 @@ passive_region::get_fit_rect_noalign(const lib::size& src_size, lib::rect* out_s
 }
 
 lib::rect 
-passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, const common::alignment *align) const
+surface_impl::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect, const common::alignment *align) const
 {
 	if (align == NULL)
 		return get_fit_rect_noalign(src_size, out_src_rect);
 		
-	const_cast<passive_region*>(this)->need_bounds();
+	const_cast<surface_impl*>(this)->need_bounds();
 	const int image_width = src_size.w;
 	const int image_height = src_size.h;
 	const int region_width = m_inner_bounds.width();
@@ -580,7 +580,7 @@ passive_region::get_fit_rect(const lib::size& src_size, lib::rect* out_src_rect,
 
 #ifdef USE_SMIL21
 bool
-passive_region::is_tiled() const
+surface_impl::is_tiled() const
 {
 	common::tiling t = m_info->get_tiling();
 	
@@ -588,7 +588,7 @@ passive_region::is_tiled() const
 }
 
 tile_positions
-passive_region::get_tiles(lib::size image_size, lib::rect surface_rect) const
+surface_impl::get_tiles(lib::size image_size, lib::rect surface_rect) const
 {
 	assert(is_tiled());
 	
@@ -619,7 +619,7 @@ passive_region::get_tiles(lib::size image_size, lib::rect surface_rect) const
 #endif
 
 void 
-passive_region::transition_done(lib::rect area)
+surface_impl::transition_done(lib::rect area)
 {
 	if (!m_parent)
 		return;   // Audio region or some such
@@ -628,13 +628,13 @@ passive_region::transition_done(lib::rect area)
 }
 
 void 
-passive_region::transition_freeze_end(lib::rect r)
+surface_impl::transition_freeze_end(lib::rect r)
 {
-	AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s, ltrb=(%d, %d, %d, %d))", (void *)this, m_name.c_str(), r.left(), r.top(), r.right(), r.bottom());
 	r &= m_outer_bounds;
 	r = m_outer_bounds.innercoordinates(r);
 	if (r.empty()) {
-	AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s) returning: no overlap", (void *)this, m_name.c_str());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s) returning: no overlap", (void *)this, m_name.c_str());
 		return;
 	}
 	
@@ -644,25 +644,25 @@ passive_region::transition_freeze_end(lib::rect r)
 	assert(m_renderers.size()<=1);
 	std::list<gui_events*>::iterator ar;
 	for (ar=m_renderers.begin(); ar!=m_renderers.end(); ar++) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
 		(*ar)->transition_freeze_end(r);
 	}
 
 	// Finally the children regions of this
 	for(children_map_t::iterator it2=m_active_children.begin();it2!=m_active_children.end();it2++) {
-		AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s) examining next z-order list", (void*)this, m_name.c_str());
+		AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s) examining next z-order list", (void*)this, m_name.c_str());
 		children_list_t& cl = (*it2).second;
 		for(children_list_t::iterator it3=cl.begin();it3!=cl.end();it3++) {
-			AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s) -> child 0x%x", (void *)this, m_name.c_str(), (void *)(*it3));
+			AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s) -> child 0x%x", (void *)this, m_name.c_str(), (void *)(*it3));
 			(*it3)->transition_freeze_end(r);
 		}
 	}
-	AM_DBG lib::logger::get_logger()->debug("passive_region.transition_freeze_end(0x%x %s) returning", (void*)this, m_name.c_str());
+	AM_DBG lib::logger::get_logger()->debug("surface_impl.transition_freeze_end(0x%x %s) returning", (void*)this, m_name.c_str());
 	m_children_cs.leave();
 }
 
 void 
-passive_region::add_subregion(zindex_t z, passive_region *rgn)
+surface_impl::add_subregion(zindex_t z, surface_impl *rgn)
 {
 	m_children_cs.enter();
 	m_subregions[z].push_back(rgn);
@@ -670,7 +670,7 @@ passive_region::add_subregion(zindex_t z, passive_region *rgn)
 }
 
 void 
-passive_region::del_subregion(zindex_t z, passive_region *rgn)
+surface_impl::del_subregion(zindex_t z, surface_impl *rgn)
 {
 	m_children_cs.enter();
 	m_subregions[z].remove(rgn);
@@ -678,7 +678,7 @@ passive_region::del_subregion(zindex_t z, passive_region *rgn)
 }
 
 passive_root_layout::passive_root_layout(const region_info *info, lib::size bounds, bgrenderer *bgrenderer, window_factory *wf)
-:   passive_region(info?info->get_name():"topLayout", NULL, rect(point(0, 0), bounds), info, bgrenderer)
+:   surface_impl(info?info->get_name():"topLayout", NULL, rect(point(0, 0), bounds), info, bgrenderer)
 {
 	m_gui_window = wf->new_window(m_name, bounds, this);
 	AM_DBG lib::logger::get_logger()->debug("passive_root_layout(0x%x, \"%s\"): window=0x%x", (void *)this, m_name.c_str(), (void *)m_gui_window);

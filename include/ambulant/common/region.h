@@ -67,13 +67,13 @@ namespace common {
 
 	using namespace ambulant::lib;
 
-class passive_region : public surface_template, public surface, public gui_events {
+class surface_impl : public surface_template, public surface, public gui_events {
   // The only constructor is protected: 
   protected:
-	passive_region(const std::string &name, passive_region *parent, rect bounds,
+	surface_impl(const std::string &name, surface_impl *parent, rect bounds,
 		const region_info *info, bgrenderer *bgrenderer);
   public:
-	virtual ~passive_region();
+	virtual ~surface_impl();
 	
 	// The surface_template interface:
 	common::surface_template *new_subsurface(const region_info *info, bgrenderer *bgrenderer);
@@ -108,7 +108,7 @@ class passive_region : public surface_template, public surface, public gui_event
 	void user_event(const point &where, int what = 0);
 		
 	// Win32 code needs this, but I don't like it:
-	const passive_region *get_parent() const { return m_parent; }
+	const surface_impl *get_parent() const { return m_parent; }
   private:
 	void clear_cache();					// invalidate cached sizes (after animation)
 	void need_bounds();					// recompute cached sizes
@@ -126,23 +126,23 @@ class passive_region : public surface_template, public surface, public gui_event
   	rect m_outer_bounds;	// region rectangle in parent coordinate space
 	point m_window_topleft;				// region top-left in window coordinate space
 
-  	passive_region *m_parent;			// parent region
+  	surface_impl *m_parent;			// parent region
 
   	std::list<gui_events *> m_renderers; // active regions currently responsible for redraws
 	lib::critical_section m_children_cs; // Protects m_renderers, m_active_children, m_subregions
 
-	typedef std::list<passive_region*> children_list_t;
+	typedef std::list<surface_impl*> children_list_t;
 	typedef std::map<zindex_t, children_list_t> children_map_t;
 	children_map_t m_active_children;	// all child regions
 	children_map_t m_subregions;		// all active children that are subregions
-	void add_subregion(zindex_t z, passive_region *rgn);
-	void del_subregion(zindex_t z, passive_region *rgn);
+	void add_subregion(zindex_t z, surface_impl *rgn);
+	void del_subregion(zindex_t z, surface_impl *rgn);
 
 	const region_info *m_info;			// Information such as z-order, etc.
 	bgrenderer *m_bg_renderer;			// Background renderer
 };
 
-class passive_root_layout : public passive_region {
+class passive_root_layout : public surface_impl {
   public:
 	passive_root_layout(const region_info *info, size bounds, bgrenderer *bgrenderer, window_factory *wf);
 	~passive_root_layout();
