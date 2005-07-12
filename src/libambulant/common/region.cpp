@@ -314,6 +314,7 @@ passive_region::user_event(const lib::point &where, int what)
 void
 passive_region::need_redraw(const lib::rect &r)
 {
+	AM_DBG lib::logger::get_logger()->debug("passive_region[0x%x].need_redraw(xywh=%d,%d,%d,%d)", (void*)this, r.left(), r.top(), r.width(), r.height());
 	if (!m_parent)
 		return;   // Audio region or some such
 	rect parent_rect = r & m_inner_bounds;

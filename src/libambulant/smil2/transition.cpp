@@ -161,12 +161,10 @@ transition_engine_barwipe::compute()
 {
 	// XXX Only does horizontal left-to-right at the moment
 	lib::rect dstrect = m_dst->get_rect();
-	int xcur = dstrect.left() + int(m_progress*(dstrect.right() - dstrect.left()) + 0.5);
-	m_stepcount = dstrect.right() - dstrect.left();
+	int wcur = int(m_progress*dstrect.width() + 0.5);
+	m_stepcount = dstrect.width();
 //	int ycur = dstrect.top() + int(m_progress*(dstrect.bottom() - dstrect.top()) + 0.5);
-	m_newrect = lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(xcur, dstrect.bottom()));
+	m_newrect = lib::rect(dstrect.left_top(), lib::size(wcur, dstrect.height()));
 }
 
 void
@@ -174,12 +172,10 @@ transition_engine_boxwipe::compute()
 {
 	// XXX Only does box from topleft right now
 	lib::rect dstrect = m_dst->get_rect();
-	int xcur = dstrect.left() + int(m_progress*(dstrect.right() - dstrect.left()) + 0.5);
-	int ycur = dstrect.top() + int(m_progress*(dstrect.bottom() - dstrect.top()) + 0.5);
-	m_stepcount = dstrect.right() - dstrect.left();
-	m_newrect = lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(xcur, ycur));
+	int wcur = int(m_progress*dstrect.width() + 0.5);
+	int hcur = int(m_progress*dstrect.height() + 0.5);
+	m_stepcount = dstrect.width();
+	m_newrect = lib::rect(dstrect.left_top(), lib::size(wcur, hcur));
 }
 
 
@@ -191,20 +187,21 @@ transition_engine_fourboxwipe::compute()
 	int ymid = (dstrect.top() + dstrect.bottom())/2;
 	int half_width = int(m_progress*(xmid - dstrect.left()) + 0.5);
 	int half_height = int(m_progress*(ymid - dstrect.top()) + 0.5);
-	m_stepcount = (dstrect.right() - dstrect.left())/2;
+	lib::size half_size(half_width, half_height);
+	m_stepcount = (dstrect.width())/2;
 	clear();
 	m_newrectlist.push_back(lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(dstrect.left()+half_width, dstrect.top()+half_height)));
+		dstrect.left_top(),
+		half_size));
 	m_newrectlist.push_back(lib::rect(
 		lib::point(dstrect.right()-half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.top()+half_height)));
+		half_size));
 	m_newrectlist.push_back(lib::rect(
 		lib::point(dstrect.left(), dstrect.bottom()-half_height),
-		lib::point(dstrect.left()+half_width, dstrect.bottom())));
+		half_size));
 	m_newrectlist.push_back(lib::rect(
 		lib::point(dstrect.right()-half_width, dstrect.bottom()-half_height),
-		lib::point(dstrect.right(), dstrect.bottom())));
+		half_size));
 }
 
 void
@@ -216,10 +213,10 @@ transition_engine_barndoorwipe::compute()
 //	int ymid = (dstrect.top() + dstrect.bottom())/2;
 	int half_width = int(m_progress*(xmid - dstrect.left()) + 0.5);
 //	int half_height = int(m_progress*(ymid - dstrect.top()) + 0.5);
-	m_stepcount = (dstrect.right() - dstrect.left())/2;
+	m_stepcount = (dstrect.width())/2;
 	m_newrect = lib::rect(
 		lib::point(xmid-half_width, dstrect.top()),
-		lib::point(xmid+half_width, dstrect.bottom()));
+		lib::size(2*half_width, dstrect.height()));
 }
 
 void
@@ -627,25 +624,25 @@ transition_engine_snakewipe::compute()
 	int index = (int)(m_progress*MATRIX_HSTEPS*MATRIX_VSTEPS);
 	int hindex = index % MATRIX_HSTEPS;
 	int vindex = index / MATRIX_HSTEPS;
-	int vindexpos = (dstrect.top() + vindex*(dstrect.bottom()-dstrect.top())/MATRIX_VSTEPS);
-	int vindex2pos = (dstrect.top() + (vindex+1)*(dstrect.bottom()-dstrect.top())/MATRIX_VSTEPS);
+	int vindexpos = (dstrect.top() + vindex*(dstrect.height())/MATRIX_VSTEPS);
+	int vindex2pos = (dstrect.top() + (vindex+1)*(dstrect.height())/MATRIX_VSTEPS);
 	m_stepcount = MATRIX_HSTEPS*MATRIX_VSTEPS;
 	clear();
 	if (vindex)
 		m_newrectlist.push_back(lib::rect(
-			lib::point(dstrect.left(), dstrect.top()),
-			lib::point(dstrect.right(), vindexpos)));
+			dstrect.left_top(),
+			lib::size(dstrect.width(), vindexpos-dstrect.top())));
 	if (hindex) {
 		if (vindex & 1) {
-			int hindexpos = (dstrect.right() - hindex*(dstrect.right()-dstrect.left())/MATRIX_VSTEPS);
+			int hindexpos = (dstrect.right() - hindex*(dstrect.width())/MATRIX_VSTEPS);
 			m_newrectlist.push_back(lib::rect(
 				lib::point(hindexpos, vindexpos),
-				lib::point(dstrect.right(), vindex2pos)));
+				lib::size(dstrect.width(), vindex2pos-vindexpos)));
 		} else {
-			int hindex2pos = (dstrect.left() + hindex*(dstrect.right()-dstrect.left())/MATRIX_VSTEPS);
+			int hindex2pos = (dstrect.left() + hindex*(dstrect.width())/MATRIX_VSTEPS);
 			m_newrectlist.push_back(lib::rect(
 				lib::point(dstrect.left(), vindexpos),
-				lib::point(hindex2pos, vindex2pos)));
+				lib::size(hindex2pos-dstrect.left(), vindex2pos-vindexpos)));
 		}
 	}
 }
@@ -657,19 +654,19 @@ transition_engine_waterfallwipe::compute()
 	int index = (int)(m_progress*MATRIX_HSTEPS*MATRIX_VSTEPS);
 	int hindex = index / MATRIX_HSTEPS;
 	int vindex = index % MATRIX_HSTEPS;
-	int hindexpos = (dstrect.left() + hindex*(dstrect.right()-dstrect.left())/MATRIX_VSTEPS);
-	int hindex2pos = (dstrect.top() + (hindex+1)*(dstrect.right()-dstrect.left())/MATRIX_VSTEPS);
-	int vindexpos = (dstrect.top() + vindex*(dstrect.bottom()-dstrect.top())/MATRIX_VSTEPS);
+	int hindexpos = (dstrect.left() + hindex*(dstrect.width())/MATRIX_VSTEPS);
+	int hindex2pos = (dstrect.top() + (hindex+1)*(dstrect.width())/MATRIX_VSTEPS);
+	int vindexpos = (dstrect.top() + vindex*(dstrect.height())/MATRIX_VSTEPS);
 	m_stepcount = MATRIX_HSTEPS*MATRIX_VSTEPS;
 	clear();
 	if (hindex)
 		m_newrectlist.push_back(lib::rect(
-			lib::point(dstrect.left(), dstrect.top()),
-			lib::point(hindexpos, dstrect.bottom())));
+			dstrect.left_top(),
+			lib::size(hindexpos-dstrect.left(), dstrect.height())));
 	if (vindex)
 		m_newrectlist.push_back(lib::rect(
 			lib::point(hindexpos, dstrect.top()),
-			lib::point(hindex2pos, vindexpos)));
+			lib::size(hindex2pos-hindexpos, vindexpos-dstrect.top())));
 }
 
 void
@@ -699,42 +696,42 @@ void
 transition_engine_pushwipe::compute()
 {
 	lib::rect dstrect = m_dst->get_rect();
-	int half_width = int(m_progress*(dstrect.right() - dstrect.left()) + 0.5);
+	int half_width = int(m_progress*(dstrect.width()) + 0.5);
 //	int half_height = int(m_progress*(ymid - dstrect.top()) + 0.5);
-	m_stepcount = dstrect.right() - dstrect.left();
+	m_stepcount = dstrect.width();
 	m_oldsrcrect = lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(dstrect.right()-half_width, dstrect.bottom()));
+		dstrect.left_top(),
+		lib::size(dstrect.width()-half_width, dstrect.height()));
 	m_olddstrect = lib::rect(
 		lib::point(dstrect.left()+half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.bottom()));
+		lib::size(dstrect.width()-half_width, dstrect.height()));
 	m_newsrcrect = lib::rect(
 		lib::point(dstrect.right()-half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.bottom()));
+		lib::size(half_width, dstrect.height()));
 	m_newdstrect = lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(dstrect.left()+half_width, dstrect.bottom()));
+		dstrect.left_top(),
+		lib::size(half_width, dstrect.height()));
 }
 
 void
 transition_engine_slidewipe::compute()
 {
 	lib::rect dstrect = m_dst->get_rect();
-	int half_width = int(m_progress*(dstrect.right() - dstrect.left()) + 0.5);
+	int half_width = int(m_progress*(dstrect.width()) + 0.5);
 //	int half_height = int(m_progress*(ymid - dstrect.top()) + 0.5);
-	m_stepcount = dstrect.right() - dstrect.left();
+	m_stepcount = dstrect.width();
 	m_oldsrcrect = lib::rect(
 		lib::point(dstrect.left()+half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.bottom()));
+		lib::size(dstrect.width()-half_width, dstrect.height()));
 	m_olddstrect = lib::rect(
 		lib::point(dstrect.left()+half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.bottom()));
+		lib::size(dstrect.width()-half_width, dstrect.height()));
 	m_newsrcrect = lib::rect(
 		lib::point(dstrect.right()-half_width, dstrect.top()),
-		lib::point(dstrect.right(), dstrect.bottom()));
+		lib::size(half_width, dstrect.height()));
 	m_newdstrect = lib::rect(
-		lib::point(dstrect.left(), dstrect.top()),
-		lib::point(dstrect.left()+half_width, dstrect.bottom()));
+		dstrect.left_top(),
+		lib::size(half_width+half_width, dstrect.height()));
 }
 
 void
