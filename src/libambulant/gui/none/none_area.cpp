@@ -88,9 +88,7 @@ none_area_renderer::start(double starttime) {
 		int w = rds.width.absolute()?rds.width.get_as_int():rrc.width();
 		int h = rds.height.absolute()?rds.height.get_as_int():rrc.height();
 		AM_DBG lib::logger::get_logger()->debug("none_area_renderer::start: lt=(%d,%d) wh=(%d,%d)", l, t, w, h);
-		lib::rect rc;
-		rc.set_coord(l, t, l+w, t+h);
-		m_rgn = new lib::rect(rc);
+		m_rgn = new lib::rect(lib::point(l, t), lib::size(w, h));
 	}
 	AM_DBG lib::logger::get_logger()->debug("none_area_renderer::start: wantclicks=%d", m_wantclicks);
 	m_dest->need_events(m_wantclicks);

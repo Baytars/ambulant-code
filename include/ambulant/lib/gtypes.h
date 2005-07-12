@@ -253,7 +253,7 @@ class basic_rect {
 	basic_rect<T, S> innercoordinates(const basic_rect<T, S>& p) const {
 		basic_rect<T, S> rv = p;
 		rv &= *this;
-		rv.translate(left_top());
+		rv.translate(-left_top());
 		return rv;
 	}
 	
@@ -261,7 +261,7 @@ class basic_rect {
 	/// in the system setup by this rectangle.
 	basic_rect<T, S> outercoordinates(const basic_rect<T, S>& p) const {
 		basic_rect<T, S> rv = p;
-		rv.translate(-left_top());
+		rv.translate(left_top());
 		rv &= *this;
 		return rv;
 	}
