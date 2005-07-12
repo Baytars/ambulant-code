@@ -73,52 +73,25 @@ posix_datasource_factory::new_raw_datasource(const net::url& url)
 {
 	AM_DBG lib::logger::get_logger()->debug("posix_datasource_factory::new_datasource(%s)", repr(url).c_str());
 	if (url.is_local_file()) {
-
-		passive_datasource *pds = new passive_datasource(url.get_file());
-		return pds->activate();
-	} else {
-		return NULL;
+		std::string filename = url.get_file();
+		int in = open(filename.c_str(), O_RDONLY);
+		if (in >= 0)
+			return new posix_datasource(filename, in);
 	}
-	
-}
-
-
-// *********************** passive_datasource ***********************************************
-
-
-
-datasource* 
-passive_datasource::activate()
-{
-	int in;
-	
-	in = open(m_filename.c_str(), O_RDONLY);
-	if (in >= 0) {
-		return new posix_datasource(this, in);
-	} else {
-		lib::logger::get_logger()->trace(gettext("%s: Cannot open: %s"),  m_filename.c_str(), strerror(errno));
-	}
-	return NULL;
-		
-}
-
-passive_datasource::~passive_datasource()
-{
-	AM_DBG lib::logger::get_logger()->debug("passive_datasource::~passive_datasource(0x%x)", (void*)this);
+	return NULL;	
 }
 
 // *********************** posix_datasource ***********************************************
 
 
-posix_datasource::posix_datasource(passive_datasource *const source, int file)
-:	m_buffer(NULL),
-	m_source(source),
+posix_datasource::posix_datasource(std::string filename, int file)
+:	m_filename(filename),
+	m_buffer(NULL),
 	m_filesize(0),
 	m_stream(file),
 	m_end_of_file(false)
 {
-	AM_DBG lib::logger::get_logger()->debug("posix_datasource::posix_datasource(0x%x, %d)->0x%x", (void*)source, file, (void*)this);
-	m_source->add_ref();
+	AM_DBG lib::logger::get_logger()->debug("posix_datasource::posix_datasource(%s, %d)->0x%x", filename.c_str(), file, (void*)this);
 	if (file >= 0) {
 		filesize();
 //		m_end_of_file = m_filesize > 0;
@@ -168,8 +141,6 @@ posix_datasource::~posix_datasource()
 		delete m_buffer;
 		m_buffer = NULL;
 	}
-	if (m_source) m_source->release();
-	m_source = NULL;
 	close(m_stream);
 	m_lock.leave();
 }
@@ -239,8 +210,8 @@ posix_datasource::read_file()
 		} while (n > 0);
 		m_end_of_file = true;
 		if (n < 0) {
-			lib::logger::get_logger()->trace("%s: %s", m_source->m_filename.c_str(), strerror(errno));
-			lib::logger::get_logger()->warn(gettext("Error encountered while reading file %s"), m_source->m_filename.c_str());
+			lib::logger::get_logger()->trace("%s: %s", m_filename.c_str(), strerror(errno));
+			lib::logger::get_logger()->warn(gettext("Error encountered while reading file %s"), m_filename.c_str());
 		} 		
 	}
 }
