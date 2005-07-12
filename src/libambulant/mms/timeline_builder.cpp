@@ -86,8 +86,7 @@ class mms_region_info : public common::region_info {
 	virtual ~mms_region_info() {}
 		
 	std::string get_name() const {return m_name; }
-	lib::rect get_rect() const { return lib::rect(m_bounds.left_top(), lib::size(m_bounds.width(), m_bounds.height())); }
-	lib::rect get_screen_rect() const { return m_bounds; }
+	lib::rect get_rect() const { return m_bounds; }
 	common::fit_t get_fit() const { return common::fit_meet; }
 	lib::color_t get_bgcolor() const { return (lib::color_t)0; }
 	bool get_transparent() const { return true; }

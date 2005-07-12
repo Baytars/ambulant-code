@@ -126,7 +126,7 @@ passive_region::~passive_region()
 common::surface_template *
 passive_region::new_subsurface(const region_info *info, bgrenderer *bgrenderer)
 {
-	rect bounds = info->get_screen_rect();
+	rect bounds = info->get_rect();
 	zindex_t z = info->get_zindex();
 	AM_DBG lib::logger::get_logger()->debug("subbregion %s: ltrb=(%d, %d, %d, %d), z=%d", info->get_name().c_str(), bounds.left(), bounds.top(), bounds.right(), bounds.bottom(), z);
 	passive_region *rv = new passive_region(info->get_name(), this, bounds, info, bgrenderer);
@@ -348,7 +348,7 @@ passive_region::need_bounds()
 {
 	if (m_bounds_inited) return;
 	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds(%s, 0x%x)", m_name.c_str(), (void*)this);
-	if (m_info) m_outer_bounds = m_info->get_screen_rect();
+	if (m_info) m_outer_bounds = m_info->get_rect();
 	AM_DBG lib::logger::get_logger()->debug("passive_region::need_bounds: %d %d %d %d", 
 		m_outer_bounds.left(), m_outer_bounds.top(), m_outer_bounds.right(), m_outer_bounds.bottom());
 	m_inner_bounds = m_outer_bounds.innercoordinates(m_outer_bounds);
