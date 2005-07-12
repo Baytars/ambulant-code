@@ -75,9 +75,9 @@ void gui::dg::dg_bgrenderer::keep_as_background() {
 	AM_DBG lib::logger::get_logger()->debug("dg_bgrenderer::keep_as_background(0x%x)", this);
 }
 	
-void gui::dg::dg_bgrenderer::redraw(const lib::screen_rect<int> &dirty, common::gui_window *window) {
+void gui::dg::dg_bgrenderer::redraw(const lib::rect &dirty, common::gui_window *window) {
 	AM_DBG lib::logger::get_logger()->debug("dg_bgrenderer::redraw(%s)",repr(dirty).c_str());
-	lib::screen_rect<int> rc = dirty;
+	lib::rect rc = dirty;
 	lib::point pt = m_dst->get_global_topleft();
 	rc.translate(pt);
 	dg_window *dgwindow = static_cast<dg_window*>(window);

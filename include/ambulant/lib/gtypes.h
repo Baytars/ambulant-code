@@ -506,80 +506,6 @@ class _screen_rect {
 };
 typedef _screen_rect<int> screen_rect_int;
 
-// Returns the coord where the arguement 'x' is mapped using the same
-// transform that mapped the 'src' argument to the 'dst' argument.
-// In the following primes represent dest coordinates (x -> x_p)
-// xp = ( (x_2^p-x_1^p)*(x-x_1) + (x_2 - x_1)*x_1_p )/(x_2 - x_1)
-template <class T>
-inline int tf_x(T x, const screen_rect_int *src, const screen_rect_int *dst) {
-	double x1 = src->left(), x2 = src->right();
-	double x1p = dst->left(), x2p = dst->right();
-	double xp = ((x2p-x1p)*(x-x1) + (x2-x1)*x1p)/(x2-x1);
-	return int(floor(xp+0.5));
-}
-
-// Returns the x coord mapped to the destination 'xp' using the same
-// transform that mapped the 'src' argument to the 'dst' argument.
-// In the following primes represent dest coordinates (x -> x_p)
-// x = ((x_2 - x_1)*x^p + (x_1*x_2^p-x_2*x_1^p))/(x_2^p-x_1^p)
-template <class T>
-inline T reverse_tf_x(T xp, const _screen_rect<T> *src, const _screen_rect<T> *dst) {
-	double x1 = src->left(), x2 = src->right();
-	double x1p = dst->left(), x2p = dst->right();
-	double x = ((x2-x1)*xp + (x1*x2p-x2*x1p))/(x2p-x1p);
-	return (int)floor(x+0.5);
-}
-
-// Returns the coord where the arguement 'y' is mapped using the same
-// transform that mapped the 'src' argument to the 'dst' argument.
-// In the following primes represent dest coordinates (y -> y_p)
-// yp = ( (y_2^p-y_1^p)*(y-y_1) + (y_2 - y_1)*y_1_p )/(y_2 - y_1)
-template <class T>
-inline T tf_y(T y, const _screen_rect<T> *src, const _screen_rect<T> *dst) {
-	double y1 = src->top(), y2 = src->bottom();
-	double y1p = dst->top(), y2p = dst->bottom();
-	double yp = ((y2p-y1p)*(y-y1) + (y2-y1)*y1p)/(y2-y1);
-	return (int)floor(yp+0.5);
-}
-
-// Returns the y coord mapped to the destination (yp) using the same
-// transform that mapped src argument to dst argument.
-// In the following primes represent dest coordinates (y -> y_p)
-// y = ((y_2 - y_1)*y^p + (y_1*y_2^p-y_2*y_1^p))/(y_2^p-y_1^p)
-template <class T>
-inline T reverse_tf_y(T yp, const _screen_rect<T> *src, const screen_rect_int *dst){
-	double y1 = src->top(), y2 = src->bottom();
-	double y1p = dst->top(), y2p = dst->bottom();
-	double y = ((y2-y1)*yp + (y1*y2p-y2*y1p))/(y2p-y1p);
-	return (int)floor(y+0.5);
-}
-
-// Returns the rect where 'psrc' is mapped using the same
-// transform that mapped 'src' argument to 'dst' argument.
-template <class T>
-inline lib::_screen_rect<T> transform( const lib::_screen_rect<T> *psrc, 
-	const lib::_screen_rect<T> *src, const lib::_screen_rect<T> *dst) {
-	lib::_screen_rect<T> rc;
-	rc.set_coord(tf_x(psrc->left(), src, dst),
-		tf_y(psrc->top(), src, dst),
-		tf_x(psrc->right(), src, dst),
-		tf_y(psrc->bottom(), src, dst));
-	return rc;
-}
-
-// Returns the source rect mapped to the destination (pdst) using the same
-// transform that mapped 'src' argument to 'dst' argument.
-template <class T>
-inline lib::_screen_rect<T> reverse_transform(const lib::_screen_rect<T> *pdst, 
-	const lib::_screen_rect<T> *src, const lib::_screen_rect<T> *dst){
-	lib::_screen_rect<T> rc;
-	rc.set_coord(reverse_tf_x(pdst->left(), src, dst),
-		reverse_tf_y(pdst->top(), src, dst),
-		reverse_tf_x(pdst->right(), src, dst),
-		reverse_tf_y(pdst->bottom(), src, dst));
-	return rc;
-}
-
 // short names for the common cases
 
 // int based
@@ -596,6 +522,85 @@ typedef basic_rect<double> drect;
 typedef basic_point<long> lpoint;
 typedef basic_size<unsigned long> lsize;
 typedef basic_rect<long, unsigned long> lrect;
+
+// Returns the coord where the arguement 'x' is mapped using the same
+// transform that mapped the 'src' argument to the 'dst' argument.
+// In the following primes represent dest coordinates (x -> x_p)
+// xp = ( (x_2^p-x_1^p)*(x-x_1) + (x_2 - x_1)*x_1_p )/(x_2 - x_1)
+inline int
+tf_x(int x, const rect *src, const rect *dst)
+{
+	double x1 = src->left(), x2 = src->right();
+	double x1p = dst->left(), x2p = dst->right();
+	double xp = ((x2p-x1p)*(x-x1) + (x2-x1)*x1p)/(x2-x1);
+	return int(floor(xp+0.5));
+}
+
+// Returns the x coord mapped to the destination 'xp' using the same
+// transform that mapped the 'src' argument to the 'dst' argument.
+// In the following primes represent dest coordinates (x -> x_p)
+// x = ((x_2 - x_1)*x^p + (x_1*x_2^p-x_2*x_1^p))/(x_2^p-x_1^p)
+inline int
+reverse_tf_x(int xp, const rect *src, const rect *dst)
+{
+	double x1 = src->left(), x2 = src->right();
+	double x1p = dst->left(), x2p = dst->right();
+	double x = ((x2-x1)*xp + (x1*x2p-x2*x1p))/(x2p-x1p);
+	return (int)floor(x+0.5);
+}
+
+// Returns the coord where the arguement 'y' is mapped using the same
+// transform that mapped the 'src' argument to the 'dst' argument.
+// In the following primes represent dest coordinates (y -> y_p)
+// yp = ( (y_2^p-y_1^p)*(y-y_1) + (y_2 - y_1)*y_1_p )/(y_2 - y_1)
+inline int
+tf_y(int y, const rect *src, const rect *dst)
+{
+	double y1 = src->top(), y2 = src->bottom();
+	double y1p = dst->top(), y2p = dst->bottom();
+	double yp = ((y2p-y1p)*(y-y1) + (y2-y1)*y1p)/(y2-y1);
+	return (int)floor(yp+0.5);
+}
+
+// Returns the y coord mapped to the destination (yp) using the same
+// transform that mapped src argument to dst argument.
+// In the following primes represent dest coordinates (y -> y_p)
+// y = ((y_2 - y_1)*y^p + (y_1*y_2^p-y_2*y_1^p))/(y_2^p-y_1^p)
+inline int
+reverse_tf_y(int yp, const rect *src, const rect *dst)
+{
+	double y1 = src->top(), y2 = src->bottom();
+	double y1p = dst->top(), y2p = dst->bottom();
+	double y = ((y2-y1)*yp + (y1*y2p-y2*y1p))/(y2p-y1p);
+	return (int)floor(y+0.5);
+}
+
+// Returns the rect where 'psrc' is mapped using the same
+// transform that mapped 'src' argument to 'dst' argument.
+inline rect
+transform(const rect *psrc, const rect *src, const rect *dst)
+{
+	int l = tf_x(psrc->left(), src, dst);
+	int t = tf_y(psrc->top(), src, dst);
+	rect rc(point(l, t),
+		size(tf_x(psrc->right(), src, dst)-l,
+			 tf_y(psrc->bottom(), src, dst)-t));
+	return rc;
+}
+
+// Returns the source rect mapped to the destination (pdst) using the same
+// transform that mapped 'src' argument to 'dst' argument.
+inline rect
+reverse_transform(const rect *pdst, const rect *src, const rect *dst)
+{
+	int l = reverse_tf_x(pdst->left(), src, dst);
+	int t = reverse_tf_y(pdst->top(), src, dst);
+	rect rc(point(l, t),
+		size(reverse_tf_x(pdst->right(), src, dst)-l,
+			 reverse_tf_y(pdst->bottom(), src, dst)-t));
+	return rc;
+}
+
   
 } // namespace lib
  

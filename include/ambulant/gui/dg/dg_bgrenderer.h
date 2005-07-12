@@ -69,7 +69,7 @@ class dg_bgrenderer : public common::background_renderer {
   public:
 	dg_bgrenderer(const common::region_info *src);
 	~dg_bgrenderer();
-	void redraw(const lib::screen_rect<int> &dirty, common::gui_window *window);
+	void redraw(const lib::rect &dirty, common::gui_window *window);
 	void keep_as_background();
 };
 

@@ -218,6 +218,6 @@ HRGN create_rectlist_region(ambulant::gui::dx::dx_transition *tr);
 HRGN create_poly_region(ambulant::gui::dx::dx_transition *tr);
 HRGN create_polylist_region(ambulant::gui::dx::dx_transition *tr);
 void clipto_r1r2r3r4(ambulant::gui::dx::dx_transition *tr, 
-	ambulant::lib::screen_rect<int>& src, ambulant::lib::screen_rect<int>& dst);
+	ambulant::lib::rect& src, ambulant::lib::rect& dst);
 
 #endif // AMBULANT_GUI_DX_TRANSITION_H
