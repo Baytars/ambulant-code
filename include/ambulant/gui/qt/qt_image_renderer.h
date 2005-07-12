@@ -91,7 +91,7 @@ class qt_image_renderer : public qt_renderer<renderer_playable_dsall> {
 	 	{};
 	~qt_image_renderer();
 
-	void redraw_body(const screen_rect<int> &dirty,
+	void redraw_body(const rect &dirty,
 			 gui_window *window);
     
  private:

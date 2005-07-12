@@ -180,7 +180,7 @@ qt_video_renderer::show_frame(const char* frame, int size)
 
 
 void
-qt_video_renderer::redraw(const lib::screen_rect<int> &dirty, common::gui_window* w) 
+qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w) 
 {
 	char *data=NULL;
 	if (m_frames.size() > 1) {
@@ -198,7 +198,7 @@ qt_video_renderer::redraw(const lib::screen_rect<int> &dirty, common::gui_window
 		//char* data = NULL;
 		QImage* image = NULL;
 		const lib::point p = m_dest->get_global_topleft();
-		const lib::screen_rect<int> &r = m_dest->get_rect();
+		const lib::rect &r = m_dest->get_rect();
 	
 		// XXXX WRONG! This is the info for the region, not for the node!
 		const common::region_info *info = m_dest->get_info();
@@ -211,7 +211,7 @@ qt_video_renderer::redraw(const lib::screen_rect<int> &dirty, common::gui_window
 		if (info && !info->get_transparent()) {
 		// First find our whole area (which we have to clear to 
 		// background color)
-			lib::screen_rect<int> dstrect_whole = r;
+			lib::rect dstrect_whole = r;
 			dstrect_whole.translate(m_dest->get_global_topleft());
 			int L = dstrect_whole.left(),
 		    T = dstrect_whole.top(),
@@ -249,7 +249,7 @@ qt_video_renderer::redraw(const lib::screen_rect<int> &dirty, common::gui_window
 			QSize qsize = image->size();
 			lib::size srcsize = lib::size(qsize.width(), qsize.height());
 			lib::rect srcrect = lib::rect(lib::size(0,0));
-			lib::screen_rect<int> dstrect = m_dest->get_fit_rect(srcsize, &srcrect, m_alignment);
+			lib::rect dstrect = m_dest->get_fit_rect(srcsize, &srcrect, m_alignment);
 			dstrect.translate(m_dest->get_global_topleft());
 			int L = dstrect.left(), 
 		    	T = dstrect.top(),

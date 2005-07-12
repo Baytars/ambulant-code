@@ -82,7 +82,7 @@ class qt_text_renderer : public qt_renderer<renderer_playable_dsall> {
 				common::factories *factory);
 	~qt_text_renderer();
 
- 	void redraw_body(const lib::screen_rect<int> &r,
+ 	void redraw_body(const lib::rect &r,
 			 common::gui_window* w);
 
   private:

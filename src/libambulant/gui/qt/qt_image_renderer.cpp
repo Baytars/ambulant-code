@@ -74,11 +74,11 @@ qt_image_renderer::~qt_image_renderer() {
 	
 
 void
-qt_image_renderer::redraw_body(const screen_rect<int> &dirty,
+qt_image_renderer::redraw_body(const rect &dirty,
 				      gui_window* w) {
 	m_lock.enter();
 	const point             p = m_dest->get_global_topleft();
-	const screen_rect<int> &r = m_dest->get_rect();
+	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("qt_image_renderer.redraw_body(0x%x): m_image=0x%x, ltrb=(%d,%d,%d,%d), p=(%d,%d)", (void *)this, &m_image,r.left(), r.top(), r.right(), r.bottom(),p.x,p.y);
 	if (m_data && !m_image_loaded) {
 		m_image_loaded = m_image.loadFromData((const uchar*)m_data, m_data_size);
@@ -98,7 +98,7 @@ qt_image_renderer::redraw_body(const screen_rect<int> &dirty,
 	QSize qsize = m_image.size();
 	size srcsize = size(qsize.width(), qsize.height());
 	rect srcrect;
-	screen_rect<int> dstrect;
+	rect dstrect;
 #ifdef USE_SMIL21
 	// While rendering background images only, check for tiling. This code is
 	// convoluted, it knows that the node and the region we're painting to are
