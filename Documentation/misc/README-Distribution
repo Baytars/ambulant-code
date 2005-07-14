@@ -141,7 +141,17 @@ but as we have done one before we should write down the procedure here.
 Testing the distributions
 =========================
 
-Here are some random remarks about testing the distributions.
+Here are some random remarks about testing the distributions. Note that
+during the distribution test period it is important to be thorough and
+precise. If you save yourself a few minute of effort by not testing
+something or not reporting a problem this may well result in an extra
+bugfix release later (which will cost everyone another 2 days or so of work).
+
+- IMPORTANT: while we are testing distributions we want to make absolutely
+  sure that any bugs are either (a) fixed or (b) acknowledged as known bugs.
+  Therefore, if you find a bug that you think may be critical you *must*
+  submit a bug report with high priority and assign to the release czar
+  (probably Jack).
 
 - The Mac player must definitely be tested on a virgin machine,
   to ensure there are no dependencies on dynamic libraries in /usr/local
