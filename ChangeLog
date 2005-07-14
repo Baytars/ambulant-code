@@ -1,3 +1,31 @@
+2005-07-14 15:28  jackjansen
+
+	* Added SMIL21Mobile.dtd and SMIL21ExtendedMobile.dtd to both PR
+	  and final namespaces.
+
+2005-07-14 12:41  jackjansen
+
+	* Fixed default value of backgroundRepeat (again).
+
+2005-06-24 16:54  jackjansen
+
+	* OAdded one extra call to step() when a transition finishes. This
+	  fixes the problem that (sometimes?) at the end of a transition
+	  the image wasn't drawn correctly.
+
+2005-06-24 16:00  jackjansen
+
+	* Transition cleanup and the corresponding calls to
+	  transition_done() were a mess, being done in two different
+	  places. It's now all centralised in the dx_player transition
+	  infrastructure.
+
+	  This fixes playback problems with Birthday.
+
+2005-06-23 17:33  jackjansen
+
+	* Fix for background tiling caused all images to be tiled. Fixed.
+
 2005-06-20 14:44  jackjansen
 
 	* Updated for new (june 13) DTDs.
