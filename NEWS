@@ -1,6 +1,9 @@
 
-What's new in Ambulant Player 1.4.4?
+What's new in Ambulant Player 1.4.5?
 ------------------------------------
+
+Changes between 1.4.5 and 1.4.4:
+- SMIL 2.1 default backgroundRepeat has been fixed.
 
 Changes between 1.4.4 and 1.4.2:
 - SMIL 2.1 has gone to PR (Proposed Recommendation). The main change is

@@ -724,8 +724,10 @@ bgimage_loader::run(smil_layout_manager *layout_mgr)
 		if (!bgimage) continue;
 		const char *bgrepeat = rn->get_attribute("backgroundRepeat");
 		AM_DBG lib::logger::get_logger()->debug("load_bgimages: load bgimage %s", bgimage);
-		const char *attrs[7], **attrp = attrs;
+		const char *attrs[9], **attrp = attrs;
 		*attrp++ = "src";
+		*attrp++ = bgimage;
+		*attrp++ = "backgroundImage";
 		*attrp++ = bgimage;
 		*attrp++ = "erase";
 		*attrp++ = "never";
