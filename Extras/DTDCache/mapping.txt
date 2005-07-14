@@ -59,7 +59,11 @@ http://www.w3.org/2005/SMIL21/PR/Language
 DTDCache/SMIL21/SMIL21.dtd
 http://www.w3.org/2005/SMIL21/PR/Mobile
 DTDCache/SMIL21/SMIL21Mobile.dtd
+http://www.w3.org/2005/SMIL21/PR/SMIL21Mobile.dtd
+DTDCache/SMIL21/SMIL21Mobile.dtd
 http://www.w3.org/2005/SMIL21/PR/ExtendedMobile
+DTDCache/SMIL21/SMIL21ExtendedMobile.dtd
+http://www.w3.org/2005/SMIL21/PR/SMIL21ExtendedMobile.dtd
 DTDCache/SMIL21/SMIL21ExtendedMobile.dtd
 #
 # SMIL 2.1 in final form
@@ -70,5 +74,9 @@ http://www.w3.org/2005/SMIL21/Language
 DTDCache/SMIL21/SMIL21.dtd
 http://www.w3.org/2005/SMIL21/Mobile
 DTDCache/SMIL21/SMIL21Mobile.dtd
+http://www.w3.org/2005/SMIL21/SMIL21Mobile.dtd
+DTDCache/SMIL21/SMIL21Mobile.dtd
 http://www.w3.org/2005/SMIL21/ExtendedMobile
+DTDCache/SMIL21/SMIL21ExtendedMobile.dtd
+http://www.w3.org/2005/SMIL21/SMIL21ExtendedMobile.dtd
 DTDCache/SMIL21/SMIL21ExtendedMobile.dtd
