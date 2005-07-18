@@ -288,6 +288,33 @@ void gui::dg::viewport::frame_rect(const lib::screen_rect<int>& rc, lib::color_t
 	DeleteObject((HGDIOBJ) hbr);
 }
 
+gui::dg::dib_surface_t*
+gui::dg::viewport::create_surface(DWORD w, DWORD h)
+{
+	HDC hdc = GetDC(NULL);
+	if(!hdc) {
+		win_report_last_error("GetDC");
+		return NULL;
+	}
+	lib::color_trible *bits = 0;
+	BITMAPINFO *pbmpi = get_bmp_info(m_width, m_height, m_bits_size);
+	HBITMAP hbmp = CreateDIBSection(hdc, pbmpi, DIB_RGB_COLORS, (void**)&bits, NULL, 0);
+	if(!hbmp || !bits) {
+		win_report_last_error("CreateDIBSection");
+		return NULL;
+	}
+	surface_t *surf = new surface_t(m_width, m_height, m_bits_size, bits);
+	surf->fill(lib::color_trible(m_bgd));
+#if 0
+	xxm_memdc = CreateCompatibleDC(hdc);
+	xxm_hold = (HBITMAP) SelectObject(xxm_memdc, xxm_hbmp);
+#endif
+	DeleteDC(hdc);
+	return new dib_surface_t(hbmp, surf);
+}
 
-
-
+gui::dg::surface_t*
+gui::dg::viewport::get_surface()
+{
+	return m_surf;
+}

@@ -127,6 +127,14 @@ class viewport {
 	
 	HWND get_hwnd() { return m_hwnd;}
 	
+	// Create a new offscreen bitmap with the given size. The bitmap is
+	// owned by the dib_surface_t object returned.
+	dib_surface_t* create_surface(DWORD w, DWORD h);
+
+	// Return the bitmap containing the current screen bits. The surface_t
+	// is not a copy, it is a borrowed reference.
+	surface_t* get_surface();
+
   private:
 	int m_width;
 	int m_height;
