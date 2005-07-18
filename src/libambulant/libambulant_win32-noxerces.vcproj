@@ -329,6 +329,9 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\gui\dg\dg_transition.cpp">
+					</File>
+					<File
 						RelativePath=".\gui\dg\dg_viewport.cpp">
 						<FileConfiguration
 							Name="ReleaseShlib|Win32"
