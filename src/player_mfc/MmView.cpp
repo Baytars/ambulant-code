@@ -534,7 +534,9 @@ void MmView::OnOpenFilter() {
 		CString str = dlg.GetPathName();
 		m_curFilter = str;
 		smil2::test_attrs::load_test_attrs(lib::textptr(LPCTSTR(str)).c_str());
+#ifndef AM_PLAYER_DG
 		if(player) player->restart();
+#endif
 	}	
 }
 
