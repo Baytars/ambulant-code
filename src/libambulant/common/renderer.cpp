@@ -454,6 +454,8 @@ video_renderer::start (double where)
 	// Now we need to define where we start playback. This depends on m_clip_begin (microseconds)
 	// and where (seconds). We use these to set m_epoch (milliseconds) to the time (m_timer-based)
 	// at which we would have played the frame with timestamp 0.
+	assert(m_clip_begin >= 0);
+	assert(where >= 0);
 	m_epoch = m_timer->elapsed() - m_clip_begin/1000 - (int)(where*1000);
 
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
@@ -541,6 +543,7 @@ video_renderer::data_avail()
 	net::timestamp_t frame_duration = 33000; // XXX For now: assume 30fps
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail(this = 0x%x):", (void *) this);
 	if (!m_activated || !m_src) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: returning (already shutting down)");
 		m_lock.leave();
 		return;
 	}
@@ -558,7 +561,7 @@ video_renderer::data_avail()
 	
 	// If we are at the end of the clip we stop and signal the scheduler.
 	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail(this = 0x%x): stopping playback and calling stopped ", (void *) this);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 		if (m_src) {
 			m_src->stop();
 			m_src->release();
@@ -583,6 +586,6 @@ video_renderer::data_avail()
 	}
 	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
-	m_src->start_frame (m_event_processor, e, frame_ts_micros);
+	m_src->start_frame (m_event_processor, e, frame_ts_micros-m_clip_begin);
 	m_lock.leave();
 }
