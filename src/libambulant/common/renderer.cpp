@@ -86,7 +86,10 @@ renderer_playable::renderer_playable(
 	m_dest(0),
 	m_alignment(0),
 	m_activated(false),
-	m_erase_never(false)
+	m_erase_never(false),
+	m_clip_begin(0),
+	m_clip_end(-1)
+
 {
 	const char *erase = m_node->get_attribute("erase");
 	if (erase && strcmp(erase, "never") == 0)
@@ -123,12 +126,52 @@ renderer_playable::stop()
 	m_activated = false;
 }
 
-void renderer_playable::user_event(const lib::point &where, int what) {
+void
+renderer_playable::user_event(const lib::point &where, int what) {
 	if (what == user_event_click) m_context->clicked(m_cookie, 0);
 	else if (what == user_event_mouse_over) m_context->pointed(m_cookie, 0);
 	else assert(0);
 }
 
+void
+renderer_playable::_init_clip_begin_end()
+{
+	// here we have to get clip_begin/clip_end from the node
+	const char *clip_begin_attr = m_node->get_attribute("clipBegin");
+	net::timestamp_t cb = 0;
+#ifndef AMBULANT_PLATFORM_WIN32
+	char *lastp;
+#endif
+	
+	if (!clip_begin_attr) {
+		clip_begin_attr = m_node->get_attribute("clip-begin");
+	}
+	
+	if (clip_begin_attr) {
+#ifdef AMBULANT_PLATFORM_WIN32
+		cb = _atoi64(clip_begin_attr);
+#else
+		cb = strtoll(clip_begin_attr, &lastp,0);
+#endif
+	}
+	
+	const char *clip_end_attr = m_node->get_attribute("clipEnd");
+	net::timestamp_t ce = -1;
+	if (!clip_end_attr) {
+		clip_end_attr = m_node->get_attribute("clip-end");
+	}
+	
+	if (clip_end_attr) {
+#ifdef AMBULANT_PLATFORM_WIN32
+		ce = _atoi64(clip_end_attr);
+#else
+		ce = strtoll(clip_end_attr, &lastp,0);
+#endif
+	}
+	AM_DBG lib::logger::get_logger()->debug("renderer_playable::init_clip_begin_end: cb=%lld, ce=%lld", cb,ce);
+	m_clip_begin = cb;
+	m_clip_end = ce;
+}
 
 renderer_playable_ds::renderer_playable_ds(
 	playable_notification *context,
@@ -309,50 +352,14 @@ video_renderer::video_renderer(
 	m_epoch(0),
 	m_activated(false),
 	m_is_paused(false),
-	m_paused_epoch(0),
-	m_clip_begin(0),
-	m_clip_end(-1)
-	
+	m_paused_epoch(0)	
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::video_renderer() (this = 0x%x): Constructor ", (void *) this);
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::video_renderer() (this = 0x%x): Constructor ", (void *) this);
 	net::url url = node->get_url("src");
 	
-	// here we have to get clip_begin/clip_end from the node
-	const char *clip_begin_attr = m_node->get_attribute("clipBegin");
-	net::timestamp_t cb = 0;
-#ifndef AMBULANT_PLATFORM_WIN32
-	char *lastp;
-#endif
-	
-	if (!clip_begin_attr) {
-		clip_begin_attr = m_node->get_attribute("clip-begin");
-	}
-	
-	if (clip_begin_attr) {
-#ifdef AMBULANT_PLATFORM_WIN32
-		cb = _atoi64(clip_begin_attr);
-#else
-		cb = strtoll(clip_begin_attr, &lastp,0);
-#endif
-	}
-	
-	const char *clip_end_attr = m_node->get_attribute("clipEnd");
-	net::timestamp_t ce = -1;
-	if (!clip_end_attr) {
-		clip_end_attr = m_node->get_attribute("clip-end");
-	}
-	
-	if (clip_end_attr) {
-#ifdef AMBULANT_PLATFORM_WIN32
-		ce = _atoi64(clip_end_attr);
-#else
-		ce = strtoll(clip_end_attr, &lastp,0);
-#endif
-	}
-	AM_DBG lib::logger::get_logger()->debug("active_video_renderer::active_video_renderer() created (cb=%lld, ce=%lld)", cb,ce);
-	m_clip_begin = cb;
-	m_clip_end = ce;
+	_init_clip_begin_end();
+
 	m_src = factory->df->new_video_datasource(url,m_clip_begin, m_clip_end);
 	if (m_src == NULL) {
 		lib::logger::get_logger()->warn(gettext("Cannot open video: %s"), url.get_url().c_str());
@@ -374,7 +381,7 @@ video_renderer::video_renderer(
 }
 
 video_renderer::~video_renderer() {
-	/*AM_DBG*/ lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
 	if (m_audio_renderer) m_audio_renderer->release();
 	// m_audio_ds released by audio renderer
@@ -387,7 +394,7 @@ void
 video_renderer::stop()
 { 
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger ()->debug ("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
+	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 	if (!m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.stop(0x%x): not started", (void*)this);
 		m_lock.leave();
@@ -459,7 +466,7 @@ video_renderer::start (double where)
 	m_epoch = m_timer->elapsed() - m_clip_begin/1000 - (int)(where*1000);
 
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
-	/*AM_DBG*/ lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, dest=0x%x", where, (void *) this, (void*)m_dest);
+	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, dest=0x%x", where, (void *) this, (void*)m_dest);
 	m_src->start_frame (m_event_processor, e, 0);
 	if (m_audio_renderer) 
 		m_audio_renderer->start(where);
@@ -543,7 +550,7 @@ video_renderer::data_avail()
 	net::timestamp_t frame_duration = 33000; // XXX For now: assume 30fps
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail(this = 0x%x):", (void *) this);
 	if (!m_activated || !m_src) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: returning (already shutting down)");
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: returning (already shutting down)");
 		m_lock.leave();
 		return;
 	}
@@ -561,7 +568,7 @@ video_renderer::data_avail()
 	
 	// If we are at the end of the clip we stop and signal the scheduler.
 	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 		if (m_src) {
 			m_src->stop();
 			m_src->release();
@@ -572,19 +579,19 @@ video_renderer::data_avail()
 		return;
 	}
 
-	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: buf=0x%x, size=%d, ts=%d, now=%d", (void *) buf, size, (int)frame_ts_micros, (int)now_micros);	
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: buf=0x%x, size=%d, ts=%d, now=%d", (void *) buf, size, (int)frame_ts_micros, (int)now_micros);	
 	// If we have a frame and it should be on-screen already we show it.
 	// If the frame's timestamp is still in the future we fall through, and schedule another
 	// callback at the time this frame is due.
 	if (buf && frame_ts_micros <= now_micros+frame_duration && frame_ts_micros >= m_clip_begin-frame_duration) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame");
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame");
 		show_frame(buf, size);
 		m_dest->need_redraw();
 		m_src->frame_done(frame_ts_micros, true);
 		// Now we need to decide when we want the next callback.
 		frame_ts_micros += frame_duration;						
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
 	m_src->start_frame (m_event_processor, e, frame_ts_micros-m_clip_begin);
 	m_lock.leave();
