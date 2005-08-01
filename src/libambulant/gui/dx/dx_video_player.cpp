@@ -158,13 +158,15 @@ bool gui::dx::video_player::is_playing() {
 		return false;
 	}
 	
+	if (hr == S_FALSE) return true;
+	// XXX Dirac workaround:
 	STREAM_TIME st;
 	hr = m_mmstream->GetTime(&st);
 	if(FAILED(hr)) {
 		win_report_error("IMultiMediaStream::GetTime()", hr);	
 		return false;
 	}
-	return st<stdur;
+	return st<stdur+10;
 }
 
 double gui::dx::video_player::get_position() {
