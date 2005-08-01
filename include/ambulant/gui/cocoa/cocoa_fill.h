@@ -53,7 +53,6 @@
 #ifndef AMBULANT_GUI_COCOA_COCOA_FILL_H
 #define AMBULANT_GUI_COCOA_COCOA_FILL_H
 
-#include "ambulant/common/renderer.h"
 #include "ambulant/smil2/transition.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/gui/cocoa/cocoa_renderer.h"

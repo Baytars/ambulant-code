@@ -205,11 +205,12 @@ libambulant_la_SOURCES = \
 	\
 	common/preferences.cpp \
 	common/region.cpp \
-	common/renderer.cpp \
+	common/renderer_impl.cpp \
 	common/schema.cpp \
 	common/smil_alignment.cpp \
 	common/smil_handler.cpp \
 	common/plugin_engine.cpp \
+	common/video_renderer.cpp \
 	\
 	smil2/animate_a.cpp \
 	smil2/animate_e.cpp \
