@@ -59,6 +59,7 @@
 #include "ambulant/common/playable.h"
 #include "ambulant/net/url.h"
 #ifdef AMBULANT_PLATFORM_UNIX
+#include <stdint.h>
 #include "ambulant/lib/unix/unix_thread.h"
 #endif
 namespace ambulant {
