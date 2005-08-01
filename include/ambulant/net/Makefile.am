@@ -7,8 +7,11 @@ library_include_HEADERS= \
 	socket.h \
 	stdio_datasource.h \
 	url.h \
-	ffmpeg_datasource.h \
-	ffmpeg_rawdatasource.h \
+	ffmpeg_common.h \
+	ffmpeg_audio.h \
+	ffmpeg_video.h \
+	ffmpeg_factory.h \
+	ffmpeg_raw.h \
 	raw_video_datasource.h \
 	rtsp_datasource.h \
 	rtsp_factory.h

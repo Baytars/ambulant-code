@@ -132,8 +132,10 @@ ffmpegincludes = -I$(FFMPEG_CODEC_INCLUDE) -DWITH_FFMPEG \
 	-I$(FFMPEG_FORMAT_INCLUDE) -DWITH_FFMPEG_AVFORMAT
 
 libambulant_ffmpeg_la_SOURCES = 	\
-		net/ffmpeg_datasource.cpp \
-		net/ffmpeg_rawdatasource.cpp
+		net/ffmpeg_common.cpp \
+		net/ffmpeg_audio.cpp \
+		net/ffmpeg_video.cpp \
+		net/ffmpeg_raw.cpp
 else
 ffmpegincludes=
 toolkit_ffmpeg_libraries=
