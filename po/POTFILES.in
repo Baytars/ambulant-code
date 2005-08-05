@@ -85,7 +85,6 @@ src/libambulant/mms/timeline_builder.cpp
 # src/libambulant/net/databuffer.cpp
 src/libambulant/net/datasource.cpp
 src/libambulant/net/ffmpeg_datasource.cpp
-src/libambulant/net/ffmpeg_rawdatasource.cpp
 src/libambulant/net/posix_datasource.cpp
 # src/libambulant/net/raw_video_datasource.cpp
 # src/libambulant/net/stdio_datasource.cpp
