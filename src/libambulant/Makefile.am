@@ -135,7 +135,8 @@ libambulant_ffmpeg_la_SOURCES = 	\
 		net/ffmpeg_common.cpp \
 		net/ffmpeg_audio.cpp \
 		net/ffmpeg_video.cpp \
-		net/ffmpeg_raw.cpp
+		net/ffmpeg_raw.cpp	\
+		net/demux_datasource.cpp
 else
 ffmpegincludes=
 toolkit_ffmpeg_libraries=
@@ -202,7 +203,6 @@ libambulant_la_SOURCES = \
 	net/stdio_datasource.cpp \
 	net/raw_video_datasource.cpp \
 	net/datasource.cpp \
-	net/demux_datasource.cpp \
 	net/databuffer.cpp \
 	net/url.cpp \
 	\
@@ -262,3 +262,5 @@ EXTRA_DIST= \
 	gui/dx \
 	gui/qt \
 	lib/win32
+
+CLEANFILES=demux_datasource.loT ffmpeg_common.loT sdl.loT
