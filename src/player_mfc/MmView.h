@@ -54,6 +54,10 @@
 
 class CLogWindow;
 
+#ifdef	WITH_HTML_WIDGET
+class MmHtmlView;
+#endif // WITH_HTML_WIDGET
+
 class MmView : public CView
 {
 protected: // create from serialization only
@@ -96,6 +100,7 @@ protected:
 // Generated message map functions
 protected:
 	DECLARE_MESSAGE_MAP()
+
 public:
 	afx_msg void OnDestroy();
 	virtual void OnInitialUpdate();
@@ -134,3 +139,46 @@ inline MmDoc* MmView::GetDocument() const
    { return reinterpret_cast<MmDoc*>(m_pDocument); }
 #endif
 
+#ifdef	WITH_HTML_WIDGET
+
+class MmHtmlView : public CHtmlView
+{
+protected: // create from serialization only
+	MmHtmlView();
+
+	DECLARE_DYNCREATE(MmHtmlView)
+
+// Attributes
+public:
+	MmHtmlView(const RECT& rect, CWnd* parent);
+	void InitialUpdate();
+	MmDoc* GetDocument() const;
+
+// Operations
+public:
+	void QuitBrowser();
+
+// Overrides
+	public:
+virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+protected:
+	virtual void OnInitialUpdate(); // called first time after construct
+
+// Implementation
+public:
+	virtual ~MmHtmlView();
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+
+// Generated message map functions
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+};
+
+#endif // WITH_HTML_WIDGET
+#ifdef	WITH_HTML_WIDGET
+#else // WITH_HTML_WIDGET
+#endif // WITH_HTML_WIDGET
