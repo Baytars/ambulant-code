@@ -74,7 +74,8 @@
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
 			UseOfMFC="1"
-			CharacterSet="1">
+			CharacterSet="1"
+			ManagedExtensions="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include"

@@ -50,6 +50,7 @@
 //
 
 #include "stdafx.h"
+#include "ambulant/gui/dx/html_bridge.h"
 #include "AmbulantPlayer.h"
 #include "MainFrm.h"
 
@@ -156,7 +157,11 @@ create_player_instance(const net::url& u) {
 static gui_player *player = 0;
 static needs_done_redraw = false;
 
-// MmView
+#ifdef	WITH_HTML_WIDGET
+static CView* topView = NULL;
+#endif // WITH_HTML_WIDGET
+
+	// MmView
 
 IMPLEMENT_DYNCREATE(MmView, CView)
 
@@ -220,10 +225,16 @@ MmView::MmView()
 #else
 	lib::logger::get_logger()->debug("Ambulant Player: using DX Player");
 #endif
+#ifdef	WITH_HTML_WIDGET
+	topView = this;
+#endif // WITH_HTML_WIDGET
 }
 
 MmView::~MmView()
 {
+#ifdef	WITH_HTML_WIDGET
+	topView = NULL;
+#endif // WITH_HTML_WIDGET
 }
 
 BOOL MmView::PreCreateWindow(CREATESTRUCT& cs)
@@ -646,3 +657,89 @@ void MmView::OnUpdateHelpWelcome(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable(!m_welcomeDocFilename.IsEmpty());
 }
+
+#ifdef	WITH_HTML_WIDGET
+// MmHtmlView
+
+IMPLEMENT_DYNCREATE(MmHtmlView, CHtmlView)
+
+BEGIN_MESSAGE_MAP(MmHtmlView, CHtmlView)
+	// Standard printing commands
+//	ON_COMMAND(ID_FILE_PRINT, MmHtmlView::OnFilePrint)
+	ON_COMMAND(AFX_IDC_BROWSER, MmHtmlView::OnInitialUpdate)
+END_MESSAGE_MAP()
+
+// MmHtmlView construction/destruction
+
+MmHtmlView::MmHtmlView()
+{
+	// TODO: add construction code here
+	// JUNK
+}
+
+MmHtmlView::MmHtmlView(const RECT& rect, CWnd* parent)
+{
+	// TODO: add construction code here
+	Create(NULL,_T("HtmlWidget"),WS_VISIBLE,rect,parent,AFX_IDW_PANE_FIRST);
+}
+
+MmHtmlView::~MmHtmlView()
+{
+}
+
+void MmHtmlView::QuitBrowser()
+{
+	lib::logger::get_logger()->debug("MmHtmlView::QuitBrowser(0x%x): m_pBrowserApp=0x%x", this, m_pBrowserApp);
+	if (m_pBrowserApp)
+		m_pBrowserApp->Quit();
+}
+
+BOOL MmHtmlView::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: Modify the Window class or styles here by modifying
+	//  the CREATESTRUCT cs
+
+	return CHtmlView::PreCreateWindow(cs);
+}
+
+void MmHtmlView::InitialUpdate()
+{
+	Navigate2(_T("http://www.google.nl/"),NULL,NULL);
+}
+
+void MmHtmlView::OnInitialUpdate()
+{
+	CHtmlView::OnInitialUpdate();
+	InitialUpdate();
+//KB	Navigate2(_T("http://www.ambulantplayer.org"),NULL,NULL);
+}
+
+void* create_html_widget(std::string url, int left, int top, int width, int height) {
+	CString CSurl(url.c_str());
+	RECT rect;
+	rect.left = left;
+	rect.top = top;
+	rect.right = left + width;
+	rect.bottom = top + height;
+	MmHtmlView* browser = new MmHtmlView(rect, topView);
+	browser->InitialUpdate();
+	browser->Navigate2(CSurl,NULL,_T(""));
+	lib::logger::get_logger()->debug("create_html_widget(%s@LTWH(%d,%d,%d,%d)): browser=0x%x", url.c_str(),left,top,width,height,browser);
+	return (void*) browser;
+}
+
+int delete_html_widget(void* ptr) {
+	MmHtmlView* browser = (MmHtmlView*) ptr;
+	lib::logger::get_logger()->debug("delete_html_widget(0x%x): browser=0x%x", ptr, browser);
+	browser->QuitBrowser();
+	browser->Invalidate();
+	ShowWindow(browser->m_hWnd, SW_HIDE);
+	return 1;
+}
+
+#else	// WITH_HTML_WIDGET
+#endif // WITH_HTML_WIDGET
+
+#ifdef	WITH_HTML_WIDGET
+#else // WITH_HTML_WIDGET
+#endif // WITH_HTML_WIDGET

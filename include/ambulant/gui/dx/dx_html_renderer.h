@@ -53,8 +53,7 @@
 #ifndef AMBULANT_GUI_DX_HTML_RENDERER_H
 #define AMBULANT_GUI_DX_HTML_RENDERER_H
 
-#define	WITH_DX_HTML_RENDERER // comment out to disable html renderer
-#ifdef	WITH_DX_HTML_RENDERER
+#ifdef	WITH_HTML_WIDGET
 
 #include "ambulant/config/config.h"
 #include "ambulant/lib/gtypes.h"
@@ -99,7 +98,7 @@ class dx_html_renderer : public dx_renderer_playable {
 
 } // namespace ambulant 
 
-#endif // WITH_DX_HTML_RENDERER
+#endif // WITH_HTML_WIDGET
 
 #endif // AMBULANT_GUI_DX_HTML_RENDERER_H
 
