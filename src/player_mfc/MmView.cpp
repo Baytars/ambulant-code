@@ -741,7 +741,6 @@ void redraw_html_widget(void* ptr) {
 	MmHtmlView* browser = (MmHtmlView*) ptr;
 	lib::logger::get_logger()->debug("redraw_html_widget(0x%x): browser=0x%x", ptr, browser);
 	ShowWindow(browser->m_hWnd, SW_SHOW);
-//	browser->SetForegroundWindow();
 }
 
 #else	// WITH_HTML_WIDGET
