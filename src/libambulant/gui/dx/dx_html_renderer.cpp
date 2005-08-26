@@ -180,7 +180,8 @@ void gui::dx::dx_html_renderer::redraw(const lib::screen_rect<int>& dirty, commo
 		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::redraw with no dx_html_widget");
 		return;
 	}
-	
+	redraw_html_widget(m_html_widget);
+/*JNK	
 	lib::screen_rect<int> text_rc = dirty;
 	lib::screen_rect<int> reg_rc = dirty;
 	
@@ -197,8 +198,9 @@ void gui::dx::dx_html_renderer::redraw(const lib::screen_rect<int>& dirty, commo
 #endif // USE_SMIL21
 		
 	// Finally blit img_rect_dirty to img_reg_rc_dirty
-/*JNK	v->draw(m_html->get_ddsurf(), html_rc, reg_rc, true, tr); KNJ*/
+	v->draw(m_html->get_ddsurf(), html_rc, reg_rc, true, tr);
 
 	if (m_erase_never) m_dest->keep_as_background();
+ KNJ*/
 }
 #endif // WITH_HTML_WIDGET

@@ -687,13 +687,6 @@ MmHtmlView::~MmHtmlView()
 {
 }
 
-void MmHtmlView::QuitBrowser()
-{
-	lib::logger::get_logger()->debug("MmHtmlView::QuitBrowser(0x%x): m_pBrowserApp=0x%x", this, m_pBrowserApp);
-	if (m_pBrowserApp)
-		m_pBrowserApp->Quit();
-}
-
 BOOL MmHtmlView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: Modify the Window class or styles here by modifying
@@ -714,6 +707,9 @@ void MmHtmlView::OnInitialUpdate()
 //KB	Navigate2(_T("http://www.ambulantplayer.org"),NULL,NULL);
 }
 
+MmHtmlView* s_browser = NULL;
+CWinThread* s_ambulant_thread = NULL;
+
 void* create_html_widget(std::string url, int left, int top, int width, int height) {
 	CString CSurl(url.c_str());
 	RECT rect;
@@ -721,20 +717,31 @@ void* create_html_widget(std::string url, int left, int top, int width, int heig
 	rect.top = top;
 	rect.right = left + width;
 	rect.bottom = top + height;
-	MmHtmlView* browser = new MmHtmlView(rect, topView);
-	browser->InitialUpdate();
-	browser->Navigate2(CSurl,NULL,_T(""));
-	lib::logger::get_logger()->debug("create_html_widget(%s@LTWH(%d,%d,%d,%d)): browser=0x%x", url.c_str(),left,top,width,height,browser);
-	return (void*) browser;
+	if ( ! s_browser) {
+		s_browser = new MmHtmlView(rect, topView);
+		assert (s_browser != NULL);
+		s_browser->InitialUpdate();
+		s_ambulant_thread = AfxGetThread();
+		s_ambulant_thread->SetThreadPriority(THREAD_PRIORITY_LOWEST);
+		ShowWindow(s_browser->m_hWnd, SW_HIDE);
+	}
+	s_browser->Navigate2(CSurl,NULL,_T(""));
+	lib::logger::get_logger()->debug("create_html_widget(%s@LTWH(%d,%d,%d,%d)): s_browser=0x%x", url.c_str(),left,top,width,height,s_browser);
+	return (void*) s_browser;
 }
 
 int delete_html_widget(void* ptr) {
 	MmHtmlView* browser = (MmHtmlView*) ptr;
 	lib::logger::get_logger()->debug("delete_html_widget(0x%x): browser=0x%x", ptr, browser);
-	browser->QuitBrowser();
-	browser->Invalidate();
 	ShowWindow(browser->m_hWnd, SW_HIDE);
 	return 1;
+}
+
+void redraw_html_widget(void* ptr) {
+	MmHtmlView* browser = (MmHtmlView*) ptr;
+	lib::logger::get_logger()->debug("redraw_html_widget(0x%x): browser=0x%x", ptr, browser);
+	ShowWindow(browser->m_hWnd, SW_SHOW);
+//	browser->SetForegroundWindow();
 }
 
 #else	// WITH_HTML_WIDGET

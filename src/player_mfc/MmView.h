@@ -156,7 +156,6 @@ public:
 
 // Operations
 public:
-	void QuitBrowser();
 
 // Overrides
 	public:
