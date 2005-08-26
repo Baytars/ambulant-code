@@ -91,7 +91,7 @@ void gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 	m_dest = dest;
 	
 	lib::screen_rect<int> rc = dest->get_rect();
-	lib::size bounds(rc.width(), rc.height());
+	const lib::point p = dest->get_global_topleft();
 	net::url url = m_node->get_url("src");
 	dx_window *dxwindow = static_cast<dx_window*>(m_window);
 	viewport *v = dxwindow->get_viewport();
@@ -100,7 +100,7 @@ void gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 			url.get_url().c_str());
 		return;
 	}
-	m_html_widget = create_html_widget(url, rc.left(), rc.top(), rc.width(), rc.height());
+	m_html_widget = create_html_widget(url, rc.left()+p.x, rc.top()+p.y, rc.width()+p.x, rc.height()+p.y);
 	if (m_html_widget) {
 		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) html_widget=0x%x",this,m_html_widget);
 	} else {
@@ -112,8 +112,6 @@ void gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 		delete params;
 		params = NULL;
 	}
-
-/*JNK	m_text->open(); KNJ*/
 }
 
 gui::dx::dx_html_renderer::~dx_html_renderer() {
