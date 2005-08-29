@@ -1,4 +1,5 @@
-#define	WITH_HTML_WIDGET // comment out to disable html renderer
+//#define	WITH_HTML_WIDGET // Project-><project>Properites->C/C++->Preprocessor->PreprocessorDefinitions
+						// to enable/disable html renderer, for <project>=AmbulantPlayer,libambulant_win32.
 #ifdef	WITH_HTML_WIDGET
 #include <string>
 
