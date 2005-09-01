@@ -89,7 +89,7 @@ class dx_html_renderer : public dx_renderer_playable {
 	void redraw(const lib::screen_rect<int> &dirty, common::gui_window *window);
 	void set_surface(common::surface *dest);
   private:
-	/*html_widget*/void *m_html_widget;
+	html_browser *m_html_browser;
 };
 
 } // namespace dx

@@ -86,6 +86,8 @@ HtmlView::HtmlView(const RECT& rect, CWnd* parent)
 
 HtmlView::~HtmlView()
 {
+//	Detach();
+//	DestroyWindow();
 }
 
 BOOL HtmlView::PreCreateWindow(CREATESTRUCT& cs)
@@ -108,48 +110,57 @@ void HtmlView::OnInitialUpdate()
 //KB	Navigate2(_T("http://www.ambulantplayer.org"),NULL,NULL);
 }
 
-//KB JNK class MmView;
 extern CWnd*  topView;
 HtmlView* s_browser = NULL;
 CWinThread* s_ambulant_thread = NULL;
 
-void* create_html_widget(std::string url, int left, int top, int width, int height) {
-	CString CSurl(url.c_str());
+html_browser::html_browser(int left, int top, int width, int height)
+: m_browser(NULL) {
 	RECT rect;
 	rect.left = left;
 	rect.top = top;
 	rect.right = left + width;
 	rect.bottom = top + height;
 	if ( ! s_browser) {
-//KB	s_browser = new HtmlView(rect, topView);
-		s_browser = new HtmlView(rect, CWnd::GetForegroundWindow());
-		assert (s_browser != NULL);
-		s_browser->InitialUpdate();
+		HtmlView* browser = new HtmlView(rect, topView);
+//KB	HtmlView* browser = new HtmlView(rect, CWnd::GetForegroundWindow());
+		assert (browser != NULL);
+		browser->InitialUpdate();
 		s_ambulant_thread = AfxGetThread();
 		s_ambulant_thread->SetThreadPriority(THREAD_PRIORITY_LOWEST);
-		ShowWindow(s_browser->m_hWnd, SW_HIDE);
-	}
-	s_browser->Navigate2(CSurl,NULL,_T(""));
-	lib::logger::get_logger()->debug("create_html_widget(%s@LTWH(%d,%d,%d,%d)): s_browser=0x%x", url.c_str(),left,top,width,height,s_browser);
-	return (void*) s_browser;
+		m_browser = s_browser = browser;
+		hide();
+	} else m_browser = s_browser;
 }
 
-int delete_html_widget(void* ptr) {
-	HtmlView* browser = (HtmlView*) ptr;
-	lib::logger::get_logger()->debug("delete_html_widget(0x%x): browser=0x%x", ptr, browser);
+html_browser::~html_browser() {
+	lib::logger::get_logger()->debug("html_browser::~html_browser(0x%x)", this);
+	HtmlView* browser = (HtmlView*) m_browser;
 	ShowWindow(browser->m_hWnd, SW_HIDE);
-	return 1;
+	delete m_browser;
+	s_browser = NULL;
 }
 
-void redraw_html_widget(void* ptr) {
-	HtmlView* browser = (HtmlView*) ptr;
-	lib::logger::get_logger()->debug("redraw_html_widget(0x%x): browser=0x%x", ptr, browser);
+void
+html_browser::goto_url(std::string url) {
+	CString CSurl(url.c_str());
+	lib::logger::get_logger()->debug("html_browser::goto_url(0x%x): url=%s)", this, url.c_str());
+	HtmlView* browser = (HtmlView*) m_browser;
+	browser->Navigate2(CSurl,NULL,_T(""));
+}
+
+void
+html_browser::hide() {
+	lib::logger::get_logger()->debug("html_browser::hide(0x%x)", this);
+	HtmlView* browser = (HtmlView*) m_browser;
+	ShowWindow(browser->m_hWnd, SW_HIDE);
+}
+
+void
+html_browser::show() {
+	lib::logger::get_logger()->debug("html_browser::show(0x%x)", this);
+	HtmlView* browser = (HtmlView*) m_browser;
 	ShowWindow(browser->m_hWnd, SW_SHOW);
 }
-
 #else	// WITH_HTML_WIDGET
-#endif // WITH_HTML_WIDGET
-
-#ifdef	WITH_HTML_WIDGET
-#else // WITH_HTML_WIDGET
 #endif // WITH_HTML_WIDGET
