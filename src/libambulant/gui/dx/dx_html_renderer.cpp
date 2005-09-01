@@ -81,11 +81,26 @@ gui::dx::dx_html_renderer::dx_html_renderer(
 	common::gui_window *window,
 	dx_playables_context *dxplayer)
 :   dx_renderer_playable(context, cookie, node, evp, window, dxplayer),
-	m_html_widget(0) {
+	m_html_browser(NULL) {
 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer(0x%x)", this);
 }
 
-void gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
+gui::dx::dx_html_renderer::~dx_html_renderer() {
+ 	AM_DBG lib::logger::get_logger()->debug("~dx_html_renderer(0x%x)", this);
+//KB delete m_html_browser;
+}
+
+void 
+gui::dx::dx_html_renderer::start(double t) {
+ 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x)", this);
+ 		if(!m_html_browser) {
+ 		// Notify scheduler
+ 		m_context->stopped(m_cookie);
+ 		return;
+		}
+}
+void
+gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) dest=0x%x", this, dest);
 
 	m_dest = dest;
@@ -100,35 +115,13 @@ void gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 			url.get_url().c_str());
 		return;
 	}
-	m_html_widget = create_html_widget(url, rc.left()+p.x, rc.top()+p.y, rc.width()+p.x, rc.height()+p.y);
-	if (m_html_widget) {
-		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) html_widget=0x%x",this,m_html_widget);
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) no html_widget", this);
+	if ( ! m_html_browser) {
+		m_html_browser = new html_browser(rc.left()+p.x, rc.top()+p.y, rc.width()+p.x, rc.height()+p.y);
+		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) html_widget=0x%x",this,m_html_browser);
 	}
-	// Pass <param> settings, if applicable
-	smil2::params *params = smil2::params::for_node(m_node);
-	if (params) {
-		delete params;
-		params = NULL;
-	}
-}
+	assert(m_html_browser != NULL);
+	m_html_browser->goto_url(url);
 
-gui::dx::dx_html_renderer::~dx_html_renderer() {
-	AM_DBG lib::logger::get_logger()->debug("~dx_html_renderer(0x%x)", this);
-//KB	delete m_html_widget;
-//KB	m_html_widget = NULL;
-}
-
-void gui::dx::dx_html_renderer::start(double t) {
-	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x)", this);
-		if(!m_html_widget) {
-		// Notify scheduler
-		m_context->stopped(m_cookie);
-		return;
-	}
-		
-	// Has this been activated
 	if(m_activated) {
 		// repeat
 		m_dest->need_redraw();
@@ -149,17 +142,19 @@ void gui::dx::dx_html_renderer::start(double t) {
 	m_context->stopped(m_cookie);
 }
 
-void gui::dx::dx_html_renderer::stop() {
+void
+gui::dx::dx_html_renderer::stop() {
 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
 //KB	delete m_html_widget;
 //KB	m_html_widget = NULL;
-	(void) delete_html_widget(m_html_widget);
+	m_html_browser->hide();
 	m_dest->renderer_done(this);
 	m_activated = false;
 	m_dxplayer->stopped(this);
 }
 
-void gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
+void
+gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 	if(what == common::user_event_click)
 		m_context->clicked(m_cookie);
 	else if(what == common::user_event_mouse_over) {
@@ -167,38 +162,19 @@ void gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 	}
 }
 
-void gui::dx::dx_html_renderer::redraw(const lib::screen_rect<int>& dirty, common::gui_window *window) {
+void
+gui::dx::dx_html_renderer::redraw(const lib::screen_rect<int>& dirty, common::gui_window *window) {
 	// Get the top-level surface
 	dx_window *dxwindow = static_cast<dx_window*>(window);
 	viewport *v = dxwindow->get_viewport();
 	if(!v) return;
 	
-	if(!m_html_widget /*JNK|| !m_html->can_play()KNJ*/) {
-		// No bits available
+	if(!m_html_browser) {
+		// No html_widget available
 		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::redraw with no dx_html_widget");
 		return;
 	}
-	redraw_html_widget(m_html_widget);
-/*JNK	
-	lib::screen_rect<int> text_rc = dirty;
-	lib::screen_rect<int> reg_rc = dirty;
-	
-	// Translate img_reg_rc_dirty to viewport coordinates 
-	lib::point pt = m_dest->get_global_topleft();
-	reg_rc.translate(pt);
-		
-	dx_transition *tr = get_transition();
-#ifdef USE_SMIL21
-	if (tr && tr->is_fullscreen()) {
-		v->set_fullscreen_transition(tr);
-		tr = NULL;
-	}
-#endif // USE_SMIL21
-		
-	// Finally blit img_rect_dirty to img_reg_rc_dirty
-	v->draw(m_html->get_ddsurf(), html_rc, reg_rc, true, tr);
-
-	if (m_erase_never) m_dest->keep_as_background();
- KNJ*/
+	m_html_browser->show();
 }
+
 #endif // WITH_HTML_WIDGET
