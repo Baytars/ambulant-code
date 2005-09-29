@@ -53,6 +53,7 @@
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/gui/cocoa/cocoa_audio.h"
 #include "ambulant/gui/cocoa/cocoa_text.h"
+#include "ambulant/gui/cocoa/cocoa_html.h"
 #include "ambulant/gui/cocoa/cocoa_image.h"
 #include "ambulant/gui/cocoa/cocoa_fill.h"
 #include "ambulant/gui/cocoa/cocoa_video.h"
@@ -175,6 +176,9 @@ cocoa_renderer_factory::new_playable(
 	} else if ( tag == "text") {
 		rv = new cocoa_text_renderer(context, cookie, node, evp, m_factory);
 		AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_text_renderer 0x%x", (void *)node, (void *)rv);
+	} else if ( tag == "html") {
+		rv = new cocoa_html_renderer(context, cookie, node, evp);
+		AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_html_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "brush") {
 		rv = new cocoa_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_fill_renderer 0x%x", (void *)node, (void *)rv);
