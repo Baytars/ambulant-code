@@ -65,7 +65,7 @@ namespace ambulant {
 
 namespace common {
 
-	using namespace ambulant::lib;
+using namespace ambulant::lib;
 
 class surface_impl : public surface_template, public surface, public gui_events {
   // The only constructor is protected: 
@@ -115,12 +115,15 @@ class surface_impl : public surface_template, public surface, public gui_events 
 	rect get_fit_rect_noalign(const size& src_size, rect* out_src_rect) const;
 	void draw_background(const rect &r, gui_window *window);
 
+#ifndef WITH_HTML_WIDGET
+#define WITH_HTML_WIDGET
+#endif
 #ifdef WITH_HTML_WIDGET
+public:
 	typedef void renderer_data;
 	typedef void* renderer_id;
 	lib::auto_ref<renderer_data> m_renderer_data;
 	renderer_id m_renderer_id;
-public:
 	surface_impl* get_parent();
 	renderer_data* get_renderer_data(renderer_id idd);
 	void set_renderer_data(renderer_id idd, renderer_data* data);
