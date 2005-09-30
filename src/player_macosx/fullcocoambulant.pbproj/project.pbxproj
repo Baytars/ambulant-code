@@ -1624,6 +1624,7 @@
 				04161463072078C400A8B0B6,
 				04161464072078C400A8B0B6,
 				04161465072078C400A8B0B6,
+				048399E008ED2FDD008505C3,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3461,6 +3462,7 @@
 				0459E7FE08DACE2600BF6ED5,
 				0459E80008DACE5D00BF6ED5,
 				0459E80208DACE8100BF6ED5,
+				048399DE08ED2FDD008505C3,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7495,6 +7497,7 @@
 				04600F4E0894F7A100B553A2,
 				04600F550894FA8D00B553A2,
 				04600F570894FA9A00B553A2,
+				048399E108ED2FDD008505C3,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8055,6 +8058,44 @@
 			path = Dutch.lproj/MainMenu.nib;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		048399DD08ED2FDC008505C3 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = WebKit.framework;
+			path = /System/Library/Frameworks/WebKit.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		048399DE08ED2FDD008505C3 = {
+			fileRef = 048399DD08ED2FDC008505C3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		048399DF08ED2FDD008505C3 = {
+			fileRef = 048399DD08ED2FDC008505C3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		048399E008ED2FDD008505C3 = {
+			fileRef = 048399DD08ED2FDC008505C3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		048399E108ED2FDD008505C3 = {
+			fileRef = 048399DD08ED2FDC008505C3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		048399E208ED2FDD008505C3 = {
+			fileRef = 048399DD08ED2FDC008505C3;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		048467B3062171980045A7A7 = {
 			fileRef = 042239CC0536F48E0010C447;
@@ -9729,6 +9770,7 @@
 				0493211708951AAE00F38A0A,
 				0442DEB708965537008D10AE,
 				0442DEB80896553B008D10AE,
+				048399E208ED2FDD008505C3,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -11078,6 +11120,7 @@
 //104
 		1058C7A6FEA54F5311CA2CBB = {
 			children = (
+				048399DD08ED2FDC008505C3,
 				045BB44806258FE500A75828,
 				045BB38A0625526900A75828,
 				045BB3670625518E00A75828,
@@ -11788,6 +11831,7 @@
 				0427B2220625FD160071CD58,
 				04B9F6130700518600B78CC4,
 				04F7E4DE08A23A0200D68AEA,
+				048399DF08ED2FDD008505C3,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
