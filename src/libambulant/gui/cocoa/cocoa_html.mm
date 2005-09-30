@@ -82,7 +82,9 @@ _get_html_view(common::surface *surf)
 	if (parent == NULL) parent = (common::surface_impl*)surf;
 	WebView *view = (WebView *)parent->get_renderer_data(my_renderer_id);
 	if (view == NULL) {
-		// XXXX
+		NSRect crect = NSMakeRect(0, 0, 500, 500);
+		view = [[WebView alloc] initWithFrame: crect frameName: nil groupName: nil];
+		[view retain];
 	}
 	parent->set_renderer_data(my_renderer_id, (surface_impl::renderer_data *)view);
 	return view;
@@ -95,11 +97,25 @@ cocoa_html_renderer::start(double where) {
 	if (m_dest) {
 		WebView *view = _get_html_view(m_dest);
 		m_html_view = (void *)view;
+		
+		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
 		net::url url = m_node->get_url("src");
 		if (view) {
 			/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: display %s", url.get_url().c_str());
-			// XXX Load URL
-			// XXX Show view, if not shown already
+			// Setup an URL loader and tell the frame about it
+			WebFrame *frame = [view mainFrame];
+			assert(frame);
+			NSURL *curl = [NSURL URLWithString: [NSString stringWithCString: url.get_url().c_str()]];
+			NSURLRequest *request = [NSURLRequest requestWithURL: curl];
+			[frame loadRequest: request];
+			// Hook the HTML view into the hierarchy. It is retained there,
+			// so we release it.
+			cocoa_window *amwindow = (cocoa_window *)m_dest->get_gui_window();
+			assert(amwindow);
+			AmbulantView *mainview = (AmbulantView *)amwindow->view();
+			assert(mainview);
+			[mainview addSubview: view];
+			[view release];
 		}
 	}
 	m_lock.leave();
@@ -110,7 +126,11 @@ cocoa_html_renderer::stop() {
 	m_lock.enter();
 	if (m_html_view) {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
-		// XXX Hide WebView? Probably not...
+		// Unhook the view from the view hierarchy. This releases it, so we must
+		// retain it beforehand
+		WebView *view = (WebView *)m_html_view;
+		[view retain];
+		[view removeFromSuperviewWithoutNeedingDisplay]; 
 	}
 	renderer_playable::stop();
 	m_lock.leave();
