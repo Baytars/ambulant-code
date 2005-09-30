@@ -61,6 +61,38 @@
 #define AM_DBG if(0)
 #endif
 
+// Helper class to allow creating the WebView and loading the URL in the
+// main thread. This appears to be needed because otherwise the WebView
+// will not load data (because it will use the unused NSRunLoop from the
+// current thread).
+@interface WebViewContainer : NSObject
+{
+	WebView *view;
+}
+- (WebView *)view;
+- (void)create: (NSRectHolder *)rect;
+- (void)load: (NSURL *)url;
+@end
+
+@implementation WebViewContainer
+- (WebView *)view
+{
+	return view;
+}
+
+- (void)create: (NSRectHolder *)rect
+{
+	view = [[WebView alloc] initWithFrame: [rect rect] frameName: nil groupName: nil];
+}
+
+- (void)load: (NSURL *)url
+{
+		NSURLRequest *req = [NSURLRequest requestWithURL: url];
+		[[view mainFrame] loadRequest: req];
+}
+
+@end
+
 namespace ambulant {
 
 using namespace lib;
@@ -73,41 +105,41 @@ static surface_impl::renderer_id my_renderer_id = (surface_impl::renderer_id)"co
 
 // Helper routine - Get a WebView from a surface, or create
 // one if it doesn't exist.
-static WebView *
+static WebViewContainer *
 _get_html_view(common::surface *surf)
 {
 	//XXXX for some reason the pointer to the browser is stored in the parent of the current surface node
 	common::surface_impl* parent = ((common::surface_impl*)surf)->get_parent();
 	// Parent can be NULL, when playing on the default region
 	if (parent == NULL) parent = (common::surface_impl*)surf;
-	WebView *view = (WebView *)parent->get_renderer_data(my_renderer_id);
-	if (view == NULL) {
-		NSRect crect = NSMakeRect(0, 0, 500, 500);
-		view = [[WebView alloc] initWithFrame: crect frameName: nil groupName: nil];
-		[view retain];
+	WebViewContainer *wvc = (WebViewContainer *)parent->get_renderer_data(my_renderer_id);
+	if (wvc == NULL) {
+		const rect& amrect = surf->get_rect();
+		NSRectHolder *crect = [[NSRectHolder alloc] initWithRect: NSMakeRect(amrect.left(), amrect.top(), amrect.width(), amrect.height())];
+		[crect autorelease];
+		wvc = [[WebViewContainer alloc] init];
+		[wvc autorelease];
+		[wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
+		[wvc retain];
 	}
-	parent->set_renderer_data(my_renderer_id, (surface_impl::renderer_data *)view);
-	return view;
+	parent->set_renderer_data(my_renderer_id, (surface_impl::renderer_data *)wvc);
+	return wvc;
 }
 
 void
 cocoa_html_renderer::start(double where) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	m_lock.enter();
 	renderer_playable::start(where);
 	if (m_dest) {
-		WebView *view = _get_html_view(m_dest);
-		m_html_view = (void *)view;
+		WebViewContainer *wvc = _get_html_view(m_dest);
+		WebView *view = [wvc view];
+		m_html_view = (void *)wvc;
 		
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
 		net::url url = m_node->get_url("src");
 		if (view) {
 			/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: display %s", url.get_url().c_str());
-			// Setup an URL loader and tell the frame about it
-			WebFrame *frame = [view mainFrame];
-			assert(frame);
-			NSURL *curl = [NSURL URLWithString: [NSString stringWithCString: url.get_url().c_str()]];
-			NSURLRequest *request = [NSURLRequest requestWithURL: curl];
-			[frame loadRequest: request];
 			// Hook the HTML view into the hierarchy. It is retained there,
 			// so we release it.
 			cocoa_window *amwindow = (cocoa_window *)m_dest->get_gui_window();
@@ -115,25 +147,37 @@ cocoa_html_renderer::start(double where) {
 			AmbulantView *mainview = (AmbulantView *)amwindow->view();
 			assert(mainview);
 			[mainview addSubview: view];
+			// Setup an URL loader and tell the frame about it
+			WebFrame *frame = [view mainFrame];
+			assert(frame);
+			NSString *cstr = [NSString stringWithCString: url.get_url().c_str()];
+			NSURL *curl = [NSURL URLWithString: cstr];
+			[wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
 			[view release];
 		}
 	}
 	m_lock.leave();
+	[pool release];
 }
 
 void
 cocoa_html_renderer::stop() {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	m_lock.enter();
 	if (m_html_view) {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
 		// Unhook the view from the view hierarchy. This releases it, so we must
 		// retain it beforehand
-		WebView *view = (WebView *)m_html_view;
+		WebViewContainer *wvc = (WebViewContainer *)m_html_view;
+		WebView *view = [wvc view];
+		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
+		if ([[view mainFrame] dataSource] == nil) lib::logger::get_logger()->debug("cocoa_html_renderer: not complete yet!");
 		[view retain];
 		[view removeFromSuperviewWithoutNeedingDisplay]; 
 	}
 	renderer_playable::stop();
 	m_lock.leave();
+	[pool release];
 }
 } // namespace cocoa
 
