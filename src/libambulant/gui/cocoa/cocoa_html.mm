@@ -101,18 +101,14 @@ namespace gui {
 
 namespace cocoa {
 
-static surface_impl::renderer_id my_renderer_id = (surface_impl::renderer_id)"cocoa_html_browser";
+static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"cocoa_html_browser";
 
 // Helper routine - Get a WebView from a surface, or create
 // one if it doesn't exist.
 static WebViewContainer *
 _get_html_view(common::surface *surf)
 {
-	//XXXX for some reason the pointer to the browser is stored in the parent of the current surface node
-	common::surface_impl* parent = ((common::surface_impl*)surf)->get_parent();
-	// Parent can be NULL, when playing on the default region
-	if (parent == NULL) parent = (common::surface_impl*)surf;
-	WebViewContainer *wvc = (WebViewContainer *)parent->get_renderer_data(my_renderer_id);
+	WebViewContainer *wvc = (WebViewContainer *)surf->get_renderer_private_data(my_renderer_id);
 	if (wvc == NULL) {
 		const rect& amrect = surf->get_rect();
 		NSRectHolder *crect = [[NSRectHolder alloc] initWithRect: NSMakeRect(amrect.left(), amrect.top(), amrect.width(), amrect.height())];
@@ -122,7 +118,7 @@ _get_html_view(common::surface *surf)
 		[wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
 		[wvc retain];
 	}
-	parent->set_renderer_data(my_renderer_id, (surface_impl::renderer_data *)wvc);
+	surf->set_renderer_private_data(my_renderer_id, (common::renderer_private_data *)wvc);
 	return wvc;
 }
 
