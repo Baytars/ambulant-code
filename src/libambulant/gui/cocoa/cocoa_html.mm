@@ -61,11 +61,11 @@
 #define AM_DBG if(0)
 #endif
 
-// Helper class to allow creating the WebView and loading the URL in the
+// Helper classes to allow creating the WebView and loading the URL in the
 // main thread. This appears to be needed because otherwise the WebView
 // will not load data (because it will use the unused NSRunLoop from the
 // current thread).
-@interface WebViewContainer : NSObject
+@interface WebViewController : NSObject
 {
 	WebView *view;
 }
@@ -74,7 +74,7 @@
 - (void)load: (NSURL *)url;
 @end
 
-@implementation WebViewContainer
+@implementation WebViewController
 - (WebView *)view
 {
 	return view;
@@ -83,12 +83,14 @@
 - (void)create: (NSRectHolder *)rect
 {
 	view = [[WebView alloc] initWithFrame: [rect rect] frameName: nil groupName: nil];
+	NSLog(@"Created new html viewer %@", view);
 }
 
 - (void)load: (NSURL *)url
 {
 		NSURLRequest *req = [NSURLRequest requestWithURL: url];
 		[[view mainFrame] loadRequest: req];
+		NSLog(@"viewer %@: loading %@", view, url);
 }
 
 @end
@@ -101,6 +103,18 @@ namespace gui {
 
 namespace cocoa {
 
+class WebViewContainer : public lib::ref_counted_obj {
+  public:
+	WebViewController *wvc;
+	WebViewContainer(WebViewController *it)
+	:	wvc(it) {}
+	~WebViewContainer() {
+		[[wvc view] release];
+		[wvc release];
+		wvc = NULL;
+	}
+};
+
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"cocoa_html_browser";
 
 // Helper routine - Get a WebView from a surface, or create
@@ -108,15 +122,15 @@ static common::renderer_private_id my_renderer_id = (common::renderer_private_id
 static WebViewContainer *
 _get_html_view(common::surface *surf)
 {
-	WebViewContainer *wvc = (WebViewContainer *)surf->get_renderer_private_data(my_renderer_id);
+	WebViewContainer *wvc = reinterpret_cast<WebViewContainer *>(surf->get_renderer_private_data(my_renderer_id));
 	if (wvc == NULL) {
 		const rect& amrect = surf->get_rect();
 		NSRectHolder *crect = [[NSRectHolder alloc] initWithRect: NSMakeRect(amrect.left(), amrect.top(), amrect.width(), amrect.height())];
 		[crect autorelease];
-		wvc = [[WebViewContainer alloc] init];
-		[wvc autorelease];
-		[wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
-		[wvc retain];
+		wvc = new WebViewContainer([[WebViewController alloc] init]);
+		[wvc->wvc autorelease];
+		[wvc->wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
+		[wvc->wvc retain];
 	}
 	surf->set_renderer_private_data(my_renderer_id, (common::renderer_private_data *)wvc);
 	return wvc;
@@ -129,7 +143,7 @@ cocoa_html_renderer::start(double where) {
 	renderer_playable::start(where);
 	if (m_dest) {
 		WebViewContainer *wvc = _get_html_view(m_dest);
-		WebView *view = [wvc view];
+		WebView *view = [wvc->wvc view];
 		m_html_view = (void *)wvc;
 		
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
@@ -143,13 +157,13 @@ cocoa_html_renderer::start(double where) {
 			AmbulantView *mainview = (AmbulantView *)amwindow->view();
 			assert(mainview);
 			[mainview addSubview: view];
+			[view release];
 			// Setup an URL loader and tell the frame about it
 			WebFrame *frame = [view mainFrame];
 			assert(frame);
 			NSString *cstr = [NSString stringWithCString: url.get_url().c_str()];
 			NSURL *curl = [NSURL URLWithString: cstr];
-			[wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
-			[view release];
+			[wvc->wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
 		}
 	}
 	m_lock.leave();
@@ -165,7 +179,7 @@ cocoa_html_renderer::stop() {
 		// Unhook the view from the view hierarchy. This releases it, so we must
 		// retain it beforehand
 		WebViewContainer *wvc = (WebViewContainer *)m_html_view;
-		WebView *view = [wvc view];
+		WebView *view = [wvc->wvc view];
 		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
 		if ([[view mainFrame] dataSource] == nil) lib::logger::get_logger()->debug("cocoa_html_renderer: not complete yet!");
 		[view retain];
