@@ -169,7 +169,7 @@ renderer_playable::_init_clip_begin_end()
 			ce = parser.get_time() *1000;	// get_time returns ms !
 		}	
 	}
-	AM_DBG lib::logger::get_logger()->debug("renderer_playable::init_clip_begin_end: cb=%lld, ce=%lld", cb,ce);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("renderer_playable::init_clip_begin_end: cb=%lld, ce=%lld", cb,ce);
 	m_clip_begin = cb;
 	m_clip_end = ce;
 }
