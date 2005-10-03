@@ -78,14 +78,16 @@ using namespace ambulant;
 // Unique key used to access our renderer_private data
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"dx_html_renderer";
 
-class gui::dx::browser_container : lib::ref_counted_obj {
+class gui::dx::browser_container : public lib::ref_counted_obj {
   public:
     html_browser *m_browser;
-
+	bool m_busy;
 	browser_container(html_browser *br)
-		:	m_browser(br) {}
+		:	m_browser(br),
+			m_busy(false) {}
 
 	~browser_container() {
+		/*AM*DBG*/ lib::logger::get_logger()->debug("~browser_container(m_browser=0x%x)", m_browser);
 		m_browser->hide();
 		// XXX Cannot delete?
 	}
@@ -110,44 +112,29 @@ gui::dx::dx_html_renderer::~dx_html_renderer() {
 void 
 gui::dx::dx_html_renderer::start(double t) {
  	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x)", this);
- 	if(!m_html_browser) {
- 		// Notify scheduler
- 		m_context->stopped(m_cookie);
- 		return;
-	}
-	m_html_browser->m_browser->show();
-}
 
-void
-gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
-	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) dest=0x%x", this, dest);
-
-	m_dest = dest;
-	
-#ifdef JACK_THINKS_THIS_IS_WRONG
-	if(!lib::memfile::exists(url)) {
-		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
-			url.get_url().c_str());
-		return;
-	}
-#endif
 	assert(!m_html_browser);
-	m_html_browser = reinterpret_cast<browser_container*>(dest->get_renderer_private_data(my_renderer_id));
+	m_html_browser = dynamic_cast<browser_container*>(m_dest->get_renderer_private_data(my_renderer_id));
 	if (m_html_browser == NULL) {
 //		dx_window *dxwindow = static_cast<dx_window*>(m_window);
 //		viewport *v = dxwindow->get_viewport();
-		lib::rect rc = dest->get_rect();
-		const lib::point p = dest->get_global_topleft();
+		lib::rect rc = m_dest->get_rect();
+		const lib::point p = m_dest->get_global_topleft();
 		rc.translate(p);
 		html_browser *br = new html_browser(rc.left(), rc.top(), rc.width(), rc.height());
 		assert(br);
 		m_html_browser = new browser_container(br);
-		dest->set_renderer_private_data(my_renderer_id, (common::renderer_private_data*)m_html_browser);
+		m_dest->set_renderer_private_data(my_renderer_id, static_cast<common::renderer_private_data*>(m_html_browser));
 	}
-	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) html_widget=0x%x",this,m_html_browser);
-	assert(m_html_browser != NULL);
+	assert(m_html_browser);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x) html_widget=0x%x",this,m_html_browser->m_browser);
+
+	assert(!m_html_browser->m_busy);
+	m_html_browser->m_busy = true;
 	net::url url = m_node->get_url("src");
 	m_html_browser->m_browser->goto_url(url);
+
+	m_html_browser->m_browser->show();
 
 #ifdef JACK_THINKS_THIS_IS_WRONG
 	if(m_activated) {
@@ -155,28 +142,32 @@ gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 		m_dest->need_redraw();
 		return;	
 	}
-	
+#endif
 	// Activate this renderer.
 	// Add this renderer to the display list of the region
 	m_dest->show(this);
 	m_dest->need_events(m_wantclicks);
 	m_activated = true;
-		
+#ifdef JACK_THINKS_THIS_IS_WRONG
+	
 	// Request a redraw
 	// Currently already done by show()
 	// m_dest->need_redraw();
 
 	// Notify scheduler that we're done playing
-#endif
 	m_context->stopped(m_cookie);
+#endif
 }
 
 void
 gui::dx::dx_html_renderer::stop() {
-	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
 //KB	delete m_html_widget;
 //KB	m_html_widget = NULL;
 	// m_html_browser->hide();
+	assert(m_html_browser);
+	assert(m_html_browser->m_busy);
+	m_html_browser->m_busy = false;
 	m_dest->renderer_done(this);
 	m_activated = false;
 	m_dxplayer->stopped(this);
@@ -206,6 +197,7 @@ gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *wi
 	}
 	
 #endif
+	lib::logger::get_logger()->debug("dx_html_renderer::redraw");
 }
 
 #endif // WITH_HTML_WIDGET
