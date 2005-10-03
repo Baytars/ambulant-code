@@ -103,34 +103,41 @@ namespace gui {
 
 namespace cocoa {
 
-class WebViewContainer : public lib::ref_counted_obj {
+// ref_counted container for the WebViewController class. Cleans up
+// the WebViewController and the WebView when its refcount drops to zero.
+class wvc_container : public lib::ref_counted_obj {
   public:
 	WebViewController *wvc;
-	WebViewContainer(WebViewController *it)
-	:	wvc(it) {}
-	~WebViewContainer() {
+	
+	wvc_container(WebViewController *it)
+	:	wvc(it) {
+		[wvc retain];
+	}
+	~wvc_container() {
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		[[wvc view] release];
 		[wvc release];
 		wvc = NULL;
+		[pool release];
 	}
 };
 
+// The (unique) address of my_renderer_id is used to distinguish this renderer class from any
+// other classes using the renderer_private_data interfaces.
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"cocoa_html_browser";
 
 // Helper routine - Get a WebView from a surface, or create
 // one if it doesn't exist.
-static WebViewContainer *
+static wvc_container *
 _get_html_view(common::surface *surf)
 {
-	WebViewContainer *wvc = reinterpret_cast<WebViewContainer *>(surf->get_renderer_private_data(my_renderer_id));
+	wvc_container *wvc = reinterpret_cast<wvc_container *>(surf->get_renderer_private_data(my_renderer_id));
 	if (wvc == NULL) {
 		const rect& amrect = surf->get_rect();
 		NSRectHolder *crect = [[NSRectHolder alloc] initWithRect: NSMakeRect(amrect.left(), amrect.top(), amrect.width(), amrect.height())];
 		[crect autorelease];
-		wvc = new WebViewContainer([[WebViewController alloc] init]);
-		[wvc->wvc autorelease];
+		wvc = new wvc_container([[WebViewController alloc] init]);
 		[wvc->wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
-		[wvc->wvc retain];
 	}
 	surf->set_renderer_private_data(my_renderer_id, (common::renderer_private_data *)wvc);
 	return wvc;
@@ -142,9 +149,9 @@ cocoa_html_renderer::start(double where) {
 	m_lock.enter();
 	renderer_playable::start(where);
 	if (m_dest) {
-		WebViewContainer *wvc = _get_html_view(m_dest);
-		WebView *view = [wvc->wvc view];
-		m_html_view = (void *)wvc;
+		assert(m_html_view == NULL);
+		m_html_view = _get_html_view(m_dest);
+		WebView *view = [m_html_view->wvc view];
 		
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
 		net::url url = m_node->get_url("src");
@@ -157,13 +164,12 @@ cocoa_html_renderer::start(double where) {
 			AmbulantView *mainview = (AmbulantView *)amwindow->view();
 			assert(mainview);
 			[mainview addSubview: view];
-			[view release];
 			// Setup an URL loader and tell the frame about it
 			WebFrame *frame = [view mainFrame];
 			assert(frame);
 			NSString *cstr = [NSString stringWithCString: url.get_url().c_str()];
 			NSURL *curl = [NSURL URLWithString: cstr];
-			[wvc->wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
+			[m_html_view->wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
 		}
 	}
 	m_lock.leave();
@@ -176,14 +182,11 @@ cocoa_html_renderer::stop() {
 	m_lock.enter();
 	if (m_html_view) {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
-		// Unhook the view from the view hierarchy. This releases it, so we must
-		// retain it beforehand
-		WebViewContainer *wvc = (WebViewContainer *)m_html_view;
-		WebView *view = [wvc->wvc view];
+		// Unhook the view from the view hierarchy.
+		WebView *view = [m_html_view->wvc view];
 		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
 		if ([[view mainFrame] dataSource] == nil) lib::logger::get_logger()->debug("cocoa_html_renderer: not complete yet!");
-		[view retain];
-		[view removeFromSuperviewWithoutNeedingDisplay]; 
+		// [view removeFromSuperviewWithoutNeedingDisplay]; 
 	}
 	renderer_playable::stop();
 	m_lock.leave();
