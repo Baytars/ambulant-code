@@ -66,6 +66,9 @@ namespace gui {
 
 namespace cocoa {
 
+// Opaque class used to store the WebKit view:
+class wvc_container;
+
 class cocoa_html_renderer : public common::renderer_playable {
   public:
 	cocoa_html_renderer(
@@ -85,7 +88,7 @@ class cocoa_html_renderer : public common::renderer_playable {
 	void set_intransition(const lib::transition_info *info) {};
 	void start_outtransition(const lib::transition_info *info) {};
   private:
-	void *m_html_view; // We don't want to include WebKit.h here...
+	wvc_container *m_html_view; // We don't want to include WebKit.h here...
 	lib::critical_section m_lock;
 };
 
