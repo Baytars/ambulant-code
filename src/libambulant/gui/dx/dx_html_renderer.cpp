@@ -75,6 +75,22 @@
 
 using namespace ambulant;
 
+// Unique key used to access our renderer_private data
+static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"dx_html_renderer";
+
+class gui::dx::browser_container : lib::ref_counted_obj {
+  public:
+    html_browser *m_browser;
+
+	browser_container(html_browser *br)
+		:	m_browser(br) {}
+
+	~browser_container() {
+		m_browser->hide();
+		// XXX Cannot delete?
+	}
+};
+
 gui::dx::dx_html_renderer::dx_html_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
@@ -89,7 +105,6 @@ gui::dx::dx_html_renderer::dx_html_renderer(
 
 gui::dx::dx_html_renderer::~dx_html_renderer() {
  	AM_DBG lib::logger::get_logger()->debug("~dx_html_renderer(0x%x)", this);
-//KB delete m_html_browser;
 }
 
 void 
@@ -100,6 +115,7 @@ gui::dx::dx_html_renderer::start(double t) {
  		m_context->stopped(m_cookie);
  		return;
 	}
+	m_html_browser->m_browser->show();
 }
 
 void
@@ -108,31 +124,32 @@ gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 
 	m_dest = dest;
 	
-	lib::rect rc = dest->get_rect();
-	const lib::point p = dest->get_global_topleft();
-	net::url url = m_node->get_url("src");
-	dx_window *dxwindow = static_cast<dx_window*>(m_window);
-	viewport *v = dxwindow->get_viewport();
+#ifdef JACK_THINKS_THIS_IS_WRONG
 	if(!lib::memfile::exists(url)) {
 		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
 			url.get_url().c_str());
 		return;
 	}
-	if ( ! m_html_browser) {
-		//XXXX for some reason the pointer to the browser is stored in the parent of the current surface node
-		common::surface_impl* parent = ((common::surface_impl*)dest)->get_parent();
-		// Parent can be NULL, when playing on the default region
-		if (parent == NULL) parent = (common::surface_impl*)dest;
-		m_html_browser = (html_browser*) parent->get_renderer_data(parent);
-		if (m_html_browser == NULL) {
-			m_html_browser = new html_browser(rc.left()+p.x, rc.top()+p.y, rc.width()+p.x, rc.height()+p.y);
-			parent->set_renderer_data(parent, m_html_browser);
-		}
+#endif
+	assert(!m_html_browser);
+	m_html_browser = reinterpret_cast<browser_container*>(dest->get_renderer_private_data(my_renderer_id));
+	if (m_html_browser == NULL) {
+//		dx_window *dxwindow = static_cast<dx_window*>(m_window);
+//		viewport *v = dxwindow->get_viewport();
+		lib::rect rc = dest->get_rect();
+		const lib::point p = dest->get_global_topleft();
+		rc.translate(p);
+		html_browser *br = new html_browser(rc.left(), rc.top(), rc.width(), rc.height());
+		assert(br);
+		m_html_browser = new browser_container(br);
+		dest->set_renderer_private_data(my_renderer_id, (common::renderer_private_data*)m_html_browser);
 	}
 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::set_surface(0x%x) html_widget=0x%x",this,m_html_browser);
 	assert(m_html_browser != NULL);
-	m_html_browser->goto_url(url);
+	net::url url = m_node->get_url("src");
+	m_html_browser->m_browser->goto_url(url);
 
+#ifdef JACK_THINKS_THIS_IS_WRONG
 	if(m_activated) {
 		// repeat
 		m_dest->need_redraw();
@@ -150,6 +167,7 @@ gui::dx::dx_html_renderer::set_surface(common::surface *dest) {
 	// m_dest->need_redraw();
 
 	// Notify scheduler that we're done playing
+#endif
 	m_context->stopped(m_cookie);
 }
 
@@ -158,7 +176,7 @@ gui::dx::dx_html_renderer::stop() {
 	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
 //KB	delete m_html_widget;
 //KB	m_html_widget = NULL;
-	m_html_browser->hide();
+	// m_html_browser->hide();
 	m_dest->renderer_done(this);
 	m_activated = false;
 	m_dxplayer->stopped(this);
@@ -176,6 +194,7 @@ gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 void
 gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *window) {
 	// Get the top-level surface
+#ifdef JACK_THINKS_THIS_IS_WRONG
 	dx_window *dxwindow = static_cast<dx_window*>(window);
 	viewport *v = dxwindow->get_viewport();
 	if(!v) return;
@@ -185,7 +204,8 @@ gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *wi
 		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::redraw with no dx_html_widget");
 		return;
 	}
-	m_html_browser->show();
+	
+#endif
 }
 
 #endif // WITH_HTML_WIDGET

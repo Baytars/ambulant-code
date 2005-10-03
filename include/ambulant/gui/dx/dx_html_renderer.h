@@ -70,6 +70,7 @@ namespace gui {
 namespace dx {
 
 class viewport;
+class browser_container;
 
 class dx_html_renderer : public dx_renderer_playable {
   public:
@@ -88,7 +89,7 @@ class dx_html_renderer : public dx_renderer_playable {
 	void redraw(const lib::rect &dirty, common::gui_window *window);
 	void set_surface(common::surface *dest);
   private:
-	html_browser *m_html_browser;
+	browser_container *m_html_browser;
 };
 
 } // namespace dx
