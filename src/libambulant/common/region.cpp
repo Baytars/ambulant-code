@@ -95,7 +95,9 @@ surface_impl::surface_impl(const std::string &name, surface_impl *parent, rect b
 	m_parent(parent),
 	m_info(info),
 //	m_alignment(NULL),
-	m_bg_renderer(bgrenderer)
+	m_bg_renderer(bgrenderer),
+	m_renderer_data(NULL),
+	m_renderer_id(NULL)
 {
 	if (parent) m_window_topleft += parent->get_global_topleft();
 	if (m_bg_renderer) {
@@ -679,7 +681,7 @@ surface_impl::del_subregion(zindex_t z, surface_impl *rgn)
 
 renderer_private_data*
 surface_impl::get_renderer_private_data(renderer_private_id idd) {
-	if (m_info->is_subregion()) {
+	if (m_info && m_info->is_subregion()) {
 		assert(m_parent);
 		return m_parent->get_renderer_private_data(idd);
 	}
@@ -690,7 +692,7 @@ surface_impl::get_renderer_private_data(renderer_private_id idd) {
 
 void 
 surface_impl::set_renderer_private_data(renderer_private_id idd, renderer_private_data* data) {
-	if (m_info->is_subregion()) {
+	if (m_info && m_info->is_subregion()) {
 		assert(m_parent);
 		m_parent->set_renderer_private_data(idd, data);
 	}
