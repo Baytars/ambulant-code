@@ -69,15 +69,37 @@ using namespace gui::qt;
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"qt_html_renderer";
 
 class gui::qt::browser_container : public ref_counted_obj {
-  public:
     KHTMLPart *m_browser;
+    int m_generation;
     
-  browser_container(KHTMLPart *br)
-  : m_browser(br) {}
+  public:
+    browser_container(KHTMLPart *br)
+    :   m_browser(br),
+        m_generation(0) {}
   
-  ~browser_container() {
-    m_browser->hide();
-  }
+    ~browser_container() {
+        m_browser->hide();
+        // XXX delete m_browsser
+    }
+    KHTMLPart *show() {
+        m_generation++;
+        return m_browser;
+    }
+	void hide_generation(int gen) {
+		if (m_generation == gen) {
+			m_browser->hide();
+			m_generation++;
+			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
+		} else {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
+		}
+	}
+	void hide(event_processor *evp) {
+		typedef lib::scalar_arg_callback_event<browser_container, int> hide_cb;
+		hide_cb *cb = new hide_cb(this, &browser_container::hide_generation, m_generation);
+		evp->add_event(cb, 1, lib::event_processor::med);
+	}
+    
 };
 
 qt_html_renderer::qt_html_renderer(
@@ -123,12 +145,13 @@ gui::qt::qt_html_renderer::start(double t) {
 		m_dest->set_renderer_private_data(my_renderer_id, static_cast<common::renderer_private_data*>(m_html_browser));
 	}
 	assert(m_html_browser);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("qt_html_renderer::start(0x%x) html_widget=0x%x",this,m_html_browser->m_browser);
+	KHTMLPart *browser = m_html_browser->show();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("qt_html_renderer::start(0x%x) html_widget=0x%x",this,browser);
 
 	net::url url = m_node->get_url("src");
-	m_html_browser->m_browser->openURL(url.get_url().c_str());
+	browser->openURL(url.get_url().c_str());
 
-	m_html_browser->m_browser->show();
+	browser->show();
 
 	m_dest->show(this);
 	m_dest->need_events(m_wantclicks);
@@ -138,119 +161,16 @@ gui::qt::qt_html_renderer::start(double t) {
 }
 
 qt_html_renderer::~qt_html_renderer() {
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("~qt_html_renderer(0x%x)", this);
-//	if (m_html_browser) {
-// the following hide() causes flicker, is needed to clear at the end
-//		m_html_browser->hide();
-//	m_html_widget is not deleted, but remembered in the surface_impl
-//		delete m_html_browser;
-//		m_html_browser = NULL;
-//	}
-	m_lock.leave();
 }
-
-#ifdef JACK_THINKS_THIS_IS_WRONG
-void
-gui::qt::qt_html_renderer::set_surface(common::surface *dest) {
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::set_surface(0x%x) dest=0x%x", this, dest);
-
-	m_dest = dest;
-	
-	m_html_browser = dynamic_cast<browser_container*>(m_dest->get_renderer_private_data(my_renderer_id));
-	lib::rect rc = dest->get_rect();
-	const lib::point p = dest->get_global_topleft();
-	net::url url = m_node->get_url("src");
-
-// following test works on WIN32, fails on linux when url contains #tag
-//	if(!lib::memfile::exists(m_url)) {
-//		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
-//			m_url.get_url().c_str());
-//		m_lock.leave();
-//		return;
-//	}
-	if(m_activated) {
-		// repeat
-		m_dest->need_redraw();
-		m_lock.leave();
-		return;	
-	}
-	// Activate this renderer.
-	// Add this renderer to the display list of the region
-	m_dest->show(this);
-	m_dest->need_events(m_wantclicks);
-	m_activated = true;
-		
-	// Request a redraw
-	// Currently already done by show()
-	// m_dest->need_redraw();
-
-	// Notify scheduler that we're done playing
-	m_context->stopped(m_cookie);
-	m_lock.leave();
-}
-#endif
 
 void
 gui::qt::qt_html_renderer::stop() {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::stop(0x%x)", this);
-// the following hide() causes flicker
-//	if (m_html_browser)
-//		m_html_browser->hide();
 	m_dest->renderer_done(this);
 	m_activated = false;
-	// XXX Call stopped()?
+	if (m_html_browser)
+	   m_html_browser->hide(m_event_processor);
 	m_lock.leave();
 }
-
-#ifdef JACK_THINKS_THIS_IS_WRONG
-void
-gui::qt::qt_html_renderer::user_event(const lib::point& pt, int what) {
-	m_lock.enter();
-	if(what == common::user_event_click)
-		m_context->clicked(m_cookie);
-	else if(what == common::user_event_mouse_over) {
-		m_context->pointed(m_cookie);
-	}
-	m_lock.leave();
-}
-
-void
-gui::qt::qt_html_renderer::redraw(const lib::rect& r, common::gui_window *window) {
-	m_lock.enter();
-	const lib::point p = m_dest->get_global_topleft();
-	AM_DBG lib::logger::get_logger()->debug(
-		"qt_html_renderer.redraw(0x%x):"
-		"ltrb=(%d,%d,%d,%d)\nm_url = %s, p=(%d,%d)",
-		(void *)this, r.left(), r.top(), r.right(), r.bottom(),
-		(const char*) m_url.get_url().c_str(),
-		p.x, p.y);
-	// Get the top-level surface
-	ambulant_qt_window* aqw = (ambulant_qt_window*)window;
-	qt_ambulant_widget* qaw = aqw->get_ambulant_widget();
-
-	if(!qaw) return;
-	
-	if ( ! m_html_browser) {
-		//XXXX for some reason the pointer to the browser is stored in the parent of the current surface node
-		common::surface_impl* parent = ((common::surface_impl*)m_dest)->get_parent();
-		// Parent can be NULL, when playing on the default region
-		if (parent == NULL) parent = (common::surface_impl*)m_dest;
-		m_html_browser = (KHTMLPart*) parent->get_renderer_data(parent);
-		if (m_html_browser == NULL) {
-			m_html_browser = new KHTMLPart((QWidget*)qaw);
-			parent->set_renderer_data(parent, m_html_browser);
-		}
-	}
-	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::redraw_body(0x%x) html_browser=0x%x",this,m_html_browser);
-	assert(m_html_browser != NULL);
-	m_html_browser->openURL(m_url.get_url().c_str());
-	m_html_browser->view()->resize(r.width(),r.height());
-
-	m_html_browser->show();
-	m_lock.leave();
-}
-#endif
 #endif/*WITH_QT_HTML_WIDGET*/
