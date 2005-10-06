@@ -54,7 +54,7 @@
 #include "ambulant/gui/cocoa/cocoa_html.h"
 //#include "ambulant/gui/cocoa/cocoa_transition.h"
 #include "ambulant/common/region_info.h"
-#include "ambulant/common/region.h" // TMP!
+#include "ambulant/lib/callback.h"
 #include <WebKit/WebKit.h>
 
 #ifndef AM_DBG
@@ -106,19 +106,38 @@ namespace cocoa {
 // ref_counted container for the WebViewController class. Cleans up
 // the WebViewController and the WebView when its refcount drops to zero.
 class wvc_container : public lib::ref_counted_obj {
+	WebViewController *m_wvc;
+	int m_generation;
   public:
-	WebViewController *wvc;
-	
 	wvc_container(WebViewController *it)
-	:	wvc(it) {
-		[wvc retain];
+	:	m_wvc(it),
+		m_generation(0)
+	{
 	}
 	~wvc_container() {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		[[wvc view] release];
-		[wvc release];
-		wvc = NULL;
+		[[m_wvc view] release];
+		[m_wvc release];
+		m_wvc = NULL;
 		[pool release];
+	}
+	WebViewController *show() {
+		m_generation++;
+		return m_wvc;
+	}
+	void hide_generation(int gen) {
+		if (m_generation == gen) {
+			[[m_wvc view] removeFromSuperviewWithoutNeedingDisplay];
+			m_generation++;
+			/*AM_DBG*/ lib::logger::get_logger()->debug("wvc_container: %d: hiding HTML view", gen);
+		} else {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("wvc_container: %d: not hiding HTML view", gen);
+		}
+	}
+	void hide(event_processor *evp) {
+		typedef lib::scalar_arg_callback_event<wvc_container, int> hide_cb;
+		hide_cb *cb = new hide_cb(this, &wvc_container::hide_generation, m_generation);
+		evp->add_event(cb, 1, lib::event_processor::med);
 	}
 };
 
@@ -136,8 +155,10 @@ _get_html_view(common::surface *surf)
 		const rect& amrect = surf->get_rect();
 		NSRectHolder *crect = [[NSRectHolder alloc] initWithRect: NSMakeRect(amrect.left(), amrect.top(), amrect.width(), amrect.height())];
 		[crect autorelease];
-		wvc = new wvc_container([[WebViewController alloc] init]);
-		[wvc->wvc performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
+		WebViewController *ctrl = [[[WebViewController alloc] init] retain];
+		[ctrl performSelectorOnMainThread: @selector(create:) withObject: crect waitUntilDone: YES];
+
+		wvc = new wvc_container(ctrl);
 	}
 	surf->set_renderer_private_data(my_renderer_id, (common::renderer_private_data *)wvc);
 	return wvc;
@@ -151,7 +172,8 @@ cocoa_html_renderer::start(double where) {
 	if (m_dest) {
 		assert(m_html_view == NULL);
 		m_html_view = _get_html_view(m_dest);
-		WebView *view = [m_html_view->wvc view];
+		WebViewController *wvc = m_html_view->show();
+		WebView *view = [wvc view];
 		
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
 		net::url url = m_node->get_url("src");
@@ -163,13 +185,17 @@ cocoa_html_renderer::start(double where) {
 			assert(amwindow);
 			AmbulantView *mainview = (AmbulantView *)amwindow->view();
 			assert(mainview);
-			[mainview addSubview: view];
+			if ([view superview]) {
+				assert([view superview] == mainview);
+			} else {
+				[mainview addSubview: view];
+			}
 			// Setup an URL loader and tell the frame about it
 			WebFrame *frame = [view mainFrame];
 			assert(frame);
 			NSString *cstr = [NSString stringWithCString: url.get_url().c_str()];
 			NSURL *curl = [NSURL URLWithString: cstr];
-			[m_html_view->wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
+			[wvc performSelectorOnMainThread: @selector(load:) withObject: curl waitUntilDone: NO];
 		}
 	}
 	m_lock.leave();
@@ -183,10 +209,10 @@ cocoa_html_renderer::stop() {
 	if (m_html_view) {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
 		// Unhook the view from the view hierarchy.
-		WebView *view = [m_html_view->wvc view];
-		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
-		if ([[view mainFrame] dataSource] == nil) lib::logger::get_logger()->debug("cocoa_html_renderer: not complete yet!");
-		// [view removeFromSuperviewWithoutNeedingDisplay]; 
+		m_html_view->hide(m_event_processor);
+//		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
+//		if ([[view mainFrame] dataSource] == nil) lib::logger::get_logger()->debug("cocoa_html_renderer: not complete yet!");
+//		// [view removeFromSuperviewWithoutNeedingDisplay]; 
 	}
 	renderer_playable::stop();
 	m_lock.leave();
