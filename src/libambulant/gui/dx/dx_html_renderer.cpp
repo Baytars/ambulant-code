@@ -79,17 +79,35 @@ using namespace ambulant;
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"dx_html_renderer";
 
 class gui::dx::browser_container : public lib::ref_counted_obj {
-  public:
     html_browser *m_browser;
-	bool m_busy;
+    int m_generation;
+  public:
 	browser_container(html_browser *br)
 		:	m_browser(br),
-			m_busy(false) {}
+			m_generation(0) {}
 
 	~browser_container() {
 		/*AM*DBG*/ lib::logger::get_logger()->debug("~browser_container(m_browser=0x%x)", m_browser);
 		m_browser->hide();
 		// XXX Cannot delete?
+	}
+    html_browser *show() {
+        m_generation++;
+        return m_browser;
+    }
+	void hide_generation(int gen) {
+		if (m_generation == gen) {
+			m_browser->hide();
+			m_generation++;
+			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
+		} else {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
+		}
+	}
+	void hide(event_processor *evp) {
+		typedef lib::scalar_arg_callback_event<browser_container, int> hide_cb;
+		hide_cb *cb = new hide_cb(this, &browser_container::hide_generation, m_generation);
+		evp->add_event(cb, 1, lib::event_processor::med);
 	}
 };
 
@@ -127,50 +145,31 @@ gui::dx::dx_html_renderer::start(double t) {
 		m_dest->set_renderer_private_data(my_renderer_id, static_cast<common::renderer_private_data*>(m_html_browser));
 	}
 	assert(m_html_browser);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x) html_widget=0x%x",this,m_html_browser->m_browser);
+	html_browser *it = m_html_browser->show();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x) html_widget=0x%x", this, it);
 
-	assert(!m_html_browser->m_busy);
-	m_html_browser->m_busy = true;
 	net::url url = m_node->get_url("src");
-	m_html_browser->m_browser->goto_url(url);
+	it->goto_url(url);
 
-	m_html_browser->m_browser->show();
+	it->show();
 
-#ifdef JACK_THINKS_THIS_IS_WRONG
-	if(m_activated) {
-		// repeat
-		m_dest->need_redraw();
-		return;	
-	}
-#endif
 	// Activate this renderer.
 	// Add this renderer to the display list of the region
 	m_dest->show(this);
 	m_dest->need_events(m_wantclicks);
 	m_activated = true;
-#ifdef JACK_THINKS_THIS_IS_WRONG
-	
-	// Request a redraw
-	// Currently already done by show()
-	// m_dest->need_redraw();
-
-	// Notify scheduler that we're done playing
-	m_context->stopped(m_cookie);
-#endif
 }
 
 void
 gui::dx::dx_html_renderer::stop() {
 	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
-//KB	delete m_html_widget;
-//KB	m_html_widget = NULL;
 	// m_html_browser->hide();
 	assert(m_html_browser);
-	assert(m_html_browser->m_busy);
-	m_html_browser->m_busy = false;
+
 	m_dest->renderer_done(this);
 	m_activated = false;
 	m_dxplayer->stopped(this);
+	m_html_browser->hide(m_event_processor);
 }
 
 void
@@ -185,19 +184,7 @@ gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 void
 gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *window) {
 	// Get the top-level surface
-#ifdef JACK_THINKS_THIS_IS_WRONG
-	dx_window *dxwindow = static_cast<dx_window*>(window);
-	viewport *v = dxwindow->get_viewport();
-	if(!v) return;
-	
-	if(!m_html_browser) {
-		// No html_widget available
-		AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::redraw with no dx_html_widget");
-		return;
-	}
-	
-#endif
-	lib::logger::get_logger()->debug("dx_html_renderer::redraw");
+    /*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::redraw");
 }
 
 #endif // WITH_HTML_WIDGET
