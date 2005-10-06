@@ -129,9 +129,9 @@ class wvc_container : public lib::ref_counted_obj {
 		if (m_generation == gen) {
 			[[m_wvc view] removeFromSuperviewWithoutNeedingDisplay];
 			m_generation++;
-			/*AM_DBG*/ lib::logger::get_logger()->debug("wvc_container: %d: hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("wvc_container: %d: hiding HTML view", gen);
 		} else {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("wvc_container: %d: not hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("wvc_container: %d: not hiding HTML view", gen);
 		}
 	}
 	void hide(event_processor *evp) {
@@ -175,10 +175,10 @@ cocoa_html_renderer::start(double where) {
 		WebViewController *wvc = m_html_view->show();
 		WebView *view = [wvc view];
 		
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
+		AM_DBG lib::logger::get_logger()->debug("cocoa_html_renderer: view=0x%x", view);
 		net::url url = m_node->get_url("src");
 		if (view) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: display %s", url.get_url().c_str());
+			AM_DBG lib::logger::get_logger()->debug("cocoa_html_renderer: display %s", url.get_url().c_str());
 			// Hook the HTML view into the hierarchy. It is retained there,
 			// so we release it.
 			cocoa_window *amwindow = (cocoa_window *)m_dest->get_gui_window();
@@ -207,7 +207,7 @@ cocoa_html_renderer::stop() {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	m_lock.enter();
 	if (m_html_view) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
+		AM_DBG lib::logger::get_logger()->debug("cocoa_html_renderer: stop display");
 		// Unhook the view from the view hierarchy.
 		m_html_view->hide(m_event_processor);
 //		lib::logger::get_logger()->debug("cocoa_html_renderer: %f%% done", [view estimatedProgress]);
