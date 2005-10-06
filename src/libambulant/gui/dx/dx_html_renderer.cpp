@@ -184,7 +184,7 @@ gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 void
 gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *window) {
 	// Get the top-level surface
-    /*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::redraw");
+//    /*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::redraw");
 }
 
 #endif // WITH_HTML_WIDGET
