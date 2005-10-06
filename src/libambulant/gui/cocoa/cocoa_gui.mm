@@ -174,9 +174,8 @@ cocoa_renderer_factory::new_playable(
 		rv = new cocoa_image_renderer(context, cookie, node, evp, m_factory);
 		AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_image_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "text") {
-		std::string src = net::url(node->get_url("src")).get_url();
-		if (src.find(".html") != std::string::npos
-		    || src.find(".htm") != std::string::npos)
+		net::url url = net::url(node->get_url("src"));
+		if (url.guesstype() == "text/html")
 		{
 			rv = new cocoa_html_renderer(context, cookie, node, evp);
 			AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_html_renderer 0x%x", (void *)node, (void *)rv);
