@@ -89,9 +89,9 @@ class gui::qt::browser_container : public ref_counted_obj {
 		if (m_generation == gen) {
 			m_browser->hide();
 			m_generation++;
-			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
 		} else {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
 		}
 	}
 	void hide(event_processor *evp) {
@@ -146,7 +146,7 @@ gui::qt::qt_html_renderer::start(double t) {
 	}
 	assert(m_html_browser);
 	KHTMLPart *browser = m_html_browser->show();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("qt_html_renderer::start(0x%x) html_widget=0x%x",this,browser);
+	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::start(0x%x) html_widget=0x%x",this,browser);
 
 	net::url url = m_node->get_url("src");
 	browser->openURL(url.get_url().c_str());
