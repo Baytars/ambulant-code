@@ -99,9 +99,9 @@ class gui::dx::browser_container : public lib::ref_counted_obj {
 		if (m_generation == gen) {
 			m_browser->hide();
 			m_generation++;
-			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("browser_container: %d: hiding HTML view", gen);
 		} else {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
+			AM_DBG lib::logger::get_logger()->debug("browser_container: %d: not hiding HTML view", gen);
 		}
 	}
 	void hide(event_processor *evp) {
@@ -146,7 +146,7 @@ gui::dx::dx_html_renderer::start(double t) {
 	}
 	assert(m_html_browser);
 	html_browser *it = m_html_browser->show();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x) html_widget=0x%x", this, it);
+	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::start(0x%x) html_widget=0x%x", this, it);
 
 	net::url url = m_node->get_url("src");
 	it->goto_url(url);
@@ -162,7 +162,7 @@ gui::dx::dx_html_renderer::start(double t) {
 
 void
 gui::dx::dx_html_renderer::stop() {
-	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
+	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::stop(0x%x)", this);
 	// m_html_browser->hide();
 	assert(m_html_browser);
 
@@ -184,7 +184,7 @@ gui::dx::dx_html_renderer::user_event(const lib::point& pt, int what) {
 void
 gui::dx::dx_html_renderer::redraw(const lib::rect& dirty, common::gui_window *window) {
 	// Get the top-level surface
-//    /*AM_DBG*/ lib::logger::get_logger()->debug("dx_html_renderer::redraw");
+//    AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::redraw");
 }
 
 #endif // WITH_HTML_WIDGET
