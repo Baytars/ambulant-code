@@ -1,10 +1,10 @@
 Ambulant Player README
 ======================
 
-This directory contains version 1.5 (non-release) of the Ambulant Player,
-a playback engine for SMIL documents. This release supports SMIL 2.1 RC.
+This directory contains version 1.6 (non-release) of the Ambulant Player,
+a playback engine for SMIL documents. This release supports SMIL 2.1.
 The Ambulant homepage at <http://www.ambulantplayer.org> has more information,
-also on exploring SMIL 2.1 PR.
+also on exploring SMIL 2.1.
 
 Ambulant consists of a core library implementing the engine,
 a number of GUI-toolkit specific libraries implementing renderers,
@@ -88,13 +88,13 @@ RTSP support has not been tested very thoroughly, feedback is requested.
 SMIL 2.1 support
 ----------------
 
-This release includes full support for SMIL 2.1 Release Candidate.
+This release includes full support for SMIL 2.1.
 All new 2.1 features are implemented on all platforms, with two exceptions:
 - backgroundRepeat is not implemented in the Windows CE player
 - soundAlign is not implemented in the Windows CE player
 
 The Ambulant homepage, <http://www.ambulantplayer.org>, has more
-information on SMIL 2.1 RC, test documents, etc.
+information on SMIL 2.1, test documents, etc.
 
 SMIL 2.0 support
 ----------------
