@@ -528,10 +528,10 @@ dnl
 dnl Need to check for post 0.4.9 cvs-style pkg-config support here too
 dnl
 
-dnl test for slurped version (default 0.4.8, otherwise use --with-ffmpeg argument)
+dnl test for slurped version (default cvs, otherwise use --with-ffmpeg argument)
 if test "x$test_ffmpeg" = "xmanual"; then
-    if test "x$withval" = "xyes" -a -f `pwd`/third_party_packages/ffmpeg-0.4.8/libavcodec/avcodec.h; then
-        withval=third_party_packages/ffmpeg-0.4.8
+    if test "x$withval" = "xyes" -a -f `pwd`/third_party_packages/ffmpeg-cvs/libavcodec/avcodec.h; then
+        withval=third_party_packages/ffmpeg-cvs
     fi
 	if test -f ${withval}/libavcodec/avcodec.h; 	then
 			withvalabs=`cd ${withval}; pwd`
