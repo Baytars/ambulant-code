@@ -32,10 +32,19 @@ others:
 	best interest to use the third_party_packages_win_20051212.zip 
 	archive we have prepared.
 	
+	After downloading and unpacking the zipfile move the 4 individual
+	folders from "INTO_third_party_packages" into this directory. Then
+	open third_party_packages.sln (windows desktop) or third_party_packages.vcw
+	(Windows CE), and build "Release". NOTE THAT LAST SENTENCE: you must
+	build the Release configuration, the default configuration opened is
+	not what you want (and we don't know how to fix this).
+	
 	If you really want to build from original distributions: the directory
 	win32_diff has all the project files that you need, move them into
 	the corresponding place in a freshly downloaded distribution of
 	{jpeg, zlib, mp3lib, libpng}. You'll probably need to fix them.
+	
+	RELEASE!
 	
 Unix (Linux, MacOSX)
 ====================
