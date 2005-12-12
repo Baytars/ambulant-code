@@ -2,8 +2,8 @@
 // Microsoft Visual C++ generated include file.
 // Used by AmbulantPlayer.rc
 //
-#define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
+#define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
 #define IDR_AMBULANTPLAYERTYPE          129
 #define IDC_CURSOR_HAND                 130
