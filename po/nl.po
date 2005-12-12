@@ -262,7 +262,7 @@ msgstr "DOM-tree kan niet gebouwd worden: %s"
 #: src/player_macosx/mainloop.cpp:177
 #, fuzzy, c-format
 msgid "%s: node ID not found"
-msgstr "Bestand kan niet geopend worden: %s"
+msgstr "%s: Node ID niet gevonden"
 
 #: src/player_macosx/mainloop.cpp:206
 #, c-format
@@ -283,7 +283,7 @@ msgstr "Open &URL..."
 
 #: src/player_unix/qt_gui.cpp:148
 msgid "&Reload..."
-msgstr ""
+msgstr "&Laad Opnieuw"
 
 #: src/player_unix/qt_gui.cpp:156
 msgid "&Settings"
@@ -388,7 +388,7 @@ msgstr "Dubbelklik om een bestand te openen"
 
 #: src/player_unix/qt_gui.cpp:395
 msgid "Settings files (*.xml)"
-msgstr ""
+msgstr "Instellingenbestanden (*.xml)"
 
 #: src/player_unix/qt_gui.cpp:397
 msgid "open settings file dialog"
