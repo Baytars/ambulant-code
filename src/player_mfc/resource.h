@@ -27,6 +27,8 @@
 #define IDC_VALIDATION_SCHEME           1011
 #define IDSHOWLOG                       1012
 #define IDC_MESSAGE                     1013
+#define IDC_CHECK1                      1014
+#define IDC_CHECK2                      1015
 #define ID_FILE_PLAY                    32771
 #define ID_FILE_PAUSE                   32772
 #define ID_FILE_STOP                    32773
@@ -46,7 +48,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif
