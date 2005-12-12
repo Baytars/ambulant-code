@@ -8,14 +8,6 @@ Here is a list of the packages, where they come from, plus the versions:
 Windows Desktop, Windows CE
 ===========================
 
-expat:
-	Windows only.
-	
-	James Clark's expat XML parser library, version 1.95.7. Download via
-	<http://expat.sourceforge.net>. Installed with the win32 binary
-	installer (it seems to be difficult to build from the source).
-
-
 xerces:
 	windows only.
 	
@@ -36,9 +28,14 @@ xerces:
 	
 others:
 	For this release we don't fully remember where we got the other
-	libraries (jpeg, zlib, mp3lib, lpng125), so it is really in your
-	best interest to use the third_party_packages-WIN.zip archive we
-	have prepared.
+	libraries (jpeg, zlib, mp3lib, lpng128), so it is really in your
+	best interest to use the third_party_packages_win_20051212.zip 
+	archive we have prepared.
+	
+	If you really want to build from original distributions: the directory
+	win32_diff has all the project files that you need, move them into
+	the corresponding place in a freshly downloaded distribution of
+	{jpeg, zlib, mp3lib, libpng}. You'll probably need to fix them.
 	
 Unix (Linux, MacOSX)
 ====================

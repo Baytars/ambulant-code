@@ -17,6 +17,8 @@ Changes between 1.6 and 1.4.5:
 
 - The build procedure for Linux/Mac has been enhanced, and support for
   pkg-config has been added.
+  
+- An experimental Mozilla/Firefox plugin is available for Windows.
 
 - Developers: Ambulant is now distributed with an LGPL license in stead of
   the previous GPL-with-exceptions licence.
