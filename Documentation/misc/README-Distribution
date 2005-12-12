@@ -155,10 +155,13 @@ Creating the MacOSX installer
 
 - Build the whole source tree, don't forget options for
   enabling xerces, etc. You want to build with Xerces in a plugin,
+  live support, no Python support, only fast internal DOM acces,
   i.e. with
-    configure --with-xerces --with-xerces-plugin
+    ../configure -C --with-ffmpeg --without-external-dom \
+        --without-python --with-live \
+        --with-xerces --with-xerces-plugin
 - Install the player in src/player_macos.
-- Create a folder called something like "Ambulant Player 1.2", 
+- Create a folder called something like "Ambulant Player 1.6", 
   and copy the items mentioned above into it.
 - Use Applications->Utilities->Disk Utilities to create a .dmg
   disk image from this folder (read only, compressed). Make sure the
