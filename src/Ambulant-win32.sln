@@ -17,7 +17,7 @@ Global
 		Release = Release
 		ReleaseNoXerces = ReleaseNoXerces
 		ReleaseShlib = ReleaseShlib
-		ReleastNoXercesNoHtml = ReleastNoXercesNoHtml
+		ReleaseNoXercesNoHtml = ReleaseNoXercesNoHtml
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Debug.ActiveCfg = Debug|Win32
@@ -34,8 +34,8 @@ Global
 		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXerces.Build.0 = ReleaseNoXerces|Win32
 		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib.ActiveCfg = ReleaseShlib|Win32
 		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib.Build.0 = ReleaseShlib|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleastNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleastNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug.ActiveCfg = Debug|Win32
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug.Build.0 = Debug|Win32
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXerces.ActiveCfg = DebugNoXerces|Win32
@@ -50,8 +50,8 @@ Global
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXerces.Build.0 = ReleaseNoXerces|Win32
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib.ActiveCfg = ReleaseShlib|Win32
 		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib.Build.0 = ReleaseShlib|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleastNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleastNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
