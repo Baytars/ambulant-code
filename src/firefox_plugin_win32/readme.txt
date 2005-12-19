@@ -17,6 +17,7 @@ Prequisites.
    - WITH_HTML_WIDGET
    - WITH_XERCES
    - WITH_XERCES_BUILIN
+   Also, exclude dx_html_renderer.cpp from the build.
 
 2. The original GeckoPluginSDK from www.mozilla.org/projects/plugins
    must have been downloaded and built in ..\..\third_party_packages.
