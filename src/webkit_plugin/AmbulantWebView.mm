@@ -7,7 +7,7 @@
 //
 
 #import "AmbulantWebView.h"
-
+#import <WebKit/WebKit.h>
 
 @implementation AmbulantWebView
 
@@ -41,26 +41,21 @@
 
 - (void)webPlugInStart
 {
-#if 0
-    if (!_loadedMovie) {
-        _loadedMovie = YES;
-        NSDictionary *webPluginAttributesObj = [_arguments objectForKey:WebPlugInAttributesKey];
+    if (!m_mainloop) {
+        NSDictionary *webPluginAttributesObj = [m_arguments objectForKey:WebPlugInAttributesKey];
         NSString *URLString = [webPluginAttributesObj objectForKey:@"src"];
         if (URLString != nil && [URLString length] != 0) {
-            NSURL *baseURL = [_arguments objectForKey:WebPlugInBaseURLKey];
+            NSURL *baseURL = [m_arguments objectForKey:WebPlugInBaseURLKey];
             NSURL *URL = [NSURL URLWithString:URLString relativeToURL:baseURL];
-            NSMovie *movie = [[NSMovie alloc] initWithURL:URL byReference:NO];
-            [self setMovie:movie];
-            [movie release];
+            m_mainloop = new mainloop([[URL absoluteString] UTF8String], NULL /*myWindowFactory*/, false, NULL /*embedder*/);			
         }
     }
-    
-#endif
-    [self startPlayer];
+	[self startPlayer];
 }
 
 - (void)webPlugInStop
 {
+	[self stopPlayer];
 }
 
 - (void)webPlugInDestroy

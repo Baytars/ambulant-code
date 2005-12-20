@@ -7,17 +7,19 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#include "ambulant/gui/cocoa/cocoa_gui.h"
+#include "../player_macosx/mainloop.h"
 
-
-@interface AmbulantWebView : NSView {
+@interface AmbulantWebView : AmbulantView {
 	NSDictionary *m_arguments;
+	mainloop *m_mainloop;
 }
 
 - (void)setArguments:(NSDictionary *)arguments;
 
 - (void)startPlayer;
 - (void)stopPlayer;
-- (void)testartPlayer;
+- (void)restartPlayer;
 - (void)pausePlayer;
 - (void)resumePlayer;
 @end

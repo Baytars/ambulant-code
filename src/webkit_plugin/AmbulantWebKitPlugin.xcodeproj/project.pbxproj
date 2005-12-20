@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		045D0B220958C14700C194EE /* libambulant.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B210958C14700C194EE /* libambulant.a */; };
+		045D0B2D0958C23900C194EE /* libambulant_sdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B290958C23900C194EE /* libambulant_sdl.a */; };
+		045D0B2E0958C23900C194EE /* libambulant_live.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B2A0958C23900C194EE /* libambulant_live.a */; };
+		045D0B2F0958C23900C194EE /* libambulant_ffmpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B2B0958C23900C194EE /* libambulant_ffmpeg.a */; };
+		045D0B300958C23900C194EE /* libambulant_cocoa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B2C0958C23900C194EE /* libambulant_cocoa.a */; };
+		045D0B350958C26800C194EE /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B340958C26800C194EE /* QuickTime.framework */; };
+		045D0B5C0958C36B00C194EE /* libintl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B5B0958C36B00C194EE /* libintl.a */; };
+		045D0B800958C53F00C194EE /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045D0B7E0958C53F00C194EE /* mainloop.cpp */; };
+		045D0B930958C71E00C194EE /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B920958C71E00C194EE /* libexpat.a */; };
 		049775AC0958AC7600A7690F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049775AB0958AC7600A7690F /* WebKit.framework */; };
 		049775B90958ADC500A7690F /* AmbulantWebView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -29,6 +38,16 @@
 /* End PBXBuildStyle section */
 
 /* Begin PBXFileReference section */
+		045D0B210958C14700C194EE /* libambulant.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant.a; path = ../libambulant/.libs/libambulant.a; sourceTree = SOURCE_ROOT; };
+		045D0B290958C23900C194EE /* libambulant_sdl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_sdl.a; path = ../libambulant/.libs/libambulant_sdl.a; sourceTree = SOURCE_ROOT; };
+		045D0B2A0958C23900C194EE /* libambulant_live.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_live.a; path = ../libambulant/.libs/libambulant_live.a; sourceTree = SOURCE_ROOT; };
+		045D0B2B0958C23900C194EE /* libambulant_ffmpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_ffmpeg.a; path = ../libambulant/.libs/libambulant_ffmpeg.a; sourceTree = SOURCE_ROOT; };
+		045D0B2C0958C23900C194EE /* libambulant_cocoa.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_cocoa.a; path = ../libambulant/.libs/libambulant_cocoa.a; sourceTree = SOURCE_ROOT; };
+		045D0B340958C26800C194EE /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
+		045D0B5B0958C36B00C194EE /* libintl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libintl.a; path = /usr/local/lib/libintl.a; sourceTree = "<absolute>"; };
+		045D0B7E0958C53F00C194EE /* mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop.cpp; path = ../player_macosx/mainloop.cpp; sourceTree = SOURCE_ROOT; };
+		045D0B7F0958C53F00C194EE /* mainloop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mainloop.h; path = ../player_macosx/mainloop.h; sourceTree = SOURCE_ROOT; };
+		045D0B920958C71E00C194EE /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = "../../../../packages/expat-unix/lib/libexpat.a"; sourceTree = SOURCE_ROOT; };
 		049775AB0958AC7600A7690F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		049775B70958ADC500A7690F /* AmbulantWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantWebView.h; sourceTree = "<group>"; };
 		049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AmbulantWebView.mm; sourceTree = "<group>"; };
@@ -48,12 +67,32 @@
 			files = (
 				8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */,
 				049775AC0958AC7600A7690F /* WebKit.framework in Frameworks */,
+				045D0B220958C14700C194EE /* libambulant.a in Frameworks */,
+				045D0B2D0958C23900C194EE /* libambulant_sdl.a in Frameworks */,
+				045D0B2E0958C23900C194EE /* libambulant_live.a in Frameworks */,
+				045D0B2F0958C23900C194EE /* libambulant_ffmpeg.a in Frameworks */,
+				045D0B300958C23900C194EE /* libambulant_cocoa.a in Frameworks */,
+				045D0B350958C26800C194EE /* QuickTime.framework in Frameworks */,
+				045D0B5C0958C36B00C194EE /* libintl.a in Frameworks */,
+				045D0B930958C71E00C194EE /* libexpat.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		045D0B570958C26F00C194EE /* Ambulant */ = {
+			isa = PBXGroup;
+			children = (
+				045D0B210958C14700C194EE /* libambulant.a */,
+				045D0B290958C23900C194EE /* libambulant_sdl.a */,
+				045D0B2A0958C23900C194EE /* libambulant_live.a */,
+				045D0B2B0958C23900C194EE /* libambulant_ffmpeg.a */,
+				045D0B2C0958C23900C194EE /* libambulant_cocoa.a */,
+			);
+			name = Ambulant;
+			sourceTree = "<group>";
+		};
 		089C166AFE841209C02AAC07 /* AmbulantWebKitPlugin */ = {
 			isa = PBXGroup;
 			children = (
@@ -69,6 +108,9 @@
 		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				045D0B570958C26F00C194EE /* Ambulant */,
+				045D0B5B0958C36B00C194EE /* libintl.a */,
+				045D0B920958C71E00C194EE /* libexpat.a */,
 				1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */,
 				1058C7AEFEA557BF11CA2CBB /* Other Frameworks */,
 			);
@@ -96,6 +138,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				045D0B340958C26800C194EE /* QuickTime.framework */,
 				049775AB0958AC7600A7690F /* WebKit.framework */,
 				1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */,
 			);
@@ -122,6 +165,8 @@
 		32C88E010371C26100C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				045D0B7E0958C53F00C194EE /* mainloop.cpp */,
+				045D0B7F0958C53F00C194EE /* mainloop.h */,
 				32DBCF630370AF2F00C91783 /* AmbulantWebKitPlugin_Prefix.pch */,
 			);
 			name = "Other Sources";
@@ -188,6 +233,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				049775B90958ADC500A7690F /* AmbulantWebView.mm in Sources */,
+				045D0B800958C53F00C194EE /* mainloop.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,8 +261,14 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantWebKitPlugin_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../include;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Internet Plug-Ins";
+				LIBRARY_SEARCH_PATHS = (
+					../libambulant/.libs,
+					/usr/local/lib,
+					"$(SRCROOT)/../../../../packages/expat-unix/lib",
+				);
 				PRODUCT_NAME = AmbulantWebKitPlugin;
 				WRAPPER_EXTENSION = plugin;
 				ZERO_LINK = YES;
@@ -234,8 +286,14 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantWebKitPlugin_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../../include;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Internet Plug-Ins";
+				LIBRARY_SEARCH_PATHS = (
+					../libambulant/.libs,
+					/usr/local/lib,
+					"$(SRCROOT)/../../../../packages/expat-unix/lib",
+				);
 				PRODUCT_NAME = AmbulantWebKitPlugin;
 				WRAPPER_EXTENSION = plugin;
 			};
