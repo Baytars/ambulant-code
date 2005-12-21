@@ -211,14 +211,24 @@ cocoa_window_factory::new_window(const std::string &name, size bounds, gui_event
 	cocoa_window *window = new cocoa_window(name, bounds, m_defaultwindow_view, handler);
 	// And we need to inform the object about it
 	AmbulantView *view = (AmbulantView *)window->view();
-	// And set the window size
 	[view setAmbulantWindow: window];
+	// And set the window size
+	init_window_size(window, name, bounds);
+	
+	return (gui_window *)window;
+}
+
+void
+cocoa_window_factory::init_window_size(cocoa_window *window, const std::string &name, lib::size bounds)
+{
+	// And we need to inform the object about it
+	AmbulantView *view = (AmbulantView *)window->view();
+	// And set the window size
 	AM_DBG NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
 	NSSize cocoa_size = NSMakeSize(bounds.w + [view frame].origin.x, bounds.h + [view frame].origin.y);
 	[[view window] setContentSize: cocoa_size];
 	AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", [view window], cocoa_size.width, cocoa_size.height);
 	[[view window] makeKeyAndOrderFront: view];
-	return (gui_window *)window;
 }
 
 common::bgrenderer *
