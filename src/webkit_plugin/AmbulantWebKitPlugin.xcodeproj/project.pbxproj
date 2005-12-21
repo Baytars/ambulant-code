@@ -267,7 +267,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					../libambulant/.libs,
 					/usr/local/lib,
-					"$(SRCROOT)/../../../../packages/expat-unix/lib",
+					"../../third_party_packages/expat-unix/lib",
 				);
 				PRODUCT_NAME = AmbulantWebKitPlugin;
 				WRAPPER_EXTENSION = plugin;
@@ -292,7 +292,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					../libambulant/.libs,
 					/usr/local/lib,
-					"$(SRCROOT)/../../../../packages/expat-unix/lib",
+					"../../third_party_packages/expat-unix/lib",
 				);
 				PRODUCT_NAME = AmbulantWebKitPlugin;
 				WRAPPER_EXTENSION = plugin;

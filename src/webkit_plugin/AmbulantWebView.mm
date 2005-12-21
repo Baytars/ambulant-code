@@ -43,14 +43,18 @@
 {
     if (!m_mainloop) {
         NSDictionary *webPluginAttributesObj = [m_arguments objectForKey:WebPlugInAttributesKey];
-        NSString *URLString = [webPluginAttributesObj objectForKey:@"src"];
-        if (URLString != nil && [URLString length] != 0) {
-            NSURL *baseURL = [m_arguments objectForKey:WebPlugInBaseURLKey];
-            NSURL *URL = [NSURL URLWithString:URLString relativeToURL:baseURL];
-            m_mainloop = new mainloop([[URL absoluteString] UTF8String], NULL /*myWindowFactory*/, false, NULL /*embedder*/);			
-        }
+        NSString *urlString = [webPluginAttributesObj objectForKey:@"src"];
+        if (urlString != nil && [urlString length] != 0) {
+            NSURL *baseUrl = [m_arguments objectForKey:WebPlugInBaseURLKey];
+            NSURL *url = [NSURL URLWithString:urlString relativeToURL:baseUrl];
+			if (url) {
+				m_mainloop = new mainloop([[url absoluteString] UTF8String], NULL /*myWindowFactory*/, false, NULL /*embedder*/);			
+			}
+		}
     }
-	[self startPlayer];
+	if (m_mainloop) {
+		[self startPlayer];
+	}
 }
 
 - (void)webPlugInStop
