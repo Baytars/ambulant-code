@@ -59,7 +59,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy /y .\Debug\npscriptable.dll  &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
-copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plugins\nsIScriptablePluginSample.xpt&quot;
+copy /y .\nsIAmbulantPlugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\nsIAmbulantPlugin.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -129,7 +129,7 @@ copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plu
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy /y .\Release\npscriptable.dll  &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
-copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plugins\nsIScriptablePluginSample.xpt&quot;
+copy /y .\nsIAmbulantPlugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\nsIAmbulantPlugin.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -265,7 +265,7 @@ copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plu
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="nsIScriptablePluginSample.idl">
+				RelativePath="nsIAmbulantPlugin.idl">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -273,9 +273,8 @@ copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plu
 						Description="Running the XPIDL compiler and linker for $(InputName)"
 						CommandLine="..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpidl -m header -I..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\idl &quot;$(InputPath)&quot;
 ..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpidl -m typelib -I..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpt_link npscriptable.xpt nsIScriptablePluginSample.xpt
 "
-						Outputs="nsIScriptablePluginSample.h"/>
+						Outputs="nsIAmbulantPlugin.h;nsIAmbulantPlugin.xpt"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
@@ -284,9 +283,9 @@ copy /y .\nsIScriptablePluginSample.xpt &quot;\Program Files\Mozilla Firefox\plu
 						Description="Running the XPIDL compiler and linker for $(InputName)"
 						CommandLine="..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpidl -m header -I..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\idl &quot;$(InputPath)&quot;
 ..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpidl -m typelib -I..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpt_link npscriptable.xpt nsIScriptablePluginSample.xpt
+..\..\third_party_packages\GeckoPluginSDK-samples\Win32SDK\gecko-sdk\xpcom\bin\xpt_link npscriptable.xpt nsIAmbulantPlugin.xpt
 "
-						Outputs="nsIScriptablePluginSample.h"/>
+						Outputs="nsIAmbulantPlugin.h"/>
 				</FileConfiguration>
 			</File>
 			<File
