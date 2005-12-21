@@ -9,6 +9,19 @@
 #import "AmbulantWebView.h"
 #import <WebKit/WebKit.h>
 
+// Subclasses of various Ambulant classes
+
+class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factory
+{
+  public:
+	my_cocoa_window_factory(void *view)
+	:	cocoa_window_factory(view) {};
+	
+	void init_window_size(
+		ambulant::gui::cocoa::cocoa_window *window, const std::string &name, 
+		ambulant::lib::size bounds) {};
+};
+
 @implementation AmbulantWebView
 
 - (void)drawRect:(NSRect)rect {
@@ -48,7 +61,10 @@
             NSURL *baseUrl = [m_arguments objectForKey:WebPlugInBaseURLKey];
             NSURL *url = [NSURL URLWithString:urlString relativeToURL:baseUrl];
 			if (url) {
-				m_mainloop = new mainloop([[url absoluteString] UTF8String], NULL /*myWindowFactory*/, false, NULL /*embedder*/);			
+				ambulant::gui::cocoa::cocoa_window_factory *myWindowFactory;
+				myWindowFactory = new my_cocoa_window_factory((void *)self);
+
+				m_mainloop = new mainloop([[url absoluteString] UTF8String], myWindowFactory, false, NULL /*embedder*/);			
 			}
 		}
     }
@@ -97,22 +113,34 @@
 
 - (void)startPlayer
 {
+	if (m_mainloop)
+		m_mainloop->play();
 }
 
 - (void)stopPlayer
 {
+	if (m_mainloop)
+		m_mainloop->stop();
 }
 
 - (void)restartPlayer
 {
+	if (m_mainloop) {
+		m_mainloop->stop();
+		m_mainloop->play();
+	}
 }
 
 - (void)pausePlayer
 {
+	if (m_mainloop)
+		m_mainloop->set_speed(0);
 }
 
 - (void)resumePlayer
 {
+	if (m_mainloop)
+		m_mainloop->set_speed(1);
 }
 
 
