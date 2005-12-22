@@ -81,6 +81,7 @@ def process(template, input, output, title=TITLE):
 def usage(long=False):
 	print "Usage: %s [opts] [smilfile ...]" % sys.argv[0]
 	print "Options:"
+	print "--help               Print help message (short: -h)"
 	print "--template htmlfile  Use htmlfile as the template (short: -t)"
 	if long:
 		print
