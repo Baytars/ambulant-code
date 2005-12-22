@@ -24,11 +24,6 @@ class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factor
 };
 
 @implementation AmbulantWebView
-#if 0
-- (void)drawRect:(NSRect)rect {
-    // Drawing code here.
-}
-#endif
 
 + (NSView *)plugInViewWithArguments:(NSDictionary *)arguments
 {
