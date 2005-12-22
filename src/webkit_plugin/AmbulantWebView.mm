@@ -17,16 +17,18 @@ class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factor
 	my_cocoa_window_factory(void *view)
 	:	cocoa_window_factory(view) {};
 	
-	void init_window_size(
+  protected:
+	virtual void init_window_size(
 		ambulant::gui::cocoa::cocoa_window *window, const std::string &name, 
 		ambulant::lib::size bounds) {};
 };
 
 @implementation AmbulantWebView
-
+#if 0
 - (void)drawRect:(NSRect)rect {
     // Drawing code here.
 }
+#endif
 
 + (NSView *)plugInViewWithArguments:(NSDictionary *)arguments
 {
