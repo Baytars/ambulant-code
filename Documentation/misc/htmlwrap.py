@@ -90,8 +90,6 @@ def main():
 	template = TEMPLATE
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "th", ["template", "help"])
-		if not args:
-			raise getopt.errror
 	except getopt.error:
 		usage()
 		sys.exit(2)
@@ -101,6 +99,9 @@ def main():
 		if o in ('-h', '--help'):
 			usage(True)
 			sys.exit(0)
+	if not args:
+		usage()
+		sys.exit(2)
 	allok = True
 	for input in args:
 		output = os.path.splitext(input)[0] + '.html'
