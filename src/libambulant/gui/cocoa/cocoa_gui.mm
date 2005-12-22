@@ -313,6 +313,7 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 {
 	NSRect my_rect = [arect rect];
 	[arect release];
+    AM_DBG NSLog(@"AmbulantView.asyncRedrawForAmbulantRect: self=0x%x rect=(%f,%f,%f,%f)", self, NSMinX(my_rect), NSMinY(my_rect), NSMaxX(my_rect), NSMaxY(my_rect));
 	[self setNeedsDisplayInRect: my_rect];
 }
 
@@ -378,19 +379,12 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 - (void)mouseDown: (NSEvent *)theEvent
 {
 	NSPoint where = [theEvent locationInWindow];
-	// Is it in our frame?
-	if (!NSPointInRect(where, [self frame])) {
+	where = [self convertPoint: where fromView: nil];
+	if (!NSPointInRect(where, [self bounds])) {
 		AM_DBG NSLog(@"mouseDown outside our frame");
 		return;
 	}
-	// Convert from window to frame coordinates
-	where.x -= NSMinX([self frame]);
-	where.y -= NSMinY([self frame]);
-#ifndef USE_COCOA_BOTLEFT
-	// Mouse clicks are not flipped, even if the view is
-	where.y = NSMaxY([self bounds]) - where.y;
-#endif
-	AM_DBG NSLog(@"mouseDown at (%f, %f)", where.x, where.y);
+	AM_DBG NSLog(@"mouseDown at ambulant-point(%f, %f)", where.x, where.y);
 	ambulant::lib::point amwhere = ambulant::lib::point((int)where.x, (int)where.y);
 	if (ambulant_window) ambulant_window->user_event(amwhere);
 }
@@ -398,19 +392,12 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 - (void)mouseMoved: (NSEvent *)theEvent
 {
 	NSPoint where = [theEvent locationInWindow];
-	// Is it in our frame?
-	if (!NSPointInRect(where, [self frame])) {
-		AM_DBG NSLog(@"mouseMoved outside our frame");
+	where = [self convertPoint: where fromView: nil];
+	if (!NSPointInRect(where, [self bounds])) {
+		AM_DBG NSLog(@"mouseDown outside our frame");
 		return;
 	}
-	// Convert from window to frame coordinates
-	where.x -= NSMinX([self frame]);
-	where.y -= NSMinY([self frame]);
-#ifndef USE_COCOA_BOTLEFT
-	// Mouse clicks are not flipped, even if the view is
-	where.y = NSMaxY([self bounds]) - where.y;
-#endif
-	AM_DBG NSLog(@"mouseMoved at (%f, %f)", where.x, where.y);
+	AM_DBG NSLog(@"mouseDown at ambulant-point(%f, %f)", where.x, where.y);
 	ambulant::lib::point amwhere = ambulant::lib::point((int)where.x, (int)where.y);
 	[[NSApplication sharedApplication] sendAction: SEL("resetMouse:") to: nil from: self];
 	if (ambulant_window) ambulant_window->user_event(amwhere, 1);
