@@ -27,4 +27,15 @@ Prequisites.
    This .html file works if you have the Welcome document stored
    in C:\Program Files\AmbulantPlayer-1.6\Extras\Welcome.
 
+4. To create a distribution:
+   - Build the plugin in release mode
+   - Create a folder ambulant-16-firefox-win32
+   - Copy \Program Files\Mozilla Firefox\plugins\npambulant.dll there.
+   - Copy \Program Files\Mozilla Firefox\plugins\nsIAmbulantPlugin.xpt there.
+   - Copy INSTALL.txt there.
+   - Copy toplevel COPYING there.
+   - Zip the ambulant-16-firefox-win32 folder and distribute.
+
+
+
    Kees Blom, Dec. 21th, 2005.
