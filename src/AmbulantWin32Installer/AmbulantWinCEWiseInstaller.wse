@@ -1,7 +1,7 @@
 Document Type: WSE
 item: Global
   Version=9.02
-  Title=Ambulant Handheld Player 1.6 for SMIL 2.1 Installation
+  Title=Ambulant Handheld Player 1.6.1 for SMIL 2.1 Installation
   Title French= Installation
   Flags=00000100
   Languages=65 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -24,7 +24,7 @@ item: Global
   Patch Memory=4000
   MIF PDF Version=1.0
   MIF SMS Version=2.0
-  EXE Filename=..\..\bin\wince\Ambulant-1.6-wince.exe
+  EXE Filename=..\..\bin\wince\Ambulant-1.6.1-wince.exe
   FTP Cluster Size=20
   Per-User Version ID=1
   Dialogs Version=7
@@ -1139,7 +1139,7 @@ item: Remark
 end
 item: Set Variable
   Variable=APPTITLE
-  Value=Ambulant Handheld Player 1.6 for SMIL 2.1
+  Value=Ambulant Handheld Player 1.6.1 for SMIL 2.1
   Flags=10000000
 end
 item: Remark
@@ -2241,7 +2241,7 @@ item: Edit Registry
   Total Keys=3
   item: Key
     Key=Software\Microsoft\Windows\CurrentVersion\Uninstall\%APPTITLE%
-    New Value=1.6
+    New Value=1.6.1
     Value Name=DisplayVersion
     Root=2
   end
