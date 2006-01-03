@@ -6,6 +6,7 @@ AM_INIT_AUTOMAKE(ambulant, $AMBULANT_VERSION)
 dnl =================================================================
 FFMPEG_REQUIRED=0.4.8
 QT_REQUIRED=3.3.4
+GTK_REQUIRED=1.2.8
 
 AC_SUBST(FFMPEG_REQUIRED)
 AC_SUBST(QT_REQUIRED)
@@ -35,6 +36,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 	src/Makefile 
 	src/libambulant/Makefile 
 	src/player_unix/Makefile
+	src/player_gtk/Makefile
 	src/player_macosx/Makefile
 	src/plugins/Makefile
 	src/pyambulant/Makefile
@@ -58,6 +60,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 	include/ambulant/gui/none/Makefile
 	include/ambulant/gui/cocoa/Makefile
 	include/ambulant/gui/qt/Makefile
+	include/ambulant/gui/gtk/Makefile
 	include/ambulant/gui/arts/Makefile
 	include/ambulant/gui/SDL/Makefile
 	third_party_packages/Makefile
@@ -447,6 +450,26 @@ AC_ARG_WITH(sdl,
 AM_CONDITIONAL(WITH_SDL, test x$test_sdl = xtrue)
 AC_MSG_RESULT($test_sdl)
 
+dnl Test for GTK
+dnl ======================================================================
+
+test_gtk=true
+AC_MSG_CHECKING(for gtk - the GIMP Toolkit)
+AC_ARG_WITH(gtk,
+     [  --with-gtk		Turn on/off gtk support],
+     [if test "x$withval" = "xno"; then
+	test_gtk=false
+  else 
+     if gtk-config --libs > /dev/null 2>&1; then
+     test_gtk=true
+     else
+     test_gtk=false
+     fi
+  fi])
+AM_CONDITIONAL(WITH_GTK, test x$test_gtk = xtrue)
+AC_MSG_RESULT($test_gtk)
+
+
 #
 # Test for arts 
 #
@@ -828,6 +851,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 	Build Qt frontend:              ${test_qt}
 	Build Cocoa frontend:		${cocoa}
 	Build with SDL:			${test_sdl}
+	Build with GTK:			${test_gtk}	${gtk_path}
 	Build with ARTS support:	${test_arts}
 	Build with live555.com RTSP:	${test_live}
 	Build with Python support:     ${with_python}
