@@ -450,23 +450,26 @@ AC_ARG_WITH(sdl,
 AM_CONDITIONAL(WITH_SDL, test x$test_sdl = xtrue)
 AC_MSG_RESULT($test_sdl)
 
-dnl Test for GTK
-dnl ======================================================================
+dnl Testing for GTK
+dnl ====================================================================
 
 test_gtk=true
 AC_MSG_CHECKING(for gtk - the GIMP Toolkit)
 AC_ARG_WITH(gtk,
-     [  --with-gtk		Turn on/off gtk support],
+     [  --with-gtk		Enalble/disable GTK support],
      [if test "x$withval" = "xno"; then
-	test_gtk=false
-  else 
-     if gtk-config --libs > /dev/null 2>&1; then
-     test_gtk=true
-     else
-     test_gtk=false
-     fi
-  fi])
+		test_gtk=false	
+      fi
+     ])
+if test "x$test_gtk" = "xtrue"; then
+	PKG_CHECK_MODULES(GTK,[gtk+-2.0 >= 2.6.0], test_gtk=true, test_gtk=false)
+	GTKT_PREFIX="`pkg-config --variable=exec_prefix gtk+-2.0`"
+fi
+
 AM_CONDITIONAL(WITH_GTK, test x$test_gtk = xtrue)
+AC_SUBST(GTK_LIBS)
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_PREFIX)
 AC_MSG_RESULT($test_gtk)
 
 
@@ -851,7 +854,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 	Build Qt frontend:              ${test_qt}
 	Build Cocoa frontend:		${cocoa}
 	Build with SDL:			${test_sdl}
-	Build with GTK:			${test_gtk}	${gtk_path}
+	Build with GTK:			${test_gtk}
 	Build with ARTS support:	${test_arts}
 	Build with live555.com RTSP:	${test_live}
 	Build with Python support:     ${with_python}
