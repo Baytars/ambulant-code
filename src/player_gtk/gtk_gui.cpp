@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include "gtk_gui.h"
-//#include "qtk_mainloop.h"
-//#include "qtk_logger.h"
-//#include "qtk_renderer.h"
+#include "gtk_mainloop.h"
+#include "gtk_logger.h"
+#include "gtk_renderer.h"
 //#include <qthread.h>
 #if 1
 #include "ambulant/config/config.h"
@@ -43,7 +43,7 @@
 
 #define	WITH_QT_LOGGER
 
-const GTKString about_text = 
+const GString about_text = 
 	"Ambulant SMIL 2.1 player.\n"
 	"Copyright Stichting CWI, 2003-2005.\n\n"
 	"License: LGPL.";
@@ -60,7 +60,7 @@ const char *welcome_locations[] = {
 #else
 	"/usr/local/share/ambulant/Welcome/Welcome.smil",
 #endif
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
+#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Qt */
 	"/home/zaurus/Documents/Ambulant/Extras/Welcome/Welcome.smil",
 #endif/*QT_NO_FILEDIALOG*/
 	NULL
@@ -91,19 +91,19 @@ find_datafile(const char **locations)
 gtk_gui::gtk_gui(const char* title,
 	       const char* initfile)
  :
-#ifdef	WITH_QT_HTML_WIDGET
+#ifdef	WITH_GTK_HTML_WIDGET
   KMainWindow(0L, title),
-#else /*WITH_QT_HTML_WIDGET*/
-	GTKWidget(),  
-#endif/*WITH_QT_HTML_WIDGET*/
+#else /*WITH_GTK_HTML_WIDGET*/
+	GtkWidget(),  
+#endif/*WITH_GTK_HTML_WIDGET*/
         m_busy(true),
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-	m_cursor_shape(Qt::ArrowCursor),
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
+	//m_cursor_shape(Qt::ArrowCursor),
+#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded GTK */
 	//m_cursor_shape(arrowCursor);
 	m_fileselector(NULL),
 	m_settings_selector(NULL),
-#endif/*QT_NO_FILEDIALOG*/
+#endif/*GTK_NO_FILEDIALOG*/
 	m_mainloop(NULL),
 	m_o_x(0),	 
 	m_o_y(0),	 
@@ -126,17 +126,18 @@ gtk_gui::gtk_gui(const char* title,
 	m_gui_thread = pthread_self();
 #endif/*TRY_LOCKING*/
 	if (initfile != NULL && initfile != "")
-		m_smilfilename = QString(initfile);
-#ifdef  QT_NO_FILEDIALOG
+		m_smilfilename = GString(initfile);
+#ifdef  GTK_NO_FILEDIALOG
 	else
-		m_smilfilename = QString(
+		m_smilfilename = GString(
 			"/home/zaurus/Documents/example.smil");
-#endif/*QT_NO_FILEDIALOG*/
+#endif/*GTK_NO_FILEDIALOG*/
 	m_playing = false;
 	m_pausing = false;
 	setCaption(initfile);
 
 	/* Menu bar */
+
 	m_menubar = new QMenuBar(this,"MainMenu");
 	{
 		int id;
@@ -633,9 +634,9 @@ qt_gui::customEvent(QCustomEvent* e) {
 }
 
 void
-qt_gui::internal_message(int level, char* msg) {
-	int msg_id = level+qt_logger::CUSTOM_OFFSET;
-  	qt_message_event* qme = new qt_message_event(msg_id, msg);
+gtk_gui::internal_message(int level, char* msg) {
+	int msg_id = level+gtk_logger::CUSTOM_OFFSET;
+  	gtk_message_event* qme = new gtk_message_event(msg_id, msg);
 #ifdef	QT_THREAD_SUPPORT
 	QThread::postEvent(this, qme);
 #else /*QT_THREAD_SUPPORT*/

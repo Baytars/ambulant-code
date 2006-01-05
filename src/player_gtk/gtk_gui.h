@@ -28,14 +28,16 @@
 
 #include "unix_preferences.h"
 
-#include <qfeatures.h>
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-# include <qapplication.h>
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-#include <qpe/qpeapplication.h>
-#include <qpe/applnk.h>
-#include <fileselector.h>
-#endif/*QT_NO_FILEDIALOG*/
+
+//#include <qfeatures.h>
+//#ifndef QT_NO_FILEDIALOG **/	 /* Assume plain Qt */
+//# include <qapplication.h>
+//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+//#include <qpe/qpeapplication.h>
+//#include <qpe/applnk.h>
+//#include <fileselector.h>
+//#endif/*QT_NO_FILEDIALOG*/
+/**
 #include <qcursor.h>
 #include <qdial.h>
 #include <qevent.h>
@@ -59,27 +61,30 @@
 
 #ifdef	WITH_QT_HTML_WIDGET
 #include <kapp.h>
-#include <kmainwindow.h>
-#endif/*WITH_QT_HTML_WIDGET*/
+#include <kmainwindow.h>**/
+//#endif/*WITH_QT_HTML_WIDGET*/
 
-#include "qt_logger.h"
-#include "qt_settings.h"
+#include "gtk_logger.h"
+//#include "gtk_settings.h"
 
-class qt_mainloop;
+class gtk_mainloop;
 
-#ifdef	WITH_QT_HTML_WIDGET
-#define qt_gui_BASE KMainWindow
-#else /*WITH_QT_HTML_WIDGET*/
-#define qt_gui_BASE QWidget
-#endif/*WITH_QT_HTML_WIDGET*/
+//#ifdef	WITH_GTK_HTML_WIDGET
+//#define gtk_gui_BASE KMainWindow
+//#else /*WITH_GTK_HTML_WIDGET*/
+//#define qt_gui_BASE GtkWidget
+//#endif/*WITH_GTK_HTML_WIDGET*/
 
- class qt_gui : public qt_gui_BASE {
+//commented by PAblo
+//class gtk_gui : public gtk_gui_BASE {
+// added by Pablo
+class gtk_gui{
 
-   Q_OBJECT
+//   GTK_OBJECT
 
    public:
-  	qt_gui(const char* title, const char* initfile);
-	~qt_gui();
+  	gtk_gui(const char* title, const char* initfile);
+	~gtk_gui();
 	bool is_busy() { return m_busy; }
 
 	int  get_o_x() {
@@ -91,10 +96,11 @@ class qt_mainloop;
 	}
 
 	const char* filename() { 
-		return m_smilfilename.ascii();
+//		return m_smilfilename.ascii();
+		return m_smilfilename.str;
 	}
 
-	bool openSMILfile(const QString smilfilename, int mode);
+	bool openSMILfile(const GString smilfilename, int mode);
 
 	// send a QEvent to the gui thread
 	void internal_message(int level, char* msg);
@@ -102,28 +108,28 @@ class qt_mainloop;
 	// signal interfaces
 	void need_redraw(const void*, void*, const void*);
 	void player_done();
-	void player_start(QString,bool,bool);
+	void player_start(GString,bool,bool);
 
-/*TMP*/	qt_mainloop* m_mainloop;
+/*TMP*/	//qt_mainloop* m_mainloop;
    private:
 	bool	     m_busy;
-	QPushButton* m_cancel_pb; // for Settings window
-	QPopupMenu*  m_filemenu;
-	QHBox* 	     m_finish_hb; // for Settings window
-	QPopupMenu*  m_helpmenu;
-	QMenuBar*    m_menubar;
-	QPushButton* m_ok_pb;	  // for Settings window
+//	QPushButton* m_cancel_pb; // for Settings window
+//	QPopupMenu*  m_filemenu;
+//	QHBox* 	     m_finish_hb; // for Settings window
+//	QPopupMenu*  m_helpmenu;
+//	QMenuBar*    m_menubar;
+//	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
 	int          m_pause_id;
 	bool         m_pausing;
 	int          m_play_id;
 	bool         m_playing;
-	QPopupMenu*  m_playmenu;
+//	QPopupMenu*  m_playmenu;
 	const char*  m_programfilename;
-	qt_settings* m_settings; // the Settings window
-	QString      m_smilfilename;
-	QPopupMenu*  m_viewmenu;
+//	qt_settings* m_settings; // the Settings window
+	GString      m_smilfilename;
+//	QPopupMenu*  m_viewmenu;
 
 #define	TRY_LOCKING
 #ifdef	TRY_LOCKING
@@ -131,23 +137,23 @@ class qt_mainloop;
 	pthread_mutex_t   m_lock_message;
 	unsigned long int m_gui_thread;
 #endif/*TRY_LOCKING*/
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-	Qt::CursorShape m_cursor_shape;
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+//	Qt::CursorShape m_cursor_shape;
+#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
 	FileSelector*m_fileselector;
 	FileSelector*m_settings_selector;
 	const DocLnk m_selectedDocLnk;
 #endif/*QT_NO_FILEDIALOG*/
-	void	     fileError(QString smilfilename);
+	void	     fileError(GString smilfilename);
 
-  public slots:
-	void setDocument(const QString&);
+//  public slots:
+//	void setDocument(const GString&);
   /* following slots are needed for Qt Embedded, and are implemented
      as empty functions for normal Qt because Qt's moc doesn't recogzize
      #ifdef and #define
   */
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 #define DocLnk void*
 #endif/*QT_NO_FILEDIALOG*/
 	void slot_file_selected(const DocLnk&);
@@ -155,7 +161,7 @@ class qt_mainloop;
 	void slot_settings_selected(const DocLnk&);
 	void slot_close_settings_selector();
 	void slot_play();
-
+/**
   private slots:
 	void slot_about();
 	void slot_homepage();
@@ -179,9 +185,9 @@ class qt_mainloop;
 	void signal_need_redraw(const void*, void*, const void*);
 
   protected:
-	void customEvent(QCustomEvent*);
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
+	void customEvent(QCustomEvent*);**/
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 	void unsetCursor(); //XXXX
-#endif/*QT_NO_FILEDIALOG*/
+#endif/*GTK_NO_FILEDIALOG*/
 };
-#endif/*__QT_GUI_H__*/
+#endif/*__GTK_GUI_H__*/

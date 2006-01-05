@@ -41,9 +41,9 @@
 #include "ambulant/common/factory.h"
 #include "ambulant/common/player.h"
 #include "ambulant/gui/none/none_gui.h"
-//#include "ambulant/gui/gtk/gtk_renderer.h"
+#include "ambulant/gui/gtk/gtk_renderer.h"
 #include "ambulant/smil2/smil_player.h"
-//#include "gtk_gui.h"
+#include "gtk_gui.h"
 
 #include <gtk/gtk.h>
 
@@ -57,14 +57,12 @@ void open_web_browser(const std::string &href);
 
 class gtk_mainloop_callback_arg {
 };
-//class gtk_gui;
+class gtk_gui;
 
 class gtk_mainloop : public ambulant::common::embedder, public ambulant::lib::ref_counted {
   //  static bool m_done;
   public:
-//        gtk_mainloop(gtk_gui* parent);
-	// Added by Pablo until we have a proper GUI
-	gtk_mainloop();
+        gtk_mainloop(gtk_gui* parent);
 	~gtk_mainloop();
 	
 	// The callback member function.
@@ -113,7 +111,7 @@ class gtk_mainloop : public ambulant::common::embedder, public ambulant::lib::re
 	// from dx_player
 	// The frames stack
 	struct frame {
-//		gtk_gui* windows; 
+		gtk_gui* windows; 
 	  	ambulant::common::player* player;
 	};
 	std::stack<frame*> m_frames;
@@ -123,7 +121,7 @@ class gtk_mainloop : public ambulant::common::embedder, public ambulant::lib::re
 	// sorted alphabetically on member name
 	document*				m_doc;
  	common::factories*			m_factory;
-//	gtk_gui*				m_gui;
+	gtk_gui*				m_gui;
 	lib::logger*				m_logger;
 	player*					m_player;
 	basic_atomic_count<critical_section>	m_refcount;
