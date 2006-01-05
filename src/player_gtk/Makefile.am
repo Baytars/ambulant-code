@@ -22,8 +22,13 @@ endif
 
 bin_PROGRAMS = AmbulantPlayer
 AmbulantPlayer_SOURCES =					\
+	gtk_gui.h 						\
+	gtk_logger.h						\
 	gtk_mainloop.cpp 					\
-	gtk_mainloop.h
+	gtk_mainloop.h						\
+	unix_preferences.cpp					\
+	unix_preferences.h
+
 
 #	gtk_gui.cpp						\
 #	gtk_gui.h 						\
@@ -31,12 +36,10 @@ AmbulantPlayer_SOURCES =					\
 #	gtk_logger.h						\
 #	gtk_mainloop.cpp 					\
 #	gtk_mainloop.h						\
-#	gtk_settings.cpp 					\
+#	gkt_settings.cpp 					\
 #	gtk_settings.h 						\
-#	gtk_preferences.cpp					\
-#	gtk_preferences.h
-
-
+#	unix_preferences.cpp					\
+#	unix_preferences.h
 
 # Conditionals for linux audio support
 if WITH_SDL
@@ -114,13 +117,13 @@ LDADD = $(top_builddir)/src/libambulant/.libs/libambulant_gtk.a	\
 	$(extra_live_LDADD) 				\
 	$(top_builddir)/src/libambulant/.libs/libambulant.a	\
 	$(EXPAT_PREFIX)/lib/libexpat.a				\
+	$(gtk_libs)					\
 	$(LIBLTDL)  
 
 AM_LDFLAGS=$(extra_arts_ldflags)				\
 	   $(extra_sdl_ldflags)					\
 	   $(extra_ffmpeg_ldflags)				\
 	   -export-dynamic	  \
-	$(gtk_libs)					\
        $(livelibs)
  
 AM_CPPFLAGS = \

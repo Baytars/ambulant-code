@@ -50,7 +50,6 @@
 //#include "ambulant/lib/tree_builder.h"
 
 #include "gtk_mainloop.h"
-#include <gtk/gtk.h>
 
 using namespace ambulant;
 using namespace gui::gtk;
@@ -82,12 +81,10 @@ open_web_browser(const std::string &href)
 	}
 }
 
-//gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
-// Modified by Pablo until we have a proper GUI
-gtk_mainloop::gtk_mainloop() :
+gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
 	m_factory(NULL),
 	m_doc(NULL),
-	//m_gui(gui),
+	m_gui(gui),
 	m_player(NULL),
  	m_refcount(1),
  	m_running(false),
@@ -152,22 +149,19 @@ AM_DBG logger::get_logger()->debug("add factory for SDL done");
 #endif 
 
 	
-//	rf->add_factory(new gtk_renderer_factory(m_factory));
+	//rf->add_factory(new gtk_renderer_factory(m_factory));
+	AM_DBG m_logger->debug("mainloop::mainloop: added gtk_video_factory");		
+ 	//rf->add_factory(new gtk_video_factory(m_factory));
+	AM_DBG m_logger->debug("mainloop::mainloop: added none_video_factory");
 	
-//	AM_DBG m_logger->debug("mainloop::mainloop: added gtk_video_factory");		
- //	rf->add_factory(new gtk_video_factory(m_factory));
-//		AM_DBG m_logger->debug("mainloop::mainloop: added none_video_factory");		
-
-//	rf->add_factory(new none::none_video_factory(m_factory));
+	rf->add_factory(new none::none_video_factory(m_factory));
 
 	
-//	m_factory->wf = new gtk_window_factory(m_gui, 
-//					      m_gui->get_o_x(),
-//					      m_gui->get_o_y());
+	//m_factory->wf = new gtk_window_factory(m_gui, 
+	//				      m_gui->get_o_x(),
+	//				      m_gui->get_o_y());
 
-//	const char *filename = m_gui->filename();
-	// Added by Pablo for testing purposes
-	const char *filename = "/ufs/garcia/native/share/ambulant/Welcome/Welcome.smil";
+	const char *filename = m_gui->filename();
 	m_doc = create_document(filename);
 	if (!m_doc) {
 		return;
@@ -312,7 +306,7 @@ gtk_mainloop::player_done()
 	if(!m_frames.empty()) {
 		frame *pf = m_frames.top();
 		m_frames.pop();
-		//m_gui = pf->windows;
+		m_gui = pf->windows;
 		m_player = pf->player;
 		delete pf;
 		m_player->resume();
@@ -366,7 +360,7 @@ gtk_mainloop::player_start(GString document_name, bool start, bool old)
 	// Push the old frame on the stack
 		m_player->pause();
 		frame *pf = new frame();
-//		pf->windows = m_gui;
+		pf->windows = m_gui;
 		pf->player = m_player;
 //TBD		m_gui->erase();
 		m_player = NULL;
