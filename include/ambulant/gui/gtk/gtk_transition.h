@@ -28,8 +28,10 @@
 
 #include "ambulant/smil2/transition.h"
 #include "ambulant/common/layout.h"
-#include "ambulant/gui/gkt/gtk_factory.h"
-#include "ambulant/gui/gkt/gtk_includes.h" // TMP 
+#include "ambulant/gui/gtk/gtk_factory.h"
+#include "ambulant/gui/gtk/gtk_includes.h" // TMP 
+
+#include <gtk/gtk.h>
 namespace ambulant {
 
 namespace gui {
