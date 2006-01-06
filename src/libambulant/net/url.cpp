@@ -86,17 +86,8 @@ void net::url::init_statics() {
 	static url_handler_pair h4a = { "n:,", &url::set_from_data_uri};
  	s_handlers.push_back(&h4a);
 
-	static url_handler_pair h5 = {"/n", &url::set_from_unix_path};
+	static url_handler_pair h5 = {"/n", &url::set_from_absolute_path};
  	s_handlers.push_back(&h5);
-
-	static url_handler_pair h6 = {"n:n", &url::set_from_windows_path};
- 	s_handlers.push_back(&h6);
- 	
-	static url_handler_pair h7 = {"n:/n", &url::set_from_windows_path};
- 	s_handlers.push_back(&h7);
- 	
-	static url_handler_pair h8 = {"\\n", &url::set_from_wince_path};
- 	s_handlers.push_back(&h8);
 	
 	static url_handler_pair h9 = {"", &url::set_from_relative_path};
  	s_handlers.push_back(&h9);
@@ -112,16 +103,22 @@ void net::url::init_statics() {
   	*/
  }
  
+// static
+net::url 
+net::url::from_filename(const std::string& spec)
+{
+	lib::logger::get_logger()->debug("url::from_filename not implemented yet");
+	return net::url();
+}
+
 net::url::url() 
 :	m_absolute(true),
-	m_port(0),
-	m_pathsep("/")
+	m_port(0)
 {
 }
  
 net::url::url(const string& spec) 
-:	m_port(0),
-	m_pathsep("/")
+:	m_port(0)
 {
 	set_from_spec(spec);
 }
@@ -131,8 +128,7 @@ net::url::url(const string& protocol, const string& host,
 :	m_protocol(protocol),
 	m_host(host),
 	m_port(0),
-	m_path(path),
-	m_pathsep("/")
+	m_path(path)
 {
 	m_absolute = (m_protocol != "");
 }
@@ -142,8 +138,7 @@ net::url::url(const string& protocol, const string& host, int port,
 :	m_protocol(protocol),
 	m_host(host),
 	m_port(short_type(port)),
-	m_path(path),
-	m_pathsep("/")
+	m_path(path)
 {
 	m_absolute = (m_protocol != "");
 }
@@ -153,8 +148,7 @@ net::url::url(const string& protocol, const string& host, int port,
 :	m_protocol(protocol),
 	m_host(host),
 	m_port(short_type(port)),
-	m_path(path),
-	m_pathsep("/"), 
+	m_path(path), 
 	m_query(query), 
 	m_ref(ref)
 {
@@ -246,32 +240,12 @@ void net::url::set_from_localhost_file_uri(lib::scanner& sc, const std::string& 
 }
 
 // pat: "/n"
-void net::url::set_from_unix_path(lib::scanner& sc, const std::string& pat) {
+void net::url::set_from_absolute_path(lib::scanner& sc, const std::string& pat) {
 	m_absolute = true;
 	m_protocol = "file";
 	m_host = "localhost";
 	m_port = 0;
 	m_path = sc.get_src();
-}
-
-// pat: "n:n" or "n:/n"
-void net::url::set_from_windows_path(lib::scanner& sc, const std::string& pat) {
-	m_absolute = true;
-	m_protocol = "file";
-	m_host = "localhost";
-	m_port = 0;
-	m_path = sc.get_src();
-	m_pathsep = "/\\";
-}
-
-// pat: "\\n"
-void net::url::set_from_wince_path(lib::scanner& sc, const std::string& pat) {
-	m_absolute = true;
-	m_protocol = "file";
-	m_host = "localhost";
-	m_port = 0;
-	m_path = sc.get_src();
-	m_pathsep = "/\\";
 }
 
 void net::url::set_from_relative_path(lib::scanner& sc, const std::string& pat) {
@@ -341,7 +315,7 @@ net::url net::url::join_to_base(const net::url &base) const
 		newpath = basepath; 
 	} else if (newpath[0] != '/') {
 		// New_path is not absolute. Prepend base of basepath
-		basepath = lib::filesys::get_base(basepath, base.m_pathsep);
+		basepath = lib::filesys::get_base(basepath);
 		// Convert basepath from Windows to URL, if needed.
 		// XXXX Incomplete?
 //		if (base.m_absolute && basepath[0] != '/')
@@ -351,7 +325,7 @@ net::url net::url::join_to_base(const net::url &base) const
 			char c = *cp;
 			if (c == '\\') *cp = '/';
 		}
-		newpath = lib::filesys::join(basepath, newpath, m_pathsep);
+		newpath = lib::filesys::join(basepath, newpath);
 		// Now ad
 		//newpath = lib::filesys::join(basepath, newpath, "/");
 	}
