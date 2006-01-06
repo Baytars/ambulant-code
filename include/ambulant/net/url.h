@@ -64,11 +64,6 @@ class AMBULANTAPI url {
 
 	// The path part of this url.
     string m_path;
-
-#if 0
-	// The path separator characters in m_path
-	char *m_pathsep;
-#endif
     
 	// The query part of this url.
     string m_query;
@@ -78,7 +73,10 @@ class AMBULANTAPI url {
 	
     // The mime type
     string m_mime;
-	  
+
+	// Determines how strict we parse URLs
+	static bool s_strict;
+
   protected:
 	/// Create a URL from a given string.
 	url(const string& spec); 
@@ -185,9 +183,16 @@ class AMBULANTAPI url {
 	/// pathname, not a URL.
 	static void set_datafile_directory(std::string pathname);
 	
+	/// Set a flag that determines whether we are strict about URL conformance
+	/// (illegal characters, etc) or not
+	static void set_strict_url_parsing(bool strict) {
+		s_strict = strict;
+	}
+
 	static void init_statics();
 
   private:
+
 	// protocols to ports map
  	// static std::map<string, short_type > s_ports;
  

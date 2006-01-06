@@ -526,7 +526,7 @@ void MmView::OnOpenFilter() {
 #ifndef AM_PLAYER_DG
 		if(player) player->restart();
 #endif
-	}	
+	}
 }
 
 void MmView::OnUpdateOpenFilter(CCmdUI *pCmdUI)
