@@ -308,8 +308,8 @@ net::url net::url::join_to_base(const net::url &base) const
 	// Note: this hasn't been checked against RFCxxxx. We pick up protocol, host, port
 	// and initial pathname from base. Alll other items from base are ignored.
 	if (m_absolute) return *this;
-	std::string basepath = base.get_file();
-	std::string newpath = get_file();
+	std::string basepath = base.get_path();
+	std::string newpath = get_path();
 	if (newpath == "") {
 		// New path is, for instance, only #anchor.
 		newpath = basepath; 
@@ -417,8 +417,8 @@ net::url::get_local_datafile() const
 			}
 		}
 	} else if (is_local_file() 
-		   && access (get_path().c_str(), 0) >= 0) {
-		result = get_path().c_str();
+		   && access (get_file().c_str(), 0) >= 0) {
+		result = get_file().c_str();
 	}
 	
 	if (!result) return std::pair<bool, net::url>(false, net::url(*this));
@@ -450,6 +450,7 @@ net::url::set_datafile_directory(std::string pathname)
 std::pair<bool, net::url>
 net::url::get_local_datafile() const
 {
+	// XXXX Needs work!
 #ifdef AMBULANT_PLATFORM_WIN32_WCE
 	// Too lazy to convert char to wide char right now
 	return std::pair<bool, net::url>(false, net::url(*this));
@@ -473,7 +474,7 @@ net::url::get_local_datafile() const
 			}
 		}
 	} else if (is_local_file()) {
-		path = get_path();
+		path = get_file();
 		if (lib::win32::file_exists(path))
 			result = path.c_str();
 	}
