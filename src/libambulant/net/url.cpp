@@ -29,20 +29,64 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/string_util.h"
 #include "ambulant/lib/filesys.h"
+#include "ambulant/lib/textptr.h"
  
 #include <string>
 #if !defined(AMBULANT_NO_IOSTREAMS) && !defined(AMBULANT_NO_STRINGSTREAM)
 #include <sstream>
 #endif
 
-
 using namespace ambulant;
 
-#ifndef AMBULANT_PLATFORM_WIN32_WCE
 const std::string url_delim = ":/?#,";
+
+//
+// Helper routines to convert local file pathnames to url-style paths
+// and vice-versa
+//
+#ifdef AMBULANT_PLATFORM_WIN32
+
+#include "ambulant/lib/win32/win32_error.h"
+#include <wininet.h>
+
+static std::string
+filepath2urlpath(const std::string& filepath)
+{
+	size_t urlbufsize = filepath.size()*3; // Worst case: all characters escaped
+	LPTSTR urlbuf = (LPTSTR)malloc(urlbufsize);
+	DWORD urlbufsizearg = urlbufsize;
+	assert(urlbuf);
+	urlbuf[0] = 0;
+	if (!InternetCanonicalizeUrl(lib::textptr(filepath.c_str()), urlbuf, &urlbufsizearg, 0)) {
+		DWORD dw = GetLastError();
+		lib::win32::win_report_error(filepath.c_str(), dw);
+		urlbuf[0] = 0;
+	}
+	return std::string(lib::textptr(urlbuf));
+}
+
+static std::string
+urlpath2filepath(const std::string& urlpath)
+{
+	lib::logger::get_logger()->debug("url::urlpath2filepath not implemented yet");
+	return urlpath;
+}
 #else
-const std::string url_delim = ":/?#\\,";
-#endif
+// Unix implementation
+static std::string
+filepath2urlpath(const std::string& filepath)
+{
+	lib::logger::get_logger()->debug("url::filepath2urlpath not implemented yet");
+	return filepath;
+}
+
+static std::string
+urlpath2filepath(const std::string& urlpath)
+{
+	lib::logger::get_logger()->debug("url::urlpath2filepath not implemented yet");
+	return urlpath;
+}
+#endif // AMBULANT_PLATFORM_WIN32
 
 // static 
 //std::list< std::pair<std::string, net::url::HANDLER> > net::url::s_handlers;
@@ -107,8 +151,7 @@ void net::url::init_statics() {
 net::url 
 net::url::from_filename(const std::string& spec)
 {
-	lib::logger::get_logger()->debug("url::from_filename not implemented yet");
-	return net::url();
+	return net::url(filepath2urlpath(spec));
 }
 
 net::url::url() 
