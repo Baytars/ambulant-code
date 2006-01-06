@@ -32,6 +32,8 @@
 #include "ambulant/gui/none/none_gui.h"
 #include "gtk_renderer.h"
 
+#include <gtk/gtk.h>
+
 namespace ambulant {
 
 namespace gui {

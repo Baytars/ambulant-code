@@ -31,6 +31,8 @@
 #include "gtk_includes.h"
 #include "gtk_fill.h"
 
+#include <gtk/gtk.h>
+
 namespace ambulant {
 
 namespace gui {
@@ -39,7 +41,7 @@ namespace gtk {
 
 /// Debug function that dumps a pixmap to a file. An incrementing
 /// count is appended to the filenname, and an extension added.
-void dumpPixmap(GtkImage *qpm, std::string filename);
+void dumpPixmap(GtkPixmap *qpm, std::string filename);
 
 class gtk_ambulant_widget;
 
@@ -61,13 +63,13 @@ class ambulant_gtk_window : public common::gui_window {
 	void user_event(const lib::point &where, int what=0);
 	void need_events(bool want);
 
-	GtkImage* get_ambulant_pixmap();
-	GtkImage* new_ambulant_surface();
-	GtkImage* get_ambulant_surface();
-	GtkImage* get_ambulant_oldpixmap();
-	GtkImage* get_pixmap_from_screen(const lib::rect &r);
+	GtkPixmap* get_ambulant_pixmap();
+	GtkPixmap* new_ambulant_surface();
+	GtkPixmap* get_ambulant_surface();
+	GtkPixmap* get_ambulant_oldpixmap();
+	GtkPixmap* get_pixmap_from_screen(const lib::rect &r);
 	void reset_ambulant_surface(void);
-	void set_ambulant_surface(GtkImage* surf);
+	void set_ambulant_surface(GtkPixmap* surf);
 	void delete_ambulant_surface();
 #ifdef USE_SMIL21
 	void startScreenTransition();
@@ -80,19 +82,19 @@ class ambulant_gtk_window : public common::gui_window {
 	
   private:
 	gtk_ambulant_widget* m_ambulant_widget;
-	GtkImage* m_pixmap;
-	GtkImage* m_oldpixmap;
-	GtkImage* m_surface;
+	GtkPixmap* m_pixmap;
+	GtkPixmap* m_oldpixmap;
+	GtkPixmap* m_surface;
 #ifdef USE_SMIL21
 	int m_fullscreen_count;
-	GtkImage* m_fullscreen_prev_pixmap;
-	GtkImage* m_fullscreen_old_pixmap;
+	GtkPixmap* m_fullscreen_prev_pixmap;
+	GtkPixmap* m_fullscreen_old_pixmap;
 	smil2::transition_engine* m_fullscreen_engine;
 	lib::transition_info::time_type m_fullscreen_now;
 #endif
 
  public:
-	GtkImage* m_tmppixmap;
+	GtkPixmap* m_tmppixmap;
 };  // class ambulant_gtk_window
 
 class gtk_ambulant_widget : public GtkWidget {
@@ -116,7 +118,7 @@ class gtk_ambulant_widget : public GtkWidget {
 //	void mouseMoveEvent(QMouseEvent* e);
 #endif/*GTK_NO_FILEDIALOG*/
 
-};  // class qt_ambulant_widget
+};  // class gtk_ambulant_widget
 
 class gtk_window_factory : public common::window_factory {
   public:
