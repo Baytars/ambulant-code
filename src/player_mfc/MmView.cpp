@@ -436,6 +436,7 @@ void MmView::OnViewSource() {
 	std::string ustr = T2CA(LPCTSTR(m_curDocFilename));
 	net::url u = net::url::from_url(ustr);
 	assert(0); // XXXX Need to find out ustr format (url or filename)
+	assert(u.is_local_file());
 	// XXXX Also check OnUpdateViewSource
 	cmd += u.get_file().c_str(); // XXXX Incorrect
 	WinExec(T2CA(cmd), SW_SHOW);	
