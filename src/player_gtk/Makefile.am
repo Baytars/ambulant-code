@@ -22,6 +22,7 @@ endif
 
 bin_PROGRAMS = AmbulantPlayer
 AmbulantPlayer_SOURCES =					\
+	gtk_gui.cpp						\
 	gtk_gui.h 						\
 	gtk_logger.h						\
 	gtk_mainloop.cpp 					\

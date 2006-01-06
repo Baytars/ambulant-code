@@ -42,6 +42,8 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/common/preferences.h"
 
+#include <gtk/gtk.h>
+
 class gtk_gui;	// forward declaration
 
 class gtk_logger {

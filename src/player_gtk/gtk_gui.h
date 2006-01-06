@@ -69,17 +69,14 @@
 
 class gtk_mainloop;
 
-//#ifdef	WITH_GTK_HTML_WIDGET
+#ifdef	WITH_GTK_HTML_WIDGET
 //#define gtk_gui_BASE KMainWindow
-//#else /*WITH_GTK_HTML_WIDGET*/
-//#define qt_gui_BASE GtkWidget
-//#endif/*WITH_GTK_HTML_WIDGET*/
+#define gtk_gui_BASE GtkWidget
+#else /*WITH_GTK_HTML_WIDGET*/
+#define gtk_gui_BASE GtkWidget
+#endif/*WITH_GTK_HTML_WIDGET*/
 
-//commented by PAblo
-//class gtk_gui : public gtk_gui_BASE {
-// added by Pablo
-class gtk_gui{
-
+class gtk_gui : public gtk_gui_BASE {
 //   GTK_OBJECT
 
    public:
@@ -97,10 +94,10 @@ class gtk_gui{
 
 	const char* filename() { 
 //		return m_smilfilename.ascii();
-		return m_smilfilename.str;
+		return m_smilfilename;
 	}
 
-	bool openSMILfile(const GString smilfilename, int mode);
+	bool openSMILfile(const char *smilfilename, int mode);
 
 	// send a QEvent to the gui thread
 	void internal_message(int level, char* msg);
@@ -110,14 +107,14 @@ class gtk_gui{
 	void player_done();
 	void player_start(GString,bool,bool);
 
-/*TMP*/	//qt_mainloop* m_mainloop;
+/*TMP*/	gtk_mainloop* m_mainloop;
    private:
 	bool	     m_busy;
 //	QPushButton* m_cancel_pb; // for Settings window
-//	QPopupMenu*  m_filemenu;
+	GtkMenuItem*  m_filemenu;
 //	QHBox* 	     m_finish_hb; // for Settings window
-//	QPopupMenu*  m_helpmenu;
-//	QMenuBar*    m_menubar;
+	GtkMenuItem*  m_helpmenu;
+	GtkMenu*    m_menubar;
 //	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
@@ -125,11 +122,11 @@ class gtk_gui{
 	bool         m_pausing;
 	int          m_play_id;
 	bool         m_playing;
-//	QPopupMenu*  m_playmenu;
+	GtkMenuItem*  m_playmenu;
 	const char*  m_programfilename;
 //	qt_settings* m_settings; // the Settings window
-	GString      m_smilfilename;
-//	QPopupMenu*  m_viewmenu;
+	const char*  m_smilfilename;
+	GtkMenuItem*  m_viewmenu;
 
 #define	TRY_LOCKING
 #ifdef	TRY_LOCKING
@@ -156,13 +153,18 @@ class gtk_gui{
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 #define DocLnk void*
 #endif/*QT_NO_FILEDIALOG*/
+// Added by Pablo
+    public:
 	void slot_file_selected(const DocLnk&);
 	void slot_close_fileselector();
 	void slot_settings_selected(const DocLnk&);
 	void slot_close_settings_selector();
 	void slot_play();
-/**
-  private slots:
+
+//Commented by PAblo
+//  private slots:
+// Included by Pablo
+    private:
 	void slot_about();
 	void slot_homepage();
 	void slot_welcome();
@@ -179,11 +181,11 @@ class gtk_gui{
 	void slot_settings_ok();
 	void slot_settings_select();
 	void slot_stop();
-
-  signals:
+// Commented by Pablo
+//  signals:
 	void signal_player_done();
 	void signal_need_redraw(const void*, void*, const void*);
-
+/**
   protected:
 	void customEvent(QCustomEvent*);**/
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
