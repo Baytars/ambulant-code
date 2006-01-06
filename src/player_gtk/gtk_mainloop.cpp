@@ -82,6 +82,7 @@ open_web_browser(const std::string &href)
 }
 
 gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
+	
 	m_factory(NULL),
 	m_doc(NULL),
 	m_gui(gui),
@@ -90,7 +91,7 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
  	m_running(false),
 	m_speed(1.0)
 {
- 	m_logger = lib::logger::get_logger();
+	m_logger = lib::logger::get_logger();
 	m_factory = new common::factories;
 	// First create the parser factory and populate it;
 	
@@ -108,15 +109,20 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
 	m_factory->df->add_audio_factory(new net::live_audio_datasource_factory()); 
 #endif
 #ifdef WITH_FFMPEG
-    AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
+    	//AM_DBG 
+	m_logger->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
 	m_factory->df->add_audio_factory(net::get_ffmpeg_audio_datasource_factory());
-    AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_parser_finder");
+    	//AM_DBG 
+	m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_parser_finder");
 	m_factory->df->add_audio_parser_finder(net::get_ffmpeg_audio_parser_finder());
-    AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_filter_finder");
+    	//AM_DBG 
+	m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_filter_finder");
 	m_factory->df->add_audio_filter_finder(net::get_ffmpeg_audio_filter_finder());
-	AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
+	//AM_DBG 
+	m_logger->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
 	m_factory->df->add_video_factory(net::get_ffmpeg_video_datasource_factory());
-    AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
+    	//AM_DBG 
+	m_logger->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
 	m_factory->df->add_raw_factory(net::get_ffmpeg_raw_datasource_factory());
 #endif
 
@@ -125,41 +131,45 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
 	// should always perform better, and is always available on OSX.
 	// If you define WITH_STDIO_DATASOURCE we prefer to use the stdio datasource,
 	// however.
-    AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add stdio_datasource_factory");
+
+    	//AM_DBG 
+	m_logger->debug("gtk_mainloop::gtk_mainloop: add stdio_datasource_factory");
 	m_factory->df->add_raw_factory(new net::stdio_datasource_factory());
 #endif
-    AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add posix_datasource_factory");
+	//AM_DBG 
+	m_logger->debug("gtk_mainloop::gtk_mainloop: add posix_datasource_factory");
 	m_factory->df->add_raw_factory(new net::posix_datasource_factory());
 
 	// Next create the playable factory and populate it.
 	global_playable_factory *rf = common::get_global_playable_factory();
     m_factory->rf = rf;
     
-	AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: Starting the plugin engine");
+	//AM_DBG 
+	m_logger->debug("gtk_mainloop::gtk_mainloop: Starting the plugin engine");
 	common::plugin_engine *pf = common::plugin_engine::get_plugin_engine();
 	pf->add_plugins(m_factory);
 #ifdef WITH_SDL
-	AM_DBG logger::get_logger()->debug("add factory for SDL");
+	//AM_DBG 
+	logger::get_logger()->debug("add factory for SDL");
 	rf->add_factory( new sdl::sdl_renderer_factory(m_factory) );
-AM_DBG logger::get_logger()->debug("add factory for SDL done");
+	//AM_DBG 
+	logger::get_logger()->debug("add factory for SDL done");
 #endif
 
 #ifdef WITH_ARTS
 	rf->add_factory(new arts::arts_renderer_factory(m_factory));
 #endif 
-
 	
-	//rf->add_factory(new gtk_renderer_factory(m_factory));
-	AM_DBG m_logger->debug("mainloop::mainloop: added gtk_video_factory");		
- 	//rf->add_factory(new gtk_video_factory(m_factory));
-	AM_DBG m_logger->debug("mainloop::mainloop: added none_video_factory");
-	
+	rf->add_factory(new gtk_renderer_factory(m_factory));
+	//AM_DBG 
+	m_logger->debug("mainloop::mainloop: added gtk_video_factory");			
 	rf->add_factory(new none::none_video_factory(m_factory));
-
+	//AM_DBG 
+	m_logger->debug("mainloop::mainloop: added none_video_factory");
 	
-	//m_factory->wf = new gtk_window_factory(m_gui, 
-	//				      m_gui->get_o_x(),
-	//				      m_gui->get_o_y());
+	m_factory->wf = new gtk_window_factory(m_gui, 
+					      m_gui->get_o_x(),
+					      m_gui->get_o_y());
 
 	const char *filename = m_gui->filename();
 	m_doc = create_document(filename);
@@ -167,7 +177,6 @@ AM_DBG logger::get_logger()->debug("add factory for SDL done");
 		return;
 	}
 	m_player = create_player(filename);
-	
 }
 
 ambulant::common::player*
@@ -189,7 +198,8 @@ lib::document *
 gtk_mainloop::create_document(const char *filename)
 {
 	char *data;
-	AM_DBG m_logger->debug("gtk_mainloop::create_document(\"%s\")", filename);
+	//AM_DBG 
+	m_logger->debug("gtk_mainloop::create_document(\"%s\")", filename);
 	net::url url(filename);
 	// Correct for relative pathnames for local files
 	if (url.is_local_file() && !url.is_absolute()) {
@@ -204,7 +214,8 @@ gtk_mainloop::create_document(const char *filename)
 		net::url cwd_url(cwdbuf);
 #endif
 		url = url.join_to_base(cwd_url);
-		AM_DBG m_logger->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
+		//AM_DBG 
+		m_logger->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
 	}
 	size_t size;
 	bool result = net::read_data_from_url(url, m_factory->df, &data, &size);
