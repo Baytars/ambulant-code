@@ -38,7 +38,10 @@
 
 using namespace ambulant;
 
+bool ambulant::net::url::s_strict = false;
 const std::string url_delim = ":/?#,";
+const std::string LEGAL_URL_PATH_CHARACTERS = "/abcdefghijkmlnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
+const std::string LEGAL_URL_CHARACTERS = LEGAL_URL_PATH_CHARACTERS+url_delim;
 
 //
 // Helper routines to convert local file pathnames to url-style paths
@@ -76,8 +79,19 @@ urlpath2filepath(const std::string& urlpath)
 static std::string
 filepath2urlpath(const std::string& filepath)
 {
-	lib::logger::get_logger()->debug("url::filepath2urlpath not implemented yet");
-	return filepath;
+	std::string::const_iterator i;
+	std::string rv;
+	for(i=filepath.begin(); i!=filepath.end(); i++) {
+		char c = *i;
+		if ( LEGAL_URL_PATH_CHARACTERS.find(c) == std::string::npos ) {
+			char buf[4];
+			sprintf(buf, "%%%02.2x", (unsigned)c);
+			rv += buf;
+		} else {
+			rv += c;
+		}
+	}
+	return rv;
 }
 
 static std::string
@@ -154,6 +168,12 @@ net::url::from_filename(const std::string& spec)
 	return net::url(filepath2urlpath(spec));
 }
 
+// Private: check URL for character escaping
+void net::url::_checkurl() const
+{
+	if (m_path.find_first_not_of(LEGAL_URL_PATH_CHARACTERS) != std::string::npos)
+		lib::logger::get_logger()->warn("%s: URL contains illegal characters", get_url().c_str());
+}
 net::url::url() 
 :	m_absolute(true),
 	m_port(0)
@@ -174,6 +194,7 @@ net::url::url(const string& protocol, const string& host,
 	m_path(path)
 {
 	m_absolute = (m_protocol != "");
+	if (s_strict) _checkurl();
 }
 
 net::url::url(const string& protocol, const string& host, int port, 
@@ -184,6 +205,7 @@ net::url::url(const string& protocol, const string& host, int port,
 	m_path(path)
 {
 	m_absolute = (m_protocol != "");
+	if (s_strict) _checkurl();
 }
 
 net::url::url(const string& protocol, const string& host, int port, 
@@ -196,6 +218,7 @@ net::url::url(const string& protocol, const string& host, int port,
 	m_ref(ref)
 {
 	m_absolute = (m_protocol != "");
+	if (s_strict) _checkurl();
 }
  
 net::url::string net::url::get_file() const {
@@ -289,6 +312,7 @@ void net::url::set_from_absolute_path(lib::scanner& sc, const std::string& pat) 
 	m_host = "localhost";
 	m_port = 0;
 	m_path = sc.get_src();
+	if (s_strict) _checkurl();
 }
 
 void net::url::set_from_relative_path(lib::scanner& sc, const std::string& pat) {
@@ -307,6 +331,7 @@ void net::url::set_from_data_uri(lib::scanner& sc, const std::string& pat) {
 	m_host = "";
 	m_port = 0;
 	m_path = sc.join(3);  // Skip data:,
+	if (s_strict) _checkurl();
 }
 
 void net::url::set_parts(lib::scanner& sc, const std::string& pat) {
@@ -324,6 +349,7 @@ void net::url::set_parts(lib::scanner& sc, const std::string& pat) {
 	m_path = sc.join(i1, i4);
 	m_query = sc.join(i2+1, i3);
 	m_ref = sc.join(i3+1);
+	if (s_strict) _checkurl();
 }
 
 bool net::url::is_local_file() const
