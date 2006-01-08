@@ -195,6 +195,9 @@ class AMBULANTAPI url {
 
 	// protocols to ports map
  	// static std::map<string, short_type > s_ports;
+	
+	// Check that URL has correctly escaped characters
+	void _checkurl() const;
  
 	void set_parts(ambulant::lib::scanner& sc, const std::string& pat);
 	
