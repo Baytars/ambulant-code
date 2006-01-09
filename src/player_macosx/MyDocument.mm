@@ -140,6 +140,12 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     ambulant::gui::cocoa::cocoa_window_factory *myWindowFactory;
     myWindowFactory = new ambulant::gui::cocoa::cocoa_window_factory((void *)view);
     NSString *url = [[self fileURL] path];
+	if ( [[self fileURL] isFileURL] ) {
+		NSString *escapedurl = (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL,
+			(CFStringRef)url, NULL, NULL, kCFStringEncodingUTF8);
+		//[url release];
+		url = escapedurl;
+	}
 	bool use_mms = ([[url pathExtension] compare: @".mms"] == 0);
 	embedder = new document_embedder(self);
 	myMainloop = new mainloop([url UTF8String], myWindowFactory, use_mms, embedder);
