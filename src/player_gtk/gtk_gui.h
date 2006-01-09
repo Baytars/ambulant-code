@@ -28,7 +28,6 @@
 
 #include "unix_preferences.h"
 
-
 //#include <qfeatures.h>
 //#ifndef QT_NO_FILEDIALOG **/	 /* Assume plain Qt */
 //# include <qapplication.h>
@@ -70,13 +69,15 @@
 class gtk_mainloop;
 
 #ifdef	WITH_GTK_HTML_WIDGET
-//#define gtk_gui_BASE KMainWindow
+#define gtk_gui_BASE GtkWidget
 #define gtk_gui_BASE GtkWidget
 #else /*WITH_GTK_HTML_WIDGET*/
 #define gtk_gui_BASE GtkWidget
 #endif/*WITH_GTK_HTML_WIDGET*/
 
-class gtk_gui : public gtk_gui_BASE {
+class gtk_gui{
+//: public GtkWidget{
+//gtk_gui_BASE {
 //   GTK_OBJECT
 
    public:
@@ -106,6 +107,9 @@ class gtk_gui : public gtk_gui_BASE {
 	void need_redraw(const void*, void*, const void*);
 	void player_done();
 	void player_start(GString,bool,bool);
+	GtkWidget* get_gui_container();
+	GtkWidget* get_document_container();
+	GtkWidget* get_toplevel_container();
 
 /*TMP*/	gtk_mainloop* m_mainloop;
    private:
@@ -114,7 +118,7 @@ class gtk_gui : public gtk_gui_BASE {
 	GtkMenuItem*  m_filemenu;
 //	QHBox* 	     m_finish_hb; // for Settings window
 	GtkMenuItem*  m_helpmenu;
-	GtkMenu*    m_menubar;
+	GtkMenuBar*    m_menubar;
 //	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
@@ -124,9 +128,12 @@ class gtk_gui : public gtk_gui_BASE {
 	bool         m_playing;
 	GtkMenuItem*  m_playmenu;
 	const char*  m_programfilename;
-//	qt_settings* m_settings; // the Settings window
+	GtkSettings* m_settings; // the Settings window
 	const char*  m_smilfilename;
-	GtkMenuItem*  m_viewmenu;
+	GtkMenuItem* m_viewmenu;
+	GtkWidget*   m_toplevelcontainer;
+	GtkWidget*   m_guicontainer;
+	GtkWidget*   m_documentcontainer;
 
 #define	TRY_LOCKING
 #ifdef	TRY_LOCKING
@@ -144,7 +151,7 @@ class gtk_gui : public gtk_gui_BASE {
 #endif/*QT_NO_FILEDIALOG*/
 	void	     fileError(GString smilfilename);
 
-//  public slots:
+//public slots:
 //	void setDocument(const GString&);
   /* following slots are needed for Qt Embedded, and are implemented
      as empty functions for normal Qt because Qt's moc doesn't recogzize
