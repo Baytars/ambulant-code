@@ -59,7 +59,7 @@ filepath2urlpath(const std::string& filepath)
 {
 	size_t urlbufsize = filepath.size()*3; // Worst case: all characters escaped
 	LPTSTR urlbuf = (LPTSTR)malloc(urlbufsize);
-	DWORD urlbufsizearg = urlbufsize;
+	DWORD urlbufsizearg = (DWORD)urlbufsize;
 	assert(urlbuf);
 	urlbuf[0] = 0;
 	if (!InternetCanonicalizeUrl(lib::textptr(filepath.c_str()), urlbuf, &urlbufsizearg, 0)) {
@@ -67,14 +67,48 @@ filepath2urlpath(const std::string& filepath)
 		lib::win32::win_report_error(filepath.c_str(), dw);
 		urlbuf[0] = 0;
 	}
-	return std::string(lib::textptr(urlbuf));
+	std::string rv = lib::textptr(urlbuf);
+	// Work around stupid bug in InternetCanonicalizeURL: it forgets a slash.
+	if (rv.substr(0, 7) == "file://" && rv[7] != '/')
+		rv = "file:///" + rv.substr(7);
+	// Finally replace backslashes
+	std::string::iterator i;
+	for(i=rv.begin(); i!=rv.end(); i++) {
+		char c = *i;
+		if (c == '\\') 
+			*i = '/';
+	}
+	return rv;
 }
 
 static std::string
 urlpath2filepath(const std::string& urlpath)
 {
-	lib::logger::get_logger()->debug("url::urlpath2filepath not implemented yet");
-	return urlpath;
+	size_t filebufsize = urlpath.size();
+	LPTSTR filebuf = (LPTSTR)malloc(filebufsize);
+	DWORD filebufsizearg = (DWORD)filebufsize;
+	assert(filebuf);
+	filebuf[0] = 0;
+	if (!InternetCanonicalizeUrl(lib::textptr(urlpath.c_str()), filebuf, 
+			&filebufsizearg, ICU_DECODE | ICU_NO_ENCODE)) {
+		DWORD dw = GetLastError();
+		lib::win32::win_report_error(urlpath.c_str(), dw);
+		filebuf[0] = 0;
+	}
+	std::string rv = lib::textptr(filebuf);
+	// Work around stupid bug in InternetCanonicalizeURL: it forgets a slash.
+	if (rv.substr(0, 8) == "file:///")
+		rv = rv.substr(8);
+	else if (rv[0] == '/')
+		rv = rv.substr(1);
+	// Finally replace slashes by backslashes
+	std::string::iterator i;
+	for(i=rv.begin(); i!=rv.end(); i++) {
+		char c = *i;
+		if (c == '/') 
+			*i = '\\';
+	}
+	return rv;
 }
 #else
 // Unix implementation
