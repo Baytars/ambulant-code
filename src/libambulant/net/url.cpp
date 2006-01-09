@@ -40,8 +40,10 @@ using namespace ambulant;
 
 bool ambulant::net::url::s_strict = false;
 const std::string url_delim = ":/?#,";
-const std::string LEGAL_URL_PATH_CHARACTERS = "/abcdefghijkmlnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
-const std::string LEGAL_URL_CHARACTERS = LEGAL_URL_PATH_CHARACTERS+url_delim;
+// Characters to be escaped in pathnames. Note that ~ and ? have special meanings in
+// http: urls, but not specifically in file: urls.
+const std::string file_url_escape_reqd = " <>#{}|\\^[]`";
+const std::string file_url_escape = file_url_escape_reqd + "%";
 
 //
 // Helper routines to convert local file pathnames to url-style paths
@@ -83,7 +85,7 @@ filepath2urlpath(const std::string& filepath)
 	std::string rv;
 	for(i=filepath.begin(); i!=filepath.end(); i++) {
 		char c = *i;
-		if ( LEGAL_URL_PATH_CHARACTERS.find(c) == std::string::npos ) {
+		if ( file_url_escape.find(c) != std::string::npos ) {
 			char buf[4];
 			sprintf(buf, "%%%02.2x", (unsigned)c);
 			rv += buf;
@@ -97,8 +99,28 @@ filepath2urlpath(const std::string& filepath)
 static std::string
 urlpath2filepath(const std::string& urlpath)
 {
-	lib::logger::get_logger()->debug("url::urlpath2filepath not implemented yet");
-	return urlpath;
+	std::string::const_iterator i;
+	std::string rv;
+	for(i=urlpath.begin(); i!=urlpath.end(); i++) {
+		char c = *i;
+		if ( c == '%' ) {
+			char buf[3];
+			unsigned utfval;
+			buf[0] = *++i;
+			buf[1] = *++i;
+			buf[2] = '\0';
+			if (sscanf(buf, "%x", &utfval) == 1) {
+				rv += (char)utfval;
+			} else {
+				// Put the original string back. What else can we do...
+				rv += '%';
+				rv += buf;
+			}
+		} else {
+			rv += c;
+		}
+	}
+	return rv;
 }
 #endif // AMBULANT_PLATFORM_WIN32
 
@@ -171,7 +193,7 @@ net::url::from_filename(const std::string& spec)
 // Private: check URL for character escaping
 void net::url::_checkurl() const
 {
-	if (m_path.find_first_not_of(LEGAL_URL_PATH_CHARACTERS) != std::string::npos)
+	if (m_path.find_first_of(file_url_escape_reqd) != std::string::npos)
 		lib::logger::get_logger()->warn("%s: URL contains illegal characters", get_url().c_str());
 }
 net::url::url() 
@@ -223,17 +245,13 @@ net::url::url(const string& protocol, const string& host, int port,
  
 net::url::string net::url::get_file() const {
 	std::string file = get_path();
-#ifdef AMBULANT_PLATFORM_WIN32
-	// Sigh, this mix-n-match of filenames and URLs is really messing
-	// us up. If this is a file URL we may need to take off the first
-	// slash, but not always...
-	if (is_local_file() && file[0] == '/') file = file.substr(1);
-#endif
+	// Workaround: we might have split a local file at the ?.
 	if(!m_query.empty()) {
 		file += '?';
 		file += m_query;
 	}
-	return file;
+	
+	return urlpath2filepath(file);
 }
 
 void net::url::set_from_spec(const string& spec) {
