@@ -167,10 +167,10 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
 	//AM_DBG 
 	m_logger->debug("mainloop::mainloop: added none_video_factory");
 	
-	m_factory->wf = new gtk_window_factory(m_gui, 
+	m_factory->wf = new gtk_window_factory(m_gui->get_toplevel_container(), 
 					      m_gui->get_o_x(),
 					      m_gui->get_o_y());
-
+	
 	const char *filename = m_gui->filename();
 	m_doc = create_document(filename);
 	if (!m_doc) {

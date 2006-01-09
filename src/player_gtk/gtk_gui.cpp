@@ -92,9 +92,10 @@ gtk_gui::gtk_gui(const char* title,
 	       const char* initfile)
  :
 #ifdef	WITH_GTK_HTML_WIDGET
-  KMainWindow(0L, title),
+
+//  KMainWindow(0L, title),
 #else /*WITH_GTK_HTML_WIDGET*/
-	GtkWidget(),  
+//  QWidget(),
 #endif/*WITH_GTK_HTML_WIDGET*/
         m_busy(true),
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
@@ -119,7 +120,12 @@ gtk_gui::gtk_gui(const char* title,
 	m_smilfilename()
 {
 
-	printf("I am in heeree");
+	/*Initialization of the GUI */
+	m_toplevelcontainer = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), title);
+	g_signal_connect (G_OBJECT (m_toplevelcontainer), "delete-event",
+                    	G_CALLBACK (gtk_main_quit), NULL);
+	gtk_widget_set_size_request(m_toplevelcontainer, 240, 320);	
 
 	m_programfilename = title;
 #ifdef	TRY_LOCKING
@@ -137,21 +143,135 @@ gtk_gui::gtk_gui(const char* title,
 	m_pausing = false;
 //	setCaption(initfile);
 
-	/* Menu bar */
-	// Not needed here!
-	GtkWidget *window;
-	window   = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	g_signal_connect (G_OBJECT (window), "delete-event",
-                    G_CALLBACK (gtk_main_quit), NULL);
-	m_menubar = (GtkMenu*)gtk_menu_new();
+	/* VBox (m_guicontainer) to place the Menu bar in the correct place */ 
+	m_guicontainer = gtk_vbox_new(FALSE, 0);
+	gtk_widget_show(m_guicontainer);
+	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));	
+	
+	/* Menu bar */	
+	m_menubar = (GtkMenuBar*)gtk_menu_bar_new();
+	gtk_widget_show ((GtkWidget*)m_menubar);
+	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);
 	{
 		int id;
 		/* File */
+		m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
+		gtk_widget_show ((GtkWidget*)m_filemenu);
+		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_filemenu));
+		GtkWidget* m_filemenu_submenu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_filemenu), m_filemenu_submenu);
+		
+		GtkWidget* m_filemenu_submenu_open = gtk_menu_item_new_with_label("Open...");
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_open);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_open));
+		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+	
+		GtkWidget* m_filemenu_submenu_openurl = gtk_menu_item_new_with_label("Open URL...");
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_openurl);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_openurl));
+		
+		GtkWidget* m_filemenu_submenu_reload = gtk_menu_item_new_with_label("Reload...");
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_reload);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_reload));
 
-		m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_label("File");
-		gtk_menu_append((GtkWidget*)m_menubar,(GtkWidget*)m_filemenu);
-		gtk_container_add (GTK_CONTAINER (window), (GtkWidget*)m_menubar);
-		gtk_widget_show_all (window);
+		GtkWidget*  m_filemenu_submenu_separator1 = gtk_separator_menu_item_new();
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator1);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator1));
+
+		GtkWidget* m_filemenu_submenu_settings = gtk_menu_item_new_with_label("Settings");
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_settings);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_settings));
+
+		GtkWidget*  m_filemenu_submenu_separator2 = gtk_separator_menu_item_new();
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator2);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator2));
+
+
+		GtkWidget* m_filemenu_submenu_quit = gtk_menu_item_new_with_label("Quit");
+		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_quit);
+		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_quit));
+
+
+		m_playmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Play");
+		gtk_widget_show ((GtkWidget*)m_playmenu);
+		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_playmenu));
+		GtkWidget* m_playmenu_submenu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_playmenu), m_playmenu_submenu);
+		
+		GtkWidget* m_playmenu_submenu_play = gtk_menu_item_new_with_label("Play");
+		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_play);
+		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_play));
+		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+	
+		GtkWidget* m_playmenu_submenu_pause = gtk_menu_item_new_with_label("Pause");
+		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_pause);
+		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_pause));
+		
+		GtkWidget* m_playmenu_submenu_stop = gtk_menu_item_new_with_label("Stop");
+		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_stop);
+		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_stop));
+
+
+		m_viewmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_View");
+		gtk_widget_show ((GtkWidget*)m_viewmenu);
+		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_viewmenu));
+		GtkWidget* m_viewmenu_submenu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_viewmenu), m_viewmenu_submenu);
+		
+		GtkWidget* m_viewmenu_submenu_fullscreen = gtk_menu_item_new_with_label("Full Screen");
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_fullscreen);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_fullscreen));
+		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+	
+		GtkWidget* m_viewmenu_submenu_window = gtk_menu_item_new_with_label("Window");
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_window);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_window));
+	
+		GtkWidget*  m_viewmenu_submenu_separator1 = gtk_separator_menu_item_new();
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator1);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator1));
+		
+		GtkWidget* m_viewmenu_submenu_settings = gtk_menu_item_new_with_label("Load Settings...");
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_settings);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_settings));
+
+#ifdef	WITH_GTK_LOGGER
+		GtkWidget*  m_viewmenu_submenu_separator2 = gtk_separator_menu_item_new();
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator2);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator2));
+
+		GtkWidget* m_viewmenu_submenu_log = gtk_menu_item_new_with_label("Log Window...");
+		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_log);
+		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_log));
+#endif /*WITH_GTK_LOGGER*/
+
+		m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
+		gtk_widget_show ((GtkWidget*)m_helpmenu);
+		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
+		GtkWidget* m_helpmenu_submenu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_helpmenu), m_helpmenu_submenu);
+
+		GtkWidget* m_helpmenu_submenu_about = gtk_menu_item_new_with_label("About AmbulantPlayer");
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_about);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_about));
+		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+	
+		GtkWidget* m_helpmenu_submenu_help = gtk_menu_item_new_with_label("AmbulantPlayer Help");
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_help);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_help));
+	
+		GtkWidget*  m_helpmenu_submenu_separator1 = gtk_separator_menu_item_new();
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_separator1);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_separator1));
+		
+		GtkWidget* m_helpmenu_submenu_website = gtk_menu_item_new_with_label("AmbulantPlayer Website...");
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_website);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_website));
+
+		GtkWidget* m_helpmenu_submenu_play = gtk_menu_item_new_with_label("Play Welcome Document");
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_play);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_play));
+
 /**		m_filemenu = new QPopupMenu (this);
 		assert(m_filemenu);
 		int open_id = m_filemenu->insertItem(gettext("&Open..."), this, SLOT(slot_open()));
@@ -214,22 +334,41 @@ gtk_gui::gtk_gui(const char* title,
 }
 
 gtk_gui::~gtk_gui() {
-/**
+
 #define DELETE(X) if (X) { delete X; X = NULL; }
 	AM_DBG printf("%s0x%X\n", "gtk_gui::~gtk_gui(), m_mainloop=",m_mainloop);
-	setCaption(QString::null);
-#ifdef  QT_NO_FILEDIALOG**/	/* Assume embedded Qt */
-/**	DELETE(m_fileselector)
+	//setCaption(QString::null);
+#ifdef  GTK_NO_FILEDIALOG	/* Assume embedded GTK */
+	DELETE(m_fileselector)
 	DELETE(m_settings_selector)
-#endif**//*QT_NO_FILEDIALOG*/
-/**	DELETE(m_mainloop) 
+#endif  /*GTK_NO_FILEDIALOG*/
+	DELETE(m_mainloop) 
 	DELETE(m_filemenu)
 	DELETE(m_helpmenu)
 	DELETE(m_playmenu)
 	DELETE(m_viewmenu)
 	DELETE(m_menubar)
-	m_smilfilename = (char*) NULL;**/
+	m_smilfilename = (char*) NULL;
 }
+
+GtkWidget*
+gtk_gui::get_toplevel_container()
+{
+	return this->m_toplevelcontainer;
+}
+
+GtkWidget*
+gtk_gui::get_gui_container()
+{
+	return this->m_guicontainer;
+}
+
+GtkWidget*
+gtk_gui::get_document_container()
+{
+	return this->m_documentcontainer;
+}
+
 
 void 
 gtk_gui::slot_about() {
@@ -323,6 +462,9 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 
 void 
 gtk_gui::slot_open() {
+printf("We are opening!!!!\n");
+
+
 #ifndef GTK_NO_FILEDIALOG
 /**
 	GString smilfilename =
@@ -502,7 +644,7 @@ gtk_gui::slot_play() {
 	//AM_DBG 
 	printf("%s-%s\n", m_programfilename, "slot_play");
 	if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
-		no_fileopen_infodisplay(this, m_programfilename);
+		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
 		return;
 	}
 	if (!m_playing) {
@@ -536,7 +678,7 @@ gtk_gui::slot_reload() {
 	if (openSMILfile(m_smilfilename, 1)) {
 		slot_play();
 	} else {
-		no_fileopen_infodisplay(this, m_programfilename);
+		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
 	}
 }
 
@@ -690,7 +832,6 @@ main (int argc, char*argv[]) {
 //#undef	ENABLE_NLS
 #ifdef	ENABLE_NLS
 	// Load localisation database
-	printf("Started");
 	bool private_locale = false;
 	char *home = getenv("HOME");
 	if (home) {
@@ -700,11 +841,9 @@ main (int argc, char*argv[]) {
 			bindtextdomain(PACKAGE, localedir.c_str());
 		}
 	}
-	printf("Started");
 	if (!private_locale)
 		bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain (PACKAGE);
-	printf("Started 2");
 #endif /*ENABLE_NLS*/
 
 	// Load preferences, initialize app and logger
@@ -713,30 +852,34 @@ main (int argc, char*argv[]) {
 	FILE* DBG = stdout;
 #ifdef	WITH_GTK_HTML_WIDGET
 //	KApplication myapp( argc, argv, "AmbulantPlayer" );
+	gtk_init(&argc,&argv);	
 #else /*WITH_QT_HTML_WIDGET*/
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 //	KApplication myapp(argc, argv);
+	gtk_init(&argc,&argv);	
 #else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 //	KApplication myapp(argc, argv);
+	gtk_init(&argc,&argv);
 #endif/*GTK_NO_FILEDIALOG*/
 #endif/*WITH_GTK_HTML_WIDGET*/
 
 	/* Setup widget */
-	gtk_init(&argc,&argv);
 	gtk_gui* mywidget = new gtk_gui(argv[0], argc > 1 ? argv[1] 
 				      : "AmbulantPlayer");
-	printf("Started 3");
-#ifndef QT_NO_FILEDIALOG     /* Assume plain GTK */
-//	mywidget->setGeometry(240, 320, 320, 240);
+#ifndef GTK_NO_FILEDIALOG     /* Assume plain GTK */
+	//mywidget->setGeometry(240, 320, 320, 240);
+	//gtk_widget_set_size_request(gtk_gui, 240, 320);
 	//QCursor qcursor(Qt::ArrowCursor);
 	//mywidget->setCursor(qcursor);
 	//myapp.setMainWidget(mywidget);
-#else /*QT_NO_FILEDIALOG*/   /* Assume embedded Qt */
+#else /*GTK_NO_FILEDIALOG*/   /* Assume embedded Qt */
 	//if (argc > 1 && strcmp(argv[1], "-qcop") != 0)
-	 // myapp.showMainWidget(mywidget);
+	 //myapp.showMainWidget(mywidget);
 	//else
-	  //myapp.showMainDocumentWidget(mywidget);
-#endif/*QT_NO_FILEDIALOG*/
+	 // myapp.showMainDocumentWidget(mywidget);
+#endif/*GTK_NO_FILEDIALOG*/
+	//gtk_widget_set_size_request(gtk_gui, 240, 320);
+	gtk_widget_show(mywidget->get_toplevel_container());
 	//mywidget->show();
 /*TMP initialize logger after gui*/	
 	// take log level from preferences
@@ -751,10 +894,8 @@ main (int argc, char*argv[]) {
 	lib::logger::get_logger()->debug(gettext("Ambulant Player: localization enabled (english)"));
 #endif
 **/
-	//AM_DBG 
-	fprintf(DBG, "argc=%d argv[0]=%s\n", argc, argv[0]);
-	//AM_DBG 
-	for (int i=1;i<argc;i++){fprintf(DBG,"%s\n", argv[i]);
+	AM_DBG fprintf(DBG, "argc=%d argv[0]=%s\n", argc, argv[0]);
+	AM_DBG for (int i=1;i<argc;i++){fprintf(DBG,"%s\n", argv[i]);
 	}
 
 	bool exec_flag = false;
@@ -764,18 +905,14 @@ main (int argc, char*argv[]) {
 		char* str = argv[argc-1];
 		int len = strlen(str);
 		strcpy(last, &str[len-5]);
-		//AM_DBG 
-		fprintf(DBG, "%s %s %x\n", str, last);
+		AM_DBG fprintf(DBG, "%s %s %x\n", str, last);
 		if (strcmp(last, ".smil") == 0
 		|| strcmp(&last[1], ".smi") == 0
 	  	|| strcmp(&last[1], ".sml") == 0) {
  			if (mywidget->openSMILfile(argv[argc-1],
 						   1)
 			    && (exec_flag = true)){
-				printf("!!!!OKKKK!!!\n");
-			// So we don't start yet!!	mywidget->slot_play();
-				printf("!!!!OKKKK!!! 90 90\n");
-
+				mywidget->slot_play();
 			}
 		}
 	} else {
@@ -792,21 +929,22 @@ main (int argc, char*argv[]) {
 		exec_flag = true;
 	}
 	
-/**	
 	if (exec_flag)
-		myapp.exec();
+		//myapp.exec();
+		gtk_main();
 	else if (argc > 1) {
 		std::string error_message = gettext("Cannot open: ");
 		error_message = error_message + "\"" + argv[1] + "\"";
 		std::cerr << error_message << std::endl;
 		//myapp.exec();
-	}
-**/	
+		gtk_main();
+	}	
 #ifndef	WITH_GTK_HTML_WIDGET
 	delete mywidget;
 #endif/*WITH_GTK_HTML_WIDGET*/
 	unix_prefs.save_preferences();
 //	delete gtk_logger::get_gtk_logger();
+	gtk_main_quit();
 	std::cout << "Exiting program" << std::endl;
 	return exec_flag ? 0 : -1;
 }
