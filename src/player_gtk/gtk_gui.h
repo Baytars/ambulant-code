@@ -27,6 +27,8 @@
 #define __GTK_GUI_H__
 
 #include "unix_preferences.h"
+#include <iostream>
+
 
 //#include <qfeatures.h>
 //#ifndef QT_NO_FILEDIALOG **/	 /* Assume plain Qt */
@@ -141,14 +143,14 @@ class gtk_gui{
 	pthread_mutex_t   m_lock_message;
 	unsigned long int m_gui_thread;
 #endif/*TRY_LOCKING*/
-#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+//#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 //	Qt::CursorShape m_cursor_shape;
-#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
+//#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
-	FileSelector*m_fileselector;
-	FileSelector*m_settings_selector;
-	const DocLnk m_selectedDocLnk;
-#endif/*QT_NO_FILEDIALOG*/
+	GtkFileSelection* m_fileselector;
+	GtkFileSelection* m_settings_selector;
+	//const DocLnk m_selectedDocLnk;
+//#endif/*QT_NO_FILEDIALOG*/
 	void	     fileError(GString smilfilename);
 
 //public slots:
@@ -162,41 +164,38 @@ class gtk_gui{
 #endif/*QT_NO_FILEDIALOG*/
 // Added by Pablo
     public:
-	void slot_file_selected(const DocLnk&);
-	void slot_close_fileselector();
-	void slot_settings_selected(const DocLnk&);
-	void slot_close_settings_selector();
-	void slot_play();
+//	void do_file_selected(const DocLnk&);
+	void do_file_selected();
+	void do_close_fileselector();
+	void do_settings_selected(const DocLnk&);
+	void do_close_settings_selector();
+	void do_play();
+    public:
+	void do_about();
+	void do_homepage();
+	void do_welcome();
+	void do_help();
+	void do_load_settings();
+  	void do_logger_window();
+	void do_open();
+	void do_open_url();
+	void do_pause();
+	void do_player_done();
+	void do_quit();
+	void do_reload();
+	void do_settings_cancel();
+	void do_settings_ok();
+	void do_settings_select();
+	void do_stop();
 
-//Commented by PAblo
-//  private slots:
-// Included by Pablo
-    private:
-	void slot_about();
-	void slot_homepage();
-	void slot_welcome();
-	void slot_help();
-	void slot_load_settings();
-  	void slot_logger_window();
-	void slot_open();
-	void slot_open_url();
-	void slot_pause();
-	void slot_player_done();
-	void slot_quit();
-	void slot_reload();
-	void slot_settings_cancel();
-	void slot_settings_ok();
-	void slot_settings_select();
-	void slot_stop();
 // Commented by Pablo
 //  signals:
-	void signal_player_done();
-	void signal_need_redraw(const void*, void*, const void*);
-/**
+//	void signal_player_done();
+//	void signal_need_redraw(const void*, void*, const void*);
   protected:
-	void customEvent(QCustomEvent*);**/
-#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+	//void customEvent(QCustomEvent*);
+//#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 	void unsetCursor(); //XXXX
-#endif/*GTK_NO_FILEDIALOG*/
+//#endif/*GTK_NO_FILEDIALOG*/
 };
 #endif/*__GTK_GUI_H__*/
