@@ -785,6 +785,9 @@
 				<File
 					RelativePath=".\net\url.cpp">
 				</File>
+				<File
+					RelativePath=".\net\win32_datasource.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="common"
@@ -1253,6 +1256,9 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\net\url.h">
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\win32_datasource.h">
 					</File>
 				</Filter>
 				<Filter
