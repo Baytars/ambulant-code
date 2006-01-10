@@ -78,6 +78,115 @@ const char *helpfile_locations[] = {
 	NULL
 };
 
+// callbacks for C++
+/* File */
+extern "C" {
+void gtk_C_callback_open(void *userdata)
+{
+	((gtk_gui*) userdata)->do_open();
+}
+}
+extern "C" {
+void gtk_C_callback_open_url(void *userdata)
+{
+	((gtk_gui*) userdata)->do_open_url();
+}
+}
+extern "C" {
+void gtk_C_callback_reload(void *userdata)
+{
+	((gtk_gui*) userdata)->do_reload();
+}
+}
+extern "C" {
+void gtk_C_callback_settings_select(void *userdata)
+{
+	((gtk_gui*) userdata)->do_settings_select();
+}
+}
+extern "C" {
+void gtk_C_callback_quit(void *userdata)
+{
+	((gtk_gui*) userdata)->do_quit();
+}
+}
+/* Play */
+extern "C" {
+void gtk_C_callback_play(void *userdata)
+{
+	((gtk_gui*) userdata)->do_play();
+}
+}
+extern "C" {
+void gtk_C_callback_pause(void *userdata)
+{
+	((gtk_gui*) userdata)->do_pause();
+}
+}
+extern "C" {
+void gtk_C_callback_stop(void *userdata)
+{
+	((gtk_gui*) userdata)->do_stop();
+}
+}
+/* View */
+extern "C" {
+void gtk_C_callback_full_screen(void *userdata)
+{
+	//((gtk_gui*) userdata)->showFullScreen();
+}
+}
+extern "C" {
+void gtk_C_callback_normal_screen(void *userdata)
+{
+	//((gtk_gui*) userdata)->showNormal();
+}
+}
+extern "C" {
+void gtk_C_callback_load_settings(void *userdata)
+{
+	((gtk_gui*) userdata)->do_load_settings();
+}
+}
+extern "C" {
+void gtk_C_callback_logger_window(void *userdata)
+{
+	((gtk_gui*) userdata)->do_logger_window();
+}
+}
+/* Help */
+extern "C" {
+void gtk_C_callback_about(void *userdata)
+{
+	((gtk_gui*) userdata)->do_about();
+}
+}
+extern "C" {
+void gtk_C_callback_help(void *userdata)
+{
+	((gtk_gui*) userdata)->do_help();
+}
+}
+extern "C" {
+void gtk_C_callback_homepage(void *userdata)
+{
+	((gtk_gui*) userdata)->do_homepage();
+}
+}
+extern "C" {
+void gtk_C_callback_welcome(void *userdata)
+{
+	((gtk_gui*) userdata)->do_welcome();
+}
+}
+/* Internal */
+extern "C" {
+void gtk_C_callback_file_selected(void *userdata)
+{
+	((gtk_gui*) userdata)->do_file_selected();
+}
+}
+
 static const char * 
 find_datafile(const char **locations)
 {
@@ -123,7 +232,7 @@ gtk_gui::gtk_gui(const char* title,
 	/*Initialization of the GUI */
 	m_toplevelcontainer = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), title);
-	g_signal_connect (G_OBJECT (m_toplevelcontainer), "delete-event",
+	gtk_signal_connect (GTK_OBJECT (m_toplevelcontainer), "delete-event",
                     	G_CALLBACK (gtk_main_quit), NULL);
 	gtk_widget_set_size_request(m_toplevelcontainer, 240, 320);	
 
@@ -137,7 +246,7 @@ gtk_gui::gtk_gui(const char* title,
 		m_smilfilename = initfile;
 #ifdef  GTK_NO_FILEDIALOG
 	else
-		m_smilfilename = GString("/home/zaurus/Documents/example.smil");
+		m_smilfilename = "/home/zaurus/Documents/example.smil";
 #endif/*GTK_NO_FILEDIALOG*/
 	m_playing = false;
 	m_pausing = false;
@@ -152,7 +261,7 @@ gtk_gui::gtk_gui(const char* title,
 	m_menubar = (GtkMenuBar*)gtk_menu_bar_new();
 	gtk_widget_show ((GtkWidget*)m_menubar);
 	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);
-	{
+	{	
 		int id;
 		/* File */
 		m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
@@ -164,15 +273,17 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_filemenu_submenu_open = gtk_menu_item_new_with_label("Open...");
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_open);
 		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_open));
-		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
-	
+		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_open), "activate",  G_CALLBACK (gtk_C_callback_open), (void*)this);	
+
 		GtkWidget* m_filemenu_submenu_openurl = gtk_menu_item_new_with_label("Open URL...");
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_openurl);
 		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_openurl));
-		
+		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_openurl), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
+
 		GtkWidget* m_filemenu_submenu_reload = gtk_menu_item_new_with_label("Reload...");
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_reload);
 		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_reload));
+		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_reload), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
 
 		GtkWidget*  m_filemenu_submenu_separator1 = gtk_separator_menu_item_new();
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator1);
@@ -181,6 +292,7 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_filemenu_submenu_settings = gtk_menu_item_new_with_label("Settings");
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_settings);
 		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_settings));
+		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_settings_select), (void*)this);		
 
 		GtkWidget*  m_filemenu_submenu_separator2 = gtk_separator_menu_item_new();
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator2);
@@ -190,8 +302,9 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_filemenu_submenu_quit = gtk_menu_item_new_with_label("Quit");
 		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_quit);
 		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_quit));
+		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_quit), "activate",  G_CALLBACK (gtk_C_callback_quit), (void*)this);
 
-
+		/* Play */
 		m_playmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Play");
 		gtk_widget_show ((GtkWidget*)m_playmenu);
 		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_playmenu));
@@ -201,17 +314,19 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_playmenu_submenu_play = gtk_menu_item_new_with_label("Play");
 		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_play);
 		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_play));
-		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_play), "activate",  G_CALLBACK (gtk_C_callback_play), (void*)this);
 	
 		GtkWidget* m_playmenu_submenu_pause = gtk_menu_item_new_with_label("Pause");
 		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_pause);
 		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_pause));
+		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_pause), "activate",  G_CALLBACK (gtk_C_callback_pause), (void*)this);
 		
 		GtkWidget* m_playmenu_submenu_stop = gtk_menu_item_new_with_label("Stop");
 		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_stop);
 		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_stop));
+		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_stop), "activate",  G_CALLBACK (gtk_C_callback_stop), (void*)this);
 
-
+		/* View */
 		m_viewmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_View");
 		gtk_widget_show ((GtkWidget*)m_viewmenu);
 		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_viewmenu));
@@ -221,11 +336,12 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_viewmenu_submenu_fullscreen = gtk_menu_item_new_with_label("Full Screen");
 		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_fullscreen);
 		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_fullscreen));
-		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
-	
+		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_fullscreen), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
+
 		GtkWidget* m_viewmenu_submenu_window = gtk_menu_item_new_with_label("Window");
 		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_window);
 		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_window));
+		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_window), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);
 	
 		GtkWidget*  m_viewmenu_submenu_separator1 = gtk_separator_menu_item_new();
 		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator1);
@@ -234,6 +350,7 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_viewmenu_submenu_settings = gtk_menu_item_new_with_label("Load Settings...");
 		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_settings);
 		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_settings));
+		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);
 
 #ifdef	WITH_GTK_LOGGER
 		GtkWidget*  m_viewmenu_submenu_separator2 = gtk_separator_menu_item_new();
@@ -243,8 +360,10 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_viewmenu_submenu_log = gtk_menu_item_new_with_label("Log Window...");
 		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_log);
 		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_log));
+		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_log), "activate",  G_CALLBACK (gtk_C_callback_logger_window), (void*)this);
 #endif /*WITH_GTK_LOGGER*/
 
+		/* Help */
 		m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
 		gtk_widget_show ((GtkWidget*)m_helpmenu);
 		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
@@ -254,12 +373,13 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_helpmenu_submenu_about = gtk_menu_item_new_with_label("About AmbulantPlayer");
 		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_about);
 		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_about));
-		//g_signal_connect (G_OBJECT (m_filemenu_submenu_open), "activate", G_CALLBACK (slot_open), NULL);	
+		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_about), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
 	
 		GtkWidget* m_helpmenu_submenu_help = gtk_menu_item_new_with_label("AmbulantPlayer Help");
 		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_help);
 		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_help));
-	
+		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_help), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);	
+
 		GtkWidget*  m_helpmenu_submenu_separator1 = gtk_separator_menu_item_new();
 		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_separator1);
 		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_separator1));
@@ -267,70 +387,23 @@ gtk_gui::gtk_gui(const char* title,
 		GtkWidget* m_helpmenu_submenu_website = gtk_menu_item_new_with_label("AmbulantPlayer Website...");
 		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_website);
 		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_website));
+		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_website), "activate",  G_CALLBACK (gtk_C_callback_homepage), (void*)this);
 
-		GtkWidget* m_helpmenu_submenu_play = gtk_menu_item_new_with_label("Play Welcome Document");
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_play);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_play));
-
-/**		m_filemenu = new QPopupMenu (this);
-		assert(m_filemenu);
-		int open_id = m_filemenu->insertItem(gettext("&Open..."), this, SLOT(slot_open()));
-		int url_id = m_filemenu->insertItem(gettext("Open &URL..."), this, SLOT(slot_open_url()));
-		int reload_id = m_filemenu->insertItem(gettext("&Reload..."), this, SLOT(slot_reload()));
-#ifdef QT_NO_FILEDIALOG	**//* Assume embedded Qt */
-		// Disable unavailable menu entries
-/**		m_filemenu->setItemEnabled(open_id, true);
-		m_filemenu->setItemEnabled(url_id, false);
-#endif**//*QT_NO_FILEDIALOG*/
-/**		m_filemenu->insertSeparator();
-		
-		m_filemenu->insertItem(gettext("&Settings"), this, SLOT(slot_settings_select()));
-		m_filemenu->insertSeparator();
-		
-		m_filemenu->insertItem(gettext("&Quit"), this, SLOT(slot_quit()));
-		m_menubar->insertItem(gettext("&File"), m_filemenu);
-**/		
-		/* Play */
-/**		m_playmenu = new QPopupMenu (this, "PlayA");
-		assert(m_playmenu);
-		m_play_id = m_playmenu->insertItem(gettext("Pla&y"), this, SLOT(slot_play()));
-		m_playmenu->setItemEnabled(m_play_id, false);
-		m_pause_id = m_playmenu->insertItem(gettext("&Pause"), this, SLOT(slot_pause()));
-		m_playmenu->setItemEnabled(m_pause_id, false);
-		m_playmenu->insertItem(gettext("&Stop"), this, SLOT(slot_stop()));
-		m_menubar->insertItem(gettext("Pla&y"), m_playmenu);
-**/		
-		/* View */
-/**		m_viewmenu = new QPopupMenu(this, "View");
-		m_viewmenu->insertItem(gettext("&Full Screen"), this, SLOT(showFullScreen()));
-		m_viewmenu->insertItem(gettext("&Window"), this, SLOT(showNormal()));
-		m_viewmenu->insertSeparator();
-		m_viewmenu->insertItem(gettext("&Load settings..."), this, SLOT(slot_load_settings()));
-#ifdef	WITH_QT_LOGGER
-		m_viewmenu->insertSeparator();
-		m_viewmenu->insertItem(gettext("&Log Window..."), this, SLOT(slot_logger_window()));
-#endif**//*WITH_QT_LOGGER*/
-//		m_menubar->insertItem(gettext("&View"), m_viewmenu);
-		
-		/* Help */
-/**		m_helpmenu = new QPopupMenu (this, "HelpA");
-		assert(m_helpmenu);
-		m_helpmenu->insertItem(gettext("&About AmbulantPlayer"), this, SLOT(slot_about()));
-		m_helpmenu->insertItem(gettext("AmbulantPlayer &Help"), this, SLOT(slot_help()));
-		m_helpmenu->insertSeparator();
-		m_helpmenu->insertItem(gettext("AmbulantPlayer &Website..."), this, SLOT(slot_homepage()));
-		m_helpmenu->insertItem(gettext("&Play Welcome Document"), this, SLOT(slot_welcome()));
-		m_menubar->insertItem(gettext("&Help"), m_helpmenu);
-		m_menubar->setGeometry(0,0,320,20);
+		GtkWidget* m_helpmenu_submenu_welcome = gtk_menu_item_new_with_label("Play Welcome Document");
+		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_welcome);
+		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_welcome));
+		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_welcome), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);
+	
 		m_o_x = 0;
-#ifndef QT_NO_FILEDIALOG**/	/* Assume plain Qt */
-//		m_o_y = 27;
-//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-//		m_o_y = 20;
-//#endif/*QT_NO_FILEDIALOG*/
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+		m_o_y = 27;
+#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
+		m_o_y = 20;
+#endif/*QT_NO_FILEDIALOG*/
 	}
+	//g_signal_connect (G_OBJECT (this), SIGNAL(signal_player_done()),  G_CALLBACK (do_player_done), NULL);	
 //	GTKObject::connect(this, SIGNAL(signal_player_done()),
-//			    this, SLOT(slot_player_done()));
+//			    this, SLOT(do_player_done()));
 }
 
 gtk_gui::~gtk_gui() {
@@ -338,16 +411,13 @@ gtk_gui::~gtk_gui() {
 #define DELETE(X) if (X) { delete X; X = NULL; }
 	AM_DBG printf("%s0x%X\n", "gtk_gui::~gtk_gui(), m_mainloop=",m_mainloop);
 	//setCaption(QString::null);
-#ifdef  GTK_NO_FILEDIALOG	/* Assume embedded GTK */
-	DELETE(m_fileselector)
-	DELETE(m_settings_selector)
-#endif  /*GTK_NO_FILEDIALOG*/
+	gtk_widget_destroy(GTK_WIDGET (m_fileselector));
+		gtk_widget_destroy(GTK_WIDGET (m_settings_selector));
+	gtk_widget_destroy(GTK_WIDGET (m_filemenu));
+	gtk_widget_destroy(GTK_WIDGET (m_playmenu));
+	gtk_widget_destroy(GTK_WIDGET (m_viewmenu));
+	gtk_widget_destroy(GTK_WIDGET (m_menubar));
 	DELETE(m_mainloop) 
-	DELETE(m_filemenu)
-	DELETE(m_helpmenu)
-	DELETE(m_playmenu)
-	DELETE(m_viewmenu)
-	DELETE(m_menubar)
 	m_smilfilename = (char*) NULL;
 }
 
@@ -371,23 +441,23 @@ gtk_gui::get_document_container()
 
 
 void 
-gtk_gui::slot_about() {
+gtk_gui::do_about() {
 	//int but = QMessageBox::information(this, gettext("About AmbulantPlayer"),about_text,gettext("OK"));
 }
 
 void 
-gtk_gui::slot_homepage() {
+gtk_gui::do_homepage() {
 	open_web_browser("http://www.ambulantplayer.org");
 }
 
 void 
-gtk_gui::slot_welcome() {
+gtk_gui::do_welcome() {
 	const char *welcome_doc = "/ufs/garcia/native/share/ambulant/Welcome/Welcome.smil";
 	//find_datafile(welcome_locations);
 	
 	if (welcome_doc) {
 		if( openSMILfile(welcome_doc, 1)) {
-			slot_play();
+			do_play();
 		}
 	} else {
 		//QMessageBox::information(this, m_programfilename, 
@@ -396,7 +466,7 @@ gtk_gui::slot_welcome() {
 }
 
 void 
-gtk_gui::slot_help() {
+gtk_gui::do_help() {
 	const char *help_doc = find_datafile(helpfile_locations);
 	
 	if (help_doc) {
@@ -408,8 +478,8 @@ gtk_gui::slot_help() {
 }
 
 void
-gtk_gui::slot_logger_window() {
-	AM_DBG printf("slot_logger_window()\n");
+gtk_gui::do_logger_window() {
+	AM_DBG printf("do_logger_window()\n");
 #ifndef GTK_NO_FILEDIALOG	 /* Assume plain Qt */
 //	QTextEdit* logger_window =
 //		gtk_logger::get_gtk_logger()->get_logger_window();
@@ -460,40 +530,28 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 	return m_mainloop->is_open();
 }
 
+
 void 
-gtk_gui::slot_open() {
-printf("We are opening!!!!\n");
+gtk_gui::do_open(){
 
+	m_fileselector =  (GtkFileSelection*) gtk_file_selection_new("Double Click a file to open");
+	gtk_file_selection_set_filename(m_fileselector, "."); // Initial dir
+	gtk_widget_show(GTK_WIDGET (m_fileselector));
+	gtk_file_selection_complete(m_fileselector,"SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)");
+	//if (openSMILfile(smilfilename, 1))
+		//do_play();
 
-#ifndef GTK_NO_FILEDIALOG
-/**
-	GString smilfilename =
-		QFileDialog::getOpenFileName(
-				 ".", // Initial dir
-				 gettext("SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)"), // file types
-				 this,
-				 gettext("open file dialog"),
-				 gettext("Double Click a file to open")
-				 );
-	if (openSMILfile(smilfilename, 1))
-		slot_play();**/
-#else	/*QT_NO_FILEDIALOG*/	
-	if (m_fileselector == NULL) {
-		GString mimeTypes("application/smil;");
-		m_fileselector = new FileSelector(mimeTypes, NULL,
-						  "slot_open", false);
-		m_fileselector->resize(240, 280);
-	} else {
-		m_fileselector->reread();
-	}
+	/* Connect the ok_button to fileSelected function */
+    	g_signal_connect (G_OBJECT (GTK_FILE_SELECTION (m_fileselector)->ok_button),"clicked", G_CALLBACK (gtk_C_callback_file_selected), (void*) this);
+
+    	/* Connect the cancel_button to destroy the widget */
+	g_signal_connect_swapped (G_OBJECT (GTK_FILE_SELECTION (m_fileselector)->cancel_button),"clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (m_fileselector));
+	gtk_widget_show(GTK_WIDGET (m_fileselector));
+
 /**
 	QObject::connect(m_fileselector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(slot_file_selected(const DocLnk&)));
-	QObject::connect(m_fileselector, SIGNAL(closeMe()), 
-			 this, SLOT(slot_close_fileselector()));
-	m_fileselector->show();
+			 this, SLOT(do_file_selected(const DocLnk&)));
 **/
-#endif	/*QT_NO_FILEDIALOG*/
 }
 
 
@@ -501,24 +559,28 @@ printf("We are opening!!!!\n");
 //gtk_gui::setDocument(const char* smilfilename) {
 //#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Qt */
 //	if (openSMILfile(smilfilename, 1))
-//		slot_play();
+//		do_play();
 //#endif/*GTK_NO_FILEDIALOG*/
 //}
 
 void
-gtk_gui::slot_file_selected(const DocLnk& selected_file) {
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	GString* smilfilepointer = new GString(selected_file.file());
-	GString smilfilename = *smilfilepointer;
-	delete smilfilepointer;
-	m_fileselector->hide();
-	if (openSMILfile(smilfilename, 1))
-		slot_play();
-#endif/*QT_NO_FILEDIALOG*/
+gtk_gui::do_file_selected() {
+	g_print ("%s\n", gtk_file_selection_get_filename (GTK_FILE_SELECTION (m_fileselector)));
+	gtk_widget_destroy(GTK_WIDGET (m_fileselector));
+//onst gchar* smilfilename = gtk_file_selection_get_filename(m_fileselector);
+//	printf(smilfilename);
+//	printf("Este era el fichero!!!\n");
+
+//	gchar* smilfilepointer = new GString(selected_file.file());
+//	GString smilfilename = *smilfilepointer;
+//	delete smilfilepointer;
+//	m_fileselector->hide();
+//	if (openSMILfile(smilfilename, 1))
+//		do_play();
 }
 
 void
-gtk_gui::slot_close_fileselector()
+gtk_gui::do_close_fileselector()
 {
 #ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	m_fileselector->hide();
@@ -526,16 +588,16 @@ gtk_gui::slot_close_fileselector()
 }
 
 void
-gtk_gui::slot_settings_selected(const DocLnk& selected_file) {
+gtk_gui::do_settings_selected(const DocLnk& selected_file) {
 #ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	GTKString settings_filename(selected_file.file());
 	smil2::test_attrs::load_test_attrs(settings_filename.ascii());
 	if (openSMILfile(m_smilfilename, 1))
-		slot_play();
+		do_play();
 #endif/*QT_NO_FILEDIALOG*/
 }
 void
-gtk_gui::slot_close_settings_selector()
+gtk_gui::do_close_settings_selector()
 {
 #ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
 	m_settings_selector->hide();
@@ -543,9 +605,9 @@ gtk_gui::slot_close_settings_selector()
 }
 
 void 
-gtk_gui::slot_load_settings() {
+gtk_gui::do_load_settings() {
 	if (m_playing)
-		slot_stop();
+		do_stop();
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 /**	GString settings_filename =
 		QFileDialog::getOpenFileName(
@@ -559,7 +621,7 @@ gtk_gui::slot_load_settings() {
 	if ( ! settings_filename.isNull()) {
 		smil2::test_attrs::load_test_attrs(settings_filename.ascii());
 		if (openSMILfile(m_smilfilename, 1))
-			slot_play();
+			do_play();
 	}**/
 #else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	/* TBD embedded Qt settings file dialog XXXX */
@@ -567,7 +629,7 @@ gtk_gui::slot_load_settings() {
 	if (m_settings_selector == NULL) {
 		QString mimeTypes("text/xml;");
 		m_settings_selector = new FileSelector(mimeTypes, NULL,
-						       "slot_open", false);
+						       "do_open", false);
 		printf("2.m_settings_selector =0x%x\n",m_settings_selector );
 		m_settings_selector->resize(240, 280);
 	} else {
@@ -575,15 +637,15 @@ gtk_gui::slot_load_settings() {
 	}
 /**
 	QObject::connect(m_settings_selector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(slot_settings_selected(const DocLnk&)));
+			 this, SLOT(do_settings_selected(const DocLnk&)));
 	QObject::connect(m_settings_selector, SIGNAL(closeMe()), 
-			 this, SLOT(slot_close_settings_selector()));
+			 this, SLOT(do_close_settings_selector()));
 	m_settings_selector->show();**/
 #endif/*QT_NO_FILEDIALOG*/
 }
 
 void 
-gtk_gui::slot_open_url() {
+gtk_gui::do_open_url() {
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
   	bool ok;
 /**	QString smilfilename =
@@ -597,7 +659,7 @@ gtk_gui::slot_open_url() {
 				 );**/
 /**	if (ok && !smilfilename.isEmpty()
 	    && openSMILfile(smilfilename, 1)) {
-		slot_play();
+		do_play();
 	}
 **/
 #else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
@@ -607,8 +669,8 @@ gtk_gui::slot_open_url() {
 }
 
 void 
-gtk_gui::slot_player_done() {
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_player_done");
+gtk_gui::do_player_done() {
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_player_done");
 	/*
 	if (m_mainloop->player_done()) {
 		m_playmenu->setItemEnabled(m_pause_id, false);
@@ -640,9 +702,9 @@ no_fileopen_infodisplay(GtkWidget* w, const char* caption) {
 }
 
 void 
-gtk_gui::slot_play() {
+gtk_gui::do_play() {
 	//AM_DBG 
-	printf("%s-%s\n", m_programfilename, "slot_play");
+	printf("%s-%s\n", m_programfilename, "do_play");
 	if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
 		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
 		return;
@@ -662,8 +724,8 @@ gtk_gui::slot_play() {
 }
 
 void 
-gtk_gui::slot_pause() {
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_pause");
+gtk_gui::do_pause() {
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_pause");
 	if (! m_pausing) {
 		m_pausing = true;
 //		m_playmenu->setItemEnabled(m_pause_id, false);
@@ -673,18 +735,18 @@ gtk_gui::slot_pause() {
 }
 
 void 
-gtk_gui::slot_reload() {
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_reload");
+gtk_gui::do_reload() {
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_reload");
 	if (openSMILfile(m_smilfilename, 1)) {
-		slot_play();
+		do_play();
 	} else {
 		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
 	}
 }
 
 void 
-gtk_gui::slot_stop() {
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_stop");
+gtk_gui::do_stop() {
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_stop");
 	if(m_mainloop)
 		m_mainloop->stop();
 //	m_playmenu->setItemEnabled(m_pause_id, false);
@@ -693,7 +755,7 @@ gtk_gui::slot_stop() {
 }
 
 void 
-gtk_gui::slot_settings_select() {
+gtk_gui::do_settings_select() {
 /**
 	m_settings = new qt_settings();
 	QWidget* settings_widget = m_settings->settings_select();
@@ -702,30 +764,29 @@ gtk_gui::slot_settings_select() {
 	m_finish_hb->setSpacing(50);
 	QPushButton* m_cancel_pb= new QPushButton(gettext("Cancel"), m_finish_hb);
 	QObject::connect(m_ok_pb, SIGNAL(released()),
-			 this, SLOT(slot_settings_ok()));
+			 this, SLOT(do_settings_ok()));
 	QObject::connect(m_cancel_pb, SIGNAL(released()),
-			 this, SLOT(slot_settings_cancel()));
+			 this, SLOT(do_settings_cancel()));
 	settings_widget->show();
 **/
 }
 
 void
-gtk_gui::slot_settings_ok() {
+gtk_gui::do_settings_ok() {
 //	m_settings->settings_ok();
-//	slot_settings_cancel();
+//	do_settings_cancel();
 }
 
 void
-gtk_gui::slot_settings_cancel() {
+gtk_gui::do_settings_cancel() {
 //	m_settings->settings_finish();
 //	delete m_settings;
 //	m_settings = NULL;
 }
 
 void
-gtk_gui::slot_quit() {
-/**
-	AM_DBG printf("%s-%s\n", m_programfilename, "slot_quit");
+gtk_gui::do_quit() {
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_quit");
 	if (m_mainloop)	{
 		m_mainloop->stop();
 //		m_mainloop->release();
@@ -733,8 +794,7 @@ gtk_gui::slot_quit() {
 		m_mainloop = NULL;
 	}
 	m_busy = false;
-	qApp->quit();
-**/
+	gtk_main_quit();
 }
 
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
@@ -912,7 +972,7 @@ main (int argc, char*argv[]) {
  			if (mywidget->openSMILfile(argv[argc-1],
 						   1)
 			    && (exec_flag = true)){
-				mywidget->slot_play();
+				mywidget->do_play();
 			}
 		}
 	} else {
@@ -922,7 +982,7 @@ main (int argc, char*argv[]) {
 			if (welcome_doc
 			&& mywidget->openSMILfile(welcome_doc,
 						  1)) {
-				mywidget->slot_play();
+				mywidget->do_play();
 				prefs->m_welcome_seen = true;
 			}
 		}
@@ -948,3 +1008,4 @@ main (int argc, char*argv[]) {
 	std::cout << "Exiting program" << std::endl;
 	return exec_flag ? 0 : -1;
 }
+
