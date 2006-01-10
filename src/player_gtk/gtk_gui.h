@@ -165,7 +165,7 @@ class gtk_gui{
 // Added by Pablo
     public:
 //	void do_file_selected(const DocLnk&);
-	void do_file_selected();
+	void do_file_selected(gpointer data);
 	void do_close_fileselector();
 	void do_settings_selected(const DocLnk&);
 	void do_close_settings_selector();

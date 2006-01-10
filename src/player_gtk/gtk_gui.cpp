@@ -181,9 +181,9 @@ void gtk_C_callback_welcome(void *userdata)
 }
 /* Internal */
 extern "C" {
-void gtk_C_callback_file_selected(void *userdata)
+void gtk_C_callback_file_selected(void *userdata, gpointer data)
 {
-	((gtk_gui*) userdata)->do_file_selected();
+	((gtk_gui*) userdata)->do_file_selected(data);
 }
 }
 
@@ -395,9 +395,9 @@ gtk_gui::gtk_gui(const char* title,
 		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_welcome), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);
 	
 		m_o_x = 0;
-#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
 		m_o_y = 27;
-#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
+#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded GTK */
 		m_o_y = 20;
 #endif/*QT_NO_FILEDIALOG*/
 	}
@@ -417,7 +417,8 @@ gtk_gui::~gtk_gui() {
 	gtk_widget_destroy(GTK_WIDGET (m_playmenu));
 	gtk_widget_destroy(GTK_WIDGET (m_viewmenu));
 	gtk_widget_destroy(GTK_WIDGET (m_menubar));
-	DELETE(m_mainloop) 
+	//DELETE(m_mainloop)
+	m_mainloop->release();
 	m_smilfilename = (char*) NULL;
 }
 
@@ -442,7 +443,15 @@ gtk_gui::get_document_container()
 
 void 
 gtk_gui::do_about() {
-	//int but = QMessageBox::information(this, gettext("About AmbulantPlayer"),about_text,gettext("OK"));
+	GtkMessageDialog* dialog = 
+	(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_INFO,
+         GTK_BUTTONS_CLOSE,
+	 "About AmbulantPlayer");
+	gtk_message_dialog_format_secondary_text(dialog,about_text);
+ 	gtk_dialog_run (GTK_DIALOG (dialog));
+ 	gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
 void 
@@ -533,25 +542,31 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 
 void 
 gtk_gui::do_open(){
-
-	m_fileselector =  (GtkFileSelection*) gtk_file_selection_new("Double Click a file to open");
+	m_fileselector =  (GtkFileSelection*) gtk_file_selection_new("Please, select a file");
+		(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_INFO,
+         GTK_BUTTONS_CLOSE,
+	 "About AmbulantPlayer");
 	gtk_file_selection_set_filename(m_fileselector, "."); // Initial dir
 	gtk_widget_show(GTK_WIDGET (m_fileselector));
 	gtk_file_selection_complete(m_fileselector,"SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)");
+	g_signal_connect (GTK_FILE_SELECTION (m_fileselector)->ok_button,
+                     "clicked",
+                     G_CALLBACK (gtk_C_callback_file_selected),
+                     ((void*) this, (gpointer) m_fileselector));
+   	/* Ensure that the dialog box is hidden when the user clicks a button. */
+   	g_signal_connect_swapped (GTK_FILE_SELECTION (m_fileselector)->ok_button,
+                             "clicked",
+                             G_CALLBACK (gtk_widget_hide), 
+                             m_fileselector);
+
+   	g_signal_connect_swapped (GTK_FILE_SELECTION (m_fileselector)->cancel_button,
+                             "clicked",
+                             G_CALLBACK (gtk_widget_hide),
+                             m_fileselector); 
 	//if (openSMILfile(smilfilename, 1))
 		//do_play();
-
-	/* Connect the ok_button to fileSelected function */
-    	g_signal_connect (G_OBJECT (GTK_FILE_SELECTION (m_fileselector)->ok_button),"clicked", G_CALLBACK (gtk_C_callback_file_selected), (void*) this);
-
-    	/* Connect the cancel_button to destroy the widget */
-	g_signal_connect_swapped (G_OBJECT (GTK_FILE_SELECTION (m_fileselector)->cancel_button),"clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (m_fileselector));
-	gtk_widget_show(GTK_WIDGET (m_fileselector));
-
-/**
-	QObject::connect(m_fileselector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(do_file_selected(const DocLnk&)));
-**/
 }
 
 
@@ -564,19 +579,13 @@ gtk_gui::do_open(){
 //}
 
 void
-gtk_gui::do_file_selected() {
-	g_print ("%s\n", gtk_file_selection_get_filename (GTK_FILE_SELECTION (m_fileselector)));
-	gtk_widget_destroy(GTK_WIDGET (m_fileselector));
-//onst gchar* smilfilename = gtk_file_selection_get_filename(m_fileselector);
-//	printf(smilfilename);
-//	printf("Este era el fichero!!!\n");
-
-//	gchar* smilfilepointer = new GString(selected_file.file());
-//	GString smilfilename = *smilfilepointer;
-//	delete smilfilepointer;
-//	m_fileselector->hide();
-//	if (openSMILfile(smilfilename, 1))
-//		do_play();
+gtk_gui::do_file_selected(gpointer data) {
+	GtkWidget *file_selector = GTK_WIDGET (data);
+   	const gchar *smilfilename  = gtk_file_selection_get_filename (GTK_FILE_SELECTION (file_selector));
+	printf(smilfilename);
+	//delete smilfilename;
+	if (openSMILfile(smilfilename, 1))
+		do_play();
 }
 
 void
@@ -789,8 +798,8 @@ gtk_gui::do_quit() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_quit");
 	if (m_mainloop)	{
 		m_mainloop->stop();
-//		m_mainloop->release();
-		delete m_mainloop;
+		m_mainloop->release();
+//		delete m_mainloop;
 		m_mainloop = NULL;
 	}
 	m_busy = false;
