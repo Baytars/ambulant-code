@@ -103,29 +103,22 @@ create_img_decoder(lib::memfile *src, HDC hdc) {
 	return 0;
 }
 
-gui::dg::image_renderer::image_renderer(const net::url& u, net::datasource_factory *df, viewport* v)
+gui::dg::image_renderer::image_renderer(const net::url& u, net::datasource *src, viewport* v)
 :	m_url(u),
-	m_df(df),
 	m_dibsurf(0),
 	m_transparent(false),
 	m_transp_color(CLR_INVALID) {
-	open(u, v);
+	open(src, v);
 }
 
 gui::dg::image_renderer::~image_renderer() {
 	if(m_dibsurf) delete m_dibsurf;
 }
 
-void gui::dg::image_renderer::open(const net::url& u, viewport* v) {
-	net::datasource *src = m_df->new_raw_datasource(u);
-	if (!src) {
-		lib::logger::get_logger()->error("%s: Cannot open URL", u.get_url().c_str());
-		return;
-	}
-	lib::memfile mf(u, src);
+void gui::dg::image_renderer::open(net::datasource *src, viewport* v) {
+	lib::memfile mf(src);
 	if(!mf.read()) {
-		lib::logger::get_logger()->show("dg::image_renderer::open - Failed to locate image file %s.", 
-			u.get_url().c_str());
+		lib::logger::get_logger()->show("%s: Cannot read data", m_url.get_url().c_str());
 		return;
 	}
 	
@@ -134,13 +127,13 @@ void gui::dg::image_renderer::open(const net::url& u, viewport* v) {
 	img_decoder_class* decoder = create_img_decoder(&mf, hdc);
 	::DeleteDC(hdc);
 	if(!decoder) {
-		lib::logger::get_logger()->show("Failed to create decoder for image %s", u.get_url().c_str());
+		lib::logger::get_logger()->show("%s: Cannot create image decoder", m_url.get_url().c_str());
 		return;
 	}
 	
 	m_dibsurf = decoder->decode();
 	if(!m_dibsurf) {
-		lib::logger::get_logger()->show("Failed to decode image %s", u.get_url().c_str());
+		lib::logger::get_logger()->show("%s: Cannot decode image", m_url.get_url().c_str());
 		delete decoder;
 		return;
 	}

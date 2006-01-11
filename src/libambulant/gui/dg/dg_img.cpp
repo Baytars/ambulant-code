@@ -56,6 +56,11 @@ gui::dg::dg_img_renderer::dg_img_renderer(
 	
 	AM_DBG lib::logger::get_logger()->debug("dg_img_renderer::ctr(0x%x)", this);
 	net::url url = m_node->get_url("src");
+	net::datasource *src = factory->df->new_raw_datasource(url);
+	if (src == NULL) {
+		// XXX Should we give an error if this fails?
+		return;
+	}
 	if(!window) {
 		lib::logger::get_logger()->show("get_window() failed. [%s]",
 			url.get_url().c_str());
@@ -63,7 +68,7 @@ gui::dg::dg_img_renderer::dg_img_renderer(
 	}
 	dg_window *dgwindow = static_cast<dg_window*>(window);
 	viewport *v = dgwindow->get_viewport();
-	m_image = new image_renderer(url, factory->df, v);
+	m_image = new image_renderer(url, src, v);
 	
 }
 

@@ -35,9 +35,6 @@ namespace lib {
 
 typedef unsigned char byte;
 typedef  std::basic_string<byte> databuffer;
-using ambulant::lib::logger;
-
-#if 1 //!defined(AMBULANT_NO_IOSTREAMS_HEADERS) && !defined(AMBULANT_PLATFORM_WIN32)
 
 class memfile {
   public:
@@ -47,24 +44,12 @@ class memfile {
 	typedef buffer_type::const_pointer const_pointer;
 	typedef buffer_type::size_type size_type;
 
-	memfile(const std::string& url, net::datasource *src)
-	:	m_url(url),
-		m_src(src),
+	memfile(net::datasource *src)
+	:	m_src(src),
 		m_gptr(0) {}
-	
-	memfile(const char *url, net::datasource *src)
-	:	m_url(url?url:""),
-		m_src(src),
-		m_gptr(0) {}
-	
+		
 	~memfile();
-	
-//	bool exists() const;
-	
-//	databuffer& get_databuffer();
-	
-//	const std::string& get_url() const;
-	
+		
 	bool read();
 
 	size_type size() const;
@@ -87,12 +72,8 @@ class memfile {
 	
 	unsigned short get_be_ushort();
 	
-//	std::string repr();
-
 	size_type read(char *b, size_type nb);
-	
-//	static bool exists(const std::string& url);
-	
+		
   private:	
 	void throw_range_error() {
 		throw std::range_error("index out of range");
@@ -103,10 +84,6 @@ class memfile {
 	net::datasource *m_src;
   
 };
-
-#elif defined(AMBULANT_PLATFORM_WIN32)
-//using ambulant::lib::win32::memfile;
-#endif
 
 } // end namespace lib
 
