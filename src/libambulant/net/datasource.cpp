@@ -414,6 +414,7 @@ ambulant::net::read_data_from_datasource(datasource *src, char **result, size_t 
 {
 	*result = NULL;
 	*sizep = 0;
+	src->add_ref();
 	datasource_reader *dr = new datasource_reader(src);
 	dr->run();
 	int nbytes = dr->getresult(result);

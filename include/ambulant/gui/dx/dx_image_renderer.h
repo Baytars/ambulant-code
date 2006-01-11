@@ -49,7 +49,7 @@ class viewport;
 
 class image_renderer {
   public:
-	  image_renderer(const net::url& u, net::datasource_factory *df, viewport* v);
+	  image_renderer(const net::url& u, net::datasource *src, viewport* v);
 	~image_renderer();
 	
 	bool can_play() const { return m_ddsurf != 0;}
@@ -58,9 +58,8 @@ class image_renderer {
 	IDirectDrawSurface *get_ddsurf() { return m_ddsurf;}
 	
   private:
-	void open(const net::url& u, viewport* v);
+	void open(net::datasource *src, viewport* v);
 	net::url m_url;
-	net::datasource_factory* m_df;
 	IDirectDrawSurface *m_ddsurf;
 	lib::size m_size;
 	bool m_transparent;
