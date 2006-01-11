@@ -55,19 +55,17 @@ class gtk_logger {
 	};
 	static gtk_logger* get_gtk_logger();
 	static void show_message(int level, const char *message);
-#ifndef GTK_NO_FILEDIALOG	 /* Assume plain Qt */
-	//QTextEdit* get_logger_window();
-#endif/*GTK_NO_FILEDIALOG*/
+	GtkWindow* get_logger_window();
 	static void set_gtk_logger_gui(gtk_gui*);
-	void log(GString logstring);
+	void log(GString *logstring);
 	~gtk_logger();
   protected:
 	gtk_logger();
   private:
 	static gtk_logger* s_gtk_logger;  // singleton
-#ifndef GTK_NO_FILEDIALOG	 /* Assume plain Qt */
-	//QTextEdit* m_logger_window;
-#endif/*GTK_NO_FILEDIALOG*/
+	GtkWindow* m_logger_window;
+	GtkTextView* m_text_view;
+	GtkTextBuffer *m_text_buffer;
 	gtk_gui* m_gui;
 	FILE* m_log_FILE;
 };
@@ -83,12 +81,15 @@ class gtk_logger_ostream : public ambulant::lib::ostream {
 	void write(ambulant::lib::byte_buffer& bb);
 	void flush();
   private:
-	GString m_qstring;
+	GString *m_string;
 };
-/**
-class GTK_message_event : public QCustomEvent {
-  public:
-	gtk_message_event(int type, char* message); 
-};
-**/
+
+
+
+
+//class GTK_message_event : public GtkEvent {
+// public:
+//	gtk_message_event(int type, char* message); 
+//};
+
 #endif/*__GTK_LOGGER_H__*/

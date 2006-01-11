@@ -85,102 +85,70 @@ void gtk_C_callback_open(void *userdata)
 {
 	((gtk_gui*) userdata)->do_open();
 }
-}
-extern "C" {
 void gtk_C_callback_open_url(void *userdata)
 {
 	((gtk_gui*) userdata)->do_open_url();
 }
-}
-extern "C" {
 void gtk_C_callback_reload(void *userdata)
 {
 	((gtk_gui*) userdata)->do_reload();
 }
-}
-extern "C" {
 void gtk_C_callback_settings_select(void *userdata)
 {
 	((gtk_gui*) userdata)->do_settings_select();
 }
-}
-extern "C" {
 void gtk_C_callback_quit(void *userdata)
 {
 	((gtk_gui*) userdata)->do_quit();
 }
-}
 /* Play */
-extern "C" {
 void gtk_C_callback_play(void *userdata)
 {
 	((gtk_gui*) userdata)->do_play();
 }
-}
-extern "C" {
 void gtk_C_callback_pause(void *userdata)
 {
 	((gtk_gui*) userdata)->do_pause();
 }
-}
-extern "C" {
 void gtk_C_callback_stop(void *userdata)
 {
 	((gtk_gui*) userdata)->do_stop();
 }
-}
 /* View */
-extern "C" {
 void gtk_C_callback_full_screen(void *userdata)
 {
 	//((gtk_gui*) userdata)->showFullScreen();
 }
-}
-extern "C" {
 void gtk_C_callback_normal_screen(void *userdata)
 {
 	//((gtk_gui*) userdata)->showNormal();
 }
-}
-extern "C" {
 void gtk_C_callback_load_settings(void *userdata)
 {
 	((gtk_gui*) userdata)->do_load_settings();
 }
-}
-extern "C" {
 void gtk_C_callback_logger_window(void *userdata)
 {
 	((gtk_gui*) userdata)->do_logger_window();
 }
-}
 /* Help */
-extern "C" {
 void gtk_C_callback_about(void *userdata)
 {
 	((gtk_gui*) userdata)->do_about();
 }
-}
-extern "C" {
 void gtk_C_callback_help(void *userdata)
 {
 	((gtk_gui*) userdata)->do_help();
 }
-}
-extern "C" {
 void gtk_C_callback_homepage(void *userdata)
 {
 	((gtk_gui*) userdata)->do_homepage();
 }
-}
-extern "C" {
 void gtk_C_callback_welcome(void *userdata)
 {
 	((gtk_gui*) userdata)->do_welcome();
 }
-}
 /* Internal */
-extern "C" {
 void gtk_C_callback_file_selected(void *userdata, gpointer data)
 {
 	((gtk_gui*) userdata)->do_file_selected(data);
@@ -447,7 +415,7 @@ gtk_gui::do_about() {
 	(GtkMessageDialog*) gtk_message_dialog_new (NULL,
          GTK_DIALOG_DESTROY_WITH_PARENT,
          GTK_MESSAGE_INFO,
-         GTK_BUTTONS_CLOSE,
+         GTK_BUTTONS_OK,
 	 "About AmbulantPlayer");
 	gtk_message_dialog_format_secondary_text(dialog,about_text);
  	gtk_dialog_run (GTK_DIALOG (dialog));
@@ -461,16 +429,21 @@ gtk_gui::do_homepage() {
 
 void 
 gtk_gui::do_welcome() {
-	const char *welcome_doc = "/ufs/garcia/native/share/ambulant/Welcome/Welcome.smil";
-	//find_datafile(welcome_locations);
+	const char *welcome_doc = find_datafile(welcome_locations);
 	
 	if (welcome_doc) {
 		if( openSMILfile(welcome_doc, 1)) {
 			do_play();
 		}
 	} else {
-		//QMessageBox::information(this, m_programfilename, 
-		//	gettext("Cannot find Welcome.smil document"));
+		GtkMessageDialog* dialog = 
+		(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         	GTK_DIALOG_DESTROY_WITH_PARENT,
+         	GTK_MESSAGE_ERROR,
+         	GTK_BUTTONS_OK,
+	 	"Cannot find Welcome.smil document");
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));
 	}
 }
 
@@ -481,23 +454,26 @@ gtk_gui::do_help() {
 	if (help_doc) {
 		open_web_browser(help_doc);
 	} else {
-//		QMessageBox::information(this, m_programfilename, 
-//			gettext("Cannot find Ambulant Player Help"));
+		GtkMessageDialog* dialog = 
+		(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         	GTK_DIALOG_DESTROY_WITH_PARENT,
+         	GTK_MESSAGE_ERROR,
+         	GTK_BUTTONS_OK,
+	 	"Cannot find Ambulant Player Help");
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));
 	}
 }
 
 void
 gtk_gui::do_logger_window() {
 	AM_DBG printf("do_logger_window()\n");
-#ifndef GTK_NO_FILEDIALOG	 /* Assume plain Qt */
-//	QTextEdit* logger_window =
-//		gtk_logger::get_gtk_logger()->get_logger_window();
-/**	if (logger_window->isHidden())
-		logger_window->show();
-	else
-		logger_window->hide();
-**/
-#endif/*QT_NO_FILEDIALOG*/
+	GtkWindow* logger_window =  gtk_logger::get_gtk_logger()->get_logger_window();
+	gtk_widget_show(GTK_WIDGET (logger_window));
+//	if (logger_window->isHidden())
+//		logger_window->show();
+//	else
+//		logger_window->hide();
 }
 
 bool 
@@ -582,10 +558,9 @@ void
 gtk_gui::do_file_selected(gpointer data) {
 	GtkWidget *file_selector = GTK_WIDGET (data);
    	const gchar *smilfilename  = gtk_file_selection_get_filename (GTK_FILE_SELECTION (file_selector));
-	printf(smilfilename);
 	//delete smilfilename;
-	if (openSMILfile(smilfilename, 1))
-		do_play();
+	//if (openSMILfile(smilfilename, 1))
+	//	do_play();
 }
 
 void
@@ -875,9 +850,11 @@ gtk_gui::unsetCursor() { //XXXX Hack
 
 void
 gtk_gui::internal_message(int level, char* msg) {
-/**
+	
 	int msg_id = level+gtk_logger::CUSTOM_OFFSET;
-  	gtk_message_event* qme = new gtk_message_event(msg_id, msg);
+//  	gtk_message_event* me = new gtk_message_event(msg_id, msg);
+//	g_signal_emit (G_OBJECT (me),0, NULL);
+
 //#ifdef	QT_THREAD_SUPPORT
 //	QThread::postEvent(this, qme);
 //#else**/ /*QT_THREAD_SUPPORT*/
