@@ -84,10 +84,8 @@ class gtk_logger_ostream : public ambulant::lib::ostream {
 	GString *m_string;
 };
 
-
-
-
-//class GTK_message_event : public GtkEvent {
+//: public GtkEvent 
+//class GTK_message_event{
 // public:
 //	gtk_message_event(int type, char* message); 
 //};
