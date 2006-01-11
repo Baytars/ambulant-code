@@ -91,7 +91,7 @@ class win32_datasource : virtual public datasource, virtual public lib::ref_coun
   	
   protected: 
     bool _end_of_file();
-    virtual void _read_file(); // Defined in the concrete subclasses
+    virtual void _read_file() = 0; // Defined in the concrete subclasses
 	const url m_url;
 	databuffer *m_buffer;
 	bool m_end_of_file;

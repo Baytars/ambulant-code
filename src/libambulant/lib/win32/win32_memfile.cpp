@@ -27,7 +27,7 @@
 
 using namespace ambulant;
 
-lib::win32::memfile::memfile(const net::url& u)
+lib::win32::memfile::memfile(const net::url& u, net::datasource *src)
 :	m_url(u), m_gptr(0) {
 }
 	

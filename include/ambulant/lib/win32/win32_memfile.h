@@ -29,6 +29,7 @@
 
 #include "ambulant/config/config.h"
 #include "ambulant/net/url.h"
+#include "ambulant/net/datasource.h"
 
 #include <string>
 
@@ -49,7 +50,7 @@ class memfile {
 	typedef buffer_type::const_pointer const_pointer;
 	typedef buffer_type::size_type size_type;
 
-	memfile(const net::url& u);
+	memfile(const net::url& u, net::datasource *src);
 	~memfile();
 	
 	bool exists() const { return memfile::exists(m_url);}

@@ -39,13 +39,13 @@ using namespace ambulant;
 using namespace net;
 
 
-class win32_file_datasource : public win32_datasource
+class win32_file_datasource : virtual public win32_datasource
 {
   public:
 	win32_file_datasource(const url& url, HANDLE hf)
 	:	win32_datasource(url),
 		m_hf(hf)
-	{}
+	{ if (hf==NULL) m_end_of_file = true; }
 	~win32_file_datasource();
   protected:
 	void _read_file();
@@ -53,14 +53,14 @@ class win32_file_datasource : public win32_datasource
 	HANDLE m_hf;
 };
 
-class win32_net_datasource : public win32_datasource
+class win32_net_datasource : virtual public win32_datasource
 {
   public:
 	win32_net_datasource(const url& url, HINTERNET hinet, HINTERNET hf)
 	:	win32_datasource(url),
 		m_hinet(hinet),
 		m_hf(hf)
-	{}
+	{ if (hf==NULL) m_end_of_file = true; }
 	~win32_net_datasource();
   protected:
 	void _read_file();
@@ -239,6 +239,7 @@ void
 win32_file_datasource::_read_file()
 {
 	// private method - no need to lock
+	if (m_hf == NULL) return; // Read the data before, or there's an error
 	DWORD nread = 0;
 	do {
 		byte *buf = (byte *)m_buffer->get_write_ptr(BUF_SIZE);
@@ -253,9 +254,11 @@ win32_file_datasource::_read_file()
 		}
 		if (nread) m_buffer->pushdata(nread);
 	} while(nread > 0);
+	m_buffer->pushdata(0);
 	// Also close the handles now, why wait until later...
 	CloseHandle(m_hf);
 	m_hf = NULL;
+	m_end_of_file = true;
 }
 
 win32_file_datasource::~win32_file_datasource()
@@ -268,6 +271,7 @@ void
 win32_net_datasource::_read_file()
 {
 	// private method - no need to lock
+	if (m_hf == NULL) return; // Read the data before, or there's an error
 	DWORD nread = 0;
 	do {
 		byte *buf = (byte *)m_buffer->get_write_ptr(BUF_SIZE);
@@ -282,11 +286,13 @@ win32_net_datasource::_read_file()
 		}
 		if (nread) m_buffer->pushdata(nread);
 	} while(nread > 0);
+	m_buffer->pushdata(0);
 	// Also close the handles now, why wait until later...
 	InternetCloseHandle(m_hf);
 	m_hf = NULL;
 	InternetCloseHandle(m_hinet);
 	m_hinet = NULL;
+	m_end_of_file = true;
 }
 
 win32_net_datasource::~win32_net_datasource()
