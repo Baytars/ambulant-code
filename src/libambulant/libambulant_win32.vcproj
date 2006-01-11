@@ -697,6 +697,9 @@
 					RelativePath=".\lib\logger.cpp">
 				</File>
 				<File
+					RelativePath=".\lib\memfile.cpp">
+				</File>
+				<File
 					RelativePath=".\lib\nfa.cpp">
 				</File>
 				<File
@@ -758,9 +761,6 @@
 					</File>
 					<File
 						RelativePath=".\lib\win32\win32_fstream.cpp">
-					</File>
-					<File
-						RelativePath=".\lib\win32\win32_memfile.cpp">
 					</File>
 					<File
 						RelativePath=".\lib\win32\win32_thread.cpp">
@@ -1221,9 +1221,6 @@
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\lib\win32\win32_fstream.h">
-						</File>
-						<File
-							RelativePath="..\..\include\ambulant\lib\win32\win32_memfile.h">
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\lib\win32\win32_mtsync.h">
