@@ -29,6 +29,7 @@
 
 #include <windows.h>
 #include <wininet.h>
+#pragma comment (lib,"wininet.lib")
 
 //#define AM_DBG
 #ifndef AM_DBG

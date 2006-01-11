@@ -66,10 +66,12 @@ void gui::dx::dx_text_renderer::set_surface(common::surface *dest) {
 	net::url url = m_node->get_url("src");
 	dx_window *dxwindow = static_cast<dx_window*>(m_window);
 	viewport *v = dxwindow->get_viewport();
+#if 0
 	if(!lib::memfile::exists(url)) {
 		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
 			url.get_url().c_str());
 	}
+#endif
 	m_text = new text_renderer(url, bounds, v);
 	
 	// Pass <param> settings, if applicable

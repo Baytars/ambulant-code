@@ -407,3 +407,18 @@ ambulant::net::read_data_from_url(const net::url &url, datasource_factory *df, c
 	*sizep = nbytes;
 	return true;
 }
+
+
+bool
+ambulant::net::read_data_from_datasource(datasource *src, char **result, size_t *sizep)
+{
+	*result = NULL;
+	*sizep = 0;
+	datasource_reader *dr = new datasource_reader(src);
+	dr->run();
+	int nbytes = dr->getresult(result);
+	dr->release();
+	if( nbytes < 0 ) return false;
+	*sizep = nbytes;
+	return true;
+}
