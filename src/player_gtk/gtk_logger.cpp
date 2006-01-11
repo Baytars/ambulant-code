@@ -85,7 +85,7 @@ gtk_logger::gtk_logger()
 {
 	m_logger_window = NULL;
 
-	
+	/*
 	common::preferences* prefs = 
 	  common::preferences::get_preferences();
 	lib::logger* logger = lib::logger::get_logger();
@@ -99,11 +99,11 @@ gtk_logger::gtk_logger()
 				     prefs->m_log_file.c_str());
 		} else setbuf(m_log_FILE, NULL); // no buffering
 	}
-	
+	*/
 	// Tell the logger about the output level preference
-	int level = prefs->m_log_level;
-	logger->set_level(level);
-	logger->set_ostream(new gtk_logger_ostream);
+	//int level = prefs->m_log_level;
+	//logger->set_level(level);
+	//logger->set_ostream(new gtk_logger_ostream);
 	
 	// create the GUI object
 	m_logger_window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
@@ -160,13 +160,13 @@ gtk_logger::log(GString *logstring) {
 	}
 	char* message = strdup(logstring->str);
 	s_gtk_logger->m_gui->internal_message(-1, message);
-	printf("I am printing a message/n");
 }
 
 void
 gtk_logger::show_message(int level, const char *msg) {
 	char* message = strdup(msg);
-	s_gtk_logger->m_gui->internal_message(level, message);	
+	s_gtk_logger->m_gui->internal_message(level, message);
+//	gtk_text_buffer_set_text (m_text_buffer, msg, -1);		
 }
 
 GtkWindow*

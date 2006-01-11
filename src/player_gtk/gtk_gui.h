@@ -124,11 +124,11 @@ class gtk_gui{
 //	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
-	int          m_pause_id;
 	bool         m_pausing;
-	int          m_play_id;
 	bool         m_playing;
 	GtkMenuItem*  m_playmenu;
+	GtkWidget*   m_playmenu_submenu_play;
+	GtkWidget*   m_playmenu_submenu_pause; 
 	const char*  m_programfilename;
 	GtkSettings* m_settings; // the Settings window
 	const char*  m_smilfilename;
@@ -187,6 +187,8 @@ class gtk_gui{
 	void do_settings_ok();
 	void do_settings_select();
 	void do_stop();
+
+//	static gint signal_player_done = gtk_signal_new ("signal_player_done", GTK_RUN_FIRST, this->type, 0, gtk_signal_default_marshaller, GTK_TYPE_NONE, 0);)
 
 // Commented by Pablo
 //  signals:
