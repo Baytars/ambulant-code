@@ -29,66 +29,63 @@
 
 using namespace ambulant;
 
-gtk_logger_ostream::gtk_logger_ostream()
-  :		m_qstring(NULL)
-{
+gtk_logger_ostream::gtk_logger_ostream(){
 }
 
 bool 
-qt_logger_ostream::is_open() const {
-	std::string id("qt_logger_ostream:::is_open() const");
+gtk_logger_ostream::is_open() const {
+	std::string id("gtk_logger_ostream:::is_open() const");
 	return true;
 }
 
 int
-qt_logger_ostream::write(const unsigned char *buffer, int nbytes)
+gtk_logger_ostream::write(const unsigned char *buffer, int nbytes)
 {
-	std::string id("qt_logger_ostream::write(const unsigned char *buffer, int nbytes)");
-	write(id+" not implemented for Qt");
+	std::string id("gtk_logger_ostream::write(const unsigned char *buffer, int nbytes)");
+	write(id+" not implemented for GTK");
 }
 
 int
-qt_logger_ostream::write(const char *cstr)
+gtk_logger_ostream::write(const gchar *cstr)
 {
-	m_qstring += cstr;
+	m_string = g_string_append(m_string, cstr);
 	return 1;
 }
 
 int
-qt_logger_ostream::write(std::string s)
+gtk_logger_ostream::write(std::string s)
 {
 	return  write(s.data());
 }
 
 void
-qt_logger_ostream::write(lib::byte_buffer& bb)
+gtk_logger_ostream::write(lib::byte_buffer& bb)
 {
-	std::string id("qt_logger_ostream::write(lib::byte_buffer& bb)");
-	write(id+" not implemented for Qt");
+	std::string id("gtk_logger_ostream::write(lib::byte_buffer& bb)");
+	write(id+" not implemented for GTK");
 }
 
 void
-qt_logger_ostream::close() {
-	std::string id("qt_logger_ostream::close()");
+gtk_logger_ostream::close() {
+	std::string id("gtk_logger_ostream::close()");
 }
 
 void
-qt_logger_ostream::flush() {
-	std::string id("qt_logger_ostream::flush()");
-	qt_logger::get_qt_logger()->log(m_qstring);
-//	logger->qt_logger::get_logger_window()->append(m_qstring);
-	m_qstring.truncate(0);
+gtk_logger_ostream::flush() {
+	std::string id("gtk_logger_ostream::flush()");
+	gtk_logger::get_gtk_logger()->log(m_string);
+	m_string = g_string_truncate(m_string, 0); 
 }
 
-qt_logger* qt_logger::s_qt_logger = 0;
+gtk_logger* gtk_logger::s_gtk_logger = 0;
 
-qt_logger::qt_logger() 
+gtk_logger::gtk_logger() 
   : 	m_log_FILE(NULL),
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-	m_logger_window( NULL),
-#endif/*QT_NO_FILEDIALOG*/
 	m_gui(NULL) 
 {
+	m_logger_window = NULL;
+
+	
 	common::preferences* prefs = 
 	  common::preferences::get_preferences();
 	lib::logger* logger = lib::logger::get_logger();
@@ -102,74 +99,83 @@ qt_logger::qt_logger()
 				     prefs->m_log_file.c_str());
 		} else setbuf(m_log_FILE, NULL); // no buffering
 	}
-	// Connect logger to our message displayer and output processor
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-	//logger->set_show_message(show_message);
-#endif/*QT_NO_FILEDIALOG*/
-
+	
 	// Tell the logger about the output level preference
 	int level = prefs->m_log_level;
 	logger->set_level(level);
-	logger->set_ostream(new qt_logger_ostream);
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-	m_logger_window = new QTextEdit();
-	m_logger_window->setReadOnly(true);
-	m_logger_window->setCaption("Ambulant-Logger");
-	m_logger_window->setTextFormat(Qt::PlainText);
-	m_logger_window->setGeometry(50, 50, 560, 240);
-#endif/*QT_NO_FILEDIALOG*/
+	logger->set_ostream(new gtk_logger_ostream);
+	
+	// create the GUI object
+	m_logger_window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
+	gtk_window_set_title (m_logger_window, "Ambulant-logger");
+	gtk_window_set_resizable (m_logger_window, false);
+	GtkWidget* sw = gtk_scrolled_window_new (NULL, NULL);
+  	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+                                  	GTK_POLICY_AUTOMATIC,
+                                  	GTK_POLICY_AUTOMATIC);
+	gtk_widget_set_size_request(GTK_WIDGET (m_logger_window), 560, 240);
+  	gtk_container_add (GTK_CONTAINER (m_logger_window), sw);
+	gtk_widget_show(GTK_WIDGET (sw));	
+	m_text_view =  (GtkTextView*) gtk_text_view_new();
+	gtk_text_view_set_editable(m_text_view, false);
+	gtk_text_view_set_cursor_visible(m_text_view, false);
+	gtk_widget_show(GTK_WIDGET (m_text_view));
+	gtk_container_add (GTK_CONTAINER (sw), GTK_WIDGET (m_text_view));
+
+	// create the text buffer
+	m_text_buffer= gtk_text_view_get_buffer (m_text_view);
+
+//	gtk_text_buffer_set_text (m_textbuffer, "Hello, this is some text", -1);
+
+//	m_logger_window->setGeometry(50, 50, 560, 240);
 }
 
-qt_logger::~qt_logger() {
+gtk_logger::~gtk_logger() {
 	if(m_log_FILE) fclose (m_log_FILE);
 	m_log_FILE = NULL;
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
 	if(m_logger_window) delete m_logger_window;
 	m_logger_window = NULL;
-#endif/*QT_NO_FILEDIALOG*/
 }
 
-qt_logger*
-qt_logger::get_qt_logger() {
-	if (s_qt_logger == NULL) {
-		s_qt_logger = new qt_logger();
+gtk_logger*
+gtk_logger::get_gtk_logger() {
+	if (s_gtk_logger == NULL) {
+		s_gtk_logger = new gtk_logger();
 	}
-	return s_qt_logger;
+	return s_gtk_logger;
 }
 
 void
-qt_logger::set_qt_logger_gui(qt_gui* gui) {
-	(void) get_qt_logger();
-	if (s_qt_logger->m_gui == NULL) {
-		s_qt_logger->m_gui = gui;
+gtk_logger::set_gtk_logger_gui(gtk_gui* gui) {
+	(void) get_gtk_logger();
+	if (s_gtk_logger->m_gui == NULL) {
+		s_gtk_logger->m_gui = gui;
 	}
 }
 
-
 void
-qt_logger::log(QString logstring) {
+gtk_logger::log(GString *logstring) {
  	if (m_log_FILE != NULL) {
-		fprintf(m_log_FILE, "%s", (const char*)logstring);
+		fprintf(m_log_FILE, "%s", (const char*)(logstring->str));
 	}
-	char* message = strdup(logstring.ascii());
-	s_qt_logger->m_gui->internal_message(-1, message);
+	char* message = strdup(logstring->str);
+	s_gtk_logger->m_gui->internal_message(-1, message);
+	printf("I am printing a message/n");
 }
 
 void
-qt_logger::show_message(int level, const char *msg) {
+gtk_logger::show_message(int level, const char *msg) {
 	char* message = strdup(msg);
-	s_qt_logger->m_gui->internal_message(level, message);
+	s_gtk_logger->m_gui->internal_message(level, message);	
 }
 
-#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-QTextEdit*
-qt_logger::get_logger_window()
+GtkWindow*
+gtk_logger::get_logger_window()
 {
 	return m_logger_window;
 }
-#endif/*QT_NO_FILEDIALOG*/
 
-qt_message_event::qt_message_event(int level, char *msg)
- : QCustomEvent((QEvent::Type)level, (void*) msg)
-{
-}
+//gtk_message_event::gtk_message_event(int level, char *msg)
+ //: QCustomEvent((QEvent::Type)level, (void*) msg)
+//{
+//}
