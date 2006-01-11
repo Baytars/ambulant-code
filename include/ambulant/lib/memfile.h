@@ -55,11 +55,11 @@ class memfile {
 	typedef buffer_type::const_pointer const_pointer;
 	typedef buffer_type::size_type size_type;
 
-	memfile(const std::string& url)
+	memfile(const std::string& url, net::datasource *src)
 	:	m_url(url), m_gptr(0) {
 	}
 	
-	memfile(const char *url)
+	memfile(const char *url, net::datasource *src)
 	:	m_url(url?url:""), m_gptr(0) {
 	}
 	

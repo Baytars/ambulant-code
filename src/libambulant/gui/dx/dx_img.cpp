@@ -49,6 +49,7 @@ gui::dx::dx_img_renderer::dx_img_renderer(
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor* evp,
+	common::factories *factory,
 	common::gui_window *window,
 	dx_playables_context *dxplayer)
 :   dx_renderer_playable(context, cookie, node, evp, window, dxplayer),
@@ -68,7 +69,7 @@ gui::dx::dx_img_renderer::dx_img_renderer(
 			url.get_url().c_str());
 		return;
 	}
-	m_image = new image_renderer(url, v);
+	m_image = new image_renderer(url, factory->df, v);
 }
 
 gui::dx::dx_img_renderer::~dx_img_renderer() {

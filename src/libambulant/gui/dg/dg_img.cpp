@@ -48,6 +48,7 @@ gui::dg::dg_img_renderer::dg_img_renderer(
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor* evp,
+		common::factories* factory,
 	common::gui_window *window,
 	dg_playables_context *dgplayer)
 :   dg_renderer_playable(context, cookie, node, evp, window, dgplayer),
@@ -62,12 +63,7 @@ gui::dg::dg_img_renderer::dg_img_renderer(
 	}
 	dg_window *dgwindow = static_cast<dg_window*>(window);
 	viewport *v = dgwindow->get_viewport();
-	if(!lib::memfile::exists(url)) {
-		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
-			url.get_url().c_str());
-		return;
-	}
-	m_image = new image_renderer(url, v);
+	m_image = new image_renderer(url, factory->df, v);
 	
 }
 

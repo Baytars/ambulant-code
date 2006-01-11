@@ -33,6 +33,7 @@
 #include "ambulant/lib/memfile.h"
 #include "ambulant/lib/string_util.h"
 #include "ambulant/smil2/params.h"
+#include "ambulant/common/factory.h"
 
 //#define AM_DBG
 
@@ -47,10 +48,13 @@ gui::dx::dx_text_renderer::dx_text_renderer(
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor* evp,
+	common::factories* factory,
 	common::gui_window *window,
 	dx_playables_context *dxplayer)
 :   dx_renderer_playable(context, cookie, node, evp, window, dxplayer),
-	m_text(0) {
+	m_text(0),
+	m_df(factory->df)
+{
 	AM_DBG lib::logger::get_logger()->debug("dx_text_renderer(0x%x)", this);
 }
 
@@ -87,7 +91,7 @@ void gui::dx::dx_text_renderer::set_surface(common::surface *dest) {
 		delete params;
 	}
 
-	m_text->open();
+	m_text->open(m_df);
 }
 
 gui::dx::dx_text_renderer::~dx_text_renderer() {

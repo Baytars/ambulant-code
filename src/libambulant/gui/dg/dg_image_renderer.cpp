@@ -103,8 +103,9 @@ create_img_decoder(lib::memfile *src, HDC hdc) {
 	return 0;
 }
 
-gui::dg::image_renderer::image_renderer(const net::url& u, viewport* v)
+gui::dg::image_renderer::image_renderer(const net::url& u, net::datasource_factory *df, viewport* v)
 :	m_url(u),
+	m_df(df),
 	m_dibsurf(0),
 	m_transparent(false),
 	m_transp_color(CLR_INVALID) {
@@ -116,7 +117,12 @@ gui::dg::image_renderer::~image_renderer() {
 }
 
 void gui::dg::image_renderer::open(const net::url& u, viewport* v) {
-	lib::memfile mf(u);
+	net::datasource *src = m_df->new_raw_datasource(u);
+	if (!src) {
+		lib::logger::get_logger()->error("%s: Cannot open URL", u.get_url().c_str());
+		return;
+	}
+	lib::memfile mf(u, src);
 	if(!mf.read()) {
 		lib::logger::get_logger()->show("dg::image_renderer::open - Failed to locate image file %s.", 
 			u.get_url().c_str());
