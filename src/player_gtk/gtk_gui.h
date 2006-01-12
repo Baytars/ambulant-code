@@ -77,8 +77,7 @@ class gtk_mainloop;
 #define gtk_gui_BASE GtkWidget
 #endif/*WITH_GTK_HTML_WIDGET*/
 
-class gtk_gui{
-//: public GtkWidget{
+class gtk_gui: public GtkWidget{
 //gtk_gui_BASE {
 //   GTK_OBJECT
 
@@ -111,7 +110,7 @@ class gtk_gui{
 	void player_start(GString,bool,bool);
 	GtkWidget* get_gui_container();
 	GtkWidget* get_document_container();
-	GtkWidget* get_toplevel_container();
+	GtkWindow* get_toplevel_container();
 
 /*TMP*/	gtk_mainloop* m_mainloop;
    private:
@@ -133,7 +132,7 @@ class gtk_gui{
 	GtkSettings* m_settings; // the Settings window
 	const char*  m_smilfilename;
 	GtkMenuItem* m_viewmenu;
-	GtkWidget*   m_toplevelcontainer;
+	GtkWindow*   m_toplevelcontainer;
 	GtkWidget*   m_guicontainer;
 	GtkWidget*   m_documentcontainer;
 
