@@ -46,7 +46,7 @@ gtk_renderer_factory::gtk_renderer_factory(common::factories *factory)
 	AM_DBG lib::logger::get_logger()->debug("gtk_renderer factory (0x%x)", (void*) this);
 }
 	
-gtk_window_factory::gtk_window_factory( GtkWidget* parent_widget, int x, int y)
+gtk_window_factory::gtk_window_factory( GtkWindow* parent_widget, int x, int y)
 :	m_parent_widget(parent_widget), m_p(lib::point(x,y)) 
 {
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory (0x%x)", (void*) this);
@@ -74,7 +74,7 @@ ambulant_gtk_window::ambulant_gtk_window(const std::string &name,
 
 ambulant_gtk_window::~ambulant_gtk_window()
 {
-/**
+
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::~ambulant_gtk_window(0x%x): m_ambulant_widget=0x%x, m_pixmap=0x%x",this,m_ambulant_widget, m_pixmap);
 	// Note that we don't destroy the widget, only sver the connection.
 	// the widget itself is destroyed independently.
@@ -89,7 +89,6 @@ ambulant_gtk_window::~ambulant_gtk_window()
 			m_tmppixmap = NULL;
 		}
 	} 
-**/
 }
 	
 void
