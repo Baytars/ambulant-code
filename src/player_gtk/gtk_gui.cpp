@@ -194,16 +194,19 @@ gtk_gui::gtk_gui(const char* title,
 #ifdef	TRY_LOCKING
 	m_gui_thread(0),
 #endif/*TRY_LOCKING*/
-	m_smilfilename()
+	m_smilfilename(NULL),
+	m_mainloop(NULL),
+	m_toplevelcontainer(NULL)
 {
-	m_mainloop = NULL;
+	
 	
 	/*Initialization of the GUI */
-	m_toplevelcontainer = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), title);
+	m_toplevelcontainer = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
+	gtk_window_set_title(m_toplevelcontainer, "AmbulantPlayer");
 	gtk_signal_connect (GTK_OBJECT (m_toplevelcontainer), "delete-event",
                     	G_CALLBACK (gtk_main_quit), NULL);
-	gtk_widget_set_size_request(m_toplevelcontainer, 240, 320);	
+	gtk_widget_set_size_request(GTK_WIDGET (m_toplevelcontainer), 320, 240);
+	gtk_widget_set_uposition(GTK_WIDGET (m_toplevelcontainer), 240, 320);	
 
 	m_programfilename = title;
 #ifdef	TRY_LOCKING
@@ -230,146 +233,145 @@ gtk_gui::gtk_gui(const char* title,
 	m_menubar = (GtkMenuBar*)gtk_menu_bar_new();
 	gtk_widget_show ((GtkWidget*)m_menubar);
 	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);
-	{	
-		int id;
-		/* File */
-		m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
-		gtk_widget_show ((GtkWidget*)m_filemenu);
-		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_filemenu));
-		GtkWidget* m_filemenu_submenu = gtk_menu_new();
-		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_filemenu), m_filemenu_submenu);
-		
-		GtkWidget* m_filemenu_submenu_open = gtk_menu_item_new_with_label("Open...");
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_open);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_open));
-		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_open), "activate",  G_CALLBACK (gtk_C_callback_open), (void*)this);	
-
-		GtkWidget* m_filemenu_submenu_openurl = gtk_menu_item_new_with_label("Open URL...");
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_openurl);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_openurl));
-		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_openurl), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
-
-		GtkWidget* m_filemenu_submenu_reload = gtk_menu_item_new_with_label("Reload...");
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_reload);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_reload));
-		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_reload), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
-
-		GtkWidget*  m_filemenu_submenu_separator1 = gtk_separator_menu_item_new();
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator1);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator1));
-
-		GtkWidget* m_filemenu_submenu_settings = gtk_menu_item_new_with_label("Settings");
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_settings);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_settings));
-		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_settings_select), (void*)this);		
-
-		GtkWidget*  m_filemenu_submenu_separator2 = gtk_separator_menu_item_new();
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator2);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator2));
-
-
-		GtkWidget* m_filemenu_submenu_quit = gtk_menu_item_new_with_label("Quit");
-		gtk_widget_show ((GtkWidget*)m_filemenu_submenu_quit);
-		gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_quit));
-		gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_quit), "activate",  G_CALLBACK (gtk_C_callback_quit), (void*)this);
-
-		/* Play */
-		m_playmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Play");
-		gtk_widget_show ((GtkWidget*)m_playmenu);
-		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_playmenu));
-		GtkWidget* m_playmenu_submenu = gtk_menu_new();
-		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_playmenu), m_playmenu_submenu);
-		
-		m_playmenu_submenu_play = gtk_menu_item_new_with_label("Play");
-		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_play);
-		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_play));
-		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_play), "activate",  G_CALLBACK (gtk_C_callback_play), (void*)this);
 	
-		m_playmenu_submenu_pause = gtk_menu_item_new_with_label("Pause");
-		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_pause);
-		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_pause));
-		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_pause), "activate",  G_CALLBACK (gtk_C_callback_pause), (void*)this);
+	/* File */
+	m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
+	gtk_widget_show ((GtkWidget*)m_filemenu);
+	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_filemenu));
+	GtkWidget* m_filemenu_submenu = gtk_menu_new();
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_filemenu), m_filemenu_submenu);
 		
-		GtkWidget* m_playmenu_submenu_stop = gtk_menu_item_new_with_label("Stop");
-		gtk_widget_show ((GtkWidget*)m_playmenu_submenu_stop);
-		gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_stop));
-		gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_stop), "activate",  G_CALLBACK (gtk_C_callback_stop), (void*)this);
+	GtkWidget* m_filemenu_submenu_open = gtk_menu_item_new_with_label("Open...");
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_open);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_open));
+	gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_open), "activate",  G_CALLBACK (gtk_C_callback_open), (void*)this);	
 
-		/* View */
-		m_viewmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_View");
-		gtk_widget_show ((GtkWidget*)m_viewmenu);
-		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_viewmenu));
-		GtkWidget* m_viewmenu_submenu = gtk_menu_new();
-		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_viewmenu), m_viewmenu_submenu);
+	GtkWidget* m_filemenu_submenu_openurl = gtk_menu_item_new_with_label("Open URL...");
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_openurl);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_openurl));
+	gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_openurl), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
+
+	GtkWidget* m_filemenu_submenu_reload = gtk_menu_item_new_with_label("Reload...");
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_reload);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_reload));
+	gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_reload), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
+
+	GtkWidget*  m_filemenu_submenu_separator1 = gtk_separator_menu_item_new();
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator1);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator1));
+
+	GtkWidget* m_filemenu_submenu_settings = gtk_menu_item_new_with_label("Settings");
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_settings);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_settings));
+	gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_settings_select), (void*)this);		
+
+	GtkWidget*  m_filemenu_submenu_separator2 = gtk_separator_menu_item_new();
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator2);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator2));
+
+
+	GtkWidget* m_filemenu_submenu_quit = gtk_menu_item_new_with_label("Quit");
+	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_quit);
+	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_quit));
+	gtk_signal_connect (GTK_OBJECT (m_filemenu_submenu_quit), "activate",  G_CALLBACK (gtk_C_callback_quit), (void*)this);
+
+	/* Play */
+	m_playmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Play");
+	gtk_widget_show ((GtkWidget*)m_playmenu);
+	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_playmenu));
+	GtkWidget* m_playmenu_submenu = gtk_menu_new();
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_playmenu), m_playmenu_submenu);
 		
-		GtkWidget* m_viewmenu_submenu_fullscreen = gtk_menu_item_new_with_label("Full Screen");
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_fullscreen);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_fullscreen));
-		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_fullscreen), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
-
-		GtkWidget* m_viewmenu_submenu_window = gtk_menu_item_new_with_label("Window");
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_window);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_window));
-		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_window), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);
+	m_playmenu_submenu_play = gtk_menu_item_new_with_label("Play");
+	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_play);
+	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_play));
+	gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_play), "activate",  G_CALLBACK (gtk_C_callback_play), (void*)this);
 	
-		GtkWidget*  m_viewmenu_submenu_separator1 = gtk_separator_menu_item_new();
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator1);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator1));
+	m_playmenu_submenu_pause = gtk_menu_item_new_with_label("Pause");
+	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_pause);
+	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_pause));
+	gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_pause), "activate",  G_CALLBACK (gtk_C_callback_pause), (void*)this);
 		
-		GtkWidget* m_viewmenu_submenu_settings = gtk_menu_item_new_with_label("Load Settings...");
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_settings);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_settings));
-		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);
+	GtkWidget* m_playmenu_submenu_stop = gtk_menu_item_new_with_label("Stop");
+	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_stop);
+	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_stop));
+	gtk_signal_connect (GTK_OBJECT (m_playmenu_submenu_stop), "activate",  G_CALLBACK (gtk_C_callback_stop), (void*)this);
+
+	/* View */
+	m_viewmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_View");
+	gtk_widget_show ((GtkWidget*)m_viewmenu);
+	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_viewmenu));
+	GtkWidget* m_viewmenu_submenu = gtk_menu_new();
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_viewmenu), m_viewmenu_submenu);
+		
+	GtkWidget* m_viewmenu_submenu_fullscreen = gtk_menu_item_new_with_label("Full Screen");
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_fullscreen);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_fullscreen));
+	gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_fullscreen), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
+
+	GtkWidget* m_viewmenu_submenu_window = gtk_menu_item_new_with_label("Window");
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_window);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_window));
+	gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_window), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);
+	
+	GtkWidget*  m_viewmenu_submenu_separator1 = gtk_separator_menu_item_new();
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator1);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator1));
+		
+	GtkWidget* m_viewmenu_submenu_settings = gtk_menu_item_new_with_label("Load Settings...");
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_settings);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_settings));
+	gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);
 
 #ifdef	WITH_GTK_LOGGER
-		GtkWidget*  m_viewmenu_submenu_separator2 = gtk_separator_menu_item_new();
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator2);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator2));
+	GtkWidget*  m_viewmenu_submenu_separator2 = gtk_separator_menu_item_new();
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator2);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator2));
 
-		GtkWidget* m_viewmenu_submenu_log = gtk_menu_item_new_with_label("Log Window...");
-		gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_log);
-		gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_log));
-		gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_log), "activate",  G_CALLBACK (gtk_C_callback_logger_window), (void*)this);
+	GtkWidget* m_viewmenu_submenu_log = gtk_menu_item_new_with_label("Log Window...");
+	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_log);
+	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_log));
+	gtk_signal_connect (GTK_OBJECT (m_viewmenu_submenu_log), "activate",  G_CALLBACK (gtk_C_callback_logger_window), (void*)this);
 #endif /*WITH_GTK_LOGGER*/
 
-		/* Help */
-		m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
+	/* Help */
+	m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
 		gtk_widget_show ((GtkWidget*)m_helpmenu);
 		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
-		GtkWidget* m_helpmenu_submenu = gtk_menu_new();
-		gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_helpmenu), m_helpmenu_submenu);
+	GtkWidget* m_helpmenu_submenu = gtk_menu_new();
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_helpmenu), m_helpmenu_submenu);
 
-		GtkWidget* m_helpmenu_submenu_about = gtk_menu_item_new_with_label("About AmbulantPlayer");
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_about);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_about));
-		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_about), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
+	GtkWidget* m_helpmenu_submenu_about = gtk_menu_item_new_with_label("About AmbulantPlayer");
+	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_about);
+	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_about));
+	gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_about), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
 	
-		GtkWidget* m_helpmenu_submenu_help = gtk_menu_item_new_with_label("AmbulantPlayer Help");
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_help);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_help));
-		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_help), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);	
+	GtkWidget* m_helpmenu_submenu_help = gtk_menu_item_new_with_label("AmbulantPlayer Help");
+	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_help);
+	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_help));
+	gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_help), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);	
 
-		GtkWidget*  m_helpmenu_submenu_separator1 = gtk_separator_menu_item_new();
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_separator1);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_separator1));
+	GtkWidget*  m_helpmenu_submenu_separator1 = gtk_separator_menu_item_new();
+	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_separator1);
+	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_separator1));
 		
-		GtkWidget* m_helpmenu_submenu_website = gtk_menu_item_new_with_label("AmbulantPlayer Website...");
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_website);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_website));
-		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_website), "activate",  G_CALLBACK (gtk_C_callback_homepage), (void*)this);
+	GtkWidget* m_helpmenu_submenu_website = gtk_menu_item_new_with_label("AmbulantPlayer Website...");
+	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_website);
+	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_website));
+	gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_website), "activate",  G_CALLBACK (gtk_C_callback_homepage), (void*)this);
 
-		GtkWidget* m_helpmenu_submenu_welcome = gtk_menu_item_new_with_label("Play Welcome Document");
-		gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_welcome);
-		gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_welcome));
-		gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_welcome), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);
+	GtkWidget* m_helpmenu_submenu_welcome = gtk_menu_item_new_with_label("Play Welcome Document");
+	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_welcome);
+	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_welcome));
+	gtk_signal_connect (GTK_OBJECT (m_helpmenu_submenu_welcome), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);
 	
-		m_o_x = 0;
+	m_o_x = 0;
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
-		m_o_y = 27;
+	m_o_y = 27;
 #else /*GTK_NO_FILEDIALOG*/	/* Assume embedded GTK */
-		m_o_y = 20;
+	m_o_y = 20;
 #endif/*QT_NO_FILEDIALOG*/
-	}
+	
 //	gtk_signal_emit(GTK_OBJECT (this), signal_player_done);
 
 //	g_signal_connect (G_OBJECT (this), "signal_player_done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);	
@@ -391,7 +393,7 @@ gtk_gui::~gtk_gui() {
 	m_smilfilename = (char*) NULL;
 }
 
-GtkWidget*
+GtkWindow*
 gtk_gui::get_toplevel_container()
 {
 	return this->m_toplevelcontainer;
@@ -470,16 +472,15 @@ void
 gtk_gui::do_logger_window() {
 	AM_DBG printf("do_logger_window()\n");
 	GtkWindow* logger_window =  gtk_logger::get_gtk_logger()->get_logger_window();
-	gtk_widget_show(GTK_WIDGET (logger_window));
-//	if (logger_window->isHidden())
-//		logger_window->show();
-//	else
-//		logger_window->hide();
+	if (GTK_WIDGET_VISIBLE (GTK_WIDGET (logger_window)))
+		gtk_widget_hide(GTK_WIDGET (logger_window));
+	else
+		gtk_widget_show(GTK_WIDGET (logger_window));
 }
 
 bool 
 checkFilename(GString filename, int mode) {
-	//QFile* file = new QFile(filename);
+	//FILE* file = new GFile(filename);
 	//return file->open(mode);
 }
 
@@ -496,21 +497,28 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 
 	if (smilfilename==NULL)
 		return false;
-#if 0
-	if (! checkFilename(smilfilename, mode)) {
-		fileError(smilfilename);
-		return false;
-	}
-#endif
+	/*
+	if (mode == 0)
+		if (! checkFilename(smilfilename, mode)) {
+			fileError(smilfilename);
+			return false;
+		}
+*/
 	char* filename = strdup(smilfilename);
-//	setCaption(basename(filename));
-	free(filename);
-	gtk_widget_set_sensitive (m_playmenu_submenu_pause, false);
-	gtk_widget_set_sensitive (m_playmenu_submenu_play, true);
+	gtk_window_set_title(GTK_WINDOW (get_toplevel_container()), filename);
+	//free(filename);
+	gtk_widget_set_sensitive (GTK_WIDGET (m_playmenu_submenu_pause), false);
+	gtk_widget_set_sensitive (GTK_WIDGET (m_playmenu_submenu_play), true);
 	m_smilfilename = smilfilename;
+	printf("Asking for MainLoop\n");
+	/*
 	if (m_mainloop != NULL){
+		printf("MainLoop is not null\n");
 		m_mainloop->release();
  	}
+	else
+		printf("MainLoop is null\n");
+	*/
 	m_mainloop = new gtk_mainloop(this);
 	m_playing = false;
 	m_pausing = false;
@@ -521,11 +529,11 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 void 
 gtk_gui::do_open(){
 	m_fileselector =  (GtkFileSelection*) gtk_file_selection_new("Please, select a file");
-	//(GtkMessageDialog*) gtk_message_dialog_new (NULL,
-         //GTK_DIALOG_DESTROY_WITH_PARENT,
-         //GTK_MESSAGE_INFO,
-         //GTK_BUTTONS_CLOSE,
-	 //"About AmbulantPlayer");
+	/*(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_INFO,
+         GTK_BUTTONS_CLOSE,
+	 "About AmbulantPlayer"); */
 	gtk_file_selection_set_filename(m_fileselector, "."); // Initial dir
 	gtk_widget_show(GTK_WIDGET (m_fileselector));
 	gtk_file_selection_complete(m_fileselector,"SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)");
@@ -543,8 +551,6 @@ gtk_gui::do_open(){
                              "clicked",
                              G_CALLBACK (gtk_widget_hide),
                              m_fileselector); 
-	//if (openSMILfile(smilfilename, 1))
-	//	do_play();
 }
 
 
@@ -561,8 +567,9 @@ gtk_gui::do_file_selected(gpointer data) {
 	GtkWidget *file_selector = GTK_WIDGET (data);
    	const gchar *smilfilename  = gtk_file_selection_get_filename (GTK_FILE_SELECTION (file_selector));
 	//delete smilfilename;
-	if (openSMILfile(smilfilename, 1))
-		do_play();
+	if (openSMILfile(smilfilename, 1)){
+	//	do_play();
+	}
 }
 
 void
@@ -691,7 +698,7 @@ gtk_gui::do_play() {
 	//AM_DBG 
 	printf("%s-%s\n", m_programfilename, "do_play");
 	if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
-		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
+		no_fileopen_infodisplay(this, m_programfilename);
 		return;
 	}
 	if (!m_playing) {
@@ -725,7 +732,7 @@ gtk_gui::do_reload() {
 	if (openSMILfile(m_smilfilename, 1)) {
 		do_play();
 	} else {
-		no_fileopen_infodisplay(this->get_toplevel_container(), m_programfilename);
+		no_fileopen_infodisplay(this, m_programfilename);
 	}
 }
 
@@ -902,7 +909,7 @@ main (int argc, char*argv[]) {
 	/* Setup widget */
 	gtk_gui* mywidget = new gtk_gui(argv[0], argc > 1 ? argv[1] 
 				      : "AmbulantPlayer");
-	gtk_widget_show(mywidget->get_toplevel_container());
+	gtk_widget_show(GTK_WIDGET (mywidget->get_toplevel_container()));
 
 	// take log level from preferences
 	gtk_logger::set_gtk_logger_gui(mywidget);

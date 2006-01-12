@@ -114,7 +114,8 @@ gtk_logger::gtk_logger()
                                   	GTK_POLICY_AUTOMATIC,
                                   	GTK_POLICY_AUTOMATIC);
 	gtk_widget_set_size_request(GTK_WIDGET (m_logger_window), 560, 240);
-  	gtk_container_add (GTK_CONTAINER (m_logger_window), sw);
+  	gtk_widget_set_uposition(GTK_WIDGET (m_logger_window), 50, 50);
+	gtk_container_add (GTK_CONTAINER (m_logger_window), sw);
 	gtk_widget_show(GTK_WIDGET (sw));	
 	m_text_view =  (GtkTextView*) gtk_text_view_new();
 	gtk_text_view_set_editable(m_text_view, false);
@@ -126,8 +127,6 @@ gtk_logger::gtk_logger()
 	m_text_buffer= gtk_text_view_get_buffer (m_text_view);
 
 //	gtk_text_buffer_set_text (m_textbuffer, "Hello, this is some text", -1);
-
-//	m_logger_window->setGeometry(50, 50, 560, 240);
 }
 
 gtk_logger::~gtk_logger() {
