@@ -113,7 +113,7 @@ class gtk_gui: public GtkWidget{
 	GtkWindow* get_toplevel_container();
 
 /*TMP*/	gtk_mainloop* m_mainloop;
-   private:
+//   private:
 	bool	     m_busy;
 //	QPushButton* m_cancel_pb; // for Settings window
 	GtkMenuItem*  m_filemenu;
