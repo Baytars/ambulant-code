@@ -463,7 +463,7 @@ AC_ARG_WITH(gtk,
      ])
 if test "x$test_gtk" = "xtrue"; then
 	PKG_CHECK_MODULES(GTK,[gtk+-2.0 >= 2.6.0], test_gtk=true, test_gtk=false)
-	GTKT_PREFIX="`pkg-config --variable=exec_prefix gtk+-2.0`"
+	GTK_PREFIX="`pkg-config --variable=exec_prefix gtk+-2.0`"
 fi
 
 AM_CONDITIONAL(WITH_GTK, test x$test_gtk = xtrue)
@@ -472,6 +472,27 @@ AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_PREFIX)
 AC_MSG_RESULT($test_gtk)
 
+dnl Testing for gthread
+dnl ====================================================================
+
+test_gthread=true
+AC_MSG_CHECKING(for gthread)
+AC_ARG_WITH(gthread,
+     [  --with-gthread		Enalble/disable gthread support],
+     [if test "x$withval" = "xno"; then
+		test_gthread=false	
+      fi
+     ])
+if test "x$test_gthread" = "xtrue"; then
+	PKG_CHECK_MODULES(gthread,[gthread-2.0 >= 2.0.0], test_gthread=true, test_gthread=false)
+	GTK_PREFIX="`pkg-config --variable=exec_prefix gthread-2.0`"
+fi
+
+AM_CONDITIONAL(WITH_gthread, test x$test_gthread = xtrue)
+AC_SUBST(gthread_LIBS)
+AC_SUBST(gthread_CFLAGS)
+AC_SUBST(gthread_PREFIX)
+AC_MSG_RESULT($test_gthread)
 
 #
 # Test for arts 
@@ -855,6 +876,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 	Build Cocoa frontend:		${cocoa}
 	Build with SDL:			${test_sdl}
 	Build with GTK:			${test_gtk}
+	Build with gthread:		${test_gthread}
 	Build with ARTS support:	${test_arts}
 	Build with live555.com RTSP:	${test_live}
 	Build with Python support:     ${with_python}
