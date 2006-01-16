@@ -95,25 +95,26 @@ class gtk_gui: public GtkWidget{
 	}
 
 	const char* filename() { 
-//		return m_smilfilename.ascii();
 		return m_smilfilename;
 	}
 
 	bool openSMILfile(const char *smilfilename, int mode);
 
-	// send a QEvent to the gui thread
+	// send an event to the gui thread
 	void internal_message(int level, char* msg);
 
 	// signal interfaces
 	void need_redraw(const void*, void*, const void*);
 	void player_done();
 	void player_start(GString,bool,bool);
+	
+	// major containers
 	GtkWidget* get_gui_container();
 	GtkWidget* get_document_container();
 	GtkWindow* get_toplevel_container();
 
 /*TMP*/	gtk_mainloop* m_mainloop;
-//   private:
+   private:
 	bool	     m_busy;
 //	QPushButton* m_cancel_pb; // for Settings window
 	GtkMenuItem*  m_filemenu;
@@ -165,11 +166,11 @@ class gtk_gui: public GtkWidget{
     public:
 //	void do_file_selected(const DocLnk&);
 	void do_file_selected(gpointer data);
-	void do_close_fileselector();
 	void do_settings_selected(const DocLnk&);
 	void do_close_settings_selector();
 	void do_play();
     public:
+	void start_mainloop();
 	void do_about();
 	void do_homepage();
 	void do_welcome();
@@ -187,7 +188,7 @@ class gtk_gui: public GtkWidget{
 	void do_settings_select();
 	void do_stop();
 
-//	static gint signal_player_done = gtk_signal_new ("signal_player_done", GTK_RUN_FIRST, this->type, 0, gtk_signal_default_marshaller, GTK_TYPE_NONE, 0);)
+	guint signal_player_done_id;
 
 // Commented by Pablo
 //  signals:
