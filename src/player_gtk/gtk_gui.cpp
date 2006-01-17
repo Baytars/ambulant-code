@@ -222,16 +222,11 @@ gtk_gui::gtk_gui(const char* title,
 	gtk_widget_show(m_guicontainer);
 	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));	
 	
-	/* A canvas should be the document_container */ 
-//	m_guicontainer = gtk_vbox_new(FALSE, 0);
-//	gtk_widget_show(m_guicontainer);
-//	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));	
-
 	/* Menu bar */	
 	m_menubar = (GtkMenuBar*)gtk_menu_bar_new();
 	gtk_widget_show ((GtkWidget*)m_menubar);
-	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);
-	
+	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);	
+
 	/* File */
 	m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
 	gtk_widget_show ((GtkWidget*)m_filemenu);
@@ -371,6 +366,28 @@ gtk_gui::gtk_gui(const char* title,
 #else /*GTK_NO_FILEDIALOG*/	/* Assume embedded GTK */
 	m_o_y = 20;
 #endif/*QT_NO_FILEDIALOG*/
+	
+
+	/* A canvas with fixed layout should be the document_container */ 
+	m_documentcontainer = gtk_fixed_new();
+	gtk_widget_show(m_documentcontainer);
+ 	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
+/*
+	GtkWidget* image1 = gtk_image_new_from_file("/ufs/garcia/src/docs/sen5/euroitv/paper_concepts.png");
+  	gtk_widget_show (image1);
+  	gtk_fixed_put (GTK_FIXED (m_documentcontainer), image1, 56, 56);
+  	gtk_widget_set_size_request (image1, 100, 100);
+
+  	GtkWidget* label1 = gtk_label_new ("label1");
+  	gtk_widget_show (label1);
+	gtk_fixed_put (GTK_FIXED (m_documentcontainer), label1, 144, 80);
+  	gtk_widget_set_size_request (label1, 36, 16);
+
+  	GtkWidget* label2 = gtk_label_new ("label2");
+  	gtk_widget_show (label2);
+  	gtk_fixed_put (GTK_FIXED (m_documentcontainer), label2, 104, 160);
+  	gtk_widget_set_size_request (label2, 280, 112);
+*/
 	do_player_done();
 
 //	g_signal_connect_swapped (G_OBJECT (this), "signal_player_done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);	
