@@ -46,7 +46,7 @@ gtk_renderer_factory::gtk_renderer_factory(common::factories *factory)
 	AM_DBG lib::logger::get_logger()->debug("gtk_renderer factory (0x%x)", (void*) this);
 }
 	
-gtk_window_factory::gtk_window_factory( GtkWindow* parent_widget, int x, int y)
+gtk_window_factory::gtk_window_factory( GtkWidget* parent_widget, int x, int y)
 :	m_parent_widget(parent_widget), m_p(lib::point(x,y)) 
 {
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory (0x%x)", (void*) this);
