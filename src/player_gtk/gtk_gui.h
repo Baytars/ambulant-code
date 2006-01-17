@@ -164,13 +164,11 @@ class gtk_gui: public GtkWidget{
 #endif/*QT_NO_FILEDIALOG*/
 // Added by Pablo
     public:
-//	void do_file_selected(const DocLnk&);
-	void do_file_selected(gpointer data);
+	void do_file_selected();
 	void do_settings_selected(const DocLnk&);
 	void do_close_settings_selector();
 	void do_play();
     public:
-	void start_mainloop();
 	void do_about();
 	void do_homepage();
 	void do_welcome();
