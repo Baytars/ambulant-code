@@ -25,23 +25,6 @@
 #ifndef __GTK_SETTINGS_H__
 #define __GTK_SETTINGS_H__
 
-// #include <qcheckbox.h>
-// #include <qcombobox.h>
-// #include <qhbox.h>
-// #include <qhbuttongroup.h>
-// #include <qhgroupbox.h>
-// #include <qlabel.h>
-// #include <qlayout.h>
-// #include <qlineedit.h>
-// #include <qmenubar.h>
-// #include <qmessagebox.h>
-// #include <qpopupmenu.h>
-// #include <qpushbutton.h>
-// #include <qradiobutton.h>
-// #include <qvbuttongroup.h>
-// #include <qvbox.h>
-// #include <qvgroupbox.h>
-
 class gtk_settings
 {
  public:
@@ -59,7 +42,7 @@ class gtk_settings
 
 	// XML parser:
 	QHBox*		m_parser_hb;
-	GtkLabel*		m_parser_lb;
+	GtkLabel*	m_parser_lb;
 	GtkComboBox*	m_parser_co;
 
 	// xerces options:

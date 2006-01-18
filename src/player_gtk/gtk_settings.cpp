@@ -65,7 +65,7 @@ static const char* val_schemes[] = {"never", "always", "auto", 0};
 
 GtkWidget* 
 gtk_settings::settings_select() {
-//printf("gtk_settings::settings_select() m_parser_val=%d\n", m_parser_val);
+	printf("gtk_settings::settings_select() m_parser_val=%d\n", m_parser_val);
   	unix_preferences* m_preferences = (unix_preferences*)
 		common::preferences::get_preferences();
 	//m_settings_vg = new QVGroupBox("Settings", 0);
