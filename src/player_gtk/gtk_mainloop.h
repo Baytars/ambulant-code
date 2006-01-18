@@ -83,7 +83,7 @@ class gtk_mainloop : public ambulant::common::embedder, public ambulant::lib::re
 	void done(common::player *p);
 	void open(net::url newdoc, bool start, common::player *old=NULL);
 	bool player_done();
-	void player_start(GString document_name, bool start, bool old);
+	void player_start(gchar* document_name, bool start, bool old);
 	
 	long add_ref() {
 		return ++m_refcount;

@@ -338,18 +338,18 @@ gtk_mainloop::open(const net::url newdoc, bool start, common::player *old)
 	msg += start ? "S-" : "  ";
 	msg += old   ? "O-" : "  ";
 	msg += newdoc;
-	//m_gui->internal_message(gtk_logger::CUSTOM_NEW_DOCUMENT,
-	//			strdup(msg.c_str()));
+	m_gui->internal_message(gtk_logger::CUSTOM_NEW_DOCUMENT,
+				strdup(msg.c_str()));
 }
 
 void
-gtk_mainloop::player_start(GString document_name, bool start, bool old)
+gtk_mainloop::player_start(gchar* document_name, bool start, bool old)
 {
 	AM_DBG m_logger->debug("player_start(%s,%d,%d)",document_name,start,old); //m_logger->debug("player_start(%s,%d,%d)",document_name.ascii(),start,old);
 	if (old) {
 		m_player->stop();
 		delete m_player;
-		m_player = create_player(document_name.str);
+		m_player = create_player(document_name);
 		if (start)
 			m_player->start();
 		return;
@@ -368,7 +368,7 @@ gtk_mainloop::player_start(GString document_name, bool start, bool old)
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s",
 			       document_name);
-	m_player = create_player(document_name.str);
+	m_player = create_player(document_name);
 	if(start) {
 		m_player->start();
 	}
