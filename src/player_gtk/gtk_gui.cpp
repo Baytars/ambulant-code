@@ -217,6 +217,9 @@ gtk_gui::gtk_gui(const char* title,
 	/* Initialization of the signals */
 	signal_player_done_id = g_signal_new ("signal-player-done", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
 
+	signal_need_redraw_id = g_signal_new ("signal-need-redraw", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
+//(const void*, void*, const void*));
+
 	/* VBox (m_guicontainer) to place the Menu bar in the correct place */ 
 	m_guicontainer = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(m_guicontainer);
@@ -665,33 +668,39 @@ gtk_gui::do_player_done() {
 
 void 
 gtk_gui::need_redraw (const void* r, void* w, const void* pt) {
-/**
+
 	AM_DBG printf("gtk_gui::need_redraw(0x%x)-r=(0x%x)\n",
 	(void *)this,r?r:0);
-	emit signal_need_redraw(r,w,pt);
-**/
+	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_need_redraw_id, 0, r, w, pt, NULL);
+//	emit signal_need_redraw(r,w,pt);
+
 }
 
 void 
 gtk_gui::player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "player_done");
-//	gtk_signal_emit(GTK_OBJECT (this), signal_player_done_id, 0);
-/*
-	emit signal_player_done();
-*/
+	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
 }
 
 void
-no_fileopen_infodisplay(GtkWidget* w, const char* caption) {
-/**	QMessageBox::information(w,caption,gettext("No file open: Please first select File->Open"));**/
+no_fileopen_infodisplay(gtk_gui* w, const char* caption) {
+	GtkMessageDialog* dialog = 
+	(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_INFO,
+         GTK_BUTTONS_OK,
+	 "No file open: Please first select File->Open");
+	gtk_message_dialog_set_markup(dialog, caption);
+	gtk_message_dialog_format_secondary_markup (dialog, "No file open: Please first select File->Open");
+ 	gtk_dialog_run (GTK_DIALOG (dialog));
+ 	gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
 void 
 gtk_gui::do_play() {
-	//AM_DBG 
-	printf("%s-%s\n", m_programfilename, "do_play");
+	AM_DBG printf("%s-%s\n", m_programfilename, "do_play");
 	if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
-		//no_fileopen_infodisplay(this, m_programfilename);
+		no_fileopen_infodisplay(this, m_programfilename);
 		return;
 	}
 	if (!m_playing) {
@@ -854,15 +863,11 @@ void
 gtk_gui::internal_message(int level, char* msg) {
 	
 	int msg_id = level+gtk_logger::CUSTOM_OFFSET;
-//  	gtk_message_event* me = new gtk_message_event(msg_id, msg);
+	
+
 //	g_signal_emit (G_OBJECT (me),0, NULL);
 
-//#ifdef	QT_THREAD_SUPPORT
-//	QThread::postEvent(this, qme);
-//#else**/ /*QT_THREAD_SUPPORT*/
-//	QApplication::postEvent(this, qme);
-//#endif/*QT_THREAD_SUPPORT*/
-//#ifdef	TRY_LOCKING
+#ifdef	TRY_LOCKING
 	if (level >= ambulant::lib::logger::LEVEL_WARN
 	    && pthread_self() != m_gui_thread) {
 	  // wait until the message as been OK'd by the user
@@ -871,7 +876,7 @@ gtk_gui::internal_message(int level, char* msg) {
 		pthread_mutex_unlock(&m_lock_message);
 
 	}
-//#endif/*TRY_LOCKING*/
+#endif/*TRY_LOCKING*/
 }
 
 int

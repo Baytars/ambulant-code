@@ -187,7 +187,8 @@ class gtk_gui: public GtkWidget{
 	void do_stop();
 
 	guint signal_player_done_id;
-
+	guint signal_need_redraw_id;
+	guint internal_message_id;
 // Commented by Pablo
 //  signals:
 //	void signal_player_done();
