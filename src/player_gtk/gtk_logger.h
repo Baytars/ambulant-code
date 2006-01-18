@@ -56,9 +56,10 @@ class gtk_logger {
 	static gtk_logger* get_gtk_logger();
 	//static 
 	void show_message(int level, const char *message);
+	GtkTextBuffer* get_logger_buffer();
 	GtkWindow* get_logger_window();
 	static void set_gtk_logger_gui(gtk_gui*);
-	void log(GString *logstring);
+	void log(gchar *logstring);
 	~gtk_logger();
   protected:
 	gtk_logger();
@@ -86,9 +87,14 @@ class gtk_logger_ostream : public ambulant::lib::ostream {
 };
 
 //: public GtkEvent 
-//class GTK_message_event{
-// public:
-//	gtk_message_event(int type, char* message); 
-//};
+class gtk_message_event{
+ public:
+	gtk_message_event(int type, gchar* message); 
+	int get_type();
+	gchar* get_message();
+ private:
+	int type;
+	gchar *message;
+};
 
 #endif/*__GTK_LOGGER_H__*/

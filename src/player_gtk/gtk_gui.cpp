@@ -164,6 +164,19 @@ void gtk_C_callback_do_player_done(void *userdata)
 {
 	((gtk_gui*) userdata)->do_player_done();
 }
+
+void gtk_C_callback_do_need_redraw(void *userdata, void* r_call, void* w_call, void* pt_call)
+{
+	const void* r = r_call;
+	void* w = w_call;
+	const void* pt = pt_call;
+//	((gtk_gui*) userdata)->do_need_redraw(r, w, pt);
+}
+void gtk_C_callback_do_internal_message(void *userdata, void* e)
+{
+	gtk_message_event* event = (gtk_message_event*) e;	
+	((gtk_gui*) userdata)->do_internal_message(event);
+}
 }
 
 static const char * 
@@ -217,8 +230,17 @@ gtk_gui::gtk_gui(const char* title,
 	/* Initialization of the signals */
 	signal_player_done_id = g_signal_new ("signal-player-done", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
 
-	signal_need_redraw_id = g_signal_new ("signal-need-redraw", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
+	signal_need_redraw_id = g_signal_new ("signal-need-redraw", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, gtk_marshal_NONE__POINTER_POINTER_POINTER,GTK_TYPE_NONE, 3, G_TYPE_POINTER, G_TYPE_POINTER, G_TYPE_POINTER);
 //(const void*, void*, const void*));
+	
+	signal_internal_message_id = g_signal_new ("signal-internal-message", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1, G_TYPE_POINTER);
+
+	// Signal connections
+	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "signal-player-done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);
+	
+	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "signal-need-redraw",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);
+
+	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "signal-internal-message",  G_CALLBACK (gtk_C_callback_do_internal_message), (void*)this);
 
 	/* VBox (m_guicontainer) to place the Menu bar in the correct place */ 
 	m_guicontainer = gtk_vbox_new(FALSE, 0);
@@ -392,7 +414,6 @@ gtk_gui::gtk_gui(const char* title,
   	gtk_widget_set_size_request (label2, 280, 112);
 
 	// emits the signal that the player is done
-	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "signal-player-done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);
 	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
 }
 
@@ -671,9 +692,7 @@ gtk_gui::need_redraw (const void* r, void* w, const void* pt) {
 
 	AM_DBG printf("gtk_gui::need_redraw(0x%x)-r=(0x%x)\n",
 	(void *)this,r?r:0);
-	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_need_redraw_id, 0, r, w, pt, NULL);
-//	emit signal_need_redraw(r,w,pt);
-
+	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_need_redraw_id, 0, r, w, pt);
 }
 
 void 
@@ -689,8 +708,7 @@ no_fileopen_infodisplay(gtk_gui* w, const char* caption) {
          GTK_DIALOG_DESTROY_WITH_PARENT,
          GTK_MESSAGE_INFO,
          GTK_BUTTONS_OK,
-	 "No file open: Please first select File->Open");
-	gtk_message_dialog_set_markup(dialog, caption);
+	 caption);
 	gtk_message_dialog_format_secondary_markup (dialog, "No file open: Please first select File->Open");
  	gtk_dialog_run (GTK_DIALOG (dialog));
  	gtk_widget_destroy (GTK_WIDGET (dialog));
@@ -816,56 +834,70 @@ gtk_gui::unsetCursor() { //XXXX Hack
 }
 #endif/*QT_NO_FILEDIALOG*/
 
-//void
-//gtk_gui::customEvent(QCustomEvent* e) {
-//	char* msg = (char*)e->data();
-//	std::string id("gtk_gui::customEvent");
-//	std::cerr<<id<<std::endl;
-//	std::cerr<<id+" type: "<<e->type()<<" msg:"<<msg<<std::endl;
-//	int level = e->type() - gtk_logger::CUSTOM_OFFSET;
-//	switch (level) {
-//	case gtk_logger::CUSTOM_NEW_DOCUMENT:
-//		if (m_mainloop) {
-//			bool start = msg[0] == 'S' ? true : false;
-//			bool old = msg[2] == 'O' ? true : false;
-//			m_mainloop->player_start(&msg[4], start, old);
-//		}
-//		break;
-//	casegtkt_logger::CUSTOM_LOGMESSAGE:
-//#ifndef QT_NO_FILEDIALOG	 /* Assume plain Qt */
-//		gtk_logger::get_gtk_logger()->get_logger_window()->append(msg);
-//#else /*QT_NO_FILEDIALOG*/
-/* No logger window on an embedded system, logging there on file */
-//#endif/*QT_NO_FILEDIALOG*/
-//		break;
-//	case ambulant::lib::logger::LEVEL_FATAL:
-//		QMessageBox::critical(NULL, "AmbulantPlayer", msg);
-//		break;
-//	case ambulant::lib::logger::LEVEL_ERROR:
-//		QMessageBox::warning(NULL, "AmbulantPlayer", msg);
-//		break;
-//	case ambulant::lib::logger::LEVEL_WARN:
-//	default:
-//		QMessageBox::information(NULL, "AmbulantPlayer", msg);
-//		break;
-//	}
-//#ifdef	TRY_LOCKING
-//	if (level >= ambulant::lib::logger::LEVEL_WARN) {
-//		pthread_mutex_lock(&m_lock_message);
-//		pthread_cond_signal(&m_cond_message);
-//		pthread_mutex_unlock(&m_lock_message);
-//	}
-//#endif/*TRY_LOCKING*/
-//	free(msg);
-//}
+void
+gtk_gui::do_internal_message(gtk_message_event* e) {
+	char* msg = (char*)e->get_message();
+	std::string id("gtk_gui::do_internal_message");
+	std::cerr<<id<<std::endl;
+	std::cerr<<id+" type: "<<e->get_type()<<" msg:"<<msg<<std::endl;
+	int level = e->get_type() - gtk_logger::CUSTOM_OFFSET;
+	GtkMessageDialog* dialog; // just in case is needed
+	switch (level) {
+	case gtk_logger::CUSTOM_NEW_DOCUMENT:
+		if (m_mainloop) {
+			bool start = msg[0] == 'S' ? true : false;
+			bool old = msg[2] == 'O' ? true : false;
+			m_mainloop->player_start(&msg[4], start, old);
+		}
+		break;
+	case gtk_logger::CUSTOM_LOGMESSAGE:
+		gtk_text_buffer_insert_at_cursor(GTK_TEXT_BUFFER (gtk_logger::get_gtk_logger()->get_logger_buffer()), msg, strlen(msg));
+		break;
+	case ambulant::lib::logger::LEVEL_FATAL:
+		dialog = (GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         	GTK_DIALOG_DESTROY_WITH_PARENT,
+         	GTK_MESSAGE_ERROR,
+         	GTK_BUTTONS_OK,
+	 	msg);
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));
+		break;
+	case ambulant::lib::logger::LEVEL_ERROR:
+		dialog = (GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         	GTK_DIALOG_DESTROY_WITH_PARENT,
+         	GTK_MESSAGE_WARNING,
+         	GTK_BUTTONS_OK,
+	 	msg);
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));
+		break;
+	case ambulant::lib::logger::LEVEL_WARN:
+	default:
+		dialog = (GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         	GTK_DIALOG_DESTROY_WITH_PARENT,
+         	GTK_MESSAGE_INFO,
+         	GTK_BUTTONS_OK,
+	 	msg);
+ 		gtk_dialog_run (GTK_DIALOG (dialog));
+ 		gtk_widget_destroy (GTK_WIDGET (dialog));
+		break;
+	}
+#ifdef	TRY_LOCKING
+	if (level >= ambulant::lib::logger::LEVEL_WARN) {
+		pthread_mutex_lock(&m_lock_message);
+		pthread_cond_signal(&m_cond_message);
+		pthread_mutex_unlock(&m_lock_message);
+	}
+#endif/*TRY_LOCKING*/
+	free(msg);
+}
 
 void
 gtk_gui::internal_message(int level, char* msg) {
 	
 	int msg_id = level+gtk_logger::CUSTOM_OFFSET;
-	
-
-//	g_signal_emit (G_OBJECT (me),0, NULL);
+	gtk_message_event* event = new gtk_message_event(msg_id, msg);
+	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_internal_message_id, 0, event);
 
 #ifdef	TRY_LOCKING
 	if (level >= ambulant::lib::logger::LEVEL_WARN
@@ -874,19 +906,18 @@ gtk_gui::internal_message(int level, char* msg) {
 		pthread_mutex_lock(&m_lock_message);
 		pthread_cond_wait(&m_cond_message, &m_lock_message);
 		pthread_mutex_unlock(&m_lock_message);
-
 	}
-#endif/*TRY_LOCKING*/
+#endif /*TRY_LOCKING*/
 }
 
 int
 main (int argc, char*argv[]) {
 
 	/** Start gthread **/
-	if( !g_thread_supported() ){
-       		g_thread_init(NULL);
-       		gdk_threads_init();
-	}
+//	if( !g_thread_supported() ){
+//      		g_thread_init(NULL);
+ //      		gdk_threads_init();
+//	}
 	gtk_init(&argc,&argv);
 
 //#undef	ENABLE_NLS
@@ -925,8 +956,7 @@ main (int argc, char*argv[]) {
 	lib::logger::get_logger()->debug(gettext("Ambulant Player: localization enabled (english)"));
 #endif
 	AM_DBG fprintf(DBG, "argc=%d argv[0]=%s\n", argc, argv[0]);
-	AM_DBG for (int i=1;i<argc;i++){fprintf(DBG,"%s\n", argv[i]);
-	}
+	AM_DBG for (int i=1;i<argc;i++){fprintf(DBG,"%s\n", argv[i]);}
 	
 	bool exec_flag = false;
 
@@ -960,16 +990,16 @@ main (int argc, char*argv[]) {
 	}
 	
 	if (exec_flag){
-		gdk_threads_enter();
+//		gdk_threads_enter();
 		gtk_main();			
-		gdk_threads_leave();
+//		gdk_threads_leave();
 	}else if (argc > 1) {
 		std::string error_message = gettext("Cannot open: ");
 		error_message = error_message + "\"" + argv[1] + "\"";
 		std::cerr << error_message << std::endl;
-		gdk_threads_enter();
+//		gdk_threads_enter();
 		gtk_main();
-		gdk_threads_leave();
+//		gdk_threads_leave();
 	}	
 	unix_prefs.save_preferences();
 	delete gtk_logger::get_gtk_logger();

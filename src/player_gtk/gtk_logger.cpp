@@ -30,6 +30,7 @@
 using namespace ambulant;
 
 gtk_logger_ostream::gtk_logger_ostream(){
+	m_string = g_string_new("");
 }
 
 bool 
@@ -73,7 +74,7 @@ gtk_logger_ostream::close() {
 void
 gtk_logger_ostream::flush() {
 	std::string id("gtk_logger_ostream::flush()");
-	gtk_logger::get_gtk_logger()->log(m_string);
+	gtk_logger::get_gtk_logger()->log(m_string->str);
 	m_string = g_string_truncate(m_string, 0); 
 }
 
@@ -88,7 +89,9 @@ gtk_logger::gtk_logger()
 	/*
 	common::preferences* prefs = 
 	  common::preferences::get_preferences();
+*/
 	lib::logger* logger = lib::logger::get_logger();
+/*
 	if (prefs != NULL && prefs->m_log_file != "") {
 		if (prefs->m_log_file == "-")
 			m_log_FILE = stderr;
@@ -103,7 +106,7 @@ gtk_logger::gtk_logger()
 	// Tell the logger about the output level preference
 	//int level = prefs->m_log_level;
 	//logger->set_level(level);
-	//logger->set_ostream(new gtk_logger_ostream);
+	logger->set_ostream(new gtk_logger_ostream);
 	
 	// create the GUI object
 	m_logger_window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
@@ -152,11 +155,11 @@ gtk_logger::set_gtk_logger_gui(gtk_gui* gui) {
 }
 
 void
-gtk_logger::log(GString *logstring) {
+gtk_logger::log(gchar *logstring) {
  	if (m_log_FILE != NULL) {
-		fprintf(m_log_FILE, "%s", (const char*)(logstring->str));
+		fprintf(m_log_FILE, "%s", (const char*)(logstring));
 	}
-	char* message = strdup(logstring->str);
+	char* message = strdup(logstring);
 	s_gtk_logger->m_gui->internal_message(-1, message);
 }
 
@@ -164,10 +167,12 @@ void
 gtk_logger::show_message(int level, const char *msg) {
 	char* message = strdup(msg);
 	s_gtk_logger->m_gui->internal_message(level, message);
-	gdk_threads_enter();
-	gtk_text_buffer_insert_at_cursor(m_text_buffer, msg, strlen(msg));
-//gtk_text_buffer_insert(m_text_buffer, msg, -1);
-	gdk_threads_leave();
+}
+
+GtkTextBuffer*
+gtk_logger::get_logger_buffer()
+{
+	return m_text_buffer;
 }
 
 GtkWindow*
@@ -176,7 +181,22 @@ gtk_logger::get_logger_window()
 	return m_logger_window;
 }
 
-//gtk_message_event::gtk_message_event(int level, char *msg)
+
+
+gtk_message_event::gtk_message_event(int level, char *msg){
+	type = level;
+	message = msg;
+}
+
+int 
+gtk_message_event::get_type(){
+	return type;
+}
+
+gchar* 
+gtk_message_event::get_message(){
+	return message;
+}
  //: QCustomEvent((QEvent::Type)level, (void*) msg)
 //{
 //}
