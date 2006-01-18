@@ -215,7 +215,7 @@ gtk_gui::gtk_gui(const char* title,
 	gtk_widget_set_uposition(GTK_WIDGET (m_toplevelcontainer), 240, 320);	
 
 	/* Initialization of the signals */
-	//signal_player_done_id = g_signal_new ("signal_player_done", G_TYPE_FROM_CLASS(this), G_SIGNAL_RUN_LAST, 0, NULL, NULL, g_cclosure_marshal_VOID__VOID, GTK_TYPE_NONE, 0, 0);
+	signal_player_done_id = g_signal_new ("signal-player-done", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
 
 	/* VBox (m_guicontainer) to place the Menu bar in the correct place */ 
 	m_guicontainer = gtk_vbox_new(FALSE, 0);
@@ -329,8 +329,8 @@ gtk_gui::gtk_gui(const char* title,
 
 	/* Help */
 	m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
-		gtk_widget_show ((GtkWidget*)m_helpmenu);
-		gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
+	gtk_widget_show ((GtkWidget*)m_helpmenu);
+	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
 	GtkWidget* m_helpmenu_submenu = gtk_menu_new();
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_helpmenu), m_helpmenu_submenu);
 
@@ -372,7 +372,7 @@ gtk_gui::gtk_gui(const char* title,
 	m_documentcontainer = gtk_fixed_new();
 	gtk_widget_show(m_documentcontainer);
  	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
-/*
+
 	GtkWidget* image1 = gtk_image_new_from_file("/ufs/garcia/src/docs/sen5/euroitv/paper_concepts.png");
   	gtk_widget_show (image1);
   	gtk_fixed_put (GTK_FIXED (m_documentcontainer), image1, 56, 56);
@@ -387,12 +387,10 @@ gtk_gui::gtk_gui(const char* title,
   	gtk_widget_show (label2);
   	gtk_fixed_put (GTK_FIXED (m_documentcontainer), label2, 104, 160);
   	gtk_widget_set_size_request (label2, 280, 112);
-*/
-	do_player_done();
 
-//	g_signal_connect_swapped (G_OBJECT (this), "signal_player_done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);	
-
-	//	g_signal_emit(GTK_OBJECT (this), signal_player_done_id, 0);
+	// emits the signal that the player is done
+	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "signal-player-done",  G_CALLBACK (gtk_C_callback_do_player_done), (void*)this);
+	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
 }
 
 gtk_gui::~gtk_gui() {
@@ -656,7 +654,6 @@ gtk_gui::do_open_url() {
 void 
 gtk_gui::do_player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_player_done");
-	printf("PLAYER DONE\n");
 	if (m_mainloop == NULL){
 		gtk_widget_set_sensitive (m_playmenu_submenu_pause, false);
 		gtk_widget_set_sensitive (m_playmenu_submenu_play, true);
