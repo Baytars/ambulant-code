@@ -54,7 +54,8 @@ class gtk_logger {
 		CUSTOM_NEW_DOCUMENT=-2
 	};
 	static gtk_logger* get_gtk_logger();
-	static void show_message(int level, const char *message);
+	//static 
+	void show_message(int level, const char *message);
 	GtkWindow* get_logger_window();
 	static void set_gtk_logger_gui(gtk_gui*);
 	void log(GString *logstring);

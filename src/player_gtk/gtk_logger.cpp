@@ -109,6 +109,7 @@ gtk_logger::gtk_logger()
 	m_logger_window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
 	gtk_window_set_title (m_logger_window, "Ambulant-logger");
 	gtk_window_set_resizable (m_logger_window, false);
+	gtk_signal_connect (GTK_OBJECT (m_logger_window), "delete-event",G_CALLBACK (gtk_widget_hide), GTK_WIDGET (m_logger_window));
 	GtkWidget* sw = gtk_scrolled_window_new (NULL, NULL);
   	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
                                   	GTK_POLICY_AUTOMATIC,
@@ -125,8 +126,6 @@ gtk_logger::gtk_logger()
 
 	// create the text buffer
 	m_text_buffer= gtk_text_view_get_buffer (m_text_view);
-
-//	gtk_text_buffer_set_text (m_textbuffer, "Hello, this is some text", -1);
 }
 
 gtk_logger::~gtk_logger() {
@@ -165,7 +164,10 @@ void
 gtk_logger::show_message(int level, const char *msg) {
 	char* message = strdup(msg);
 	s_gtk_logger->m_gui->internal_message(level, message);
-//	gtk_text_buffer_set_text (m_text_buffer, msg, -1);		
+	gdk_threads_enter();
+	gtk_text_buffer_insert_at_cursor(m_text_buffer, msg, strlen(msg));
+//gtk_text_buffer_insert(m_text_buffer, msg, -1);
+	gdk_threads_leave();
 }
 
 GtkWindow*
