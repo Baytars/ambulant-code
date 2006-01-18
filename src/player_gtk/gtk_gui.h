@@ -117,22 +117,24 @@ class gtk_gui: public GtkWidget{
    private:
 	bool	     m_busy;
 //	QPushButton* m_cancel_pb; // for Settings window
-	GtkMenuItem*  m_filemenu;
+	GtkMenuItem* m_filemenu;
 //	QHBox* 	     m_finish_hb; // for Settings window
 	GtkMenuItem*  m_helpmenu;
-	GtkMenuBar*    m_menubar;
+	GtkMenuBar*   m_menubar;
 //	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
 	bool         m_pausing;
 	bool         m_playing;
-	GtkMenuItem*  m_playmenu;
+	GtkMenuItem* m_playmenu;
 	GtkWidget*   m_playmenu_submenu_play;
 	GtkWidget*   m_playmenu_submenu_pause; 
 	const char*  m_programfilename;
 	GtkSettings* m_settings; // the Settings window
 	const char*  m_smilfilename;
 	GtkMenuItem* m_viewmenu;
+	
+
 	GtkWindow*   m_toplevelcontainer;
 	GtkWidget*   m_guicontainer;
 	GtkWidget*   m_documentcontainer;
@@ -147,8 +149,9 @@ class gtk_gui: public GtkWidget{
 //	Qt::CursorShape m_cursor_shape;
 //#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
-	GtkFileSelection* m_fileselector;
+	GtkFileSelection* m_file_selector;
 	GtkFileSelection* m_settings_selector;
+	GtkEntry*	m_url_text_entry;
 	//const DocLnk m_selectedDocLnk;
 //#endif/*QT_NO_FILEDIALOG*/
 	void	     fileError(GString smilfilename);
@@ -165,8 +168,8 @@ class gtk_gui: public GtkWidget{
 // Added by Pablo
     public:
 	void do_file_selected();
-	void do_settings_selected(const DocLnk&);
-	void do_close_settings_selector();
+	void do_url_selected();
+	void do_settings_selected();
 	void do_play();
     public:
 	void do_about();

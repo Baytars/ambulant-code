@@ -158,6 +158,14 @@ void gtk_C_callback_file_selected(void *userdata)
 {
 	((gtk_gui*) userdata)->do_file_selected();
 }
+void gtk_C_callback_settings_selected(void *userdata)
+{
+	((gtk_gui*) userdata)->do_settings_selected();
+}
+void gtk_C_callback_url_selected(void *userdata)
+{
+	((gtk_gui*) userdata)->do_url_selected();
+}
 }
 extern "C" {
 void gtk_C_callback_do_player_done(void *userdata)
@@ -193,7 +201,7 @@ gtk_gui::gtk_gui(const char* title,
 	       const char* initfile)
  :
         m_busy(true),
-	m_fileselector(NULL),
+	m_file_selector(NULL),
 	m_settings_selector(NULL),
 	m_o_x(0),	 
 	m_o_y(0),	 
@@ -422,7 +430,7 @@ gtk_gui::~gtk_gui() {
 #define DELETE(X) if (X) { delete X; X = NULL; }
 	AM_DBG printf("%s0x%X\n", "gtk_gui::~gtk_gui(), m_mainloop=",m_mainloop);
 	//setCaption(QString::null);
-	gtk_widget_destroy(GTK_WIDGET (m_fileselector));
+	gtk_widget_destroy(GTK_WIDGET (m_file_selector));
 	gtk_widget_destroy(GTK_WIDGET (m_settings_selector));
 	gtk_widget_destroy(GTK_WIDGET (m_filemenu));
 	gtk_widget_destroy(GTK_WIDGET (m_playmenu));
@@ -560,22 +568,22 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 
 void 
 gtk_gui::do_open(){
-	m_fileselector =  (GtkFileSelection*) gtk_file_selection_new("Please, select a file");
-	gtk_file_selection_set_filename(m_fileselector, "."); // Initial dir
-	gtk_widget_show(GTK_WIDGET (m_fileselector));
-	gtk_file_selection_complete(m_fileselector,"SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)");
+	m_file_selector =  (GtkFileSelection*) gtk_file_selection_new("Please, select a file");
+	gtk_file_selection_set_filename(m_file_selector, "."); // Initial dir
+	gtk_widget_show(GTK_WIDGET (m_file_selector));
+	gtk_file_selection_complete(m_file_selector,"SMIL files (*.smil *.smi);; All files (*.smil *.smi *.mms *.grins);; Any file (*)");
 
 	/* Ensure that the dialog box is hidden when the user clicks a button. */
-	g_signal_connect_swapped (GTK_FILE_SELECTION (m_fileselector)->ok_button,
+	g_signal_connect_swapped (GTK_FILE_SELECTION (m_file_selector)->ok_button,
                              "clicked",
                              G_CALLBACK (gtk_widget_hide), 
-                             m_fileselector);
+                             m_file_selector);
 
-   	g_signal_connect_swapped (GTK_FILE_SELECTION (m_fileselector)->cancel_button,
+   	g_signal_connect_swapped (GTK_FILE_SELECTION (m_file_selector)->cancel_button,
                              "clicked",
                              G_CALLBACK (gtk_widget_hide),
-                             m_fileselector);
-	g_signal_connect_swapped (GTK_OBJECT ((m_fileselector)->ok_button),"clicked", G_CALLBACK (gtk_C_callback_file_selected),(void*) this);
+                             m_file_selector);
+	g_signal_connect_swapped (GTK_OBJECT ((m_file_selector)->ok_button),"clicked", G_CALLBACK (gtk_C_callback_file_selected),(void*) this);
 }
 
 //void
@@ -587,7 +595,7 @@ gtk_gui::do_open(){
 //}
 
 void gtk_gui::do_file_selected() {
-	const gchar *smilfilename  = gtk_file_selection_get_filename (m_fileselector);
+	const gchar *smilfilename  = gtk_file_selection_get_filename (m_file_selector);
 	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), smilfilename);
 	if (openSMILfile(smilfilename, 1)){		
 		do_play();
@@ -595,84 +603,72 @@ void gtk_gui::do_file_selected() {
 }
 
 void
-gtk_gui::do_settings_selected(const DocLnk& selected_file) {
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	GTKString settings_filename(selected_file.file());
-	smil2::test_attrs::load_test_attrs(settings_filename.ascii());
-	if (openSMILfile(m_smilfilename, 1))
-		do_play();
-#endif/*QT_NO_FILEDIALOG*/
-}
-void
-gtk_gui::do_close_settings_selector()
-{
-#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Qt */
-	m_settings_selector->hide();
-#endif/*QT_NO_FILEDIALOG*/
+gtk_gui::do_settings_selected() {
+	const gchar *settings_filename  = gtk_file_selection_get_filename (m_settings_selector);
+	if ( settings_filename != NULL) {
+		smil2::test_attrs::load_test_attrs(settings_filename);
+		if (openSMILfile(m_smilfilename, 1))
+			do_play();
+	}
 }
 
 void 
 gtk_gui::do_load_settings() {
 	if (m_playing)
 		do_stop();
-#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
-/**	GString settings_filename =
-		QFileDialog::getOpenFileName(
-				 ".", // Initial dir
-				 gettext("Settings files (*.xml)"), // file types
-				 this,
-				 gettext("open settings file dialog"),
-				 gettext("Double Click a settings file to open")
-				 );**/
-	/**
-	if ( ! settings_filename.isNull()) {
-		smil2::test_attrs::load_test_attrs(settings_filename.ascii());
-		if (openSMILfile(m_smilfilename, 1))
-			do_play();
-	}**/
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-	/* TBD embedded Qt settings file dialog XXXX */
-	printf("1.m_settings_selector =0x%x\n",m_settings_selector );
-	if (m_settings_selector == NULL) {
-		QString mimeTypes("text/xml;");
-		m_settings_selector = new FileSelector(mimeTypes, NULL,
-						       "do_open", false);
-		printf("2.m_settings_selector =0x%x\n",m_settings_selector );
-		m_settings_selector->resize(240, 280);
-	} else {
-		m_settings_selector->reread();
-	}
-/**
-	QObject::connect(m_settings_selector, SIGNAL(fileSelected(const DocLnk&)),
-			 this, SLOT(do_settings_selected(const DocLnk&)));
-	QObject::connect(m_settings_selector, SIGNAL(closeMe()), 
-			 this, SLOT(do_close_settings_selector()));
-	m_settings_selector->show();**/
-#endif/*QT_NO_FILEDIALOG*/
+
+	m_settings_selector =  (GtkFileSelection*) gtk_file_selection_new("Please, select a settings file");
+	gtk_file_selection_set_filename(m_settings_selector, "."); // Initial dir
+	gtk_widget_show(GTK_WIDGET (m_settings_selector));
+	gtk_file_selection_complete(m_settings_selector,"*.xml");
+
+	/* Ensure that the dialog box is hidden when the user clicks a button. */
+	g_signal_connect_swapped (GTK_FILE_SELECTION (m_settings_selector)->ok_button,
+                             "clicked",
+                             G_CALLBACK (gtk_widget_hide), 
+                             m_settings_selector);
+
+   	g_signal_connect_swapped (GTK_FILE_SELECTION (m_settings_selector)->cancel_button,
+                             "clicked",
+                             G_CALLBACK (gtk_widget_hide),
+                             m_settings_selector);
+	g_signal_connect_swapped (GTK_OBJECT ((m_settings_selector)->ok_button),"clicked", G_CALLBACK (gtk_C_callback_file_selected),(void*) this);
 }
 
 void 
 gtk_gui::do_open_url() {
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-  	bool ok;
-/**	QString smilfilename =
-		QInputDialog::getText(
-				      "AmbulantPlayer",
-				      gettext("URL to open:"),
-				      QLineEdit::Normal,
-				      QString::null,
-				      &ok,
-				      this
-				 );**/
-/**	if (ok && !smilfilename.isEmpty()
-	    && openSMILfile(smilfilename, 1)) {
+	GtkDialog* url_dialog =  GTK_DIALOG (gtk_dialog_new_with_buttons
+	("AmbulantPlayer", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL));
+	
+	GtkLabel* label = GTK_LABEL (gtk_label_new("URL to open:"));
+	gtk_label_set_justify(label,GTK_JUSTIFY_LEFT);
+	gtk_widget_show(GTK_WIDGET (label));
+	
+	m_url_text_entry = GTK_ENTRY (gtk_entry_new());
+	gtk_entry_set_editable(m_url_text_entry, true);
+	gtk_entry_set_text(m_url_text_entry,"http://");
+	gtk_widget_show(GTK_WIDGET (m_url_text_entry));
+	
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(url_dialog)->vbox), GTK_WIDGET (label));
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(url_dialog)->vbox), GTK_WIDGET (m_url_text_entry));
+	
+	g_signal_connect_swapped (url_dialog,"response", G_CALLBACK (gtk_C_callback_url_selected), (void*) this);
+	
+	g_signal_connect_swapped (url_dialog, "response",
+                             G_CALLBACK (gtk_widget_hide), 
+                            GTK_WIDGET (url_dialog));
+	gtk_widget_show_all(GTK_WIDGET (url_dialog));
+
+//	gtk_dialog_run (GTK_DIALOG (url_dialog));
+// 	gtk_widget_destroy (GTK_WIDGET (url_dialog));
+}
+
+void gtk_gui::do_url_selected() {
+	const gchar *smilfilename  = gtk_entry_get_text(m_url_text_entry);
+	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), smilfilename);
+	if (openSMILfile(smilfilename, 1)){		
 		do_play();
 	}
-**/
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-//	QMessageBox::information (this, m_programfilename,
-//		gettext("Open URL not implemented for Embedded Qt"));
-#endif/*QT_NO_FILEDIALOG*/
 }
 
 void 
@@ -837,9 +833,9 @@ gtk_gui::unsetCursor() { //XXXX Hack
 void
 gtk_gui::do_internal_message(gtk_message_event* e) {
 	char* msg = (char*)e->get_message();
-	std::string id("gtk_gui::do_internal_message");
-	std::cerr<<id<<std::endl;
-	std::cerr<<id+" type: "<<e->get_type()<<" msg:"<<msg<<std::endl;
+	//std::string id("gtk_gui::do_internal_message");
+	//std::cerr<<id<<std::endl;
+	//std::cerr<<id+" type: "<<e->get_type()<<" msg:"<<msg<<std::endl;
 	int level = e->get_type() - gtk_logger::CUSTOM_OFFSET;
 	GtkMessageDialog* dialog; // just in case is needed
 	switch (level) {
