@@ -36,8 +36,6 @@
 class gtk_mainloop;
 
 class gtk_gui: public GtkWidget{
-//gtk_gui_BASE {
-//   GTK_OBJECT
 
    public:
   	gtk_gui(const char* title, const char* initfile);
@@ -103,27 +101,17 @@ class gtk_gui: public GtkWidget{
 	pthread_mutex_t   m_lock_message;
 	unsigned long int m_gui_thread;
 #endif/*TRY_LOCKING*/
-//#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
-//	Qt::CursorShape m_cursor_shape;
-//#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
 	GtkFileChooser* m_file_chooser;
 	GtkFileChooser* m_settings_chooser;
 	GtkEntry*	m_url_text_entry;
 	//const DocLnk m_selectedDocLnk;
-//#endif/*QT_NO_FILEDIALOG*/
 	void	     fileError(const gchar* smilfilename);
 
-//public slots:
-//	void setDocument(const GString&);
-  /* following slots are needed for Qt Embedded, and are implemented
-     as empty functions for normal Qt because Qt's moc doesn't recogzize
-     #ifdef and #define
-  */
+	void setDocument(const char* string);
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
 #define DocLnk void*
-#endif/*QT_NO_FILEDIALOG*/
-// Added by Pablo
+#endif/*GTK_NO_FILEDIALOG*/
     public:
 	void do_file_selected();
 	void do_url_selected();
@@ -152,14 +140,7 @@ class gtk_gui: public GtkWidget{
 	guint signal_internal_message_id;
 
 	void do_internal_message(gtk_message_event* e);
-// Commented by Pablo
-//  signals:
-//	void signal_player_done();
-//	void signal_need_redraw(const void*, void*, const void*);
-  protected:
-	//void customEvent(QCustomEvent*);
-//#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
-	void unsetCursor(); //XXXX
-//#endif/*GTK_NO_FILEDIALOG*/
+
+	void unsetCursor();
 };
 #endif/*__GTK_GUI_H__*/
