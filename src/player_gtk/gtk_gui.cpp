@@ -528,11 +528,9 @@ gtk_gui::do_logger_window() {
 
 bool 
 checkFilename(const gchar* filename, int mode) {
-	//ifstream file = new ifstream(filename, mode);
-	//file.open();
-	//return file.is_open();	
-//FILE* file = new FILE(filename);
-//return file->fopen(mode);
+	FILE * file;
+	if (mode==0)
+  	return fopen (filename,"r");
 }
 
 void
@@ -540,7 +538,15 @@ gtk_gui::fileError(const gchar* smilfilename) {
  	char buf[1024];
 	sprintf(buf, gettext("%s: Cannot open file: %s"),
 		(const char*) smilfilename, strerror(errno));
-//	QMessageBox::information(this, m_programfilename, buf);
+	GtkMessageDialog* dialog = 
+	(GtkMessageDialog*) gtk_message_dialog_new (NULL,
+         GTK_DIALOG_DESTROY_WITH_PARENT,
+         GTK_MESSAGE_ERROR,
+         GTK_BUTTONS_OK,
+	 m_programfilename);
+	gtk_message_dialog_format_secondary_text(dialog, buf);
+ 	gtk_dialog_run (GTK_DIALOG (dialog));
+ 	gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
 bool 
@@ -548,13 +554,13 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 
 	if (smilfilename==NULL)
 		return false;
-	/*
+	
 	if (mode == 0)
 		if (! checkFilename(smilfilename, mode)) {
 			fileError(smilfilename);
 			return false;
 		}
-*/
+
 	char* filename = strdup(smilfilename);
 	m_smilfilename = smilfilename;
 
@@ -604,20 +610,20 @@ gtk_gui::do_open(){
 void gtk_gui::do_file_selected() {
 	const gchar *smilfilename  = gtk_file_chooser_get_filename (m_file_chooser);
 	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), smilfilename);
-	//if (openSMILfile(smilfilename, 1)){		
+	if (openSMILfile(smilfilename, 0)){
 		//do_play();
-	//}
+	}
 }
 
 
 
-//void
-//gtk_gui::setDocument(const char* smilfilename) {
-//#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Qt */
-//	if (openSMILfile(smilfilename, 0))
-//		do_play();
-//#endif/*GTK_NO_FILEDIALOG*/
-//}
+void
+gtk_gui::setDocument(const char* smilfilename) {
+#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded GTK */
+	if (openSMILfile(smilfilename, 0))
+		do_play();
+#endif/*GTK_NO_FILEDIALOG*/
+}
 
 
 void
@@ -652,7 +658,8 @@ gtk_gui::do_load_settings() {
     	}
 	gtk_widget_hide(GTK_WIDGET (m_settings_chooser));	
 
-	/* Ensure that the dialog box is hidden when the user clicks a button. */
+	/* Ensure that the dialog box is hidden when the user clicks a button.
+	We don't need anymore the callbacks, because they can be embedded in this part of the code */
 /*
 	g_signal_connect_swapped (GTK_FILE_SELECTION (m_settings_selector)->ok_button,
                              "clicked",
@@ -702,8 +709,6 @@ gtk_gui::do_open_url() {
                             GTK_WIDGET (url_dialog));
 	gtk_widget_show_all(GTK_WIDGET (url_dialog));
 */
-//	gtk_dialog_run (GTK_DIALOG (url_dialog));
-// 	gtk_widget_destroy (GTK_WIDGET (url_dialog));
 }
 
 void gtk_gui::do_url_selected() {

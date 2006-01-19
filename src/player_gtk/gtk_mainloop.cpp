@@ -164,7 +164,7 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui) :
 	if (!m_doc) {
 		return;
 	}
-	m_player = create_player(filename);
+//	m_player = create_player(filename);
 }
 
 ambulant::common::player*
