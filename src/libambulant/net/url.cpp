@@ -391,7 +391,7 @@ std::string
 net::url::guesstype() const
 {
 	size_t dotpos = m_path.find_last_of(".");
-	if (dotpos <= 0) return "";
+	if (dotpos == std::string::npos) return "";
 	std::string ext = m_path.substr(dotpos);
 	
 	if (ext == ".htm" || ext == ".HTM" || ext == ".html" || ext == ".HTML")
