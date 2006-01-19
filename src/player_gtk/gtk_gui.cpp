@@ -29,7 +29,7 @@
 #include "gtk_mainloop.h"
 #include "gtk_logger.h"
 #include "gtk_renderer.h"
-//#include <gtk-thread.h>
+
 #if 1
 #include "ambulant/config/config.h"
 #include "ambulant/lib/logger.h"
@@ -213,6 +213,7 @@ gtk_gui::gtk_gui(const char* title,
 #endif/*TRY_LOCKING*/
 	m_smilfilename(NULL),
 	m_mainloop(NULL),
+//	m_settings(NULL),
 	m_toplevelcontainer()
 {
 
@@ -812,32 +813,19 @@ gtk_gui::do_stop() {
 
 void 
 gtk_gui::do_settings_select() {
-/**
-	m_settings = new qt_settings();
-	QWidget* settings_widget = m_settings->settings_select();
-	m_finish_hb = new QHBox(settings_widget);
-	m_ok_pb	= new QPushButton(gettext("OK"), m_finish_hb);
-	m_finish_hb->setSpacing(50);
-	QPushButton* m_cancel_pb= new QPushButton(gettext("Cancel"), m_finish_hb);
-	QObject::connect(m_ok_pb, SIGNAL(released()),
-			 this, SLOT(do_settings_ok()));
-	QObject::connect(m_cancel_pb, SIGNAL(released()),
-			 this, SLOT(do_settings_cancel()));
-	settings_widget->show();
-**/
-}
 
-void
-gtk_gui::do_settings_ok() {
-//	m_settings->settings_ok();
-//	do_settings_cancel();
-}
-
-void
-gtk_gui::do_settings_cancel() {
-//	m_settings->settings_finish();
-//	delete m_settings;
-//	m_settings = NULL;
+//	m_settings = new gtk_settings(this);
+	/*
+	gint result = gtk_dialog_run (GTK_DIALOG (m_settings->getWidget()));
+  	switch (result){
+      	case GTK_RESPONSE_ACCEPT:
+		m_settings->settings_ok();
+	       	break;
+      	default:
+         	break;
+    	}
+	gtk_widget_destroy (GTK_WIDGET (m_settings->getWidget()));
+*/
 }
 
 void

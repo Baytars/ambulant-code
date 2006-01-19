@@ -27,15 +27,15 @@
 #define __GTK_GUI_H__
 
 #include "unix_preferences.h"
-#include <iostream>
-#include <fstream>
+//#include <iostream>
+//#include <fstream>
 
 #include "gtk_logger.h"
-//#include "gtk_settings.h"
+#include "gtk_settings.h"
 
 class gtk_mainloop;
 
-class gtk_gui: public GtkWidget{
+class gtk_gui : public GtkWidget{
 
    public:
   	gtk_gui(const char* title, const char* initfile);
@@ -72,12 +72,9 @@ class gtk_gui: public GtkWidget{
 /*TMP*/	gtk_mainloop* m_mainloop;
    private:
 	bool	     m_busy;
-//	QPushButton* m_cancel_pb; // for Settings window
 	GtkMenuItem* m_filemenu;
-//	QHBox* 	     m_finish_hb; // for Settings window
 	GtkMenuItem*  m_helpmenu;
 	GtkMenuBar*   m_menubar;
-//	QPushButton* m_ok_pb;	  // for Settings window
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
 	bool         m_pausing;
@@ -86,11 +83,9 @@ class gtk_gui: public GtkWidget{
 	GtkWidget*   m_playmenu_submenu_play;
 	GtkWidget*   m_playmenu_submenu_pause; 
 	const char*  m_programfilename;
-	GtkSettings* m_settings; // the Settings window
 	const char*  m_smilfilename;
 	GtkMenuItem* m_viewmenu;
-	
-
+//	gtk_settings*   m_settings;
 	GtkWindow*   m_toplevelcontainer;
 	GtkWidget*   m_guicontainer;
 	GtkWidget*   m_documentcontainer;
@@ -117,7 +112,7 @@ class gtk_gui: public GtkWidget{
 	void do_url_selected();
 	void do_settings_selected();
 	void do_play();
-    public:
+
 	void do_about();
 	void do_homepage();
 	void do_welcome();
@@ -130,8 +125,6 @@ class gtk_gui: public GtkWidget{
 	void do_player_done();
 	void do_quit();
 	void do_reload();
-	void do_settings_cancel();
-	void do_settings_ok();
 	void do_settings_select();
 	void do_stop();
 
