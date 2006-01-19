@@ -28,20 +28,10 @@ AmbulantPlayer_SOURCES =					\
 	gtk_logger.h						\
 	gtk_mainloop.cpp 					\
 	gtk_mainloop.h						\
+	gtk_settings.cpp 					\
+	gtk_settings.h 						\
 	unix_preferences.cpp					\
 	unix_preferences.h
-
-
-#	gtk_gui.cpp						\
-#	gtk_gui.h 						\
-#	gtk_logger.cpp	 					\
-#	gtk_logger.h						\
-#	gtk_mainloop.cpp 					\
-#	gtk_mainloop.h						\
-#	gkt_settings.cpp 					\
-#	gtk_settings.h 						\
-#	unix_preferences.cpp					\
-#	unix_preferences.h
 
 # Conditionals for linux audio support
 if WITH_SDL

@@ -20,7 +20,7 @@
 /* 
  * @$Id$ 
  */
-/
+
 #include "gtk_settings.h"
 #include "ambulant/common/preferences.h"
 #include "unix_preferences.h"
@@ -62,12 +62,38 @@ static const char* loglevels[] =
   { "debug", "trace", "show", "warn", "error", "fatal", 0 };
 static const char* parsers[]   = { "any", "expat", "xerces", 0 };
 static const char* val_schemes[] = {"never", "always", "auto", 0};
-
-GtkWidget* 
-gtk_settings::settings_select() {
-	printf("gtk_settings::settings_select() m_parser_val=%d\n", m_parser_val);
-  	unix_preferences* m_preferences = (unix_preferences*)
+/*
+gtk_settings::gtk_settings() {
+  	
+	unix_preferences* m_preferences = (unix_preferences*)
 		common::preferences::get_preferences();
+	
+	m_dialog = GTK_DIALOG (gtk_dialog_new_with_buttons
+	("AmbulantPlayer", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL));
+
+	gtk_widget_set_uposition (GTK_WIDGET (this), 160, 120);
+*/
+/*
+	gtk_set_title (GTK_DIALOG(url_dialog)->vbox)
+
+	
+	GtkLabel* label = GTK_LABEL (gtk_label_new("URL to open:"));
+	gtk_label_set_justify(label,GTK_JUSTIFY_LEFT);
+	gtk_widget_show(GTK_WIDGET (label));
+	
+	m_url_text_entry = GTK_ENTRY (gtk_entry_new());
+	gtk_entry_set_editable(m_url_text_entry, true);
+	gtk_entry_set_text(m_url_text_entry,"http://www");
+	gtk_widget_show(GTK_WIDGET (m_url_text_entry));
+	
+	gtk_container_add(GTK_CONTAINER(), GTK_WIDGET (label));
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(url_dialog)->vbox), GTK_WIDGET (m_url_text_entry));
+*/
+
+
+//m_finish_hb->setSpacing(50);
+
+
 	//m_settings_vg = new QVGroupBox("Settings", 0);
 	//m_settings_vg->move(160,120);
 	
@@ -135,20 +161,17 @@ gtk_settings::settings_select() {
 	
 //printf("gtk_settings::settings_select m_settings_vg=0x%x\n", m_settings_vg);
 	return m_settings_vg;
-}
- 
-void 
-gtk_settings::settings_finish() {
-//printf("gtk_settings::settings_finish()\n");
-	delete m_settings_vg;
-	m_settings_vg = NULL;
-}
+**/
+//}
+
+
 
 void
 gtk_settings::settings_ok() {
 	unix_preferences* m_preferences = (unix_preferences*)
 		common::preferences::get_preferences();
 
+/**
 	int current_log_level = m_loglevel_co->currentItem();
 	if (m_preferences->m_log_level != current_log_level) {
 		m_preferences->m_log_level = current_log_level;
@@ -178,7 +201,8 @@ gtk_settings::settings_ok() {
 	m_preferences->m_plugin_dir = std::string((const char*) m_plugin_dir_le->text());
 	
 	m_preferences->save_preferences();
-}**/
+**/
+}
 
 int 
 gtk_settings::index_in_string_array(const char* s, const char* sa[]) {
