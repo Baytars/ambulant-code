@@ -28,54 +28,12 @@
 
 #include "unix_preferences.h"
 #include <iostream>
-
-
-//#include <qfeatures.h>
-//#ifndef QT_NO_FILEDIALOG **/	 /* Assume plain Qt */
-//# include <qapplication.h>
-//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-//#include <qpe/qpeapplication.h>
-//#include <qpe/applnk.h>
-//#include <fileselector.h>
-//#endif/*QT_NO_FILEDIALOG*/
-/**
-#include <qcursor.h>
-#include <qdial.h>
-#include <qevent.h>
-#include <qhbox.h>
-#include <qfiledialog.h>
-#include <qimage.h>
-#include <qinputdialog.h>
-#include <qiodevice.h>
-#include <qlabel.h>
-#include <qlcdnumber.h>
-#include <qmenubar.h>
-#include <qmessagebox.h>
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qpopupmenu.h>
-#include <qpushbutton.h>
-#include <qslider.h>
-#include <qtextstream.h>
-#include <qtooltip.h>
-#include <qwidget.h>
-
-#ifdef	WITH_QT_HTML_WIDGET
-#include <kapp.h>
-#include <kmainwindow.h>**/
-//#endif/*WITH_QT_HTML_WIDGET*/
+#include <fstream>
 
 #include "gtk_logger.h"
 //#include "gtk_settings.h"
 
 class gtk_mainloop;
-
-#ifdef	WITH_GTK_HTML_WIDGET
-#define gtk_gui_BASE GtkWidget
-#define gtk_gui_BASE GtkWidget
-#else /*WITH_GTK_HTML_WIDGET*/
-#define gtk_gui_BASE GtkWidget
-#endif/*WITH_GTK_HTML_WIDGET*/
 
 class gtk_gui: public GtkWidget{
 //gtk_gui_BASE {
@@ -149,12 +107,12 @@ class gtk_gui: public GtkWidget{
 //	Qt::CursorShape m_cursor_shape;
 //#else /*GTK_NO_FILEDIALOG*/	/* Assume embedded Qt */
 	bool         m_pointinghand_cursor; //XXXX
-	GtkFileSelection* m_file_selector;
-	GtkFileSelection* m_settings_selector;
+	GtkFileChooser* m_file_chooser;
+	GtkFileChooser* m_settings_chooser;
 	GtkEntry*	m_url_text_entry;
 	//const DocLnk m_selectedDocLnk;
 //#endif/*QT_NO_FILEDIALOG*/
-	void	     fileError(GString smilfilename);
+	void	     fileError(const gchar* smilfilename);
 
 //public slots:
 //	void setDocument(const GString&);
