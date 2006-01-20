@@ -72,23 +72,17 @@ class gtk_gui : public GtkWidget{
 /*TMP*/	gtk_mainloop* m_mainloop;
    private:
 	bool	     m_busy;
-	GtkMenuItem* m_filemenu;
-	GtkMenuItem*  m_helpmenu;
-	GtkMenuBar*   m_menubar;
 	int	     m_o_x;	  // x coord of origin play window
 	int	     m_o_y;	  // y coord of origin play window
 	bool         m_pausing;
 	bool         m_playing;
-	GtkMenuItem* m_playmenu;
-	GtkWidget*   m_playmenu_submenu_play;
-	GtkWidget*   m_playmenu_submenu_pause; 
 	const char*  m_programfilename;
 	const char*  m_smilfilename;
-	GtkMenuItem* m_viewmenu;
 //	gtk_settings*   m_settings;
 	GtkWindow*   m_toplevelcontainer;
 	GtkWidget*   m_guicontainer;
 	GtkWidget*   m_documentcontainer;
+	GtkActionGroup *m_actions;
 
 #define	TRY_LOCKING
 #ifdef	TRY_LOCKING
