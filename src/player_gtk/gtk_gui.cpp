@@ -241,7 +241,7 @@ gtk_gui::gtk_gui(const char* title,
 	{ "ViewMenu", "<alt>V", "_View"},
 	{ "fullscreen", NULL, "_Full Screen", "<alt>F", "Full Screen", NULL},
 	{ "window", NULL, "_Window", "<alt>W", "Normal Screen", NULL},
-	{ "loadsettings", GTK_STOCK_PROPERTIES, "_Reload...", "<alt>R", "Reload a document", NULL},
+	{ "loadsettings", GTK_STOCK_PROPERTIES, "_Load Settings...", "<alt>R", "Launch the settings window", NULL},
 	{ "logwindow", NULL, "_Log Window...", "<alt>L", "Launch log window", NULL},
 	// Help Menu
 	{ "HelpMenu", "<alt>H", "_Help"},
@@ -303,6 +303,14 @@ gtk_gui::gtk_gui(const char* title,
 		g_error("Could not merge UI from %s, error was: %s\n", UI_FILENAME, error->message);
 	gtk_ui_manager_insert_action_group(ui, m_actions, 0);
 	
+	/* Disable and make invisible menus and menu items */
+#ifdef GTK_NO_FILEDIALOG
+	gtk_action_set_sensitive(gtk_action_group_get_action(m_actions, "open"), true);
+	gtk_action_set_sensitive(gtk_action_group_get_action(m_actions, "openurl"), false);
+#endif
+	gtk_action_set_sensitive(gtk_action_group_get_action(m_actions, "play"), false);
+	gtk_action_set_sensitive(gtk_action_group_get_action(m_actions, "pause"), false);
+
 	// The actual activation calls
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "open"), "activate",  G_CALLBACK (gtk_C_callback_open), (void *) this );	
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "openurl"), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
@@ -317,7 +325,7 @@ gtk_gui::gtk_gui(const char* title,
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "fullscreen"), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "window"), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);		
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "loadsettings"), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);		
-	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "reload"), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "logwindow"), "activate",  G_CALLBACK (gtk_C_callback_logger_window), (void*)this);		
 
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "about"), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
 	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "help"), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);		
@@ -378,7 +386,7 @@ gtk_gui::gtk_gui(const char* title,
   	gtk_widget_set_size_request (label2, 280, 112);
 
 	// emits the signal that the player is done
-	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
+//	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
 }
 
 gtk_gui::~gtk_gui() {
@@ -518,6 +526,10 @@ gtk_gui::openSMILfile(const char *smilfilename, int mode) {
 			return false;
 		}
 
+	gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), false);
+	gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), true);
+	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), smilfilename);
+
 	char* filename = strdup(smilfilename);
 	m_smilfilename = smilfilename;
 
@@ -566,7 +578,6 @@ gtk_gui::do_open(){
 
 void gtk_gui::do_file_selected() {
 	const gchar *smilfilename  = gtk_file_chooser_get_filename (m_file_chooser);
-	gtk_window_set_title(GTK_WINDOW (m_toplevelcontainer), smilfilename);
 	if (openSMILfile(smilfilename, 0)){
 		//do_play();
 	}
@@ -676,10 +687,6 @@ void gtk_gui::do_url_selected() {
 	}
 }
 
-
-
-
-
 void 
 gtk_gui::do_player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_player_done");
@@ -774,8 +781,7 @@ gtk_gui::do_stop() {
 void 
 gtk_gui::do_settings_select() {
 
-//	m_settings = new gtk_settings(this);
-	/*
+	m_settings = new gtk_settings();
 	gint result = gtk_dialog_run (GTK_DIALOG (m_settings->getWidget()));
   	switch (result){
       	case GTK_RESPONSE_ACCEPT:
@@ -785,7 +791,6 @@ gtk_gui::do_settings_select() {
          	break;
     	}
 	gtk_widget_destroy (GTK_WIDGET (m_settings->getWidget()));
-*/
 }
 
 void

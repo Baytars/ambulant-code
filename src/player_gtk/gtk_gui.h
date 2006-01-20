@@ -30,10 +30,11 @@
 //#include <iostream>
 //#include <fstream>
 
-#include "gtk_logger.h"
 #include "gtk_settings.h"
+#include "gtk_logger.h"
 
 class gtk_mainloop;
+class gtk_settings;
 
 class gtk_gui : public GtkWidget{
 
@@ -70,6 +71,7 @@ class gtk_gui : public GtkWidget{
 	GtkWindow* get_toplevel_container();
 
 /*TMP*/	gtk_mainloop* m_mainloop;
+
    private:
 	bool	     m_busy;
 	int	     m_o_x;	  // x coord of origin play window
@@ -78,7 +80,7 @@ class gtk_gui : public GtkWidget{
 	bool         m_playing;
 	const char*  m_programfilename;
 	const char*  m_smilfilename;
-//	gtk_settings*   m_settings;
+	gtk_settings* m_settings;
 	GtkWindow*   m_toplevelcontainer;
 	GtkWidget*   m_guicontainer;
 	GtkWidget*   m_documentcontainer;
