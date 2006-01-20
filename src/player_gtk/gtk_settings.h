@@ -31,51 +31,61 @@
 class gtk_settings
 {
 
- public:
+public:
 	void settings_ok();
-	//gtk_settings();
+	gtk_settings();
 	GtkDialog* getWidget();
 
- private:
-	// settings
-	GtkDialog*	m_dialog;
-	//QVGroupBox*	m_settings_vg;
-	// Log level:
-//	QHBox*		m_loglevel_hb;
-//	QLabel*		m_loglevel_lb;
-//	QComboBox*	m_loglevel_co;
+private:
+	GtkDialog*	m_dialog; // this is the main window
 
-	// XML parser:
-//	QHBox*		m_parser_hb;
-//	GtkLabel*	m_parser_lb;
-//	GtkComboBox*	m_parser_co;
+	// settings
+	GtkFrame*	m_settings_fr; // the settings frame
+
+	// Log level
+	GtkHBox*	m_loglevel_hb; // the label and the combo box
+	GtkLabel*	m_loglevel_lb;
+	GtkComboBox* 	m_loglevel_co;
+
+	// XML parser
+	GtkHBox*	m_parser_hb;
+	GtkLabel*	m_parser_lb;
+	GtkComboBox*	m_parser_co;
 
 	// xerces options:
-//	QVGroupBox*	m_xerces_vg;
-//	GtkCheckBox*	m_namespace_cb;	// Enable XML namespace support
+	GtkFrame*	m_xerces_fr; // the xerces frame
+	
+	// Enable XML namespace support
+	GtkCheckButton* m_namespace_cb;
 	bool		m_namespace_val;
- //	QHBox*		m_validation_hb;// Enable XML validation:
- //	GtkLabel*		m_validation_lb;// Enable XML validation:
- //	QComboBox*	m_validation_co;// Enable XML validation:
-	//QCheckBox*	m_validation_cb;
-	//bool		m_validation_val;
-//	QVBox*		m_validation_vb;
-//	QHButtonGroup*	m_declaration_bg;
-//	QRadioButton* 	m_schema_rb;	// Using Schema
+	
+	// Enable XML validation
+ 	GtkHBox*	m_validation_hb;// Enable XML validation:
+ 	GtkLabel*	m_validation_lb;// Enable XML validation:
+ 	GtkComboBox*	m_validation_co;// Enable XML validation:
+		
+	// Using Schema / Using DTD
+	GtkHButtonBox* 	m_validation_fr; //placeholder of the buttons
+	//GtkRadioButton*
+	GtkRadioButton* m_schema_rb;	// Using Schema
 	bool		m_schema_val;
-//	QRadioButton*	m_dtd_rb;	// Using DTD
+	GtkRadioButton*	m_dtd_rb;	// Using DTD
 	bool		m_dtd_val;
-//	QCheckBox*	m_full_check_cb;// Validation Schema full checking
+
+	// Validation schema full checking
+	GtkCheckButton* m_full_check_cb;
 	bool		m_full_check_val;
 //	QHBox*		m_finish_hb;
 //	GtkButton*	m_ok_pb;	// OK
 //	GtkButton*	m_cancel_pb;	// Cancel
 	
 	// plugin options
-//	QVGroupBox* m_plugin_vg;
-//	QCheckBox*  m_use_plugin_cb;
-//	QLineEdit*	m_plugin_dir_le;
-//	GtkLabel*	m_plugin_dir_lb;
+	GtkFrame*	m_plugin_fr; // the plugin frame
+
+	GtkVBox* 	m_plugin_hb;
+	GtkCheckButton* m_use_plugin_cb;
+	GtkLabel*	m_plugin_dir_lb;
+	GtkEntry*	m_plugin_dir_le;
 
 	int index_in_string_array(const char* s, const char* sa[]);
 };

@@ -62,7 +62,8 @@ static const char* loglevels[] =
   { "debug", "trace", "show", "warn", "error", "fatal", 0 };
 static const char* parsers[]   = { "any", "expat", "xerces", 0 };
 static const char* val_schemes[] = {"never", "always", "auto", 0};
-/*
+
+
 gtk_settings::gtk_settings() {
   	
 	unix_preferences* m_preferences = (unix_preferences*)
@@ -71,41 +72,33 @@ gtk_settings::gtk_settings() {
 	m_dialog = GTK_DIALOG (gtk_dialog_new_with_buttons
 	("AmbulantPlayer", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL));
 
-	gtk_widget_set_uposition (GTK_WIDGET (this), 160, 120);
-*/
-/*
-	gtk_set_title (GTK_DIALOG(url_dialog)->vbox)
+	gtk_widget_set_uposition (GTK_WIDGET (m_dialog), 160, 120);
 
-	
-	GtkLabel* label = GTK_LABEL (gtk_label_new("URL to open:"));
-	gtk_label_set_justify(label,GTK_JUSTIFY_LEFT);
-	gtk_widget_show(GTK_WIDGET (label));
-	
-	m_url_text_entry = GTK_ENTRY (gtk_entry_new());
-	gtk_entry_set_editable(m_url_text_entry, true);
-	gtk_entry_set_text(m_url_text_entry,"http://www");
-	gtk_widget_show(GTK_WIDGET (m_url_text_entry));
-	
-	gtk_container_add(GTK_CONTAINER(), GTK_WIDGET (label));
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(url_dialog)->vbox), GTK_WIDGET (m_url_text_entry));
-*/
+	// Settings frame
+	m_settings_fr = GTK_FRAME (gtk_frame_new("Settings"));
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(m_dialog)->vbox), GTK_WIDGET (m_settings_fr));
+	gtk_widget_show(GTK_WIDGET (m_settings_fr));
 
+	// VBox to include loglevel, XML parsers...
+	GtkVBox *m_settings_vb = GTK_VBOX (gtk_vbox_new(false, 0));
 
-//m_finish_hb->setSpacing(50);
-
-
-	//m_settings_vg = new QVGroupBox("Settings", 0);
-	//m_settings_vg->move(160,120);
-	
 	// This part takes care of the loglevel
-	/**m_loglevel_hb	= new QHBox(m_settings_vg);
-	m_loglevel_lb	= new QLabel(gettext("Log level:"), m_loglevel_hb);
-	m_loglevel_co	= new QComboBox("QComboBox1", m_loglevel_hb);
-	m_loglevel_co->insertStrList(loglevels);
-	m_loglevel_co->setCurrentItem(m_preferences->m_log_level);
+	m_loglevel_hb	= GTK_HBOX (gtk_hbox_new(false,0));
+	m_loglevel_lb	= GTK_LABEL (gtk_label_new("Log level:"));
+	gtk_widget_show(GTK_WIDGET (m_loglevel_lb));
+	m_loglevel_co	= GTK_COMBO_BOX (gtk_combo_box_new());
+	gtk_widget_show(GTK_WIDGET (m_loglevel_co));
+	//gtk_combo_box_append_text(m_loglevel_co, "I am in hre");
+	gtk_box_pack_start (GTK_BOX (m_loglevel_hb), GTK_WIDGET (m_loglevel_lb), FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (m_loglevel_hb), GTK_WIDGET (m_loglevel_co), FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (m_settings_vb), GTK_WIDGET (m_loglevel_hb), FALSE, FALSE, 0);
+
+	
+//	m_loglevel_co->insertStrList(loglevels);
+//	m_loglevel_co->setCurrentItem(m_preferences->m_log_level);
 
 	// This part takes care of the parser pref
-	const char* id	= m_preferences->m_parser_id.c_str();
+/**	const char* id	= m_preferences->m_parser_id.c_str();
 	int id_nr = index_in_string_array(id, parsers);
 	
 	m_parser_hb	= new QHBox(m_settings_vg);
@@ -115,6 +108,17 @@ gtk_settings::gtk_settings() {
 	//m_parser_co->setCurrentText(QString(id));
 	m_parser_co->setCurrentItem(id_nr);
 	**/
+
+
+
+	
+	m_plugin_fr = GTK_FRAME (gtk_frame_new("Plugin Options"));
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(m_dialog)->vbox), GTK_WIDGET (m_plugin_fr));
+	gtk_widget_show(GTK_WIDGET (m_plugin_fr));
+
+//m_finish_hb->setSpacing(50);
+
+	
 
 //#ifndef gtk_NO_FILEDIALOG	 /* Assume plain Qt */
 /**	m_xerces_vg	= new QVGroupBox(gettext("Xerces options:"),
@@ -162,7 +166,7 @@ gtk_settings::gtk_settings() {
 //printf("gtk_settings::settings_select m_settings_vg=0x%x\n", m_settings_vg);
 	return m_settings_vg;
 **/
-//}
+}
 
 
 
@@ -202,6 +206,11 @@ gtk_settings::settings_ok() {
 	
 	m_preferences->save_preferences();
 **/
+}
+
+GtkDialog* 
+gtk_settings::getWidget(){
+	return m_dialog;
 }
 
 int 
