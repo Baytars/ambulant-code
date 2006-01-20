@@ -43,6 +43,8 @@
 
 #define	WITH_GTK_LOGGER
 
+#define UI_FILENAME "ui_manager.xml"
+
 const char *about_text = 
 	"Ambulant SMIL 2.1 player.\n"
 	"Copyright Stichting CWI, 2003-2005.\n\n"
@@ -153,6 +155,7 @@ void gtk_C_callback_welcome(void *userdata)
 }
 
 /* Internal */
+/*
 extern "C" {
 void gtk_C_callback_file_selected(void *userdata)
 {
@@ -167,6 +170,7 @@ void gtk_C_callback_url_selected(void *userdata)
 	((gtk_gui*) userdata)->do_url_selected();
 }
 }
+*/
 extern "C" {
 void gtk_C_callback_do_player_done(void *userdata)
 {
@@ -217,6 +221,38 @@ gtk_gui::gtk_gui(const char* title,
 	m_toplevelcontainer()
 {
 
+	GError *error = NULL;
+
+	// Initialization of the Menu Bar Items
+	// There is a problem in here because the callbacks in Actions go like g_signal_connect (but, we need g_sginal_connect_swapped)
+	static GtkActionEntry entries[] = {
+	{ "FileMenu", NULL, "_File"},
+	{ "open", GTK_STOCK_OPEN, "_Open...", "<alt>F", "Open a file", NULL},
+	{ "openurl", NULL, "Open _URL...", "<alt>U", "Open a url", NULL},
+	{ "reload", GTK_STOCK_REFRESH, "_Reload...", "<alt>R", "Reload a document", NULL},
+	{ "settings", GTK_STOCK_PREFERENCES , "_Settings", "<alt>S", "Launch settings window", NULL},
+	{ "quit", GTK_STOCK_QUIT, "_Quit", "<alt>Q", "Quit ambulant", NULL},	
+	// Play Menu
+	{ "PlayMenu", "<alt>Y", "Pla_y"},
+	{ "play", GTK_STOCK_MEDIA_PLAY, "Pla_y", "<alt>Y", "Play document", NULL},
+	{ "pause", GTK_STOCK_MEDIA_PAUSE, "_Pause", "<alt>P", "Pause document", G_CALLBACK (gtk_C_callback_pause)},
+	{ "stop", GTK_STOCK_MEDIA_STOP, "_Stop", "<alt>S", "Stop document", NULL},
+	// View Menu
+	{ "ViewMenu", "<alt>V", "_View"},
+	{ "fullscreen", NULL, "_Full Screen", "<alt>F", "Full Screen", NULL},
+	{ "window", NULL, "_Window", "<alt>W", "Normal Screen", NULL},
+	{ "loadsettings", GTK_STOCK_PROPERTIES, "_Reload...", "<alt>R", "Reload a document", NULL},
+	{ "logwindow", NULL, "_Log Window...", "<alt>L", "Launch log window", NULL},
+	// Help Menu
+	{ "HelpMenu", "<alt>H", "_Help"},
+	{ "about", GTK_STOCK_ABOUT, "_About AmbulantPlayer", "<alt>A", "Information about Ambulant", NULL},
+	{ "help", GTK_STOCK_HELP, "AmbulantPlayer _Help", "<alt>H", "Help in AmbulantPlayer Webpage", NULL},
+	{ "website", NULL, "AmbulantPlayer _Website...", "<alt>W", "Open the Ambulant Webpage", NULL},
+	{ "welcome", GTK_STOCK_HOME, "_Play Welcome Document", "<alt>P", "Plays a simple SMIL file", NULL}
+	};
+
+	int n_entries = G_N_ELEMENTS(entries);
+
 	m_programfilename = title;
 #ifdef	TRY_LOCKING
 	pthread_cond_init(&m_cond_message, NULL);
@@ -228,14 +264,15 @@ gtk_gui::gtk_gui(const char* title,
 
 	m_playing = false;
 	m_pausing = false;
-
-	/*Initialization of the GUI */
+		
+	/*Initialization of the Main Window */
 	m_toplevelcontainer = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
 	gtk_window_set_title(m_toplevelcontainer, initfile);
-	gtk_signal_connect (GTK_OBJECT (m_toplevelcontainer), "delete-event",G_CALLBACK (gtk_main_quit), NULL);
+	gtk_window_set_resizable(m_toplevelcontainer, true); 	
 	gtk_widget_set_size_request(GTK_WIDGET (m_toplevelcontainer), 320, 240);
 	gtk_widget_set_uposition(GTK_WIDGET (m_toplevelcontainer), 240, 320);	
-
+	g_signal_connect_swapped (GTK_OBJECT (m_toplevelcontainer), "delete-event", G_CALLBACK (gtk_C_callback_quit), (void *) this);
+	
 	/* Initialization of the signals */
 	signal_player_done_id = g_signal_new ("signal-player-done", gtk_window_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__VOID,GTK_TYPE_NONE, 0, NULL);
 
@@ -253,15 +290,54 @@ gtk_gui::gtk_gui(const char* title,
 
 	/* VBox (m_guicontainer) to place the Menu bar in the correct place */ 
 	m_guicontainer = gtk_vbox_new(FALSE, 0);
-	gtk_widget_show(m_guicontainer);
-	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));	
+	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));
 	
-	/* Menu bar */	
+	/* The Action Group that includes the menu bar */
+	m_actions = gtk_action_group_new("Actions");
+	gtk_action_group_add_actions(m_actions, entries, n_entries, (void*)this);
+
+	/* The Gtk UI Manager */
+	GtkUIManager *ui = gtk_ui_manager_new();
+
+	if (!gtk_ui_manager_add_ui_from_file(ui, UI_FILENAME, &error))
+		g_error("Could not merge UI from %s, error was: %s\n", UI_FILENAME, error->message);
+	gtk_ui_manager_insert_action_group(ui, m_actions, 0);
+	
+	// The actual activation calls
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "open"), "activate",  G_CALLBACK (gtk_C_callback_open), (void *) this );	
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "openurl"), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "reload"), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "settings"), "activate",  G_CALLBACK (gtk_C_callback_settings_select), (void *) this );	
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "quit"), "activate",  G_CALLBACK (gtk_C_callback_quit), (void*)this);		
+
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "play"), "activate",  G_CALLBACK (gtk_C_callback_play), (void*)this);
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "pause"), "activate",  G_CALLBACK (gtk_C_callback_pause), (void *) this );	
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "stop"), "activate",  G_CALLBACK (gtk_C_callback_stop), (void*)this);
+
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "fullscreen"), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "window"), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "loadsettings"), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "reload"), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
+
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "about"), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "help"), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "website"), "activate",  G_CALLBACK (gtk_C_callback_homepage), (void*)this);		
+	g_signal_connect_swapped (gtk_action_group_get_action (m_actions, "welcome"), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);		
+
+	
+	/* Creation of the Menubar and Menu Items */
+	GtkWidget *menubar = gtk_ui_manager_get_widget (ui, "/MenuBar");
+	gtk_box_pack_start (GTK_BOX (m_guicontainer), menubar, FALSE, FALSE, 0);
+	gtk_widget_show_all(GTK_WIDGET (m_toplevelcontainer));
+	
+	/* Old Menu bar */	
+/*
 	m_menubar = (GtkMenuBar*)gtk_menu_bar_new();
 	gtk_widget_show ((GtkWidget*)m_menubar);
-	gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);	
-
-	/* File */
+	//gtk_box_pack_start(GTK_BOX (m_guicontainer), GTK_WIDGET (m_menubar), FALSE, FALSE, 0);	
+*/
+	/* Old File  Menu*/
+/*
 	m_filemenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_File");
 	gtk_widget_show ((GtkWidget*)m_filemenu);
 	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_filemenu));
@@ -272,128 +348,7 @@ gtk_gui::gtk_gui(const char* title,
 	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_open);
 	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_open));
 	g_signal_connect_swapped (GTK_OBJECT (m_filemenu_submenu_open), "activate",  G_CALLBACK (gtk_C_callback_open), (void *) this );	
-
-	GtkWidget* m_filemenu_submenu_openurl = gtk_menu_item_new_with_label("Open URL...");
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_openurl);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_openurl));
-	g_signal_connect_swapped (GTK_OBJECT (m_filemenu_submenu_openurl), "activate",  G_CALLBACK (gtk_C_callback_open_url), (void*)this);		
-
-	GtkWidget* m_filemenu_submenu_reload = gtk_menu_item_new_with_label("Reload...");
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_reload);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_reload));
-	g_signal_connect_swapped (GTK_OBJECT (m_filemenu_submenu_reload), "activate",  G_CALLBACK (gtk_C_callback_reload), (void*)this);		
-
-	GtkWidget*  m_filemenu_submenu_separator1 = gtk_separator_menu_item_new();
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator1);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator1));
-
-	GtkWidget* m_filemenu_submenu_settings = gtk_menu_item_new_with_label("Settings");
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_settings);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_settings));
-	g_signal_connect_swapped (GTK_OBJECT (m_filemenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_settings_select), (void*)this);		
-
-	GtkWidget*  m_filemenu_submenu_separator2 = gtk_separator_menu_item_new();
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_separator2);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_separator2));
-
-
-	GtkWidget* m_filemenu_submenu_quit = gtk_menu_item_new_with_label("Quit");
-	gtk_widget_show ((GtkWidget*)m_filemenu_submenu_quit);
-	gtk_container_add(GTK_CONTAINER (m_filemenu_submenu), GTK_WIDGET (m_filemenu_submenu_quit));
-	g_signal_connect_swapped (GTK_OBJECT (m_filemenu_submenu_quit), "activate",  G_CALLBACK (gtk_C_callback_quit), (void*)this);
-
-	/* Play */
-	m_playmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Play");
-	gtk_widget_show ((GtkWidget*)m_playmenu);
-	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_playmenu));
-	GtkWidget* m_playmenu_submenu = gtk_menu_new();
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_playmenu), m_playmenu_submenu);
-		
-	m_playmenu_submenu_play = gtk_menu_item_new_with_label("Play");
-	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_play);
-	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_play));
-	g_signal_connect_swapped (GTK_OBJECT (m_playmenu_submenu_play), "activate",  G_CALLBACK (gtk_C_callback_play), (void*)this);
-	
-	m_playmenu_submenu_pause = gtk_menu_item_new_with_label("Pause");
-	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_pause);
-	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_pause));
-	g_signal_connect_swapped (GTK_OBJECT (m_playmenu_submenu_pause), "activate",  G_CALLBACK (gtk_C_callback_pause), (void*)this);
-		
-	GtkWidget* m_playmenu_submenu_stop = gtk_menu_item_new_with_label("Stop");
-	gtk_widget_show ((GtkWidget*)m_playmenu_submenu_stop);
-	gtk_container_add(GTK_CONTAINER (m_playmenu_submenu), GTK_WIDGET (m_playmenu_submenu_stop));
-	g_signal_connect_swapped (GTK_OBJECT (m_playmenu_submenu_stop), "activate",  G_CALLBACK (gtk_C_callback_stop), (void*)this);
-
-	/* View */
-	m_viewmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_View");
-	gtk_widget_show ((GtkWidget*)m_viewmenu);
-	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_viewmenu));
-	GtkWidget* m_viewmenu_submenu = gtk_menu_new();
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_viewmenu), m_viewmenu_submenu);
-		
-	GtkWidget* m_viewmenu_submenu_fullscreen = gtk_menu_item_new_with_label("Full Screen");
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_fullscreen);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_fullscreen));
-	g_signal_connect_swapped (GTK_OBJECT (m_viewmenu_submenu_fullscreen), "activate",  G_CALLBACK (gtk_C_callback_full_screen), (void*)this);
-
-	GtkWidget* m_viewmenu_submenu_window = gtk_menu_item_new_with_label("Window");
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_window);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_window));
-	g_signal_connect_swapped (GTK_OBJECT (m_viewmenu_submenu_window), "activate",  G_CALLBACK (gtk_C_callback_normal_screen), (void*)this);
-	
-	GtkWidget*  m_viewmenu_submenu_separator1 = gtk_separator_menu_item_new();
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator1);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator1));
-		
-	GtkWidget* m_viewmenu_submenu_settings = gtk_menu_item_new_with_label("Load Settings...");
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_settings);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_settings));
-	g_signal_connect_swapped (GTK_OBJECT (m_viewmenu_submenu_settings), "activate",  G_CALLBACK (gtk_C_callback_load_settings), (void*)this);
-
-#ifdef	WITH_GTK_LOGGER
-	GtkWidget*  m_viewmenu_submenu_separator2 = gtk_separator_menu_item_new();
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_separator2);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_separator2));
-
-	GtkWidget* m_viewmenu_submenu_log = gtk_menu_item_new_with_label("Log Window...");
-	gtk_widget_show ((GtkWidget*)m_viewmenu_submenu_log);
-	gtk_container_add(GTK_CONTAINER (m_viewmenu_submenu), GTK_WIDGET (m_viewmenu_submenu_log));
-	g_signal_connect_swapped (GTK_OBJECT (m_viewmenu_submenu_log), "activate",  G_CALLBACK (gtk_C_callback_logger_window), (void*)this);
-#endif /*WITH_GTK_LOGGER*/
-
-	/* Help */
-	m_helpmenu = (GtkMenuItem*)gtk_menu_item_new_with_mnemonic("_Help");
-	gtk_widget_show ((GtkWidget*)m_helpmenu);
-	gtk_container_add(GTK_CONTAINER (m_menubar), GTK_WIDGET (m_helpmenu));
-	GtkWidget* m_helpmenu_submenu = gtk_menu_new();
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM (m_helpmenu), m_helpmenu_submenu);
-
-	GtkWidget* m_helpmenu_submenu_about = gtk_menu_item_new_with_label("About AmbulantPlayer");
-	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_about);
-	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_about));
-	g_signal_connect_swapped (GTK_OBJECT (m_helpmenu_submenu_about), "activate",  G_CALLBACK (gtk_C_callback_about), (void*)this);
-	
-	GtkWidget* m_helpmenu_submenu_help = gtk_menu_item_new_with_label("AmbulantPlayer Help");
-	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_help);
-	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_help));
-	g_signal_connect_swapped (GTK_OBJECT (m_helpmenu_submenu_help), "activate",  G_CALLBACK (gtk_C_callback_help), (void*)this);	
-
-	GtkWidget*  m_helpmenu_submenu_separator1 = gtk_separator_menu_item_new();
-	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_separator1);
-	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_separator1));
-		
-	GtkWidget* m_helpmenu_submenu_website = gtk_menu_item_new_with_label("AmbulantPlayer Website...");
-	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_website);
-	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_website));
-	g_signal_connect_swapped (GTK_OBJECT (m_helpmenu_submenu_website), "activate",  G_CALLBACK (gtk_C_callback_homepage), (void*)this);
-
-	GtkWidget* m_helpmenu_submenu_welcome = gtk_menu_item_new_with_label("Play Welcome Document");
-	gtk_widget_show ((GtkWidget*)m_helpmenu_submenu_welcome);
-	gtk_container_add(GTK_CONTAINER (m_helpmenu_submenu), GTK_WIDGET (m_helpmenu_submenu_welcome));
-	g_signal_connect_swapped (GTK_OBJECT (m_helpmenu_submenu_welcome), "activate",  G_CALLBACK (gtk_C_callback_welcome), (void*)this);
-	
-	gtk_widget_show(GTK_WIDGET (m_toplevelcontainer));
-
+*/
 	m_o_x = 0;
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
 	m_o_y = 27;
@@ -433,10 +388,11 @@ gtk_gui::~gtk_gui() {
 	//setCaption(QString::null);
 	gtk_widget_destroy(GTK_WIDGET (m_file_chooser));
 	gtk_widget_destroy(GTK_WIDGET (m_settings_chooser));
-	gtk_widget_destroy(GTK_WIDGET (m_filemenu));
-	gtk_widget_destroy(GTK_WIDGET (m_playmenu));
-	gtk_widget_destroy(GTK_WIDGET (m_viewmenu));
-	gtk_widget_destroy(GTK_WIDGET (m_menubar));
+	DELETE(m_actions);
+//	gtk_widget_destroy(GTK_WIDGET (m_filemenu));
+//	gtk_widget_destroy(GTK_WIDGET (m_playmenu));
+//	gtk_widget_destroy(GTK_WIDGET (m_viewmenu));
+//	gtk_widget_destroy(GTK_WIDGET (m_menubar));
 	//DELETE(m_mainloop)
 	m_mainloop->release();
 	m_smilfilename = (char*) NULL;
@@ -720,12 +676,16 @@ void gtk_gui::do_url_selected() {
 	}
 }
 
+
+
+
+
 void 
 gtk_gui::do_player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_player_done");
 	if (m_mainloop == NULL){
-		gtk_widget_set_sensitive (m_playmenu_submenu_pause, false);
-		gtk_widget_set_sensitive (m_playmenu_submenu_play, true);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), false);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), true);
 		m_playing = false;
 	}else if ((m_mainloop->player_done())) {
 
@@ -768,14 +728,14 @@ gtk_gui::do_play() {
 	}
 	if (!m_playing) {
 		m_playing = true;
-		gtk_widget_set_sensitive (m_playmenu_submenu_play, false);
-		gtk_widget_set_sensitive (m_playmenu_submenu_pause, true);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), false);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), true);
 		m_mainloop->play();
 	}
 	if (m_pausing) {
 		m_pausing = false;
-		gtk_widget_set_sensitive (m_playmenu_submenu_pause, true);
-		gtk_widget_set_sensitive (m_playmenu_submenu_play, false);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), true);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), false);
 		m_mainloop->set_speed(1);
 	}
 }
@@ -785,8 +745,8 @@ gtk_gui::do_pause() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_pause");
 	if (! m_pausing) {
 		m_pausing = true;
-		gtk_widget_set_sensitive (m_playmenu_submenu_pause, false);
-		gtk_widget_set_sensitive (m_playmenu_submenu_play, true);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), false);
+		gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), true);
 		m_mainloop->set_speed(0);
 	}
 }
@@ -806,8 +766,8 @@ gtk_gui::do_stop() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "do_stop");
 	if(m_mainloop)
 		m_mainloop->stop();
-	gtk_widget_set_sensitive (m_playmenu_submenu_pause, false);
-	gtk_widget_set_sensitive (m_playmenu_submenu_play, true);
+	gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "pause"), false);
+	gtk_action_set_sensitive(gtk_action_group_get_action (m_actions, "play"), true);
 	m_playing = false;
 }
 
