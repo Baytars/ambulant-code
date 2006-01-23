@@ -368,6 +368,7 @@ gtk_gui::gtk_gui(const char* title,
 	/* A canvas with fixed layout should be the document_container */ 
 	m_documentcontainer = gtk_fixed_new();
 	gtk_widget_show(m_documentcontainer);
+	printf("%d\n",m_documentcontainer);
  	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
 
 	GtkWidget* image1 = gtk_image_new_from_file("/ufs/garcia/src/docs/sen5/euroitv/paper_concepts.png");
@@ -579,7 +580,7 @@ gtk_gui::do_open(){
 void gtk_gui::do_file_selected() {
 	const gchar *smilfilename  = gtk_file_chooser_get_filename (m_file_chooser);
 	if (openSMILfile(smilfilename, 0)){
-		//do_play();
+		do_play();
 	}
 }
 
