@@ -32,6 +32,8 @@
 #include "ambulant/gui/gtk/gtk_text_renderer.h"
 #include "ambulant/gui/gtk/gtk_video_renderer.h"
 
+
+
 using namespace ambulant;
 using namespace gui::gtk;
 using namespace net;
@@ -49,6 +51,8 @@ gtk_renderer_factory::gtk_renderer_factory(common::factories *factory)
 gtk_window_factory::gtk_window_factory( GtkWidget* parent_widget, int x, int y)
 :	m_parent_widget(parent_widget), m_p(lib::point(x,y)) 
 {
+	printf("%d\n",parent_widget);
+	printf("%d\n",m_parent_widget);
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory (0x%x)", (void*) this);
 }	
   
@@ -297,12 +301,10 @@ ambulant_gtk_window::need_events(bool want)
 gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 	lib::rect* bounds,
 	GtkWidget* parent_widget)
-/**
-:	QWidget(parent_widget,"gtk_ambulant_widget",0),
+:	//GtkWidget(GTK_TYPE_WIDGET, "parent", parent_widget, "name", "gtk_ambulant_widget",0),
 	m_gtk_window(NULL)
-**/
 {
-/**
+	//this = gtk_widget_new(GTK_TYPE_WIDGET, "parent", parent_widget, "name", "gtk_ambulant_widget",0);
 	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::gtk_ambulant_widget(0x%x-0x%x(%d,%d,%d,%d))",
 		(void *)this,
 		(void*)  parent_widget,
@@ -310,7 +312,7 @@ gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 		bounds->top(),
 		bounds->right(),
 		bounds->bottom());
-	setGeometry(bounds->left(), bounds->top(), bounds->right(), bounds->bottom());**/
+//	setGeometry(bounds->left(), bounds->top(), bounds->right(), bounds->bottom());
 //#ifndef QT_NO_FILEDIALOG	/* Assume plain Q */
 //	setMouseTracking(true); // enable mouseMoveEvent() to be called
 //#endif/*QT_NO_FILEDIALOG*/
@@ -395,8 +397,9 @@ gtk_renderer_factory::new_playable(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *const evp) {
-/**
+	lib::event_processor *const evp) 
+{
+/*
 	lib::xml_string tag = node->get_qname().second;
 	common::playable* rv;
 	if (tag == "img") {
@@ -410,25 +413,24 @@ gtk_renderer_factory::new_playable(
 		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_fill_renderer 0x%x", 
 			(void*) node, (void*) rv);
 	} else if ( tag == "text") {
-#ifdef	WITH_QT_HTML_WIDGET
+#ifdef	WITH_GTK_HTML_WIDGET
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "text/html") {
 			rv = new gtk_html_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_html_renderer 0x%x", (void*) node, (void*) rv);
-		} else {**/
-//#endif/*WITH_QT_HTML_WIDGET*/
-/**		rv = new gtk_text_renderer(context, cookie, node,
-						 evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
-			(void*) node, (void*) rv);
-#ifdef	WITH_QT_HTML_WIDGET**/
+		} else {
+#endif */ /*WITH_GTK_HTML_WIDGET*/
+//		rv = new gtk_text_renderer(context, cookie, node,
+//						 evp, m_factory);
+//		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
+//			(void*) node, (void*) rv);
+//#ifdef	WITH_GTK_HTML_WIDGET**/
 //		}
 //#endif/*WITH_QT_HTML_WIDGET*/
-/**	} else {
-		return NULL;
-	}
-    return rv;
-**/
+//	} else {
+//		return NULL;
+//	}
+//  return rv;
 }
 
 common::playable *
@@ -447,12 +449,12 @@ gtk_window_factory::new_window (const std::string &name,
 			       lib::size bounds,
 			       common::gui_events *region)
 {
-//	lib::rect* r = new lib::rect(m_p, bounds);
-//	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window (0x%x): name=%s %d,%d,%d,%d",
-//		(void*) this, name.c_str(), r->left(),r->top(),r->right(),r->bottom());
- //	ambulant_gtk_window * aqw = new ambulant_gtk_window(name, r, region);
-//	gtk_ambulant_widget * qaw = new gtk_ambulant_widget(name, r, m_parent_widget);
-//#ifndef	QT_NO_FILEDIALOG     /* Assume plain Q */
+	lib::rect* r = new lib::rect(m_p, bounds);
+	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window (0x%x): name=%s %d,%d,%d,%d",
+		(void*) this, name.c_str(), r->left(),r->top(),r->right(),r->bottom());
+	ambulant_gtk_window * aqw = new ambulant_gtk_window(name, r, region);
+	gtk_ambulant_widget * qaw = new gtk_ambulant_widget(name, r, m_parent_widget);
+//#ifndef	GTK_NO_FILEDIALOG     /* Assume plain Q */
 //	qaw->setBackgroundMode(Qt::NoBackground);
 //	if (qApp == NULL || qApp->mainWidget() == NULL) {
 //		lib::logger::get_logger()->error("gtk_window_factory::new_window (0x%x) %s",
