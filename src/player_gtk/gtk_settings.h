@@ -65,8 +65,7 @@ private:
  	GtkComboBox*	m_validation_co;// Enable XML validation:
 		
 	// Using Schema / Using DTD
-	GtkHButtonBox* 	m_validation_fr; //placeholder of the buttons
-	//GtkRadioButton*
+	GtkHButtonBox*  m_schema_dtd_hb; // Placeholder of the radio buttons
 	GtkRadioButton* m_schema_rb;	// Using Schema
 	bool		m_schema_val;
 	GtkRadioButton*	m_dtd_rb;	// Using DTD
@@ -80,12 +79,12 @@ private:
 //	GtkButton*	m_cancel_pb;	// Cancel
 	
 	// plugin options
-	GtkFrame*	m_plugin_fr; // the plugin frame
+	GtkFrame*	m_plugins_fr; // the plugin frame
 
-	GtkVBox* 	m_plugin_hb;
-	GtkCheckButton* m_use_plugin_cb;
-	GtkLabel*	m_plugin_dir_lb;
-	GtkEntry*	m_plugin_dir_le;
+	GtkVBox* 	m_plugins_hb;
+	GtkCheckButton* m_use_plugins_cb;
+	GtkLabel*	m_plugins_dir_lb;
+	GtkEntry*	m_plugins_dir_te;
 
 	int index_in_string_array(const char* s, const char* sa[]);
 };
