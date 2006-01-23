@@ -649,7 +649,7 @@ gtk_gui::do_open_url() {
 	("AmbulantPlayer", NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, NULL));
 	
 	GtkLabel* label = GTK_LABEL (gtk_label_new("URL to open:"));
-	gtk_label_set_justify(label,GTK_JUSTIFY_LEFT);
+		gtk_misc_set_alignment (GTK_MISC (label), 0, 0);
 	gtk_widget_show(GTK_WIDGET (label));
 	
 	m_url_text_entry = GTK_ENTRY (gtk_entry_new());
