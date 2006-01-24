@@ -21,9 +21,9 @@
  * @$Id$
  */
 
-#include "ambulant/gui/qt/qt_includes.h"
-#include "ambulant/gui/qt/qt_image_renderer.h"
-#include "ambulant/gui/qt/qt_transition.h"
+#include "ambulant/gui/gtk/gtk_includes.h"
+#include "ambulant/gui/gtk/gtk_image_renderer.h"
+#include "ambulant/gui/gtk/gtk_transition.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/smil_alignment.h"
 
@@ -35,22 +35,23 @@
 using namespace ambulant;
 using namespace common;
 using namespace lib;
-using namespace gui::qt;
+using namespace gui::gtk;
 
-qt_image_renderer::~qt_image_renderer() {
+gtk_image_renderer::~gtk_image_renderer() {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("qt_image_renderer::~qt_image_renderer(0x%x)", this);
+	AM_DBG lib::logger::get_logger()->debug("gtk_image_renderer::~gtk_image_renderer(0x%x)", this);
 	m_lock.leave();
 }
 	
 
 void
-qt_image_renderer::redraw_body(const rect &dirty,
+gtk_image_renderer::redraw_body(const rect &dirty,
 				      gui_window* w) {
+/*
 	m_lock.enter();
 	const point             p = m_dest->get_global_topleft();
 	const rect &r = m_dest->get_rect();
-	AM_DBG logger::get_logger()->debug("qt_image_renderer.redraw_body(0x%x): m_image=0x%x, ltrb=(%d,%d,%d,%d), p=(%d,%d)", (void *)this, &m_image,r.left(), r.top(), r.right(), r.bottom(),p.x,p.y);
+	AM_DBG logger::get_logger()->debug("gtk_image_renderer.redraw_body(0x%x): m_image=0x%x, ltrb=(%d,%d,%d,%d), p=(%d,%d)", (void *)this, &m_image,r.left(), r.top(), r.right(), r.bottom(),p.x,p.y);
 	if (m_data && !m_image_loaded) {
 		m_image_loaded = m_image.loadFromData((const uchar*)m_data, m_data_size);
 	}
@@ -61,8 +62,8 @@ qt_image_renderer::redraw_body(const rect &dirty,
 	}
 // XXXX WRONG! This is the info for the region, not for the node!
 	const common::region_info *info = m_dest->get_info();
-	AM_DBG logger::get_logger()->debug("qt_image_renderer.redraw_body: info=0x%x",info);
-	ambulant_qt_window* aqw = (ambulant_qt_window*) w;
+	AM_DBG logger::get_logger()->debug("gtk_image_renderer.redraw_body: info=0x%x",info);
+	ambulant_gtk_window* aqw = (ambulant_gtk_window*) w;
 
 	QPainter paint;
 	paint.begin(aqw->get_ambulant_pixmap());
@@ -75,7 +76,7 @@ qt_image_renderer::redraw_body(const rect &dirty,
 	// convoluted, it knows that the node and the region we're painting to are
 	// really the same node.
 	if (m_node->get_attribute("backgroundImage") && m_dest->is_tiled()) {
-		AM_DBG lib::logger::get_logger()->debug("qt_image_renderer.redraw: drawing tiled image");
+		AM_DBG lib::logger::get_logger()->debug("gtk_image_renderer.redraw: drawing tiled image");
 		dstrect = m_dest->get_rect();
 		dstrect.translate(m_dest->get_global_topleft());
 		common::tile_positions tiles = m_dest->get_tiles(srcsize, dstrect);
@@ -91,7 +92,7 @@ qt_image_renderer::redraw_body(const rect &dirty,
 				D_T = dstrect.top(),
 				D_W = dstrect.width(),
 				D_H = dstrect.height();
-			AM_DBG lib::logger::get_logger()->debug("qt_image_renderer.redraw_body(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d) from (L=%d,T=%d,W=%d,H=%d)",(void *)this,D_L,D_T,D_W,D_H,S_L,S_T,S_W,S_H);
+			AM_DBG lib::logger::get_logger()->debug("gtk_image_renderer.redraw_body(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d) from (L=%d,T=%d,W=%d,H=%d)",(void *)this,D_L,D_T,D_W,D_H,S_L,S_T,S_W,S_H);
 			paint.drawImage(D_L,D_T, m_image, S_L,S_T, S_W,S_H);
 	
 		}
@@ -118,21 +119,21 @@ qt_image_renderer::redraw_body(const rect &dirty,
 		D_T = dstrect.top(),
 		D_W = dstrect.width(),
 		D_H = dstrect.height();
-	AM_DBG lib::logger::get_logger()->debug("qt_image_renderer.redraw_body(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d) from (L=%d,T=%d,W=%d,H=%d)",(void *)this,D_L,D_T,D_W,D_H,S_L,S_T,S_W,S_H);
+	AM_DBG lib::logger::get_logger()->debug("gtk_image_renderer.redraw_body(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d) from (L=%d,T=%d,W=%d,H=%d)",(void *)this,D_L,D_T,D_W,D_H,S_L,S_T,S_W,S_H);
 	float	fact_W = (float)D_W/(float)S_W,
 		fact_H = (float)D_H/(float)S_H;
 	int	N_L = (int)(S_L*fact_W),
 		N_T = (int)(S_T*fact_H),
 		N_W = (int)(O_W*fact_W),
 		N_H = (int)(O_H*fact_H);
-	AM_DBG lib::logger::get_logger()->debug("qt_image_renderer.redraw_body(0x%x): orig=(%d, %d) scalex=%f, scaley=%f  intermediate (L=%d,T=%d,W=%d,H=%d)",(void *)this,O_W,O_H,fact_W,fact_H,N_L,N_T,N_W,N_H);
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-	QImage scaledimage = m_image.smoothScale(N_W, N_H, QImage::ScaleFree);
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-	QImage scaledimage = m_image.smoothScale(N_W, N_H);
-#endif/*QT_NO_FILEDIALOG*/
-	paint.drawImage(D_L, D_T, scaledimage, N_L, N_T, D_W,D_H);
-	paint.flush();
-	paint.end();
-	m_lock.leave();
+	AM_DBG lib::logger::get_logger()->debug("gtk_image_renderer.redraw_body(0x%x): orig=(%d, %d) scalex=%f, scaley=%f  intermediate (L=%d,T=%d,W=%d,H=%d)",(void *)this,O_W,O_H,fact_W,fact_H,N_L,N_T,N_W,N_H);
+#ifndef QT_NO_FILEDIALOG*/	/* Assume plain Qt */
+//	QImage scaledimage = m_image.smoothScale(N_W, N_H, QImage::ScaleFree);
+//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+//	QImage scaledimage = m_image.smoothScale(N_W, N_H);
+//#endif/*QT_NO_FILEDIALOG*/
+//	paint.drawImage(D_L, D_T, scaledimage, N_L, N_T, D_W,D_H);
+//	paint.flush();
+//	paint.end();
+//	m_lock.leave();
 }
