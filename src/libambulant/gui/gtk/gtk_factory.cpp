@@ -96,41 +96,40 @@ ambulant_gtk_window::~ambulant_gtk_window()
 }
 	
 void
-ambulant_gtk_window::set_ambulant_widget(gtk_ambulant_widget* qaw)
+ambulant_gtk_window::set_ambulant_widget(gtk_ambulant_widget* gtkaw)
 {
-/**
-	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_widget(0x%x)",(void *)qaw);
+
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_widget(0x%x)",(void *)gtkaw);
 	// Don't destroy!
 	//if (m_ambulant_widget != NULL)
 	//	delete m_ambulant_widget;
-	m_ambulant_widget = qaw;
+	m_ambulant_widget = gtkaw;
 
-	if (qaw != NULL) {
-		QSize size = qaw->frameSize();
-		m_pixmap = new QPixmap(size.width(), size.height());
-		QPainter paint(m_pixmap);
-		QColor bgc = QColor(255,255,255); // white color
-		// in debugging mode, initialize with purple background
-		AM_DBG bgc = QColor(255,  0,255); // purple color
-		
-		paint.setBrush(bgc);
-		paint.drawRect(0,0,size.width(),size.height());
-		paint.flush();
-		paint.end();
-	} 
-**/
+	if (gtkaw != NULL) {
+//		QPainter paint(m_pixmap);
+//		QColor bgc = QColor(255,255,255); // white color
+//		// in debugging mode, initialize with purple background
+//		AM_DBG bgc = QColor(255,  0,255); // purple color
+//		
+//		paint.setBrush(bgc);
+//		paint.drawRect(0,0,size.width(),size.height());
+//		paint.flush();
+//		paint.end();
+	}
 }
 
-GtkPixmap* 
+GdkPixmap* 
 ambulant_gtk_window::get_ambulant_pixmap()
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::ambulant_pixmap(0x%x) = 0x%x",(void *)this,(void *)m_pixmap);
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::ambulant_pixmap(0x%x) = 0x%x",(void *)this,(void *)m_pixmap);
 	return m_pixmap;
 }
 
-GtkPixmap*
+GdkPixmap*
 ambulant_gtk_window::get_pixmap_from_screen(const lib::rect &r)
 {
+	
+
 //	QPixmap *rv = new QPixmap(r.width(), r.height());
 //	bitBlt(rv, 0, 0, m_pixmap, r.left(), r.top(), r.width(), r.height());
 //	return rv;
@@ -145,7 +144,7 @@ ambulant_gtk_window::get_ambulant_widget()
 	return m_ambulant_widget;
 }
 
-GtkPixmap*
+GdkPixmap*
 ambulant_gtk_window::new_ambulant_surface()
 {
 /**
@@ -158,14 +157,14 @@ ambulant_gtk_window::new_ambulant_surface()
 **/
 }
 
-GtkPixmap*
+GdkPixmap*
 ambulant_gtk_window::get_ambulant_surface()
 {
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::get_ambulant_surface(0x%x) = 0x%x",(void *)this,(void *)m_surface);
         return m_surface;
 }
 
-GtkPixmap*
+GdkPixmap*
 ambulant_gtk_window::get_ambulant_oldpixmap()
 {
 //	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::get_ambulant_oldpixmap(0x%x) = 0x%x",(void *)this,(void *)m_oldpixmap);
@@ -184,7 +183,7 @@ ambulant_gtk_window::reset_ambulant_surface(void)
 }
 
 void
-ambulant_gtk_window::set_ambulant_surface(GtkPixmap* surf)
+ambulant_gtk_window::set_ambulant_surface(GdkPixmap* surf)
 {
 //	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_surface(0x%x) surf = 0x%x",(void *)this,(void *)surf);
 //	m_oldpixmap = m_pixmap;
@@ -232,7 +231,7 @@ ambulant_gtk_window::mouse_region_changed()
 
 /* test if there is something new to see */
 static GtkImage* oldImageP;
-static bool isEqualToPrevious(GtkPixmap* qpmP) {
+static bool isEqualToPrevious(GdkPixmap* qpmP) {
 	return false;
 	//QImage img = qpmP->convertToImage();
 	//if (oldImageP != NULL && img == *oldImageP) {
@@ -249,7 +248,7 @@ static bool isEqualToPrevious(GtkPixmap* qpmP) {
 // doesn't compile on Zaurus
 /**/
 /* dumpPixmap on file */
-void gui::gtk::dumpPixmap(QPixmap* qpm, std::string filename) {
+void gui::gtk::dumpPixmap(GdkPixmap* qpm, std::string filename) {
 /*	if ( ! qpm) return;
 	QImage img = qpm->convertToImage();
 	if ( ! isEqualToPrevious(qpm)) {

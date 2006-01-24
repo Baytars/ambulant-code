@@ -19,10 +19,10 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "ambulant/gui/qt/qt_factory.h"
-#include "ambulant/gui/qt/qt_includes.h"
-#include "ambulant/gui/qt/qt_renderer.h"
-#include "ambulant/gui/qt/qt_video_renderer.h"
+#include "ambulant/gui/gtk/gtk_factory.h"
+#include "ambulant/gui/gtk/gtk_includes.h"
+#include "ambulant/gui/gtk/gtk_renderer.h"
+#include "ambulant/gui/gtk/gtk_video_renderer.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/factory.h"
 #include <stdlib.h>
@@ -34,11 +34,11 @@
 #endif
 
 using namespace ambulant;
-using namespace gui::qt;
+using namespace gui::gtk;
 
 
 
-qt_video_renderer::qt_video_renderer(
+gtk_video_renderer::gtk_video_renderer(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
@@ -61,21 +61,22 @@ qt_video_renderer::qt_video_renderer(
 	
 }
 
-qt_video_renderer::~qt_video_renderer()
+gtk_video_renderer::~gtk_video_renderer()
 {
 }
 
 void 
-qt_video_renderer::show_frame(const char* frame, int size)
+gtk_video_renderer::show_frame(const char* frame, int size)
 {
-	m_lock.enter();
+
+/*	m_lock.enter();
 	
-	AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame: frame=0x%x, size=%d, this=0x%x", (void*) frame, size, (void*) this);
+	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: frame=0x%x, size=%d, this=0x%x", (void*) frame, size, (void*) this);
     char* data = NULL;
 	
     data = (char*) malloc(size);
     if (data) {
-        AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame: allocated m_data=0x%x, size=%d", data, size);
+        AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: allocated m_data=0x%x, size=%d", data, size);
         
     }
 
@@ -86,20 +87,20 @@ qt_video_renderer::show_frame(const char* frame, int size)
 			if (memcpy(data, frame, size)) {
 				std::pair<int, char*> element(size, data);
 				m_frames.push(element);
-				AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame: m_data(0x%x) stored !", (void*) element.second);
+				AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: m_data(0x%x) stored !", (void*) element.second);
 			}
 		} else {
 			free(data);
 			data = NULL;
 		}
 	} else {
-		lib::logger::get_logger()->debug("qt_video_renderer.show_frame: m_data is NULL or frame is NULL!");
+		lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: m_data is NULL or frame is NULL!");
 		if (data) {
 			free(data);
 			data = NULL;
 		}			
 	}
-
+*/
 	//if (m_image) {
 	//	delete m_image;
 	//	m_image = NULL;
@@ -108,29 +109,31 @@ qt_video_renderer::show_frame(const char* frame, int size)
 	//~ if (m_data ) {
 		//~ int width = m_size.w;
 		//~ int height = m_size.h;
-		//~ AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame(0x%x): width = %d, height = %d",(void *)this, width, height);
+		//~ AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame(0x%x): width = %d, height = %d",(void *)this, width, height);
 
 		//~ m_image = new QImage((uchar*) m_data, width, height, 32, NULL, 0, QImage::IgnoreEndian);
 	//~ } else {
-		//~ AM_DBG lib::logger::get_logger()->debug("qt_video_renderer, m_data=0x%x (this=0x%x)",(void*) m_data, (void *)this);
+		//~ AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer, m_data=0x%x (this=0x%x)",(void*) m_data, (void *)this);
 	//~ }
-	if (m_dest) {
-		AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame: About to calll need_redraw, (m_dest=0x%x)", (void*) m_dest);
+/*	if (m_dest) {
+		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: About to calll need_redraw, (m_dest=0x%x)", (void*) m_dest);
 		m_dest->need_redraw();	
-		AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame: need_redraw called");
+		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: need_redraw called");
 	} else {
-		lib::logger::get_logger()->error("qt_video_renderer.show_frame: m_dest is NULL !");
+		lib::logger::get_logger()->error("gtk_video_renderer.show_frame: m_dest is NULL !");
 	}
-	AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame done");
+	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame done");
 
 	m_lock.leave();
+*/
 }
 
 
 
 void
-qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w) 
+gtk_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w) 
 {
+/*
 	char *data=NULL;
 	if (m_frames.size() > 1) {
 		std::pair<int, char*> element = m_frames.front();
@@ -142,7 +145,7 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 	
 	if (m_frames.size() > 0) {
 		//m_lock.enter();
-		AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.redraw(0x%x)",(void*) this);
+		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw(0x%x)",(void*) this);
 
 		//char* data = NULL;
 		QImage* image = NULL;
@@ -151,8 +154,8 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 	
 		// XXXX WRONG! This is the info for the region, not for the node!
 		const common::region_info *info = m_dest->get_info();
-		AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.redraw: info=0x%x", info);
-		ambulant_qt_window* aqw = (ambulant_qt_window*) w;
+		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw: info=0x%x", info);
+		ambulant_gtk_window* aqw = (ambulant_gtk_window*) w;
 		QPainter paint;
 		paint.begin(aqw->get_ambulant_pixmap());
 		// background drawing
@@ -168,7 +171,7 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		    H = dstrect_whole.height();
 		// XXXX Fill with background color
 			lib::color_t bgcolor = info->get_bgcolor();
-			AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.redraw: clearing to 0x%x", (long)bgcolor);
+			AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw: clearing to 0x%x", (long)bgcolor);
 			QColor bgc = QColor(lib::redc(bgcolor), lib::greenc(bgcolor), lib::bluec(bgcolor));
 			paint.setBrush(bgc);
 			paint.drawRect(L,T,W,H);
@@ -181,7 +184,7 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		if (m_frames.size() > 0 ) {
 			std::pair<int, char*> element = m_frames.front();
 			data = element.second;
-			AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.redraw, data(0x%x) retrieved (this=0x%x) (still %d frames)",(void*) data, (void *)this, m_frames.size());
+			AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw, data(0x%x) retrieved (this=0x%x) (still %d frames)",(void*) data, (void *)this, m_frames.size());
 		} else {
 			data = NULL;
 		}
@@ -189,10 +192,10 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		if (data ) {
 			int width = m_size.w;
 			int height = m_size.h;
-			AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.show_frame(0x%x): width = %d, height = %d",(void *)this, width, height);
+			AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame(0x%x): width = %d, height = %d",(void *)this, width, height);
 			image = new QImage((uchar*) data, width, height, 32, NULL, 0, QImage::IgnoreEndian);
 		} else {
-			AM_DBG lib::logger::get_logger()->debug("qt_video_renderer, m_data=0x%x (this=0x%x)",(void*) data, (void *)this);
+			AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer, m_data=0x%x (this=0x%x)",(void*) data, (void *)this);
 		}
 		if (image) {
 			QSize qsize = image->size();
@@ -204,11 +207,11 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		    	T = dstrect.top(),
 		    	W = dstrect.width(),
 		    	H = dstrect.height();
-			AM_DBG lib::logger::get_logger()->debug(" qt_video_renderer.redraw(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d)", (void *)this,L,T,W,H);
+			AM_DBG lib::logger::get_logger()->debug(" gtk_video_renderer.redraw(0x%x): drawImage at (L=%d,T=%d,W=%d,H=%d)", (void *)this,L,T,W,H);
 			paint.drawImage(L,T,*image,0,0,W,H);
 		} else {
-	//		AM_DBG lib::logger::get_logger()->error("qt_video_renderer.redraw(0x%x): no m_image", (void *) this);
-			AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.redraw(0x%x): no m_image", (void *) this);
+	//		AM_DBG lib::logger::get_logger()->error("gtk_video_renderer.redraw(0x%x): no m_image", (void *) this);
+			AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw(0x%x): no m_image", (void *) this);
 		}
 		paint.flush();
 		paint.end();
@@ -225,4 +228,5 @@ qt_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		//~ m_frames.pop();
 	//m_lock.leave();
 	}
+*/
 }
