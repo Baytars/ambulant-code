@@ -124,6 +124,8 @@ class gtk_gui : public GtkWidget{
 	void do_settings_select();
 	void do_stop();
 
+	void do_need_redraw();
+
 	guint signal_player_done_id;
 	guint signal_need_redraw_id;
 	guint signal_internal_message_id;

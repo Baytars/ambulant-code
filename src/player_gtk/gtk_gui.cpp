@@ -80,6 +80,8 @@ const char *helpfile_locations[] = {
 	NULL
 };
 
+static GdkPixmap *pixmap = NULL;
+
 // callbacks for C++
 /* File */
 extern "C" {
@@ -175,6 +177,10 @@ extern "C" {
 void gtk_C_callback_do_player_done(void *userdata)
 {
 	((gtk_gui*) userdata)->do_player_done();
+}
+void gtk_C_callback_do_need_redraw_simple(void *userdata)
+{
+	((gtk_gui*) userdata)->do_need_redraw();
 }
 
 void gtk_C_callback_do_need_redraw(void *userdata, void* r_call, void* w_call, void* pt_call)
@@ -366,11 +372,14 @@ gtk_gui::gtk_gui(const char* title,
 	
 
 	/* A canvas with fixed layout should be the document_container */ 
-	m_documentcontainer = gtk_fixed_new();
-	gtk_widget_show(m_documentcontainer);
-	printf("%d\n",m_documentcontainer);
- 	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
+	m_documentcontainer = gtk_drawing_area_new();
+	g_signal_connect_swapped (G_OBJECT (m_documentcontainer), "expose_event", G_CALLBACK (gtk_C_callback_do_need_redraw_simple), (void*) this);
 
+	gtk_widget_show(m_documentcontainer);
+	
+//	printf("%d\n",m_documentcontainer);
+ 	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
+	/*
 	GtkWidget* image1 = gtk_image_new_from_file("/ufs/garcia/src/docs/sen5/euroitv/paper_concepts.png");
   	gtk_widget_show (image1);
   	gtk_fixed_put (GTK_FIXED (m_documentcontainer), image1, 56, 56);
@@ -383,11 +392,64 @@ gtk_gui::gtk_gui(const char* title,
 
   	GtkWidget* label2 = gtk_label_new ("label2");
   	gtk_widget_show (label2);
-  	gtk_fixed_put (GTK_FIXED (m_documentcontainer), label2, 104, 160);
-  	gtk_widget_set_size_request (label2, 280, 112);
+*/
+	GdkColor color;
+//	color.red = 65535;
+	color.red = 255;
+	color.green = 0;
+	color.blue = 0;
 
+//	gdk_color_parse("red", &color);
+//	for (int i=0; i<5; i++)
+//		style->text[i] = color;
+	gtk_widget_modify_bg (GTK_WIDGET (m_toplevelcontainer), GTK_STATE_NORMAL, &color);
+//	gtk_fixed_put (GTK_FIXED (m_documentcontainer), label2, 104, 160);
+ // 	gtk_widget_set_size_request (label2, 280, 112);
+
+	
+/*
+	gtk_widget_queue_draw_area (m_documentcontainer,
+                              update_rect.x, update_rect.y,
+		              update_rect.width, update_rect.height);
+*/
 	// emits the signal that the player is done
 //	g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
+}
+
+void 
+gtk_gui::do_need_redraw () {
+
+//	AM_DBG printf("gtk_gui::need_redraw(0x%x)-r=(0x%x)\n", (void *)this,r?r:0);
+/*	GdkRectangle update_rect;
+	
+	update_rect.x = 50;
+	update_rect.y = 50;
+	update_rect.width = 100;
+	update_rect.height = 100;	
+	
+	if (pixmap)
+		gdk_pixmap_unref(pixmap);	
+
+  	pixmap = gdk_pixmap_new(m_documentcontainer->window,
+                          	m_documentcontainer->allocation.width,
+                          	m_documentcontainer->allocation.height,
+                          	-1);
+  	gdk_draw_rectangle (pixmap,
+                      	m_documentcontainer->style->black_gc,
+                      	TRUE,
+			update_rect.x,
+			update_rect.y,
+			update_rect.width,
+                      	update_rect.height);
+  	gdk_draw_pixmap (m_documentcontainer->window,
+			m_documentcontainer->style->fg_gc[GTK_WIDGET_STATE (m_documentcontainer)],
+			pixmap,
+			update_rect.x, update_rect.y,
+			0, 0,
+			update_rect.width,
+                      	update_rect.height);
+
+*/
 }
 
 gtk_gui::~gtk_gui() {
