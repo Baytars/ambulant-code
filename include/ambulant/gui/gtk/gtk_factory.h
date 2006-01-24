@@ -41,7 +41,7 @@ namespace gtk {
 
 /// Debug function that dumps a pixmap to a file. An incrementing
 /// count is appended to the filenname, and an extension added.
-void dumpPixmap(GtkPixmap *qpm, std::string filename);
+void dumpPixmap(GdkPixmap *qpm, std::string filename);
 
 class gtk_ambulant_widget;
 
@@ -63,13 +63,13 @@ class ambulant_gtk_window : public common::gui_window {
 	void user_event(const lib::point &where, int what=0);
 	void need_events(bool want);
 
-	GtkPixmap* get_ambulant_pixmap();
-	GtkPixmap* new_ambulant_surface();
-	GtkPixmap* get_ambulant_surface();
-	GtkPixmap* get_ambulant_oldpixmap();
-	GtkPixmap* get_pixmap_from_screen(const lib::rect &r);
+	GdkPixmap* get_ambulant_pixmap();
+	GdkPixmap* new_ambulant_surface();
+	GdkPixmap* get_ambulant_surface();
+	GdkPixmap* get_ambulant_oldpixmap();
+	GdkPixmap* get_pixmap_from_screen(const lib::rect &r);
 	void reset_ambulant_surface(void);
-	void set_ambulant_surface(GtkPixmap* surf);
+	void set_ambulant_surface(GdkPixmap* surf);
 	void delete_ambulant_surface();
 #ifdef USE_SMIL21
 	void startScreenTransition();
@@ -82,19 +82,19 @@ class ambulant_gtk_window : public common::gui_window {
 	
   private:
 	gtk_ambulant_widget* m_ambulant_widget;
-	GtkPixmap* m_pixmap;
-	GtkPixmap* m_oldpixmap;
-	GtkPixmap* m_surface;
+	GdkPixmap* m_pixmap;
+	GdkPixmap* m_oldpixmap;
+	GdkPixmap* m_surface;
 #ifdef USE_SMIL21
 	int m_fullscreen_count;
-	GtkPixmap* m_fullscreen_prev_pixmap;
-	GtkPixmap* m_fullscreen_old_pixmap;
+	GdkPixmap* m_fullscreen_prev_pixmap;
+	GdkPixmap* m_fullscreen_old_pixmap;
 	smil2::transition_engine* m_fullscreen_engine;
 	lib::transition_info::time_type m_fullscreen_now;
 #endif
 
  public:
-	GtkPixmap* m_tmppixmap;
+	GdkPixmap* m_tmppixmap;
 };  // class ambulant_gtk_window
 
 class gtk_ambulant_widget : public GtkWidget {
