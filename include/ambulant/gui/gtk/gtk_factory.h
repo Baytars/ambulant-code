@@ -41,7 +41,7 @@ namespace gtk {
 
 /// Debug function that dumps a pixmap to a file. An incrementing
 /// count is appended to the filenname, and an extension added.
-void dumpPixmap(GdkPixmap *qpm, std::string filename);
+void dumpPixmap(GdkPixmap *gtkpm, std::string filename);
 
 class gtk_ambulant_widget;
 
@@ -52,7 +52,7 @@ class ambulant_gtk_window : public common::gui_window {
 			   common::gui_events *region);
 	~ambulant_gtk_window();
 			   
-	void set_ambulant_widget(gtk_ambulant_widget* qaw);
+	void set_ambulant_widget(gtk_ambulant_widget* gtkaw);
 	gtk_ambulant_widget* get_ambulant_widget();
 
 	void need_redraw(const lib::rect &r);
@@ -104,7 +104,7 @@ class gtk_ambulant_widget : public GtkWidget {
 			   GtkWidget* parent_widget);
 	~gtk_ambulant_widget();
 	
-	void set_gtk_window( ambulant_gtk_window* aqw);
+	void set_gtk_window( ambulant_gtk_window* agtkw);
 	ambulant_gtk_window* gtk_window();
 	
 //	void paintEvent(QPaintEvent* e);
@@ -112,6 +112,7 @@ class gtk_ambulant_widget : public GtkWidget {
 
   private:
 	ambulant_gtk_window* m_gtk_window;
+	GtkWidget *m_widget;
 
 #ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
   protected:
