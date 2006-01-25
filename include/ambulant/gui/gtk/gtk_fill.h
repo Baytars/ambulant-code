@@ -87,7 +87,7 @@ class gtk_background_renderer : public common::background_renderer {
 	void redraw(const lib::rect &dirty, common::gui_window *windo);
 	void keep_as_background();
   private:
-  	GtkImage *m_background_pixmap;
+  	GdkPixmap *m_background_pixmap;
 };
 
 } // namespace gtk
