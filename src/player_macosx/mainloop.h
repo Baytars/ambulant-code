@@ -35,34 +35,21 @@
 #include "ambulant/common/embedder.h"
 #include "ambulant/net/url.h"
 
-class mainloop : public ambulant::lib::ref_counted_obj {
+class mainloop : public ambulant::common::gui_player {
   public:
 	mainloop(const char *filename, ambulant::common::window_factory *wf,
 		bool use_mms, ambulant::common::embedder *app);
 	~mainloop();
-	
-	// The callback member function.
-	void player_done_callback() {
-		m_running = false;
-	}
-	
+		
 	void play();
 	void stop();
-	void set_speed(double speed);
-	double get_speed() const { return m_speed; }
-	bool is_running() const;
-	
-	int get_cursor() const {return m_player?m_player->get_cursor():0; };
-	void set_cursor(int cursor) { if (m_player) m_player->set_cursor(cursor); }
-	
-	static void set_preferences(std::string &path);
+	void pause();
+		
+	void set_preferences(std::string &path);
 
   private:
 	ambulant::lib::document *create_document(ambulant::net::url& url);
-  	bool m_running;
-	double m_speed;
 	ambulant::lib::document *m_doc;
-	ambulant::common::player *m_player;
   	ambulant::common::factories *m_factory;
 	ambulant::common::embedder *m_embedder;
 	const ambulant::lib::node *m_goto_node;	// XXX Quick hack
