@@ -35,7 +35,6 @@ using namespace gui::gtk;
 
 gtk_fill_renderer::~gtk_fill_renderer()
 {
-/**
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("~gtk_fill_renderer(0x%x)", (void *)this);
 	m_intransition = NULL;
@@ -43,13 +42,11 @@ gtk_fill_renderer::~gtk_fill_renderer()
 	if (m_trans_engine) delete m_trans_engine;
 	m_trans_engine = NULL;
 	m_lock.leave();
-**/
 }
 	
 void
 gtk_fill_renderer::start(double where)
 {
-/**
 	m_lock.enter();
 	AM_DBG logger::get_logger()->debug("gtk_fill_renderer.start(0x%x)", (void *)this);
 	if (m_is_showing) {
@@ -68,13 +65,11 @@ gtk_fill_renderer::start(double where)
 	}
 	m_dest->show(this);
 	m_lock.leave();
-**/
 }
 
 void
 gtk_fill_renderer::start_outtransition(lib::transition_info *info)
 {
-/**
 	m_lock.enter();
 	m_outtransition = info;
 	if (m_outtransition) {
@@ -83,13 +78,11 @@ gtk_fill_renderer::start_outtransition(lib::transition_info *info)
 		//m_event_processor->add_event(ev, XXXX);
 	}
 	m_lock.leave();
-**/
 }
 
 void
 gtk_fill_renderer::stop()
 {
-/**
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("gtk_fill_renderer.stop(0x%x)", (void *)this);
 	if (!m_is_showing) {
@@ -99,7 +92,6 @@ gtk_fill_renderer::stop()
 		if (m_dest) m_dest->renderer_done(this);
 	}
 	m_lock.leave();
-**/
 }
 
 void
@@ -162,17 +154,15 @@ gtk_fill_renderer::redraw(const rect &dirty,
 void
 gtk_fill_renderer::transition_step()
 {
-//	if (m_dest) m_dest->need_redraw();
+	if (m_dest) m_dest->need_redraw();
 }
 
 void 
 gtk_fill_renderer::user_event(const point &where, int what)
 {
-/**
 	if (what == user_event_click) m_context->clicked(m_cookie, 0);
 	else if (what == user_event_mouse_over) m_context->pointed(m_cookie, 0);
 	else assert(0);
-**/
 }
 
 void
@@ -250,16 +240,15 @@ gtk_background_renderer::redraw(const lib::rect &dirty,
 void
 gtk_background_renderer::keep_as_background()
 {
-/**	AM_DBG lib::logger::get_logger()->debug("gtk_background_renderer::keep_as_background(0x%x) called", (void *)this);
+	AM_DBG lib::logger::get_logger()->debug("gtk_background_renderer::keep_as_background(0x%x) called", (void *)this);
 	const lib::rect &r = m_dst->get_rect();
-	ambulant_gtk_window* aqw = (ambulant_gtk_window*) m_dst->get_gui_window();
+	ambulant_gtk_window* agtkw = (ambulant_gtk_window*) m_dst->get_gui_window();
 	lib::rect dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
 	if (m_background_pixmap) {
 		delete m_background_pixmap;
 		m_background_pixmap = NULL;
 	}
-	m_background_pixmap = aqw->get_pixmap_from_screen(dstrect_whole);
+	m_background_pixmap = agtkw->get_pixmap_from_screen(dstrect_whole);
 //XXXX	dumpPixmap(m_background_pixmap, "/tmp/keepbg");
-**/
 }

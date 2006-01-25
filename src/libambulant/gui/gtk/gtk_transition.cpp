@@ -73,7 +73,7 @@ gtk_transition_debug::paint_rect(ambulant_gtk_window* aqw, // TMP
 // Helper functions to setup transitions
 
 static void
-setup_transition(bool outtrans, ambulant_gtk_window *aqw, GtkPixmap** oldpxmp, GtkPixmap** newpxmp)
+setup_transition(bool outtrans, ambulant_gtk_window *aqw, GdkPixmap** oldpxmp, GdkPixmap** newpxmp)
 {
 /**
 	if (outtrans) {
@@ -352,7 +352,6 @@ gtk_transition_blitclass_polylist::update()
 smil2::transition_engine *
 gtk_transition_engine(common::surface *dst, bool is_outtrans, const transition_info *info)
 {
-/**
 	smil2::transition_engine *rv;
 	AM_DBG logger::get_logger()->debug("gtk_transition_engine: info=0x%x info->m_type=%d", info, info->m_type);
 	
@@ -481,7 +480,6 @@ gtk_transition_engine(common::surface *dst, bool is_outtrans, const transition_i
 	if (rv)
 		rv->init(dst, is_outtrans, info);
 	return rv;
-**/
 }
 
 } // namespace gtk
