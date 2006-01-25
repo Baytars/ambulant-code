@@ -84,10 +84,7 @@ class pbfeedback pbfeedback;
 
 mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 	bool use_mms, ambulant::common::embedder *app)
-:   m_running(false),
-	m_speed(1.0),
-	m_doc(NULL),
-	m_player(NULL),
+:   m_doc(NULL),
 	m_factory(NULL),
 	m_embedder(app),
 	m_goto_node(NULL)
@@ -102,7 +99,7 @@ mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 #endif // NONE_PLAYER
 	net::datasource_factory *df = new net::datasource_factory();
 	lib::global_parser_factory *pf = lib::global_parser_factory::get_parser_factory();	
-	m_factory = new common::factories(rf, wf, df, pf);
+	m_factory = new common::factories(); // XXXX (rf, wf, df, pf);
 
 #ifndef NONE_PLAYER
 #ifdef WITH_LIVE	
@@ -233,8 +230,7 @@ mainloop::play()
 		ambulant::lib::logger::get_logger()->error(gettext("Cannot play document: no player"));
 		return;
 	}
-	m_running = true;
-	m_speed = 1.0;
+//	m_speed = 1.0;
 	m_player->start();
 	if (m_goto_node) {
 		bool ok = m_player->goto_node(m_goto_node);
@@ -248,32 +244,19 @@ void
 mainloop::stop()
 {
 	if (m_player) m_player->stop();
-	m_speed = 1.0;
 	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::run(): returning");
 }
 
 void
-mainloop::set_speed(double speed)
+mainloop::pause()
 {
-	m_speed = speed;
-	if (m_player) {
-		if (speed == 0.0)
-			m_player->pause();
-		else
-			m_player->resume();
-	}
+	if (m_player) m_player->pause();
+	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::pause(): returning");
 }
 
-bool
-mainloop::is_running() const
-{
-	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::is_running(0x%x)", (void*)this);
-	if (!m_running || !m_player) return false;
-	return !m_player->is_done();
-}
 
 void
-mainloop::set_preferences(std::string &url)
+mainloop::set_preferences(std::string& filename)
 {
-	ambulant::smil2::test_attrs::load_test_attrs(url);
+	ambulant::smil2::test_attrs::load_test_attrs(filename);
 }

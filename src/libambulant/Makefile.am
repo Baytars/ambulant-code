@@ -196,6 +196,7 @@ libambulant_la_SOURCES = \
 	net/databuffer.cpp \
 	net/url.cpp \
 	\
+	common/factory.cpp \
 	common/preferences.cpp \
 	common/region.cpp \
 	common/renderer_impl.cpp \
