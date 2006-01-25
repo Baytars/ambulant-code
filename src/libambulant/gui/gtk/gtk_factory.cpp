@@ -33,7 +33,6 @@
 #include "ambulant/gui/gtk/gtk_video_renderer.h"
 
 
-
 using namespace ambulant;
 using namespace gui::gtk;
 using namespace net;
@@ -104,17 +103,37 @@ ambulant_gtk_window::set_ambulant_widget(gtk_ambulant_widget* gtkaw)
 	//if (m_ambulant_widget != NULL)
 	//	delete m_ambulant_widget;
 	m_ambulant_widget = gtkaw;
-
+	GdkColor color;
+	GdkColormap *cmap = gdk_colormap_get_system();
+	GdkPixmap *pixmap = NULL;
+	
 	if (gtkaw != NULL) {
-//		QPainter paint(m_pixmap);
-//		QColor bgc = QColor(255,255,255); // white color
-//		// in debugging mode, initialize with purple background
-//		AM_DBG bgc = QColor(255,  0,255); // purple color
-//		
-//		paint.setBrush(bgc);
-//		paint.drawRect(0,0,size.width(),size.height());
-//		paint.flush();
-//		paint.end();
+		// color is white
+		gdk_color_parse("PeachPuff", &color);
+		// in debugging mode, initialize with purple background
+		AM_DBG gdk_color_parse("Purple", &color);
+		gdk_colormap_alloc_color(cmap, &color, FALSE, TRUE);
+		// set the color in the widget
+		gtk_widget_modify_bg (gtkaw, GTK_STATE_NORMAL, &color );	
+		if (pixmap)
+			gdk_pixmap_unref(pixmap);	
+  		pixmap = gdk_pixmap_new(gtkaw->window,
+                          	gtkaw->allocation.width,
+                          	gtkaw->allocation.height,
+                          	-1);
+  		gdk_draw_rectangle (pixmap,
+			gtkaw->style->bg_gc[GTK_STATE_NORMAL],
+                      	TRUE,
+			0, 0,
+			gtkaw->allocation.width,
+                        gtkaw->allocation.height);
+  		gdk_draw_pixmap (gtkaw->window,
+			gtkaw->style->bg_gc[GTK_STATE_NORMAL],
+			pixmap,
+			0, 0,
+			0, 0,
+			gtkaw->allocation.width,
+                      	gtkaw->allocation.width);
 	}
 }
 
@@ -128,13 +147,11 @@ ambulant_gtk_window::get_ambulant_pixmap()
 GdkPixmap*
 ambulant_gtk_window::get_pixmap_from_screen(const lib::rect &r)
 {
-	
-
-//	QPixmap *rv = new QPixmap(r.width(), r.height());
-//	bitBlt(rv, 0, 0, m_pixmap, r.left(), r.top(), r.width(), r.height());
-//	return rv;
-// Pablo
-return NULL;
+	GdkPixmap *rv = gdk_pixmap_new(m_pixmap,
+                          	m_ambulant_widget->allocation.width,
+                          	m_ambulant_widget->allocation.height,
+                          	-1);
+	return rv;
 }
 
 gtk_ambulant_widget*
@@ -147,14 +164,14 @@ ambulant_gtk_window::get_ambulant_widget()
 GdkPixmap*
 ambulant_gtk_window::new_ambulant_surface()
 {
-/**
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::new_ambulant_surface(0x%x)",(void *)m_surface);
 	if (m_surface != NULL) delete m_surface;
-	QSize size = m_pixmap->size();
-	m_surface = new QPixmap(size.width(), size.height());
+	m_surface = gdk_pixmap_new(m_ambulant_widget->window,
+                          	m_ambulant_widget->allocation.width,
+                          	m_ambulant_widget->allocation.height,
+                          	-1);
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::new_ambulant_surface(0x%x)",(void *)m_surface);
         return m_surface;
-**/
 }
 
 GdkPixmap*
@@ -167,70 +184,70 @@ ambulant_gtk_window::get_ambulant_surface()
 GdkPixmap*
 ambulant_gtk_window::get_ambulant_oldpixmap()
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::get_ambulant_oldpixmap(0x%x) = 0x%x",(void *)this,(void *)m_oldpixmap);
-//#ifdef USE_SMIL21
-//	if (m_fullscreen_count && m_fullscreen_old_pixmap)
-//		return m_fullscreen_old_pixmap;
-//#endif
-  //      return m_oldpixmap;
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::get_ambulant_oldpixmap(0x%x) = 0x%x",(void *)this,(void *)m_oldpixmap);
+#ifdef USE_SMIL21
+	if (m_fullscreen_count && m_fullscreen_old_pixmap)
+		return m_fullscreen_old_pixmap;
+#endif
+        return m_oldpixmap;
 }
 
 void
 ambulant_gtk_window::reset_ambulant_surface(void)
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::reset_ambulant_surface(0x%x) m_oldpixmap = 0x%x",(void *)this,(void *)m_oldpixmap);
-//	if (m_oldpixmap != NULL) m_pixmap = m_oldpixmap;
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::reset_ambulant_surface(0x%x) m_oldpixmap = 0x%x",(void *)this,(void *)m_oldpixmap);
+	if (m_oldpixmap != NULL) m_pixmap = m_oldpixmap;
 }
 
 void
 ambulant_gtk_window::set_ambulant_surface(GdkPixmap* surf)
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_surface(0x%x) surf = 0x%x",(void *)this,(void *)surf);
-//	m_oldpixmap = m_pixmap;
-//	if (surf != NULL) m_pixmap = surf;
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_surface(0x%x) surf = 0x%x",(void *)this,(void *)surf);
+	m_oldpixmap = m_pixmap;
+	if (surf != NULL) m_pixmap = surf;
 }
 
 void
 ambulant_gtk_window::delete_ambulant_surface()
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::delete_ambulant_surface(0x%x) m_surface = 0x%x",(void *)this, (void *)m_surface);
-//	delete m_surface;
-//	m_surface = NULL;
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::delete_ambulant_surface(0x%x) m_surface = 0x%x",(void *)this, (void *)m_surface);
+	delete m_surface;
+	m_surface = NULL;
 }
 
 void
 ambulant_gtk_window::need_redraw(const lib::rect &r)
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_redraw(0x%x): ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
-//	if (m_ambulant_widget == NULL) {
-//		lib::logger::get_logger()->error("ambulant_gtk_window::need_redraw(0x%x): m_ambulant_widget == NULL !!!", (void*) this);
-//		return;
-//	}
-//#ifdef	QT_NO_FILEDIALOG	/* Assume embedded Q */
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_redraw(0x%x): ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	if (m_ambulant_widget == NULL) {
+		lib::logger::get_logger()->error("ambulant_gtk_window::need_redraw(0x%x): m_ambulant_widget == NULL !!!", (void*) this);
+		return;
+	}
+//#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Q */
 //	m_ambulant_widget->repaint(r.left(), r.top(), r.width(), r.height(), false);
 //	qApp->wakeUpGuiThread();
 //	qApp->processEvents();
-//#else	/*QT_NO_FILEDIALOG*/	/* Assume plain Q */
+//#else	/*GTK_NO_FILEDIALOG*/	/* Assume plain Q */
 //	m_ambulant_widget->update(r.left(), r.top(), r.width(), r.height());
 //	qApp->wakeUpGuiThread();
-//#endif	/*QT_NO_FILEDIALOG*/
+//#endif	/*GTK_NO_FILEDIALOG*/
 }
 
 void
 ambulant_gtk_window::redraw_now()
 {
-//	AM_DBG //lib::logger::get_logger()->debug("ambulant_gtk_window::redraw_now()");
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::redraw_now()");
 //	m_ambulant_widget->repaint(false);
 }
 
 void
 ambulant_gtk_window::mouse_region_changed()
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::mouse_region_changed needs to be implemented");
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::mouse_region_changed needs to be implemented");
 }
 
 /* test if there is something new to see */
-static GtkImage* oldImageP;
+static GdkPixmap* oldImageP;
 static bool isEqualToPrevious(GdkPixmap* qpmP) {
 	return false;
 	//QImage img = qpmP->convertToImage();
@@ -267,7 +284,7 @@ void gui::gtk::dumpPixmap(GdkPixmap* qpm, std::string filename) {
 void
 ambulant_gtk_window::redraw(const lib::rect &r)
 {
-/**
+
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::redraw(0x%x): ltrb=(%d,%d,%d,%d)",(void *)this, r.left(), r.top(), r.right(), r.bottom());
 #ifdef USE_SMIL21
 	_screenTransitionPreRedraw();
@@ -277,33 +294,30 @@ ambulant_gtk_window::redraw(const lib::rect &r)
 #ifdef USE_SMIL21
 	_screenTransitionPostRedraw(r);
 #endif
-	bitBlt(m_ambulant_widget,r.left(),r.top(), m_pixmap,r.left(),r.top(), r.right(),r.bottom());
+//	bitBlt(m_ambulant_widget,r.left(),r.top(), m_pixmap,r.left(),r.top(), r.right(),r.bottom());
 //XXXX	dumpPixmap(m_pixmap, "top"); //AM_DBG 
-
-**/
 }
 
 void
 ambulant_gtk_window::user_event(const lib::point &where, int what) 
 {
-   //     AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::user_event(0x%x): point=(%d,%d)", this, where.x, where.y);
-	//m_handler->user_event(where, what);
+        AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::user_event(0x%x): point=(%d,%d)", this, where.x, where.y);
+	m_handler->user_event(where, what);
 }
 
 void
 ambulant_gtk_window::need_events(bool want) 
 {
-//	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_events(0x%x): want=%d", this, want);
+	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_events(0x%x): want=%d", this, want);
 }
 
 // XXXX
 gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 	lib::rect* bounds,
 	GtkWidget* parent_widget)
-:	//GtkWidget(GTK_TYPE_WIDGET, "parent", parent_widget, "name", "gtk_ambulant_widget",0),
-	m_gtk_window(NULL)
+:	m_gtk_window(NULL)
 {
-	//this = gtk_widget_new(GTK_TYPE_WIDGET, "parent", parent_widget, "name", "gtk_ambulant_widget",0);
+	m_widget = gtk_widget_new(GTK_TYPE_DRAWING_AREA, "parent", parent_widget, "name", "gtk_ambulant_widget",0);
 	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::gtk_ambulant_widget(0x%x-0x%x(%d,%d,%d,%d))",
 		(void *)this,
 		(void*)  parent_widget,
@@ -311,7 +325,8 @@ gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 		bounds->top(),
 		bounds->right(),
 		bounds->bottom());
-//	setGeometry(bounds->left(), bounds->top(), bounds->right(), bounds->bottom());
+	gtk_widget_set_size_request(GTK_WIDGET (m_widget), bounds->left(), bounds->top());
+	gtk_widget_set_uposition(GTK_WIDGET (m_widget), bounds->right(), bounds->bottom());
 //#ifndef QT_NO_FILEDIALOG	/* Assume plain Q */
 //	setMouseTracking(true); // enable mouseMoveEvent() to be called
 //#endif/*QT_NO_FILEDIALOG*/
@@ -319,12 +334,11 @@ gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 
 gtk_ambulant_widget::~gtk_ambulant_widget()
 {
-/**	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::~gtk_ambulant_widget(0x%x): m_gtk_window=0x%x", (void*)this, m_gtk_window);
+	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::~gtk_ambulant_widget(0x%x): m_gtk_window=0x%x", (void*)this, m_gtk_window);
 	if (m_gtk_window) {
 		m_gtk_window->set_ambulant_widget(NULL);
 		m_gtk_window = NULL;
 	}
-**/
 }
 	/**
 void
@@ -380,9 +394,9 @@ gtk_ambulant_widget::set_gtk_window( ambulant_gtk_window* aqw)
 	// Note: the window and widget are destucted independently.
 	//	if (m_gtk_window != NULL)
 	//	  delete m_gtk_window;
-//	m_gtk_window = aqw;
-//	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::set_gtk_window(0x%x): m_gtk_window==0x%x)",
-//		(void*) this, (void*) m_gtk_window);
+	m_gtk_window = aqw;
+	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::set_gtk_window(0x%x): m_gtk_window==0x%x)",
+		(void*) this, (void*) m_gtk_window);
 }
 
 ambulant_gtk_window* 
@@ -418,12 +432,13 @@ gtk_renderer_factory::new_playable(
 			rv = new gtk_html_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_html_renderer 0x%x", (void*) node, (void*) rv);
 		} else {
-#endif */ /*WITH_GTK_HTML_WIDGET*/
-//		rv = new gtk_text_renderer(context, cookie, node,
-//						 evp, m_factory);
-//		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
-//			(void*) node, (void*) rv);
-//#ifdef	WITH_GTK_HTML_WIDGET**/
+#endif */  /*WITH_GTK_HTML_WIDGET*/
+/*		rv = new gtk_text_renderer(context, cookie, node,
+						 evp, m_factory);
+		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
+			(void*) node, (void*) rv);
+*/
+//#ifdef	WITH_GTK_HTML_WIDGET
 //		}
 //#endif/*WITH_QT_HTML_WIDGET*/
 //	} else {
@@ -451,9 +466,11 @@ gtk_window_factory::new_window (const std::string &name,
 	lib::rect* r = new lib::rect(m_p, bounds);
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window (0x%x): name=%s %d,%d,%d,%d",
 		(void*) this, name.c_str(), r->left(),r->top(),r->right(),r->bottom());
-	ambulant_gtk_window * aqw = new ambulant_gtk_window(name, r, region);
-	gtk_ambulant_widget * qaw = new gtk_ambulant_widget(name, r, m_parent_widget);
-//#ifndef	GTK_NO_FILEDIALOG     /* Assume plain Q */
+	ambulant_gtk_window * agtkw = new ambulant_gtk_window(name, r, region);
+	gtk_ambulant_widget * gtkaw = new gtk_ambulant_widget(name, r, m_parent_widget);
+#ifndef	GTK_NO_FILEDIALOG     /* Assume plain Q */
+
+
 //	qaw->setBackgroundMode(Qt::NoBackground);
 //	if (qApp == NULL || qApp->mainWidget() == NULL) {
 //		lib::logger::get_logger()->error("gtk_window_factory::new_window (0x%x) %s",
@@ -461,16 +478,16 @@ gtk_window_factory::new_window (const std::string &name,
 //	   		"qApp == NULL || qApp->mainWidget() == NULL");
 //	}
 //	qApp->mainWidget()->resize(bounds.w + m_p.x, bounds.h + m_p.y);
-//#else	/*QT_NO_FILEDIALOG*/  /* Assume embedded Q */
+#else	/*QT_NO_FILEDIALOG*/  /* Assume embedded Q */
 //	qaw->setBackgroundMode(QWidget::NoBackground);
 	/* No resize implemented for embedded Q */
-//#endif	/*QT_NO_FILEDIALOG*/
-//	aqw->set_ambulant_widget(qaw);
-//	qaw->set_gtk_window(aqw);
- //	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window(0x%x): ambulant_widget=0x%x gtk_window=0x%x",
-//		(void*) this, (void*) qaw, (void*) aqw);
-//	qaw->show();
-//	return aqw;
+#endif	/*QT_NO_FILEDIALOG*/
+	agtkw->set_ambulant_widget(gtkaw);
+	gtkaw->set_gtk_window(agtkw);
+	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window(0x%x): ambulant_widget=0x%x gtk_window=0x%x",
+		(void*) this, (void*) gtkaw, (void*) agtkw);
+	//gtk_show_widget(gtkaw);
+	return agtkw;
 }
 
 common::bgrenderer *
@@ -489,7 +506,7 @@ gtk_video_factory::new_playable(
 		const lib::node *node,
 		lib::event_processor *evp)
 {
-/**	common::playable *rv;
+	common::playable *rv;
 	
 	lib::xml_string tag = node->get_qname().second;
     AM_DBG lib::logger::get_logger()->debug("gtk_video_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
@@ -501,7 +518,6 @@ gtk_video_factory::new_playable(
 		return NULL;
 	}
 	return rv;
-**/
 }
 
 common::playable *
@@ -520,7 +536,6 @@ gtk_video_factory::new_aux_audio_playable(
 void 
 ambulant_gtk_window::startScreenTransition()
 {
-/**
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::startScreenTransition()");
 	if (m_fullscreen_count)
 		logger::get_logger()->warn("ambulant_gtk_window::startScreenTransition():multiple Screen transitions in progress (m_fullscreen_count=%d)",m_fullscreen_count);
@@ -528,45 +543,38 @@ ambulant_gtk_window::startScreenTransition()
 	if (m_fullscreen_old_pixmap) delete m_fullscreen_old_pixmap;
 	m_fullscreen_old_pixmap = m_fullscreen_prev_pixmap;
 	m_fullscreen_prev_pixmap = NULL;
-**/
 }
 
 void 
 ambulant_gtk_window::endScreenTransition()
 {
-/**
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::endScreenTransition()");
 	assert(m_fullscreen_count > 0);
 	m_fullscreen_count--;
-**/
 }
 
 void 
 ambulant_gtk_window::screenTransitionStep(smil2::transition_engine* engine, lib::transition_info::time_type now)
 {
-/**
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::screenTransitionStep()");
 	assert(m_fullscreen_count > 0);
 	m_fullscreen_engine = engine;
 	m_fullscreen_now = now;
-**/
 }
 		
 void 
 ambulant_gtk_window::_screenTransitionPreRedraw()
 {
-/**
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPreRedraw()");
 	if (m_fullscreen_count == 0) return;
 	// XXX setup drawing to transition surface
 //	[[self getTransitionSurface] lockFocus];
-**/
 }
 
 void 
 ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 {
-/**
+
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPostRedraw()");
 	if (m_fullscreen_count == 0 && m_fullscreen_old_pixmap == NULL) {
 		// Neither in fullscreen transition nor wrapping one up.
@@ -588,10 +596,10 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPostRedraw: bitblit");
 	if (m_fullscreen_engine) {
 		// Do the transition step
-		QPixmap* new_src = get_ambulant_surface();
+		GdkPixmap* new_src = get_ambulant_surface();
 		if ( ! new_src) new_src = new_ambulant_surface();
-		bitBlt(m_surface, 0, 0, m_pixmap);
-		bitBlt(m_pixmap, 0, 0, m_fullscreen_old_pixmap);
+//		bitBlt(m_surface, 0, 0, m_pixmap);
+//		bitBlt(m_pixmap, 0, 0, m_fullscreen_old_pixmap);
 //		dumpPixmap(new_src, "fnew");
 //		dumpPixmap(m_pixmap, "fold");
 		m_fullscreen_engine->step(m_fullscreen_now);
@@ -605,6 +613,5 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		m_fullscreen_old_pixmap = NULL;
 		m_fullscreen_engine = NULL;
 	}
-**/
 }
 #endif
