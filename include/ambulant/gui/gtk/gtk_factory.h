@@ -63,6 +63,8 @@ class ambulant_gtk_window : public common::gui_window {
 	void user_event(const lib::point &where, int what=0);
 	void need_events(bool want);
 
+//	GtkWindow* get_gtk_window();
+//	void set_gtk_window(GtkWindow* w);
 	GdkPixmap* get_ambulant_pixmap();
 	GdkPixmap* new_ambulant_surface();
 	GdkPixmap* get_ambulant_surface();
@@ -82,6 +84,7 @@ class ambulant_gtk_window : public common::gui_window {
 	
   private:
 	gtk_ambulant_widget* m_ambulant_widget;
+//	GtkWidow *m_window;
 	GdkPixmap* m_pixmap;
 	GdkPixmap* m_oldpixmap;
 	GdkPixmap* m_surface;
@@ -106,7 +109,9 @@ class gtk_ambulant_widget : public GtkWidget {
 	
 	void set_gtk_window( ambulant_gtk_window* agtkw);
 	ambulant_gtk_window* gtk_window();
-	
+	GtkWidget* get_gtk_widget();	
+
+	void do_need_redraw ();
 //	void paintEvent(QPaintEvent* e);
 //	void mouseReleaseEvent(QMouseEvent* e);
 
