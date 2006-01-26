@@ -17,9 +17,9 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "ambulant/gui/qt/qt_includes.h"
-#include "ambulant/gui/qt/qt_renderer.h"
-#include "ambulant/gui/qt/qt_transition.h"
+#include "ambulant/gui/gtk/gtk_includes.h"
+#include "ambulant/gui/gtk/gtk_renderer.h"
+#include "ambulant/gui/gtk/gtk_transition.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -33,12 +33,12 @@ namespace gui {
 using namespace common;
 using namespace lib;
 
-namespace qt {
+namespace gtk {
 
-qt_transition_renderer::~qt_transition_renderer()
+gtk_transition_renderer::~gtk_transition_renderer()
 {
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("~qt_renderer(0x%x)", (void *)this);
+	AM_DBG logger::get_logger()->debug("~gtk_renderer(0x%x)", (void *)this);
 	m_intransition = NULL;
 	m_outtransition = NULL;
 	if (m_trans_engine) delete m_trans_engine;
@@ -47,7 +47,7 @@ qt_transition_renderer::~qt_transition_renderer()
 }
 	
 void
-qt_transition_renderer::set_surface(common::surface *dest)
+gtk_transition_renderer::set_surface(common::surface *dest)
 { 
 	m_transition_dest = dest;
 #ifdef USE_SMIL21
@@ -57,7 +57,7 @@ qt_transition_renderer::set_surface(common::surface *dest)
 }
 	
 void
-qt_transition_renderer::set_intransition(const lib::transition_info *info)
+gtk_transition_renderer::set_intransition(const lib::transition_info *info)
 {
 	m_intransition = info;
 #ifdef USE_SMIL21
@@ -67,19 +67,19 @@ qt_transition_renderer::set_intransition(const lib::transition_info *info)
 }
 
 void
-qt_transition_renderer::start(double where)
+gtk_transition_renderer::start(double where)
 {
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("qt_renderer.start(0x%x)", (void *)this);
+	AM_DBG logger::get_logger()->debug("gtk_renderer.start(0x%x)", (void *)this);
 	if (m_intransition && m_transition_dest) {
 		m_view = m_transition_dest->get_gui_window();
-		m_trans_engine = qt_transition_engine(m_transition_dest, false, m_intransition);
+		m_trans_engine = gtk_transition_engine(m_transition_dest, false, m_intransition);
 		if (m_trans_engine) {
 			m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
 #ifdef USE_SMIL21
 			m_fullscreen = m_intransition->m_scope == scope_screen;
 			if (m_fullscreen) {
-				((ambulant_qt_window*)m_view)->startScreenTransition();
+				((ambulant_gtk_window*)m_view)->startScreenTransition();
 			}
 #endif
 		}
@@ -88,20 +88,20 @@ qt_transition_renderer::start(double where)
 }
 
 void
-qt_transition_renderer::start_outtransition(const lib::transition_info *info)
+gtk_transition_renderer::start_outtransition(const lib::transition_info *info)
 {
 	if (m_trans_engine) stop();
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("qt_renderer.start_outtransition(0x%x)", (void *)this);
+	AM_DBG logger::get_logger()->debug("gtk_renderer.start_outtransition(0x%x)", (void *)this);
 	m_outtransition = info;
-	m_trans_engine = qt_transition_engine(m_transition_dest, true, m_outtransition);
+	m_trans_engine = gtk_transition_engine(m_transition_dest, true, m_outtransition);
 	if (m_transition_dest && m_trans_engine) {
 		m_view = m_transition_dest->get_gui_window();
 		m_trans_engine->begin(m_event_processor->get_timer()->elapsed());
 #ifdef USE_SMIL21
 		m_fullscreen = m_outtransition->m_scope == scope_screen;
 		if (m_fullscreen) {
-			((ambulant_qt_window*)m_view)->startScreenTransition();
+			((ambulant_gtk_window*)m_view)->startScreenTransition();
 		}
 #endif
 	}
@@ -110,7 +110,7 @@ qt_transition_renderer::start_outtransition(const lib::transition_info *info)
 }
 
 void
-qt_transition_renderer::stop()
+gtk_transition_renderer::stop()
 {
 	m_lock.enter();
 	if (!m_trans_engine) {
@@ -121,7 +121,7 @@ qt_transition_renderer::stop()
 	m_trans_engine = NULL;
 #ifdef USE_SMIL21
 	if (m_fullscreen && m_view) {
-		((ambulant_qt_window*)m_view)->endScreenTransition();
+		((ambulant_gtk_window*)m_view)->endScreenTransition();
 	}
 #endif
 	m_lock.leave();
@@ -130,13 +130,13 @@ qt_transition_renderer::stop()
 }
 
 void
-qt_transition_renderer::redraw_pre(gui_window *window)
+gtk_transition_renderer::redraw_pre(gui_window *window)
 {
 	m_lock.enter();
 	const rect &r = m_transition_dest->get_rect();
-	ambulant_qt_window* aqw = (ambulant_qt_window*) window;
-	AM_DBG logger::get_logger()->debug("qt_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d) gui_window=0x%x qpm=0x%x",(void*)this,r.left(),r.top(),r.right(),r.bottom(),window,aqw->get_ambulant_pixmap());
-
+	ambulant_gtk_window* aqw = (ambulant_gtk_window*) window;
+	AM_DBG logger::get_logger()->debug("gtk_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d) gui_window=0x%x qpm=0x%x",(void*)this,r.left(),r.top(),r.right(),r.bottom(),window,aqw->get_ambulant_pixmap());
+/*
 	QPixmap *surf = NULL;
 	// See whether we're in a transition
 	if (m_trans_engine
@@ -152,21 +152,23 @@ qt_transition_renderer::redraw_pre(gui_window *window)
 			// Copy the background pixels
 			rect dstrect = r;
 			dstrect.translate(m_transition_dest->get_global_topleft());
-			AM_DBG logger::get_logger()->debug("qt_renderer.redraw: bitBlt to=0x%x (%d,%d) from=0x%x (%d,%d,%d,%d)",surf, dstrect.left(), dstrect.top(), qpm,dstrect.left(), dstrect.top(), dstrect.width(), dstrect.height());
+			AM_DBG logger::get_logger()->debug("gtk_renderer.redraw: bitBlt to=0x%x (%d,%d) from=0x%x (%d,%d,%d,%d)",surf, dstrect.left(), dstrect.top(), qpm,dstrect.left(), dstrect.top(), dstrect.width(), dstrect.height());
 			bitBlt(surf, dstrect.left(),dstrect.top(),
 			       qpm,dstrect.left(),dstrect.top(),dstrect.width(),dstrect.height());
-			AM_DBG logger::get_logger()->debug("qt_renderer.redraw: drawing to transition surface");
+			AM_DBG logger::get_logger()->debug("gtk_renderer.redraw: drawing to transition surface");
 			aqw->set_ambulant_surface(surf);
 		}
 	}
+*/
 	m_lock.leave();
 }
 
 void
-qt_transition_renderer::redraw_post(gui_window *window)
+gtk_transition_renderer::redraw_post(gui_window *window)
 {
 	m_lock.enter();
-	ambulant_qt_window* aqw = (ambulant_qt_window*) window;
+/*
+	ambulant_gtk_window* aqw = (ambulant_gtk_window*) window;
 	QPixmap *surf = aqw->get_ambulant_surface();
 	
 	if (surf != NULL) {
@@ -183,12 +185,12 @@ qt_transition_renderer::redraw_post(gui_window *window)
 #else
 			m_trans_engine->step(now);
 #endif
-			typedef lib::no_arg_callback<qt_transition_renderer> stop_transition_callback;
-			lib::event *ev = new stop_transition_callback(this, &qt_transition_renderer::stop);
+			typedef lib::no_arg_callback<gtk_transition_renderer> stop_transition_callback;
+			lib::event *ev = new stop_transition_callback(this, &gtk_transition_renderer::stop);
 			m_event_processor->add_event(ev, 0, lib::event_processor::med);
-		} else {
-			if ( 1 /* XXX was: surf */) {
-				AM_DBG logger::get_logger()->debug("qt_renderer.redraw: drawing to view");
+		} else {*/
+//			if ( 1 /* XXX was: surf */) {
+/*				AM_DBG logger::get_logger()->debug("gtk_renderer.redraw: drawing to view");
 #ifdef USE_SMIL21
 				if (m_fullscreen) {
 					aqw->screenTransitionStep (m_trans_engine, now);
@@ -198,29 +200,30 @@ qt_transition_renderer::redraw_post(gui_window *window)
 #else
 				m_trans_engine->step(now);
 #endif
-				typedef no_arg_callback<qt_transition_renderer>transition_callback;
-				event *ev = new transition_callback (this, &qt_transition_renderer::transition_step);
+				typedef no_arg_callback<gtk_transition_renderer>transition_callback;
+				event *ev = new transition_callback (this, &gtk_transition_renderer::transition_step);
 				transition_info::time_type delay = m_trans_engine->next_step_delay();
 				if (delay < 33) delay = 33; // XXX band-aid
 	//				delay = 1000;
-				AM_DBG logger::get_logger()->debug("qt_transition_renderer.redraw: now=%d, schedule step for %d",m_event_processor->get_timer()->elapsed(),m_event_processor->get_timer()->elapsed()+delay);
+				AM_DBG logger::get_logger()->debug("gtk_transition_renderer.redraw: now=%d, schedule step for %d",m_event_processor->get_timer()->elapsed(),m_event_processor->get_timer()->elapsed()+delay);
 				m_event_processor->add_event(ev, delay, event_processor::low);
 			}
 		}
 	}
+*/
 	m_lock.leave();
 }
 
 void
-qt_transition_renderer::transition_step()
+gtk_transition_renderer::transition_step()
 {
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("qt_renderer.transition_step: now=%d",m_event_processor->get_timer()->elapsed());
+	AM_DBG logger::get_logger()->debug("gtk_renderer.transition_step: now=%d",m_event_processor->get_timer()->elapsed());
 	if (m_transition_dest) m_transition_dest->need_redraw();
 	m_lock.leave();
 }
 
-} // namespace qt
+} // namespace gtk
 
 } // namespace gui
 
