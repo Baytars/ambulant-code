@@ -372,10 +372,10 @@ gtk_gui::gtk_gui(const char* title,
 	
 
 	/* A canvas with fixed layout should be the document_container */ 
-	m_documentcontainer = gtk_drawing_area_new();
-	g_signal_connect_swapped (G_OBJECT (m_documentcontainer), "expose_event", G_CALLBACK (gtk_C_callback_do_need_redraw_simple), (void*) this);
-	gtk_widget_show(m_documentcontainer);
- 	gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
+	//m_documentcontainer = gtk_drawing_area_new();
+	//g_signal_connect_swapped (G_OBJECT (m_documentcontainer), "expose_event", G_CALLBACK (gtk_C_callback_do_need_redraw_simple), (void*) this);
+	//gtk_widget_show(m_documentcontainer);
+ 	//gtk_box_pack_start (GTK_BOX (m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
 	
 	// emits the signal that the player is done - it is not needed
 	//g_signal_emit(GTK_OBJECT (m_toplevelcontainer), signal_player_done_id, 0);
