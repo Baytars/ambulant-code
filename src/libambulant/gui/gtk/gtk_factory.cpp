@@ -37,6 +37,14 @@ using namespace ambulant;
 using namespace gui::gtk;
 using namespace net;
 
+
+static GdkPixmap *pixmap = NULL;
+
+void gtk_C_callback_do_need_redraw(void *userdata)
+{
+	((gtk_ambulant_widget*) userdata)->do_need_redraw();
+}
+
 gtk_video_factory::~gtk_video_factory()
 {
 }
@@ -50,8 +58,6 @@ gtk_renderer_factory::gtk_renderer_factory(common::factories *factory)
 gtk_window_factory::gtk_window_factory( GtkWidget* parent_widget, int x, int y)
 :	m_parent_widget(parent_widget), m_p(lib::point(x,y)) 
 {
-	printf("%d\n",parent_widget);
-	printf("%d\n",m_parent_widget);
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory (0x%x)", (void*) this);
 }	
   
@@ -109,31 +115,12 @@ ambulant_gtk_window::set_ambulant_widget(gtk_ambulant_widget* gtkaw)
 	
 	if (gtkaw != NULL) {
 		// color is white
-		gdk_color_parse("PeachPuff", &color);
+		gdk_color_parse("white", &color);
 		// in debugging mode, initialize with purple background
 		AM_DBG gdk_color_parse("Purple", &color);
 		gdk_colormap_alloc_color(cmap, &color, FALSE, TRUE);
 		// set the color in the widget
-		gtk_widget_modify_bg (gtkaw, GTK_STATE_NORMAL, &color );	
-		if (pixmap)
-			gdk_pixmap_unref(pixmap);	
-  		pixmap = gdk_pixmap_new(gtkaw->window,
-                          	gtkaw->allocation.width,
-                          	gtkaw->allocation.height,
-                          	-1);
-  		gdk_draw_rectangle (pixmap,
-			gtkaw->style->bg_gc[GTK_STATE_NORMAL],
-                      	TRUE,
-			0, 0,
-			gtkaw->allocation.width,
-                        gtkaw->allocation.height);
-  		gdk_draw_pixmap (gtkaw->window,
-			gtkaw->style->bg_gc[GTK_STATE_NORMAL],
-			pixmap,
-			0, 0,
-			0, 0,
-			gtkaw->allocation.width,
-                      	gtkaw->allocation.width);
+		gtk_widget_modify_bg (GTK_WIDGET (gtkaw->get_gtk_widget()), GTK_STATE_NORMAL, &color );	
 	}
 }
 
@@ -223,14 +210,14 @@ ambulant_gtk_window::need_redraw(const lib::rect &r)
 		lib::logger::get_logger()->error("ambulant_gtk_window::need_redraw(0x%x): m_ambulant_widget == NULL !!!", (void*) this);
 		return;
 	}
-//#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Q */
+#ifdef	GTK_NO_FILEDIALOG	/* Assume embedded Q */
 //	m_ambulant_widget->repaint(r.left(), r.top(), r.width(), r.height(), false);
 //	qApp->wakeUpGuiThread();
 //	qApp->processEvents();
-//#else	/*GTK_NO_FILEDIALOG*/	/* Assume plain Q */
+#else	/*GTK_NO_FILEDIALOG*/	/* Assume plain Q */
 //	m_ambulant_widget->update(r.left(), r.top(), r.width(), r.height());
 //	qApp->wakeUpGuiThread();
-//#endif	/*GTK_NO_FILEDIALOG*/
+#endif	/*GTK_NO_FILEDIALOG*/
 }
 
 void
@@ -317,7 +304,8 @@ gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 	GtkWidget* parent_widget)
 :	m_gtk_window(NULL)
 {
-	m_widget = gtk_widget_new(GTK_TYPE_DRAWING_AREA, "parent", parent_widget, "name", "gtk_ambulant_widget",0);
+//	m_widget = gtk_widget_new(GTK_TYPE_DRAWING_AREA, "parent", parent_widget, "name", "gtk_ambulant_widget",0);
+	m_widget = gtk_drawing_area_new();
 	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::gtk_ambulant_widget(0x%x-0x%x(%d,%d,%d,%d))",
 		(void *)this,
 		(void*)  parent_widget,
@@ -325,11 +313,62 @@ gtk_ambulant_widget::gtk_ambulant_widget(const std::string &name,
 		bounds->top(),
 		bounds->right(),
 		bounds->bottom());
-	gtk_widget_set_size_request(GTK_WIDGET (m_widget), bounds->left(), bounds->top());
-	gtk_widget_set_uposition(GTK_WIDGET (m_widget), bounds->right(), bounds->bottom());
+	// Wrong parameters
+	gtk_widget_set_size_request(GTK_WIDGET (m_widget), bounds->bottom(), bounds->right());
+	gtk_widget_set_uposition(GTK_WIDGET (m_widget), bounds->left(), bounds->top());
+	gtk_box_pack_start (GTK_BOX (parent_widget), GTK_WIDGET (m_widget), TRUE, TRUE, 0);
+	gtk_widget_show(m_widget);
+	g_signal_connect_swapped (G_OBJECT (m_widget), "expose_event", G_CALLBACK (gtk_C_callback_do_need_redraw), (void*) this);
+
+
 //#ifndef QT_NO_FILEDIALOG	/* Assume plain Q */
 //	setMouseTracking(true); // enable mouseMoveEvent() to be called
 //#endif/*QT_NO_FILEDIALOG*/
+}
+
+void 
+gtk_ambulant_widget::do_need_redraw () {
+	GdkRectangle update_rect;
+	GdkColor color;
+	GdkColormap *cmap = gdk_colormap_get_system(  );	
+/*
+	if (gdk_color_parse("PeachPuff", &color) && gdk_colormap_alloc_color(cmap, &color, FALSE, TRUE))
+	{
+ 
+		update_rect.x = 50;
+		update_rect.y = 50;
+		update_rect.width = 100;
+		update_rect.height = 100;	
+		
+		gtk_widget_modify_bg (m_widget, GTK_STATE_NORMAL, &color );
+
+		if (pixmap)
+			gdk_pixmap_unref(pixmap);	
+
+  		pixmap = gdk_pixmap_new(m_widget->window,
+                          	m_widget->allocation.width,
+                          	m_widget->allocation.height,
+                          	-1);
+  		gdk_draw_rectangle (pixmap,
+			m_widget->style->bg_gc[GTK_STATE_NORMAL],
+                      	TRUE,
+			update_rect.x,
+			update_rect.y,
+			update_rect.width,
+                      	update_rect.height);
+  		gdk_draw_pixmap (m_widget->window,
+			m_widget->style->bg_gc[GTK_STATE_NORMAL],
+			pixmap,
+			update_rect.x, update_rect.y,
+			0, 0,
+			update_rect.width,
+                      	update_rect.height);
+	}
+	else
+	{
+		printf("we haven't found the color\n");
+	}
+*/
 }
 
 gtk_ambulant_widget::~gtk_ambulant_widget()
@@ -339,6 +378,13 @@ gtk_ambulant_widget::~gtk_ambulant_widget()
 		m_gtk_window->set_ambulant_widget(NULL);
 		m_gtk_window = NULL;
 	}
+}
+
+
+GtkWidget*
+gtk_ambulant_widget::get_gtk_widget()
+{
+	return m_widget;
 }
 	/**
 void
@@ -389,12 +435,12 @@ gtk_ambulant_widget::mouseMoveEvent(QMouseEvent* e) {
 #endif/*QT_NO_FILEDIALOG*/
 
 void 
-gtk_ambulant_widget::set_gtk_window( ambulant_gtk_window* aqw)
+gtk_ambulant_widget::set_gtk_window( ambulant_gtk_window* agtkw)
 {
 	// Note: the window and widget are destucted independently.
 	//	if (m_gtk_window != NULL)
 	//	  delete m_gtk_window;
-	m_gtk_window = aqw;
+	m_gtk_window = agtkw;
 	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::set_gtk_window(0x%x): m_gtk_window==0x%x)",
 		(void*) this, (void*) m_gtk_window);
 }
@@ -412,7 +458,7 @@ gtk_renderer_factory::new_playable(
 	const lib::node *node,
 	lib::event_processor *const evp) 
 {
-/*
+
 	lib::xml_string tag = node->get_qname().second;
 	common::playable* rv;
 	if (tag == "img") {
@@ -432,19 +478,19 @@ gtk_renderer_factory::new_playable(
 			rv = new gtk_html_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_html_renderer 0x%x", (void*) node, (void*) rv);
 		} else {
-#endif */  /*WITH_GTK_HTML_WIDGET*/
-/*		rv = new gtk_text_renderer(context, cookie, node,
+#endif   /*WITH_GTK_HTML_WIDGET*/
+		rv = new gtk_text_renderer(context, cookie, node,
 						 evp, m_factory);
 		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
 			(void*) node, (void*) rv);
-*/
-//#ifdef	WITH_GTK_HTML_WIDGET
-//		}
-//#endif/*WITH_QT_HTML_WIDGET*/
-//	} else {
-//		return NULL;
-//	}
-//  return rv;
+
+#ifdef	WITH_GTK_HTML_WIDGET
+		}
+#endif/*WITH_QT_HTML_WIDGET*/
+	} else {
+		return NULL;
+	}
+  return rv;
 }
 
 common::playable *
@@ -463,30 +509,17 @@ gtk_window_factory::new_window (const std::string &name,
 			       lib::size bounds,
 			       common::gui_events *region)
 {
+//	GList *list = NULL;
 	lib::rect* r = new lib::rect(m_p, bounds);
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window (0x%x): name=%s %d,%d,%d,%d",
 		(void*) this, name.c_str(), r->left(),r->top(),r->right(),r->bottom());
 	ambulant_gtk_window * agtkw = new ambulant_gtk_window(name, r, region);
 	gtk_ambulant_widget * gtkaw = new gtk_ambulant_widget(name, r, m_parent_widget);
-#ifndef	GTK_NO_FILEDIALOG     /* Assume plain Q */
-
-
-//	qaw->setBackgroundMode(Qt::NoBackground);
-//	if (qApp == NULL || qApp->mainWidget() == NULL) {
-//		lib::logger::get_logger()->error("gtk_window_factory::new_window (0x%x) %s",
-//			(void*) this,
-//	   		"qApp == NULL || qApp->mainWidget() == NULL");
-//	}
 //	qApp->mainWidget()->resize(bounds.w + m_p.x, bounds.h + m_p.y);
-#else	/*QT_NO_FILEDIALOG*/  /* Assume embedded Q */
-//	qaw->setBackgroundMode(QWidget::NoBackground);
-	/* No resize implemented for embedded Q */
-#endif	/*QT_NO_FILEDIALOG*/
 	agtkw->set_ambulant_widget(gtkaw);
 	gtkaw->set_gtk_window(agtkw);
 	AM_DBG lib::logger::get_logger()->debug("gtk_window_factory::new_window(0x%x): ambulant_widget=0x%x gtk_window=0x%x",
 		(void*) this, (void*) gtkaw, (void*) agtkw);
-	//gtk_show_widget(gtkaw);
 	return agtkw;
 }
 

@@ -98,33 +98,33 @@ void
 gtk_fill_renderer::redraw(const rect &dirty,
 			 gui_window *window)
 {
-/**
+
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("gtk_fill_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)",(void *)this,r.left(),r.top(),r.right(),r.bottom());
 	
-	ambulant_gtk_window* aqw = (ambulant_gtk_window*) window;
-	QPixmap *surf = NULL;
+	ambulant_gtk_window* agtkw = (ambulant_gtk_window*) window;
+	GdkPixmap *surf = NULL;
 	if (m_trans_engine && m_trans_engine->is_done()) {
 		delete m_trans_engine;
 		m_trans_engine = NULL;
 	}
 	// See whether we're in a transition
 	if (m_trans_engine) {
-		QPixmap *qpm = aqw->get_ambulant_pixmap();
-		surf = aqw->get_ambulant_surface();
+		GdkPixmap *qpm = agtkw->get_ambulant_pixmap();
+		surf = agtkw->get_ambulant_surface();
 		if (surf == NULL)
-			surf = aqw->new_ambulant_surface();
+			surf = agtkw->new_ambulant_surface();
 		if (surf != NULL) {
-			aqw->set_ambulant_surface(surf);
+			agtkw->set_ambulant_surface(surf);
 			// Copy the background pixels
 			rect dstrect = r;
 			dstrect.translate(m_dest->get_global_topleft());
 			AM_DBG logger::get_logger()->debug("gtk_fill.redraw: bitBlt to=0x%x (%d,%d) from=0x%x (%d,%d,%d,%d)",surf, dstrect.left(), dstrect.top(), qpm,dstrect.left(), dstrect.top(), dstrect.width(), dstrect.height());
-			bitBlt(surf, dstrect.left(),dstrect.top(),
-			       qpm,dstrect.left(),dstrect.top(),dstrect.width(),dstrect.height());
-			bitBlt(surf, dstrect.left(), dstrect.top(),
-			       qpm,  dstrect.left(), dstrect.top(), dstrect.width(), dstrect.height());
+//			bitBlt(surf, dstrect.left(),dstrect.top(),
+//			       qpm,dstrect.left(),dstrect.top(),dstrect.width(),dstrect.height());
+//			bitBlt(surf, dstrect.left(), dstrect.top(),
+//			       qpm,  dstrect.left(), dstrect.top(), dstrect.width(), dstrect.height());
 			AM_DBG logger::get_logger()->debug("gtk_fill_renderer.redraw: drawing to transition surface");
 		}
 	}
@@ -132,7 +132,7 @@ gtk_fill_renderer::redraw(const rect &dirty,
 	redraw_body(dirty, window);
 	
 	if (surf != NULL) {
-		aqw->reset_ambulant_surface();
+		agtkw->reset_ambulant_surface();
 	}
 	if (m_trans_engine && surf) {
 		AM_DBG logger::get_logger()->debug
@@ -147,7 +147,6 @@ gtk_fill_renderer::redraw(const rect &dirty,
 		m_event_processor->add_event(ev, delay, event_processor::low);
 	}
 	m_lock.leave();
-**/
 }
 
 
@@ -168,12 +167,15 @@ gtk_fill_renderer::user_event(const point &where, int what)
 void
 gtk_fill_renderer::redraw_body(const lib::rect &dirty,
 				     common::gui_window *window) {
-/**
+
+//	GdkColor color;
+//	GdkColormap *cmap = gdk_colormap_get_system();
+
 	const common::region_info *info = m_dest->get_info();
 	const lib::rect &r = m_dest->get_rect();
-	ambulant_gtk_window* aqw = (ambulant_gtk_window*) window;
-	QPainter paint;
-	paint.begin(aqw->get_ambulant_pixmap());
+	ambulant_gtk_window* agtkw = (ambulant_gtk_window*) window;
+	//QPainter paint;
+	//paint.begin(agtkw->get_ambulant_pixmap());
 	// <brush> drawing
 	// First find our whole area to be cleared to <brush> color
 	lib::rect dstrect_whole = r;
@@ -194,27 +196,25 @@ gtk_fill_renderer::redraw_body(const lib::rect &dirty,
 	AM_DBG lib::logger::get_logger()->debug
 		("gtk_fill_renderer.redraw_body: clearing to 0x%x", 
 		 (long)color);
-	QColor bgc = QColor(lib::redc(color),lib::greenc(color),lib::bluec(color));
+//QColor bgc = QColor(lib::redc(color),lib::greenc(color),lib::bluec(color));
 	AM_DBG lib::logger::get_logger()->debug("gtk_fill_renderer.redraw_body(0x%x, local_ltrb=(%d,%d,%d,%d)",(void *)this, L,T,W,H);
-	paint.setBrush(bgc);
-	paint.drawRect(L,T,W,H);
-	paint.flush();
-	paint.end();
-**/
+//	paint.setBrush(bgc);
+//	paint.drawRect(L,T,W,H);
+//	paint.flush();
+//	paint.end();
 }
 
 void
 gtk_background_renderer::redraw(const lib::rect &dirty,
 			       common::gui_window *window)
 {
-/**	
 	const lib::rect &r = m_dst->get_rect();
 	AM_DBG lib::logger::get_logger()->debug("gtk_background_renderer::redraw(0x%x)", (void *)this);
 	if (m_src && !m_src->get_transparent()) {
 	// First find our whole area to be cleared to background color
-		ambulant_gtk_window* aqw = (ambulant_gtk_window*) window;
-		QPainter paint;
-		paint.begin(aqw->get_ambulant_pixmap());
+		ambulant_gtk_window* agtkw = (ambulant_gtk_window*) window;
+		//QPainter paint;
+		//paint.begin(aqw->get_ambulant_pixmap());
 		lib::rect dstrect_whole = r;
 		dstrect_whole.translate(m_dst->get_global_topleft());
 		int L = dstrect_whole.left(),
@@ -224,17 +224,16 @@ gtk_background_renderer::redraw(const lib::rect &dirty,
 		// XXXX Fill with background color
 		lib::color_t bgcolor = m_src->get_bgcolor();
 		AM_DBG lib::logger::get_logger()->debug("gtk_background_renderer::redraw: clearing to %x, local_ltwh(%d,%d,%d,%d)",(long)bgcolor,L,T,W,H);
-		QColor bgc = QColor(lib::redc(bgcolor),lib::greenc(bgcolor),lib::bluec(bgcolor));
-		paint.setBrush(bgc);
-		paint.drawRect(L,T,W,H);
+		//QColor bgc = QColor(lib::redc(bgcolor),lib::greenc(bgcolor),lib::bluec(bgcolor));
+		//paint.setBrush(bgc);
+		//paint.drawRect(L,T,W,H);
 		if (m_background_pixmap) {
 			AM_DBG lib::logger::get_logger()->debug("gtk_background_renderer::redraw: drawing pixmap");
-			paint.drawPixmap(L, T, *m_background_pixmap);
+		//	paint.drawPixmap(L, T, *m_background_pixmap);
 		}
-		paint.flush();
-		paint.end();
+		//paint.flush();
+		//paint.end();
 	}
-**/
 }
 
 void
