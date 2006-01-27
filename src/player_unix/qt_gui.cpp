@@ -107,12 +107,6 @@ qt_gui::qt_gui(const char* title,
 	m_mainloop(NULL),
 	m_o_x(0),	 
 	m_o_y(0),	 
-	m_pause_id(),
-	m_pausing(),
-	m_play_id(),
-	m_playing(),
-	m_playmenu(),
-	m_programfilename(),
 #ifdef	TRY_LOCKING
 	m_gui_thread(0),
 #endif/*TRY_LOCKING*/
@@ -132,8 +126,6 @@ qt_gui::qt_gui(const char* title,
 		m_smilfilename = QString(
 			"/home/zaurus/Documents/example.smil");
 #endif/*QT_NO_FILEDIALOG*/
-	m_playing = false;
-	m_pausing = false;
 	setCaption(initfile);
 
 	/* Menu bar */
@@ -166,7 +158,7 @@ qt_gui::qt_gui(const char* title,
 		m_playmenu->setItemEnabled(m_play_id, false);
 		m_pause_id = m_playmenu->insertItem(gettext("&Pause"), this, SLOT(slot_pause()));
 		m_playmenu->setItemEnabled(m_pause_id, false);
-		m_playmenu->insertItem(gettext("&Stop"), this, SLOT(slot_stop()));
+		m_stop_id = m_playmenu->insertItem(gettext("&Stop"), this, SLOT(slot_stop()));
 		m_menubar->insertItem(gettext("Pla&y"), m_playmenu);
 		
 		/* View */
@@ -301,10 +293,8 @@ qt_gui::openSMILfile(const QString smilfilename, int mode) {
 	m_playmenu->setItemEnabled(m_play_id, true);
 	m_smilfilename = smilfilename;
 	if (m_mainloop != NULL)
-		m_mainloop->release();
+		delete m_mainloop;
  	m_mainloop = new qt_mainloop(this);
-	m_playing = false;
-	m_pausing = false;
 	return m_mainloop->is_open();
 }
 
@@ -386,8 +376,8 @@ qt_gui::slot_close_settings_selector()
 
 void 
 qt_gui::slot_load_settings() {
-	if (m_playing)
-		slot_stop();
+	if (m_mainloop && m_mainloop->is_open())
+	   slot_stop();
 #ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
 	QString settings_filename =
 		QFileDialog::getOpenFileName(
@@ -448,13 +438,6 @@ qt_gui::slot_open_url() {
 void 
 qt_gui::slot_player_done() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_player_done");
-	/*
-	if (m_mainloop->player_done()) {
-		m_playmenu->setItemEnabled(m_pause_id, false);
-		m_playmenu->setItemEnabled(m_play_id, true);
-		m_playing = false;
-	}
-	*/
 }
 
 void 
@@ -482,29 +465,19 @@ qt_gui::slot_play() {
 		no_fileopen_infodisplay(this, m_programfilename);
 		return;
 	}
-	if (!m_playing) {
-		m_playing = true;
-		m_playmenu->setItemEnabled(m_play_id, false);
-		m_playmenu->setItemEnabled(m_pause_id, true);
-		m_mainloop->play();
-	}
-	if (m_pausing) {
-		m_pausing = false;
-		m_playmenu->setItemEnabled(m_pause_id, true);
-		m_playmenu->setItemEnabled(m_play_id, false);
-		m_mainloop->set_speed(1);
-	}
+	m_mainloop->play();
+	_update_menus();
 }
 
 void 
 qt_gui::slot_pause() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_pause");
-	if (! m_pausing) {
-		m_pausing = true;
-		m_playmenu->setItemEnabled(m_pause_id, false);
-		m_playmenu->setItemEnabled(m_play_id, true);
-		m_mainloop->set_speed(0);
+		if (m_smilfilename == NULL || m_mainloop == NULL || ! m_mainloop->is_open()) {
+		no_fileopen_infodisplay(this, m_programfilename);
+		return;
 	}
+    m_mainloop->pause();
+    _update_menus();
 }
 
 void 
@@ -522,9 +495,7 @@ qt_gui::slot_stop() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_stop");
 	if(m_mainloop)
 		m_mainloop->stop();
-	m_playmenu->setItemEnabled(m_pause_id, false);
-	m_playmenu->setItemEnabled(m_play_id, true);
-	m_playing = false;
+	_update_menus();
 }
 
 void 
@@ -560,7 +531,6 @@ qt_gui::slot_quit() {
 	AM_DBG printf("%s-%s\n", m_programfilename, "slot_quit");
 	if (m_mainloop)	{
 		m_mainloop->stop();
-//		m_mainloop->release();
 		delete m_mainloop;
 		m_mainloop = NULL;
 	}
@@ -653,6 +623,17 @@ qt_gui::internal_message(int level, char* msg) {
 
 	}
 #endif/*TRY_LOCKING*/
+}
+
+void
+qt_gui::_update_menus()
+{
+    m_playmenu->setItemEnabled(m_play_id, m_mainloop && m_mainloop->is_play_enabled());
+    m_playmenu->setItemChecked(m_play_id, m_mainloop && m_mainloop->is_play_active());
+    m_playmenu->setItemEnabled(m_pause_id, m_mainloop && m_mainloop->is_pause_enabled());
+    m_playmenu->setItemChecked(m_pause_id, m_mainloop && m_mainloop->is_pause_active());
+    m_playmenu->setItemEnabled(m_stop_id, m_mainloop && m_mainloop->is_stop_enabled());
+    m_playmenu->setItemChecked(m_stop_id, m_mainloop && m_mainloop->is_stop_active());
 }
 
 int
