@@ -86,37 +86,18 @@ int gui::dx::dx_gui_region::s_counter = 0;
 gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedback *feedback, const net::url& u) 
 :	m_hoster(hoster),
 	m_url(u),
-	m_goto_node(0),
-	m_player(0),
 	m_timer(new timer_control_impl(realtime_timer_factory(), 1.0, false)),
 	m_update_event(0),
-	m_logger(lib::logger::get_logger()),
-	m_factory(0) {
+	m_logger(lib::logger::get_logger())
+{
 	
-	// Fill the factory object
-	global_playable_factory *rf = common::get_global_playable_factory();
-	net::datasource_factory *df = new net::datasource_factory();
-	window_factory *wf = this->get_window_factory(); 
-	global_parser_factory *pf = lib::global_parser_factory::get_parser_factory();	
-	m_factory = new factories(rf, wf, df, pf);
-
-	// Add the playable factory
-	rf->add_factory(new dx_playable_factory(m_factory, m_logger, this));
-
-	// Add the datasource factories. For now we only need a raw
-	// datasource factory.
-	df->add_raw_factory(net::get_win32_datasource_factory());
-	// Add the xerces parser, if available
-#ifdef WITH_XERCES_BUILTIN
-	pf->add_factory(new lib::xerces_factory());
-#endif
-	// Load the plugins
-	common::plugin_engine *plf = common::plugin_engine::get_plugin_engine();
-	plf->add_plugins(m_factory);
+	// Fill the factory objects
+	init_factories();
+	m_window_factory = this->get_window_factory(); 
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
-	lib::document *doc = lib::document::create_from_url(m_factory, u);
+	lib::document *doc = lib::document::create_from_url(this, u);
 	
 	if(!doc) {
 		// message already logged
@@ -137,7 +118,7 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 #endif
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", u.get_url().c_str());	
-	m_player = new smil2::smil_player(doc, m_factory, this);
+	m_player = new smil2::smil_player(doc, this, this);
 #ifdef USE_SMIL21
 	m_player->initialize();
 #endif
@@ -158,21 +139,45 @@ gui::dx::dx_player::~dx_player() {
 		stop();
 		delete m_player;
 	}
+	m_player = NULL;
 	if(m_timer) m_timer->pause();
 	delete m_timer;	
 	assert(m_windows.empty());
-	delete m_factory;
 	if(dx_gui_region::s_counter != 0) 
 		m_logger->warn("Undeleted gui regions: %d", dx_gui_region::s_counter);
 }
 
-void gui::dx::dx_player::start() {
+void
+gui::dx::dx_player::init_playable_factory()
+{
+	m_playable_factory = common::get_global_playable_factory();
+	// Add the playable factory
+	m_playable_factory->add_factory(new dx_playable_factory(this, m_logger, this));
+}
+
+void
+gui::dx::dx_player::init_datasource_factory()
+{
+	m_datasource_factory = new net::datasource_factory();
+	// Add the datasource factories. For now we only need a raw
+	// datasource factory.
+	m_datasource_factory->add_raw_factory(net::get_win32_datasource_factory());
+}
+
+void
+gui::dx::dx_player::init_parser_factory()
+{
+	m_parser_factory = lib::global_parser_factory::get_parser_factory();
+	// Add the xerces parser, if available
+#ifdef WITH_XERCES_BUILTIN
+	m_parser_factory->add_factory(new lib::xerces_factory());
+#endif
+}
+
+
+void gui::dx::dx_player::play() {
 	if(m_player) {
-		if (m_goto_node) {
-			m_player->goto_node(m_goto_node);
-			m_goto_node = NULL;
-		}
-		m_player->start();
+		common::gui_player::play();
 		m_timer->resume();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
@@ -187,31 +192,23 @@ void gui::dx::dx_player::stop() {
 		m_timer->pause();
 		m_update_event = 0;
 		clear_transitions();
-		m_player->stop();
+		common::gui_player::stop();
 	}
 }
 
 void gui::dx::dx_player::pause() {
 	if(m_player) {
-		if(m_player->is_playing()) {
-			m_player->pause();
+		common::gui_player::pause();
+		if(is_pause_active()) {
 			m_timer->pause();
-		} else if(m_player->is_pausing()) {
-			m_player->resume();
+		} else {
 			m_timer->resume();
 		}
 	}
 }
 
-void gui::dx::dx_player::resume() {
-	if(m_player) {
-		m_player->resume();
-		m_timer->resume();
-	}
-}
-
 void gui::dx::dx_player::restart() {
-	bool playing = is_playing();
+	bool playing = is_play_active();
 	stop();
 	
 	delete m_player;
@@ -225,17 +222,18 @@ void gui::dx::dx_player::restart() {
 		delete m_player;
 	}
 	m_player = 0;	
-	lib::document *doc = lib::document::create_from_url(m_factory, m_url);
+	lib::document *doc = lib::document::create_from_url(this, m_url);
 	if(!doc) {
 		m_logger->show("Failed to parse document %s", m_url.get_url().c_str());
 		return;
 	}
 	AM_DBG m_logger->debug("Creating player instance for: %s", m_url.get_url().c_str());	
-	m_player = new smil2::smil_player(doc, m_factory, this);	
+	m_player = new smil2::smil_player(doc, this, this);	
 	
-	if(playing) start();	
+	if(playing) play();	
 }
 
+#if 0
 bool gui::dx::dx_player::is_playing() const {
 	return (m_player && m_player->is_playing()) || !m_frames.empty();
 }
@@ -253,9 +251,9 @@ void gui::dx::dx_player::set_preferences(const std::string& url) {
 	if(is_playing()) stop();
 	if(m_player) m_player->build_timegraph();
 }
-
+#endif
 void gui::dx::dx_player::on_click(int x, int y, HWND hwnd) {
-	if(!m_player || !is_playing()) return;
+	if(!m_player) return;
 	lib::point pt(x, y);
 	dx_window *dxwin = (dx_window *) get_window(hwnd);
 	if(!dxwin) return;
@@ -265,7 +263,7 @@ void gui::dx::dx_player::on_click(int x, int y, HWND hwnd) {
 }
 
 int gui::dx::dx_player::get_cursor(int x, int y, HWND hwnd) {
-	if(!m_player || !is_playing()) return 0;
+	if(!m_player) return 0;
 	lib::point pt(x, y);
 	dx_window *dxwin = (dx_window *) get_window(hwnd);
 	if(!dxwin) return 0;
@@ -276,8 +274,12 @@ int gui::dx::dx_player::get_cursor(int x, int y, HWND hwnd) {
 }
 
 std::string gui::dx::dx_player::get_pointed_node_str() {
+#if 1
+	return "";
+#else
 	if(!m_player || !is_playing()) return "";
 	return m_player->get_pointed_node_str();
+#endif
 }
 
 void gui::dx::dx_player::on_char(int ch) {
@@ -562,9 +564,11 @@ void gui::dx::dx_player::update_callback() {
 
 void gui::dx::dx_player::schedule_update() {
 	if(!m_player) return;
+	smil2::smil_player *spl = dynamic_cast<smil2::smil_player *>(m_player);
+	if (!spl) return;
 	m_update_event = new lib::no_arg_callback_event<dx_player>(this, 
 		&dx_player::update_callback);
-	m_player->schedule_event(m_update_event, 50, ep_high);
+	spl->schedule_event(m_update_event, 50, ep_high);
 }
 
 ////////////////////////
@@ -590,6 +594,7 @@ get_top_layout_name(smil2::smil_layout_manager *layout, const lib::node* n) {
 	return ri?ri->get_name().c_str():0;
 }
 
+#if 0
 common::gui_window *
 gui::dx::dx_player::get_window(const lib::node* n) {
 	typedef common::surface_template region;
@@ -606,6 +611,7 @@ gui::dx::dx_player::get_window(const lib::node* n) {
 	wininfo* winfo = (*it).second;
 	return winfo->w;
 }
+#endif
 
 void gui::dx::dx_player::show_file(const net::url& href) {
 	ShellExecute(GetDesktopWindow(), text_str("open"), textptr(href.get_url().c_str()), NULL, NULL, SW_SHOWNORMAL);
@@ -628,7 +634,7 @@ void gui::dx::dx_player::done(common::player *p) {
 		m_windows = pf->windows;
 		m_player = pf->player;
 		delete pf;
-		resume();
+		assert(0); // resume();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
 			dx_window *dxwin = (dx_window *)(*it).second->w;
@@ -656,7 +662,7 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 	}
 	
 	// Parse the provided URL. 
-	lib::document *doc = lib::document::create_from_url(m_factory, newdoc);
+	lib::document *doc = lib::document::create_from_url(this, newdoc);
 	if(!doc) {
 		m_logger->show("Failed to parse document %s", newdoc.get_url().c_str());
 		return;
@@ -675,7 +681,7 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 	
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", newdoc.get_url().c_str());
-	m_player = new smil2::smil_player(doc, m_factory, this);
-	if(startnewdoc) start();
+	m_player = new smil2::smil_player(doc, this, this);
+	if(startnewdoc) play();
 }
 
