@@ -62,9 +62,6 @@ class ambulant_gtk_window : public common::gui_window {
 	void mouse_region_changed();
 	void user_event(const lib::point &where, int what=0);
 	void need_events(bool want);
-
-//	GtkWindow* get_gtk_window();
-//	void set_gtk_window(GtkWindow* w);
 	GdkPixmap* get_ambulant_pixmap();
 	GdkPixmap* new_ambulant_surface();
 	GdkPixmap* get_ambulant_surface();
@@ -84,7 +81,6 @@ class ambulant_gtk_window : public common::gui_window {
 	
   private:
 	gtk_ambulant_widget* m_ambulant_widget;
-//	GtkWidow *m_window;
 	GdkPixmap* m_pixmap;
 	GdkPixmap* m_oldpixmap;
 	GdkPixmap* m_surface;
@@ -111,15 +107,14 @@ class gtk_ambulant_widget : public GtkWidget {
 	ambulant_gtk_window* gtk_window();
 	GtkWidget* get_gtk_widget();	
 
-	void do_need_redraw ();
-//	void paintEvent(QPaintEvent* e);
+	void gtk_ambulant_widget::do_paint_event (GdkEventExpose * event); 
 //	void mouseReleaseEvent(QMouseEvent* e);
 
   private:
 	ambulant_gtk_window* m_gtk_window;
 	GtkWidget *m_widget;
 
-#ifndef GTK_NO_FILEDIALOG	/* Assume plain Qt */
+#ifndef GTK_NO_FILEDIALOG	/* Assume plain GTK */
   protected:
 //	void mouseMoveEvent(QMouseEvent* e);
 #endif/*GTK_NO_FILEDIALOG*/
