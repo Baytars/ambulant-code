@@ -86,14 +86,12 @@ int gui::dx::dx_gui_region::s_counter = 0;
 gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedback *feedback, const net::url& u) 
 :	m_hoster(hoster),
 	m_url(u),
-	m_timer(new timer_control_impl(realtime_timer_factory(), 1.0, false)),
 	m_update_event(0),
 	m_logger(lib::logger::get_logger())
 {
 	
 	// Fill the factory objects
 	init_factories();
-	m_window_factory = this->get_window_factory(); 
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
@@ -140,8 +138,6 @@ gui::dx::dx_player::~dx_player() {
 		delete m_player;
 	}
 	m_player = NULL;
-	if(m_timer) m_timer->pause();
-	delete m_timer;	
 	assert(m_windows.empty());
 	if(dx_gui_region::s_counter != 0) 
 		m_logger->warn("Undeleted gui regions: %d", dx_gui_region::s_counter);
@@ -153,6 +149,12 @@ gui::dx::dx_player::init_playable_factory()
 	m_playable_factory = common::get_global_playable_factory();
 	// Add the playable factory
 	m_playable_factory->add_factory(new dx_playable_factory(this, m_logger, this));
+}
+
+void
+gui::dx::dx_player::init_window_factory()
+{
+		m_window_factory = this; 
 }
 
 void
@@ -178,7 +180,6 @@ gui::dx::dx_player::init_parser_factory()
 void gui::dx::dx_player::play() {
 	if(m_player) {
 		common::gui_player::play();
-		m_timer->resume();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
 			dx_window *dxwin = (dx_window *)(*it).second->w;
@@ -189,7 +190,6 @@ void gui::dx::dx_player::play() {
 
 void gui::dx::dx_player::stop() {
 	if(m_player) {
-		m_timer->pause();
 		m_update_event = 0;
 		clear_transitions();
 		common::gui_player::stop();
@@ -199,11 +199,6 @@ void gui::dx::dx_player::stop() {
 void gui::dx::dx_player::pause() {
 	if(m_player) {
 		common::gui_player::pause();
-		if(is_pause_active()) {
-			m_timer->pause();
-		} else {
-			m_timer->resume();
-		}
 	}
 }
 
@@ -472,9 +467,12 @@ void gui::dx::dx_player::start_outtransition(common::playable *p, const lib::tra
 }
 
 gui::dx::dx_transition *
-gui::dx::dx_player::set_transition(common::playable *p, const lib::transition_info *info, bool is_outtransition) {  
-//XXXX	stopped(p);
-	lib::timer_control *timer = new lib::timer_control_impl(m_timer, 1.0, false);
+gui::dx::dx_player::set_transition(common::playable *p, 
+								   const lib::transition_info *info, 
+								   bool is_outtransition)
+{  
+	assert(m_player);
+	lib::timer_control *timer = new lib::timer_control_impl(m_player->get_timer(), 1.0, false);
 	dx_transition *tr = make_transition(info->m_type, p, timer);
 	m_trmap[p] = tr;
 	common::surface *surf = p->get_renderer()->get_surface();
@@ -491,7 +489,8 @@ bool gui::dx::dx_player::has_transitions() const {
 
 void gui::dx::dx_player::update_transitions() {
 	m_trmap_cs.enter();
-	lib::timer::time_type pt = m_timer->elapsed();
+	assert(m_player);
+	lib::timer::time_type pt = m_player->get_timer()->elapsed();
 	//lock_redraw();
 	for(trmap_t::iterator it=m_trmap.begin();it!=m_trmap.end();it++) {
 		if(!(*it).second->next_step(pt)) {
@@ -564,11 +563,10 @@ void gui::dx::dx_player::update_callback() {
 
 void gui::dx::dx_player::schedule_update() {
 	if(!m_player) return;
-	smil2::smil_player *spl = dynamic_cast<smil2::smil_player *>(m_player);
-	if (!spl) return;
+	lib::event_processor *evp = m_player->get_evp();
 	m_update_event = new lib::no_arg_callback_event<dx_player>(this, 
 		&dx_player::update_callback);
-	spl->schedule_event(m_update_event, 50, ep_high);
+	evp->add_event(m_update_event, 50, ep_high);
 }
 
 ////////////////////////
@@ -625,7 +623,6 @@ void gui::dx::dx_player::show_file(const net::url& href) {
 
 
 void gui::dx::dx_player::done(common::player *p) {
-	m_timer->pause();
 	m_update_event = 0;
 	clear_transitions();
 	if(!m_frames.empty()) {

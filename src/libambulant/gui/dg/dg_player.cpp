@@ -81,8 +81,7 @@ gui::dg::dg_player::dg_player(dg_player_callbacks &hoster, const net::url& u)
 	m_update_event(0),	
 	m_logger(lib::logger::get_logger()) {
 	
-	m_window_factory = this->get_window_factory(); 
-
+	init_factories();
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
@@ -132,6 +131,12 @@ gui::dg::dg_player::init_playable_factory()
 	m_playable_factory = common::get_global_playable_factory();
 	// Add the playable factory
 	m_playable_factory->add_factory(new dg_playable_factory(this, m_logger, this));
+}
+
+void
+gui::dg::dg_player::init_window_factory()
+{
+		m_window_factory = this; 
 }
 
 void
@@ -456,7 +461,7 @@ void gui::dg::dg_player::schedule_update() {
 	if(!m_player) return;
 	m_update_event = new lib::no_arg_callback_event<dg_player>(this, 
 		&dg_player::update_callback);
-	m_worker_processor->add_event(m_update_event, 50, lib::event_processor::low);
+	m_worker_processor->add_event(m_update_event, 50, lib::ep_low);
 }
 
 ////////////////////////

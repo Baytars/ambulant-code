@@ -126,6 +126,7 @@ class dg_player :
 	////////////////////
 	// common::gui_player implementation
 	void init_playable_factory();
+	void init_window_factory();
 	void init_datasource_factory();
 	void init_parser_factory();
 #if 0
@@ -172,7 +173,6 @@ class dg_player :
 	std::string get_pointed_node_str();
 	const net::url& get_url() const { return m_url;}
 	
-	common::window_factory *get_window_factory() { return this;}
 	viewport* create_viewport(int w, int h, HWND hwnd);
 	void redraw(HWND hwnd, HDC hdc);
 	void on_done();

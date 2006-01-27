@@ -142,7 +142,7 @@ void smil_player::build_timegraph() {
 }
 
 void smil_player::schedule_event(lib::event *ev, lib::timer::time_type t, event_priority ep) {
-	m_event_processor->add_event(ev, t, (event_processor::event_priority)ep);
+	m_event_processor->add_event(ev, t, ep);
 }
 
 // Command to start playback
@@ -593,7 +593,7 @@ void smil_player::update() {
 		if(m_root->is_active()) {
 			lib::event *update_event = new lib::no_arg_callback_event<smil_player>(this, 
 				&smil_player::update);
-			m_event_processor->add_event(update_event, dt, event_processor::high);
+			m_event_processor->add_event(update_event, dt, lib::ep_high);
 		}
 	}
 }
