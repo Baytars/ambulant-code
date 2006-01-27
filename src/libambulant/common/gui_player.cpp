@@ -92,6 +92,12 @@ gui_player::pause()
 	m_lock.leave();
 }
 
+void
+gui_player::restart()
+{
+	ambulant::lib::logger::get_logger()->error("Restarting presentation not implemented in this release.");
+}
+
 bool
 gui_player::is_play_enabled() const
 {

@@ -22,6 +22,7 @@
 #ifndef GUI_PLAYER_H
 #define GUI_PLAYER_H
 
+#include "ambulant/config/config.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/factory.h"
 #include "ambulant/common/player.h"
@@ -48,6 +49,8 @@ class gui_player : public factories {
 	virtual void stop();
 	virtual void pause();
 	
+	virtual void restart();
+
 //	virtual void set_speed(double speed) = 0;
 //	virtual double get_speed() const = 0;
 	

@@ -338,7 +338,7 @@ void MmView::SetMMDocument(LPCTSTR lpszPathName, bool autostart) {
 void MmView::OnFilePlay()
 {
 	if(player) {
-		player->start();
+		player->play();
 		needs_done_redraw = true;
 		InvalidateRect(NULL);
 	}
@@ -346,8 +346,8 @@ void MmView::OnFilePlay()
 
 void MmView::OnUpdateFilePlay(CCmdUI *pCmdUI)
 {	
-	bool enable = player && !player->is_playing();
-	pCmdUI->Enable(enable?TRUE:FALSE);
+	pCmdUI->Enable((int)(player && player->is_play_enabled()));
+	pCmdUI->SetCheck((int)(player && player->is_play_active()));
 }
 
 void MmView::OnFilePause()
@@ -357,9 +357,8 @@ void MmView::OnFilePause()
 
 void MmView::OnUpdateFilePause(CCmdUI *pCmdUI)
 {
-	bool enable = player && (player->is_playing() || player->is_pausing());
-	pCmdUI->Enable(enable?TRUE:FALSE);
-	if(enable) pCmdUI->SetCheck(player->is_pausing()?1:0);
+	pCmdUI->Enable((int)(player && player->is_pause_enabled()));
+	pCmdUI->SetCheck((int)(player && player->is_pause_active()));
 }
 
 void MmView::OnFileStop()
@@ -383,14 +382,15 @@ void MmView::OnFileStop()
 
 void MmView::OnUpdateFileStop(CCmdUI *pCmdUI)
 {
-	bool enable = player && (player->is_playing() || player->is_pausing());
-	pCmdUI->Enable(enable?TRUE:FALSE);
+	pCmdUI->Enable((int)(player && player->is_stop_enabled()));
+	pCmdUI->SetCheck((int)(player && player->is_stop_active()));
 }
 
 void MmView::OnTimer(UINT nIDEvent)
 {
+	// XXXX Jack: This seems a very funny way to get a final redraw...
 	CView::OnTimer(nIDEvent);
-	if(player && needs_done_redraw && player->is_done()) {
+	if(player && needs_done_redraw && player->is_stop_active()) {
 		player->on_done();
 		InvalidateRect(NULL);
 		PostMessage(WM_INITMENUPOPUP,0, 0); 
