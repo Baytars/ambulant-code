@@ -19,18 +19,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
- 
-
-#include "ambulant/common/factory.h"
-
 #include "ambulant/version.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/refcount.h"
-//#include "ambulant/lib/event_processor.h"
-//#include "ambulant/lib/asb.h"
-#include "ambulant/common/player.h"
+#include "ambulant/common/gui_player.h"
 #include "ambulant/common/playable.h"
-//#include "ambulant/common/renderer.h"
 #include "ambulant/lib/document.h"
 #include "ambulant/common/embedder.h"
 #include "ambulant/net/url.h"
@@ -41,16 +34,12 @@ class mainloop : public ambulant::common::gui_player {
 		bool use_mms, ambulant::common::embedder *app);
 	~mainloop();
 		
-	void play();
-	void stop();
-	void pause();
-		
-	void set_preferences(std::string &path);
-
+	void init_playable_factory();
+	void init_window_factory();
+	void init_datasource_factory();
+	void init_parser_factory();
   private:
 	ambulant::lib::document *create_document(ambulant::net::url& url);
 	ambulant::lib::document *m_doc;
-  	ambulant::common::factories *m_factory;
 	ambulant::common::embedder *m_embedder;
-	const ambulant::lib::node *m_goto_node;	// XXX Quick hack
 };

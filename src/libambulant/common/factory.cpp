@@ -28,10 +28,6 @@ factories::factories()
 	m_datasource_factory(NULL),
 	m_parser_factory(NULL)
 {
-	init_playable_factory();
-	init_window_factory();
-	init_datasource_factory();
-	init_parser_factory();
 }
 
 factories::~factories()
@@ -40,6 +36,15 @@ factories::~factories()
 	// delete m_window_factory; Owned by parent
 	delete m_datasource_factory;
 	// delete m_parser_factory; singleton
+}
+
+void
+factories::init_factories()
+{
+	init_playable_factory();
+	init_window_factory();
+	init_datasource_factory();
+	init_parser_factory();
 }
 
 void

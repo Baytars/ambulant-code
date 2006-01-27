@@ -1121,6 +1121,18 @@
 		0471BDE2089E3F6300C44EA0 /* ffmpeg_raw.h in Headers */ = {isa = PBXBuildFile; fileRef = 0471BDDE089E3F6300C44EA0 /* ffmpeg_raw.h */; };
 		0471BDE3089E3F6300C44EA0 /* ffmpeg_video.h in Headers */ = {isa = PBXBuildFile; fileRef = 0471BDDF089E3F6300C44EA0 /* ffmpeg_video.h */; };
 		0471BE07089E456100C44EA0 /* ffmpeg_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 0471BE06089E456100C44EA0 /* ffmpeg_factory.h */; };
+		047846B00989710800A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B10989710900A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B20989710900A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B30989710900A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B40989710900A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B50989710900A3E39F /* gui_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 047846AF0989710800A3E39F /* gui_player.cpp */; };
+		047846B70989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
+		047846B80989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
+		047846B90989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
+		047846BA0989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
+		047846BB0989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
+		047846BC0989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
 		0478D956060B382C004224C0 /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		0478D958060B383E004224C0 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		048399DE08ED2FDD008505C3 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048399DD08ED2FDC008505C3 /* WebKit.framework */; };
@@ -1453,6 +1465,12 @@
 		04F7E4F208A23A8B00D68AEA /* renderer_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0471BDAE089E272700C44EA0 /* renderer_impl.cpp */; };
 		04F7E4F308A23A9300D68AEA /* factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 04A107720748E0A6002EA347 /* factory.h */; };
 		04F7E4F408A23A9600D68AEA /* video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0471BDA1089E25A200C44EA0 /* video_renderer.cpp */; };
+		04F844800986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
+		04F844810986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
+		04F844820986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
+		04F844830986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
+		04F844840986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
+		04F844850986E7CA00398A72 /* factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F8447F0986E7CA00398A72 /* factory.cpp */; };
 		04FB91CD06466E5C00DE8086 /* cocoa_transition.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04FB91CC06466E5C00DE8086 /* cocoa_transition.mm */; };
 		04FB91CF06466E7100DE8086 /* cocoa_transition.h in Headers */ = {isa = PBXBuildFile; fileRef = 04FB91CE06466E7100DE8086 /* cocoa_transition.h */; };
 		04FD793F0609E97100E69C96 /* MyAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04FD793E0609E97100E69C96 /* MyAppDelegate.mm */; };
@@ -1730,6 +1748,8 @@
 		0471BDDE089E3F6300C44EA0 /* ffmpeg_raw.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ffmpeg_raw.h; sourceTree = "<group>"; };
 		0471BDDF089E3F6300C44EA0 /* ffmpeg_video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ffmpeg_video.h; sourceTree = "<group>"; };
 		0471BE06089E456100C44EA0 /* ffmpeg_factory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ffmpeg_factory.h; sourceTree = "<group>"; };
+		047846AF0989710800A3E39F /* gui_player.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gui_player.cpp; sourceTree = "<group>"; };
+		047846B60989712000A3E39F /* gui_player.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gui_player.h; sourceTree = "<group>"; };
 		0478D955060B382C004224C0 /* stdio_datasource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = stdio_datasource.h; sourceTree = "<group>"; };
 		0478D957060B383E004224C0 /* stdio_datasource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = stdio_datasource.cpp; sourceTree = "<group>"; };
 		0480D5E907208FB600D39BB5 /* libxerces-c.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libxerces-c.dylib"; path = "../../../../packages/xerces-unix/lib/libxerces-c.dylib"; sourceTree = SOURCE_ROOT; };
@@ -1810,6 +1830,7 @@
 		04EA7C6C05D7C69600487047 /* smil_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = smil_handler.cpp; sourceTree = "<group>"; };
 		04F545BE06E4A59D0090511E /* mypreferences.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = mypreferences.h; sourceTree = "<group>"; };
 		04F545BF06E4A59D0090511E /* mypreferences.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = mypreferences.mm; sourceTree = "<group>"; };
+		04F8447F0986E7CA00398A72 /* factory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = factory.cpp; sourceTree = "<group>"; };
 		04FB91CC06466E5C00DE8086 /* cocoa_transition.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_transition.mm; sourceTree = "<group>"; };
 		04FB91CE06466E7100DE8086 /* cocoa_transition.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cocoa_transition.h; sourceTree = "<group>"; };
 		04FD793E0609E97100E69C96 /* MyAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = MyAppDelegate.mm; sourceTree = "<group>"; };
@@ -1977,6 +1998,8 @@
 		042AF8F8053C2F020010C447 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				047846AF0989710800A3E39F /* gui_player.cpp */,
+				04F8447F0986E7CA00398A72 /* factory.cpp */,
 				0471BDAE089E272700C44EA0 /* renderer_impl.cpp */,
 				0471BDA1089E25A200C44EA0 /* video_renderer.cpp */,
 				04B9F60C0700511E00B78CC4 /* plugin_engine.cpp */,
@@ -2017,6 +2040,7 @@
 		04382ABC05D7AEE600CFA029 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				047846B60989712000A3E39F /* gui_player.h */,
 				0471BD6C089E23E700C44EA0 /* smil_handler.h */,
 				0471BD68089E23CF00C44EA0 /* renderer_impl.h */,
 				0471BD69089E23CF00C44EA0 /* video_renderer.h */,
@@ -2667,6 +2691,7 @@
 				04F7E4EE08A23A5200D68AEA /* smil_handler.h in Headers */,
 				04F7E4F308A23A9300D68AEA /* factory.h in Headers */,
 				042EBB4708EC849700DB2F0E /* cocoa_html.h in Headers */,
+				047846B80989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2801,6 +2826,7 @@
 				0416556608F331530017F91F /* renderer_impl.h in Headers */,
 				044FD77A08F335A200ED79BF /* rtsp_datasource.h in Headers */,
 				044FD77C08F335A400ED79BF /* rtsp_factory.h in Headers */,
+				047846BC0989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2933,6 +2959,7 @@
 				0459E82408DAD12B00BF6ED5 /* video_renderer.h in Headers */,
 				042EBB4508EC849700DB2F0E /* cocoa_html.h in Headers */,
 				042EBB5A08EC869800DB2F0E /* renderer_impl.h in Headers */,
+				047846BB0989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3068,6 +3095,7 @@
 				0409718208A0CC2B00EC8191 /* demux_datasource.h in Headers */,
 				0409718608A0CFF000EC8191 /* renderer_impl.h in Headers */,
 				042EBB4808EC849700DB2F0E /* cocoa_html.h in Headers */,
+				047846B90989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3201,6 +3229,7 @@
 				0471BE07089E456100C44EA0 /* ffmpeg_factory.h in Headers */,
 				04BD5C0D089E6DF200597620 /* demux_datasource.h in Headers */,
 				042EBB4908EC849700DB2F0E /* cocoa_html.h in Headers */,
+				047846BA0989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3334,6 +3363,7 @@
 				04F7E4D608A2399100D68AEA /* renderer_impl.h in Headers */,
 				04F7E4F008A23A6700D68AEA /* video_renderer.h in Headers */,
 				042EBB4608EC849700DB2F0E /* cocoa_html.h in Headers */,
+				047846B70989712000A3E39F /* gui_player.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4202,6 +4232,8 @@
 				04F7E4F208A23A8B00D68AEA /* renderer_impl.cpp in Sources */,
 				04F7E4F408A23A9600D68AEA /* video_renderer.cpp in Sources */,
 				042EBB4D08EC84B500DB2F0E /* cocoa_html.mm in Sources */,
+				04F844810986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B10989710900A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4295,6 +4327,8 @@
 				041655CA08F331530017F91F /* cocoa_html.mm in Sources */,
 				044FD77908F335A100ED79BF /* rtsp_datasource.cpp in Sources */,
 				044FD77B08F335A300ED79BF /* rtsp_factory.cpp in Sources */,
+				04F844850986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B50989710900A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4386,6 +4420,8 @@
 				0459E82108DAD11100BF6ED5 /* video_renderer.cpp in Sources */,
 				0459E82208DAD11900BF6ED5 /* demux_datasource.cpp in Sources */,
 				042EBB4B08EC84B500DB2F0E /* cocoa_html.mm in Sources */,
+				04F844840986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B40989710900A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4479,6 +4515,8 @@
 				0409718408A0CC3B00EC8191 /* demux_datasource.cpp in Sources */,
 				0409718508A0CFEF00EC8191 /* renderer_impl.cpp in Sources */,
 				042EBB4E08EC84B500DB2F0E /* cocoa_html.mm in Sources */,
+				04F844820986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B20989710900A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4570,6 +4608,8 @@
 				0471BDD2089E3D3900C44EA0 /* ffmpeg_video.cpp in Sources */,
 				04BD5C0A089E6DE000597620 /* demux_datasource.cpp in Sources */,
 				042EBB4F08EC84B500DB2F0E /* cocoa_html.mm in Sources */,
+				04F844830986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B30989710900A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4661,6 +4701,8 @@
 				04F7E4DA08A239A000D68AEA /* video_renderer.cpp in Sources */,
 				04F7E4DB08A239A300D68AEA /* renderer_impl.cpp in Sources */,
 				042EBB4C08EC84B500DB2F0E /* cocoa_html.mm in Sources */,
+				04F844800986E7CA00398A72 /* factory.cpp in Sources */,
+				047846B00989710800A3E39F /* gui_player.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
