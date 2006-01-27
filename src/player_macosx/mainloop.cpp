@@ -186,32 +186,18 @@ ambulant::lib::document *
 mainloop::create_document(ambulant::net::url& url)
 {
 	// XXXX Needs work for URLs
-	char *data;
 	// Correct for relative pathnames for local files
 	if (url.is_local_file() && !url.is_absolute()) {
-#if 0
-		// Not implemented yet for posix
-		ambulant::net::url cwd_url(lib::filesys::getcwd());
-#else
 		char cwdbuf[1024];
 		if (getcwd(cwdbuf, sizeof cwdbuf-2) < 0)
 			strcpy(cwdbuf, ".");
 		strcat(cwdbuf, "/");
 		ambulant::net::url cwd_url = ambulant::net::url::from_filename(cwdbuf);
-#endif
 		url = url.join_to_base(cwd_url);
 		AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
 	}
-	size_t size;
-	bool ok = ambulant::net::read_data_from_url(url, get_datasource_factory(), &data, &size);
-	if (!ok) {
-		ambulant::lib::logger::get_logger()->error(gettext("%s: Cannot open"), url.get_url().c_str());
-		return NULL;
-	}
-	std::string docdata(data, size);
-	free(data);
 	ambulant::lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
-	ambulant::lib::document *rv = ambulant::lib::document::create_from_string(this, docdata, url.get_url());
+	ambulant::lib::document *rv = ambulant::lib::document::create_from_url(this, url);
 	if (rv) {
 		ambulant::lib::logger::get_logger()->trace("%s: Parser done", url.get_url().c_str());
 		rv->set_src_url(url);
