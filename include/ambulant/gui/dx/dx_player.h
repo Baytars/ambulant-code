@@ -123,6 +123,7 @@ class AMBULANTAPI dx_player :
 	////////////////////
 	// common::gui_player implementation
 	void init_playable_factory();
+	void init_window_factory();
 	void init_datasource_factory();
 	void init_parser_factory();
 
@@ -131,19 +132,8 @@ class AMBULANTAPI dx_player :
 	void pause();
 
 	void restart();
-#if 0
-	void resume();
 
-	bool is_playing() const;
-	bool is_pausing() const;
-	bool is_done() const;
-#endif
-	void set_preferences(const std::string& url);
-	
-	// should these be part of the player interface?
-	lib::timer* get_timer() { return 0;}
-	lib::event_processor* get_evp() { return 0;}
-	
+	void set_preferences(const std::string& url);	
 	
 	////////////////////
 	// common::window_factory implementation
@@ -202,13 +192,6 @@ class AMBULANTAPI dx_player :
 	dx_player_callbacks &m_hoster;
 	// The current document URL
 	net::url m_url;
-#if 0	
-	// The node we want to start playback at.
-	const lib::node *m_goto_node;
-
-	// The current SMIL2 player
-	smil2::smil_player *m_player;
-#endif
 	// The current view	
 	struct wininfo {HWND h; viewport *v; dx_window *w; long f;};
 	std::map<std::string, wininfo*> m_windows;	
@@ -217,10 +200,7 @@ class AMBULANTAPI dx_player :
 	// The frames stack
 	struct frame {std::map<std::string, wininfo*> windows; common::player* player;};
 	std::stack<frame*> m_frames;
-	
-	// The secondary timer and processor
-	lib::timer_control *m_timer;
-		
+			
 	lib::event *m_update_event;
 	typedef std::map<common::playable *, dx_transition*> trmap_t;
 	trmap_t m_trmap;
