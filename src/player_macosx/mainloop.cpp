@@ -56,13 +56,7 @@
 #define AM_DBG if(0)
 #endif
 
-void
-usage()
-{
-	std::cerr << "Usage: demoplayer file" << std::endl;
-	std::cerr << "Options: --version (-v) prints version info" << std::endl;
-	exit(1);
-}
+using namespace ambulant;
 
 #ifdef TEST_PLAYBACK_FEEDBACK
 #include "ambulant/common/player.h"
@@ -84,68 +78,21 @@ class pbfeedback pbfeedback;
 
 mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 	bool use_mms, ambulant::common::embedder *app)
-:   m_doc(NULL),
-	m_factory(NULL),
-	m_embedder(app),
-	m_goto_node(NULL)
+:   common::gui_player(),
+	m_doc(NULL),
+	m_embedder(app)
 {
-	using namespace ambulant;
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop(0x%x): created", (void*)this);
-
-	common::global_playable_factory *rf = common::get_global_playable_factory();
+	init_factories();
+	
 #ifdef NONE_PLAYER
 	// Replace the real window factory with a none_window_factory instance.
 	wf = new gui::none::none_window_factory();
 #endif // NONE_PLAYER
-	net::datasource_factory *df = new net::datasource_factory();
-	lib::global_parser_factory *pf = lib::global_parser_factory::get_parser_factory();	
-	m_factory = new common::factories(); // XXXX (rf, wf, df, pf);
+	m_window_factory = wf;
 
-#ifndef NONE_PLAYER
-#ifdef WITH_LIVE	
-	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add live_audio_datasource_factory");
-	m_factory->df->add_video_factory(new net::live_video_datasource_factory());
-	m_factory->df->add_audio_factory(new net::live_audio_datasource_factory()); 
-#endif
-#ifdef WITH_FFMPEG
-#ifdef WITH_FFMPEG_VIDEO
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
-	df->add_video_factory(net::get_ffmpeg_video_datasource_factory());
-#endif // WITH_FFMPEG_VIDEO
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
-	df->add_audio_factory(net::get_ffmpeg_audio_datasource_factory());
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_parser_finder");
-	df->add_audio_parser_finder(net::get_ffmpeg_audio_parser_finder());
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_filter_finder");
-	df->add_audio_filter_finder(net::get_ffmpeg_audio_filter_finder());
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
-	df->add_raw_factory(net::get_ffmpeg_raw_datasource_factory());
-#endif // WITH_FFMPEG
-#endif // NONE_PLAYER
-#ifdef WITH_STDIO_DATASOURCE
-	// This is for debugging only, really: the posix datasource
-	// should always perform better, and is always available on OSX.
-	// If you define WITH_STDIO_DATASOURCE we prefer to use the stdio datasource,
-	// however.
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add stdio_datasource_factory");
-	df->add_raw_factory(net::get_stdio_datasource_factory());
-#endif
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add posix_datasource_factory");
-	df->add_raw_factory(net::get_posix_datasource_factory());
+	init_plugins();
 	
-#ifndef NONE_PLAYER
-	rf->add_factory(new gui::cocoa::cocoa_renderer_factory(m_factory));
-#ifdef WITH_SDL
-    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add factory for SDL");
-	rf->add_factory( new gui::sdl::sdl_renderer_factory(m_factory) );      
-#endif // WITH_SDL
-#endif // NONE_PLAYER
-
-	AM_DBG lib::logger::get_logger()->debug("qt_mainloop::qt_mainloop: Starting the plugin engine");
-
-	common::plugin_engine *plf = common::plugin_engine::get_plugin_engine();
-	plf->add_plugins(m_factory);
-
 	ambulant::net::url url = ambulant::net::url::from_url(urlstr);
 	m_doc = create_document(url);
 	if (!m_doc) {
@@ -153,9 +100,9 @@ mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 		return;
 	}
 	if (use_mms)
-		m_player = common::create_mms_player(m_doc, m_factory);
+		m_player = common::create_mms_player(m_doc, this);
 	else
-		m_player = common::create_smil2_player(m_doc, m_factory, m_embedder);
+		m_player = common::create_smil2_player(m_doc, this, m_embedder);
 #ifdef USE_SMIL21
 	m_player->initialize();
 #endif
@@ -172,6 +119,68 @@ mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 		}
 	}
 }
+
+void
+mainloop::init_playable_factory()
+{
+	m_playable_factory = common::get_global_playable_factory();
+#ifndef NONE_PLAYER
+	m_playable_factory->add_factory(new gui::cocoa::cocoa_renderer_factory(this));
+#ifdef WITH_SDL
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add factory for SDL");
+	m_playable_factory->add_factory( new gui::sdl::sdl_renderer_factory(this) );      
+#endif // WITH_SDL
+#endif // NONE_PLAYER
+}
+
+void
+mainloop::init_window_factory()
+{
+}
+
+void
+mainloop::init_datasource_factory()
+{
+	m_datasource_factory = new net::datasource_factory();
+#ifndef NONE_PLAYER
+#ifdef WITH_LIVE	
+	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add live_audio_datasource_factory");
+	m_datasource_factory->add_video_factory(new net::live_video_datasource_factory());
+	m_datasource_factory->add_audio_factory(new net::live_audio_datasource_factory()); 
+#endif
+#ifdef WITH_FFMPEG
+#ifdef WITH_FFMPEG_VIDEO
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
+	m_datasource_factory->add_video_factory(net::get_ffmpeg_video_datasource_factory());
+#endif // WITH_FFMPEG_VIDEO
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
+	m_datasource_factory->add_audio_factory(net::get_ffmpeg_audio_datasource_factory());
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_parser_finder");
+	m_datasource_factory->add_audio_parser_finder(net::get_ffmpeg_audio_parser_finder());
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_audio_filter_finder");
+	m_datasource_factory->add_audio_filter_finder(net::get_ffmpeg_audio_filter_finder());
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
+	m_datasource_factory->add_raw_factory(net::get_ffmpeg_raw_datasource_factory());
+#endif // WITH_FFMPEG
+#endif // NONE_PLAYER
+#ifdef WITH_STDIO_DATASOURCE
+	// This is for debugging only, really: the posix datasource
+	// should always perform better, and is always available on OSX.
+	// If you define WITH_STDIO_DATASOURCE we prefer to use the stdio datasource,
+	// however.
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add stdio_datasource_factory");
+	m_datasource_factory->add_raw_factory(net::get_stdio_datasource_factory());
+#endif
+    AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add posix_datasource_factory");
+	m_datasource_factory->add_raw_factory(net::get_posix_datasource_factory());
+}
+
+void
+mainloop::init_parser_factory()
+{
+	m_parser_factory = lib::global_parser_factory::get_parser_factory();	
+}
+
 
 ambulant::lib::document *
 mainloop::create_document(ambulant::net::url& url)
@@ -194,7 +203,7 @@ mainloop::create_document(ambulant::net::url& url)
 		AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
 	}
 	size_t size;
-	bool ok = ambulant::net::read_data_from_url(url, m_factory->get_datasource_factory(), &data, &size);
+	bool ok = ambulant::net::read_data_from_url(url, get_datasource_factory(), &data, &size);
 	if (!ok) {
 		ambulant::lib::logger::get_logger()->error(gettext("%s: Cannot open"), url.get_url().c_str());
 		return NULL;
@@ -202,7 +211,7 @@ mainloop::create_document(ambulant::net::url& url)
 	std::string docdata(data, size);
 	free(data);
 	ambulant::lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
-	ambulant::lib::document *rv = ambulant::lib::document::create_from_string(m_factory, docdata, url.get_url());
+	ambulant::lib::document *rv = ambulant::lib::document::create_from_string(this, docdata, url.get_url());
 	if (rv) {
 		ambulant::lib::logger::get_logger()->trace("%s: Parser done", url.get_url().c_str());
 		rv->set_src_url(url);
@@ -217,46 +226,4 @@ mainloop::~mainloop()
 //  m_doc will be cleaned up by the smil_player.
 //	if (m_doc) delete m_doc;
 //	m_doc = NULL;
-	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::~mainloop(0x%x)", (void*)this);
-	if (m_player) delete m_player;
-	m_player = NULL;
-	delete m_factory;
-}
-
-void
-mainloop::play()
-{
-	if (!m_player) {
-		ambulant::lib::logger::get_logger()->error(gettext("Cannot play document: no player"));
-		return;
-	}
-//	m_speed = 1.0;
-	m_player->start();
-	if (m_goto_node) {
-		bool ok = m_player->goto_node(m_goto_node);
-		if (!ok)
-			ambulant::lib::logger::get_logger()->trace("mainloop::run: goto_node failed");
-	} 
-	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::run(): returning");
-}
-
-void
-mainloop::stop()
-{
-	if (m_player) m_player->stop();
-	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::run(): returning");
-}
-
-void
-mainloop::pause()
-{
-	if (m_player) m_player->pause();
-	AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::pause(): returning");
-}
-
-
-void
-mainloop::set_preferences(std::string& filename)
-{
-	ambulant::smil2::test_attrs::load_test_attrs(filename);
 }

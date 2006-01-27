@@ -158,7 +158,7 @@ initialize_logger()
 	NSString *systemTestSettingsPath = [thisBundle pathForResource:@"systemTestSettings" ofType:@"xml"];
 	if (systemTestSettingsPath) {
 		std::string path([systemTestSettingsPath cString]);
-		mainloop::set_preferences(ambulant::net::url::from_filename(path));
+		mainloop::load_test_attrs(path);
 		// And initialize the location where we find other datafiles (bit of a hack)
 		NSString *nsresourcedir = [systemTestSettingsPath stringByDeletingLastPathComponent];
 		std::string resourcedir([nsresourcedir cString]);
@@ -204,7 +204,7 @@ initialize_logger()
 	if (result != NSOKButton) return;
 	NSString *filename = [[panel filenames] objectAtIndex: 0];
 	std::string path([filename cString]);
-	mainloop::set_preferences(ambulant::net::url::from_filename(path));
+	mainloop::load_test_attrs(path);
 }
 
 - (IBAction)playWelcome:(id)sender
