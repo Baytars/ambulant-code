@@ -370,7 +370,7 @@ gtk_gui::gtk_gui(const char* title,
 	m_o_y = 20;
 #endif/*QT_NO_FILEDIALOG*/
 	
-
+// This is the old manner of creating the menu bar 
 	/* A canvas with fixed layout should be the document_container */ 
 	//m_documentcontainer = gtk_drawing_area_new();
 	//g_signal_connect_swapped (G_OBJECT (m_documentcontainer), "expose_event", G_CALLBACK (gtk_C_callback_do_need_redraw_simple), (void*) this);
