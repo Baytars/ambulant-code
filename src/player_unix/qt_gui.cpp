@@ -105,8 +105,6 @@ qt_gui::qt_gui(const char* title,
 	m_settings_selector(NULL),
 #endif/*QT_NO_FILEDIALOG*/
 	m_mainloop(NULL),
-	m_o_x(0),	 
-	m_o_y(0),	 
 #ifdef	TRY_LOCKING
 	m_gui_thread(0),
 #endif/*TRY_LOCKING*/
@@ -183,12 +181,11 @@ qt_gui::qt_gui(const char* title,
 		m_helpmenu->insertItem(gettext("&Play Welcome Document"), this, SLOT(slot_welcome()));
 		m_menubar->insertItem(gettext("&Help"), m_helpmenu);
 		m_menubar->setGeometry(0,0,320,20);
-		m_o_x = 0;
-#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-		m_o_y = 27;
-#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-		m_o_y = 20;
-#endif/*QT_NO_FILEDIALOG*/
+//#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
+//		m_o_y = 27;
+//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+//		m_o_y = 20;
+//#endif/*QT_NO_FILEDIALOG*/
 	}
 	QObject::connect(this, SIGNAL(signal_player_done()),
 			    this, SLOT(slot_player_done()));
