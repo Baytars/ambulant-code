@@ -30,11 +30,11 @@
 #include "qt_logger.h"
 #include "qt_renderer.h"
 #include <qthread.h>
-#if 1
+
 #include "ambulant/config/config.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/version.h"
-#endif
+#include "ambulant/gui/qt/qt_factory.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -181,11 +181,11 @@ qt_gui::qt_gui(const char* title,
 		m_helpmenu->insertItem(gettext("&Play Welcome Document"), this, SLOT(slot_welcome()));
 		m_menubar->insertItem(gettext("&Help"), m_helpmenu);
 		m_menubar->setGeometry(0,0,320,20);
-//#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
-//		m_o_y = 27;
-//#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
-//		m_o_y = 20;
-//#endif/*QT_NO_FILEDIALOG*/
+#ifndef QT_NO_FILEDIALOG	/* Assume plain Qt */
+		m_menubar_height = 27;
+#else /*QT_NO_FILEDIALOG*/	/* Assume embedded Qt */
+		m_menubar_height = 20;
+#endif/*QT_NO_FILEDIALOG*/
 	}
 	QObject::connect(this, SIGNAL(signal_player_done()),
 			    this, SLOT(slot_player_done()));
@@ -291,7 +291,8 @@ qt_gui::openSMILfile(const QString smilfilename, int mode) {
 	m_smilfilename = smilfilename;
 	if (m_mainloop != NULL)
 		delete m_mainloop;
- 	m_mainloop = new qt_mainloop(this);
+	ambulant::common::window_factory *wf = new ambulant::gui::qt::qt_window_factory(this, m_menubar_height);
+ 	m_mainloop = new qt_mainloop(this, wf);
 	return m_mainloop->is_open();
 }
 

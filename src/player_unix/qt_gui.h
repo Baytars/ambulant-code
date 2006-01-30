@@ -115,6 +115,7 @@ class qt_mainloop;
 	qt_settings* m_settings; // the Settings window
 	QString      m_smilfilename;
 	QPopupMenu*  m_viewmenu;
+	int          m_menubar_height; // Hack: top Y position of player widget
 
 #define	TRY_LOCKING
 #ifdef	TRY_LOCKING
