@@ -83,11 +83,12 @@ open_web_browser(const std::string &href)
 	}
 }
 
-qt_mainloop::qt_mainloop(qt_gui* gui) :
-	m_doc(NULL),
+qt_mainloop::qt_mainloop(qt_gui* gui, ambulant::common::window_factory *wf)
+:	m_doc(NULL),
 	m_gui(gui)
 {
  	m_logger = lib::logger::get_logger();
+ 	m_window_factory = wf;
  	init_factories();
 	
 	const char *filename = m_gui->filename();
@@ -159,12 +160,6 @@ qt_mainloop::init_playable_factory()
 #ifdef WITH_ARTS
 	m_playable_factory->add_factory(new arts::arts_renderer_factory(this));
 #endif 
-}
-
-void
-qt_mainloop::init_window_factory()
-{
-    m_window_factory = new qt_window_factory(m_gui);
 }
 
 void

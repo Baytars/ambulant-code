@@ -47,8 +47,9 @@ qt_renderer_factory::qt_renderer_factory(common::factories *factory)
 	AM_DBG lib::logger::get_logger()->debug("qt_renderer factory (0x%x)", (void*) this);
 }
 	
-qt_window_factory::qt_window_factory( QWidget* parent_widget)
-:	m_parent_widget(parent_widget)
+qt_window_factory::qt_window_factory( QWidget* parent_widget, int top_offset)
+:	m_parent_widget(parent_widget),
+    m_top_offset(top_offset)
 {
 	AM_DBG lib::logger::get_logger()->debug("qt_window_factory (0x%x)", (void*) this);
 }	
@@ -427,7 +428,7 @@ qt_window_factory::new_window (const std::string &name,
 			       lib::size bounds,
 			       common::gui_events *region)
 {
-	lib::rect* r = new lib::rect(lib::point(0, 0), bounds);
+	lib::rect* r = new lib::rect(lib::point(0, m_top_offset), bounds);
 	AM_DBG lib::logger::get_logger()->debug("qt_window_factory::new_window (0x%x): name=%s %d,%d,%d,%d",
 		(void*) this, name.c_str(), r->left(),r->top(),r->right(),r->bottom());
  	ambulant_qt_window * aqw = new ambulant_qt_window(name, r, region);
@@ -436,7 +437,7 @@ qt_window_factory::new_window (const std::string &name,
 	qaw->setBackgroundMode(Qt::NoBackground);
 	assert(qApp);
 	assert(qApp->mainWidget());
-	qApp->mainWidget()->resize(bounds.w, bounds.h);
+	qApp->mainWidget()->resize(bounds.w, bounds.h+m_top_offset);
 #else	/*QT_NO_FILEDIALOG*/  /* Assume embedded Qt */
 	qaw->setBackgroundMode(QWidget::NoBackground);
 	/* No resize implemented for embedded Qt */
