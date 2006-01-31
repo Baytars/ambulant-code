@@ -1104,6 +1104,12 @@
 		046718F205219EFA0010C447 /* MyAppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 046718F005219EFA0010C447 /* MyAppDelegate.h */; };
 		0469447206249C0D0007093B /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		0469447606249D3C0007093B /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
+		046B0A41098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
+		046B0A42098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
+		046B0A43098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
+		046B0A44098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
+		046B0A45098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
+		046B0A46098E75E200A7D964 /* node_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 046B0A40098E75E200A7D964 /* node_impl.h */; };
 		046C3FA50676052300F22EF7 /* cocoa_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 046C3FA40676052300F22EF7 /* cocoa_renderer.h */; };
 		046C3FA70676062900F22EF7 /* cocoa_renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 046C3FA60676062900F22EF7 /* cocoa_renderer.mm */; };
 		04707B8906DC86B400C3B6BA /* preferences.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04707B8806DC86B400C3B6BA /* preferences.cpp */; };
@@ -1731,6 +1737,7 @@
 		046718F005219EFA0010C447 /* MyAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MyAppDelegate.h; sourceTree = "<group>"; };
 		0469447106249C0D0007093B /* none_area.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = none_area.h; sourceTree = "<group>"; };
 		0469447506249D3B0007093B /* none_area.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = none_area.cpp; sourceTree = "<group>"; };
+		046B0A40098E75E200A7D964 /* node_impl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = node_impl.h; sourceTree = "<group>"; };
 		046C3FA40676052300F22EF7 /* cocoa_renderer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cocoa_renderer.h; sourceTree = "<group>"; };
 		046C3FA60676062900F22EF7 /* cocoa_renderer.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_renderer.mm; sourceTree = "<group>"; };
 		04707B8806DC86B400C3B6BA /* preferences.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = preferences.cpp; sourceTree = "<group>"; };
@@ -2159,6 +2166,7 @@
 		04382B4805D7AEE600CFA029 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				046B0A40098E75E200A7D964 /* node_impl.h */,
 				041614840720836C00A8B0B6 /* xerces_parser.h */,
 				04C65258071FC0C3001E3C7B /* parser_factory.h */,
 				04E976B9067FA5DA00AE60D0 /* gpaths.h */,
@@ -2692,6 +2700,7 @@
 				04F7E4F308A23A9300D68AEA /* factory.h in Headers */,
 				042EBB4708EC849700DB2F0E /* cocoa_html.h in Headers */,
 				047846B80989712000A3E39F /* gui_player.h in Headers */,
+				046B0A43098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2827,6 +2836,7 @@
 				044FD77A08F335A200ED79BF /* rtsp_datasource.h in Headers */,
 				044FD77C08F335A400ED79BF /* rtsp_factory.h in Headers */,
 				047846BC0989712000A3E39F /* gui_player.h in Headers */,
+				046B0A46098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2960,6 +2970,7 @@
 				042EBB4508EC849700DB2F0E /* cocoa_html.h in Headers */,
 				042EBB5A08EC869800DB2F0E /* renderer_impl.h in Headers */,
 				047846BB0989712000A3E39F /* gui_player.h in Headers */,
+				046B0A45098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3096,6 +3107,7 @@
 				0409718608A0CFF000EC8191 /* renderer_impl.h in Headers */,
 				042EBB4808EC849700DB2F0E /* cocoa_html.h in Headers */,
 				047846B90989712000A3E39F /* gui_player.h in Headers */,
+				046B0A44098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3230,6 +3242,7 @@
 				04BD5C0D089E6DF200597620 /* demux_datasource.h in Headers */,
 				042EBB4908EC849700DB2F0E /* cocoa_html.h in Headers */,
 				047846BA0989712000A3E39F /* gui_player.h in Headers */,
+				046B0A41098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3364,6 +3377,7 @@
 				04F7E4F008A23A6700D68AEA /* video_renderer.h in Headers */,
 				042EBB4608EC849700DB2F0E /* cocoa_html.h in Headers */,
 				047846B70989712000A3E39F /* gui_player.h in Headers */,
+				046B0A42098E75E200A7D964 /* node_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
