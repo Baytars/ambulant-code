@@ -74,7 +74,7 @@ lib::document::get_root() const {
 lib::document* 
 lib::document::create_from_file(common::factories* factory, const std::string& filename) {
 	document *d = new document();
-	tree_builder builder(d);
+	tree_builder builder(factory->get_node_factory(), d);
 	if(!builder.build_tree_from_file(filename.c_str())) {
 		// build_tree_from_file has reported the error already
 		// logger::get_logger()->error(gettext("%s: Not a valid XML document"), filename.c_str());
@@ -99,7 +99,7 @@ lib::document::create_from_file(common::factories* factory, const std::string& f
 lib::document* 
 lib::document::create_from_url(common::factories* factory, const net::url& u) {
 	document *d = new document();
-	tree_builder builder(d);
+	tree_builder builder(factory->get_node_factory(), d);
 	char *data;
 	size_t datasize;
 	if (!net::read_data_from_url(u, factory->get_datasource_factory(), &data, &datasize)) {
@@ -128,7 +128,7 @@ lib::document::create_from_url(common::factories* factory, const net::url& u) {
 lib::document* 
 lib::document::create_from_string(common::factories* factory, const std::string& smil_src, const std::string& src_id) {
 	document *d = new document();
-	tree_builder builder(d, src_id.c_str());
+	tree_builder builder(factory->get_node_factory(), d, src_id.c_str());
 	if(!builder.build_tree_from_str(smil_src)) {
 		logger::get_logger()->error(gettext("%s: Not a valid XML document"), src_id.c_str());
 		delete d;

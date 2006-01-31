@@ -26,7 +26,8 @@ factories::factories()
 :	m_playable_factory(NULL),
 	m_window_factory(NULL),
 	m_datasource_factory(NULL),
-	m_parser_factory(NULL)
+	m_parser_factory(NULL),
+	m_node_factory(NULL)
 {
 }
 
@@ -45,6 +46,7 @@ factories::init_factories()
 	init_window_factory();
 	init_datasource_factory();
 	init_parser_factory();
+	init_node_factory();
 }
 
 void
@@ -65,5 +67,11 @@ factories::init_datasource_factory()
 void
 factories::init_parser_factory()
 {
+}
+
+void
+factories::init_node_factory()
+{
+	m_node_factory = lib::get_builtin_node_factory();
 }
 

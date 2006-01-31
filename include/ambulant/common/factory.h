@@ -26,6 +26,7 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/layout.h"
+#include "ambulant/lib/node.h"
 
 namespace ambulant {
 
@@ -40,16 +41,19 @@ public:
 	virtual void init_window_factory();
 	virtual void init_datasource_factory();
 	virtual void init_parser_factory();
+	virtual void init_node_factory();
 	
 	ambulant::common::playable_factory *get_playable_factory() const { return m_playable_factory; }
 	ambulant::common::window_factory *get_window_factory() const { return m_window_factory; }
 	ambulant::net::datasource_factory *get_datasource_factory() const { return m_datasource_factory; }
 	ambulant::lib::global_parser_factory *get_parser_factory() const { return m_parser_factory; }
+	ambulant::lib::node_factory *get_node_factory() const { return m_node_factory; }
 protected:
 	ambulant::common::global_playable_factory *m_playable_factory;
 	ambulant::common::window_factory *m_window_factory;
 	ambulant::net::datasource_factory *m_datasource_factory;
 	ambulant::lib::global_parser_factory *m_parser_factory;
+	ambulant::lib::node_factory *m_node_factory;
 };
 
 } // end namespaces

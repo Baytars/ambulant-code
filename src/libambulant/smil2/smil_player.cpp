@@ -87,7 +87,7 @@ smil_player::smil_player(lib::document *doc, common::factories *factory, common:
 void
 smil_player::initialize()
 {
-	m_layout_manager->load_bgimages(m_factory->get_playable_factory());
+	m_layout_manager->load_bgimages(m_factory);
 }
 #endif
 
