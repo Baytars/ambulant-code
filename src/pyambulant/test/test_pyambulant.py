@@ -111,7 +111,31 @@ class TestBasics(unittest.TestCase):
         self.assertEqual(p1.get_local_name(), "par")
         self.assertEqual(p1.get_attribute_1("id"), "par1")
         self.assertEqual(p1.get_attribute_2("id"), "par1")
- #       self.assertEqual(p1.get_attribute_1("src"), "img1.gif")
+
+        self.assertEqual(p1.get_root(), root)
+        self.assertNotEqual(p1, root)
+
+        p1_path = p1.get_path_display_desc()
+        self.assertEqual(p1_path, "smil/body/par:par1")
+        self.assertEqual(root.locate_node("body/par"), p1)
+
+    def test_07_node_factory(self):
+        class MyNodeFactory:
+            def new_node(self, tag, arglist, context):
+                orig_nf = ambulant.get_builtin_node_factory()
+                return orig_nf.new_node_1(tag, arglist, context)
+
+        factories = self._getfactories()
+        factories.set_node_factory(MyNodeFactory())
+        doc = ambulant.create_from_string(factories, DOCUMENT, "file:///testdir/test.smil")
+        self.assert_(doc)
+        root = doc.get_root()
+        self.assertEqual(root.get_local_name(), "smil")
+        self.assertEqual(root.size(), 8)
+        p1 = doc.get_node("par1")
+        self.assertEqual(p1.get_local_name(), "par")
+        self.assertEqual(p1.get_attribute_1("id"), "par1")
+        self.assertEqual(p1.get_attribute_2("id"), "par1")
 
         self.assertEqual(p1.get_root(), root)
         self.assertNotEqual(p1, root)

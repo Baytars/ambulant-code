@@ -1183,7 +1183,35 @@ static void node_factoryObj_dealloc(node_factoryObject *self)
 	self->ob_type->tp_free((PyObject *)self);
 }
 
-static PyObject *node_factoryObj_new_node(node_factoryObject *_self, PyObject *_args)
+static PyObject *node_factoryObj_new_node_1(node_factoryObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::q_name_pair qn;
+	ambulant::lib::q_attributes_list qattrs;
+	ambulant::lib::node_context* ctx;
+	ambulant::lib::xml_string qn_first;
+	ambulant::lib::xml_string qn_second;
+	char *qn_first_cstr;
+	char *qn_second_cstr;
+	if (!PyArg_ParseTuple(_args, "(ss)O&O&",
+	                      &qn_first_cstr, &qn_second_cstr,
+	                      ambulant_attributes_list_Convert, &qattrs,
+	                      node_contextObj_Convert, &ctx))
+		return NULL;
+	qn_first = qn_first_cstr;
+	qn_second = qn_second_cstr;
+	qn = ambulant::lib::q_name_pair(qn_first, qn_second);
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::node* _rv = _self->ob_itself->new_node(qn,
+	                                                      qattrs,
+	                                                      ctx);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     nodeObj_New, _rv);
+	return _res;
+}
+
+static PyObject *node_factoryObj_new_node_2(node_factoryObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
 	ambulant::lib::node* other;
@@ -1199,7 +1227,9 @@ static PyObject *node_factoryObj_new_node(node_factoryObject *_self, PyObject *_
 }
 
 static PyMethodDef node_factoryObj_methods[] = {
-	{"new_node", (PyCFunction)node_factoryObj_new_node, 1,
+	{"new_node_1", (PyCFunction)node_factoryObj_new_node_1, 1,
+	 PyDoc_STR("(ambulant::lib::q_name_pair qn, ambulant::lib::q_attributes_list qattrs, ambulant::lib::node_context* ctx) -> (ambulant::lib::node* _rv)")},
+	{"new_node_2", (PyCFunction)node_factoryObj_new_node_2, 1,
 	 PyDoc_STR("(ambulant::lib::node* other) -> (ambulant::lib::node* _rv)")},
 	{NULL, NULL, 0}
 };
