@@ -319,7 +319,7 @@ class node_factory {
 	virtual node *new_node(const node* other) = 0;
 };
 
-node_factory *get_builtin_node_factory();
+AMBULANTAPI node_factory *get_builtin_node_factory();
 
 } // namespace lib
  
