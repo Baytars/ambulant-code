@@ -70,7 +70,7 @@ show_message(int level, const char *format)
 	NSString *message = [[NSString stringWithCString: format] retain];
 	MyAppDelegate *delegate = [[NSApplication sharedApplication] delegate];
 	[delegate performSelectorOnMainThread: @selector(showMessage:) 
-		withObject: message waitUntilDone: YES];
+		withObject: message waitUntilDone: NO];
 //	[message release];
 }
 

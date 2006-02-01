@@ -37,6 +37,7 @@ factories::~factories()
 	// delete m_window_factory; Owned by parent
 	delete m_datasource_factory;
 	// delete m_parser_factory; singleton
+	// delete m_node_factory; singleton
 }
 
 void

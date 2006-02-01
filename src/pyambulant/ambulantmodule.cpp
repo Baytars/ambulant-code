@@ -11980,6 +11980,20 @@ static PyObject *PyAm_get_version(PyObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *PyAm_get_builtin_node_factory(PyObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::node_factory* _rv;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_rv = ambulant::lib::get_builtin_node_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     node_factoryObj_New, _rv);
+	return _res;
+}
+
 static PyObject *PyAm_create_from_url(PyObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -12294,6 +12308,8 @@ static PyObject *PyAm_get_stdio_datasource_factory(PyObject *_self, PyObject *_a
 static PyMethodDef PyAm_methods[] = {
 	{"get_version", (PyCFunction)PyAm_get_version, 1,
 	 PyDoc_STR("() -> (const char * _rv)")},
+	{"get_builtin_node_factory", (PyCFunction)PyAm_get_builtin_node_factory, 1,
+	 PyDoc_STR("() -> (ambulant::lib::node_factory* _rv)")},
 	{"create_from_url", (PyCFunction)PyAm_create_from_url, 1,
 	 PyDoc_STR("(ambulant::common::factories* factory, ambulant::net::url u) -> (ambulant::lib::document* _rv)")},
 	{"create_from_file", (PyCFunction)PyAm_create_from_file, 1,

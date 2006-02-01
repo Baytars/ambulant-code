@@ -27,6 +27,20 @@ class TestBasics(unittest.TestCase):
     def setUp(self):
         pass
         
+    def _getfactories(self):
+        rf = ambulant.get_global_playable_factory()
+        wf = ambulant.none_window_factory()
+        df = ambulant.datasource_factory()
+        pf = ambulant.get_parser_factory()
+        nf = ambulant.get_builtin_node_factory()
+        factories = ambulant.factories()
+        factories.set_playable_factory(rf)
+        factories.set_window_factory(wf)
+        factories.set_datasource_factory(df)
+        factories.set_parser_factory(pf)
+        factories.set_node_factory(nf)
+        return factories
+        
     def test_01_getversion(self):
         version = ambulant.get_version()
         self.assertEqual(version, VERSION)
@@ -71,23 +85,15 @@ class TestBasics(unittest.TestCase):
         del evp
         
     def test_04_document(self):
-        rf = ambulant.get_global_playable_factory()
-        wf = ambulant.none_window_factory()
-        df = ambulant.datasource_factory()
-        pf = ambulant.get_parser_factory()
-        factories = ambulant.factories()
-        factories.set_playable_factory(rf)
-        factories.set_window_factory(wf)
-        factories.set_datasource_factory(df)
-        factories.set_parser_factory(pf)
+        factories = self._getfactories()
         doc = ambulant.create_from_string(factories, "<smil></smil>", "file:///test.smil")
         self.assert_(type(doc) is ambulant.document)
         root = doc.get_root()
         self.assert_(type(root) is ambulant.node)
         self.assertEqual(root.size(), 1)
         
-    def test_05_baddocument(self):
-        factories = ambulant.factories()
+    def x_test_05_baddocument(self):
+        factories = self._getfactories()
         doc = ambulant.create_from_string(factories, "<smil></smil>", "file:///test.smil")
         self.assert_(type(doc) is ambulant.document)
         root = doc.get_root()
@@ -95,15 +101,7 @@ class TestBasics(unittest.TestCase):
         self.assertEqual(root.size(), 1)
         
     def test_06_node(self):
-        rf = ambulant.get_global_playable_factory()
-        wf = ambulant.none_window_factory()
-        df = ambulant.datasource_factory()
-        pf = ambulant.get_parser_factory()
-        factories = ambulant.factories()
-        factories.set_playable_factory(rf)
-        factories.set_window_factory(wf)
-        factories.set_datasource_factory(df)
-        factories.set_parser_factory(pf)
+        factories = self._getfactories()
         doc = ambulant.create_from_string(factories, DOCUMENT, "file:///testdir/test.smil")
         self.assert_(doc)
         root = doc.get_root()
@@ -123,15 +121,7 @@ class TestBasics(unittest.TestCase):
         self.assertEqual(root.locate_node("body/par"), p1)
         
     def x_test_07_mmsplayer(self):
-        rf = ambulant.get_global_playable_factory()
-        wf = ambulant.none_window_factory()
-        df = ambulant.datasource_factory()
-        pf = ambulant.get_parser_factory()
-        factories = ambulant.factories()
-        factories.set_playable_factory(rf)
-        factories.set_window_factory(wf)
-        factories.set_datasource_factory(df)
-        factories.set_parser_factory(pf)
+        factories = self._getfactories()
         doc = ambulant.create_from_file(factories, WELCOME)
         self.assert_(doc)
         player = ambulant.create_mms_player(doc, factories)
@@ -142,15 +132,7 @@ class TestBasics(unittest.TestCase):
     def x_test_08_smil2player(self):
         class MyEmbedder:
             pass
-        rf = ambulant.get_global_playable_factory()
-        wf = ambulant.none_window_factory()
-        df = ambulant.datasource_factory()
-        pf = ambulant.get_parser_factory()
-        factories = ambulant.factories()
-        factories.set_playable_factory(rf)
-        factories.set_window_factory(wf)
-        factories.set_datasource_factory(df)
-        factories.set_parser_factory(pf)
+        factories = self._getfactories()
         doc = ambulant.create_from_file(factories, WELCOME)
         self.assert_(doc)
         embedder = MyEmbedder()
