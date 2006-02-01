@@ -162,7 +162,7 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 
     def output_tp_initBody(self):
         Output("%s itself;", self.itselftype)
-        Output("char *kw[] = {\"itself\", 0};")
+        Output("const char *kw[] = {\"itself\", 0};")
         Output()
         for con in self.constructors:
             con.outputConstructorBody()
@@ -293,11 +293,9 @@ url = net_url
 const_ambulant_net_url_ref = net_url
 posix_datasource_ptr = datasource_ptr
 stdio_datasource_ptr = datasource_ptr
-ambulant_common_playable_factory_ptr = playable_factory_ptr
-ambulant_common_window_factory_ptr = window_factory_ptr
-ambulant_lib_global_parser_factory_ptr = global_parser_factory_ptr
-ambulant_lib_node_factory_ptr = node_factory_ptr
-ambulant_net_datasource_factory_ptr = datasource_factory_ptr
+lib_global_parser_factory_ptr = global_parser_factory_ptr
+lib_node_factory_ptr = node_factory_ptr
+net_datasource_factory_ptr = datasource_factory_ptr
 common_factories_ptr = factories_ptr
 
 print "=== Testing availability of support for all needed C types ==="
@@ -392,6 +390,9 @@ class NoFunctionGenerator(FunctionGenerator):
         
     def checkgenerate(self):
         return False
+        
+    def generateAttributeExistenceTest(self):
+        pass
         
 Function = NoFunctionGenerator
 Method = BackMethodGenerator

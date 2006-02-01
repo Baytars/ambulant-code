@@ -2059,6 +2059,11 @@ factories::factories(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "get_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_datasource_factory");
 		if (!PyObject_HasAttrString(itself, "get_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_parser_factory");
 		if (!PyObject_HasAttrString(itself, "get_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_node_factory");
+		if (!PyObject_HasAttrString(itself, "set_playable_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_playable_factory");
+		if (!PyObject_HasAttrString(itself, "set_window_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_window_factory");
+		if (!PyObject_HasAttrString(itself, "set_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_datasource_factory");
+		if (!PyObject_HasAttrString(itself, "set_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_parser_factory");
+		if (!PyObject_HasAttrString(itself, "set_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_node_factory");
 	}
 	if (itself == NULL) itself = Py_None;
 
