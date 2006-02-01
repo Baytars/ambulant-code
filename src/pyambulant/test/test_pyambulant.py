@@ -3,7 +3,7 @@ import ambulant
 import unittest
 import time
 
-VERSION="1.5" # Ambulant version
+VERSION="1.7" # Ambulant version
 WELCOME="../../Extras/Welcome/Welcome.smil"
 DOCUMENT="""<?xml version="1.0"?>
 <!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 2.0//EN"
@@ -75,7 +75,11 @@ class TestBasics(unittest.TestCase):
         wf = ambulant.none_window_factory()
         df = ambulant.datasource_factory()
         pf = ambulant.get_parser_factory()
-        factories = (rf, wf, df, pf)
+        factories = ambulant.factories()
+        factories.set_playable_factory(rf)
+        factories.set_window_factory(wf)
+        factories.set_datasource_factory(df)
+        factories.set_parser_factory(pf)
         doc = ambulant.create_from_string(factories, "<smil></smil>", "file:///test.smil")
         self.assert_(type(doc) is ambulant.document)
         root = doc.get_root()
@@ -83,11 +87,7 @@ class TestBasics(unittest.TestCase):
         self.assertEqual(root.size(), 1)
         
     def test_05_baddocument(self):
-        rf = None #ambulant.get_global_playable_factory()
-        wf = None #ambulant.none_window_factory()
-        df = None #ambulant.datasource_factory()
-        pf = None #ambulant.get_parser_factory()
-        factories = (rf, wf, df, pf)
+        factories = ambulant.factories()
         doc = ambulant.create_from_string(factories, "<smil></smil>", "file:///test.smil")
         self.assert_(type(doc) is ambulant.document)
         root = doc.get_root()
@@ -99,7 +99,11 @@ class TestBasics(unittest.TestCase):
         wf = ambulant.none_window_factory()
         df = ambulant.datasource_factory()
         pf = ambulant.get_parser_factory()
-        factories = (rf, wf, df, pf)
+        factories = ambulant.factories()
+        factories.set_playable_factory(rf)
+        factories.set_window_factory(wf)
+        factories.set_datasource_factory(df)
+        factories.set_parser_factory(pf)
         doc = ambulant.create_from_string(factories, DOCUMENT, "file:///testdir/test.smil")
         self.assert_(doc)
         root = doc.get_root()
@@ -123,7 +127,11 @@ class TestBasics(unittest.TestCase):
         wf = ambulant.none_window_factory()
         df = ambulant.datasource_factory()
         pf = ambulant.get_parser_factory()
-        factories = (rf, wf, df, pf)
+        factories = ambulant.factories()
+        factories.set_playable_factory(rf)
+        factories.set_window_factory(wf)
+        factories.set_datasource_factory(df)
+        factories.set_parser_factory(pf)
         doc = ambulant.create_from_file(factories, WELCOME)
         self.assert_(doc)
         player = ambulant.create_mms_player(doc, factories)
@@ -138,7 +146,11 @@ class TestBasics(unittest.TestCase):
         wf = ambulant.none_window_factory()
         df = ambulant.datasource_factory()
         pf = ambulant.get_parser_factory()
-        factories = (rf, wf, df, pf)
+        factories = ambulant.factories()
+        factories.set_playable_factory(rf)
+        factories.set_window_factory(wf)
+        factories.set_datasource_factory(df)
+        factories.set_parser_factory(pf)
         doc = ambulant.create_from_file(factories, WELCOME)
         self.assert_(doc)
         embedder = MyEmbedder()
