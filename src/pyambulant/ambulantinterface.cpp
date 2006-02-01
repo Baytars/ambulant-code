@@ -1197,6 +1197,57 @@ void node::set_context(ambulant::lib::node_context* c)
 	PyGILState_Release(_GILState);
 }
 
+/* ----------------------- Class node_factory ----------------------- */
+
+node_factory::node_factory(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "new_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_node");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_node_factory = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+node_factory::~node_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_node_factory);
+	py_node_factory = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+ambulant::lib::node* node_factory::new_node(const ambulant::lib::node* other)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::lib::node* _rv;
+	PyObject *py_other = Py_BuildValue("O&", nodeObj_New, other);
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_factory, "new_node", "(O)", py_other);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_node() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", nodeObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_node() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_other);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
 /* -------------------------- Class event --------------------------- */
 
 event::event(PyObject *itself)
@@ -1267,7 +1318,7 @@ event_processor::~event_processor()
 }
 
 
-void event_processor::add_event(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_processor::event_priority priority)
+void event_processor::add_event(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_priority priority)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	PyObject *py_pe = Py_BuildValue("O&", eventObj_New, pe);
@@ -1304,7 +1355,7 @@ void event_processor::cancel_all_events()
 	PyGILState_Release(_GILState);
 }
 
-bool event_processor::cancel_event(ambulant::lib::event* pe, ambulant::lib::event_processor::event_priority priority)
+bool event_processor::cancel_event(ambulant::lib::event* pe, ambulant::lib::event_priority priority)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	bool _rv;
@@ -1986,6 +2037,116 @@ void embedder::done(ambulant::common::player* p)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_p);
+
+	PyGILState_Release(_GILState);
+}
+
+/* ------------------------ Class factories ------------------------- */
+
+factories::factories(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "init_factories")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_factories");
+		if (!PyObject_HasAttrString(itself, "init_playable_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_playable_factory");
+		if (!PyObject_HasAttrString(itself, "init_window_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_window_factory");
+		if (!PyObject_HasAttrString(itself, "init_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_datasource_factory");
+		if (!PyObject_HasAttrString(itself, "init_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_parser_factory");
+		if (!PyObject_HasAttrString(itself, "init_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_node_factory");
+		if (!PyObject_HasAttrString(itself, "get_playable_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_playable_factory");
+		if (!PyObject_HasAttrString(itself, "get_window_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_window_factory");
+		if (!PyObject_HasAttrString(itself, "get_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_datasource_factory");
+		if (!PyObject_HasAttrString(itself, "get_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_parser_factory");
+		if (!PyObject_HasAttrString(itself, "get_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_node_factory");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_factories = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+factories::~factories()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_factories);
+	py_factories = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+void factories::init_playable_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_playable_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_playable_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::init_window_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_window_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_window_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::init_datasource_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_datasource_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_datasource_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::init_parser_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_parser_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_parser_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::init_node_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_node_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_node_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
 
 	PyGILState_Release(_GILState);
 }
@@ -3856,6 +4017,7 @@ player::player(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "is_done")) PyErr_Warn(PyExc_Warning, "player: missing attribute: is_done");
 		if (!PyObject_HasAttrString(itself, "get_cursor")) PyErr_Warn(PyExc_Warning, "player: missing attribute: get_cursor");
 		if (!PyObject_HasAttrString(itself, "set_cursor")) PyErr_Warn(PyExc_Warning, "player: missing attribute: set_cursor");
+		if (!PyObject_HasAttrString(itself, "on_char")) PyErr_Warn(PyExc_Warning, "player: missing attribute: on_char");
 		if (!PyObject_HasAttrString(itself, "set_feedback")) PyErr_Warn(PyExc_Warning, "player: missing attribute: set_feedback");
 		if (!PyObject_HasAttrString(itself, "goto_node")) PyErr_Warn(PyExc_Warning, "player: missing attribute: goto_node");
 	}
@@ -4110,6 +4272,24 @@ void player::set_cursor(int cursor)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_cursor);
+
+	PyGILState_Release(_GILState);
+}
+
+void player::on_char(int ch)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_ch = Py_BuildValue("i", ch);
+
+	PyObject *py_rv = PyObject_CallMethod(py_player, "on_char", "(O)", py_ch);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during player::on_char() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_ch);
 
 	PyGILState_Release(_GILState);
 }

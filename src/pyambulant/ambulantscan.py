@@ -23,6 +23,7 @@ def main():
         AMBULANT+ "lib/timer.h",
         AMBULANT+ "lib/transition_info.h",
         AMBULANT+ "common/embedder.h",
+        AMBULANT+ "common/factory.h",
         AMBULANT+ "common/layout.h",
         AMBULANT+ "common/playable.h",
         AMBULANT+ "common/player.h",

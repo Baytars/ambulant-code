@@ -32,7 +32,7 @@ ambulant_url_Convert(PyObject *v, ambulant::net::url *p_itself)
     char *cstr = PyString_AsString(v);
     if (cstr == NULL) return 0;
     std::string cxxstr = cstr;
-    ambulant::net::url url(cxxstr);
+    ambulant::net::url url = ambulant::net::url::from_url(cxxstr);
     *p_itself = url;
     return 1;
 }

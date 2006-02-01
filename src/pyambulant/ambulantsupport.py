@@ -79,7 +79,7 @@ zindex_t = Type("ambulant::common::zindex_t", "l")
 cookie_type = Type("ambulant::common::playable::cookie_type", "l")
 const_cookie_type = cookie_type
 color_t = Type("ambulant::lib::color_t", "l") # XXXX Split into RGB
-event_priority = Type("ambulant::lib::event_processor::event_priority", "l")
+event_priority = Type("ambulant::lib::event_priority", "l")
 timestamp_t = Type("ambulant::net::timestamp_t", "L")
 time_type = Type("ambulant::lib::timer::time_type", "l")
 tiling = Type("ambulant::common::tiling", "l")
@@ -187,12 +187,6 @@ print "=== declaring more types ==="
 # XXXX Temporarily disabled
 methods_none_playable_factory = []
 
-common_factories_ptr = HeapTupleType("ambulant::common::factories",
-        (playable_factory_ptr, "rf"),
-        (window_factory_ptr, "wf"),
-        (datasource_factory_ptr, "df"),
-        (global_parser_factory_ptr, "pf"))
-
 audio_format = TupleType("ambulant::net::audio_format",
         (std_string, "mime_type"),
         (std_string, "name"),
@@ -299,6 +293,12 @@ url = net_url
 const_ambulant_net_url_ref = net_url
 posix_datasource_ptr = datasource_ptr
 stdio_datasource_ptr = datasource_ptr
+ambulant_common_playable_factory_ptr = playable_factory_ptr
+ambulant_common_window_factory_ptr = window_factory_ptr
+ambulant_lib_global_parser_factory_ptr = global_parser_factory_ptr
+ambulant_lib_node_factory_ptr = node_factory_ptr
+ambulant_net_datasource_factory_ptr = datasource_factory_ptr
+common_factories_ptr = factories_ptr
 
 print "=== Testing availability of support for all needed C types ==="
 
@@ -449,6 +449,12 @@ node_object.othermethods = [
     "void get_children(const_node_list& l) const {}", # XXX for now
     "void append_data(const char *data, size_t len) { abort(); }", # XXX for now
     "void set_attributes(const char **attrs) { abort(); }", # XXX for now
+]
+node_factory_object.othermethods = [
+	"ambulant::lib::node *new_node(const char *local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };",
+	"ambulant::lib::node *new_node(const ambulant::lib::xml_string& local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };",
+	"ambulant::lib::node *new_node(const ambulant::lib::q_name_pair& qn, const ambulant::lib::q_attributes_list& qattrs, const ambulant::lib::node_context *ctx = 0) { abort(); };",
+
 ]
 parser_factory_object.othermethods = [
     "ambulant::lib::xml_parser* new_parser(ambulant::lib::sax_content_handler*, ambulant::lib::sax_error_handler*) { abort(); }", # XXX for now
