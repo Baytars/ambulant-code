@@ -150,7 +150,7 @@ initialize_logger()
 		fact.pf->add_factory(new ambulant::lib::xerces_factory());
 #endif
 		ambulant::common::plugin_engine *pe = ambulant::common::plugin_engine::get_plugin_engine();
-		pe->add_plugins(&fact);
+		pe->add_plugins(&fact, NULL);
 	}
 #endif
 

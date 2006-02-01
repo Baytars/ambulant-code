@@ -48,7 +48,7 @@ gui_player::init_plugins()
 {
 	m_lock.enter();
 	common::plugin_engine *plf = common::plugin_engine::get_plugin_engine();
-	plf->add_plugins(this);
+	plf->add_plugins(this, this);
 	m_lock.leave();
 }
 
