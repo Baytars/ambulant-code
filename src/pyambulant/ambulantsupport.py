@@ -68,6 +68,7 @@ return_stringptr = Type("const char *", "s")  # ONLY FOR RETURN VALUES!!
 output_malloc_buf = MallocHeapOutputBufferType("char", "size_t", "l")
 
 # Ambulant-specific
+q_attributes_list = OpaqueByRefType("ambulant::lib::q_attributes_list", "ambulant_attributes_list")
 region_dim = OpaqueByRefType("ambulant::common::region_dim", "ambulant_region_dim")
 net_url = OpaqueByRefType("ambulant::net::url", "ambulant_url")
 rect = OpaqueByRefType("ambulant::lib::rect", "ambulant_rect")
@@ -454,8 +455,6 @@ node_object.othermethods = [
 node_factory_object.othermethods = [
 	"ambulant::lib::node *new_node(const char *local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };",
 	"ambulant::lib::node *new_node(const ambulant::lib::xml_string& local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };",
-	"ambulant::lib::node *new_node(const ambulant::lib::q_name_pair& qn, const ambulant::lib::q_attributes_list& qattrs, const ambulant::lib::node_context *ctx = 0) { abort(); };",
-
 ]
 parser_factory_object.othermethods = [
     "ambulant::lib::xml_parser* new_parser(ambulant::lib::sax_content_handler*, ambulant::lib::sax_error_handler*) { abort(); }", # XXX for now

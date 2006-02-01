@@ -83,9 +83,6 @@ class MyScanner(CxxScanner):
             "stdio_datasource_ptr", # Ditto
             "stdio_datasource_factory", # Ditto
             "Where_we_get_our", # Parser trips over a comment:-)
-            "q_attributes_list",    # We don't do lists, for now
-            "q_attributes_list_ref",    # We don't do lists, for now
-            "const_q_attributes_list_ref",    # We don't do lists, for now
             "flag_event",  # Holds a reference to a bool, not useful for Python
             "flag_event_ptr",  # Holds a reference to a bool, not useful for Python
             "const_custom_test_map_ptr", # We don't do maps for now

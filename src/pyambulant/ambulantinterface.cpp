@@ -1205,6 +1205,7 @@ node_factory::node_factory(PyObject *itself)
 	if (itself)
 	{
 		if (!PyObject_HasAttrString(itself, "new_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_node");
+		if (!PyObject_HasAttrString(itself, "new_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_node");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -1221,6 +1222,36 @@ node_factory::~node_factory()
 	PyGILState_Release(_GILState);
 }
 
+
+ambulant::lib::node* node_factory::new_node(const ambulant::lib::q_name_pair& qn, const ambulant::lib::q_attributes_list& qattrs, const ambulant::lib::node_context* ctx)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::lib::node* _rv;
+	PyObject *py_qn = Py_BuildValue("(ss)", qn.first.c_str(), qn.second.c_str());
+	PyObject *py_qattrs = Py_BuildValue("O", ambulant_attributes_list_New(qattrs));
+	PyObject *py_ctx = Py_BuildValue("O&", node_contextObj_New, ctx);
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_factory, "new_node", "(OOO)", py_qn, py_qattrs, py_ctx);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_node() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", nodeObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_node() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_qn);
+	Py_XDECREF(py_qattrs);
+	Py_XDECREF(py_ctx);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
 
 ambulant::lib::node* node_factory::new_node(const ambulant::lib::node* other)
 {
