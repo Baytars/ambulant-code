@@ -18,6 +18,7 @@
 #include "ambulant/lib/timer.h"
 #include "ambulant/lib/transition_info.h"
 #include "ambulant/common/embedder.h"
+#include "ambulant/common/factory.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/player.h"
@@ -1118,6 +1119,181 @@ PyTypeObject node_Type = {
 /* ---------------------- End object type node ---------------------- */
 
 
+/* -------------------- Object type node_factory -------------------- */
+
+extern PyTypeObject node_factory_Type;
+
+inline bool node_factoryObj_Check(PyObject *x)
+{
+	return ((x)->ob_type == &node_factory_Type);
+}
+
+typedef struct node_factoryObject {
+	PyObject_HEAD
+	ambulant::lib::node_factory* ob_itself;
+} node_factoryObject;
+
+PyObject *node_factoryObj_New(ambulant::lib::node_factory* itself)
+{
+	node_factoryObject *it;
+	if (itself == NULL)
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+#ifdef BGEN_BACK_SUPPORT_node_factory
+	node_factory *encaps_itself = dynamic_cast<node_factory *>(itself);
+	if (encaps_itself && encaps_itself->py_node_factory)
+	{
+		Py_INCREF(encaps_itself->py_node_factory);
+		return encaps_itself->py_node_factory;
+	}
+#endif
+	it = PyObject_NEW(node_factoryObject, &node_factory_Type);
+	if (it == NULL) return NULL;
+	it->ob_itself = itself;
+	return (PyObject *)it;
+}
+
+int node_factoryObj_Convert(PyObject *v, ambulant::lib::node_factory* *p_itself)
+{
+	if (v == Py_None)
+	{
+		*p_itself = NULL;
+		return 1;
+	}
+#ifdef BGEN_BACK_SUPPORT_node_factory
+	if (!node_factoryObj_Check(v))
+	{
+		*p_itself = Py_WrapAs_node_factory(v);
+		if (*p_itself) return 1;
+	}
+#endif
+	if (!node_factoryObj_Check(v))
+	{
+		PyErr_SetString(PyExc_TypeError, "node_factory required");
+		return 0;
+	}
+	*p_itself = ((node_factoryObject *)v)->ob_itself;
+	return 1;
+}
+
+static void node_factoryObj_dealloc(node_factoryObject *self)
+{
+	self->ob_type->tp_free((PyObject *)self);
+}
+
+static PyObject *node_factoryObj_new_node(node_factoryObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::node* other;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      nodeObj_Convert, &other))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::node* _rv = _self->ob_itself->new_node(other);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     nodeObj_New, _rv);
+	return _res;
+}
+
+static PyMethodDef node_factoryObj_methods[] = {
+	{"new_node", (PyCFunction)node_factoryObj_new_node, 1,
+	 PyDoc_STR("(ambulant::lib::node* other) -> (ambulant::lib::node* _rv)")},
+	{NULL, NULL, 0}
+};
+
+#define node_factoryObj_getsetlist NULL
+
+
+static int node_factoryObj_compare(node_factoryObject *self, node_factoryObject *other)
+{
+	if ( self->ob_itself > other->ob_itself ) return 1;
+	if ( self->ob_itself < other->ob_itself ) return -1;
+	return 0;
+}
+
+#define node_factoryObj_repr NULL
+
+static int node_factoryObj_hash(node_factoryObject *self)
+{
+	return (int)self->ob_itself;
+}
+static int node_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
+{
+	ambulant::lib::node_factory* itself;
+	char *kw[] = {"itself", 0};
+
+	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, node_factoryObj_Convert, &itself))
+	{
+		((node_factoryObject *)_self)->ob_itself = itself;
+		return 0;
+	}
+	return -1;
+}
+
+#define node_factoryObj_tp_alloc PyType_GenericAlloc
+
+static PyObject *node_factoryObj_tp_new(PyTypeObject *type, PyObject *_args, PyObject *_kwds)
+{
+	PyObject *_self;
+
+	if ((_self = type->tp_alloc(type, 0)) == NULL) return NULL;
+	((node_factoryObject *)_self)->ob_itself = NULL;
+	return _self;
+}
+
+#define node_factoryObj_tp_free PyObject_Del
+
+
+PyTypeObject node_factory_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.node_factory", /*tp_name*/
+	sizeof(node_factoryObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) node_factoryObj_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) node_factoryObj_compare, /*tp_compare*/
+	(reprfunc) node_factoryObj_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) node_factoryObj_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	node_factoryObj_methods, /* tp_methods */
+	0, /*tp_members*/
+	node_factoryObj_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	node_factoryObj_tp_init, /* tp_init */
+	node_factoryObj_tp_alloc, /* tp_alloc */
+	node_factoryObj_tp_new, /* tp_new */
+	node_factoryObj_tp_free, /* tp_free */
+};
+
+/* ------------------ End object type node_factory ------------------ */
+
+
 /* ---------------------- Object type document ---------------------- */
 
 extern PyTypeObject document_Type;
@@ -1696,7 +1872,7 @@ static PyObject *event_processorObj_add_event(event_processorObject *_self, PyOb
 	PyObject *_res = NULL;
 	ambulant::lib::event* pe;
 	ambulant::lib::timer::time_type t;
-	ambulant::lib::event_processor::event_priority priority;
+	ambulant::lib::event_priority priority;
 	if (!PyArg_ParseTuple(_args, "O&ll",
 	                      eventObj_Convert, &pe,
 	                      &t,
@@ -1729,7 +1905,7 @@ static PyObject *event_processorObj_cancel_event(event_processorObject *_self, P
 {
 	PyObject *_res = NULL;
 	ambulant::lib::event* pe;
-	ambulant::lib::event_processor::event_priority priority;
+	ambulant::lib::event_priority priority;
 	if (!PyArg_ParseTuple(_args, "O&l",
 	                      eventObj_Convert, &pe,
 	                      &priority))
@@ -1784,11 +1960,11 @@ static PyObject *event_processorObj_stop_processor_thread(event_processorObject 
 
 static PyMethodDef event_processorObj_methods[] = {
 	{"add_event", (PyCFunction)event_processorObj_add_event, 1,
-	 PyDoc_STR("(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_processor::event_priority priority) -> None")},
+	 PyDoc_STR("(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_priority priority) -> None")},
 	{"cancel_all_events", (PyCFunction)event_processorObj_cancel_all_events, 1,
 	 PyDoc_STR("() -> None")},
 	{"cancel_event", (PyCFunction)event_processorObj_cancel_event, 1,
-	 PyDoc_STR("(ambulant::lib::event* pe, ambulant::lib::event_processor::event_priority priority) -> (bool _rv)")},
+	 PyDoc_STR("(ambulant::lib::event* pe, ambulant::lib::event_priority priority) -> (bool _rv)")},
 	{"serve_events", (PyCFunction)event_processorObj_serve_events, 1,
 	 PyDoc_STR("() -> None")},
 	{"get_timer", (PyCFunction)event_processorObj_get_timer, 1,
@@ -4023,6 +4199,329 @@ PyTypeObject embedder_Type = {
 };
 
 /* -------------------- End object type embedder -------------------- */
+
+
+/* --------------------- Object type factories ---------------------- */
+
+extern PyTypeObject factories_Type;
+
+inline bool factoriesObj_Check(PyObject *x)
+{
+	return ((x)->ob_type == &factories_Type);
+}
+
+typedef struct factoriesObject {
+	PyObject_HEAD
+	ambulant::common::factories* ob_itself;
+} factoriesObject;
+
+PyObject *factoriesObj_New(ambulant::common::factories* itself)
+{
+	factoriesObject *it;
+	if (itself == NULL)
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+#ifdef BGEN_BACK_SUPPORT_factories
+	factories *encaps_itself = dynamic_cast<factories *>(itself);
+	if (encaps_itself && encaps_itself->py_factories)
+	{
+		Py_INCREF(encaps_itself->py_factories);
+		return encaps_itself->py_factories;
+	}
+#endif
+	it = PyObject_NEW(factoriesObject, &factories_Type);
+	if (it == NULL) return NULL;
+	it->ob_itself = itself;
+	return (PyObject *)it;
+}
+
+int factoriesObj_Convert(PyObject *v, ambulant::common::factories* *p_itself)
+{
+	if (v == Py_None)
+	{
+		*p_itself = NULL;
+		return 1;
+	}
+#ifdef BGEN_BACK_SUPPORT_factories
+	if (!factoriesObj_Check(v))
+	{
+		*p_itself = Py_WrapAs_factories(v);
+		if (*p_itself) return 1;
+	}
+#endif
+	if (!factoriesObj_Check(v))
+	{
+		PyErr_SetString(PyExc_TypeError, "factories required");
+		return 0;
+	}
+	*p_itself = ((factoriesObject *)v)->ob_itself;
+	return 1;
+}
+
+static void factoriesObj_dealloc(factoriesObject *self)
+{
+	self->ob_type->tp_free((PyObject *)self);
+}
+
+static PyObject *factoriesObj_init_factories(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_factories();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_init_playable_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_playable_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_init_window_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_window_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_init_datasource_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_datasource_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_init_parser_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_parser_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_init_node_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_node_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *factoriesObj_get_playable_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::playable_factory* _rv = _self->ob_itself->get_playable_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     playable_factoryObj_New, _rv);
+	return _res;
+}
+
+static PyObject *factoriesObj_get_window_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::window_factory* _rv = _self->ob_itself->get_window_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     window_factoryObj_New, _rv);
+	return _res;
+}
+
+static PyObject *factoriesObj_get_datasource_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::net::datasource_factory* _rv = _self->ob_itself->get_datasource_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     datasource_factoryObj_New, _rv);
+	return _res;
+}
+
+static PyObject *factoriesObj_get_parser_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::global_parser_factory* _rv = _self->ob_itself->get_parser_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     global_parser_factoryObj_New, _rv);
+	return _res;
+}
+
+static PyObject *factoriesObj_get_node_factory(factoriesObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::node_factory* _rv = _self->ob_itself->get_node_factory();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     node_factoryObj_New, _rv);
+	return _res;
+}
+
+static PyMethodDef factoriesObj_methods[] = {
+	{"init_factories", (PyCFunction)factoriesObj_init_factories, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_playable_factory", (PyCFunction)factoriesObj_init_playable_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_window_factory", (PyCFunction)factoriesObj_init_window_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_datasource_factory", (PyCFunction)factoriesObj_init_datasource_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_parser_factory", (PyCFunction)factoriesObj_init_parser_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_node_factory", (PyCFunction)factoriesObj_init_node_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"get_playable_factory", (PyCFunction)factoriesObj_get_playable_factory, 1,
+	 PyDoc_STR("() -> (ambulant::common::playable_factory* _rv)")},
+	{"get_window_factory", (PyCFunction)factoriesObj_get_window_factory, 1,
+	 PyDoc_STR("() -> (ambulant::common::window_factory* _rv)")},
+	{"get_datasource_factory", (PyCFunction)factoriesObj_get_datasource_factory, 1,
+	 PyDoc_STR("() -> (ambulant::net::datasource_factory* _rv)")},
+	{"get_parser_factory", (PyCFunction)factoriesObj_get_parser_factory, 1,
+	 PyDoc_STR("() -> (ambulant::lib::global_parser_factory* _rv)")},
+	{"get_node_factory", (PyCFunction)factoriesObj_get_node_factory, 1,
+	 PyDoc_STR("() -> (ambulant::lib::node_factory* _rv)")},
+	{NULL, NULL, 0}
+};
+
+#define factoriesObj_getsetlist NULL
+
+
+static int factoriesObj_compare(factoriesObject *self, factoriesObject *other)
+{
+	if ( self->ob_itself > other->ob_itself ) return 1;
+	if ( self->ob_itself < other->ob_itself ) return -1;
+	return 0;
+}
+
+#define factoriesObj_repr NULL
+
+static int factoriesObj_hash(factoriesObject *self)
+{
+	return (int)self->ob_itself;
+}
+static int factoriesObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
+{
+	ambulant::common::factories* itself;
+	char *kw[] = {"itself", 0};
+
+	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, factoriesObj_Convert, &itself))
+	{
+		((factoriesObject *)_self)->ob_itself = itself;
+		return 0;
+	}
+	return -1;
+}
+
+#define factoriesObj_tp_alloc PyType_GenericAlloc
+
+static PyObject *factoriesObj_tp_new(PyTypeObject *type, PyObject *_args, PyObject *_kwds)
+{
+	PyObject *_self;
+
+	if ((_self = type->tp_alloc(type, 0)) == NULL) return NULL;
+	((factoriesObject *)_self)->ob_itself = NULL;
+	return _self;
+}
+
+#define factoriesObj_tp_free PyObject_Del
+
+
+PyTypeObject factories_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.factories", /*tp_name*/
+	sizeof(factoriesObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) factoriesObj_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) factoriesObj_compare, /*tp_compare*/
+	(reprfunc) factoriesObj_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) factoriesObj_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	factoriesObj_methods, /* tp_methods */
+	0, /*tp_members*/
+	factoriesObj_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	factoriesObj_tp_init, /* tp_init */
+	factoriesObj_tp_alloc, /* tp_alloc */
+	factoriesObj_tp_new, /* tp_new */
+	factoriesObj_tp_free, /* tp_free */
+};
+
+/* ------------------- End object type factories -------------------- */
 
 
 /* --------------------- Object type alignment ---------------------- */
@@ -7954,6 +8453,21 @@ static PyObject *playerObj_set_cursor(playerObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *playerObj_on_char(playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	int ch;
+	if (!PyArg_ParseTuple(_args, "i",
+	                      &ch))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->on_char(ch);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyObject *playerObj_set_feedback(playerObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -8012,6 +8526,8 @@ static PyMethodDef playerObj_methods[] = {
 	 PyDoc_STR("() -> (int _rv)")},
 	{"set_cursor", (PyCFunction)playerObj_set_cursor, 1,
 	 PyDoc_STR("(int cursor) -> None")},
+	{"on_char", (PyCFunction)playerObj_on_char, 1,
+	 PyDoc_STR("(int ch) -> None")},
 	{"set_feedback", (PyCFunction)playerObj_set_feedback, 1,
 	 PyDoc_STR("(ambulant::common::player_feedback* fb) -> None")},
 	{"goto_node", (PyCFunction)playerObj_goto_node, 1,
@@ -11371,31 +11887,14 @@ static PyObject *PyAm_get_version(PyObject *_self, PyObject *_args)
 	return _res;
 }
 
-static PyObject *PyAm_node_factory(PyObject *_self, PyObject *_args)
-{
-	PyObject *_res = NULL;
-	ambulant::lib::node* _rv;
-	ambulant::lib::node* other;
-	if (!PyArg_ParseTuple(_args, "O&",
-	                      nodeObj_Convert, &other))
-		return NULL;
-	PyThreadState *_save = PyEval_SaveThread();
-	_rv = ambulant::lib::node_factory(other);
-	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("O&",
-	                     nodeObj_New, _rv);
-	return _res;
-}
-
 static PyObject *PyAm_create_from_url(PyObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
 	ambulant::lib::document* _rv;
 	ambulant::common::factories* factory;
 	ambulant::net::url u;
-	factory = new ambulant::common::factories;
-	if (!PyArg_ParseTuple(_args, "(O&O&O&O&)O&",
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	if (!PyArg_ParseTuple(_args, "O&O&",
+	                      factoriesObj_Convert, &factory,
 	                      ambulant_url_Convert, &u))
 		return NULL;
 	PyThreadState *_save = PyEval_SaveThread();
@@ -11413,10 +11912,9 @@ static PyObject *PyAm_create_from_file(PyObject *_self, PyObject *_args)
 	ambulant::lib::document* _rv;
 	ambulant::common::factories* factory;
 	std::string filename;
-	factory = new ambulant::common::factories;
 	char *filename_cstr;
-	if (!PyArg_ParseTuple(_args, "(O&O&O&O&)s",
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	if (!PyArg_ParseTuple(_args, "O&s",
+	                      factoriesObj_Convert, &factory,
 	                      &filename_cstr))
 		return NULL;
 	filename = filename_cstr;
@@ -11436,11 +11934,10 @@ static PyObject *PyAm_create_from_string(PyObject *_self, PyObject *_args)
 	ambulant::common::factories* factory;
 	std::string smil_src;
 	std::string src_id;
-	factory = new ambulant::common::factories;
 	char *smil_src_cstr;
 	char *src_id_cstr;
-	if (!PyArg_ParseTuple(_args, "(O&O&O&O&)ss",
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	if (!PyArg_ParseTuple(_args, "O&ss",
+	                      factoriesObj_Convert, &factory,
 	                      &smil_src_cstr,
 	                      &src_id_cstr))
 		return NULL;
@@ -11463,9 +11960,8 @@ static PyObject *PyAm_create_from_tree(PyObject *_self, PyObject *_args)
 	ambulant::common::factories* factory;
 	ambulant::lib::node* root;
 	ambulant::net::url u;
-	factory = new ambulant::common::factories;
-	if (!PyArg_ParseTuple(_args, "(O&O&O&O&)O&O&",
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	if (!PyArg_ParseTuple(_args, "O&O&O&",
+	                      factoriesObj_Convert, &factory,
 	                      nodeObj_Convert, &root,
 	                      ambulant_url_Convert, &u))
 		return NULL;
@@ -11545,9 +12041,8 @@ static PyObject *PyAm_create_smil2_layout_manager(PyObject *_self, PyObject *_ar
 	ambulant::common::layout_manager* _rv;
 	ambulant::common::factories* factory;
 	ambulant::lib::document* doc;
-	factory = new ambulant::common::factories;
-	if (!PyArg_ParseTuple(_args, "(O&O&O&O&)O&",
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	if (!PyArg_ParseTuple(_args, "O&O&",
+	                      factoriesObj_Convert, &factory,
 	                      documentObj_Convert, &doc))
 		return NULL;
 	PyThreadState *_save = PyEval_SaveThread();
@@ -11593,10 +12088,9 @@ static PyObject *PyAm_create_mms_player(PyObject *_self, PyObject *_args)
 	ambulant::common::player* _rv;
 	ambulant::lib::document* doc;
 	ambulant::common::factories* factory;
-	factory = new ambulant::common::factories;
-	if (!PyArg_ParseTuple(_args, "O&(O&O&O&O&)",
+	if (!PyArg_ParseTuple(_args, "O&O&",
 	                      documentObj_Convert, &doc,
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf))
+	                      factoriesObj_Convert, &factory))
 		return NULL;
 	PyThreadState *_save = PyEval_SaveThread();
 	_rv = ambulant::common::create_mms_player(doc,
@@ -11614,10 +12108,9 @@ static PyObject *PyAm_create_smil2_player(PyObject *_self, PyObject *_args)
 	ambulant::lib::document* doc;
 	ambulant::common::factories* factory;
 	ambulant::common::embedder* sys;
-	factory = new ambulant::common::factories;
-	if (!PyArg_ParseTuple(_args, "O&(O&O&O&O&)O&",
+	if (!PyArg_ParseTuple(_args, "O&O&O&",
 	                      documentObj_Convert, &doc,
-	                      playable_factoryObj_Convert, &factory->rf, window_factoryObj_Convert, &factory->wf, datasource_factoryObj_Convert, &factory->df, global_parser_factoryObj_Convert, &factory->pf,
+	                      factoriesObj_Convert, &factory,
 	                      embedderObj_Convert, &sys))
 		return NULL;
 	PyThreadState *_save = PyEval_SaveThread();
@@ -11647,6 +12140,28 @@ static PyObject *PyAm_read_data_from_url(PyObject *_self, PyObject *_args)
 	_rv = ambulant::net::read_data_from_url(url,
 	                                        df,
 	                                        &result__out__, &result__len__);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&z#",
+	                     bool_New, _rv,
+	                     result__out__, (int)result__len__);
+	if( result__out__ ) free(result__out__);
+	return _res;
+}
+
+static PyObject *PyAm_read_data_from_datasource(PyObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	bool _rv;
+	ambulant::net::datasource* src;
+	char *result__out__;
+	size_t result__len__;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      datasourceObj_Convert, &src))
+		return NULL;
+	result__out__ = NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_rv = ambulant::net::read_data_from_datasource(src,
+	                                               &result__out__, &result__len__);
 	PyEval_RestoreThread(_save);
 	_res = Py_BuildValue("O&z#",
 	                     bool_New, _rv,
@@ -11686,8 +12201,6 @@ static PyObject *PyAm_get_stdio_datasource_factory(PyObject *_self, PyObject *_a
 static PyMethodDef PyAm_methods[] = {
 	{"get_version", (PyCFunction)PyAm_get_version, 1,
 	 PyDoc_STR("() -> (const char * _rv)")},
-	{"node_factory", (PyCFunction)PyAm_node_factory, 1,
-	 PyDoc_STR("(ambulant::lib::node* other) -> (ambulant::lib::node* _rv)")},
 	{"create_from_url", (PyCFunction)PyAm_create_from_url, 1,
 	 PyDoc_STR("(ambulant::common::factories* factory, ambulant::net::url u) -> (ambulant::lib::document* _rv)")},
 	{"create_from_file", (PyCFunction)PyAm_create_from_file, 1,
@@ -11716,6 +12229,8 @@ static PyMethodDef PyAm_methods[] = {
 	 PyDoc_STR("(ambulant::lib::document* doc, ambulant::common::factories* factory, ambulant::common::embedder* sys) -> (ambulant::common::player* _rv)")},
 	{"read_data_from_url", (PyCFunction)PyAm_read_data_from_url, 1,
 	 PyDoc_STR("(ambulant::net::url url, ambulant::net::datasource_factory* df, Buffer result) -> (bool _rv, Buffer result)")},
+	{"read_data_from_datasource", (PyCFunction)PyAm_read_data_from_datasource, 1,
+	 PyDoc_STR("(ambulant::net::datasource* src, Buffer result) -> (bool _rv, Buffer result)")},
 	{"get_posix_datasource_factory", (PyCFunction)PyAm_get_posix_datasource_factory, 1,
 	 PyDoc_STR("() -> (ambulant::net::raw_datasource_factory* _rv)")},
 	{"get_stdio_datasource_factory", (PyCFunction)PyAm_get_stdio_datasource_factory, 1,
@@ -11752,6 +12267,10 @@ void initambulant(void)
 	if (PyType_Ready(&node_Type) < 0) return;
 	Py_INCREF(&node_Type);
 	PyModule_AddObject(m, "node", (PyObject *)&node_Type);
+	node_factory_Type.ob_type = &PyType_Type;
+	if (PyType_Ready(&node_factory_Type) < 0) return;
+	Py_INCREF(&node_factory_Type);
+	PyModule_AddObject(m, "node_factory", (PyObject *)&node_factory_Type);
 	document_Type.ob_type = &PyType_Type;
 	document_Type.tp_base = &node_context_Type;
 	if (PyType_Ready(&document_Type) < 0) return;
@@ -11809,6 +12328,10 @@ void initambulant(void)
 	if (PyType_Ready(&embedder_Type) < 0) return;
 	Py_INCREF(&embedder_Type);
 	PyModule_AddObject(m, "embedder", (PyObject *)&embedder_Type);
+	factories_Type.ob_type = &PyType_Type;
+	if (PyType_Ready(&factories_Type) < 0) return;
+	Py_INCREF(&factories_Type);
+	PyModule_AddObject(m, "factories", (PyObject *)&factories_Type);
 	alignment_Type.ob_type = &PyType_Type;
 	if (PyType_Ready(&alignment_Type) < 0) return;
 	Py_INCREF(&alignment_Type);

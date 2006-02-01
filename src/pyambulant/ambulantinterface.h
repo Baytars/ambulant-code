@@ -15,6 +15,7 @@
 #include "ambulant/lib/timer.h"
 #include "ambulant/lib/transition_info.h"
 #include "ambulant/common/embedder.h"
+#include "ambulant/common/factory.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/player.h"
@@ -105,6 +106,23 @@ public:
 #define BGEN_BACK_SUPPORT_node
 inline node *Py_WrapAs_node(PyObject *o) { return new node(o); }
 
+class node_factory : public ambulant::lib::node_factory {
+public:
+	node_factory(PyObject *itself);
+	virtual ~node_factory();
+
+	ambulant::lib::node* new_node(const ambulant::lib::node* other);
+	ambulant::lib::node *new_node(const char *local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };
+	ambulant::lib::node *new_node(const ambulant::lib::xml_string& local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };
+	ambulant::lib::node *new_node(const ambulant::lib::q_name_pair& qn, const ambulant::lib::q_attributes_list& qattrs, const ambulant::lib::node_context *ctx = 0) { abort(); };
+  private:
+	PyObject *py_node_factory;
+
+	friend PyObject *node_factoryObj_New(ambulant::lib::node_factory *itself);
+};
+#define BGEN_BACK_SUPPORT_node_factory
+inline node_factory *Py_WrapAs_node_factory(PyObject *o) { return new node_factory(o); }
+
 class event : public ambulant::lib::event {
 public:
 	event(PyObject *itself);
@@ -124,9 +142,9 @@ public:
 	event_processor(PyObject *itself);
 	virtual ~event_processor();
 
-	void add_event(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_processor::event_priority priority);
+	void add_event(ambulant::lib::event* pe, ambulant::lib::timer::time_type t, ambulant::lib::event_priority priority);
 	void cancel_all_events();
-	bool cancel_event(ambulant::lib::event* pe, ambulant::lib::event_processor::event_priority priority);
+	bool cancel_event(ambulant::lib::event* pe, ambulant::lib::event_priority priority);
 	void serve_events();
 	ambulant::lib::timer* get_timer() const;
 	void stop_processor_thread();
@@ -254,6 +272,24 @@ public:
 };
 #define BGEN_BACK_SUPPORT_embedder
 inline embedder *Py_WrapAs_embedder(PyObject *o) { return new embedder(o); }
+
+class factories : public ambulant::common::factories {
+public:
+	factories(PyObject *itself);
+	virtual ~factories();
+
+	void init_playable_factory();
+	void init_window_factory();
+	void init_datasource_factory();
+	void init_parser_factory();
+	void init_node_factory();
+  private:
+	PyObject *py_factories;
+
+	friend PyObject *factoriesObj_New(ambulant::common::factories *itself);
+};
+#define BGEN_BACK_SUPPORT_factories
+inline factories *Py_WrapAs_factories(PyObject *o) { return new factories(o); }
 
 class alignment : public ambulant::common::alignment {
 public:
@@ -565,6 +601,7 @@ public:
 	bool is_done() const;
 	int get_cursor() const;
 	void set_cursor(int cursor);
+	void on_char(int ch);
 	void set_feedback(ambulant::common::player_feedback* fb);
 	bool goto_node(const ambulant::lib::node* n);
   private:
