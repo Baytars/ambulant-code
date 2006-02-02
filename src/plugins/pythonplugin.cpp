@@ -54,9 +54,18 @@ extern "C" void initialize(
 	factory = bug_workaround(factory);
     AM_DBG lib::logger::get_logger()->debug("python_plugin: loaded.");
     
-    Py_Initialize();
+    // Starting up Python is a bit difficult because we want to release the
+    // lock before we return. So the first time we're here we initialze and then
+    // release the GIL only to re-acquire it immediately.
+    if (!PyEval_ThreadsInitialized()) {
+	    Py_Initialize();
+	    PyEval_InitThreads();
+	    PyEval_SaveThread();
+	}
     AM_DBG lib::logger::get_logger()->debug("python_plugin: initialized Python.");
     
+    PyGILState_STATE _GILState = PyGILState_Ensure();
+	AM_DBG lib::logger::get_logger()->debug("python_plugin: acquired GIL.");
     PyObject *mod = PyImport_ImportModule(AMPYTHON_MODULE_NAME);
     if (mod == NULL) {
         PyErr_Print();
@@ -71,6 +80,8 @@ extern "C" void initialize(
         lib::logger::get_logger()->debug("python_plugin: calling of %s failed.", AMPYTHON_METHOD_NAME);
         return;
     }
+    AM_DBG lib::logger::get_logger()->debug("python_plugin: %s returned, about to release GIL", AMPYTHON_METHOD_NAME);
+    PyGILState_Release(_GILState);
     Py_DECREF(rv);
     AM_DBG lib::logger::get_logger()->debug("python_plugin: returning.");
 }
