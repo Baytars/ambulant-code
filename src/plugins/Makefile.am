@@ -34,11 +34,23 @@ xerces_plugin=
 xerces_include=
 endif
 
+# The Python plugin
+if WITH_PYTHON_PLUGIN
+python_plugin = libamplugin_python.la
+python_includes = $(PYTHON_INCLUDES)
+libamplugin_python_la_LDFLAGS = -module $(PYTHON_LIBS)
+libamplugin_python_la_SOURCES = pythonplugin.cpp
+
+else
+python_plugin=
+python_include=
+endif
+
 # Now tie it all together.
 # XXXX Need to set install directory
 
-pkglib_LTLIBRARIES = $(dummy_plugin) $(arts_plugin) $(xerces_plugin)
+pkglib_LTLIBRARIES = $(dummy_plugin) $(arts_plugin) $(xerces_plugin) $(python_plugin)
 
 INCLUDES = -I$(top_builddir)/include -I$(top_srcdir)/include \
-	 $(arts_includes) $(xerces_includes)
+	 $(arts_includes) $(xerces_includes) $(python_includes)
 
