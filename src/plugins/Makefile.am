@@ -36,9 +36,18 @@ endif
 
 # The Python plugin
 if WITH_PYTHON_PLUGIN
+# XXX These should be elsewhere
+pymodule = $(top_srcdir)/src/pyambulant
+pymodule_includes = -I$(pymodule)
+pymodule_tmp = $(pymodule)/build/temp.darwin-8.4.0-Power_Macintosh-2.5
+pymodule_libs = \
+    $(pymodule_tmp)/ambulantmodule.o \
+    $(pymodule_tmp)/ambulantinterface.o \
+    $(pymodule_tmp)/ambulantutilities.o
+
 python_plugin = libamplugin_python.la
-python_includes = $(PYTHON_INCLUDES)
-libamplugin_python_la_LDFLAGS = -module $(PYTHON_LIBS)
+python_includes = $(PYTHON_INCLUDES) $(pymodule_includes)
+libamplugin_python_la_LDFLAGS = -module $(PYTHON_LIBS) $(pymodule_libs)
 libamplugin_python_la_SOURCES = pythonplugin.cpp
 
 else
