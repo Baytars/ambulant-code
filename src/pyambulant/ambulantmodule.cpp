@@ -19,6 +19,7 @@
 #include "ambulant/lib/transition_info.h"
 #include "ambulant/common/embedder.h"
 #include "ambulant/common/factory.h"
+#include "ambulant/common/gui_player.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/player.h"
@@ -4645,6 +4646,430 @@ PyTypeObject factories_Type = {
 };
 
 /* ------------------- End object type factories -------------------- */
+
+
+/* --------------------- Object type gui_player --------------------- */
+
+extern PyTypeObject gui_player_Type;
+
+inline bool gui_playerObj_Check(PyObject *x)
+{
+	return ((x)->ob_type == &gui_player_Type);
+}
+
+typedef struct gui_playerObject {
+	PyObject_HEAD
+	ambulant::common::gui_player* ob_itself;
+} gui_playerObject;
+
+PyObject *gui_playerObj_New(ambulant::common::gui_player* itself)
+{
+	gui_playerObject *it;
+	if (itself == NULL)
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+#ifdef BGEN_BACK_SUPPORT_gui_player
+	gui_player *encaps_itself = dynamic_cast<gui_player *>(itself);
+	if (encaps_itself && encaps_itself->py_gui_player)
+	{
+		Py_INCREF(encaps_itself->py_gui_player);
+		return encaps_itself->py_gui_player;
+	}
+#endif
+	it = PyObject_NEW(gui_playerObject, &gui_player_Type);
+	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_itself = itself;
+	return (PyObject *)it;
+}
+
+int gui_playerObj_Convert(PyObject *v, ambulant::common::gui_player* *p_itself)
+{
+	if (v == Py_None)
+	{
+		*p_itself = NULL;
+		return 1;
+	}
+#ifdef BGEN_BACK_SUPPORT_gui_player
+	if (!gui_playerObj_Check(v))
+	{
+		*p_itself = Py_WrapAs_gui_player(v);
+		if (*p_itself) return 1;
+	}
+#endif
+	if (!gui_playerObj_Check(v))
+	{
+		PyErr_SetString(PyExc_TypeError, "gui_player required");
+		return 0;
+	}
+	*p_itself = ((gui_playerObject *)v)->ob_itself;
+	return 1;
+}
+
+static void gui_playerObj_dealloc(gui_playerObject *self)
+{
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+}
+
+static PyObject *gui_playerObj_init_playable_factory(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_playable_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_init_window_factory(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_window_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_init_datasource_factory(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_datasource_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_init_parser_factory(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_parser_factory();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_init_plugins(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->init_plugins();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_play(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->play();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_stop(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->stop();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_pause(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->pause();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_restart(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->restart();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_play_enabled(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_play_enabled();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_stop_enabled(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_stop_enabled();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_pause_enabled(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_pause_enabled();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_play_active(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_play_active();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_stop_active(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_stop_active();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_is_pause_active(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_pause_active();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_get_cursor(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	int _rv = _self->ob_itself->get_cursor();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("i",
+	                     _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_set_cursor(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	int cursor;
+	if (!PyArg_ParseTuple(_args, "i",
+	                      &cursor))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->set_cursor(cursor);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyMethodDef gui_playerObj_methods[] = {
+	{"init_playable_factory", (PyCFunction)gui_playerObj_init_playable_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_window_factory", (PyCFunction)gui_playerObj_init_window_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_datasource_factory", (PyCFunction)gui_playerObj_init_datasource_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_parser_factory", (PyCFunction)gui_playerObj_init_parser_factory, 1,
+	 PyDoc_STR("() -> None")},
+	{"init_plugins", (PyCFunction)gui_playerObj_init_plugins, 1,
+	 PyDoc_STR("() -> None")},
+	{"play", (PyCFunction)gui_playerObj_play, 1,
+	 PyDoc_STR("() -> None")},
+	{"stop", (PyCFunction)gui_playerObj_stop, 1,
+	 PyDoc_STR("() -> None")},
+	{"pause", (PyCFunction)gui_playerObj_pause, 1,
+	 PyDoc_STR("() -> None")},
+	{"restart", (PyCFunction)gui_playerObj_restart, 1,
+	 PyDoc_STR("() -> None")},
+	{"is_play_enabled", (PyCFunction)gui_playerObj_is_play_enabled, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"is_stop_enabled", (PyCFunction)gui_playerObj_is_stop_enabled, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"is_pause_enabled", (PyCFunction)gui_playerObj_is_pause_enabled, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"is_play_active", (PyCFunction)gui_playerObj_is_play_active, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"is_stop_active", (PyCFunction)gui_playerObj_is_stop_active, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"is_pause_active", (PyCFunction)gui_playerObj_is_pause_active, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"get_cursor", (PyCFunction)gui_playerObj_get_cursor, 1,
+	 PyDoc_STR("() -> (int _rv)")},
+	{"set_cursor", (PyCFunction)gui_playerObj_set_cursor, 1,
+	 PyDoc_STR("(int cursor) -> None")},
+	{NULL, NULL, 0}
+};
+
+#define gui_playerObj_getsetlist NULL
+
+
+static int gui_playerObj_compare(gui_playerObject *self, gui_playerObject *other)
+{
+	if ( self->ob_itself > other->ob_itself ) return 1;
+	if ( self->ob_itself < other->ob_itself ) return -1;
+	return 0;
+}
+
+#define gui_playerObj_repr NULL
+
+static int gui_playerObj_hash(gui_playerObject *self)
+{
+	return (int)self->ob_itself;
+}
+static int gui_playerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
+{
+	ambulant::common::gui_player* itself;
+	const char *kw[] = {"itself", 0};
+
+	{
+		if (PyArg_ParseTuple(_args, ""))
+		{
+			((gui_playerObject *)_self)->ob_itself = new ambulant::common::gui_player();
+			return 0;
+		}
+	}
+
+	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, gui_playerObj_Convert, &itself))
+	{
+		((gui_playerObject *)_self)->ob_itself = itself;
+		return 0;
+	}
+	return -1;
+}
+
+#define gui_playerObj_tp_alloc PyType_GenericAlloc
+
+static PyObject *gui_playerObj_tp_new(PyTypeObject *type, PyObject *_args, PyObject *_kwds)
+{
+	PyObject *_self;
+
+	if ((_self = type->tp_alloc(type, 0)) == NULL) return NULL;
+	((gui_playerObject *)_self)->ob_itself = NULL;
+	return _self;
+}
+
+#define gui_playerObj_tp_free PyObject_Del
+
+
+PyTypeObject gui_player_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.gui_player", /*tp_name*/
+	sizeof(gui_playerObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) gui_playerObj_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) gui_playerObj_compare, /*tp_compare*/
+	(reprfunc) gui_playerObj_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) gui_playerObj_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	gui_playerObj_methods, /* tp_methods */
+	0, /*tp_members*/
+	gui_playerObj_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	gui_playerObj_tp_init, /* tp_init */
+	gui_playerObj_tp_alloc, /* tp_alloc */
+	gui_playerObj_tp_new, /* tp_new */
+	gui_playerObj_tp_free, /* tp_free */
+};
+
+/* ------------------- End object type gui_player ------------------- */
 
 
 /* --------------------- Object type alignment ---------------------- */
@@ -12471,6 +12896,11 @@ void initambulant(void)
 	if (PyType_Ready(&factories_Type) < 0) return;
 	Py_INCREF(&factories_Type);
 	PyModule_AddObject(m, "factories", (PyObject *)&factories_Type);
+	gui_player_Type.ob_type = &PyType_Type;
+	gui_player_Type.tp_base = &factories_Type;
+	if (PyType_Ready(&gui_player_Type) < 0) return;
+	Py_INCREF(&gui_player_Type);
+	PyModule_AddObject(m, "gui_player", (PyObject *)&gui_player_Type);
 	alignment_Type.ob_type = &PyType_Type;
 	if (PyType_Ready(&alignment_Type) < 0) return;
 	Py_INCREF(&alignment_Type);

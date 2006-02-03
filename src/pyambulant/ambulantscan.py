@@ -24,6 +24,7 @@ def main():
         AMBULANT+ "lib/transition_info.h",
         AMBULANT+ "common/embedder.h",
         AMBULANT+ "common/factory.h",
+        AMBULANT+ "common/gui_player.h",
         AMBULANT+ "common/layout.h",
         AMBULANT+ "common/playable.h",
         AMBULANT+ "common/player.h",
@@ -65,6 +66,7 @@ class MyScanner(CxxScanner):
             "none_background_renderer", # XXX Constructor for unsupported type
             "none_playable_factory",  # XXX Constructor for unsupported type
             "event_processor_impl", # Constructor for unsupported type
+            "load_test_attrs",
            
         ]
 
