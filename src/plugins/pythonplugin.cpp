@@ -23,8 +23,33 @@
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/gui_player.h"
 
+#if 1
+// These are needed for ambulantmodule.h
+#include "ambulant/lib/node.h"
+#include "ambulant/lib/document.h"
+#include "ambulant/lib/event.h"
+#include "ambulant/lib/event_processor.h"
+#include "ambulant/lib/parser_factory.h"
+#include "ambulant/lib/sax_handler.h"
+#include "ambulant/lib/system.h"
+#include "ambulant/lib/timer.h"
+#include "ambulant/lib/transition_info.h"
+#include "ambulant/common/embedder.h"
+#include "ambulant/common/factory.h"
+#include "ambulant/common/layout.h"
+#include "ambulant/common/playable.h"
+#include "ambulant/common/player.h"
+#include "ambulant/common/region_dim.h"
+#include "ambulant/common/region_info.h"
+#include "ambulant/gui/none/none_gui.h"
+#include "ambulant/net/datasource.h"
+#include "ambulant/net/stdio_datasource.h"
+#include "ambulant/net/posix_datasource.h"
+#endif
 #include "Python.h"
+#include "ambulantmodule.h"
 
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -66,7 +91,16 @@ extern "C" void initialize(
     
     PyGILState_STATE _GILState = PyGILState_Ensure();
 	AM_DBG lib::logger::get_logger()->debug("python_plugin: acquired GIL.");
-    PyObject *mod = PyImport_ImportModule(AMPYTHON_MODULE_NAME);
+	
+	PyObject *mod = PyImport_ImportModule("ambulant");
+    if (mod == NULL) {
+        PyErr_Print();
+        lib::logger::get_logger()->debug("python_plugin: import ambulant failed.");
+        return;
+    }
+    AM_DBG lib::logger::get_logger()->debug("python_plugin: imported ambulant.");
+	
+    mod = PyImport_ImportModule(AMPYTHON_MODULE_NAME);
     if (mod == NULL) {
         PyErr_Print();
         lib::logger::get_logger()->debug("python_plugin: import %s failed.", AMPYTHON_MODULE_NAME);
@@ -74,7 +108,10 @@ extern "C" void initialize(
     }
     AM_DBG lib::logger::get_logger()->debug("python_plugin: imported %s.", AMPYTHON_MODULE_NAME);
     
-    PyObject *rv = PyObject_CallMethod(mod, AMPYTHON_METHOD_NAME, "");
+    PyObject *rv = PyObject_CallMethod(mod, AMPYTHON_METHOD_NAME, "iO&", 
+        api_version,
+        factoriesObj_New, factory
+        );
     if (rv == NULL) {
         PyErr_Print();
         lib::logger::get_logger()->debug("python_plugin: calling of %s failed.", AMPYTHON_METHOD_NAME);
