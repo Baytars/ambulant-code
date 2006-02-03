@@ -6929,7 +6929,7 @@
 					../../third_party_packages/live/BasicUsageEnvironment/include,
 					"../../third_party_packages/xerces-unix/include",
 				);
-				INFOPLIST_FILE = "/Users/jack/src/ambulant/src/player_macosx/Info copy 2.plist";
+				INFOPLIST_FILE = /Users/jack/src/ambulant/src/player_macosx/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				KEEP_PRIVATE_EXTERNS = YES;
 				LIBRARY_SEARCH_PATHS = (
@@ -7020,7 +7020,7 @@
 					../../third_party_packages/live/BasicUsageEnvironment/include,
 					"../../third_party_packages/xerces-unix/include",
 				);
-				INFOPLIST_FILE = "/Users/jack/src/ambulant/src/player_macosx/Info copy 2.plist";
+				INFOPLIST_FILE = /Users/jack/src/ambulant/src/player_macosx/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					/usr/lib/gcc/darwin/3.3,
@@ -7106,7 +7106,7 @@
 					../../third_party_packages/live/BasicUsageEnvironment/include,
 					"../../third_party_packages/xerces-unix/include",
 				);
-				INFOPLIST_FILE = "/Users/jack/src/ambulant/src/player_macosx/Info copy 2.plist";
+				INFOPLIST_FILE = /Users/jack/src/ambulant/src/player_macosx/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					/usr/lib/gcc/darwin/3.3,
