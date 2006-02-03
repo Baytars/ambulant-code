@@ -48,6 +48,9 @@
 #endif
 #include "Python.h"
 #include "ambulantmodule.h"
+extern "C" {
+void initambulant();
+};
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -83,6 +86,7 @@ extern "C" void initialize(
     // lock before we return. So the first time we're here we initialze and then
     // release the GIL only to re-acquire it immediately.
     if (!PyEval_ThreadsInitialized()) {
+    	PyImport_AppendInittab("ambulant", initambulant);
 	    Py_Initialize();
 	    PyEval_InitThreads();
 	    PyEval_SaveThread();
