@@ -108,9 +108,10 @@ extern "C" void initialize(
     }
     AM_DBG lib::logger::get_logger()->debug("python_plugin: imported %s.", AMPYTHON_MODULE_NAME);
     
-    PyObject *rv = PyObject_CallMethod(mod, AMPYTHON_METHOD_NAME, "iO&", 
+    PyObject *rv = PyObject_CallMethod(mod, AMPYTHON_METHOD_NAME, "iO&O&", 
         api_version,
-        factoriesObj_New, factory
+        factoriesObj_New, factory,
+        gui_playerObj_New, player
         );
     if (rv == NULL) {
         PyErr_Print();

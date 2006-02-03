@@ -49,6 +49,9 @@ extern int embedderObj_Convert(PyObject *v, ambulant::common::embedder* *p_itsel
 extern PyObject *factoriesObj_New(ambulant::common::factories* itself);
 extern int factoriesObj_Convert(PyObject *v, ambulant::common::factories* *p_itself);
 
+extern PyObject *gui_playerObj_New(ambulant::common::gui_player* itself);
+extern int gui_playerObj_Convert(PyObject *v, ambulant::common::gui_player* *p_itself);
+
 extern PyObject *alignmentObj_New(ambulant::common::alignment* itself);
 extern int alignmentObj_Convert(PyObject *v, ambulant::common::alignment* *p_itself);
 

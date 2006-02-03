@@ -16,6 +16,7 @@
 #include "ambulant/lib/transition_info.h"
 #include "ambulant/common/embedder.h"
 #include "ambulant/common/factory.h"
+#include "ambulant/common/gui_player.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
 #include "ambulant/common/player.h"
@@ -290,6 +291,36 @@ public:
 };
 #define BGEN_BACK_SUPPORT_factories
 inline factories *Py_WrapAs_factories(PyObject *o) { return new factories(o); }
+
+class gui_player : public factories, public ambulant::common::gui_player {
+public:
+	gui_player(PyObject *itself);
+	virtual ~gui_player();
+
+	void init_playable_factory();
+	void init_window_factory();
+	void init_datasource_factory();
+	void init_parser_factory();
+	void init_plugins();
+	void play();
+	void stop();
+	void pause();
+	void restart();
+	bool is_play_enabled() const;
+	bool is_stop_enabled() const;
+	bool is_pause_enabled() const;
+	bool is_play_active() const;
+	bool is_stop_active() const;
+	bool is_pause_active() const;
+	int get_cursor() const;
+	void set_cursor(int cursor);
+  private:
+	PyObject *py_gui_player;
+
+	friend PyObject *gui_playerObj_New(ambulant::common::gui_player *itself);
+};
+#define BGEN_BACK_SUPPORT_gui_player
+inline gui_player *Py_WrapAs_gui_player(PyObject *o) { return new gui_player(o); }
 
 class alignment : public ambulant::common::alignment {
 public:
