@@ -93,7 +93,7 @@ public:
 	const ambulant::lib::node_context* get_context() const;
 	void set_context(ambulant::lib::node_context* c);
 	void get_children(const_node_list& l) const {}
-	void append_data(const char *data, size_t len) { abort(); }
+	void append_data(const char *data, size_t len) { append_data(data); }
 	void set_attributes(const char **attrs) { abort(); }
   private:
 	PyObject *py_node;

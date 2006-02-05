@@ -52,6 +52,9 @@ lib::tree_builder::tree_builder(node_factory *nf, node_context *context, const c
 	m_filename(id)
 {
 	assert(m_node_factory);
+#ifndef WITH_EXTERNAL_DOM
+	assert(m_node_factory == get_builtin_node_factory());
+#endif
 	reset();
 }
 
