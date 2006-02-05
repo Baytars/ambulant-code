@@ -449,7 +449,7 @@ node_context_object.othermethods = [
 ]
 node_object.othermethods = [
     "void get_children(const_node_list& l) const {}", # XXX for now
-    "void append_data(const char *data, size_t len) { abort(); }", # XXX for now
+    "void append_data(const char *data, size_t len) { append_data(data); }", # XXX for now
     "void set_attributes(const char **attrs) { abort(); }", # XXX for now
 ]
 node_factory_object.othermethods = [
