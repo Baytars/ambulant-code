@@ -27,7 +27,32 @@
 #include "ambulant/net/stdio_datasource.h"
 #include "ambulant/net/posix_datasource.h"
 
-class node_context : public ambulant::lib::node_context {
+
+/* ============ Glue classes to maintain object identity ============ */
+
+class cpppybridge {
+  public:
+    virtual ~cpppybridge() {};
+};
+
+#if 1
+extern PyTypeObject pycppbridge_Type;
+
+extern cpppybridge *pycppbridge_getwrapper(PyObject *o);
+extern void pycppbridge_setwrapper(PyObject *o, cpppybridge *w);
+
+inline bool pycppbridge_Check(PyObject *x)
+{
+	return PyObject_TypeCheck(x, &pycppbridge_Type);
+}
+
+#else
+inline bool pycppbridge_Check(PyObject *x) { return false; };
+inline cpppybridge *pycppbridge_getwrapper(PyObject *o) { return NULL; };
+inline void pycppbridge_setwrapper(PyObject *o, cpppybridge *w) {};
+#endif
+
+class node_context : public cpppybridge, public ambulant::lib::node_context {
 public:
 	node_context(PyObject *itself);
 	virtual ~node_context();
@@ -44,9 +69,16 @@ public:
 	friend PyObject *node_contextObj_New(ambulant::lib::node_context *itself);
 };
 #define BGEN_BACK_SUPPORT_node_context
-inline node_context *Py_WrapAs_node_context(PyObject *o) { return new node_context(o); }
+inline node_context *Py_WrapAs_node_context(PyObject *o)
+{
+	node_context *rv = dynamic_cast<node_context*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new node_context(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class node : public ambulant::lib::node {
+class node : public cpppybridge, public ambulant::lib::node {
 public:
 	node(PyObject *itself);
 	virtual ~node();
@@ -105,9 +137,16 @@ public:
 	friend PyObject *nodeObj_New(ambulant::lib::node *itself);
 };
 #define BGEN_BACK_SUPPORT_node
-inline node *Py_WrapAs_node(PyObject *o) { return new node(o); }
+inline node *Py_WrapAs_node(PyObject *o)
+{
+	node *rv = dynamic_cast<node*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new node(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class node_factory : public ambulant::lib::node_factory {
+class node_factory : public cpppybridge, public ambulant::lib::node_factory {
 public:
 	node_factory(PyObject *itself);
 	virtual ~node_factory();
@@ -122,9 +161,16 @@ public:
 	friend PyObject *node_factoryObj_New(ambulant::lib::node_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_node_factory
-inline node_factory *Py_WrapAs_node_factory(PyObject *o) { return new node_factory(o); }
+inline node_factory *Py_WrapAs_node_factory(PyObject *o)
+{
+	node_factory *rv = dynamic_cast<node_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new node_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class event : public ambulant::lib::event {
+class event : public cpppybridge, public ambulant::lib::event {
 public:
 	event(PyObject *itself);
 	virtual ~event();
@@ -136,9 +182,16 @@ public:
 	friend PyObject *eventObj_New(ambulant::lib::event *itself);
 };
 #define BGEN_BACK_SUPPORT_event
-inline event *Py_WrapAs_event(PyObject *o) { return new event(o); }
+inline event *Py_WrapAs_event(PyObject *o)
+{
+	event *rv = dynamic_cast<event*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new event(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class event_processor : public ambulant::lib::event_processor {
+class event_processor : public cpppybridge, public ambulant::lib::event_processor {
 public:
 	event_processor(PyObject *itself);
 	virtual ~event_processor();
@@ -155,9 +208,16 @@ public:
 	friend PyObject *event_processorObj_New(ambulant::lib::event_processor *itself);
 };
 #define BGEN_BACK_SUPPORT_event_processor
-inline event_processor *Py_WrapAs_event_processor(PyObject *o) { return new event_processor(o); }
+inline event_processor *Py_WrapAs_event_processor(PyObject *o)
+{
+	event_processor *rv = dynamic_cast<event_processor*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new event_processor(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class parser_factory : public ambulant::lib::parser_factory {
+class parser_factory : public cpppybridge, public ambulant::lib::parser_factory {
 public:
 	parser_factory(PyObject *itself);
 	virtual ~parser_factory();
@@ -170,9 +230,16 @@ public:
 	friend PyObject *parser_factoryObj_New(ambulant::lib::parser_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_parser_factory
-inline parser_factory *Py_WrapAs_parser_factory(PyObject *o) { return new parser_factory(o); }
+inline parser_factory *Py_WrapAs_parser_factory(PyObject *o)
+{
+	parser_factory *rv = dynamic_cast<parser_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new parser_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class xml_parser : public ambulant::lib::xml_parser {
+class xml_parser : public cpppybridge, public ambulant::lib::xml_parser {
 public:
 	xml_parser(PyObject *itself);
 	virtual ~xml_parser();
@@ -188,9 +255,16 @@ public:
 	friend PyObject *xml_parserObj_New(ambulant::lib::xml_parser *itself);
 };
 #define BGEN_BACK_SUPPORT_xml_parser
-inline xml_parser *Py_WrapAs_xml_parser(PyObject *o) { return new xml_parser(o); }
+inline xml_parser *Py_WrapAs_xml_parser(PyObject *o)
+{
+	xml_parser *rv = dynamic_cast<xml_parser*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new xml_parser(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class system_embedder : public ambulant::lib::system_embedder {
+class system_embedder : public cpppybridge, public ambulant::lib::system_embedder {
 public:
 	system_embedder(PyObject *itself);
 	virtual ~system_embedder();
@@ -202,9 +276,16 @@ public:
 	friend PyObject *system_embedderObj_New(ambulant::lib::system_embedder *itself);
 };
 #define BGEN_BACK_SUPPORT_system_embedder
-inline system_embedder *Py_WrapAs_system_embedder(PyObject *o) { return new system_embedder(o); }
+inline system_embedder *Py_WrapAs_system_embedder(PyObject *o)
+{
+	system_embedder *rv = dynamic_cast<system_embedder*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new system_embedder(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class timer_events : public ambulant::lib::timer_events {
+class timer_events : public cpppybridge, public ambulant::lib::timer_events {
 public:
 	timer_events(PyObject *itself);
 	virtual ~timer_events();
@@ -216,9 +297,16 @@ public:
 	friend PyObject *timer_eventsObj_New(ambulant::lib::timer_events *itself);
 };
 #define BGEN_BACK_SUPPORT_timer_events
-inline timer_events *Py_WrapAs_timer_events(PyObject *o) { return new timer_events(o); }
+inline timer_events *Py_WrapAs_timer_events(PyObject *o)
+{
+	timer_events *rv = dynamic_cast<timer_events*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new timer_events(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class timer : public ambulant::lib::timer {
+class timer : public cpppybridge, public ambulant::lib::timer {
 public:
 	timer(PyObject *itself);
 	virtual ~timer();
@@ -231,7 +319,14 @@ public:
 	friend PyObject *timerObj_New(ambulant::lib::timer *itself);
 };
 #define BGEN_BACK_SUPPORT_timer
-inline timer *Py_WrapAs_timer(PyObject *o) { return new timer(o); }
+inline timer *Py_WrapAs_timer(PyObject *o)
+{
+	timer *rv = dynamic_cast<timer*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new timer(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class timer_control : public timer, public ambulant::lib::timer_control {
 public:
@@ -255,7 +350,14 @@ public:
 	friend PyObject *timer_controlObj_New(ambulant::lib::timer_control *itself);
 };
 #define BGEN_BACK_SUPPORT_timer_control
-inline timer_control *Py_WrapAs_timer_control(PyObject *o) { return new timer_control(o); }
+inline timer_control *Py_WrapAs_timer_control(PyObject *o)
+{
+	timer_control *rv = dynamic_cast<timer_control*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new timer_control(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class embedder : public system_embedder, public ambulant::common::embedder {
 public:
@@ -272,9 +374,16 @@ public:
 	friend PyObject *embedderObj_New(ambulant::common::embedder *itself);
 };
 #define BGEN_BACK_SUPPORT_embedder
-inline embedder *Py_WrapAs_embedder(PyObject *o) { return new embedder(o); }
+inline embedder *Py_WrapAs_embedder(PyObject *o)
+{
+	embedder *rv = dynamic_cast<embedder*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new embedder(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class factories : public ambulant::common::factories {
+class factories : public cpppybridge, public ambulant::common::factories {
 public:
 	factories(PyObject *itself);
 	virtual ~factories();
@@ -290,7 +399,14 @@ public:
 	friend PyObject *factoriesObj_New(ambulant::common::factories *itself);
 };
 #define BGEN_BACK_SUPPORT_factories
-inline factories *Py_WrapAs_factories(PyObject *o) { return new factories(o); }
+inline factories *Py_WrapAs_factories(PyObject *o)
+{
+	factories *rv = dynamic_cast<factories*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new factories(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class gui_player : public factories, public ambulant::common::gui_player {
 public:
@@ -320,9 +436,16 @@ public:
 	friend PyObject *gui_playerObj_New(ambulant::common::gui_player *itself);
 };
 #define BGEN_BACK_SUPPORT_gui_player
-inline gui_player *Py_WrapAs_gui_player(PyObject *o) { return new gui_player(o); }
+inline gui_player *Py_WrapAs_gui_player(PyObject *o)
+{
+	gui_player *rv = dynamic_cast<gui_player*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new gui_player(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class alignment : public ambulant::common::alignment {
+class alignment : public cpppybridge, public ambulant::common::alignment {
 public:
 	alignment(PyObject *itself);
 	virtual ~alignment();
@@ -335,9 +458,16 @@ public:
 	friend PyObject *alignmentObj_New(ambulant::common::alignment *itself);
 };
 #define BGEN_BACK_SUPPORT_alignment
-inline alignment *Py_WrapAs_alignment(PyObject *o) { return new alignment(o); }
+inline alignment *Py_WrapAs_alignment(PyObject *o)
+{
+	alignment *rv = dynamic_cast<alignment*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new alignment(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class animation_notification : public ambulant::common::animation_notification {
+class animation_notification : public cpppybridge, public ambulant::common::animation_notification {
 public:
 	animation_notification(PyObject *itself);
 	virtual ~animation_notification();
@@ -349,9 +479,16 @@ public:
 	friend PyObject *animation_notificationObj_New(ambulant::common::animation_notification *itself);
 };
 #define BGEN_BACK_SUPPORT_animation_notification
-inline animation_notification *Py_WrapAs_animation_notification(PyObject *o) { return new animation_notification(o); }
+inline animation_notification *Py_WrapAs_animation_notification(PyObject *o)
+{
+	animation_notification *rv = dynamic_cast<animation_notification*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new animation_notification(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class gui_window : public ambulant::common::gui_window {
+class gui_window : public cpppybridge, public ambulant::common::gui_window {
 public:
 	gui_window(PyObject *itself);
 	virtual ~gui_window();
@@ -365,9 +502,16 @@ public:
 	friend PyObject *gui_windowObj_New(ambulant::common::gui_window *itself);
 };
 #define BGEN_BACK_SUPPORT_gui_window
-inline gui_window *Py_WrapAs_gui_window(PyObject *o) { return new gui_window(o); }
+inline gui_window *Py_WrapAs_gui_window(PyObject *o)
+{
+	gui_window *rv = dynamic_cast<gui_window*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new gui_window(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class gui_events : public ambulant::common::gui_events {
+class gui_events : public cpppybridge, public ambulant::common::gui_events {
 public:
 	gui_events(PyObject *itself);
 	virtual ~gui_events();
@@ -381,7 +525,14 @@ public:
 	friend PyObject *gui_eventsObj_New(ambulant::common::gui_events *itself);
 };
 #define BGEN_BACK_SUPPORT_gui_events
-inline gui_events *Py_WrapAs_gui_events(PyObject *o) { return new gui_events(o); }
+inline gui_events *Py_WrapAs_gui_events(PyObject *o)
+{
+	gui_events *rv = dynamic_cast<gui_events*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new gui_events(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class renderer : public gui_events, public ambulant::common::renderer {
 public:
@@ -402,7 +553,14 @@ public:
 	friend PyObject *rendererObj_New(ambulant::common::renderer *itself);
 };
 #define BGEN_BACK_SUPPORT_renderer
-inline renderer *Py_WrapAs_renderer(PyObject *o) { return new renderer(o); }
+inline renderer *Py_WrapAs_renderer(PyObject *o)
+{
+	renderer *rv = dynamic_cast<renderer*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new renderer(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class bgrenderer : public gui_events, public ambulant::common::bgrenderer {
 public:
@@ -420,9 +578,16 @@ public:
 	friend PyObject *bgrendererObj_New(ambulant::common::bgrenderer *itself);
 };
 #define BGEN_BACK_SUPPORT_bgrenderer
-inline bgrenderer *Py_WrapAs_bgrenderer(PyObject *o) { return new bgrenderer(o); }
+inline bgrenderer *Py_WrapAs_bgrenderer(PyObject *o)
+{
+	bgrenderer *rv = dynamic_cast<bgrenderer*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new bgrenderer(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class surface : public ambulant::common::surface {
+class surface : public cpppybridge, public ambulant::common::surface {
 public:
 	surface(PyObject *itself);
 	virtual ~surface();
@@ -457,9 +622,16 @@ public:
 	friend PyObject *surfaceObj_New(ambulant::common::surface *itself);
 };
 #define BGEN_BACK_SUPPORT_surface
-inline surface *Py_WrapAs_surface(PyObject *o) { return new surface(o); }
+inline surface *Py_WrapAs_surface(PyObject *o)
+{
+	surface *rv = dynamic_cast<surface*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new surface(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class window_factory : public ambulant::common::window_factory {
+class window_factory : public cpppybridge, public ambulant::common::window_factory {
 public:
 	window_factory(PyObject *itself);
 	virtual ~window_factory();
@@ -473,7 +645,14 @@ public:
 	friend PyObject *window_factoryObj_New(ambulant::common::window_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_window_factory
-inline window_factory *Py_WrapAs_window_factory(PyObject *o) { return new window_factory(o); }
+inline window_factory *Py_WrapAs_window_factory(PyObject *o)
+{
+	window_factory *rv = dynamic_cast<window_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new window_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class surface_template : public animation_notification, public ambulant::common::surface_template {
 public:
@@ -489,9 +668,16 @@ public:
 	friend PyObject *surface_templateObj_New(ambulant::common::surface_template *itself);
 };
 #define BGEN_BACK_SUPPORT_surface_template
-inline surface_template *Py_WrapAs_surface_template(PyObject *o) { return new surface_template(o); }
+inline surface_template *Py_WrapAs_surface_template(PyObject *o)
+{
+	surface_template *rv = dynamic_cast<surface_template*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new surface_template(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class surface_factory : public ambulant::common::surface_factory {
+class surface_factory : public cpppybridge, public ambulant::common::surface_factory {
 public:
 	surface_factory(PyObject *itself);
 	virtual ~surface_factory();
@@ -503,9 +689,16 @@ public:
 	friend PyObject *surface_factoryObj_New(ambulant::common::surface_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_surface_factory
-inline surface_factory *Py_WrapAs_surface_factory(PyObject *o) { return new surface_factory(o); }
+inline surface_factory *Py_WrapAs_surface_factory(PyObject *o)
+{
+	surface_factory *rv = dynamic_cast<surface_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new surface_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class layout_manager : public ambulant::common::layout_manager {
+class layout_manager : public cpppybridge, public ambulant::common::layout_manager {
 public:
 	layout_manager(PyObject *itself);
 	virtual ~layout_manager();
@@ -520,9 +713,16 @@ public:
 	friend PyObject *layout_managerObj_New(ambulant::common::layout_manager *itself);
 };
 #define BGEN_BACK_SUPPORT_layout_manager
-inline layout_manager *Py_WrapAs_layout_manager(PyObject *o) { return new layout_manager(o); }
+inline layout_manager *Py_WrapAs_layout_manager(PyObject *o)
+{
+	layout_manager *rv = dynamic_cast<layout_manager*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new layout_manager(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class playable : public ambulant::common::playable {
+class playable : public cpppybridge, public ambulant::common::playable {
 public:
 	playable(PyObject *itself);
 	virtual ~playable();
@@ -543,9 +743,16 @@ public:
 	friend PyObject *playableObj_New(ambulant::common::playable *itself);
 };
 #define BGEN_BACK_SUPPORT_playable
-inline playable *Py_WrapAs_playable(PyObject *o) { return new playable(o); }
+inline playable *Py_WrapAs_playable(PyObject *o)
+{
+	playable *rv = dynamic_cast<playable*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new playable(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class playable_notification : public ambulant::common::playable_notification {
+class playable_notification : public cpppybridge, public ambulant::common::playable_notification {
 public:
 	playable_notification(PyObject *itself);
 	virtual ~playable_notification();
@@ -563,9 +770,16 @@ public:
 	friend PyObject *playable_notificationObj_New(ambulant::common::playable_notification *itself);
 };
 #define BGEN_BACK_SUPPORT_playable_notification
-inline playable_notification *Py_WrapAs_playable_notification(PyObject *o) { return new playable_notification(o); }
+inline playable_notification *Py_WrapAs_playable_notification(PyObject *o)
+{
+	playable_notification *rv = dynamic_cast<playable_notification*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new playable_notification(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class playable_factory : public ambulant::common::playable_factory {
+class playable_factory : public cpppybridge, public ambulant::common::playable_factory {
 public:
 	playable_factory(PyObject *itself);
 	virtual ~playable_factory();
@@ -578,7 +792,14 @@ public:
 	friend PyObject *playable_factoryObj_New(ambulant::common::playable_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_playable_factory
-inline playable_factory *Py_WrapAs_playable_factory(PyObject *o) { return new playable_factory(o); }
+inline playable_factory *Py_WrapAs_playable_factory(PyObject *o)
+{
+	playable_factory *rv = dynamic_cast<playable_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new playable_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class global_playable_factory : public playable_factory, public ambulant::common::global_playable_factory {
 public:
@@ -594,9 +815,16 @@ public:
 	friend PyObject *global_playable_factoryObj_New(ambulant::common::global_playable_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_global_playable_factory
-inline global_playable_factory *Py_WrapAs_global_playable_factory(PyObject *o) { return new global_playable_factory(o); }
+inline global_playable_factory *Py_WrapAs_global_playable_factory(PyObject *o)
+{
+	global_playable_factory *rv = dynamic_cast<global_playable_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new global_playable_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class player_feedback : public ambulant::common::player_feedback {
+class player_feedback : public cpppybridge, public ambulant::common::player_feedback {
 public:
 	player_feedback(PyObject *itself);
 	virtual ~player_feedback();
@@ -611,9 +839,16 @@ public:
 	friend PyObject *player_feedbackObj_New(ambulant::common::player_feedback *itself);
 };
 #define BGEN_BACK_SUPPORT_player_feedback
-inline player_feedback *Py_WrapAs_player_feedback(PyObject *o) { return new player_feedback(o); }
+inline player_feedback *Py_WrapAs_player_feedback(PyObject *o)
+{
+	player_feedback *rv = dynamic_cast<player_feedback*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new player_feedback(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class player : public ambulant::common::player {
+class player : public cpppybridge, public ambulant::common::player {
 public:
 	player(PyObject *itself);
 	virtual ~player();
@@ -641,9 +876,16 @@ public:
 	friend PyObject *playerObj_New(ambulant::common::player *itself);
 };
 #define BGEN_BACK_SUPPORT_player
-inline player *Py_WrapAs_player(PyObject *o) { return new player(o); }
+inline player *Py_WrapAs_player(PyObject *o)
+{
+	player *rv = dynamic_cast<player*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new player(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class region_info : public ambulant::common::region_info {
+class region_info : public cpppybridge, public ambulant::common::region_info {
 public:
 	region_info(PyObject *itself);
 	virtual ~region_info();
@@ -672,7 +914,14 @@ public:
 	friend PyObject *region_infoObj_New(ambulant::common::region_info *itself);
 };
 #define BGEN_BACK_SUPPORT_region_info
-inline region_info *Py_WrapAs_region_info(PyObject *o) { return new region_info(o); }
+inline region_info *Py_WrapAs_region_info(PyObject *o)
+{
+	region_info *rv = dynamic_cast<region_info*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new region_info(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
 class animation_destination : public region_info, public ambulant::common::animation_destination {
 public:
@@ -711,9 +960,16 @@ public:
 	friend PyObject *animation_destinationObj_New(ambulant::common::animation_destination *itself);
 };
 #define BGEN_BACK_SUPPORT_animation_destination
-inline animation_destination *Py_WrapAs_animation_destination(PyObject *o) { return new animation_destination(o); }
+inline animation_destination *Py_WrapAs_animation_destination(PyObject *o)
+{
+	animation_destination *rv = dynamic_cast<animation_destination*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new animation_destination(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class datasource : public ambulant::net::datasource {
+class datasource : public cpppybridge, public ambulant::net::datasource {
 public:
 	datasource(PyObject *itself);
 	virtual ~datasource();
@@ -733,9 +989,16 @@ public:
 	friend PyObject *datasourceObj_New(ambulant::net::datasource *itself);
 };
 #define BGEN_BACK_SUPPORT_datasource
-inline datasource *Py_WrapAs_datasource(PyObject *o) { return new datasource(o); }
+inline datasource *Py_WrapAs_datasource(PyObject *o)
+{
+	datasource *rv = dynamic_cast<datasource*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new datasource(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class raw_datasource_factory : public ambulant::net::raw_datasource_factory {
+class raw_datasource_factory : public cpppybridge, public ambulant::net::raw_datasource_factory {
 public:
 	raw_datasource_factory(PyObject *itself);
 	virtual ~raw_datasource_factory();
@@ -747,9 +1010,16 @@ public:
 	friend PyObject *raw_datasource_factoryObj_New(ambulant::net::raw_datasource_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_raw_datasource_factory
-inline raw_datasource_factory *Py_WrapAs_raw_datasource_factory(PyObject *o) { return new raw_datasource_factory(o); }
+inline raw_datasource_factory *Py_WrapAs_raw_datasource_factory(PyObject *o)
+{
+	raw_datasource_factory *rv = dynamic_cast<raw_datasource_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new raw_datasource_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class audio_datasource_factory : public ambulant::net::audio_datasource_factory {
+class audio_datasource_factory : public cpppybridge, public ambulant::net::audio_datasource_factory {
 public:
 	audio_datasource_factory(PyObject *itself);
 	virtual ~audio_datasource_factory();
@@ -761,9 +1031,16 @@ public:
 	friend PyObject *audio_datasource_factoryObj_New(ambulant::net::audio_datasource_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_audio_datasource_factory
-inline audio_datasource_factory *Py_WrapAs_audio_datasource_factory(PyObject *o) { return new audio_datasource_factory(o); }
+inline audio_datasource_factory *Py_WrapAs_audio_datasource_factory(PyObject *o)
+{
+	audio_datasource_factory *rv = dynamic_cast<audio_datasource_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new audio_datasource_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class video_datasource_factory : public ambulant::net::video_datasource_factory {
+class video_datasource_factory : public cpppybridge, public ambulant::net::video_datasource_factory {
 public:
 	video_datasource_factory(PyObject *itself);
 	virtual ~video_datasource_factory();
@@ -775,9 +1052,16 @@ public:
 	friend PyObject *video_datasource_factoryObj_New(ambulant::net::video_datasource_factory *itself);
 };
 #define BGEN_BACK_SUPPORT_video_datasource_factory
-inline video_datasource_factory *Py_WrapAs_video_datasource_factory(PyObject *o) { return new video_datasource_factory(o); }
+inline video_datasource_factory *Py_WrapAs_video_datasource_factory(PyObject *o)
+{
+	video_datasource_factory *rv = dynamic_cast<video_datasource_factory*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new video_datasource_factory(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class audio_parser_finder : public ambulant::net::audio_parser_finder {
+class audio_parser_finder : public cpppybridge, public ambulant::net::audio_parser_finder {
 public:
 	audio_parser_finder(PyObject *itself);
 	virtual ~audio_parser_finder();
@@ -789,9 +1073,16 @@ public:
 	friend PyObject *audio_parser_finderObj_New(ambulant::net::audio_parser_finder *itself);
 };
 #define BGEN_BACK_SUPPORT_audio_parser_finder
-inline audio_parser_finder *Py_WrapAs_audio_parser_finder(PyObject *o) { return new audio_parser_finder(o); }
+inline audio_parser_finder *Py_WrapAs_audio_parser_finder(PyObject *o)
+{
+	audio_parser_finder *rv = dynamic_cast<audio_parser_finder*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new audio_parser_finder(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 
-class audio_filter_finder : public ambulant::net::audio_filter_finder {
+class audio_filter_finder : public cpppybridge, public ambulant::net::audio_filter_finder {
 public:
 	audio_filter_finder(PyObject *itself);
 	virtual ~audio_filter_finder();
@@ -803,5 +1094,12 @@ public:
 	friend PyObject *audio_filter_finderObj_New(ambulant::net::audio_filter_finder *itself);
 };
 #define BGEN_BACK_SUPPORT_audio_filter_finder
-inline audio_filter_finder *Py_WrapAs_audio_filter_finder(PyObject *o) { return new audio_filter_finder(o); }
+inline audio_filter_finder *Py_WrapAs_audio_filter_finder(PyObject *o)
+{
+	audio_filter_finder *rv = dynamic_cast<audio_filter_finder*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new audio_filter_finder(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
 

@@ -38,7 +38,89 @@
 extern PyObject *audio_format_choicesObj_New(ambulant::net::audio_format_choices *itself);
 extern int audio_format_choicesObj_Convert(PyObject *v, ambulant::net::audio_format_choices *p_itself);
 
+
 static PyObject *PyAm_Error;
+
+/* -------------------- Object type pycppbridge --------------------- */
+
+typedef struct pycppbridgeObject {
+	PyObject_HEAD
+	cpppybridge *ob_wrapper;
+} pycppbridgeObject;
+
+static void pycppbridge_dealloc(pycppbridgeObject *self)
+{
+	delete self->ob_wrapper;
+	self->ob_wrapper = NULL;
+	self->ob_type->tp_free((PyObject *)self);
+}
+
+static PyMethodDef pycppbridge_methods[] = {
+	{NULL, NULL, 0}
+};
+
+#define pycppbridge_getsetlist NULL
+
+
+#define pycppbridge_compare NULL
+
+#define pycppbridge_repr NULL
+
+#define pycppbridge_hash NULL
+#define pycppbridge_tp_init 0
+
+#define pycppbridge_tp_alloc PyType_GenericAlloc
+
+#define pycppbridge_tp_new PyType_GenericNew
+#define pycppbridge_tp_free PyObject_Del
+
+
+PyTypeObject pycppbridge_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.pycppbridge", /*tp_name*/
+	sizeof(pycppbridgeObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) pycppbridge_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) pycppbridge_compare, /*tp_compare*/
+	(reprfunc) pycppbridge_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) pycppbridge_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	pycppbridge_methods, /* tp_methods */
+	0, /*tp_members*/
+	pycppbridge_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	pycppbridge_tp_init, /* tp_init */
+	pycppbridge_tp_alloc, /* tp_alloc */
+	pycppbridge_tp_new, /* tp_new */
+	pycppbridge_tp_free, /* tp_free */
+};
+
+/* ------------------ End object type pycppbridge ------------------- */
+
 
 /* -------------------- Object type node_context -------------------- */
 
@@ -51,6 +133,7 @@ inline bool node_contextObj_Check(PyObject *x)
 
 typedef struct node_contextObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::node_context* ob_itself;
 } node_contextObject;
 
@@ -72,6 +155,8 @@ PyObject *node_contextObj_New(ambulant::lib::node_context* itself)
 #endif
 	it = PyObject_NEW(node_contextObject, &node_context_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -101,7 +186,7 @@ int node_contextObj_Convert(PyObject *v, ambulant::lib::node_context* *p_itself)
 
 static void node_contextObj_dealloc(node_contextObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *node_contextObj_set_prefix_mapping(node_contextObject *_self, PyObject *_args)
@@ -303,6 +388,7 @@ inline bool nodeObj_Check(PyObject *x)
 
 typedef struct nodeObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::node* ob_itself;
 } nodeObject;
 
@@ -324,6 +410,8 @@ PyObject *nodeObj_New(ambulant::lib::node* itself)
 #endif
 	it = PyObject_NEW(nodeObject, &node_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -353,7 +441,7 @@ int nodeObj_Convert(PyObject *v, ambulant::lib::node* *p_itself)
 
 static void nodeObj_dealloc(nodeObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *nodeObj_down_1(nodeObject *_self, PyObject *_args)
@@ -1131,6 +1219,7 @@ inline bool node_factoryObj_Check(PyObject *x)
 
 typedef struct node_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::node_factory* ob_itself;
 } node_factoryObject;
 
@@ -1152,6 +1241,8 @@ PyObject *node_factoryObj_New(ambulant::lib::node_factory* itself)
 #endif
 	it = PyObject_NEW(node_factoryObject, &node_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -1181,7 +1272,7 @@ int node_factoryObj_Convert(PyObject *v, ambulant::lib::node_factory* *p_itself)
 
 static void node_factoryObj_dealloc(node_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *node_factoryObj_new_node_1(node_factoryObject *_self, PyObject *_args)
@@ -1336,6 +1427,7 @@ inline bool documentObj_Check(PyObject *x)
 
 typedef struct documentObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::document* ob_itself;
 } documentObject;
 
@@ -1358,6 +1450,7 @@ PyObject *documentObj_New(ambulant::lib::document* itself)
 	it = PyObject_NEW(documentObject, &document_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -1672,6 +1765,7 @@ inline bool eventObj_Check(PyObject *x)
 
 typedef struct eventObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::event* ob_itself;
 } eventObject;
 
@@ -1693,6 +1787,8 @@ PyObject *eventObj_New(ambulant::lib::event* itself)
 #endif
 	it = PyObject_NEW(eventObject, &event_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -1722,7 +1818,7 @@ int eventObj_Convert(PyObject *v, ambulant::lib::event* *p_itself)
 
 static void eventObj_dealloc(eventObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *eventObj_fire(eventObject *_self, PyObject *_args)
@@ -1845,6 +1941,7 @@ inline bool event_processorObj_Check(PyObject *x)
 
 typedef struct event_processorObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::event_processor* ob_itself;
 } event_processorObject;
 
@@ -1866,6 +1963,8 @@ PyObject *event_processorObj_New(ambulant::lib::event_processor* itself)
 #endif
 	it = PyObject_NEW(event_processorObject, &event_processor_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -1895,7 +1994,7 @@ int event_processorObj_Convert(PyObject *v, ambulant::lib::event_processor* *p_i
 
 static void event_processorObj_dealloc(event_processorObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *event_processorObj_add_event(event_processorObject *_self, PyObject *_args)
@@ -2106,6 +2205,7 @@ inline bool parser_factoryObj_Check(PyObject *x)
 
 typedef struct parser_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::parser_factory* ob_itself;
 } parser_factoryObject;
 
@@ -2127,6 +2227,8 @@ PyObject *parser_factoryObj_New(ambulant::lib::parser_factory* itself)
 #endif
 	it = PyObject_NEW(parser_factoryObject, &parser_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -2156,7 +2258,7 @@ int parser_factoryObj_Convert(PyObject *v, ambulant::lib::parser_factory* *p_its
 
 static void parser_factoryObj_dealloc(parser_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *parser_factoryObj_get_parser_name(parser_factoryObject *_self, PyObject *_args)
@@ -2279,6 +2381,7 @@ inline bool global_parser_factoryObj_Check(PyObject *x)
 
 typedef struct global_parser_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::global_parser_factory* ob_itself;
 } global_parser_factoryObject;
 
@@ -2301,6 +2404,7 @@ PyObject *global_parser_factoryObj_New(ambulant::lib::global_parser_factory* its
 	it = PyObject_NEW(global_parser_factoryObject, &global_parser_factory_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -2455,6 +2559,7 @@ inline bool xml_parserObj_Check(PyObject *x)
 
 typedef struct xml_parserObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::xml_parser* ob_itself;
 } xml_parserObject;
 
@@ -2476,6 +2581,8 @@ PyObject *xml_parserObj_New(ambulant::lib::xml_parser* itself)
 #endif
 	it = PyObject_NEW(xml_parserObject, &xml_parser_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -2505,7 +2612,7 @@ int xml_parserObj_Convert(PyObject *v, ambulant::lib::xml_parser* *p_itself)
 
 static void xml_parserObj_dealloc(xml_parserObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *xml_parserObj_parse(xml_parserObject *_self, PyObject *_args)
@@ -2636,6 +2743,7 @@ inline bool system_embedderObj_Check(PyObject *x)
 
 typedef struct system_embedderObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::system_embedder* ob_itself;
 } system_embedderObject;
 
@@ -2657,6 +2765,8 @@ PyObject *system_embedderObj_New(ambulant::lib::system_embedder* itself)
 #endif
 	it = PyObject_NEW(system_embedderObject, &system_embedder_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -2686,7 +2796,7 @@ int system_embedderObj_Convert(PyObject *v, ambulant::lib::system_embedder* *p_i
 
 static void system_embedderObj_dealloc(system_embedderObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *system_embedderObj_show_file(system_embedderObject *_self, PyObject *_args)
@@ -2811,6 +2921,7 @@ inline bool timer_eventsObj_Check(PyObject *x)
 
 typedef struct timer_eventsObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::timer_events* ob_itself;
 } timer_eventsObject;
 
@@ -2832,6 +2943,8 @@ PyObject *timer_eventsObj_New(ambulant::lib::timer_events* itself)
 #endif
 	it = PyObject_NEW(timer_eventsObject, &timer_events_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -2861,7 +2974,7 @@ int timer_eventsObj_Convert(PyObject *v, ambulant::lib::timer_events* *p_itself)
 
 static void timer_eventsObj_dealloc(timer_eventsObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timer_eventsObj_speed_changed(timer_eventsObject *_self, PyObject *_args)
@@ -2984,6 +3097,7 @@ inline bool timerObj_Check(PyObject *x)
 
 typedef struct timerObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::timer* ob_itself;
 } timerObject;
 
@@ -3005,6 +3119,8 @@ PyObject *timerObj_New(ambulant::lib::timer* itself)
 #endif
 	it = PyObject_NEW(timerObject, &timer_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -3034,7 +3150,7 @@ int timerObj_Convert(PyObject *v, ambulant::lib::timer* *p_itself)
 
 static void timerObj_dealloc(timerObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timerObj_elapsed(timerObject *_self, PyObject *_args)
@@ -3172,6 +3288,7 @@ inline bool timer_controlObj_Check(PyObject *x)
 
 typedef struct timer_controlObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::timer_control* ob_itself;
 } timer_controlObject;
 
@@ -3194,6 +3311,7 @@ PyObject *timer_controlObj_New(ambulant::lib::timer_control* itself)
 	it = PyObject_NEW(timer_controlObject, &timer_control_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -3504,6 +3622,7 @@ inline bool timer_control_implObj_Check(PyObject *x)
 
 typedef struct timer_control_implObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::timer_control_impl* ob_itself;
 } timer_control_implObject;
 
@@ -3526,6 +3645,7 @@ PyObject *timer_control_implObj_New(ambulant::lib::timer_control_impl* itself)
 	it = PyObject_NEW(timer_control_implObject, &timer_control_impl_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -3851,6 +3971,7 @@ inline bool transition_infoObj_Check(PyObject *x)
 
 typedef struct transition_infoObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::lib::transition_info* ob_itself;
 } transition_infoObject;
 
@@ -3872,6 +3993,8 @@ PyObject *transition_infoObj_New(ambulant::lib::transition_info* itself)
 #endif
 	it = PyObject_NEW(transition_infoObject, &transition_info_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -3901,7 +4024,7 @@ int transition_infoObj_Convert(PyObject *v, ambulant::lib::transition_info* *p_i
 
 static void transition_infoObj_dealloc(transition_infoObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyMethodDef transition_infoObj_methods[] = {
@@ -4027,6 +4150,7 @@ inline bool embedderObj_Check(PyObject *x)
 
 typedef struct embedderObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::embedder* ob_itself;
 } embedderObject;
 
@@ -4049,6 +4173,7 @@ PyObject *embedderObj_New(ambulant::common::embedder* itself)
 	it = PyObject_NEW(embedderObject, &embedder_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -4243,6 +4368,7 @@ inline bool factoriesObj_Check(PyObject *x)
 
 typedef struct factoriesObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::factories* ob_itself;
 } factoriesObject;
 
@@ -4264,6 +4390,8 @@ PyObject *factoriesObj_New(ambulant::common::factories* itself)
 #endif
 	it = PyObject_NEW(factoriesObject, &factories_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -4293,7 +4421,7 @@ int factoriesObj_Convert(PyObject *v, ambulant::common::factories* *p_itself)
 
 static void factoriesObj_dealloc(factoriesObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *factoriesObj_init_factories(factoriesObject *_self, PyObject *_args)
@@ -4659,6 +4787,7 @@ inline bool gui_playerObj_Check(PyObject *x)
 
 typedef struct gui_playerObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::gui_player* ob_itself;
 } gui_playerObject;
 
@@ -4681,6 +4810,7 @@ PyObject *gui_playerObj_New(ambulant::common::gui_player* itself)
 	it = PyObject_NEW(gui_playerObject, &gui_player_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -5083,6 +5213,7 @@ inline bool alignmentObj_Check(PyObject *x)
 
 typedef struct alignmentObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::alignment* ob_itself;
 } alignmentObject;
 
@@ -5104,6 +5235,8 @@ PyObject *alignmentObj_New(ambulant::common::alignment* itself)
 #endif
 	it = PyObject_NEW(alignmentObject, &alignment_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -5133,7 +5266,7 @@ int alignmentObj_Convert(PyObject *v, ambulant::common::alignment* *p_itself)
 
 static void alignmentObj_dealloc(alignmentObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *alignmentObj_get_image_fixpoint(alignmentObject *_self, PyObject *_args)
@@ -5275,6 +5408,7 @@ inline bool animation_notificationObj_Check(PyObject *x)
 
 typedef struct animation_notificationObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::animation_notification* ob_itself;
 } animation_notificationObject;
 
@@ -5296,6 +5430,8 @@ PyObject *animation_notificationObj_New(ambulant::common::animation_notification
 #endif
 	it = PyObject_NEW(animation_notificationObject, &animation_notification_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -5325,7 +5461,7 @@ int animation_notificationObj_Convert(PyObject *v, ambulant::common::animation_n
 
 static void animation_notificationObj_dealloc(animation_notificationObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *animation_notificationObj_animated(animation_notificationObject *_self, PyObject *_args)
@@ -5448,6 +5584,7 @@ inline bool gui_windowObj_Check(PyObject *x)
 
 typedef struct gui_windowObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::gui_window* ob_itself;
 } gui_windowObject;
 
@@ -5469,6 +5606,8 @@ PyObject *gui_windowObj_New(ambulant::common::gui_window* itself)
 #endif
 	it = PyObject_NEW(gui_windowObject, &gui_window_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -5498,7 +5637,7 @@ int gui_windowObj_Convert(PyObject *v, ambulant::common::gui_window* *p_itself)
 
 static void gui_windowObj_dealloc(gui_windowObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *gui_windowObj_need_redraw(gui_windowObject *_self, PyObject *_args)
@@ -5655,6 +5794,7 @@ inline bool gui_eventsObj_Check(PyObject *x)
 
 typedef struct gui_eventsObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::gui_events* ob_itself;
 } gui_eventsObject;
 
@@ -5676,6 +5816,8 @@ PyObject *gui_eventsObj_New(ambulant::common::gui_events* itself)
 #endif
 	it = PyObject_NEW(gui_eventsObject, &gui_events_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -5705,7 +5847,7 @@ int gui_eventsObj_Convert(PyObject *v, ambulant::common::gui_events* *p_itself)
 
 static void gui_eventsObj_dealloc(gui_eventsObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *gui_eventsObj_redraw(gui_eventsObject *_self, PyObject *_args)
@@ -5870,6 +6012,7 @@ inline bool rendererObj_Check(PyObject *x)
 
 typedef struct rendererObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::renderer* ob_itself;
 } rendererObject;
 
@@ -5892,6 +6035,7 @@ PyObject *rendererObj_New(ambulant::common::renderer* itself)
 	it = PyObject_NEW(rendererObject, &renderer_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -6112,6 +6256,7 @@ inline bool bgrendererObj_Check(PyObject *x)
 
 typedef struct bgrendererObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::bgrenderer* ob_itself;
 } bgrendererObject;
 
@@ -6134,6 +6279,7 @@ PyObject *bgrendererObj_New(ambulant::common::bgrenderer* itself)
 	it = PyObject_NEW(bgrendererObject, &bgrenderer_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -6303,6 +6449,7 @@ inline bool surfaceObj_Check(PyObject *x)
 
 typedef struct surfaceObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::surface* ob_itself;
 } surfaceObject;
 
@@ -6324,6 +6471,8 @@ PyObject *surfaceObj_New(ambulant::common::surface* itself)
 #endif
 	it = PyObject_NEW(surfaceObject, &surface_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -6353,7 +6502,7 @@ int surfaceObj_Convert(PyObject *v, ambulant::common::surface* *p_itself)
 
 static void surfaceObj_dealloc(surfaceObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *surfaceObj_show(surfaceObject *_self, PyObject *_args)
@@ -6736,6 +6885,7 @@ inline bool window_factoryObj_Check(PyObject *x)
 
 typedef struct window_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::window_factory* ob_itself;
 } window_factoryObject;
 
@@ -6757,6 +6907,8 @@ PyObject *window_factoryObj_New(ambulant::common::window_factory* itself)
 #endif
 	it = PyObject_NEW(window_factoryObject, &window_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -6786,7 +6938,7 @@ int window_factoryObj_Convert(PyObject *v, ambulant::common::window_factory* *p_
 
 static void window_factoryObj_dealloc(window_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *window_factoryObj_new_window(window_factoryObject *_self, PyObject *_args)
@@ -6955,6 +7107,7 @@ inline bool surface_templateObj_Check(PyObject *x)
 
 typedef struct surface_templateObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::surface_template* ob_itself;
 } surface_templateObject;
 
@@ -6977,6 +7130,7 @@ PyObject *surface_templateObj_New(ambulant::common::surface_template* itself)
 	it = PyObject_NEW(surface_templateObject, &surface_template_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -7149,6 +7303,7 @@ inline bool surface_factoryObj_Check(PyObject *x)
 
 typedef struct surface_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::surface_factory* ob_itself;
 } surface_factoryObject;
 
@@ -7170,6 +7325,8 @@ PyObject *surface_factoryObj_New(ambulant::common::surface_factory* itself)
 #endif
 	it = PyObject_NEW(surface_factoryObject, &surface_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -7199,7 +7356,7 @@ int surface_factoryObj_Convert(PyObject *v, ambulant::common::surface_factory* *
 
 static void surface_factoryObj_dealloc(surface_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *surface_factoryObj_new_topsurface(surface_factoryObject *_self, PyObject *_args)
@@ -7330,6 +7487,7 @@ inline bool layout_managerObj_Check(PyObject *x)
 
 typedef struct layout_managerObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::layout_manager* ob_itself;
 } layout_managerObject;
 
@@ -7351,6 +7509,8 @@ PyObject *layout_managerObj_New(ambulant::common::layout_manager* itself)
 #endif
 	it = PyObject_NEW(layout_managerObject, &layout_manager_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -7380,7 +7540,7 @@ int layout_managerObj_Convert(PyObject *v, ambulant::common::layout_manager* *p_
 
 static void layout_managerObj_dealloc(layout_managerObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *layout_managerObj_get_surface(layout_managerObject *_self, PyObject *_args)
@@ -7556,6 +7716,7 @@ inline bool playableObj_Check(PyObject *x)
 
 typedef struct playableObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::playable* ob_itself;
 } playableObject;
 
@@ -7577,6 +7738,8 @@ PyObject *playableObj_New(ambulant::common::playable* itself)
 #endif
 	it = PyObject_NEW(playableObject, &playable_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -7606,7 +7769,7 @@ int playableObj_Convert(PyObject *v, ambulant::common::playable* *p_itself)
 
 static void playableObj_dealloc(playableObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playableObj_start(playableObject *_self, PyObject *_args)
@@ -7878,6 +8041,7 @@ inline bool playable_notificationObj_Check(PyObject *x)
 
 typedef struct playable_notificationObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::playable_notification* ob_itself;
 } playable_notificationObject;
 
@@ -7899,6 +8063,8 @@ PyObject *playable_notificationObj_New(ambulant::common::playable_notification* 
 #endif
 	it = PyObject_NEW(playable_notificationObject, &playable_notification_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -7928,7 +8094,7 @@ int playable_notificationObj_Convert(PyObject *v, ambulant::common::playable_not
 
 static void playable_notificationObj_dealloc(playable_notificationObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playable_notificationObj_started(playable_notificationObject *_self, PyObject *_args)
@@ -8176,6 +8342,7 @@ inline bool playable_factoryObj_Check(PyObject *x)
 
 typedef struct playable_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::playable_factory* ob_itself;
 } playable_factoryObject;
 
@@ -8197,6 +8364,8 @@ PyObject *playable_factoryObj_New(ambulant::common::playable_factory* itself)
 #endif
 	it = PyObject_NEW(playable_factoryObject, &playable_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -8226,7 +8395,7 @@ int playable_factoryObj_Convert(PyObject *v, ambulant::common::playable_factory*
 
 static void playable_factoryObj_dealloc(playable_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playable_factoryObj_new_playable(playable_factoryObject *_self, PyObject *_args)
@@ -8389,6 +8558,7 @@ inline bool global_playable_factoryObj_Check(PyObject *x)
 
 typedef struct global_playable_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::global_playable_factory* ob_itself;
 } global_playable_factoryObject;
 
@@ -8411,6 +8581,7 @@ PyObject *global_playable_factoryObj_New(ambulant::common::global_playable_facto
 	it = PyObject_NEW(global_playable_factoryObject, &global_playable_factory_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -8565,6 +8736,7 @@ inline bool player_feedbackObj_Check(PyObject *x)
 
 typedef struct player_feedbackObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::player_feedback* ob_itself;
 } player_feedbackObject;
 
@@ -8586,6 +8758,8 @@ PyObject *player_feedbackObj_New(ambulant::common::player_feedback* itself)
 #endif
 	it = PyObject_NEW(player_feedbackObject, &player_feedback_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -8615,7 +8789,7 @@ int player_feedbackObj_Convert(PyObject *v, ambulant::common::player_feedback* *
 
 static void player_feedbackObj_dealloc(player_feedbackObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *player_feedbackObj_document_started(player_feedbackObject *_self, PyObject *_args)
@@ -8787,6 +8961,7 @@ inline bool playerObj_Check(PyObject *x)
 
 typedef struct playerObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::player* ob_itself;
 } playerObject;
 
@@ -8808,6 +8983,8 @@ PyObject *playerObj_New(ambulant::common::player* itself)
 #endif
 	it = PyObject_NEW(playerObject, &player_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -8837,7 +9014,7 @@ int playerObj_Convert(PyObject *v, ambulant::common::player* *p_itself)
 
 static void playerObj_dealloc(playerObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 #ifdef USE_SMIL21
@@ -9184,6 +9361,7 @@ inline bool region_infoObj_Check(PyObject *x)
 
 typedef struct region_infoObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::region_info* ob_itself;
 } region_infoObject;
 
@@ -9205,6 +9383,8 @@ PyObject *region_infoObj_New(ambulant::common::region_info* itself)
 #endif
 	it = PyObject_NEW(region_infoObject, &region_info_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -9234,7 +9414,7 @@ int region_infoObj_Convert(PyObject *v, ambulant::common::region_info* *p_itself
 
 static void region_infoObj_dealloc(region_infoObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *region_infoObj_get_name(region_infoObject *_self, PyObject *_args)
@@ -9540,6 +9720,7 @@ inline bool animation_destinationObj_Check(PyObject *x)
 
 typedef struct animation_destinationObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::common::animation_destination* ob_itself;
 } animation_destinationObject;
 
@@ -9562,6 +9743,7 @@ PyObject *animation_destinationObj_New(ambulant::common::animation_destination* 
 	it = PyObject_NEW(animation_destinationObject, &animation_destination_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -9901,6 +10083,7 @@ inline bool none_windowObj_Check(PyObject *x)
 
 typedef struct none_windowObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::gui::none::none_window* ob_itself;
 } none_windowObject;
 
@@ -9923,6 +10106,7 @@ PyObject *none_windowObj_New(ambulant::gui::none::none_window* itself)
 	it = PyObject_NEW(none_windowObject, &none_window_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10127,6 +10311,7 @@ inline bool none_window_factoryObj_Check(PyObject *x)
 
 typedef struct none_window_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::gui::none::none_window_factory* ob_itself;
 } none_window_factoryObject;
 
@@ -10149,6 +10334,7 @@ PyObject *none_window_factoryObj_New(ambulant::gui::none::none_window_factory* i
 	it = PyObject_NEW(none_window_factoryObject, &none_window_factory_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10336,6 +10522,7 @@ inline bool datasourceObj_Check(PyObject *x)
 
 typedef struct datasourceObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::datasource* ob_itself;
 } datasourceObject;
 
@@ -10357,6 +10544,8 @@ PyObject *datasourceObj_New(ambulant::net::datasource* itself)
 #endif
 	it = PyObject_NEW(datasourceObject, &datasource_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10386,7 +10575,7 @@ int datasourceObj_Convert(PyObject *v, ambulant::net::datasource* *p_itself)
 
 static void datasourceObj_dealloc(datasourceObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *datasourceObj_start(datasourceObject *_self, PyObject *_args)
@@ -10576,6 +10765,7 @@ inline bool audio_datasourceObj_Check(PyObject *x)
 
 typedef struct audio_datasourceObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::audio_datasource* ob_itself;
 } audio_datasourceObject;
 
@@ -10598,6 +10788,7 @@ PyObject *audio_datasourceObj_New(ambulant::net::audio_datasource* itself)
 	it = PyObject_NEW(audio_datasourceObject, &audio_datasource_Type);
 	if (it == NULL) return NULL;
 	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10735,6 +10926,7 @@ inline bool video_datasourceObj_Check(PyObject *x)
 
 typedef struct video_datasourceObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::video_datasource* ob_itself;
 } video_datasourceObject;
 
@@ -10756,6 +10948,8 @@ PyObject *video_datasourceObj_New(ambulant::net::video_datasource* itself)
 #endif
 	it = PyObject_NEW(video_datasourceObject, &video_datasource_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10785,7 +10979,7 @@ int video_datasourceObj_Convert(PyObject *v, ambulant::net::video_datasource* *p
 
 static void video_datasourceObj_dealloc(video_datasourceObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyMethodDef video_datasourceObj_methods[] = {
@@ -10893,6 +11087,7 @@ inline bool datasource_factoryObj_Check(PyObject *x)
 
 typedef struct datasource_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::datasource_factory* ob_itself;
 } datasource_factoryObject;
 
@@ -10914,6 +11109,8 @@ PyObject *datasource_factoryObj_New(ambulant::net::datasource_factory* itself)
 #endif
 	it = PyObject_NEW(datasource_factoryObject, &datasource_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -10943,7 +11140,7 @@ int datasource_factoryObj_Convert(PyObject *v, ambulant::net::datasource_factory
 
 static void datasource_factoryObj_dealloc(datasource_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *datasource_factoryObj_new_raw_datasource(datasource_factoryObject *_self, PyObject *_args)
@@ -11233,6 +11430,7 @@ inline bool raw_datasource_factoryObj_Check(PyObject *x)
 
 typedef struct raw_datasource_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::raw_datasource_factory* ob_itself;
 } raw_datasource_factoryObject;
 
@@ -11254,6 +11452,8 @@ PyObject *raw_datasource_factoryObj_New(ambulant::net::raw_datasource_factory* i
 #endif
 	it = PyObject_NEW(raw_datasource_factoryObject, &raw_datasource_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -11283,7 +11483,7 @@ int raw_datasource_factoryObj_Convert(PyObject *v, ambulant::net::raw_datasource
 
 static void raw_datasource_factoryObj_dealloc(raw_datasource_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *raw_datasource_factoryObj_new_raw_datasource(raw_datasource_factoryObject *_self, PyObject *_args)
@@ -11408,6 +11608,7 @@ inline bool audio_datasource_factoryObj_Check(PyObject *x)
 
 typedef struct audio_datasource_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::audio_datasource_factory* ob_itself;
 } audio_datasource_factoryObject;
 
@@ -11429,6 +11630,8 @@ PyObject *audio_datasource_factoryObj_New(ambulant::net::audio_datasource_factor
 #endif
 	it = PyObject_NEW(audio_datasource_factoryObject, &audio_datasource_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -11458,7 +11661,7 @@ int audio_datasource_factoryObj_Convert(PyObject *v, ambulant::net::audio_dataso
 
 static void audio_datasource_factoryObj_dealloc(audio_datasource_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_datasource_factoryObj_new_audio_datasource(audio_datasource_factoryObject *_self, PyObject *_args)
@@ -11592,6 +11795,7 @@ inline bool video_datasource_factoryObj_Check(PyObject *x)
 
 typedef struct video_datasource_factoryObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::video_datasource_factory* ob_itself;
 } video_datasource_factoryObject;
 
@@ -11613,6 +11817,8 @@ PyObject *video_datasource_factoryObj_New(ambulant::net::video_datasource_factor
 #endif
 	it = PyObject_NEW(video_datasource_factoryObject, &video_datasource_factory_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -11642,7 +11848,7 @@ int video_datasource_factoryObj_Convert(PyObject *v, ambulant::net::video_dataso
 
 static void video_datasource_factoryObj_dealloc(video_datasource_factoryObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *video_datasource_factoryObj_new_video_datasource(video_datasource_factoryObject *_self, PyObject *_args)
@@ -11773,6 +11979,7 @@ inline bool audio_parser_finderObj_Check(PyObject *x)
 
 typedef struct audio_parser_finderObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::audio_parser_finder* ob_itself;
 } audio_parser_finderObject;
 
@@ -11794,6 +12001,8 @@ PyObject *audio_parser_finderObj_New(ambulant::net::audio_parser_finder* itself)
 #endif
 	it = PyObject_NEW(audio_parser_finderObject, &audio_parser_finder_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -11823,7 +12032,7 @@ int audio_parser_finderObj_Convert(PyObject *v, ambulant::net::audio_parser_find
 
 static void audio_parser_finderObj_dealloc(audio_parser_finderObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_parser_finderObj_new_audio_parser(audio_parser_finderObject *_self, PyObject *_args)
@@ -11954,6 +12163,7 @@ inline bool audio_filter_finderObj_Check(PyObject *x)
 
 typedef struct audio_filter_finderObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::audio_filter_finder* ob_itself;
 } audio_filter_finderObject;
 
@@ -11975,6 +12185,8 @@ PyObject *audio_filter_finderObj_New(ambulant::net::audio_filter_finder* itself)
 #endif
 	it = PyObject_NEW(audio_filter_finderObject, &audio_filter_finder_Type);
 	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = itself;
 	return (PyObject *)it;
 }
@@ -12004,7 +12216,7 @@ int audio_filter_finderObj_Convert(PyObject *v, ambulant::net::audio_filter_find
 
 static void audio_filter_finderObj_dealloc(audio_filter_finderObject *self)
 {
-	self->ob_type->tp_free((PyObject *)self);
+	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_filter_finderObj_new_audio_filter(audio_filter_finderObject *_self, PyObject *_args)
@@ -12132,6 +12344,7 @@ inline bool audio_format_choicesObj_Check(PyObject *x)
 
 typedef struct audio_format_choicesObject {
 	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
 	ambulant::net::audio_format_choices ob_itself;
 } audio_format_choicesObject;
 
@@ -12153,6 +12366,7 @@ PyObject *audio_format_choicesObj_New(const ambulant::net::audio_format_choices 
 #endif
 	it = PyObject_NEW(audio_format_choicesObject, &audio_format_choices_Type);
 	if (it == NULL) return NULL;
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
 	it->ob_itself = *itself;
 	return (PyObject *)it;
 }
@@ -12803,6 +13017,30 @@ static PyMethodDef PyAm_methods[] = {
 };
 
 
+// Helper routines to enable object identity to be maintained
+// across the bridge:
+
+cpppybridge *
+pycppbridge_getwrapper(PyObject *o)
+{
+    if (!pycppbridge_Check(o)) return NULL;
+    pycppbridgeObject *bo = (pycppbridgeObject *)o;
+    return bo->ob_wrapper;
+}
+
+void
+pycppbridge_setwrapper(PyObject *o, cpppybridge *w)
+{
+    if (!pycppbridge_Check(o)) {
+        PyErr_SetString(PyExc_SystemError, "ambulant: attempt to set wrapper for non-bridged object");
+    } else {
+        pycppbridgeObject *bo = (pycppbridgeObject *)o;
+        if (bo->ob_wrapper)
+            PyErr_SetString(PyExc_SystemError, "ambulant: attempt to set wrapper second time");
+        bo->ob_wrapper = w;
+    }
+}
+
 // Declare initambulant as a C external:
 
 extern "C" void initambulant(); 
@@ -12823,15 +13061,22 @@ void initambulant(void)
 	if (PyAm_Error == NULL ||
 	    PyDict_SetItemString(d, "Error", PyAm_Error) != 0)
 		return;
+	pycppbridge_Type.ob_type = &PyType_Type;
+	if (PyType_Ready(&pycppbridge_Type) < 0) return;
+	Py_INCREF(&pycppbridge_Type);
+	PyModule_AddObject(m, "pycppbridge", (PyObject *)&pycppbridge_Type);
 	node_context_Type.ob_type = &PyType_Type;
+	node_context_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&node_context_Type) < 0) return;
 	Py_INCREF(&node_context_Type);
 	PyModule_AddObject(m, "node_context", (PyObject *)&node_context_Type);
 	node_Type.ob_type = &PyType_Type;
+	node_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&node_Type) < 0) return;
 	Py_INCREF(&node_Type);
 	PyModule_AddObject(m, "node", (PyObject *)&node_Type);
 	node_factory_Type.ob_type = &PyType_Type;
+	node_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&node_factory_Type) < 0) return;
 	Py_INCREF(&node_factory_Type);
 	PyModule_AddObject(m, "node_factory", (PyObject *)&node_factory_Type);
@@ -12841,14 +13086,17 @@ void initambulant(void)
 	Py_INCREF(&document_Type);
 	PyModule_AddObject(m, "document", (PyObject *)&document_Type);
 	event_Type.ob_type = &PyType_Type;
+	event_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&event_Type) < 0) return;
 	Py_INCREF(&event_Type);
 	PyModule_AddObject(m, "event", (PyObject *)&event_Type);
 	event_processor_Type.ob_type = &PyType_Type;
+	event_processor_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&event_processor_Type) < 0) return;
 	Py_INCREF(&event_processor_Type);
 	PyModule_AddObject(m, "event_processor", (PyObject *)&event_processor_Type);
 	parser_factory_Type.ob_type = &PyType_Type;
+	parser_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&parser_factory_Type) < 0) return;
 	Py_INCREF(&parser_factory_Type);
 	PyModule_AddObject(m, "parser_factory", (PyObject *)&parser_factory_Type);
@@ -12858,18 +13106,22 @@ void initambulant(void)
 	Py_INCREF(&global_parser_factory_Type);
 	PyModule_AddObject(m, "global_parser_factory", (PyObject *)&global_parser_factory_Type);
 	xml_parser_Type.ob_type = &PyType_Type;
+	xml_parser_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&xml_parser_Type) < 0) return;
 	Py_INCREF(&xml_parser_Type);
 	PyModule_AddObject(m, "xml_parser", (PyObject *)&xml_parser_Type);
 	system_embedder_Type.ob_type = &PyType_Type;
+	system_embedder_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&system_embedder_Type) < 0) return;
 	Py_INCREF(&system_embedder_Type);
 	PyModule_AddObject(m, "system_embedder", (PyObject *)&system_embedder_Type);
 	timer_events_Type.ob_type = &PyType_Type;
+	timer_events_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&timer_events_Type) < 0) return;
 	Py_INCREF(&timer_events_Type);
 	PyModule_AddObject(m, "timer_events", (PyObject *)&timer_events_Type);
 	timer_Type.ob_type = &PyType_Type;
+	timer_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&timer_Type) < 0) return;
 	Py_INCREF(&timer_Type);
 	PyModule_AddObject(m, "timer", (PyObject *)&timer_Type);
@@ -12884,6 +13136,7 @@ void initambulant(void)
 	Py_INCREF(&timer_control_impl_Type);
 	PyModule_AddObject(m, "timer_control_impl", (PyObject *)&timer_control_impl_Type);
 	transition_info_Type.ob_type = &PyType_Type;
+	transition_info_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&transition_info_Type) < 0) return;
 	Py_INCREF(&transition_info_Type);
 	PyModule_AddObject(m, "transition_info", (PyObject *)&transition_info_Type);
@@ -12893,6 +13146,7 @@ void initambulant(void)
 	Py_INCREF(&embedder_Type);
 	PyModule_AddObject(m, "embedder", (PyObject *)&embedder_Type);
 	factories_Type.ob_type = &PyType_Type;
+	factories_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&factories_Type) < 0) return;
 	Py_INCREF(&factories_Type);
 	PyModule_AddObject(m, "factories", (PyObject *)&factories_Type);
@@ -12902,18 +13156,22 @@ void initambulant(void)
 	Py_INCREF(&gui_player_Type);
 	PyModule_AddObject(m, "gui_player", (PyObject *)&gui_player_Type);
 	alignment_Type.ob_type = &PyType_Type;
+	alignment_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&alignment_Type) < 0) return;
 	Py_INCREF(&alignment_Type);
 	PyModule_AddObject(m, "alignment", (PyObject *)&alignment_Type);
 	animation_notification_Type.ob_type = &PyType_Type;
+	animation_notification_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&animation_notification_Type) < 0) return;
 	Py_INCREF(&animation_notification_Type);
 	PyModule_AddObject(m, "animation_notification", (PyObject *)&animation_notification_Type);
 	gui_window_Type.ob_type = &PyType_Type;
+	gui_window_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&gui_window_Type) < 0) return;
 	Py_INCREF(&gui_window_Type);
 	PyModule_AddObject(m, "gui_window", (PyObject *)&gui_window_Type);
 	gui_events_Type.ob_type = &PyType_Type;
+	gui_events_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&gui_events_Type) < 0) return;
 	Py_INCREF(&gui_events_Type);
 	PyModule_AddObject(m, "gui_events", (PyObject *)&gui_events_Type);
@@ -12928,10 +13186,12 @@ void initambulant(void)
 	Py_INCREF(&bgrenderer_Type);
 	PyModule_AddObject(m, "bgrenderer", (PyObject *)&bgrenderer_Type);
 	surface_Type.ob_type = &PyType_Type;
+	surface_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&surface_Type) < 0) return;
 	Py_INCREF(&surface_Type);
 	PyModule_AddObject(m, "surface", (PyObject *)&surface_Type);
 	window_factory_Type.ob_type = &PyType_Type;
+	window_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&window_factory_Type) < 0) return;
 	Py_INCREF(&window_factory_Type);
 	PyModule_AddObject(m, "window_factory", (PyObject *)&window_factory_Type);
@@ -12941,22 +13201,27 @@ void initambulant(void)
 	Py_INCREF(&surface_template_Type);
 	PyModule_AddObject(m, "surface_template", (PyObject *)&surface_template_Type);
 	surface_factory_Type.ob_type = &PyType_Type;
+	surface_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&surface_factory_Type) < 0) return;
 	Py_INCREF(&surface_factory_Type);
 	PyModule_AddObject(m, "surface_factory", (PyObject *)&surface_factory_Type);
 	layout_manager_Type.ob_type = &PyType_Type;
+	layout_manager_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&layout_manager_Type) < 0) return;
 	Py_INCREF(&layout_manager_Type);
 	PyModule_AddObject(m, "layout_manager", (PyObject *)&layout_manager_Type);
 	playable_Type.ob_type = &PyType_Type;
+	playable_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&playable_Type) < 0) return;
 	Py_INCREF(&playable_Type);
 	PyModule_AddObject(m, "playable", (PyObject *)&playable_Type);
 	playable_notification_Type.ob_type = &PyType_Type;
+	playable_notification_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&playable_notification_Type) < 0) return;
 	Py_INCREF(&playable_notification_Type);
 	PyModule_AddObject(m, "playable_notification", (PyObject *)&playable_notification_Type);
 	playable_factory_Type.ob_type = &PyType_Type;
+	playable_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&playable_factory_Type) < 0) return;
 	Py_INCREF(&playable_factory_Type);
 	PyModule_AddObject(m, "playable_factory", (PyObject *)&playable_factory_Type);
@@ -12966,14 +13231,17 @@ void initambulant(void)
 	Py_INCREF(&global_playable_factory_Type);
 	PyModule_AddObject(m, "global_playable_factory", (PyObject *)&global_playable_factory_Type);
 	player_feedback_Type.ob_type = &PyType_Type;
+	player_feedback_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&player_feedback_Type) < 0) return;
 	Py_INCREF(&player_feedback_Type);
 	PyModule_AddObject(m, "player_feedback", (PyObject *)&player_feedback_Type);
 	player_Type.ob_type = &PyType_Type;
+	player_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&player_Type) < 0) return;
 	Py_INCREF(&player_Type);
 	PyModule_AddObject(m, "player", (PyObject *)&player_Type);
 	region_info_Type.ob_type = &PyType_Type;
+	region_info_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&region_info_Type) < 0) return;
 	Py_INCREF(&region_info_Type);
 	PyModule_AddObject(m, "region_info", (PyObject *)&region_info_Type);
@@ -12993,6 +13261,7 @@ void initambulant(void)
 	Py_INCREF(&none_window_factory_Type);
 	PyModule_AddObject(m, "none_window_factory", (PyObject *)&none_window_factory_Type);
 	datasource_Type.ob_type = &PyType_Type;
+	datasource_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&datasource_Type) < 0) return;
 	Py_INCREF(&datasource_Type);
 	PyModule_AddObject(m, "datasource", (PyObject *)&datasource_Type);
@@ -13002,30 +13271,37 @@ void initambulant(void)
 	Py_INCREF(&audio_datasource_Type);
 	PyModule_AddObject(m, "audio_datasource", (PyObject *)&audio_datasource_Type);
 	video_datasource_Type.ob_type = &PyType_Type;
+	video_datasource_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&video_datasource_Type) < 0) return;
 	Py_INCREF(&video_datasource_Type);
 	PyModule_AddObject(m, "video_datasource", (PyObject *)&video_datasource_Type);
 	datasource_factory_Type.ob_type = &PyType_Type;
+	datasource_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&datasource_factory_Type) < 0) return;
 	Py_INCREF(&datasource_factory_Type);
 	PyModule_AddObject(m, "datasource_factory", (PyObject *)&datasource_factory_Type);
 	raw_datasource_factory_Type.ob_type = &PyType_Type;
+	raw_datasource_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&raw_datasource_factory_Type) < 0) return;
 	Py_INCREF(&raw_datasource_factory_Type);
 	PyModule_AddObject(m, "raw_datasource_factory", (PyObject *)&raw_datasource_factory_Type);
 	audio_datasource_factory_Type.ob_type = &PyType_Type;
+	audio_datasource_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&audio_datasource_factory_Type) < 0) return;
 	Py_INCREF(&audio_datasource_factory_Type);
 	PyModule_AddObject(m, "audio_datasource_factory", (PyObject *)&audio_datasource_factory_Type);
 	video_datasource_factory_Type.ob_type = &PyType_Type;
+	video_datasource_factory_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&video_datasource_factory_Type) < 0) return;
 	Py_INCREF(&video_datasource_factory_Type);
 	PyModule_AddObject(m, "video_datasource_factory", (PyObject *)&video_datasource_factory_Type);
 	audio_parser_finder_Type.ob_type = &PyType_Type;
+	audio_parser_finder_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&audio_parser_finder_Type) < 0) return;
 	Py_INCREF(&audio_parser_finder_Type);
 	PyModule_AddObject(m, "audio_parser_finder", (PyObject *)&audio_parser_finder_Type);
 	audio_filter_finder_Type.ob_type = &PyType_Type;
+	audio_filter_finder_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&audio_filter_finder_Type) < 0) return;
 	Py_INCREF(&audio_filter_finder_Type);
 	PyModule_AddObject(m, "audio_filter_finder", (PyObject *)&audio_filter_finder_Type);

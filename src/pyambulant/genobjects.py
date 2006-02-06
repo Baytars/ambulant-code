@@ -120,7 +120,7 @@ for item in OBJECTS:
 	if bname:
 		bname = 'basetype = "%s_Type"\n    baseclass = "%s"' % (bname, bname)
 	else:
-		bname = 'baseclass = None'
+		bname = 'basetype = "pycppbridge_Type"'
 	print >>out, FORMAT % locals()
 	print >>modout, INCLFORMAT % locals()
 	

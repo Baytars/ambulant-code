@@ -33,9 +33,34 @@ includestuff = includestuff + """
 
 extern PyObject *audio_format_choicesObj_New(ambulant::net::audio_format_choices *itself);
 extern int audio_format_choicesObj_Convert(PyObject *v, ambulant::net::audio_format_choices *p_itself);
+
 """
 
 finalstuff = """
+// Helper routines to enable object identity to be maintained
+// across the bridge:
+
+cpppybridge *
+pycppbridge_getwrapper(PyObject *o)
+{
+    if (!pycppbridge_Check(o)) return NULL;
+    pycppbridgeObject *bo = (pycppbridgeObject *)o;
+    return bo->ob_wrapper;
+}
+
+void
+pycppbridge_setwrapper(PyObject *o, cpppybridge *w)
+{
+    if (!pycppbridge_Check(o)) {
+        PyErr_SetString(PyExc_SystemError, "ambulant: attempt to set wrapper for non-bridged object");
+    } else {
+        pycppbridgeObject *bo = (pycppbridgeObject *)o;
+        if (bo->ob_wrapper)
+            PyErr_SetString(PyExc_SystemError, "ambulant: attempt to set wrapper second time");
+        bo->ob_wrapper = w;
+    }
+}
+
 // Declare initambulant as a C external:
 
 extern "C" void initambulant(); 
@@ -91,8 +116,38 @@ sound_alignment = Type("ambulant::common::sound_alignment", "l")
 renderer_private_data_ptr = Type("ambulant::common::renderer_private_data *", "l")
 renderer_private_id = Type("ambulant::common::renderer_private_id", "l")
 
-# Our (opaque) objects
+# A helper object, used as baseclass for our Python objects to enable
+# bridging objects back-and-forth between Python and C++ while maintaining
+# object identity.
+class MyBridgeObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 
+    def __init__(self, name, prefix):
+        GlobalObjectDefinition.__init__(self, name, prefix, None)
+        self.constructors = []
+        
+    def outputNew(self):
+        pass
+        
+    def outputConvert(self):
+        pass
+        
+    def outputCheck(self):
+        pass
+        
+    def outputStructMembers(self):
+        Output("cpppybridge *ob_wrapper;")
+        
+    def outputInitStructMembers(self):
+        Output("ob_wrapper = NULL;")
+        
+    def outputCleanupStructMembers(self):
+        Output("delete self->ob_wrapper;")
+        Output("self->ob_wrapper = NULL;")
+
+    def output_tp_new(self):
+        Output("#define %s_tp_new PyType_GenericNew", self.prefix)
+        
+# Our (opaque) objects
 class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 
     def __init__(self, name, prefix, itselftype):
@@ -125,10 +180,12 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
         CxxMixin.outputCheckConvertArg(self)
         
     def outputStructMembers(self):
+        Output("void *ob_dummy_wrapper; // Overlays bridge object storage")
         GlobalObjectDefinition.outputStructMembers(self)
         # XXX Output("bool owned;")
         
     def outputInitStructMembers(self):
+        Output("it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class")
         GlobalObjectDefinition.outputInitStructMembers(self)
         # XXX init owned, if needed
         
@@ -178,6 +235,10 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 # Create the generator groups and link them
 module = CxxModule(MODNAME, MODPREFIX, includestuff, finalstuff, initstuff, variablestuff)
 functions = []
+
+# Start with adding the bridging base class
+pycppbridge = MyBridgeObjectDefinition("pycppbridge", "pycppbridge")
+module.addobject(pycppbridge)
 
 print "=== generating object definitions ==="
 
