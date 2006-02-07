@@ -223,7 +223,7 @@ static PyObject *node_contextObj_get_namespace_prefix(node_contextObject *_self,
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_namespace_prefix(uri);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -661,7 +661,7 @@ static PyObject *nodeObj_get_container_attribute(nodeObject *_self, PyObject *_a
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_container_attribute(name);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -915,7 +915,7 @@ static PyObject *nodeObj_get_attribute_1(nodeObject *_self, PyObject *_args)
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_attribute(name);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -932,7 +932,7 @@ static PyObject *nodeObj_get_attribute_2(nodeObject *_self, PyObject *_args)
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_attribute(name);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -1588,7 +1588,7 @@ static PyObject *documentObj_get_namespace_prefix(documentObject *_self, PyObjec
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_namespace_prefix(uri);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -9576,7 +9576,7 @@ static PyObject *region_infoObj_get_bgimage(region_infoObject *_self, PyObject *
 	PyThreadState *_save = PyEval_SaveThread();
 	const char * _rv = _self->ob_itself->get_bgimage();
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -12644,7 +12644,7 @@ static PyObject *PyAm_get_version(PyObject *_self, PyObject *_args)
 	PyThreadState *_save = PyEval_SaveThread();
 	_rv = ambulant::get_version();
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("s",
+	_res = Py_BuildValue("z",
 	                     _rv);
 	return _res;
 }
@@ -13023,7 +13023,10 @@ static PyMethodDef PyAm_methods[] = {
 cpppybridge *
 pycppbridge_getwrapper(PyObject *o)
 {
-    if (!pycppbridge_Check(o)) return NULL;
+    if (!pycppbridge_Check(o)) {
+    	PyErr_Warn(PyExc_Warning, "ambulant: Passing non-pycppbridge object to C++");
+    	return NULL;
+    }
     pycppbridgeObject *bo = (pycppbridgeObject *)o;
     return bo->ob_wrapper;
 }

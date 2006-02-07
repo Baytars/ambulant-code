@@ -72,7 +72,7 @@ const char * node_context::get_namespace_prefix(const ambulant::lib::xml_string&
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv))
+	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
 	{
 		PySys_WriteStderr("Python exception during node_context::get_namespace_prefix() return:\n");
 		PyErr_Print();
@@ -587,7 +587,7 @@ const char * node::get_container_attribute(const char* name) const
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv))
+	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
 	{
 		PySys_WriteStderr("Python exception during node::get_container_attribute() return:\n");
 		PyErr_Print();
@@ -988,7 +988,7 @@ const char * node::get_attribute(const char* name) const
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv))
+	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
 	{
 		PySys_WriteStderr("Python exception during node::get_attribute() return:\n");
 		PyErr_Print();
@@ -1014,7 +1014,7 @@ const char * node::get_attribute(const std::string& name) const
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv))
+	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
 	{
 		PySys_WriteStderr("Python exception during node::get_attribute() return:\n");
 		PyErr_Print();
@@ -5056,7 +5056,7 @@ const char * region_info::get_bgimage() const
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv))
+	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
 	{
 		PySys_WriteStderr("Python exception during region_info::get_bgimage() return:\n");
 		PyErr_Print();

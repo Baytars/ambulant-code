@@ -43,7 +43,10 @@ finalstuff = """
 cpppybridge *
 pycppbridge_getwrapper(PyObject *o)
 {
-    if (!pycppbridge_Check(o)) return NULL;
+    if (!pycppbridge_Check(o)) {
+    	PyErr_Warn(PyExc_Warning, "ambulant: Passing non-pycppbridge object to C++");
+    	return NULL;
+    }
     pycppbridgeObject *bo = (pycppbridgeObject *)o;
     return bo->ob_wrapper;
 }
@@ -88,7 +91,7 @@ const_q_name_pair_ref = StdPairType(xml_string, xml_string,
 duration = StdPairType(bool, double, "ambulant::common::duration")
 
 InBuffer = VarInputBufferType('char', 'size_t', 'l')
-return_stringptr = Type("const char *", "s")  # ONLY FOR RETURN VALUES!!
+return_stringptr = Type("const char *", "z")  # ONLY FOR RETURN VALUES!! May be None/NULL.
 # output_stringptr = Type("char *", "s")  # BE CAREFUL!
 output_malloc_buf = MallocHeapOutputBufferType("char", "size_t", "l")
 
