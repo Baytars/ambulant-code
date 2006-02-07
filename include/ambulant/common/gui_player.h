@@ -35,6 +35,8 @@ class gui_player : public factories {
   public:
 	gui_player()
 	:	factories(),
+		m_doc(NULL),
+		m_embedder(NULL),
 		m_player(NULL),
 		m_goto_node(NULL) {}
 	virtual ~gui_player();
@@ -64,8 +66,17 @@ class gui_player : public factories {
 	virtual int get_cursor() const;
 	virtual void set_cursor(int cursor);
 	
+	virtual lib::document *get_document() const { return m_doc; }
+	virtual void set_document(lib::document *doc) { m_doc = doc; }
+	
+	virtual embedder *get_embedder() const { return m_embedder; }
+	virtual void set_embedder(embedder *em) { m_embedder = em; }
+	
 	static void load_test_attrs(std::string& filename);
   protected:
+	lib::document *create_document(net::url& url);
+	lib::document *m_doc;
+	embedder *m_embedder;
 	player *m_player;
 	const lib::node *m_goto_node;	// XXX Quick hack
 	lib::critical_section m_lock;

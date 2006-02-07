@@ -169,3 +169,28 @@ gui_player::set_cursor(int cursor)
 	m_lock.leave();
 }
 
+lib::document *
+gui_player::create_document(net::url& url)
+{
+	// XXXX Needs work for URLs
+	// Correct for relative pathnames for local files
+	if (url.is_local_file() && !url.is_absolute()) {
+		char cwdbuf[1024];
+		if (getcwd(cwdbuf, sizeof cwdbuf-2) < 0)
+			strcpy(cwdbuf, ".");
+		strcat(cwdbuf, "/");
+		net::url cwd_url = ambulant::net::url::from_filename(cwdbuf);
+		url = url.join_to_base(cwd_url);
+		AM_DBG lib::logger::get_logger()->debug("gui_player::create_document: URL is now \"%s\"", url.get_url().c_str());
+	}
+	lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
+	lib::document *rv = lib::document::create_from_url(this, url);
+	if (rv) {
+		lib::logger::get_logger()->trace("%s: Parser done", url.get_url().c_str());
+		rv->set_src_url(url);
+	} else {
+		lib::logger::get_logger()->trace("%s: Failed to parse document ", url.get_url().c_str());
+	}
+	return rv;
+}	
+

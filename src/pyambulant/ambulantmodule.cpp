@@ -5066,6 +5066,62 @@ static PyObject *gui_playerObj_set_cursor(gui_playerObject *_self, PyObject *_ar
 	return _res;
 }
 
+static PyObject *gui_playerObj_get_document(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::document* _rv = _self->ob_itself->get_document();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     documentObj_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_set_document(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::document* doc;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      documentObj_Convert, &doc))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->set_document(doc);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
+static PyObject *gui_playerObj_get_embedder(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::embedder* _rv = _self->ob_itself->get_embedder();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     embedderObj_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_set_embedder(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::common::embedder* em;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      embedderObj_Convert, &em))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->set_embedder(em);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyMethodDef gui_playerObj_methods[] = {
 	{"init_playable_factory", (PyCFunction)gui_playerObj_init_playable_factory, 1,
 	 PyDoc_STR("() -> None")},
@@ -5101,6 +5157,14 @@ static PyMethodDef gui_playerObj_methods[] = {
 	 PyDoc_STR("() -> (int _rv)")},
 	{"set_cursor", (PyCFunction)gui_playerObj_set_cursor, 1,
 	 PyDoc_STR("(int cursor) -> None")},
+	{"get_document", (PyCFunction)gui_playerObj_get_document, 1,
+	 PyDoc_STR("() -> (ambulant::lib::document* _rv)")},
+	{"set_document", (PyCFunction)gui_playerObj_set_document, 1,
+	 PyDoc_STR("(ambulant::lib::document* doc) -> None")},
+	{"get_embedder", (PyCFunction)gui_playerObj_get_embedder, 1,
+	 PyDoc_STR("() -> (ambulant::common::embedder* _rv)")},
+	{"set_embedder", (PyCFunction)gui_playerObj_set_embedder, 1,
+	 PyDoc_STR("(ambulant::common::embedder* em) -> None")},
 	{NULL, NULL, 0}
 };
 

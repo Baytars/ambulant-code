@@ -2212,6 +2212,10 @@ gui_player::gui_player(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "is_pause_active")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: is_pause_active");
 		if (!PyObject_HasAttrString(itself, "get_cursor")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_cursor");
 		if (!PyObject_HasAttrString(itself, "set_cursor")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_cursor");
+		if (!PyObject_HasAttrString(itself, "get_document")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_document");
+		if (!PyObject_HasAttrString(itself, "set_document")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_document");
+		if (!PyObject_HasAttrString(itself, "get_embedder")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_embedder");
+		if (!PyObject_HasAttrString(itself, "set_embedder")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_embedder");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -2546,6 +2550,90 @@ void gui_player::set_cursor(int cursor)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_cursor);
+
+	PyGILState_Release(_GILState);
+}
+
+ambulant::lib::document* gui_player::get_document() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::lib::document* _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "get_document", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_document() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", documentObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_document() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+void gui_player::set_document(ambulant::lib::document* doc)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_doc = Py_BuildValue("O&", documentObj_New, doc);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "set_document", "(O)", py_doc);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::set_document() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_doc);
+
+	PyGILState_Release(_GILState);
+}
+
+ambulant::common::embedder* gui_player::get_embedder() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::common::embedder* _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "get_embedder", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_embedder() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", embedderObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_embedder() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+void gui_player::set_embedder(ambulant::common::embedder* em)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_em = Py_BuildValue("O&", embedderObj_New, em);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "set_embedder", "(O)", py_em);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::set_embedder() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_em);
 
 	PyGILState_Release(_GILState);
 }
