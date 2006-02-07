@@ -78,10 +78,9 @@ class pbfeedback pbfeedback;
 
 mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 	bool use_mms, ambulant::common::embedder *app)
-:   common::gui_player(),
-	m_doc(NULL),
-	m_embedder(app)
+:   common::gui_player()
 {
+	set_embedder(app);
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop(0x%x): created", (void*)this);
 	init_factories();
 	
@@ -180,32 +179,6 @@ mainloop::init_parser_factory()
 {
 	m_parser_factory = lib::global_parser_factory::get_parser_factory();	
 }
-
-
-ambulant::lib::document *
-mainloop::create_document(ambulant::net::url& url)
-{
-	// XXXX Needs work for URLs
-	// Correct for relative pathnames for local files
-	if (url.is_local_file() && !url.is_absolute()) {
-		char cwdbuf[1024];
-		if (getcwd(cwdbuf, sizeof cwdbuf-2) < 0)
-			strcpy(cwdbuf, ".");
-		strcat(cwdbuf, "/");
-		ambulant::net::url cwd_url = ambulant::net::url::from_filename(cwdbuf);
-		url = url.join_to_base(cwd_url);
-		AM_DBG ambulant::lib::logger::get_logger()->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
-	}
-	ambulant::lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
-	ambulant::lib::document *rv = ambulant::lib::document::create_from_url(this, url);
-	if (rv) {
-		ambulant::lib::logger::get_logger()->trace("%s: Parser done", url.get_url().c_str());
-		rv->set_src_url(url);
-	} else {
-		ambulant::lib::logger::get_logger()->trace("%s: Failed to parse document ", url.get_url().c_str());
-	}
-	return rv;
-}	
 
 mainloop::~mainloop()
 {

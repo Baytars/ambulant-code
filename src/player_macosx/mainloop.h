@@ -38,8 +38,4 @@ class mainloop : public ambulant::common::gui_player {
 	void init_window_factory();
 	void init_datasource_factory();
 	void init_parser_factory();
-  private:
-	ambulant::lib::document *create_document(ambulant::net::url& url);
-	ambulant::lib::document *m_doc;
-	ambulant::common::embedder *m_embedder;
 };

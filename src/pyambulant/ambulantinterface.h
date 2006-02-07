@@ -430,6 +430,10 @@ public:
 	bool is_pause_active() const;
 	int get_cursor() const;
 	void set_cursor(int cursor);
+	ambulant::lib::document* get_document() const;
+	void set_document(ambulant::lib::document* doc);
+	ambulant::common::embedder* get_embedder() const;
+	void set_embedder(ambulant::common::embedder* em);
   private:
 	PyObject *py_gui_player;
 
