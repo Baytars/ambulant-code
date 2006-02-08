@@ -152,6 +152,7 @@ void smil_player::start() {
 	} else if(m_state == common::ps_idle || m_state == common::ps_done) {
 		if(!m_root) build_timegraph();
 		if(m_root) {
+			if (m_system) m_system->starting(this);
 			m_scheduler->start(m_root);
 			update();
 		}

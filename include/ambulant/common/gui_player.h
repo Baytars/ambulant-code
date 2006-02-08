@@ -72,6 +72,9 @@ class gui_player : public factories {
 	virtual embedder *get_embedder() const { return m_embedder; }
 	virtual void set_embedder(embedder *em) { m_embedder = em; }
 	
+	virtual player *get_player() const { return m_player; }
+	virtual void set_player(player *pl) { m_player = pl; }
+	
 	static void load_test_attrs(std::string& filename);
   protected:
 	lib::document *create_document(net::url& url);
