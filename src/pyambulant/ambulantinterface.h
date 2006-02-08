@@ -367,6 +367,7 @@ public:
 	void close(ambulant::common::player* p);
 	void open(ambulant::net::url newdoc, bool start, ambulant::common::player* old);
 	void done(ambulant::common::player* p);
+	void starting(ambulant::common::player* p);
 	void show_file(const ambulant::net::url& url) { system_embedder::show_file(url); }
   private:
 	PyObject *py_embedder;
@@ -434,6 +435,8 @@ public:
 	void set_document(ambulant::lib::document* doc);
 	ambulant::common::embedder* get_embedder() const;
 	void set_embedder(ambulant::common::embedder* em);
+	ambulant::common::player* get_player() const;
+	void set_player(ambulant::common::player* pl);
   private:
 	PyObject *py_gui_player;
 
