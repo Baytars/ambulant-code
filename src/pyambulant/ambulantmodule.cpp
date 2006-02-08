@@ -186,7 +186,7 @@ int node_contextObj_Convert(PyObject *v, ambulant::lib::node_context* *p_itself)
 
 static void node_contextObj_dealloc(node_contextObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *node_contextObj_set_prefix_mapping(node_contextObject *_self, PyObject *_args)
@@ -305,6 +305,10 @@ static int node_contextObj_hash(node_contextObject *self)
 }
 static int node_contextObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::node_context* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -441,7 +445,7 @@ int nodeObj_Convert(PyObject *v, ambulant::lib::node* *p_itself)
 
 static void nodeObj_dealloc(nodeObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *nodeObj_down_1(nodeObject *_self, PyObject *_args)
@@ -1136,6 +1140,10 @@ static int nodeObj_hash(nodeObject *self)
 }
 static int nodeObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::node* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -1272,7 +1280,7 @@ int node_factoryObj_Convert(PyObject *v, ambulant::lib::node_factory* *p_itself)
 
 static void node_factoryObj_dealloc(node_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *node_factoryObj_new_node_1(node_factoryObject *_self, PyObject *_args)
@@ -1344,6 +1352,10 @@ static int node_factoryObj_hash(node_factoryObject *self)
 }
 static int node_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::node_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -1480,7 +1492,7 @@ int documentObj_Convert(PyObject *v, ambulant::lib::document* *p_itself)
 
 static void documentObj_dealloc(documentObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	node_context_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *documentObj_get_root_1(documentObject *_self, PyObject *_args)
@@ -1682,6 +1694,10 @@ static int documentObj_hash(documentObject *self)
 }
 static int documentObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (node_context_Type.tp_init)
+	{
+		if ( (*node_context_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::document* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -1818,7 +1834,7 @@ int eventObj_Convert(PyObject *v, ambulant::lib::event* *p_itself)
 
 static void eventObj_dealloc(eventObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *eventObj_fire(eventObject *_self, PyObject *_args)
@@ -1858,6 +1874,10 @@ static int eventObj_hash(eventObject *self)
 }
 static int eventObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::event* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -1994,7 +2014,7 @@ int event_processorObj_Convert(PyObject *v, ambulant::lib::event_processor* *p_i
 
 static void event_processorObj_dealloc(event_processorObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *event_processorObj_add_event(event_processorObject *_self, PyObject *_args)
@@ -2122,6 +2142,10 @@ static int event_processorObj_hash(event_processorObject *self)
 }
 static int event_processorObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::event_processor* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -2258,7 +2282,7 @@ int parser_factoryObj_Convert(PyObject *v, ambulant::lib::parser_factory* *p_its
 
 static void parser_factoryObj_dealloc(parser_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *parser_factoryObj_get_parser_name(parser_factoryObject *_self, PyObject *_args)
@@ -2298,6 +2322,10 @@ static int parser_factoryObj_hash(parser_factoryObject *self)
 }
 static int parser_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::parser_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -2434,7 +2462,7 @@ int global_parser_factoryObj_Convert(PyObject *v, ambulant::lib::global_parser_f
 
 static void global_parser_factoryObj_dealloc(global_parser_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	parser_factory_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *global_parser_factoryObj_add_factory(global_parser_factoryObject *_self, PyObject *_args)
@@ -2476,6 +2504,10 @@ static int global_parser_factoryObj_hash(global_parser_factoryObject *self)
 }
 static int global_parser_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (parser_factory_Type.tp_init)
+	{
+		if ( (*parser_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::global_parser_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -2612,7 +2644,7 @@ int xml_parserObj_Convert(PyObject *v, ambulant::lib::xml_parser* *p_itself)
 
 static void xml_parserObj_dealloc(xml_parserObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *xml_parserObj_parse(xml_parserObject *_self, PyObject *_args)
@@ -2660,6 +2692,10 @@ static int xml_parserObj_hash(xml_parserObject *self)
 }
 static int xml_parserObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::xml_parser* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -2796,7 +2832,7 @@ int system_embedderObj_Convert(PyObject *v, ambulant::lib::system_embedder* *p_i
 
 static void system_embedderObj_dealloc(system_embedderObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *system_embedderObj_show_file(system_embedderObject *_self, PyObject *_args)
@@ -2838,6 +2874,10 @@ static int system_embedderObj_hash(system_embedderObject *self)
 }
 static int system_embedderObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::system_embedder* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -2974,7 +3014,7 @@ int timer_eventsObj_Convert(PyObject *v, ambulant::lib::timer_events* *p_itself)
 
 static void timer_eventsObj_dealloc(timer_eventsObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timer_eventsObj_speed_changed(timer_eventsObject *_self, PyObject *_args)
@@ -3014,6 +3054,10 @@ static int timer_eventsObj_hash(timer_eventsObject *self)
 }
 static int timer_eventsObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::timer_events* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -3150,7 +3194,7 @@ int timerObj_Convert(PyObject *v, ambulant::lib::timer* *p_itself)
 
 static void timerObj_dealloc(timerObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timerObj_elapsed(timerObject *_self, PyObject *_args)
@@ -3205,6 +3249,10 @@ static int timerObj_hash(timerObject *self)
 }
 static int timerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::timer* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -3341,7 +3389,7 @@ int timer_controlObj_Convert(PyObject *v, ambulant::lib::timer_control* *p_itsel
 
 static void timer_controlObj_dealloc(timer_controlObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	timer_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timer_controlObj_elapsed_1(timer_controlObject *_self, PyObject *_args)
@@ -3539,6 +3587,10 @@ static int timer_controlObj_hash(timer_controlObject *self)
 }
 static int timer_controlObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (timer_Type.tp_init)
+	{
+		if ( (*timer_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::timer_control* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -3675,7 +3727,7 @@ int timer_control_implObj_Convert(PyObject *v, ambulant::lib::timer_control_impl
 
 static void timer_control_implObj_dealloc(timer_control_implObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	timer_control_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *timer_control_implObj_elapsed_1(timer_control_implObject *_self, PyObject *_args)
@@ -3888,6 +3940,10 @@ static int timer_control_implObj_hash(timer_control_implObject *self)
 }
 static int timer_control_implObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (timer_control_Type.tp_init)
+	{
+		if ( (*timer_control_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::timer_control_impl* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -4024,7 +4080,7 @@ int transition_infoObj_Convert(PyObject *v, ambulant::lib::transition_info* *p_i
 
 static void transition_infoObj_dealloc(transition_infoObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyMethodDef transition_infoObj_methods[] = {
@@ -4049,6 +4105,10 @@ static int transition_infoObj_hash(transition_infoObject *self)
 }
 static int transition_infoObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::lib::transition_info* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -4203,7 +4263,7 @@ int embedderObj_Convert(PyObject *v, ambulant::common::embedder* *p_itself)
 
 static void embedderObj_dealloc(embedderObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	system_embedder_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *embedderObj_close(embedderObject *_self, PyObject *_args)
@@ -4257,12 +4317,29 @@ static PyObject *embedderObj_done(embedderObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *embedderObj_starting(embedderObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::common::player* p;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      playerObj_Convert, &p))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->starting(p);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyMethodDef embedderObj_methods[] = {
 	{"close", (PyCFunction)embedderObj_close, 1,
 	 PyDoc_STR("(ambulant::common::player* p) -> None")},
 	{"open", (PyCFunction)embedderObj_open, 1,
 	 PyDoc_STR("(ambulant::net::url newdoc, bool start, ambulant::common::player* old) -> None")},
 	{"done", (PyCFunction)embedderObj_done, 1,
+	 PyDoc_STR("(ambulant::common::player* p) -> None")},
+	{"starting", (PyCFunction)embedderObj_starting, 1,
 	 PyDoc_STR("(ambulant::common::player* p) -> None")},
 	{NULL, NULL, 0}
 };
@@ -4285,6 +4362,10 @@ static int embedderObj_hash(embedderObject *self)
 }
 static int embedderObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (system_embedder_Type.tp_init)
+	{
+		if ( (*system_embedder_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::embedder* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -4421,7 +4502,7 @@ int factoriesObj_Convert(PyObject *v, ambulant::common::factories* *p_itself)
 
 static void factoriesObj_dealloc(factoriesObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *factoriesObj_init_factories(factoriesObject *_self, PyObject *_args)
@@ -4696,6 +4777,10 @@ static int factoriesObj_hash(factoriesObject *self)
 }
 static int factoriesObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::factories* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -4840,7 +4925,7 @@ int gui_playerObj_Convert(PyObject *v, ambulant::common::gui_player* *p_itself)
 
 static void gui_playerObj_dealloc(gui_playerObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	factories_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *gui_playerObj_init_playable_factory(gui_playerObject *_self, PyObject *_args)
@@ -5122,6 +5207,34 @@ static PyObject *gui_playerObj_set_embedder(gui_playerObject *_self, PyObject *_
 	return _res;
 }
 
+static PyObject *gui_playerObj_get_player(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::player* _rv = _self->ob_itself->get_player();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     playerObj_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_playerObj_set_player(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::common::player* pl;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      playerObj_Convert, &pl))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->set_player(pl);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyMethodDef gui_playerObj_methods[] = {
 	{"init_playable_factory", (PyCFunction)gui_playerObj_init_playable_factory, 1,
 	 PyDoc_STR("() -> None")},
@@ -5165,6 +5278,10 @@ static PyMethodDef gui_playerObj_methods[] = {
 	 PyDoc_STR("() -> (ambulant::common::embedder* _rv)")},
 	{"set_embedder", (PyCFunction)gui_playerObj_set_embedder, 1,
 	 PyDoc_STR("(ambulant::common::embedder* em) -> None")},
+	{"get_player", (PyCFunction)gui_playerObj_get_player, 1,
+	 PyDoc_STR("() -> (ambulant::common::player* _rv)")},
+	{"set_player", (PyCFunction)gui_playerObj_set_player, 1,
+	 PyDoc_STR("(ambulant::common::player* pl) -> None")},
 	{NULL, NULL, 0}
 };
 
@@ -5186,6 +5303,10 @@ static int gui_playerObj_hash(gui_playerObject *self)
 }
 static int gui_playerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (factories_Type.tp_init)
+	{
+		if ( (*factories_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::gui_player* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -5330,7 +5451,7 @@ int alignmentObj_Convert(PyObject *v, ambulant::common::alignment* *p_itself)
 
 static void alignmentObj_dealloc(alignmentObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *alignmentObj_get_image_fixpoint(alignmentObject *_self, PyObject *_args)
@@ -5389,6 +5510,10 @@ static int alignmentObj_hash(alignmentObject *self)
 }
 static int alignmentObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::alignment* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -5525,7 +5650,7 @@ int animation_notificationObj_Convert(PyObject *v, ambulant::common::animation_n
 
 static void animation_notificationObj_dealloc(animation_notificationObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *animation_notificationObj_animated(animation_notificationObject *_self, PyObject *_args)
@@ -5565,6 +5690,10 @@ static int animation_notificationObj_hash(animation_notificationObject *self)
 }
 static int animation_notificationObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::animation_notification* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -5701,7 +5830,7 @@ int gui_windowObj_Convert(PyObject *v, ambulant::common::gui_window* *p_itself)
 
 static void gui_windowObj_dealloc(gui_windowObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *gui_windowObj_need_redraw(gui_windowObject *_self, PyObject *_args)
@@ -5775,6 +5904,10 @@ static int gui_windowObj_hash(gui_windowObject *self)
 }
 static int gui_windowObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::gui_window* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -5911,7 +6044,7 @@ int gui_eventsObj_Convert(PyObject *v, ambulant::common::gui_events* *p_itself)
 
 static void gui_eventsObj_dealloc(gui_eventsObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *gui_eventsObj_redraw(gui_eventsObject *_self, PyObject *_args)
@@ -5993,6 +6126,10 @@ static int gui_eventsObj_hash(gui_eventsObject *self)
 }
 static int gui_eventsObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::gui_events* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -6129,7 +6266,7 @@ int rendererObj_Convert(PyObject *v, ambulant::common::renderer* *p_itself)
 
 static void rendererObj_dealloc(rendererObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	gui_events_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *rendererObj_set_surface(rendererObject *_self, PyObject *_args)
@@ -6237,6 +6374,10 @@ static int rendererObj_hash(rendererObject *self)
 }
 static int rendererObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (gui_events_Type.tp_init)
+	{
+		if ( (*gui_events_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::renderer* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -6373,7 +6514,7 @@ int bgrendererObj_Convert(PyObject *v, ambulant::common::bgrenderer* *p_itself)
 
 static void bgrendererObj_dealloc(bgrendererObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	gui_events_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *bgrendererObj_set_surface(bgrendererObject *_self, PyObject *_args)
@@ -6430,6 +6571,10 @@ static int bgrendererObj_hash(bgrendererObject *self)
 }
 static int bgrendererObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (gui_events_Type.tp_init)
+	{
+		if ( (*gui_events_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::bgrenderer* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -6566,7 +6711,7 @@ int surfaceObj_Convert(PyObject *v, ambulant::common::surface* *p_itself)
 
 static void surfaceObj_dealloc(surfaceObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *surfaceObj_show(surfaceObject *_self, PyObject *_args)
@@ -6866,6 +7011,10 @@ static int surfaceObj_hash(surfaceObject *self)
 }
 static int surfaceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::surface* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -7002,7 +7151,7 @@ int window_factoryObj_Convert(PyObject *v, ambulant::common::window_factory* *p_
 
 static void window_factoryObj_dealloc(window_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *window_factoryObj_new_window(window_factoryObject *_self, PyObject *_args)
@@ -7088,6 +7237,10 @@ static int window_factoryObj_hash(window_factoryObject *self)
 }
 static int window_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::window_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -7224,7 +7377,7 @@ int surface_templateObj_Convert(PyObject *v, ambulant::common::surface_template*
 
 static void surface_templateObj_dealloc(surface_templateObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	animation_notification_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *surface_templateObj_new_subsurface(surface_templateObject *_self, PyObject *_args)
@@ -7284,6 +7437,10 @@ static int surface_templateObj_hash(surface_templateObject *self)
 }
 static int surface_templateObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (animation_notification_Type.tp_init)
+	{
+		if ( (*animation_notification_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::surface_template* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -7420,7 +7577,7 @@ int surface_factoryObj_Convert(PyObject *v, ambulant::common::surface_factory* *
 
 static void surface_factoryObj_dealloc(surface_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *surface_factoryObj_new_topsurface(surface_factoryObject *_self, PyObject *_args)
@@ -7468,6 +7625,10 @@ static int surface_factoryObj_hash(surface_factoryObject *self)
 }
 static int surface_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::surface_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -7604,7 +7765,7 @@ int layout_managerObj_Convert(PyObject *v, ambulant::common::layout_manager* *p_
 
 static void layout_managerObj_dealloc(layout_managerObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *layout_managerObj_get_surface(layout_managerObject *_self, PyObject *_args)
@@ -7697,6 +7858,10 @@ static int layout_managerObj_hash(layout_managerObject *self)
 }
 static int layout_managerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::layout_manager* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -7833,7 +7998,7 @@ int playableObj_Convert(PyObject *v, ambulant::common::playable* *p_itself)
 
 static void playableObj_dealloc(playableObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playableObj_start(playableObject *_self, PyObject *_args)
@@ -8022,6 +8187,10 @@ static int playableObj_hash(playableObject *self)
 }
 static int playableObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::playable* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -8158,7 +8327,7 @@ int playable_notificationObj_Convert(PyObject *v, ambulant::common::playable_not
 
 static void playable_notificationObj_dealloc(playable_notificationObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playable_notificationObj_started(playable_notificationObject *_self, PyObject *_args)
@@ -8323,6 +8492,10 @@ static int playable_notificationObj_hash(playable_notificationObject *self)
 }
 static int playable_notificationObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::playable_notification* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -8459,7 +8632,7 @@ int playable_factoryObj_Convert(PyObject *v, ambulant::common::playable_factory*
 
 static void playable_factoryObj_dealloc(playable_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *playable_factoryObj_new_playable(playable_factoryObject *_self, PyObject *_args)
@@ -8539,6 +8712,10 @@ static int playable_factoryObj_hash(playable_factoryObject *self)
 }
 static int playable_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::playable_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -8675,7 +8852,7 @@ int global_playable_factoryObj_Convert(PyObject *v, ambulant::common::global_pla
 
 static void global_playable_factoryObj_dealloc(global_playable_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	playable_factory_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *global_playable_factoryObj_add_factory(global_playable_factoryObject *_self, PyObject *_args)
@@ -8717,6 +8894,10 @@ static int global_playable_factoryObj_hash(global_playable_factoryObject *self)
 }
 static int global_playable_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (playable_factory_Type.tp_init)
+	{
+		if ( (*playable_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::global_playable_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -8853,7 +9034,7 @@ int player_feedbackObj_Convert(PyObject *v, ambulant::common::player_feedback* *
 
 static void player_feedbackObj_dealloc(player_feedbackObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *player_feedbackObj_document_started(player_feedbackObject *_self, PyObject *_args)
@@ -8942,6 +9123,10 @@ static int player_feedbackObj_hash(player_feedbackObject *self)
 }
 static int player_feedbackObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::player_feedback* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -9078,7 +9263,7 @@ int playerObj_Convert(PyObject *v, ambulant::common::player* *p_itself)
 
 static void playerObj_dealloc(playerObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 #ifdef USE_SMIL21
@@ -9342,6 +9527,10 @@ static int playerObj_hash(playerObject *self)
 }
 static int playerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::player* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -9478,7 +9667,7 @@ int region_infoObj_Convert(PyObject *v, ambulant::common::region_info* *p_itself
 
 static void region_infoObj_dealloc(region_infoObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *region_infoObj_get_name(region_infoObject *_self, PyObject *_args)
@@ -9701,6 +9890,10 @@ static int region_infoObj_hash(region_infoObject *self)
 }
 static int region_infoObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::region_info* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -9837,7 +10030,7 @@ int animation_destinationObj_Convert(PyObject *v, ambulant::common::animation_de
 
 static void animation_destinationObj_dealloc(animation_destinationObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	region_info_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *animation_destinationObj_get_region_dim(animation_destinationObject *_self, PyObject *_args)
@@ -10064,6 +10257,10 @@ static int animation_destinationObj_hash(animation_destinationObject *self)
 }
 static int animation_destinationObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (region_info_Type.tp_init)
+	{
+		if ( (*region_info_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::common::animation_destination* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -10200,7 +10397,7 @@ int none_windowObj_Convert(PyObject *v, ambulant::gui::none::none_window* *p_its
 
 static void none_windowObj_dealloc(none_windowObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	gui_window_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *none_windowObj_need_redraw(none_windowObject *_self, PyObject *_args)
@@ -10274,6 +10471,10 @@ static int none_windowObj_hash(none_windowObject *self)
 }
 static int none_windowObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (gui_window_Type.tp_init)
+	{
+		if ( (*gui_window_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::gui::none::none_window* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -10428,7 +10629,7 @@ int none_window_factoryObj_Convert(PyObject *v, ambulant::gui::none::none_window
 
 static void none_window_factoryObj_dealloc(none_window_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	window_factory_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *none_window_factoryObj_new_window(none_window_factoryObject *_self, PyObject *_args)
@@ -10495,6 +10696,10 @@ static int none_window_factoryObj_hash(none_window_factoryObject *self)
 }
 static int none_window_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (window_factory_Type.tp_init)
+	{
+		if ( (*window_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::gui::none::none_window_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -10639,7 +10844,7 @@ int datasourceObj_Convert(PyObject *v, ambulant::net::datasource* *p_itself)
 
 static void datasourceObj_dealloc(datasourceObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *datasourceObj_start(datasourceObject *_self, PyObject *_args)
@@ -10746,6 +10951,10 @@ static int datasourceObj_hash(datasourceObject *self)
 }
 static int datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::datasource* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -10882,7 +11091,7 @@ int audio_datasourceObj_Convert(PyObject *v, ambulant::net::audio_datasource* *p
 
 static void audio_datasourceObj_dealloc(audio_datasourceObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	datasource_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyMethodDef audio_datasourceObj_methods[] = {
@@ -10907,6 +11116,10 @@ static int audio_datasourceObj_hash(audio_datasourceObject *self)
 }
 static int audio_datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (datasource_Type.tp_init)
+	{
+		if ( (*datasource_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::audio_datasource* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -11043,7 +11256,7 @@ int video_datasourceObj_Convert(PyObject *v, ambulant::net::video_datasource* *p
 
 static void video_datasourceObj_dealloc(video_datasourceObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyMethodDef video_datasourceObj_methods[] = {
@@ -11068,6 +11281,10 @@ static int video_datasourceObj_hash(video_datasourceObject *self)
 }
 static int video_datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::video_datasource* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -11204,7 +11421,7 @@ int datasource_factoryObj_Convert(PyObject *v, ambulant::net::datasource_factory
 
 static void datasource_factoryObj_dealloc(datasource_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *datasource_factoryObj_new_raw_datasource(datasource_factoryObject *_self, PyObject *_args)
@@ -11403,6 +11620,10 @@ static int datasource_factoryObj_hash(datasource_factoryObject *self)
 }
 static int datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::datasource_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -11547,7 +11768,7 @@ int raw_datasource_factoryObj_Convert(PyObject *v, ambulant::net::raw_datasource
 
 static void raw_datasource_factoryObj_dealloc(raw_datasource_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *raw_datasource_factoryObj_new_raw_datasource(raw_datasource_factoryObject *_self, PyObject *_args)
@@ -11589,6 +11810,10 @@ static int raw_datasource_factoryObj_hash(raw_datasource_factoryObject *self)
 }
 static int raw_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::raw_datasource_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -11725,7 +11950,7 @@ int audio_datasource_factoryObj_Convert(PyObject *v, ambulant::net::audio_dataso
 
 static void audio_datasource_factoryObj_dealloc(audio_datasource_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_datasource_factoryObj_new_audio_datasource(audio_datasource_factoryObject *_self, PyObject *_args)
@@ -11776,6 +12001,10 @@ static int audio_datasource_factoryObj_hash(audio_datasource_factoryObject *self
 }
 static int audio_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::audio_datasource_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -11912,7 +12141,7 @@ int video_datasource_factoryObj_Convert(PyObject *v, ambulant::net::video_dataso
 
 static void video_datasource_factoryObj_dealloc(video_datasource_factoryObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *video_datasource_factoryObj_new_video_datasource(video_datasource_factoryObject *_self, PyObject *_args)
@@ -11960,6 +12189,10 @@ static int video_datasource_factoryObj_hash(video_datasource_factoryObject *self
 }
 static int video_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::video_datasource_factory* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -12096,7 +12329,7 @@ int audio_parser_finderObj_Convert(PyObject *v, ambulant::net::audio_parser_find
 
 static void audio_parser_finderObj_dealloc(audio_parser_finderObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_parser_finderObj_new_audio_parser(audio_parser_finderObject *_self, PyObject *_args)
@@ -12144,6 +12377,10 @@ static int audio_parser_finderObj_hash(audio_parser_finderObject *self)
 }
 static int audio_parser_finderObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::audio_parser_finder* itself;
 	const char *kw[] = {"itself", 0};
 
@@ -12280,7 +12517,7 @@ int audio_filter_finderObj_Convert(PyObject *v, ambulant::net::audio_filter_find
 
 static void audio_filter_finderObj_dealloc(audio_filter_finderObject *self)
 {
-	self->ob_type->tp_base->tp_dealloc((PyObject *)self);
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
 static PyObject *audio_filter_finderObj_new_audio_filter(audio_filter_finderObject *_self, PyObject *_args)
@@ -12325,6 +12562,10 @@ static int audio_filter_finderObj_hash(audio_filter_finderObject *self)
 }
 static int audio_filter_finderObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
 	ambulant::net::audio_filter_finder* itself;
 	const char *kw[] = {"itself", 0};
 
