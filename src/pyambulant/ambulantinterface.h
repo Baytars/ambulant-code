@@ -422,7 +422,7 @@ public:
 	void play();
 	void stop();
 	void pause();
-	void restart();
+	void restart(bool reparse);
 	bool is_play_enabled() const;
 	bool is_stop_enabled() const;
 	bool is_pause_enabled() const;
@@ -437,6 +437,7 @@ public:
 	void set_embedder(ambulant::common::embedder* em);
 	ambulant::common::player* get_player() const;
 	void set_player(ambulant::common::player* pl);
+	ambulant::net::url get_url() const;
   private:
 	PyObject *py_gui_player;
 

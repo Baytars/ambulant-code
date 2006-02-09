@@ -2237,6 +2237,7 @@ gui_player::gui_player(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "set_embedder")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_embedder");
 		if (!PyObject_HasAttrString(itself, "get_player")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_player");
 		if (!PyObject_HasAttrString(itself, "set_player")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_player");
+		if (!PyObject_HasAttrString(itself, "get_url")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_url");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -2374,10 +2375,12 @@ void gui_player::pause()
 	PyGILState_Release(_GILState);
 }
 
-void gui_player::restart()
+void gui_player::restart(bool reparse)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
-	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "restart", "()");
+	PyObject *py_reparse = Py_BuildValue("O&", bool_New, reparse);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "restart", "(O)", py_reparse);
 	if (PyErr_Occurred())
 	{
 		PySys_WriteStderr("Python exception during gui_player::restart() callback:\n");
@@ -2385,6 +2388,7 @@ void gui_player::restart()
 	}
 
 	Py_XDECREF(py_rv);
+	Py_XDECREF(py_reparse);
 
 	PyGILState_Release(_GILState);
 }
@@ -2699,6 +2703,30 @@ void gui_player::set_player(ambulant::common::player* pl)
 	Py_XDECREF(py_pl);
 
 	PyGILState_Release(_GILState);
+}
+
+ambulant::net::url gui_player::get_url() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::net::url _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "get_url", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_url() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", ambulant_url_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_url() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
 }
 
 /* ------------------------ Class alignment ------------------------- */

@@ -95,7 +95,7 @@ gui_player::pause()
 void
 gui_player::restart(bool reparse)
 {
-	ambulant::lib::logger::get_logger()->error("Restarting presentation not implemented in this release.");
+	lib::logger::get_logger()->trace("restart not implemented yet");
 }
 
 bool
@@ -180,11 +180,14 @@ gui_player::create_document(const net::url& url)
 			strcpy(cwdbuf, ".");
 		strcat(cwdbuf, "/");
 		net::url cwd_url = ambulant::net::url::from_filename(cwdbuf);
-		url = url.join_to_base(cwd_url);
-		AM_DBG lib::logger::get_logger()->debug("gui_player::create_document: URL is now \"%s\"", url.get_url().c_str());
+		m_url = url.join_to_base(cwd_url);
+		AM_DBG lib::logger::get_logger()->debug("gui_player::create_document: URL is now \"%s\"", m_url.get_url().c_str());
+	} else {
+		m_url = url;
 	}
-#endif
+#else
 	m_url = url;
+#endif
 	lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
 	lib::document *rv = lib::document::create_from_url(this, url);
 	if (rv) {

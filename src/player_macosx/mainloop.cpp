@@ -18,7 +18,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define WITH_FFMPEG_VIDEO
-//#define TEST_PLAYBACK_FEEDBACK
 // Define NONE_PLAYER to skip all cocoa support but use the dummy
 // none_window and none_playable in stead.
 //#define NONE_PLAYER
@@ -58,24 +57,6 @@
 
 using namespace ambulant;
 
-#ifdef TEST_PLAYBACK_FEEDBACK
-#include "ambulant/common/player.h"
-#include "ambulant/lib/node.h"
-
-class pbfeedback : public ambulant::common::player_feedback {
-  public:
-	void node_started(ambulant::lib::node *n) {
-		ambulant::lib::logger::get_logger()->trace("%s started", n->get_sig().c_str());
-	}
-
-	void node_stopped(ambulant::lib::node *n) {
-		ambulant::lib::logger::get_logger()->trace("%s stopped", n->get_sig().c_str());
-	}
-};
-
-class pbfeedback pbfeedback;
-#endif
-
 mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 	bool use_mms, ambulant::common::embedder *app)
 :   common::gui_player()
@@ -104,9 +85,6 @@ mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
 		m_player = common::create_smil2_player(m_doc, this, m_embedder);
 #ifdef USE_SMIL21
 	m_player->initialize();
-#endif
-#ifdef TEST_PLAYBACK_FEEDBACK
-	m_player->set_feedback(&pbfeedback);
 #endif
 	const std::string& id = url.get_ref();
 	if (id != "") {
@@ -186,3 +164,39 @@ mainloop::~mainloop()
 //	if (m_doc) delete m_doc;
 //	m_doc = NULL;
 }
+
+void
+mainloop::restart(bool reparse)
+{
+	bool playing = is_play_active();
+	stop();
+	
+	delete m_player;
+	m_player = 0;
+	if (reparse) {
+		m_doc = create_document(m_url);
+		if(!m_doc) {
+			lib::logger::get_logger()->show("Failed to parse document %s", m_url.get_url().c_str());
+			return;
+		}
+	}
+	AM_DBG lib::logger::get_logger()->debug("Creating player instance for: %s", m_url.get_url().c_str());
+	// XXXX
+	m_player = common::create_smil2_player(m_doc, this, m_embedder);
+#ifdef USE_SMIL21
+	m_player->initialize();
+#endif
+#if 0
+	const std::string& id = url.get_ref();
+	if (id != "") {
+		const ambulant::lib::node *node = m_doc->get_node(id);
+		if (!node) {
+			lib::logger::get_logger()->warn(gettext("%s: node ID not found"), id.c_str());
+		} else {
+			m_goto_node = node;
+		}
+	}
+#endif
+	if(playing) play();	
+}
+

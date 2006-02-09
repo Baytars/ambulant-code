@@ -5035,10 +5035,12 @@ static PyObject *gui_playerObj_pause(gui_playerObject *_self, PyObject *_args)
 static PyObject *gui_playerObj_restart(gui_playerObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
-	if (!PyArg_ParseTuple(_args, ""))
+	bool reparse;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      bool_Convert, &reparse))
 		return NULL;
 	PyThreadState *_save = PyEval_SaveThread();
-	_self->ob_itself->restart();
+	_self->ob_itself->restart(reparse);
 	PyEval_RestoreThread(_save);
 	Py_INCREF(Py_None);
 	_res = Py_None;
@@ -5235,6 +5237,19 @@ static PyObject *gui_playerObj_set_player(gui_playerObject *_self, PyObject *_ar
 	return _res;
 }
 
+static PyObject *gui_playerObj_get_url(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::net::url _rv = _self->ob_itself->get_url();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O",
+	                     ambulant_url_New(_rv));
+	return _res;
+}
+
 static PyMethodDef gui_playerObj_methods[] = {
 	{"init_playable_factory", (PyCFunction)gui_playerObj_init_playable_factory, 1,
 	 PyDoc_STR("() -> None")},
@@ -5253,7 +5268,7 @@ static PyMethodDef gui_playerObj_methods[] = {
 	{"pause", (PyCFunction)gui_playerObj_pause, 1,
 	 PyDoc_STR("() -> None")},
 	{"restart", (PyCFunction)gui_playerObj_restart, 1,
-	 PyDoc_STR("() -> None")},
+	 PyDoc_STR("(bool reparse) -> None")},
 	{"is_play_enabled", (PyCFunction)gui_playerObj_is_play_enabled, 1,
 	 PyDoc_STR("() -> (bool _rv)")},
 	{"is_stop_enabled", (PyCFunction)gui_playerObj_is_stop_enabled, 1,
@@ -5282,6 +5297,8 @@ static PyMethodDef gui_playerObj_methods[] = {
 	 PyDoc_STR("() -> (ambulant::common::player* _rv)")},
 	{"set_player", (PyCFunction)gui_playerObj_set_player, 1,
 	 PyDoc_STR("(ambulant::common::player* pl) -> None")},
+	{"get_url", (PyCFunction)gui_playerObj_get_url, 1,
+	 PyDoc_STR("() -> (ambulant::net::url _rv)")},
 	{NULL, NULL, 0}
 };
 
