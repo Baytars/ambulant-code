@@ -63,8 +63,7 @@ class qt_mainloop :
 {
   //  static bool m_done;
   public:
-        qt_mainloop(qt_gui* parent, window_factory *wf);
-	~qt_mainloop();
+    qt_mainloop(qt_gui* parent, window_factory *wf);
 	
 	void init_playable_factory();
 	void init_datasource_factory();
@@ -89,10 +88,8 @@ class qt_mainloop :
 	};
 	std::stack<frame*> m_frames;
 #endif
-	ambulant::lib::document *create_document(net::url& filename);
 	ambulant::common::player* create_player(const char* filename);
 	// sorted alphabetically on member name
-	document*				m_doc;
 	qt_gui*					m_gui;
 	lib::logger*				m_logger;
 };
