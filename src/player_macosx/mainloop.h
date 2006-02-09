@@ -24,7 +24,6 @@
 #include "ambulant/lib/refcount.h"
 #include "ambulant/common/gui_player.h"
 #include "ambulant/common/playable.h"
-#include "ambulant/lib/document.h"
 #include "ambulant/common/embedder.h"
 #include "ambulant/net/url.h"
 
