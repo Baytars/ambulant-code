@@ -36,6 +36,13 @@
 
 using namespace ambulant;
 
+lib::document::document()
+:	m_root(NULL),
+	m_root_owned(false)
+{
+}
+
+#if 0
 lib::document::document(node *root, bool owned) 
 :	m_root(root),
 	m_root_owned(owned)
@@ -46,11 +53,13 @@ lib::document::document(node *root, bool owned)
 
 lib::document::document(node *root, const net::url& src_url) 
 :	m_root(root),
-	m_src_url(src_url) {
+	m_root_owned(xxx),
+	m_src_url(src_url)
+{
 	build_id2node_map();
 	read_custom_attributes();
 }
-
+#endif
 
 lib::document::~document() {
 	if (m_root_owned) delete m_root;
@@ -143,6 +152,7 @@ lib::document::create_from_string(common::factories* factory, const std::string&
 	return d;
 }
 
+#if 0
 //static 
 lib::document* 
 lib::document::create_from_tree(common::factories* factory, lib::node *root, const net::url& u) {
@@ -155,6 +165,7 @@ lib::document::create_from_tree(common::factories* factory, lib::node *root, con
 	d->set_src_url(u);
 	return d;
 }
+#endif
 
 void 
 lib::document::set_prefix_mapping(const std::string& prefix, const std::string& uri) {
@@ -180,10 +191,15 @@ lib::document::resolve_url(const net::url& rurl) const {
 
 void lib::document::set_root(node* n) {
 	if(m_root_owned && m_root != n) delete m_root;
-	// XXX Should we reset m_root_owned??
+	m_root_owned = true;
 	m_root = n;
 	build_id2node_map();
 	read_custom_attributes();
+}
+
+void
+lib::document::tree_changed() {
+	set_root(m_root);
 }
 
 void lib::document::build_id2node_map() {

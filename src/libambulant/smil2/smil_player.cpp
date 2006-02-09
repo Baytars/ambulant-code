@@ -112,7 +112,7 @@ smil_player::~smil_player() {
 	delete m_animation_engine;
 	delete m_root;
 	delete m_scheduler;
-	delete m_doc;
+//	delete m_doc;
 	delete m_layout_manager;
 }
 

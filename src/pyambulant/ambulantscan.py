@@ -67,6 +67,7 @@ class MyScanner(CxxScanner):
             "none_playable_factory",  # XXX Constructor for unsupported type
             "event_processor_impl", # Constructor for unsupported type
             "load_test_attrs",
+            "create_from_tree", # Ifdeffed out, for the time being
            
         ]
 

@@ -1523,6 +1523,19 @@ static PyObject *documentObj_get_root_2(documentObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *documentObj_tree_changed(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->tree_changed();
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyObject *documentObj_locate_node_1(documentObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -1657,6 +1670,8 @@ static PyMethodDef documentObj_methods[] = {
 	 PyDoc_STR("(bool detach) -> (ambulant::lib::node* _rv)")},
 	{"get_root_2", (PyCFunction)documentObj_get_root_2, 1,
 	 PyDoc_STR("() -> (const ambulant::lib::node* _rv)")},
+	{"tree_changed", (PyCFunction)documentObj_tree_changed, 1,
+	 PyDoc_STR("() -> None")},
 	{"locate_node_1", (PyCFunction)documentObj_locate_node_1, 1,
 	 PyDoc_STR("(char* path) -> (ambulant::lib::node* _rv)")},
 	{"locate_node_2", (PyCFunction)documentObj_locate_node_2, 1,
@@ -13051,28 +13066,6 @@ static PyObject *PyAm_create_from_string(PyObject *_self, PyObject *_args)
 	return _res;
 }
 
-static PyObject *PyAm_create_from_tree(PyObject *_self, PyObject *_args)
-{
-	PyObject *_res = NULL;
-	ambulant::lib::document* _rv;
-	ambulant::common::factories* factory;
-	ambulant::lib::node* root;
-	ambulant::net::url u;
-	if (!PyArg_ParseTuple(_args, "O&O&O&",
-	                      factoriesObj_Convert, &factory,
-	                      nodeObj_Convert, &root,
-	                      ambulant_url_Convert, &u))
-		return NULL;
-	PyThreadState *_save = PyEval_SaveThread();
-	_rv = ambulant::lib::document::create_from_tree(factory,
-	                                                root,
-	                                                u);
-	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("O&",
-	                     documentObj_New, _rv);
-	return _res;
-}
-
 static PyObject *PyAm_event_processor_factory(PyObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -13307,8 +13300,6 @@ static PyMethodDef PyAm_methods[] = {
 	 PyDoc_STR("(ambulant::common::factories* factory, std::string filename) -> (ambulant::lib::document* _rv)")},
 	{"create_from_string", (PyCFunction)PyAm_create_from_string, 1,
 	 PyDoc_STR("(ambulant::common::factories* factory, std::string smil_src, std::string src_id) -> (ambulant::lib::document* _rv)")},
-	{"create_from_tree", (PyCFunction)PyAm_create_from_tree, 1,
-	 PyDoc_STR("(ambulant::common::factories* factory, ambulant::lib::node* root, ambulant::net::url u) -> (ambulant::lib::document* _rv)")},
 	{"event_processor_factory", (PyCFunction)PyAm_event_processor_factory, 1,
 	 PyDoc_STR("(ambulant::lib::timer* t) -> (ambulant::lib::event_processor* _rv)")},
 	{"get_parser_factory", (PyCFunction)PyAm_get_parser_factory, 1,
