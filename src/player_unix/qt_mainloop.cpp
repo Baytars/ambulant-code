@@ -84,10 +84,10 @@ open_web_browser(const std::string &href)
 }
 
 qt_mainloop::qt_mainloop(qt_gui* gui, ambulant::common::window_factory *wf)
-:	m_doc(NULL),
-	m_gui(gui)
+:	m_gui(gui)
 {
  	m_logger = lib::logger::get_logger();
+ 	set_embedder(this);
  	m_window_factory = wf;
  	init_factories();
 	
@@ -107,41 +107,12 @@ qt_mainloop::create_player(const char* filename) {
 	if (is_mms) {
 		player = create_mms_player(m_doc, this);
 	} else {
-		player = create_smil2_player(m_doc, this, this);
+		player = create_smil2_player(m_doc, this, m_embedder);
 	}
 #ifdef USE_SMIL21
 	player->initialize();
 #endif
 	return player;
-}
-
-lib::document *
-qt_mainloop::create_document(net::url& url)
-{
-	AM_DBG m_logger->debug("qt_mainloop::create_document(\"%s\")", url.get_url().c_str());
-	// Correct for relative pathnames for local files
-	if (url.is_local_file() && !url.is_absolute()) {
-		char cwdbuf[1024];
-		if (getcwd(cwdbuf, sizeof cwdbuf-2) < 0)
-			strcpy(cwdbuf, ".");
-		strcat(cwdbuf, "/");
-		net::url cwd_url = net::url::from_filename(cwdbuf);
-		url = url.join_to_base(cwd_url);
-		AM_DBG m_logger->debug("mainloop::create_document: URL is now \"%s\"", url.get_url().c_str());
-	}
-	ambulant::lib::document *rv = ambulant::lib::document::create_from_url(this, url);
-	if (!rv) {
-		m_logger->trace("%s: Failed to parse document ", url.get_url().c_str());
-	}
-	return rv;
-}	
-
-qt_mainloop::~qt_mainloop()
-{
-//  m_doc will be cleaned up by the smil_player.
-//	if (m_doc) delete m_doc;
-//	m_doc = NULL;
-	AM_DBG m_logger->debug("qt_mainloop::~qt_mainloop() m_player=0x%x", m_player);
 }
 
 void
