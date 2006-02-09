@@ -75,7 +75,7 @@ class gui_player : public factories {
 	virtual player *get_player() const { return m_player; }
 	virtual void set_player(player *pl) { m_player = pl; }
 
-	virtual const net::url& get_url() const { return m_url; }
+	virtual net::url get_url() const { return m_url; }
 	
 	static void load_test_attrs(std::string& filename);
   protected:

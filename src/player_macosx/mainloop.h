@@ -33,7 +33,8 @@ class mainloop : public ambulant::common::gui_player {
 	mainloop(const char *filename, ambulant::common::window_factory *wf,
 		bool use_mms, ambulant::common::embedder *app);
 	~mainloop();
-		
+	
+	void restart(bool reparse=true);
 	void init_playable_factory();
 	void init_window_factory();
 	void init_datasource_factory();
