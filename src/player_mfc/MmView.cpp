@@ -88,10 +88,10 @@ using namespace ambulant;
 //#define AM_PLAYER_DG
 
 #ifdef AM_PLAYER_DG
-typedef gui::dg::dg_player gui_player;
+typedef gui::dg::dg_player dg_or_dx_player;
 typedef gui::dg::dg_player_callbacks gui_callbacks;
 #else 
-typedef gui::dx::dx_player gui_player;
+typedef gui::dx::dx_player dg_or_dx_player;
 typedef gui::dx::dx_player_callbacks gui_callbacks;
 #endif
 
@@ -119,12 +119,12 @@ void my_player_callbacks::destroy_os_window(HWND hwnd) {
 }
 
 
-static gui_player* 
+static dg_or_dx_player* 
 create_player_instance(const net::url& u) {
-	return new gui_player(s_player_callbacks, NULL, u);
+	return new dg_or_dx_player(s_player_callbacks, NULL, u);
 }
 
-static gui_player *player = 0;
+static dg_or_dx_player *player = 0;
 static needs_done_redraw = false;
 
 CWnd* topView = NULL;
@@ -297,7 +297,7 @@ void MmView::OnDestroy()
 
 void MmView::SetMMDocument(LPCTSTR lpszPathName, bool autostart) {
 	USES_CONVERSION;
-	gui_player *dummy = player;
+	dg_or_dx_player *dummy = player;
 	player = 0;
 	if(dummy) {
 		dummy->stop();
@@ -366,7 +366,7 @@ void MmView::OnFileStop()
 
 	if(player) {
 		net::url u = player->get_url();
-		gui_player *dummy = player;
+		dg_or_dx_player *dummy = player;
 		player = 0;
 		if(dummy) {
 			dummy->stop();

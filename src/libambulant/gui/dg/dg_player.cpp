@@ -75,18 +75,18 @@ int gui::dg::dg_gui_region::s_counter = 0;
 
 gui::dg::dg_player::dg_player(dg_player_callbacks &hoster, const net::url& u) 
 :	m_hoster(hoster),
-	m_url(u),
 	m_timer(new timer_control_impl(realtime_timer_factory(), 1.0, false)),
 	m_worker_processor(0),
 	m_update_event(0),	
-	m_logger(lib::logger::get_logger()) {
-	
+	m_logger(lib::logger::get_logger())
+{
+	set_embedder(this);	
 	init_factories();
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
-	lib::document *doc = lib::document::create_from_url(this, u);
-	if(!doc) {
+	m_doc = lib::document::create_from_url(this, u);
+	if(!m_doc) {
 		m_logger->show("Failed to parse document %s", u.get_url().c_str());
 		return;
 	}
@@ -94,7 +94,7 @@ gui::dg::dg_player::dg_player(dg_player_callbacks &hoster, const net::url& u)
 	
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", u.get_url().c_str());
-	m_player = new smil2::smil_player(doc, this, this);
+	m_player = new smil2::smil_player(m_doc, this, m_embedder);
 #ifdef USE_SMIL21
 	m_player->initialize();
 #endif
