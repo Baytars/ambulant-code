@@ -129,17 +129,6 @@ class dg_player :
 	void init_window_factory();
 	void init_datasource_factory();
 	void init_parser_factory();
-#if 0
-	void start();
-	void stop();
-	void pause();
-	
-	bool is_playing() const;
-	bool is_pausing() const;
-	bool is_done() const;
-
-	void set_preferences(const char *url);
-#endif
 
 	// should these be part of the player interface?
 	lib::timer* get_timer() { return 0;}
@@ -171,7 +160,7 @@ class dg_player :
 	void on_click(int x, int y, HWND hwnd);
 	int get_cursor(int x, int y, HWND hwnd);
 	std::string get_pointed_node_str();
-	const net::url& get_url() const { return m_url;}
+//	const net::url& get_url() const { return m_url;}
 	
 	viewport* create_viewport(int w, int h, HWND hwnd);
 	void redraw(HWND hwnd, HDC hdc);
@@ -198,12 +187,6 @@ class dg_player :
 	// Callbacks to the hosting program
   	dg_player_callbacks &m_hoster;
   	
-	// The current document URL
-	net::url m_url;
-#if 0
-	// The current SMIL2 player
-	smil2::smil_player *m_player;
-#endif
 	// The current view	
 	struct wininfo {HWND h; viewport *v; dg_window *w; long f;};
 	std::map<std::string, wininfo*> m_windows;	

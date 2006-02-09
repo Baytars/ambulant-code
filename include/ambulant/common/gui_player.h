@@ -51,7 +51,7 @@ class gui_player : public factories {
 	virtual void stop();
 	virtual void pause();
 	
-	virtual void restart();
+	virtual void restart(bool reparse=true);
 
 //	virtual void set_speed(double speed) = 0;
 //	virtual double get_speed() const = 0;
@@ -74,10 +74,13 @@ class gui_player : public factories {
 	
 	virtual player *get_player() const { return m_player; }
 	virtual void set_player(player *pl) { m_player = pl; }
+
+	virtual const net::url& get_url() const { return m_url; }
 	
 	static void load_test_attrs(std::string& filename);
   protected:
-	lib::document *create_document(net::url& url);
+	lib::document *create_document(const net::url& url);
+	net::url m_url;
 	lib::document *m_doc;
 	embedder *m_embedder;
 	player *m_player;

@@ -85,19 +85,18 @@ int gui::dx::dx_gui_region::s_counter = 0;
 
 gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedback *feedback, const net::url& u) 
 :	m_hoster(hoster),
-	m_url(u),
 	m_update_event(0),
 	m_logger(lib::logger::get_logger())
 {
-	
+	set_embedder(this);
 	// Fill the factory objects
 	init_factories();
 
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
-	lib::document *doc = lib::document::create_from_url(this, u);
+	m_doc = create_document(u);
 	
-	if(!doc) {
+	if(!m_doc) {
 		// message already logged
 		return;
 	}
@@ -116,7 +115,7 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 #endif
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", u.get_url().c_str());	
-	m_player = new smil2::smil_player(doc, this, this);
+	m_player = new smil2::smil_player(m_doc, this, m_embedder);
 #ifdef USE_SMIL21
 	m_player->initialize();
 #endif
@@ -133,6 +132,7 @@ gui::dx::dx_player::~dx_player() {
 		m_frames.pop();
 		m_windows = pf->windows;
 		m_player = pf->player;
+		m_doc = pf->doc;
 		delete pf;
 		stop();
 		delete m_player;
@@ -202,7 +202,7 @@ void gui::dx::dx_player::pause() {
 	}
 }
 
-void gui::dx::dx_player::restart() {
+void gui::dx::dx_player::restart(bool reparse) {
 	bool playing = is_play_active();
 	stop();
 	
@@ -212,18 +212,21 @@ void gui::dx::dx_player::restart() {
 		m_frames.pop();
 		m_windows = pf->windows;
 		m_player = pf->player;
+		m_doc = pf->doc;
 		delete pf;
 		stop();
 		delete m_player;
 	}
-	m_player = 0;	
-	lib::document *doc = lib::document::create_from_url(this, m_url);
-	if(!doc) {
-		m_logger->show("Failed to parse document %s", m_url.get_url().c_str());
-		return;
+	m_player = 0;
+	if (reparse) {
+		m_doc = create_document(m_url);
+		if(!m_doc) {
+			m_logger->show("Failed to parse document %s", m_url.get_url().c_str());
+			return;
+		}
 	}
 	AM_DBG m_logger->debug("Creating player instance for: %s", m_url.get_url().c_str());	
-	m_player = new smil2::smil_player(doc, this, this);	
+	m_player = new smil2::smil_player(m_doc, this, m_embedder);	
 	
 	if(playing) play();	
 }
@@ -630,6 +633,7 @@ void gui::dx::dx_player::done(common::player *p) {
 		m_frames.pop();
 		m_windows = pf->windows;
 		m_player = pf->player;
+		m_doc = pf->doc;
 		delete pf;
 		assert(0); // resume();
 		std::map<std::string, wininfo*>::iterator it;
@@ -658,12 +662,8 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 		return;
 	}
 	
-	// Parse the provided URL. 
-	lib::document *doc = lib::document::create_from_url(this, newdoc);
-	if(!doc) {
-		m_logger->show("Failed to parse document %s", newdoc.get_url().c_str());
-		return;
-	}
+	// Parse the document. 
+	m_doc = create_document(newdoc);
 	
 	// Push the old frame on the stack
 	if(m_player) {
@@ -671,6 +671,7 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 		frame *pf = new frame();
 		pf->windows = m_windows;
 		pf->player = m_player;
+		pf->doc = m_doc;
 		m_windows.clear();
 		m_player = 0;
 		m_frames.push(pf);
@@ -678,7 +679,7 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 	
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", newdoc.get_url().c_str());
-	m_player = new smil2::smil_player(doc, this, this);
+	m_player = new smil2::smil_player(m_doc, this, m_embedder);
 	if(startnewdoc) play();
 }
 

@@ -131,7 +131,7 @@ class AMBULANTAPI dx_player :
 	void stop();
 	void pause();
 
-	void restart();
+	void restart(bool reparse=true);
 
 	void set_preferences(const std::string& url);	
 	
@@ -159,7 +159,7 @@ class AMBULANTAPI dx_player :
 	void on_click(int x, int y, HWND hwnd);
 	int get_cursor(int x, int y, HWND hwnd);
 	std::string get_pointed_node_str();
-	const net::url& get_url() const { return m_url;}
+//	const net::url& get_url() const { return m_url;}
 	void on_done();
 	
 	common::window_factory *get_window_factory() { return this;}
@@ -191,14 +191,18 @@ class AMBULANTAPI dx_player :
 	// The hosting application
 	dx_player_callbacks &m_hoster;
 	// The current document URL
-	net::url m_url;
+//	net::url m_url;
 	// The current view	
 	struct wininfo {HWND h; viewport *v; dx_window *w; long f;};
 	std::map<std::string, wininfo*> m_windows;	
 	wininfo* get_wininfo(HWND hwnd);
 	
 	// The frames stack
-	struct frame {std::map<std::string, wininfo*> windows; common::player* player;};
+	struct frame {
+		std::map<std::string, wininfo*> windows;
+		common::player* player;
+		lib::document* doc;
+	};
 	std::stack<frame*> m_frames;
 			
 	lib::event *m_update_event;

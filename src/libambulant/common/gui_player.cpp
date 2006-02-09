@@ -93,7 +93,7 @@ gui_player::pause()
 }
 
 void
-gui_player::restart()
+gui_player::restart(bool reparse)
 {
 	ambulant::lib::logger::get_logger()->error("Restarting presentation not implemented in this release.");
 }
@@ -170,9 +170,9 @@ gui_player::set_cursor(int cursor)
 }
 
 lib::document *
-gui_player::create_document(net::url& url)
+gui_player::create_document(const net::url& url)
 {
-	// XXXX Needs work for URLs
+#ifdef AMBULANT_PLATFORM_UNIX
 	// Correct for relative pathnames for local files
 	if (url.is_local_file() && !url.is_absolute()) {
 		char cwdbuf[1024];
@@ -183,6 +183,8 @@ gui_player::create_document(net::url& url)
 		url = url.join_to_base(cwd_url);
 		AM_DBG lib::logger::get_logger()->debug("gui_player::create_document: URL is now \"%s\"", url.get_url().c_str());
 	}
+#endif
+	m_url = url;
 	lib::logger::get_logger()->trace("%s: Parsing document...", url.get_url().c_str());
 	lib::document *rv = lib::document::create_from_url(this, url);
 	if (rv) {
