@@ -700,7 +700,7 @@ ambulant::lib::node* node::clone() const
 	return _rv;
 }
 
-void node::append_data(char *data__in__, long data__len__)
+void node::append_data(const char *data__in__, size_t data__len__)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	PyObject *py_data = Py_BuildValue("s#", data__in__, (int)data__len__);
@@ -1544,7 +1544,7 @@ xml_parser::~xml_parser()
 }
 
 
-bool xml_parser::parse(char *buf__in__, long buf__len__, bool final)
+bool xml_parser::parse(const char *buf__in__, size_t buf__len__, bool final)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	bool _rv;
@@ -2255,7 +2255,7 @@ void gui_screen::get_size(int* width, int* height)
 	PyGILState_Release(_GILState);
 }
 
-bool gui_screen::get_screenshot(const char* type, char *out_data__out__, size_t* out_data__len__)
+bool gui_screen::get_screenshot(const char* type, char* *out_data__out__, size_t* out_data__len__)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	bool _rv;
@@ -2284,7 +2284,7 @@ bool gui_screen::get_screenshot(const char* type, char *out_data__out__, size_t*
 	return _rv;
 }
 
-bool gui_screen::set_overlay(const char* type, char *data__in__, long data__len__)
+bool gui_screen::set_overlay(const char* type, const char *data__in__, size_t data__len__)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	bool _rv;

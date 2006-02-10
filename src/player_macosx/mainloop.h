@@ -29,7 +29,7 @@
 
 class mainloop : public ambulant::common::gui_player {
   public:
-	mainloop(const char *filename, ambulant::common::window_factory *wf,
+	mainloop(const char *filename, void *view,
 		bool use_mms, ambulant::common::embedder *app);
 	~mainloop();
 	
@@ -38,4 +38,8 @@ class mainloop : public ambulant::common::gui_player {
 	void init_window_factory();
 	void init_datasource_factory();
 	void init_parser_factory();
+	ambulant::common::gui_screen *get_gui_screen();
+  private:
+	void *m_view;
+	ambulant::common::gui_screen *m_gui_screen;
 };

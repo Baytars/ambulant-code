@@ -103,7 +103,7 @@ public:
 	ambulant::lib::node* append_child(const char* name);
 	ambulant::lib::node* detach();
 	ambulant::lib::node* clone() const;
-	void append_data(char *data__in__, long data__len__);
+	void append_data(const char *data__in__, size_t data__len__);
 	void append_data(const char* c_str);
 	void append_data(const ambulant::lib::xml_string& str);
 	void set_attribute(const char* name, const char* value);
@@ -125,7 +125,6 @@ public:
 	const ambulant::lib::node_context* get_context() const;
 	void set_context(ambulant::lib::node_context* c);
 	void get_children(const_node_list& l) const {}
-	void append_data(const char *data, size_t len) { append_data(data); }
 	void set_attributes(const char **attrs) { abort(); }
   private:
 	PyObject *py_node;
@@ -244,9 +243,7 @@ public:
 	xml_parser(PyObject *itself);
 	virtual ~xml_parser();
 
-	bool parse(char *buf__in__, long buf__len__, bool final);
-	bool parse(const char*, long unsigned int, bool) { abort(); }
-	bool parse(const char*, unsigned int, bool) { abort(); }
+	bool parse(const char *buf__in__, size_t buf__len__, bool final);
 	void set_content_handler(ambulant::lib::sax_content_handler*) { abort(); }
 	void set_error_handler(ambulant::lib::sax_error_handler*) { abort(); }
   private:
@@ -415,8 +412,8 @@ public:
 	virtual ~gui_screen();
 
 	void get_size(int* width, int* height);
-	bool get_screenshot(const char* type, char *out_data__out__, size_t* out_data__len__);
-	bool set_overlay(const char* type, char *data__in__, long data__len__);
+	bool get_screenshot(const char* type, char* *out_data__out__, size_t* out_data__len__);
+	bool set_overlay(const char* type, const char *data__in__, size_t data__len__);
 	bool clear_overlay();
   private:
 	PyObject *py_gui_screen;
@@ -645,7 +642,6 @@ public:
 	ambulant::common::gui_window* get_gui_window();
 	void set_renderer_private_data(ambulant::common::renderer_private_id idd, ambulant::common::renderer_private_data * data);
 	ambulant::common::renderer_private_data * get_renderer_private_data(ambulant::common::renderer_private_id idd);
-	ambulant::lib::rect get_fit_rect(const ambulant::lib::size&, ambulant::lib::rect*, const ambulant::common::alignment*) const { abort(); }
 	ambulant::common::tile_positions get_tiles(ambulant::lib::size s, ambulant::lib::rect r) const { return surface::get_tiles(s, r); }
   private:
 	PyObject *py_surface;

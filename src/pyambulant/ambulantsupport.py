@@ -430,7 +430,7 @@ class BackVarInputBufferType(VarInputBufferType):
     def mkvalueArgs(self, name):
         return "%s__in__, (int)%s__len__" % (name, name)
 
-InBuffer = BackVarInputBufferType('char', 'long', 'l')
+InBuffer = BackVarInputBufferType('char', 'size_t', 'l')
 
 includestuff = """
 #define WITH_EXTERNAL_DOM 1
@@ -514,7 +514,6 @@ node_context_object.othermethods = [
 ]
 node_object.othermethods = [
     "void get_children(const_node_list& l) const {}", # XXX for now
-    "void append_data(const char *data, size_t len) { append_data(data); }", # XXX for now
     "void set_attributes(const char **attrs) { abort(); }", # XXX for now
 ]
 node_factory_object.othermethods = [
@@ -525,8 +524,6 @@ parser_factory_object.othermethods = [
     "ambulant::lib::xml_parser* new_parser(ambulant::lib::sax_content_handler*, ambulant::lib::sax_error_handler*) { abort(); }", # XXX for now
 ]
 xml_parser_object.othermethods = [
-    "bool parse(const char*, long unsigned int, bool) { abort(); }", # XXX for now
-    "bool parse(const char*, unsigned int, bool) { abort(); }", # XXX for now
     "void set_content_handler(ambulant::lib::sax_content_handler*) { abort(); }", #XXXX
     "void set_error_handler(ambulant::lib::sax_error_handler*) { abort(); }", #XXXX
 ]
@@ -545,7 +542,6 @@ bgrenderer_object.othermethods = [
     "void transition_freeze_end(ambulant::lib::rect) { abort(); }", # XXX
 ]
 surface_object.othermethods = [
-    "ambulant::lib::rect get_fit_rect(const ambulant::lib::size&, ambulant::lib::rect*, const ambulant::common::alignment*) const { abort(); }", # XXX
     "ambulant::common::tile_positions get_tiles(ambulant::lib::size s, ambulant::lib::rect r) const { return surface::get_tiles(s, r); }",
 ]
 surface_template_object.othermethods = [
