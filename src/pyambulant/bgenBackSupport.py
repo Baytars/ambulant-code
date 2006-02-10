@@ -362,7 +362,7 @@ class BackMethodGenerator:
             namedecl = "void %s" % name
         argdecllist = []
         for arg in self.argumentList:
-            argdecllist = argdecllist + arg.getArgDeclarations(constmode=True)
+            argdecllist = argdecllist + arg.getArgDeclarations(fullmodes=True)
         argdecl = ', '.join(argdecllist)
         return "%s(%s)%s" % (namedecl, argdecl, self.const)
         

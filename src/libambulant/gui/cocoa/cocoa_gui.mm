@@ -237,6 +237,78 @@ cocoa_window_factory::new_background_renderer(const common::region_info *src)
 	return new cocoa_background_renderer(src);
 }
 
+void
+cocoa_gui_screen::get_size(int *width, int *height)
+{
+	AmbulantView *view = (AmbulantView *)m_view;
+	NSRect bounds = [view bounds];
+	*width = int(bounds.size.width);
+	*height = int(bounds.size.height);
+}
+
+bool
+cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_size)
+{
+	*out_data = NULL;
+	*out_size = 0;
+	NSBitmapImageFileType filetype;
+	if ( strcmp(type, "tiff") == 0) filetype = NSTIFFFileType;
+	else if (strcmp(type, "bmp") == 0) filetype = NSBMPFileType;
+	else if (strcmp(type, "gif") == 0) filetype = NSGIFFileType;
+	else if (strcmp(type, "jpeg") == 0) filetype = NSJPEGFileType;
+	else if (strcmp(type, "png") == 0) filetype = NSPNGFileType;
+	else {
+		lib::logger::get_logger()->trace("get_screenshot: unknown filetype \"%s\"", type);
+		return false;
+	}
+	NSData *data = NULL;
+	AmbulantView *view = (AmbulantView *)m_view;
+	NSImage *image = [view _getOnScreenImage];
+	if (image == NULL) {
+		lib::logger::get_logger()->trace("get_screenshot: cannot get screen shot");
+		return false;
+	}
+	NSImageRep *rep = [image bestRepresentationForDevice: NULL];
+	if (rep == NULL) {
+		lib::logger::get_logger()->trace("get_screenshot: cannot get representation for screen shot");
+		[image release];
+		return false;
+	}
+	data = [rep representationUsingType: filetype properties: NULL];
+	[image release];
+	if (data == NULL) {
+		lib::logger::get_logger()->trace("get_screenshot: cannot convert screenshot to %s format", type);
+		return false;
+	}
+	*out_data = (char *)malloc([data length]);
+	if (*out_data == NULL) {
+		lib::logger::get_logger()->trace("get_screenshot: out of memory");
+		[data release];
+		return false;
+	}
+	*out_size = [data length];
+	[data getBytes: *out_data];
+	[data release];
+	return true;
+}
+
+bool
+cocoa_gui_screen::set_overlay(const char *type, const char *data, size_t size)
+{
+	AmbulantView *view = (AmbulantView *)m_view;
+	lib::logger::get_logger()->trace("set_overlay: not implemented yet");
+	return false;
+}
+
+bool
+cocoa_gui_screen::clear_overlay()
+{
+	AmbulantView *view = (AmbulantView *)m_view;
+	lib::logger::get_logger()->trace("clear_overlay: not implemented yet");
+	return false;
+}
+
+
 } // namespace cocoa
 
 } // namespace gui

@@ -4876,6 +4876,251 @@ PyTypeObject factories_Type = {
 /* ------------------- End object type factories -------------------- */
 
 
+/* --------------------- Object type gui_screen --------------------- */
+
+extern PyTypeObject gui_screen_Type;
+
+inline bool gui_screenObj_Check(PyObject *x)
+{
+	return ((x)->ob_type == &gui_screen_Type);
+}
+
+typedef struct gui_screenObject {
+	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
+	ambulant::common::gui_screen* ob_itself;
+} gui_screenObject;
+
+PyObject *gui_screenObj_New(ambulant::common::gui_screen* itself)
+{
+	gui_screenObject *it;
+	if (itself == NULL)
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+#ifdef BGEN_BACK_SUPPORT_gui_screen
+	gui_screen *encaps_itself = dynamic_cast<gui_screen *>(itself);
+	if (encaps_itself && encaps_itself->py_gui_screen)
+	{
+		Py_INCREF(encaps_itself->py_gui_screen);
+		return encaps_itself->py_gui_screen;
+	}
+#endif
+	it = PyObject_NEW(gui_screenObject, &gui_screen_Type);
+	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
+	it->ob_itself = itself;
+	return (PyObject *)it;
+}
+
+int gui_screenObj_Convert(PyObject *v, ambulant::common::gui_screen* *p_itself)
+{
+	if (v == Py_None)
+	{
+		*p_itself = NULL;
+		return 1;
+	}
+#ifdef BGEN_BACK_SUPPORT_gui_screen
+	if (!gui_screenObj_Check(v))
+	{
+		*p_itself = Py_WrapAs_gui_screen(v);
+		if (*p_itself) return 1;
+	}
+#endif
+	if (!gui_screenObj_Check(v))
+	{
+		PyErr_SetString(PyExc_TypeError, "gui_screen required");
+		return 0;
+	}
+	*p_itself = ((gui_screenObject *)v)->ob_itself;
+	return 1;
+}
+
+static void gui_screenObj_dealloc(gui_screenObject *self)
+{
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
+}
+
+static PyObject *gui_screenObj_get_size(gui_screenObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	int width;
+	int height;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->get_size(&width,
+	                           &height);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("ii",
+	                     width,
+	                     height);
+	return _res;
+}
+
+static PyObject *gui_screenObj_get_screenshot(gui_screenObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	char* type;
+	char *out_data__out__;
+	size_t out_data__len__;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &type))
+		return NULL;
+	out_data__out__ = NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->get_screenshot(type,
+	                                            &out_data__out__, &out_data__len__);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&z#",
+	                     bool_New, _rv,
+	                     out_data__out__, (int)out_data__len__);
+	if( out_data__out__ ) free(out_data__out__);
+	return _res;
+}
+
+static PyObject *gui_screenObj_set_overlay(gui_screenObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	char* type;
+	char *data__in__;
+	size_t data__len__;
+	int data__in_len__;
+	if (!PyArg_ParseTuple(_args, "ss#",
+	                      &type,
+	                      &data__in__, &data__in_len__))
+		return NULL;
+	data__len__ = data__in_len__;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->set_overlay(type,
+	                                         data__in__, data__len__);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *gui_screenObj_clear_overlay(gui_screenObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->clear_overlay();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyMethodDef gui_screenObj_methods[] = {
+	{"get_size", (PyCFunction)gui_screenObj_get_size, 1,
+	 PyDoc_STR("() -> (int width, int height)")},
+	{"get_screenshot", (PyCFunction)gui_screenObj_get_screenshot, 1,
+	 PyDoc_STR("(char* type, Buffer out_data) -> (bool _rv, Buffer out_data)")},
+	{"set_overlay", (PyCFunction)gui_screenObj_set_overlay, 1,
+	 PyDoc_STR("(char* type, Buffer data) -> (bool _rv)")},
+	{"clear_overlay", (PyCFunction)gui_screenObj_clear_overlay, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{NULL, NULL, 0}
+};
+
+#define gui_screenObj_getsetlist NULL
+
+
+static int gui_screenObj_compare(gui_screenObject *self, gui_screenObject *other)
+{
+	if ( self->ob_itself > other->ob_itself ) return 1;
+	if ( self->ob_itself < other->ob_itself ) return -1;
+	return 0;
+}
+
+#define gui_screenObj_repr NULL
+
+static int gui_screenObj_hash(gui_screenObject *self)
+{
+	return (int)self->ob_itself;
+}
+static int gui_screenObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
+{
+	if (pycppbridge_Type.tp_init)
+	{
+		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
+	}
+	ambulant::common::gui_screen* itself;
+	const char *kw[] = {"itself", 0};
+
+	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, gui_screenObj_Convert, &itself))
+	{
+		((gui_screenObject *)_self)->ob_itself = itself;
+		return 0;
+	}
+	return -1;
+}
+
+#define gui_screenObj_tp_alloc PyType_GenericAlloc
+
+static PyObject *gui_screenObj_tp_new(PyTypeObject *type, PyObject *_args, PyObject *_kwds)
+{
+	PyObject *_self;
+
+	if ((_self = type->tp_alloc(type, 0)) == NULL) return NULL;
+	((gui_screenObject *)_self)->ob_itself = NULL;
+	return _self;
+}
+
+#define gui_screenObj_tp_free PyObject_Del
+
+
+PyTypeObject gui_screen_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.gui_screen", /*tp_name*/
+	sizeof(gui_screenObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) gui_screenObj_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) gui_screenObj_compare, /*tp_compare*/
+	(reprfunc) gui_screenObj_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) gui_screenObj_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	gui_screenObj_methods, /* tp_methods */
+	0, /*tp_members*/
+	gui_screenObj_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	gui_screenObj_tp_init, /* tp_init */
+	gui_screenObj_tp_alloc, /* tp_alloc */
+	gui_screenObj_tp_new, /* tp_new */
+	gui_screenObj_tp_free, /* tp_free */
+};
+
+/* ------------------- End object type gui_screen ------------------- */
+
+
 /* --------------------- Object type gui_player --------------------- */
 
 extern PyTypeObject gui_player_Type;
@@ -5265,6 +5510,19 @@ static PyObject *gui_playerObj_get_url(gui_playerObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *gui_playerObj_get_gui_screen(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::gui_screen* _rv = _self->ob_itself->get_gui_screen();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     gui_screenObj_New, _rv);
+	return _res;
+}
+
 static PyMethodDef gui_playerObj_methods[] = {
 	{"init_playable_factory", (PyCFunction)gui_playerObj_init_playable_factory, 1,
 	 PyDoc_STR("() -> None")},
@@ -5314,6 +5572,8 @@ static PyMethodDef gui_playerObj_methods[] = {
 	 PyDoc_STR("(ambulant::common::player* pl) -> None")},
 	{"get_url", (PyCFunction)gui_playerObj_get_url, 1,
 	 PyDoc_STR("() -> (ambulant::net::url _rv)")},
+	{"get_gui_screen", (PyCFunction)gui_playerObj_get_gui_screen, 1,
+	 PyDoc_STR("() -> (ambulant::common::gui_screen* _rv)")},
 	{NULL, NULL, 0}
 };
 
@@ -13466,6 +13726,11 @@ void initambulant(void)
 	if (PyType_Ready(&factories_Type) < 0) return;
 	Py_INCREF(&factories_Type);
 	PyModule_AddObject(m, "factories", (PyObject *)&factories_Type);
+	gui_screen_Type.ob_type = &PyType_Type;
+	gui_screen_Type.tp_base = &pycppbridge_Type;
+	if (PyType_Ready(&gui_screen_Type) < 0) return;
+	Py_INCREF(&gui_screen_Type);
+	PyModule_AddObject(m, "gui_screen", (PyObject *)&gui_screen_Type);
 	gui_player_Type.ob_type = &PyType_Type;
 	gui_player_Type.tp_base = &factories_Type;
 	if (PyType_Ready(&gui_player_Type) < 0) return;

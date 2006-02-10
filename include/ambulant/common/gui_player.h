@@ -30,7 +30,18 @@
 namespace ambulant {
 
 namespace common {
+
+/// This class allows plugins access to the screen.
+class gui_screen {
+  public:
+	virtual ~gui_screen() {};
 	
+	virtual void get_size(int *width, int *height) = 0;
+	virtual bool get_screenshot(const char *type, char **out_data, size_t *out_size) = 0;
+	virtual bool set_overlay(const char *type, const char *data, size_t size) = 0;
+	virtual bool clear_overlay() = 0;
+};
+
 class gui_player : public factories {
   public:
 	gui_player()
@@ -76,6 +87,8 @@ class gui_player : public factories {
 	virtual void set_player(player *pl) { m_player = pl; }
 
 	virtual net::url get_url() const { return m_url; }
+	
+	virtual gui_screen *get_gui_screen() const { return NULL; }
 	
 	static void load_test_attrs(std::string& filename);
   protected:
