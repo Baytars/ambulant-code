@@ -140,7 +140,7 @@ class MyScanner(CxxScanner):
                 ('char_ptr', '*', 'InMode+ConstMode'),
                 ('size_t', '*', 'InMode')
               ],[
-                ('InBuffer', '*', 'InMode'),
+                ('InBuffer', '*', 'InMode+ConstMode'),
                ]
             ),
             

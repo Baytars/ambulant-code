@@ -88,7 +88,7 @@ class gui_player : public factories {
 
 	virtual net::url get_url() const { return m_url; }
 	
-	virtual gui_screen *get_gui_screen() const { return NULL; }
+	virtual gui_screen *get_gui_screen() { return NULL; }
 	
 	static void load_test_attrs(std::string& filename);
   protected:

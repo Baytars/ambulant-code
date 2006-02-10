@@ -56,20 +56,16 @@
 
 using namespace ambulant;
 
-mainloop::mainloop(const char *urlstr, ambulant::common::window_factory *wf,
+mainloop::mainloop(const char *urlstr, void *view,
 	bool use_mms, ambulant::common::embedder *app)
-:   common::gui_player()
+:   common::gui_player(),
+	m_view(view),
+	m_gui_screen(NULL)
 {
 	set_embedder(app);
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop(0x%x): created", (void*)this);
 	init_factories();
 	
-#ifdef NONE_PLAYER
-	// Replace the real window factory with a none_window_factory instance.
-	wf = new gui::none::none_window_factory();
-#endif // NONE_PLAYER
-	m_window_factory = wf;
-
 	init_plugins();
 	
 	ambulant::net::url url = ambulant::net::url::from_url(urlstr);
@@ -112,6 +108,12 @@ mainloop::init_playable_factory()
 void
 mainloop::init_window_factory()
 {
+#ifdef NONE_PLAYER
+	// Replace the real window factory with a none_window_factory instance.
+	m_window_factory = new gui::none::none_window_factory();
+#else
+	m_window_factory = new gui::cocoa::cocoa_window_factory(m_view);
+#endif // NONE_PLAYER
 }
 
 void
@@ -159,9 +161,10 @@ mainloop::init_parser_factory()
 
 mainloop::~mainloop()
 {
-//  m_doc will be cleaned up by the smil_player.
-//	if (m_doc) delete m_doc;
-//	m_doc = NULL;
+	delete m_doc;
+	m_doc = NULL;
+	delete m_gui_screen;
+	delete m_window_factory;
 }
 
 void
@@ -199,3 +202,9 @@ mainloop::restart(bool reparse)
 	if(playing) play();	
 }
 
+common::gui_screen *
+mainloop::get_gui_screen()
+{
+	if (!m_gui_screen) m_gui_screen = new gui::cocoa::cocoa_gui_screen(m_view);
+	return m_gui_screen;
+}
