@@ -126,6 +126,14 @@ class MyScanner(CxxScanner):
 
     def makerepairinstructions(self):
         return [
+        	# Assume an int pointer is an out-param
+        	(
+        	  [
+        	  	('int_ptr', '*', 'InMode'),
+        	  ], [
+        	    ('int', '*', 'OutMode')
+        	  ]
+        	),
             # Assume a pair (const char *, size_t) is an input buffer
             (
               [

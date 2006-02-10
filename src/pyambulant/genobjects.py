@@ -56,6 +56,7 @@ OBJECTS=[
 	("factories", "ambulant::common::factories", None),
 	
 	"common/gui_player.h",
+	("gui_screen", "ambulant::common::gui_screen", None),
 	("gui_player", "ambulant::common::gui_player", "factories"),
 	
 	"common/layout.h",

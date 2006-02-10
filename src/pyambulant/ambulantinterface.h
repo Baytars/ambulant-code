@@ -409,6 +409,30 @@ inline factories *Py_WrapAs_factories(PyObject *o)
 	return rv;
 }
 
+class gui_screen : public cpppybridge, public ambulant::common::gui_screen {
+public:
+	gui_screen(PyObject *itself);
+	virtual ~gui_screen();
+
+	void get_size(int* width, int* height);
+	bool get_screenshot(const char* type, char *out_data__out__, size_t* out_data__len__);
+	bool set_overlay(const char* type, char *data__in__, long data__len__);
+	bool clear_overlay();
+  private:
+	PyObject *py_gui_screen;
+
+	friend PyObject *gui_screenObj_New(ambulant::common::gui_screen *itself);
+};
+#define BGEN_BACK_SUPPORT_gui_screen
+inline gui_screen *Py_WrapAs_gui_screen(PyObject *o)
+{
+	gui_screen *rv = dynamic_cast<gui_screen*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new gui_screen(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
+
 class gui_player : public factories, public ambulant::common::gui_player {
 public:
 	gui_player(PyObject *itself);
@@ -438,6 +462,7 @@ public:
 	ambulant::common::player* get_player() const;
 	void set_player(ambulant::common::player* pl);
 	ambulant::net::url get_url() const;
+	ambulant::common::gui_screen* get_gui_screen() const;
   private:
 	PyObject *py_gui_player;
 
@@ -609,7 +634,7 @@ public:
 	void keep_as_background();
 	const ambulant::lib::rect& get_rect() const;
 	const ambulant::lib::point& get_global_topleft() const;
-	ambulant::lib::rect get_fit_rect(const ambulant::lib::size& src_size, ambulant::lib::rect out_src_rect, const ambulant::common::alignment* align) const;
+	ambulant::lib::rect get_fit_rect(const ambulant::lib::size& src_size, ambulant::lib::rect* out_src_rect, const ambulant::common::alignment* align) const;
 	const ambulant::common::region_info* get_info() const;
 #ifdef USE_SMIL21
 	ambulant::common::surface* get_top_surface();

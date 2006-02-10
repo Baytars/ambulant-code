@@ -2206,6 +2206,136 @@ void factories::init_node_factory()
 	PyGILState_Release(_GILState);
 }
 
+/* ------------------------ Class gui_screen ------------------------ */
+
+gui_screen::gui_screen(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "get_size")) PyErr_Warn(PyExc_Warning, "gui_screen: missing attribute: get_size");
+		if (!PyObject_HasAttrString(itself, "get_screenshot")) PyErr_Warn(PyExc_Warning, "gui_screen: missing attribute: get_screenshot");
+		if (!PyObject_HasAttrString(itself, "set_overlay")) PyErr_Warn(PyExc_Warning, "gui_screen: missing attribute: set_overlay");
+		if (!PyObject_HasAttrString(itself, "clear_overlay")) PyErr_Warn(PyExc_Warning, "gui_screen: missing attribute: clear_overlay");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_gui_screen = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+gui_screen::~gui_screen()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_gui_screen);
+	py_gui_screen = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+void gui_screen::get_size(int* width, int* height)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_gui_screen, "get_size", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_screen::get_size() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "(ii)", &width, &height))
+	{
+		PySys_WriteStderr("Python exception during gui_screen::get_size() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+bool gui_screen::get_screenshot(const char* type, char *out_data__out__, size_t* out_data__len__)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_type = Py_BuildValue("s", type);
+	PyObject *py_out_data = Py_BuildValue("z#", out_data__out__, (int)out_data__len__);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_screen, "get_screenshot", "(OO)", py_type, py_out_data);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_screen::get_screenshot() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_screen::get_screenshot() return:\n");
+		PyErr_Print();
+	}
+
+	out_data__out__ = NULL;
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_type);
+	Py_XDECREF(py_out_data);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool gui_screen::set_overlay(const char* type, char *data__in__, long data__len__)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_type = Py_BuildValue("s", type);
+	PyObject *py_data = Py_BuildValue("s#", data__in__, (int)data__len__);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_screen, "set_overlay", "(OO)", py_type, py_data);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_screen::set_overlay() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_screen::set_overlay() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_type);
+	Py_XDECREF(py_data);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool gui_screen::clear_overlay()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_screen, "clear_overlay", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_screen::clear_overlay() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_screen::clear_overlay() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
 /* ------------------------ Class gui_player ------------------------ */
 
 gui_player::gui_player(PyObject *itself)
@@ -2238,6 +2368,7 @@ gui_player::gui_player(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "get_player")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_player");
 		if (!PyObject_HasAttrString(itself, "set_player")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: set_player");
 		if (!PyObject_HasAttrString(itself, "get_url")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_url");
+		if (!PyObject_HasAttrString(itself, "get_gui_screen")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: get_gui_screen");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -2720,6 +2851,30 @@ ambulant::net::url gui_player::get_url() const
 	if (py_rv && !PyArg_Parse(py_rv, "O&", ambulant_url_Convert, &_rv))
 	{
 		PySys_WriteStderr("Python exception during gui_player::get_url() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+ambulant::common::gui_screen* gui_player::get_gui_screen() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::common::gui_screen* _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "get_gui_screen", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_gui_screen() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", gui_screenObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during gui_player::get_gui_screen() return:\n");
 		PyErr_Print();
 	}
 
@@ -3404,7 +3559,7 @@ const ambulant::lib::point& surface::get_global_topleft() const
 	return get_global_topleft_rvkeepref;
 }
 
-ambulant::lib::rect surface::get_fit_rect(const ambulant::lib::size& src_size, ambulant::lib::rect out_src_rect, const ambulant::common::alignment* align) const
+ambulant::lib::rect surface::get_fit_rect(const ambulant::lib::size& src_size, ambulant::lib::rect* out_src_rect, const ambulant::common::alignment* align) const
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	ambulant::lib::rect _rv;
