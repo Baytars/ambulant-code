@@ -52,7 +52,6 @@ extern "C" {
 void initambulant();
 };
 
-#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -81,6 +80,10 @@ extern "C" void initialize(
         lib::logger::get_logger()->warn("python_plugin: built for different Ambulant version (%s)", AMBULANT_VERSION);
 	factory = bug_workaround(factory);
     AM_DBG lib::logger::get_logger()->debug("python_plugin: loaded.");
+    if (getenv("AMBULANT_ENABLE_PYTHON") == 0) {
+        lib::logger::get_logger()->trace("python_plugin: skipped. Run with AMBULANT_ENABLE_PYTHON=1 to enable.");
+        return;
+    }
     
     // Starting up Python is a bit difficult because we want to release the
     // lock before we return. So the first time we're here we initialze and then
