@@ -34,6 +34,13 @@ includestuff = includestuff + """
 extern PyObject *audio_format_choicesObj_New(ambulant::net::audio_format_choices *itself);
 extern int audio_format_choicesObj_Convert(PyObject *v, ambulant::net::audio_format_choices *p_itself);
 
+/* Workaround for "const" added in Python 2.5 */
+#if PY_VERSION_HEX >= 0x02050000
+# define Py_KEYWORDS_STRING_TYPE const char
+#else
+# define Py_KEYWORDS_STRING_TYPE char
+#endif
+
 """
 
 finalstuff = """
@@ -223,7 +230,7 @@ class MyGlobalObjectDefinition(CxxMixin, PEP253Mixin, GlobalObjectDefinition):
 
     def output_tp_initBody(self):
         Output("%s itself;", self.itselftype)
-        Output("const char *kw[] = {\"itself\", 0};")
+        Output("Py_KEYWORDS_STRING_TYPE *kw[] = {\"itself\", 0};")
         Output()
         for con in self.constructors:
             con.outputConstructorBody()

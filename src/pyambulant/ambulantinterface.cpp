@@ -2860,7 +2860,7 @@ ambulant::net::url gui_player::get_url() const
 	return _rv;
 }
 
-ambulant::common::gui_screen* gui_player::get_gui_screen() const
+ambulant::common::gui_screen* gui_player::get_gui_screen()
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	ambulant::common::gui_screen* _rv;
