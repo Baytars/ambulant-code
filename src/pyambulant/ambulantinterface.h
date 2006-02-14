@@ -459,7 +459,7 @@ public:
 	ambulant::common::player* get_player() const;
 	void set_player(ambulant::common::player* pl);
 	ambulant::net::url get_url() const;
-	ambulant::common::gui_screen* get_gui_screen() const;
+	ambulant::common::gui_screen* get_gui_screen();
   private:
 	PyObject *py_gui_player;
 

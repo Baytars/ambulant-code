@@ -249,6 +249,8 @@ cocoa_gui_screen::get_size(int *width, int *height)
 bool
 cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_size)
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
 	*out_data = NULL;
 	*out_size = 0;
 	NSBitmapImageFileType filetype;
@@ -259,37 +261,41 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 	else if (strcmp(type, "png") == 0) filetype = NSPNGFileType;
 	else {
 		lib::logger::get_logger()->trace("get_screenshot: unknown filetype \"%s\"", type);
-		return false;
+		goto bad;
 	}
-	NSData *data = NULL;
+	NSData *data;
 	AmbulantView *view = (AmbulantView *)m_view;
 	NSImage *image = [view _getOnScreenImage];
 	if (image == NULL) {
 		lib::logger::get_logger()->trace("get_screenshot: cannot get screen shot");
-		return false;
+		goto bad;
 	}
 	NSImageRep *rep = [image bestRepresentationForDevice: NULL];
 	if (rep == NULL) {
 		lib::logger::get_logger()->trace("get_screenshot: cannot get representation for screen shot");
-		[image release];
-		return false;
+//		[image release];
+		goto bad;
 	}
 	data = [rep representationUsingType: filetype properties: NULL];
-	[image release];
+//	[image release];
 	if (data == NULL) {
 		lib::logger::get_logger()->trace("get_screenshot: cannot convert screenshot to %s format", type);
-		return false;
+		goto bad;
 	}
 	*out_data = (char *)malloc([data length]);
 	if (*out_data == NULL) {
 		lib::logger::get_logger()->trace("get_screenshot: out of memory");
-		[data release];
-		return false;
+//		[data release];
+		goto bad;
 	}
 	*out_size = [data length];
 	[data getBytes: *out_data];
-	[data release];
+//	[data release];
+	[pool release];
 	return true;
+bad:
+	[pool release];
+	return false;
 }
 
 bool

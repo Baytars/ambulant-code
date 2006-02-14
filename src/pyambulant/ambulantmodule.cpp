@@ -38,6 +38,13 @@
 extern PyObject *audio_format_choicesObj_New(ambulant::net::audio_format_choices *itself);
 extern int audio_format_choicesObj_Convert(PyObject *v, ambulant::net::audio_format_choices *p_itself);
 
+/* Workaround for "const" added in Python 2.5 */
+#if PY_VERSION_HEX >= 0x02050000
+# define Py_KEYWORDS_STRING_TYPE const char
+#else
+# define Py_KEYWORDS_STRING_TYPE char
+#endif
+
 
 static PyObject *PyAm_Error;
 
@@ -310,7 +317,7 @@ static int node_contextObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::node_context* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, node_contextObj_Convert, &itself))
 	{
@@ -1145,7 +1152,7 @@ static int nodeObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::node* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, nodeObj_Convert, &itself))
 	{
@@ -1357,7 +1364,7 @@ static int node_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::node_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, node_factoryObj_Convert, &itself))
 	{
@@ -1714,7 +1721,7 @@ static int documentObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds
 		if ( (*node_context_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::document* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, documentObj_Convert, &itself))
 	{
@@ -1894,7 +1901,7 @@ static int eventObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::event* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, eventObj_Convert, &itself))
 	{
@@ -2162,7 +2169,7 @@ static int event_processorObj_tp_init(PyObject *_self, PyObject *_args, PyObject
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::event_processor* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, event_processorObj_Convert, &itself))
 	{
@@ -2342,7 +2349,7 @@ static int parser_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject 
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::parser_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, parser_factoryObj_Convert, &itself))
 	{
@@ -2524,7 +2531,7 @@ static int global_parser_factoryObj_tp_init(PyObject *_self, PyObject *_args, Py
 		if ( (*parser_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::global_parser_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, global_parser_factoryObj_Convert, &itself))
 	{
@@ -2712,7 +2719,7 @@ static int xml_parserObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::xml_parser* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, xml_parserObj_Convert, &itself))
 	{
@@ -2894,7 +2901,7 @@ static int system_embedderObj_tp_init(PyObject *_self, PyObject *_args, PyObject
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::system_embedder* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, system_embedderObj_Convert, &itself))
 	{
@@ -3074,7 +3081,7 @@ static int timer_eventsObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::timer_events* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, timer_eventsObj_Convert, &itself))
 	{
@@ -3269,7 +3276,7 @@ static int timerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::timer* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, timerObj_Convert, &itself))
 	{
@@ -3607,7 +3614,7 @@ static int timer_controlObj_tp_init(PyObject *_self, PyObject *_args, PyObject *
 		if ( (*timer_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::timer_control* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, timer_controlObj_Convert, &itself))
 	{
@@ -3960,7 +3967,7 @@ static int timer_control_implObj_tp_init(PyObject *_self, PyObject *_args, PyObj
 		if ( (*timer_control_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::timer_control_impl* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, timer_control_implObj_Convert, &itself))
 	{
@@ -4125,7 +4132,7 @@ static int transition_infoObj_tp_init(PyObject *_self, PyObject *_args, PyObject
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::lib::transition_info* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
@@ -4382,7 +4389,7 @@ static int embedderObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds
 		if ( (*system_embedder_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::embedder* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, embedderObj_Convert, &itself))
 	{
@@ -4797,7 +4804,7 @@ static int factoriesObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwd
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::factories* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
@@ -5050,7 +5057,7 @@ static int gui_screenObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::gui_screen* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, gui_screenObj_Convert, &itself))
 	{
@@ -5600,7 +5607,7 @@ static int gui_playerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*factories_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::gui_player* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
@@ -5807,7 +5814,7 @@ static int alignmentObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwd
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::alignment* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, alignmentObj_Convert, &itself))
 	{
@@ -5987,7 +5994,7 @@ static int animation_notificationObj_tp_init(PyObject *_self, PyObject *_args, P
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::animation_notification* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, animation_notificationObj_Convert, &itself))
 	{
@@ -6201,7 +6208,7 @@ static int gui_windowObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::gui_window* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, gui_windowObj_Convert, &itself))
 	{
@@ -6423,7 +6430,7 @@ static int gui_eventsObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::gui_events* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, gui_eventsObj_Convert, &itself))
 	{
@@ -6671,7 +6678,7 @@ static int rendererObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds
 		if ( (*gui_events_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::renderer* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, rendererObj_Convert, &itself))
 	{
@@ -6868,7 +6875,7 @@ static int bgrendererObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*gui_events_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::bgrenderer* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, bgrendererObj_Convert, &itself))
 	{
@@ -7308,7 +7315,7 @@ static int surfaceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::surface* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, surfaceObj_Convert, &itself))
 	{
@@ -7534,7 +7541,7 @@ static int window_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject 
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::window_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, window_factoryObj_Convert, &itself))
 	{
@@ -7734,7 +7741,7 @@ static int surface_templateObj_tp_init(PyObject *_self, PyObject *_args, PyObjec
 		if ( (*animation_notification_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::surface_template* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, surface_templateObj_Convert, &itself))
 	{
@@ -7922,7 +7929,7 @@ static int surface_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObject
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::surface_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, surface_factoryObj_Convert, &itself))
 	{
@@ -8155,7 +8162,7 @@ static int layout_managerObj_tp_init(PyObject *_self, PyObject *_args, PyObject 
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::layout_manager* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, layout_managerObj_Convert, &itself))
 	{
@@ -8484,7 +8491,7 @@ static int playableObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::playable* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, playableObj_Convert, &itself))
 	{
@@ -8789,7 +8796,7 @@ static int playable_notificationObj_tp_init(PyObject *_self, PyObject *_args, Py
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::playable_notification* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, playable_notificationObj_Convert, &itself))
 	{
@@ -9009,7 +9016,7 @@ static int playable_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObjec
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::playable_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, playable_factoryObj_Convert, &itself))
 	{
@@ -9191,7 +9198,7 @@ static int global_playable_factoryObj_tp_init(PyObject *_self, PyObject *_args, 
 		if ( (*playable_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::global_playable_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, global_playable_factoryObj_Convert, &itself))
 	{
@@ -9420,7 +9427,7 @@ static int player_feedbackObj_tp_init(PyObject *_self, PyObject *_args, PyObject
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::player_feedback* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, player_feedbackObj_Convert, &itself))
 	{
@@ -9824,7 +9831,7 @@ static int playerObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::player* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, playerObj_Convert, &itself))
 	{
@@ -10187,7 +10194,7 @@ static int region_infoObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_k
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::region_info* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, region_infoObj_Convert, &itself))
 	{
@@ -10554,7 +10561,7 @@ static int animation_destinationObj_tp_init(PyObject *_self, PyObject *_args, Py
 		if ( (*region_info_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::common::animation_destination* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, animation_destinationObj_Convert, &itself))
 	{
@@ -10768,7 +10775,7 @@ static int none_windowObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_k
 		if ( (*gui_window_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::gui::none::none_window* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		std::string name;
@@ -10993,7 +11000,7 @@ static int none_window_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyOb
 		if ( (*window_factory_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::gui::none::none_window_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
@@ -11248,7 +11255,7 @@ static int datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kw
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::datasource* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, datasourceObj_Convert, &itself))
 	{
@@ -11413,7 +11420,7 @@ static int audio_datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObjec
 		if ( (*datasource_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::audio_datasource* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, audio_datasourceObj_Convert, &itself))
 	{
@@ -11578,7 +11585,7 @@ static int video_datasourceObj_tp_init(PyObject *_self, PyObject *_args, PyObjec
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::video_datasource* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, video_datasourceObj_Convert, &itself))
 	{
@@ -11917,7 +11924,7 @@ static int datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, PyObj
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::datasource_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
@@ -12107,7 +12114,7 @@ static int raw_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args, P
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::raw_datasource_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, raw_datasource_factoryObj_Convert, &itself))
 	{
@@ -12298,7 +12305,7 @@ static int audio_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args,
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::audio_datasource_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, audio_datasource_factoryObj_Convert, &itself))
 	{
@@ -12486,7 +12493,7 @@ static int video_datasource_factoryObj_tp_init(PyObject *_self, PyObject *_args,
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::video_datasource_factory* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, video_datasource_factoryObj_Convert, &itself))
 	{
@@ -12674,7 +12681,7 @@ static int audio_parser_finderObj_tp_init(PyObject *_self, PyObject *_args, PyOb
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::audio_parser_finder* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, audio_parser_finderObj_Convert, &itself))
 	{
@@ -12859,7 +12866,7 @@ static int audio_filter_finderObj_tp_init(PyObject *_self, PyObject *_args, PyOb
 		if ( (*pycppbridge_Type.tp_init)(_self, _args, _kwds) < 0) return -1;
 	}
 	ambulant::net::audio_filter_finder* itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, audio_filter_finderObj_Convert, &itself))
 	{
@@ -13112,7 +13119,7 @@ static PyMethodDef audio_format_choicesObj_methods[] = {
 static int audio_format_choicesObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
 {
 	ambulant::net::audio_format_choices itself;
-	const char *kw[] = {"itself", 0};
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
 
 	{
 		if (PyArg_ParseTuple(_args, ""))
