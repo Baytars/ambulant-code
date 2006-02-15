@@ -69,6 +69,7 @@ gui_player::play()
 		bool ok = m_player->goto_node(m_goto_node);
 		if (!ok)
 			ambulant::lib::logger::get_logger()->trace("gui_player::run: goto_node failed");
+		m_goto_node = NULL;
 	} 
 	AM_DBG ambulant::lib::logger::get_logger()->debug("gui_player::run(): returning");
 	m_lock.leave();
