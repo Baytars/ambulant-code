@@ -5314,6 +5314,21 @@ static PyObject *gui_playerObj_restart(gui_playerObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *gui_playerObj_goto_node(gui_playerObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::node* n;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      nodeObj_Convert, &n))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->goto_node(n);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyObject *gui_playerObj_is_play_enabled(gui_playerObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -5549,6 +5564,8 @@ static PyMethodDef gui_playerObj_methods[] = {
 	 PyDoc_STR("() -> None")},
 	{"restart", (PyCFunction)gui_playerObj_restart, 1,
 	 PyDoc_STR("(bool reparse) -> None")},
+	{"goto_node", (PyCFunction)gui_playerObj_goto_node, 1,
+	 PyDoc_STR("(ambulant::lib::node* n) -> None")},
 	{"is_play_enabled", (PyCFunction)gui_playerObj_is_play_enabled, 1,
 	 PyDoc_STR("() -> (bool _rv)")},
 	{"is_stop_enabled", (PyCFunction)gui_playerObj_is_stop_enabled, 1,

@@ -84,11 +84,9 @@ mainloop::mainloop(const char *urlstr, void *view,
 	const std::string& id = url.get_ref();
 	if (id != "") {
 		const ambulant::lib::node *node = m_doc->get_node(id);
-		if (!node) {
+		if (!node)
 			lib::logger::get_logger()->warn(gettext("%s: node ID not found"), id.c_str());
-		} else {
-			m_goto_node = node;
-		}
+		goto_node(node);
 	}
 }
 
@@ -171,6 +169,7 @@ void
 mainloop::restart(bool reparse)
 {
 	bool playing = is_play_active();
+	bool pausing = is_pause_active();
 	stop();
 	
 	delete m_player;
@@ -188,18 +187,8 @@ mainloop::restart(bool reparse)
 #ifdef USE_SMIL21
 	m_player->initialize();
 #endif
-#if 0
-	const std::string& id = url.get_ref();
-	if (id != "") {
-		const ambulant::lib::node *node = m_doc->get_node(id);
-		if (!node) {
-			lib::logger::get_logger()->warn(gettext("%s: node ID not found"), id.c_str());
-		} else {
-			m_goto_node = node;
-		}
-	}
-#endif
-	if(playing) play();	
+	if (playing || pausing) play();
+	if (pausing) pause();
 }
 
 common::gui_screen *

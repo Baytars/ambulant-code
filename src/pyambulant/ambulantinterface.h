@@ -444,6 +444,7 @@ public:
 	void stop();
 	void pause();
 	void restart(bool reparse);
+	void goto_node(const ambulant::lib::node* n);
 	bool is_play_enabled() const;
 	bool is_stop_enabled() const;
 	bool is_pause_enabled() const;

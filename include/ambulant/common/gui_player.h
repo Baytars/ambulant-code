@@ -63,6 +63,8 @@ class gui_player : public factories {
 	virtual void pause();
 	
 	virtual void restart(bool reparse=true);
+	
+	virtual void goto_node(const lib::node *n) { m_goto_node = n; }
 
 //	virtual void set_speed(double speed) = 0;
 //	virtual double get_speed() const = 0;
@@ -97,7 +99,7 @@ class gui_player : public factories {
 	lib::document *m_doc;
 	embedder *m_embedder;
 	player *m_player;
-	const lib::node *m_goto_node;	// XXX Quick hack
+	const lib::node *m_goto_node;
 	lib::critical_section m_lock;
 };
 

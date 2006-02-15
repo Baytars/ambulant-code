@@ -2353,6 +2353,7 @@ gui_player::gui_player(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "stop")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: stop");
 		if (!PyObject_HasAttrString(itself, "pause")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: pause");
 		if (!PyObject_HasAttrString(itself, "restart")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: restart");
+		if (!PyObject_HasAttrString(itself, "goto_node")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: goto_node");
 		if (!PyObject_HasAttrString(itself, "is_play_enabled")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: is_play_enabled");
 		if (!PyObject_HasAttrString(itself, "is_stop_enabled")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: is_stop_enabled");
 		if (!PyObject_HasAttrString(itself, "is_pause_enabled")) PyErr_Warn(PyExc_Warning, "gui_player: missing attribute: is_pause_enabled");
@@ -2520,6 +2521,24 @@ void gui_player::restart(bool reparse)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_reparse);
+
+	PyGILState_Release(_GILState);
+}
+
+void gui_player::goto_node(const ambulant::lib::node* n)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_n = Py_BuildValue("O&", nodeObj_New, n);
+
+	PyObject *py_rv = PyObject_CallMethod(py_gui_player, "goto_node", "(O)", py_n);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during gui_player::goto_node() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_n);
 
 	PyGILState_Release(_GILState);
 }
