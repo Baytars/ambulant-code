@@ -39,7 +39,7 @@ if WITH_PYTHON_PLUGIN
 # XXX These should be elsewhere
 pymodule = $(top_srcdir)/src/pyambulant
 pymodule_includes = -I$(pymodule)
-pymodule_tmp = $(pymodule)/build/temp.darwin-8.4.0-Power_Macintosh-2.5
+pymodule_tmp = $(pymodule)/build/temp.*
 pymodule_libs = \
     $(pymodule_tmp)/ambulantmodule.o \
     $(pymodule_tmp)/ambulantinterface.o \
