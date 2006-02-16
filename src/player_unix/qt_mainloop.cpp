@@ -90,6 +90,7 @@ qt_mainloop::qt_mainloop(qt_gui* gui, ambulant::common::window_factory *wf)
  	set_embedder(this);
  	m_window_factory = wf;
  	init_factories();
+ 	init_plugins();
 	
 	const char *filename = m_gui->filename();
 	net::url url = net::url::from_filename(filename);

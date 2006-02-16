@@ -648,7 +648,21 @@ then
 		with_python_plugin=false
 	else
 	   PYTHON_INCLUDES=-I`python -c "import distutils.sysconfig; print distutils.sysconfig.get_python_inc()"`
-       PYTHON_LIBS="-framework Python" 
+       # Trick to determine whether we're using a Mac framework build, in which
+       # case we need to specify the library differently.
+       case x$PYTHON_INCLUDES in
+       x/Library*)
+           PYTHON_LIBS="-framework Python" 
+           ;;
+       x/System/Library*)
+           PYTHON_LIBS="-framework Python"
+           ;;
+       *)
+           pylibdir=`python -c 'from distutils.sysconfig import *; print parse_makefile(get_makefile_filename()).get("LIBDIR")'`
+           pyversion=`python -c 'import distutils.sysconfig ; print distutils.sysconfig.get_python_version()'`
+           PYTHON_LIBS="-L${libdir} -lpython${pyversion}"
+           ;;
+       esac
 	fi
 fi
 
