@@ -266,18 +266,6 @@ void lib::logger::log_cstr(int level, const char *buf) {
 		time_t t = time(NULL);
 		lt = localtime(&t);
 	}
-#define KB
-#ifdef  KB
-	struct timeval tv;
-	struct timezone tz;
-	(void) gettimeofday(&tv, &tz);
-	long unsigned int usec = tv.tv_usec;
-	if (s_usec < usec) usec -= s_usec;
-	else {
-	      s_usec = usec;
-	      usec = 0;
-	}
-#endif // KB
 #endif // AMBULANT_NO_TIME_H
 
 	ostream& os = *m_pos;
@@ -289,18 +277,10 @@ void lib::logger::log_cstr(int level, const char *buf) {
 		sprintf(tbuf, "%d/%02d/%02d ", (1900 + lt->tm_year), (1 + lt->tm_mon), lt->tm_mday);
 		os << tbuf;
 	}
-#ifdef  KB
-	char usecbuf[32];
-	if(logger::logtime) {
-	  sprintf(usecbuf, "%02d:%02d:%02d:%06u ", lt->tm_hour, lt->tm_min, lt->tm_sec, usec);
-		os <<  usecbuf;
-	}
-#else  // KB
 	if(logger::logtime) {
 		sprintf(tbuf, "%02d:%02d:%02d ", lt->tm_hour, lt->tm_min, lt->tm_sec);
 		os << tbuf;
 	}
-#endif // KB
 #endif // AMBULANT_NO_TIME_H
 
 	if(loglevel)
