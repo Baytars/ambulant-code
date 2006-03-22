@@ -29,6 +29,9 @@
 #include "gtk_mainloop.h"
 #include "gtk_logger.h"
 #include "gtk_renderer.h"
+#ifdef	WITH_GSTREAMER
+#include "ambulant/gui/gstreamer/gstreamer.h"
+#endif/*WITH_GSTREAMER*/
 
 #if 1
 #include "ambulant/config/config.h"
@@ -937,6 +940,10 @@ main (int argc, char*argv[]) {
 		return -1;
 	}
 #endif/*WITH_NOKIA770*/
+#ifdef	WITH_GSTREAMER
+  /* initialize GStreamer */
+	gst_init (&argc, &argv);
+#endif/*WITH_GSTREAMER*/
 
 //	g_thread_init(NULL);
 //	gdk_threads_init ();
