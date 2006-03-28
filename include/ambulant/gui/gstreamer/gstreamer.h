@@ -59,6 +59,7 @@ namespace gstreamer {
     ~gstreamer_player(); 
     GstElement* gst_player();
     unsigned long init();
+    void stop();
 
   protected:
     unsigned long run();
@@ -67,6 +68,7 @@ namespace gstreamer {
     const char* m_uri;
     gstreamer_audio_renderer* m_audio_renderer;
     GstElement* m_gst_player;
+    gboolean* m_player_done;
   };
 
 } // end namespace gstreamer
