@@ -49,60 +49,84 @@ mp3player_error_cb (GstElement * bin, GstElement * error_element,
 		    gpointer user_data);
 
 int
-gst_mp3_player(const char* uri, GstElement** gst_player_p, gstreamer_audio_renderer* rend)
+gst_mp3_player(const char* uri, GstElement** gst_player_p, gstreamer_audio_renderer* rend, gboolean** player_done_p)
 {
   GMainLoop *loop;
-  GstElement *source, *pipeline;
+  GstElement *source=NULL,*sink=NULL, *pipeline=NULL;
   char **files = NULL;
   gboolean gst_mp3_player_done = FALSE;
+  const char* id = "gst_mp3_player";
+  AM_DBG g_print ("%s: %s\n", id, "starting");
 
   /* create elements */
   pipeline = (GstElement*)gst_pipeline_new ("mp3-player");
-  source   = gst_element_factory_make ("playbin", "playbin");
-  
+#ifdef  WITH_NOKIA770
+  source   = gst_element_factory_make ("gnomevfssrc", "source"); 
+  sink     = gst_element_factory_make ("dspmp3sink", "sink"); 
+  if (gst_player_p) *gst_player_p = pipeline;
+  if (player_done_p) *player_done_p = &gst_mp3_player_done;
+#else //WITH_NOKIA770
+  source   = gst_element_factory_make ("playbin", "playbin"); 
   if (gst_player_p) *gst_player_p = source;
+#endif//WITH_NOKIA770
 
-  if ( !( pipeline && source) ) {
+  if ( !( pipeline && source
+#ifdef  WITH_NOKIA770
+	  && sink
+#endif//WITH_NOKIA770
+	  ) ) {
     g_print ("%s:", "gst_mp3_player");
     if ( ! pipeline) g_print (" %s() failed", "get_pipeline_new");
     if ( ! source)   g_print (" %s=%s(%s) failed", "source", 
-			      "gst_element_factory_make", "filesrc");
+			      "gst_element_factory_make", "gnomevfssrc");
+#ifdef  WITH_NOKIA770
+    if ( ! sink)   g_print (" %s=%s(%s) failed", "sink", 
+			      "gst_element_factory_make", "dspmp3sink");
 
+#endif//WITH_NOKIA770
     g_print ("\n");
+    lock_release(rend);
     return -1;
   }
-
+  g_print ("%s: %s\n", id, "set the source audio file");
   /* set the source audio file */
-  g_object_set (G_OBJECT(source), "uri",uri, NULL);
+  g_object_set (G_OBJECT(source), "location", uri, NULL);
 
   /* put all elements  to the main pipeline */
-  gst_bin_add_many (GST_BIN(pipeline), source, NULL);
+  gst_bin_add_many (GST_BIN(pipeline), source,
+#ifdef  WITH_NOKIA770
+		    sink,
+#endif//WITH_NOKIA770
+		    NULL);
 
   /* link the elements */
+  gst_element_link (source, sink);
 
+
+  AM_DBG g_print ("%s: %s\n", id, "add call-back message handler for eos");
   /* add call-back message handlers to check for eos and errors */
   g_signal_connect (GST_BIN(pipeline), "eos",
 		    G_CALLBACK (mp3player_eos_cb), &gst_mp3_player_done);
+  AM_DBG g_print ("%s: %s\n", id, "add call-back message handler for error");
   g_signal_connect (GST_BIN(pipeline), "error",
 		    G_CALLBACK (mp3player_error_cb), &gst_mp3_player_done);
 
+  AM_DBG g_print ("%s: %s\n", id, "wait for start");
   /* wait for start */
   gst_element_set_state (GST_ELEMENT(pipeline), GST_STATE_PAUSED);
 
   lock_release(rend);
   pipeline_store(rend, pipeline);
 
+  AM_DBG g_print ("%s: %s\n", id, "iterate");
    /* iterate */
   if ( ! gst_mp3_player_done) g_print ("Now playing %s ...", uri);
   while ( ! gst_mp3_player_done) {
      gst_bin_iterate (GST_BIN(pipeline));
-     sleep(1);
   }
   /* stop the pipeline */
   gst_element_set_state (GST_ELEMENT(pipeline), GST_STATE_NULL);
-  if ( ! gst_mp3_player_done) g_print (" done !"); 
-  g_print ("\n");
-
+  AM_DBG if (gst_mp3_player_done) g_print (" done !\n"); 
 
   /* cleanup */
   gst_object_unref (GST_OBJECT(pipeline));
@@ -113,8 +137,10 @@ gst_mp3_player(const char* uri, GstElement** gst_player_p, gstreamer_audio_rende
 static void
 mp3player_eos_cb (GstElement *pipeline,gpointer user_data)
 {
+  const char* id = "mp3player_eos_cb";
   gboolean *p_gst_mp3_player_done = (gboolean *) user_data;
 
+  AM_DBG g_print ("%s: %s\n", id, "called");
   *p_gst_mp3_player_done = TRUE;
 }
 
@@ -123,8 +149,10 @@ mp3player_error_cb (GstElement *pipeline, GstElement *error_element,
 		    GError *error, const gchar *debug_msg,
 gpointer user_data)
 {
+  const char* id = "mp3player_error_cb";
   gboolean *p_gst_mp3_player_done = (gboolean *) user_data;
 
+  AM_DBG g_print ("%s: %s\n", id, "called");
   if (error)
     g_printerr ("Error: %s", error->message);
 
@@ -192,6 +220,7 @@ gstreamer_audio_renderer::~gstreamer_audio_renderer()
 	if (m_is_playing) {
 		m_lock.leave();
 		//TBD stop it
+		m_player->stop();
 		m_lock.enter();
 	}	
 #ifdef USE_SMIL21
@@ -208,6 +237,7 @@ gstreamer_audio_renderer::~gstreamer_audio_renderer()
 
 void
 gstreamer_audio_renderer::lock_release() {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer::lock_release(0x%x)",  this);
 	m_lock.leave();
 }
 
@@ -227,7 +257,7 @@ void
 gstreamer_audio_renderer::init_player(const lib::node *node) {
 	assert (node);
 	m_url = node->get_url("src");
-	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer::gstreamer_audio_renderer(0x%x) url=",  this, m_url.get_url().c_str());
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer::init_player(0x%x) url=",  this, m_url.get_url().c_str());
 	_init_clip_begin_end();
 	m_player = new gstreamer_player(m_url.get_url().c_str(), this);
 	m_lock.enter(); // thread will release the lock
@@ -293,7 +323,8 @@ gstreamer_audio_renderer::stop()
 	if (m_is_playing) {
 		m_lock.leave();
 		// XXX Should we call stopped_callback?
-		m_context->stopped(m_cookie, 0);
+		// m_context->stopped(m_cookie, 0);
+		m_player->stop();
 		m_lock.enter();
 	}
 	m_is_playing = false;
@@ -303,6 +334,7 @@ gstreamer_audio_renderer::stop()
 void
 gstreamer_audio_renderer::pause()
 {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer.pause(0x%x)", (void *)this);
 	m_lock.enter();
 	gst_element_set_state (m_player->gst_player(), GST_STATE_PAUSED);
 	m_is_paused = true;
@@ -312,6 +344,7 @@ gstreamer_audio_renderer::pause()
 void
 gstreamer_audio_renderer::resume()
 {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer.resume(0x%x)", (void *)this);
 	m_lock.enter();
 	gst_element_set_state (m_player->gst_player(), GST_STATE_PLAYING);
 	m_is_playing = true;
@@ -352,6 +385,7 @@ gstreamer_audio_renderer::get_dur()
 	GstFormat fmtTime = GST_FORMAT_TIME;
 	common::duration rv(false, 0.0);
 
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer.get_dur(0x%x)", (void *)this);
 	m_lock.enter();
 	if (m_dest) {
 	       gst_element_query(m_player->gst_player(), GST_QUERY_TOTAL, &fmtTime, &length);
@@ -382,21 +416,32 @@ gstreamer_player::gstreamer_player(const char* uri, gstreamer_audio_renderer* re
     m_uri(NULL) {
 	m_uri = strdup(uri);
 	m_audio_renderer = rend;
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_player(0x%x) uri=%s", (void*)this, uri);
 }
 
 gstreamer_player::~gstreamer_player() {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_player::~gstreamer_player()(0x%x) m_uri=%s", (void*)this, m_uri);
+	stop();
 	delete m_uri;
 }
 
 unsigned long
 gstreamer_player::run() {
-        gst_mp3_player (m_uri, &m_gst_player, m_audio_renderer);
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_player::run(0x%x)m_uri=%s", (void*)this, m_uri);
+        gst_mp3_player (m_uri, &m_gst_player, m_audio_renderer, &m_player_done);
 }
 
 unsigned long
 gstreamer_player::init() {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_player::start(0x%x)m_uri=%s", (void*)this, m_uri);
         start();
 	return 0;
+}
+
+void
+gstreamer_player::stop() {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_player::stop(0x%x)m_uri=%s", (void*)this, m_uri);
+	mp3player_eos_cb(m_gst_player, m_player_done);
 }
 
 GstElement*
@@ -419,7 +464,7 @@ gstreamer_renderer_factory::new_playable(
 {
 	common::playable *rv;
 	lib::xml_string tag = node->get_qname().second;
-    AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "audio") {
 		rv = new gui::gstreamer::gstreamer_audio_renderer(context, cookie, node, evp, m_factory);
 		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
@@ -445,3 +490,4 @@ gstreamer_renderer_factory::new_aux_audio_playable(
 	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
 	return rv;
 }
+

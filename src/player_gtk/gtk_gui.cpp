@@ -136,7 +136,7 @@ static GdkPixmap *pixmap = NULL;
 extern "C" {
 gboolean gtk_C_callback_timer(void *userdata)
 {
-	AM_DBG lib::logger::get_logger()->debug("gtk_C_callback_timer called");
+//	AM_DBG lib::logger::get_logger()->debug("gtk_C_callback_timer called");
 	return TRUE;
 }
 }
@@ -941,7 +941,8 @@ main (int argc, char*argv[]) {
 	}
 #endif/*WITH_NOKIA770*/
 #ifdef	WITH_GSTREAMER
-  /* initialize GStreamer */
+	/* initialize GStreamer */
+	AM_DBG fprintf(stderr, "initialize GStreamer\n");
 	gst_init (&argc, &argv);
 #endif/*WITH_GSTREAMER*/
 
