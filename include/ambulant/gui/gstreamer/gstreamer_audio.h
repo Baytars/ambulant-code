@@ -92,8 +92,7 @@ class gstreamer_audio_renderer : public common::renderer_playable {
 	net::audio_datasource *ds);
   
 	~gstreamer_audio_renderer();
-	void lock_release();
-	  
+
 	bool is_paused();
 	bool is_stopped();
 	bool is_playing();
