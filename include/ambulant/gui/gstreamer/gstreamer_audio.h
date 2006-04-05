@@ -33,6 +33,7 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/gui/none/none_gui.h"
 #include "ambulant/net/datasource.h"
+#include "ambulant/net/url.h"
 #include "ambulant/lib/event_processor.h"
 #ifdef USE_SMIL21
 #include "ambulant/smil2/transition.h"
@@ -92,6 +93,8 @@ class gstreamer_audio_renderer : public common::renderer_playable {
 	net::audio_datasource *ds);
   
 	~gstreamer_audio_renderer();
+
+	static bool is_supported(const lib::node *node);
 
 	bool is_paused();
 	bool is_stopped();

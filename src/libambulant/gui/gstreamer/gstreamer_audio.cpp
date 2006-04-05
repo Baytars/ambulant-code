@@ -17,7 +17,7 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -128,7 +128,7 @@ gst_mp3_player(const char* uri, GstElement** gst_player_p, gstreamer_player* gst
 
   AM_DBG g_print ("%s: %s\n", id, "iterate");
    /* iterate */
-  if ( ! *player_done_p) g_print ("Now playing %s ...", uri);
+  AM_DBG if ( ! *player_done_p) g_print ("Now playing %s ...", uri);
   while ( ! *player_done_p) {
     gst_bin_iterate (GST_BIN(pipeline));
   }
@@ -165,7 +165,7 @@ gpointer user_data)
 
   AM_DBG g_print ("%s: %s\n", id, "called");
   if (error)
-    g_printerr ("Error: %s", error->message);
+    g_printerr ("Error: %s\n", error->message);
 
   *p_player_done = TRUE;
 }
@@ -283,6 +283,26 @@ gstreamer_audio_renderer::start_outtransition(const lib::transition_info* info) 
 	m_transition_engine->init(m_event_processor, true, info);
 }
 #endif
+
+bool
+gstreamer_audio_renderer::is_supported(const lib::node *node)
+{
+	if ( ! node)
+    		return false;
+	std::string url(node->get_url("src"));
+	size_t dotpos = url.find_last_of(".");
+	if (dotpos <= 0) return false;
+	std::string ext = url.substr(dotpos);
+	
+#ifdef  WITH_NOKIA770
+	if (ext == ".mp3" || ext == ".MP3")
+		return true;
+#else //WITH_NOKIA770
+	if (ext == ".wav" || ext == ".WAV")
+		return true;
+#endif//WITH_NOKIA770
+	return false;
+}
 
 bool
 gstreamer_audio_renderer::is_paused()
@@ -546,15 +566,15 @@ gstreamer_renderer_factory::new_playable(
 		const lib::node *node,
 		lib::event_processor *evp)
 {
-	common::playable *rv;
+	common::playable *rv = NULL;
 	lib::xml_string tag = node->get_qname().second;
-	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
-	if ( tag == "audio") {
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_playable: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+	if ( tag == "audio" && gui::gstreamer::gstreamer_audio_renderer::is_supported(node)) {
 		rv = new gui::gstreamer::gstreamer_audio_renderer(context, cookie, node, evp, m_factory);
-		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
+		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_playable: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: no GStreamer renderer for tag \"%s\"", tag.c_str());
-        return NULL;
+		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_playable: no GStreamer renderer for tag \"%s\"", tag.c_str());
+                return NULL;
 	}
 	return rv;
 }
@@ -567,11 +587,16 @@ gstreamer_renderer_factory::new_aux_audio_playable(
 		lib::event_processor *evp,
 		net::audio_datasource *src)
 {
-	common::playable *rv;
+	common::playable *rv = NULL;
 	lib::xml_string tag = node->get_qname().second;
-    AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory:new_aux_audio_playable: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
-	rv = new gui::gstreamer::gstreamer_audio_renderer(context, cookie, node, evp, m_factory, src);
-	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
+	AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_aux_playable: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+	if ( tag == "audio" && gui::gstreamer::gstreamer_audio_renderer::is_supported(node)) {
+		rv = new gui::gstreamer::gstreamer_audio_renderer(context, cookie, node, evp, m_factory);
+		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_aux_playable: node 0x%x: returning gstreamer_audio_renderer 0x%x", (void *)node, (void *)rv);
+	} else {
+		AM_DBG lib::logger::get_logger()->debug("gstreamer_renderer_factory::new_aux_playable: no GStreamer renderer for tag \"%s\"", tag.c_str());
+                return NULL;
+	}
 	return rv;
 }
 
