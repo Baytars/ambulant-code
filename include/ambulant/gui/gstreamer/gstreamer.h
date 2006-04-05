@@ -49,26 +49,35 @@
  
 namespace ambulant {
 namespace gui {
-namespace gstreamer {	  
+namespace gstreamer {	
+  
+class gstreamer_audio_renderer;
 
-  class gstreamer_audio_renderer;
-  class gstreamer_player :  public lib::unix::thread {
+ static pthread_mutex_t s_mutex;
+static bool s_initialized = false;
 
-  public:
-    gstreamer_player(const char* uri,  gstreamer_audio_renderer* rend); 
-    ~gstreamer_player(); 
-    GstElement* gst_player();
-    unsigned long init();
-    void stop();
+class gstreamer_player :  public lib::unix::thread {
+
+ public:
+	gstreamer_player(const char* uri,  gstreamer_audio_renderer* rend); 
+	~gstreamer_player(); 
+	GstElement* gst_player();
+ 	unsigned long init();
+	void pause();
+	void play();
+	void stop_player();
+	void mutex_acquire();
+	void mutex_release();
 
   protected:
-    unsigned long run();
+	unsigned long run();
 
   private:
-    const char* m_uri;
-    gstreamer_audio_renderer* m_audio_renderer;
-    GstElement* m_gst_player;
-    gboolean* m_player_done;
+	char* m_uri;
+	gstreamer_audio_renderer* m_audio_renderer;
+	GstElement* m_gst_player;
+	gboolean m_player_done;
+
   };
 
 } // end namespace gstreamer
