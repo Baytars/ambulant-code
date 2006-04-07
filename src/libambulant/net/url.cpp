@@ -490,6 +490,10 @@ net::url::guesstype() const
 	
 	if (ext == ".htm" || ext == ".HTM" || ext == ".html" || ext == ".HTML")
 		return "text/html";
+	if (ext == ".mp3" || ext == ".MP3")
+		return "audio/mpeg";
+	if (ext == ".wav" || ext == ".WAV")
+		return "audio/wav";
 	return "";
 }
 

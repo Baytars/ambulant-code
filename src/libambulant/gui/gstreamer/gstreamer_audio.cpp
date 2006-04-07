@@ -17,7 +17,7 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -130,7 +130,9 @@ gst_mp3_player(const char* uri, GstElement** gst_player_p, gstreamer_player* gst
    /* iterate */
   AM_DBG if ( ! *player_done_p) g_print ("Now playing %s ...", uri);
   while ( ! *player_done_p) {
+    mutex_acquire(gstreamer_player); 
     gst_bin_iterate (GST_BIN(pipeline));
+    mutex_release(gstreamer_player);
   }
   AM_DBG if (player_done_p) g_print (" done !\n"); 
 
@@ -289,16 +291,13 @@ gstreamer_audio_renderer::is_supported(const lib::node *node)
 {
 	if ( ! node)
     		return false;
-	std::string url(node->get_url("src"));
-	size_t dotpos = url.find_last_of(".");
-	if (dotpos <= 0) return false;
-	std::string ext = url.substr(dotpos);
+	std::string mimetype(node->get_url("src").guesstype());
 	
 #ifdef  WITH_NOKIA770
-	if (ext == ".mp3" || ext == ".MP3")
+	if (mimetype == "audio/mpeg") // .mp3
 		return true;
 #else //WITH_NOKIA770
-	if (ext == ".wav" || ext == ".WAV")
+	if (mimetype == "audio/wav") // .wav
 		return true;
 #endif//WITH_NOKIA770
 	return false;
@@ -340,9 +339,9 @@ gstreamer_audio_renderer::stop()
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer::stop(0x%x)",(void*)this);
-	if (m_is_playing) {
+	if (m_player && m_is_playing) {
 		m_lock.leave();
-		m_player->stop();
+		m_player->stop_player();
 		m_lock.enter();
 		// XXX Should we call stopped_callback?
 		m_context->stopped(m_cookie, 0);
@@ -541,7 +540,7 @@ static void
 mutex_acquire(void* obj) {
         gstreamer_player* player = (gstreamer_player*) obj;
         if (player) {
-	  player->mutex_acquire();
+	        player->mutex_acquire();
         }
 }
 
