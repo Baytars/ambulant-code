@@ -21,7 +21,7 @@
 #include "ambulant/gui/arts/arts.h"
 #endif
 #ifdef WITH_GSTREAMER
-#include "ambulant/gui/gstreamer/gstreamer_audio.h"
+#include "ambulant/gui/gstreamer/gstreamer_renderer_factory.h"
 #endif
 #ifdef WITH_SDL
 #include "ambulant/gui/SDL/sdl_gui.h"
@@ -57,7 +57,7 @@
 using namespace ambulant;
 using namespace gui::gtk;
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
