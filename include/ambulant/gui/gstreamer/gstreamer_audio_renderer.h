@@ -19,10 +19,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GSTREAMER_AUDIO_H
-#define __GSTREAMER_AUDIO_H
+#ifndef __GSTREAMER_AUDIO_RENDERER_H
+#define __GSTREAMER_AUDIO_RENDERER_H
 
-#include "gstreamer.h"
+#include "gstreamer_player.h"
 #include <iostream>
 
 #include "ambulant/common/factory.h"
@@ -48,31 +48,6 @@
 namespace ambulant {
 namespace gui {
 namespace gstreamer {	  
-
-class gstreamer_renderer_factory : public common::playable_factory {
-  public:
-
-	gstreamer_renderer_factory(common::factories *factory)
-	:   m_factory(factory) {}
-	~gstreamer_renderer_factory();
-		
-	common::playable *new_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp);
-		
-	common::playable *new_aux_audio_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp,
-		net::audio_datasource *src);	
-		
-  private:
-	common::factories *m_factory;
-	
-};
 
 class gstreamer_audio_renderer : public common::renderer_playable {
 
@@ -148,4 +123,5 @@ class gstreamer_audio_renderer : public common::renderer_playable {
 } // end namespace ambulant
 
 
-#endif // __GSTREAMER_AUDIO_H
+#endif // __GSTREAMER_AUDIO_RENDERER_H
+

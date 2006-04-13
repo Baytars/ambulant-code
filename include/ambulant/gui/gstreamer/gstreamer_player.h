@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __GSTREAMER_H
-#define __GSTREAMER_H
+#ifndef __GSTREAMER_PLAYER_h
+#define __GSTREAMER_PLAYER_h
 
 #include <gst/gst.h>
 #include <iostream>
@@ -53,8 +53,10 @@ namespace gstreamer {
   
 class gstreamer_audio_renderer;
 
- static pthread_mutex_t s_mutex;
+static pthread_mutex_t s_mutex;
 static bool s_initialized = false;
+
+// gstreamer_player: interface to low-level gstreamer code
 
 class gstreamer_player :  public lib::unix::thread {
 
@@ -84,4 +86,4 @@ class gstreamer_player :  public lib::unix::thread {
 } // end namespace gui
 } // end namespace ambulant
 
-#endif // __GSTREAMER_H
+#endif // __GSTREAMER_PLAYER_h

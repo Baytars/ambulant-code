@@ -165,9 +165,11 @@ gstreamer_includes = -DWITH_GSTREAMER \
 		 $(GSTREAMER_CFLAGS)
 
 libambulant_gstreamer_la_SOURCES = 	\
-	        gui/gstreamer/gstreamer_audio.cpp
+	        gui/gstreamer/gstreamer_audio_renderer.cpp	\
+	        gui/gstreamer/gstreamer_renderer_factory.cpp	\
+	        gui/gstreamer/gstreamer_player.cpp
 else
-gstreamerincludes=
+gstreamer_includes=
 toolkit_gstreamer_libraries=
 endif
 

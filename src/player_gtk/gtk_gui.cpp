@@ -30,7 +30,7 @@
 #include "gtk_logger.h"
 #include "gtk_renderer.h"
 #ifdef	WITH_GSTREAMER
-#include "ambulant/gui/gstreamer/gstreamer.h"
+#include "ambulant/gui/gstreamer/gstreamer_renderer_factory.h"
 #endif/*WITH_GSTREAMER*/
 
 #if 1
@@ -943,7 +943,7 @@ main (int argc, char*argv[]) {
 #ifdef	WITH_GSTREAMER
 	/* initialize GStreamer */
 	AM_DBG fprintf(stderr, "initialize GStreamer\n");
-	gst_init (&argc, &argv);
+	gstreamer_player_initialize (&argc, &argv);
 #endif/*WITH_GSTREAMER*/
 
 //	g_thread_init(NULL);
