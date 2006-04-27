@@ -1,6 +1,12 @@
 
-What's new in Ambulant Player 1.6.1?
+What's new in Ambulant Player 1.6.2?
 ------------------------------------
+Changes between 1.6.1 and 1.6.2:
+
+- Two source files, needed only on Windows, were inadvertantly omitted from
+  the 1.6.1 source distribution. This is the only real difference between
+  the releases.
+  
 Changes between 1.6 and 1.6.1:
 
 - Network playback was broken on Windows. Fixed.
