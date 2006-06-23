@@ -27,7 +27,7 @@
 #include "ambulant/lib/colors.h"
 #include "ambulant/lib/logger.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -41,14 +41,14 @@ namespace gui {
 namespace gtk {
 
 void 
-gtk_transition_debug::paint_rect(ambulant_gtk_window* aqw, // TMP
+gtk_transition_debug::paint_rect(ambulant_gtk_window* agw, // TMP
 	   common::surface * dst,
 	   color_t color) 
 {
 /**
 	rect dstrect_whole = dst->get_rect();
 	QPainter paint;
-	paint.begin(aqw->get_ambulant_pixmap());
+	paint.begin(agw->get_ambulant_pixmap());
 	dstrect_whole.translate(dst->get_global_topleft());
 	int L = dstrect_whole.left(),
 	T = dstrect_whole.top(),
@@ -73,37 +73,35 @@ gtk_transition_debug::paint_rect(ambulant_gtk_window* aqw, // TMP
 // Helper functions to setup transitions
 
 static void
-setup_transition(bool outtrans, ambulant_gtk_window *aqw, GdkPixmap** oldpxmp, GdkPixmap** newpxmp)
+setup_transition(bool outtrans, ambulant_gtk_window *agw, GdkPixmap** oldpxmp, GdkPixmap** newpxmp)
 {
-/**
 	if (outtrans) {
-		if (aqw->m_tmppixmap == NULL) {
+		if (agw->m_tmppixmap == NULL) {
 			// make a copy
-			aqw->m_tmppixmap = new QPixmap(*aqw->get_ambulant_oldpixmap());
+			agw->m_tmppixmap = new GdkPixmap(*agw->get_ambulant_oldpixmap());
 		}
-		*oldpxmp = aqw->get_ambulant_surface();
-		*newpxmp = aqw->m_tmppixmap;
+		*oldpxmp = agw->get_ambulant_surface();
+		*newpxmp = agw->m_tmppixmap;
 	} else {
-		*oldpxmp = aqw->get_ambulant_pixmap();
-		*newpxmp = aqw->get_ambulant_surface();
+		*oldpxmp = agw->get_ambulant_pixmap();
+		*newpxmp = agw->get_ambulant_surface();
 	}
-**/
 }
 static void
-finalize_transition(bool outtrans, ambulant_gtk_window *aqw,  common::surface *dest)
+finalize_transition(bool outtrans, ambulant_gtk_window *agw,  common::surface *dest)
 {
-/**
 	if (outtrans) {
 		// copy the pixels in m_tmppixmap to the on-screen pixmap
-		QPixmap* dest_pixmap = aqw->get_ambulant_pixmap();
-		QPixmap* temp_pixmap = aqw->get_ambulant_surface();
+		GdkPixmap* dest_pixmap = agw->get_ambulant_pixmap();
+		GdkPixmap* temp_pixmap = agw->get_ambulant_surface();
 		const lib::rect &cr=  dest->get_rect();
 		lib::rect r=cr;
 		r.translate(dest->get_global_topleft());
 		AM_DBG logger::get_logger()->debug("finalize_transition: dest_pixmap=0x%x: temp_pixmap=0x%x (L,T,W,H)=(%d,%d,%d,%d)", dest_pixmap, temp_pixmap,r.left(),r.top(),r.width(), r.height());
-		bitBlt(dest_pixmap,r.left(),r.top(), temp_pixmap,r.left(),r.top(),r.width(), r.height());
+		GdkGC *gc = gdk_gc_new (dest_pixmap);
+		gdk_draw_pixmap(dest_pixmap, gc, temp_pixmap, r.left(),r.top(),r.left(),r.top(),r.width(), r.height());
+		g_object_unref (G_OBJECT (gc));
 	}
-**/
 }
 
 void
@@ -111,9 +109,9 @@ gtk_transition_blitclass_fade::update()
 {
 /**
         AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_fade::update(%f)", m_progress);
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *qpm;
+	setup_transition(m_outtrans, agw, &qpm, &npm);
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_fade::update(%f) qpm(%d,%d),npm(%d,%d)", m_progress, qpm->width(),  qpm->height(), npm->width(), npm->height());
 	QImage m_old_image;
 	QImage m_new_image;
@@ -162,40 +160,40 @@ gtk_transition_blitclass_fade::update()
 	AM_DBG logger::get_logger()->debug(
 				  "gtk_transition_blitclass_fade::update(): "
 				  " ltwh=(%d,%d,%d,%d)",L,T,W,H);
-	QPixmap rpm(W,H);
+	GdkPixmap rpm(W,H);
 	rpm.convertFromImage(res);
-	bitBlt(qpm, L, T, &rpm, L, T, W, H);	
-	finalize_transition(m_outtrans, aqw, m_dst);
+	gdk_draw_pixmap(qpm, L, T, &rpm, L, T, W, H);	
+	finalize_transition(m_outtrans, agw, m_dst);
 **/
 }
 
 void
 gtk_transition_blitclass_rect::update()
 {
-/**
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rect::update(%f)", m_progress);
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *opm;
+	setup_transition(m_outtrans, agw, &opm, &npm);
+
 	rect newrect_whole = m_newrect;
 	newrect_whole.translate(m_dst->get_global_topleft());
 	int L = newrect_whole.left(), T = newrect_whole.top(),
         	W = newrect_whole.width(), H = newrect_whole.height();
-	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rect: qpm=0x%x, npm=0x%x, (L,T,W,H)=(%d,%d,%d,%d)",qpm,npm,L,T,W,H);
-	bitBlt(qpm, L, T, npm, L, T, W, H);
-	finalize_transition(m_outtrans, aqw, m_dst);
-**/
+	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rect: opm=0x%x, npm=0x%x, (L,T,W,H)=(%d,%d,%d,%d)",opm,npm,L,T,W,H);
+	GdkGC *gc = gdk_gc_new (opm);
+	gdk_draw_pixmap(opm, gc,  npm, L, T, L, T, W, H);
+	g_object_unref (G_OBJECT (gc));
+	finalize_transition(m_outtrans, agw, m_dst);
 }
 void
 gtk_transition_blitclass_r1r2r3r4::update()
 {
-/**
  	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4::update(%f)", m_progress);
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
-	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4::update(%f) qpm(%d,%d),npm(%d,%d)", m_progress, qpm->width(),  qpm->height(), npm->width(), npm->height());
-	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4::update() qpm=0x%x, npm=0x%x.", qpm, npm);
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *opm;
+	setup_transition(m_outtrans, agw, &opm, &npm);
+//XX	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4::update(%f) opm(%d,%d),npm(%d,%d)", m_progress, opm->width(),  opm->height(), npm->width(), npm->height());
+	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4::update() opm=0x%x, npm=0x%x.", opm, npm);
 	rect oldsrcrect_whole = m_oldsrcrect;
 	rect olddstrect_whole = m_olddstrect;
 	rect newsrcrect_whole = m_newsrcrect;
@@ -224,47 +222,62 @@ gtk_transition_blitclass_r1r2r3r4::update()
 		Wnewdst = newdstrect_whole.width(),
 		Hnewdst = newdstrect_whole.height();
 //	logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4: (Lnewdst,Tnewdst,Wnewdst,Hnewdst)=(%d,%d,%d,%d)",Lnewdst,Tnewdst,Wnewdst,Hnewdst);
-	bitBlt(qpm, Lolddst, Tolddst, qpm, Loldsrc, Toldsrc, Woldsrc, Holdsrc);
-	bitBlt(qpm, Lnewdst, Tnewdst, npm, Lnewsrc, Tnewsrc, Wnewsrc, Hnewsrc);
-	finalize_transition(m_outtrans, aqw, m_dst);
-**/
+	GdkGC *gc = gdk_gc_new (opm);
+//XX	gdk_draw_pixmap(opm, gc, opm, Lolddst, Tolddst, Loldsrc, Toldsrc, Woldsrc, Holdsrc);
+	gdk_draw_pixmap(opm, gc, npm, Lnewdst, Tnewdst, Lnewsrc, Tnewsrc, Wnewsrc, Hnewsrc);
+	g_object_unref (G_OBJECT (gc));
+	finalize_transition(m_outtrans, agw, m_dst);
 }
 
 void
 gtk_transition_blitclass_rectlist::update()
 {
-/**
+
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rectlist::update(%f)", m_progress);
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
-	QImage img1 = qpm->convertToImage();
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *opm;
+	setup_transition(m_outtrans, agw, &opm, &npm);
+/**XX	QImage img1 = opm->convertToImage();
 	QImage img2 = npm->convertToImage();
+**/
 	rect dstrect_whole = m_dst->get_rect();
 	dstrect_whole.translate(m_dst->get_global_topleft());
-	int L = dstrect_whole.left(), T = dstrect_whole.top(),
-		W = dstrect_whole.width(), H = dstrect_whole.height();
-	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rectlist: (L,T,W,H)=(%d,%d,%d,%d)",L,T,W,H);
-	QPainter paint;
+	int Ldst = dstrect_whole.left(), Tdst = dstrect_whole.top(),
+		Wdst = dstrect_whole.width(), Hdst = dstrect_whole.height();
+	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rectlist: (L,T,W,H)=(%d,%d,%d,%d)",Ldst,Tdst,Wdst,Hdst);
+/**XX	QPainter paint;
 	QRegion clip_region;
-	paint.begin(qpm);
+	paint.begin(opm);
 	paint.drawImage(L,T,img1,L,T,W,H);
+**/
+	GdkGC *gc = gdk_gc_new (opm);
+	GdkRegion* region = gdk_region_new();
 	std::vector< rect >::iterator newrect;
 	for(newrect=m_newrectlist.begin(); newrect != m_newrectlist.end(); newrect++) {
 		rect corner_rect = *newrect;
 		corner_rect.translate(m_dst->get_global_topleft());
 		int L = corner_rect.left(), T = corner_rect.top(),
         		W = corner_rect.width(), H = corner_rect.height();
+		GdkRectangle rectangle;
+		rectangle.x = L;
+		rectangle.y = T;
+		rectangle.width = W;
+		rectangle.height = H;
 		AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_rectlist: (L,T,W,H)=(%d,%d,%d,%d)",L,T,W,H);
-		QRegion newcorner(L,T,W,H);
-		clip_region += newcorner;
+//XX		QRegion newcorner(L,T,W,H);
+//XX		clip_region += newcorner;
+		gdk_region_union_with_rect(region, &rectangle);
 	}
-	paint.setClipRegion(clip_region);
+/**XX	paint.setClipRegion(clip_region);
 	paint.drawImage(L,T,img2,L,T,W,H);
 	paint.flush();
 	paint.end();
-	finalize_transition(m_outtrans, aqw, m_dst);
 **/
+	gdk_gc_set_clip_region(gc, region);
+//?	gdk_draw_pixmap(opm, gc, npm, Ldst, Tdst, Lsrc, Tsrc, Wsrc, Hsrc);
+	gdk_draw_pixmap(opm, gc, npm, Ldst, Tdst, Ldst, Tdst, Wdst, Hdst);
+	g_object_unref (G_OBJECT (gc));
+	finalize_transition(m_outtrans, agw, m_dst);
 }
 
 void
@@ -272,11 +285,11 @@ gtk_transition_blitclass_poly::update()
 {
 /**
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(%f)", m_progress);
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *opm;
 	const lib::point& dst_global_topleft = m_dst->get_global_topleft();
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
-//	QImage img1 = qpm->convertToImage();
+	setup_transition(m_outtrans, agw, &opm, &npm);
+//	QImage img1 = opm->convertToImage();
 	QImage img2 = npm->convertToImage();
 	QPointArray qpa;
 	int idx = 0;
@@ -292,14 +305,14 @@ gtk_transition_blitclass_poly::update()
 	int L = newrect_whole.left(), T = newrect_whole.top(),
         	W = newrect_whole.width(), H = newrect_whole.height();
 	QPainter paint;
-	paint.begin(qpm);
+	paint.begin(opm);
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(): ltwh=(%d,%d,%d,%d)",L,T,W,H);
 //	paint.drawImage(L,T,img1,L,T,W,H);
 	paint.setClipRegion(qreg);
 	paint.drawImage(L,T,img2,L,T,W,H);
 	paint.flush();
 	paint.end();
-	finalize_transition(m_outtrans, aqw, m_dst);
+	finalize_transition(m_outtrans, agw, m_dst);
 **/
 }
 
@@ -309,11 +322,11 @@ gtk_transition_blitclass_polylist::update()
 /**
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_polylist::update(%f)", m_progress);
 	logger::get_logger()->debug("gtk_transition_blitclass_polylist: not yet tested");
-	ambulant_gtk_window *aqw = (ambulant_gtk_window *)m_dst->get_gui_window();
-	QPixmap *npm, *qpm;
+	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
+	GdkPixmap *npm, *opm;
 	const lib::point& dst_global_topleft = m_dst->get_global_topleft();
-	setup_transition(m_outtrans, aqw, &qpm, &npm);
-//	QImage img1 = qpm->convertToImage();
+	setup_transition(m_outtrans, agw, &opm, &npm);
+//	QImage img1 = opm->convertToImage();
 	QImage img2 = npm->convertToImage();
 	QRegion clip_region;
 	logger::get_logger()->debug("gtk_transition_blitclass_polylist: m_newpolygonlist.size()=%d", m_newpolygonlist.size());
@@ -339,13 +352,13 @@ gtk_transition_blitclass_polylist::update()
 	 W = newrect_whole.width(), H = newrect_whole.height();
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_polylist::update() drawImage npm=0x%x ltwh=(%d,%d,%d,%d)",npm,L,T,W,H);
 	QPainter paint;
-	paint.begin(qpm);
+	paint.begin(opm);
 //	paint.drawImage(L,T,img1,L,T,W,H);
 	paint.setClipRegion(clip_region);
 	paint.drawImage(L,T,img2,L,T,W,H);
 	paint.flush();
 	paint.end();
-	finalize_transition(m_outtrans, aqw, m_dst);
+	finalize_transition(m_outtrans, agw, m_dst);
 **/
 }
 
