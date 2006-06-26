@@ -223,7 +223,6 @@ gtk_transition_blitclass_r1r2r3r4::update()
 		Hnewdst = newdstrect_whole.height();
 //	logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4: (Lnewdst,Tnewdst,Wnewdst,Hnewdst)=(%d,%d,%d,%d)",Lnewdst,Tnewdst,Wnewdst,Hnewdst);
 	GdkGC *gc = gdk_gc_new (opm);
-//XX	gdk_draw_pixmap(opm, gc, opm, Lolddst, Tolddst, Loldsrc, Toldsrc, Woldsrc, Holdsrc);
 	gdk_draw_pixmap(opm, gc, npm, Lnewdst, Tnewdst, Lnewsrc, Tnewsrc, Wnewsrc, Hnewsrc);
 	g_object_unref (G_OBJECT (gc));
 	finalize_transition(m_outtrans, agw, m_dst);
@@ -283,37 +282,53 @@ gtk_transition_blitclass_rectlist::update()
 void
 gtk_transition_blitclass_poly::update()
 {
-/**
+
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(%f)", m_progress);
 	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
 	GdkPixmap *npm, *opm;
 	const lib::point& dst_global_topleft = m_dst->get_global_topleft();
 	setup_transition(m_outtrans, agw, &opm, &npm);
+/**XX
 //	QImage img1 = opm->convertToImage();
 	QImage img2 = npm->convertToImage();
 	QPointArray qpa;
-	int idx = 0;
+**/
+	uint n_points = m_newpolygon.size();
+	if (n_points <= 2) { // cannot create polygon, maybe not yet implemented
+		return;
+	}	
+	GdkPoint* points = (GdkPoint*) malloc (n_points*sizeof(GdkPoint));
+	uint idx = 0;
 	std::vector<point>::iterator newpoint;
 	for( newpoint=m_newpolygon.begin();
 	     newpoint != m_newpolygon.end(); newpoint++) {
 	    	point p = *newpoint + dst_global_topleft;
-		qpa.putPoints(idx++, 1, p.x, p.y);
+		points[idx].x = p.x;
+		points[idx++].y = p.y;
+
 	}
-	QRegion qreg(qpa, true);
+	GdkRegion* region = gdk_region_polygon(points, n_points, GDK_WINDING_RULE); 
+	free(points);
+	GdkGC *gc = gdk_gc_new (opm);
+	gdk_gc_set_clip_region(gc, region);
+//XX	QRegion qreg(qpa, true);
 	rect newrect_whole =  m_dst->get_rect();
 	newrect_whole.translate(dst_global_topleft);
-	int L = newrect_whole.left(), T = newrect_whole.top(),
-        	W = newrect_whole.width(), H = newrect_whole.height();
+	int Ldst= newrect_whole.left(), Tdst = newrect_whole.top(),
+        	Wdst = newrect_whole.width(), Hdst = newrect_whole.height();
+/**XX
 	QPainter paint;
 	paint.begin(opm);
-	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(): ltwh=(%d,%d,%d,%d)",L,T,W,H);
 //	paint.drawImage(L,T,img1,L,T,W,H);
 	paint.setClipRegion(qreg);
 	paint.drawImage(L,T,img2,L,T,W,H);
 	paint.flush();
 	paint.end();
-	finalize_transition(m_outtrans, agw, m_dst);
 **/
+	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(): ltwh=(%d,%d,%d,%d)",Ldst,Tdst,Wdst,Hdst);
+	gdk_draw_pixmap(opm, gc, npm, Ldst, Tdst, Ldst, Tdst, Wdst, Hdst);
+	g_object_unref (G_OBJECT (gc));
+	finalize_transition(m_outtrans, agw, m_dst);
 }
 
 void
