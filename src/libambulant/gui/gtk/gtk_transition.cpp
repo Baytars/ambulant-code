@@ -31,7 +31,7 @@
 #include <gtk-2.0/gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk-2.0/gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -43,36 +43,6 @@ using namespace lib;
 namespace gui {
 
 namespace gtk {
-
-void 
-gtk_transition_debug::paint_rect(ambulant_gtk_window* agw, // TMP
-	   common::surface * dst,
-	   color_t color) 
-{
-/**
-	rect dstrect_whole = dst->get_rect();
-	QPainter paint;
-	paint.begin(agw->get_ambulant_pixmap());
-	dstrect_whole.translate(dst->get_global_topleft());
-	int L = dstrect_whole.left(),
-	T = dstrect_whole.top(),
-	W = dstrect_whole.width(),
-	H = dstrect_whole.height();
-	// XXXX Fill with background color
-	AM_DBG logger::get_logger()->debug(
-				  "gtk_transition_debug::paint_rect:"
-				  " %s0x%x,%s(%d,%d,%d,%d)",
-				  " clearing to ", (long)color, 
-				  " local_ltwh=",L,T,W,H);
-	QColor bgc = QColor(redc(color),
-			    greenc(color),
-			    bluec(color));
-	paint.setBrush(bgc);
-	paint.drawRect(L,T,W,H);
-	paint.flush();
-	paint.end();
-**/
-}
 
 // Helper functions to setup transitions
 
@@ -121,17 +91,17 @@ gtk_transition_blitclass_fade::update()
         	W = newrect_whole.width(), H = newrect_whole.height();
 	setup_transition(m_outtrans, agw, &opm, &npm);
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_fade::update(%f) agw=0x%x, opm=0x%x,npm0x%x", m_progress, agw, opm, npm);
-	GdkPixbuf* old_pixbuf = gdk_pixbuf_get_from_drawable(NULL, opm, 0, L, T, L, T, W, H);
-	GdkPixbuf* new_pixbuf = gdk_pixbuf_get_from_drawable(NULL, npm, 0, L, T, L, T, W, H);
+	GdkPixbuf* old_pixbuf = gdk_pixbuf_get_from_drawable(NULL, opm, 0, L, T, 0, 0, W, H);
+	GdkPixbuf* new_pixbuf = gdk_pixbuf_get_from_drawable(NULL, npm, 0, L, T, 0, 0, W, H);
 	GdkPixbuf* tmp_pixbuf = gdk_pixbuf_copy(new_pixbuf);
 	int alpha = static_cast<int>(round(255*m_progress));
 	AM_DBG logger::get_logger()->debug(
 				  "gtk_transition_blitclass_fade::update(): "
 				  " ltwh=(%d,%d,%d,%d)",L,T,W,H);
-	gdk_pixbuf_composite(old_pixbuf, tmp_pixbuf, L,T,W,H,0,0,1,1,GDK_INTERP_BILINEAR, 255-alpha);
-	gdk_pixbuf_composite(new_pixbuf, tmp_pixbuf, L,T,W,H,0,0,1,1,GDK_INTERP_BILINEAR, alpha);
+	gdk_pixbuf_composite(old_pixbuf, tmp_pixbuf,0,0,W,H,0,0,1,1,GDK_INTERP_BILINEAR, 255-alpha);
+	gdk_pixbuf_composite(new_pixbuf, tmp_pixbuf,0,0,W,H,0,0,1,1,GDK_INTERP_BILINEAR, alpha);
 	GdkGC *gc = gdk_gc_new (opm);
-	gdk_draw_pixbuf(opm, gc, tmp_pixbuf, L, T, L, T, W, H, GDK_RGB_DITHER_NONE,0,0);	
+	gdk_draw_pixbuf(opm, gc, tmp_pixbuf, 0, 0, L, T, W, H, GDK_RGB_DITHER_NONE,0,0);	
 	g_object_unref (G_OBJECT (old_pixbuf));
 	g_object_unref (G_OBJECT (new_pixbuf));
 	g_object_unref (G_OBJECT (gc));
