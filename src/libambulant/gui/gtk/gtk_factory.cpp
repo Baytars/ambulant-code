@@ -326,10 +326,12 @@ ambulant_gtk_window::~ambulant_gtk_window()
 		g_object_unref(G_OBJECT(m_pixmap));
 		m_pixmap = NULL;
 	}
+/** m_oldpixmap not to be deleted, it points to either m_pixmap or m_tmppixmap
 	if (m_oldpixmap != NULL) {
 		g_object_unref(G_OBJECT(m_oldpixmap));
 		m_oldpixmap = NULL;
 	}
+**/
 	if (m_tmppixmap != NULL) {
 		g_object_unref(G_OBJECT(m_tmppixmap));
 		m_tmppixmap = NULL;
