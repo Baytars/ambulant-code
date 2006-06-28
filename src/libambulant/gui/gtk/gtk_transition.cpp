@@ -31,7 +31,7 @@
 #include <gtk-2.0/gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk-2.0/gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -193,7 +193,8 @@ gtk_transition_blitclass_r1r2r3r4::update()
 		Hnewdst = newdstrect_whole.height();
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_r1r2r3r4: (Lnewdst,Tnewdst,Wnewdst,Hnewdst)=(%d,%d,%d,%d)",Lnewdst,Tnewdst,Wnewdst,Hnewdst);
 	GdkGC *gc = gdk_gc_new (opm);
-	gdk_draw_pixmap(opm, gc, npm, Lnewdst, Tnewdst, Lnewsrc, Tnewsrc, Wnewsrc, Hnewsrc);
+	gdk_draw_pixmap(opm, gc, opm, Loldsrc, Toldsrc, Lolddst, Tolddst, Woldsrc, Hnewsrc);
+	gdk_draw_pixmap(opm, gc, npm, Lnewsrc, Tnewsrc, Lnewdst, Tnewdst, Wnewsrc, Hnewsrc);
 	g_object_unref (G_OBJECT (gc));
 	finalize_transition(m_outtrans, agw, m_dst);
 }
