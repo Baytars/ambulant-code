@@ -31,7 +31,7 @@
 #include <gtk-2.0/gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk-2.0/gdk-pixbuf-xlib/gdk-pixbuf-xlib.h>
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -52,7 +52,8 @@ setup_transition(bool outtrans, ambulant_gtk_window *agw, GdkPixmap** oldpxmp, G
 	if (outtrans) {
 		if (agw->m_tmppixmap == NULL) {
 			// make a copy
-			agw->m_tmppixmap = new GdkPixmap(*agw->get_ambulant_oldpixmap());
+			//agw->m_tmppixmap = new GdkPixmap(*agw->get_ambulant_oldpixmap());
+			agw->m_tmppixmap = agw->get_ambulant_oldpixmap();
 		}
 		*oldpxmp = agw->get_ambulant_surface();
 		*newpxmp = agw->m_tmppixmap;

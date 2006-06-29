@@ -332,10 +332,12 @@ ambulant_gtk_window::~ambulant_gtk_window()
 		m_oldpixmap = NULL;
 	}
 **/
+/** m_tmppixmap not to be deleted, it is not a copy anymore
 	if (m_tmppixmap != NULL) {
 		g_object_unref(G_OBJECT(m_tmppixmap));
 		m_tmppixmap = NULL;
 	}
+**/
 }
 
 void
