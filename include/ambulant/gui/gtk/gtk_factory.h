@@ -168,6 +168,11 @@ class ambulant_gtk_window : public common::gui_window {
 	void set_ambulant_surface(GdkPixmap* surf);
 	void delete_ambulant_surface();
 
+//#define DUMPPIXMAP
+#ifdef	DUMPPIXMAP
+	void dumpPixmap(GdkPixmap* gpm, std::string filename);
+#endif/*DUMPPIXMAP*/
+
 #ifdef USE_SMIL21
 	void startScreenTransition();
 	void endScreenTransition();

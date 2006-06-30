@@ -82,28 +82,41 @@ void gtk_C_callback_do_button_release_event(void *userdata, GdkEventButton *even
 }
 }
 
+#ifdef	DUMPPIXMAP
+/* test if there is something new to see */
+static GdkPixmap* oldImageP;
+static bool
+isEqualToPrevious(GdkPixmap* gpmP) {
+	return false;
+	//QImage img = gpmP->convertToImage();
+	//if (oldImageP != NULL && img == *oldImageP) {
+	//	AM_DBG lib::logger::get_logger()->debug("isEqualToPrevious: new image not different from old one");
+	//	return true;
+	//} else {
+	//	if (oldImageP != NULL) delete oldImageP;
+	//	oldImageP = new QImage(img);
+	//	return false;
+	//}
+}
 
-#ifdef DUMPPIXMAP
-// doesn't compile on Zaurus
-/**/
 /* dumpPixmap on file */
-void gui::gtk::dumpPixmap(GdkPixmap* qpm, std::string filename) {
-/**
-	GtkImage image;
-	if ( ! qpm) return;
-		gtk_image_set_from_pixmap (GTK_IMAGE (image), qpm, NULL);
-//QImage img = qpm->convertToImage();
-	if ( !
-		char buf[5]; isEqualToPrevious(qpm)) {
+void
+ambulant_gtk_window::dumpPixmap(GdkPixmap* gpm, std::string filename) {
+	if ( ! gpm) return;
+	GdkPixbuf* pixbuf = gdk_pixbuf_get_from_drawable(NULL, gpm, 0, 0, 0, 0, 0, -1, -1);
+//QImage img = gpm->convertToImage();
+	if (pixbuf && ! isEqualToPrevious(gpm)) {
+		char buf[5];
 		static int i;
 		sprintf(buf,"%04d",i++);
 		std::string newfile = buf + std::string(filename) +".png";
-		qpm->save(newfile, "PNG");
+		GError* error = NULL;
+		gdk_pixbuf_save(pixbuf, newfile.c_str(), "png", &error, NULL);
+		g_object_unref(G_OBJECT(pixbuf));
 		AM_DBG lib::logger::get_logger()->debug("dumpPixmap(%s)", newfile.c_str());
 	}
-**/
 }
-#endif
+#endif/*DUMPPIXMAP*/
 
 //
 // gtk_renderer_factory
@@ -411,8 +424,6 @@ ambulant_gtk_window::redraw(const lib::rect &r)
 
 	GError *error = NULL;
 	gint width; gint height;
-//	gsize buffer_size;
-//	gchar *buffer;
 
 	gdk_drawable_get_size(m_ambulant_widget->get_gtk_widget()->window, &width, &height);
 	
@@ -429,10 +440,9 @@ ambulant_gtk_window::redraw(const lib::rect &r)
 		g_error_free (error);
 	}
 	g_object_unref (G_OBJECT (pixbuf));
-//	m_ambulant_widget->set_screenshot(&buffer, &buffer_size);
-//	free(pixbuf);
-//	free(error);
-//XXXX	dumpPixmap(m_pixmap, "top"); //AM_DBG 
+#ifdef	DUMPPIXMAP
+	dumpPixmap(m_pixmap, "top");
+#endif/*DUMPPIXMAP*/
 }
 
 void
@@ -491,7 +501,7 @@ ambulant_gtk_window::set_ambulant_widget(gtk_ambulant_widget* gtkaw)
                 		width,
                           	height,
                           	-1);
-		lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_widget(0x%x); size (%i,%i)",(void *)gtkaw, width, height);
+		AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::set_ambulant_widget(0x%x); size (%i,%i)",(void *)gtkaw, width, height);
 		// User Interaction
 	}		
 //	}else{
@@ -570,11 +580,12 @@ ambulant_gtk_window::get_pixmap_from_screen(const lib::rect &r)
                           	r.width(),
                           	r.height(),
                           	-1);
-	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (m_ambulant_widget->get_gtk_widget()));
+//	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (m_ambulant_widget->get_gtk_widget()));
+	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (rv));
 
 	// draw the screen into m_pixmap
-	gdk_draw_drawable(m_pixmap,
-			gc, rv,
+	gdk_draw_drawable(GDK_DRAWABLE (rv),
+			gc, GDK_DRAWABLE (m_pixmap),
 			r.left(), r.top(),
 			r.left(), r.top(), 
 			r.width(), r.height());
@@ -606,22 +617,7 @@ ambulant_gtk_window::delete_ambulant_surface()
 	m_surface = NULL;
 }
 
-/* test if there is something new to see */
-static GdkPixmap* oldImageP;
-static bool isEqualToPrevious(GdkPixmap* qpmP) {
-	return false;
-	//QImage img = qpmP->convertToImage();
-	//if (oldImageP != NULL && img == *oldImageP) {
-	//	AM_DBG lib::logger::get_logger()->debug("isEqualToPrevious: new image not different from old one");
-	//	return true;
-	//} else {
-	//	if (oldImageP != NULL) delete oldImageP;
-	//	oldImageP = new QImage(img);
-	//	return false;
-	//}
-}
-
-// Transitions: it is not done yet for GTK
+// Transitions
   
 #ifdef USE_SMIL21
 
@@ -660,7 +656,6 @@ ambulant_gtk_window::_screenTransitionPreRedraw()
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPreRedraw()");
 	if (m_fullscreen_count == 0) return;
 	// XXX setup drawing to transition surface
-//	[[self getTransitionSurface] lockFocus];
 }
 
 void 
@@ -673,8 +668,10 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		// Take a snapshot of the screen and return.
 		AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPostRedraw: screen snapshot");
 		if (m_fullscreen_prev_pixmap) delete m_fullscreen_prev_pixmap;
-//		m_fullscreen_prev_pixmap = get_pixmap_from_screen(r); // XXX wrong
-//		dumpPixmap(m_fullscreen_prev_pixmap, "snap");
+		m_fullscreen_prev_pixmap = get_pixmap_from_screen(r); // XXX wrong
+#ifdef	DUMPPIXMAP
+		dumpPixmap(m_fullscreen_prev_pixmap, "snap");
+#endif/*DUMPPIXMAP*/
 		return;
 	}
 	if (m_fullscreen_old_pixmap == NULL) {
@@ -691,11 +688,21 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		GdkPixmap* new_src = get_ambulant_surface();
 		if ( ! new_src) new_src = new_ambulant_surface();
 //		bitBlt(m_surface, 0, 0, m_pixmap);
+		GdkGC *gc = gdk_gc_new (m_surface);
+		gdk_draw_pixmap(m_surface, gc,  m_pixmap, r.left(), r.top(), r.left(),  r.top(), r.width(),  r.height());
+		g_object_unref (G_OBJECT (gc));
 //		bitBlt(m_pixmap, 0, 0, m_fullscreen_old_pixmap);
-//		dumpPixmap(new_src, "fnew");
-//		dumpPixmap(m_pixmap, "fold");
+		GdkGC *gc2 = gdk_gc_new (m_pixmap);
+		gdk_draw_pixmap(m_pixmap, gc2,  m_fullscreen_old_pixmap, r.left(), r.top(), r.left(),  r.top(), r.width(),  r.height());
+		g_object_unref (G_OBJECT (gc2));
+#ifdef	DUMPPIXMAP
+		dumpPixmap(new_src, "fnew");
+		dumpPixmap(m_pixmap, "fold");
+#endif/*DUMPPIXMAP*/
 		m_fullscreen_engine->step(m_fullscreen_now);
-//		dumpPixmap(m_pixmap, "fres");
+#ifdef	DUMPPIXMAP
+		dumpPixmap(m_pixmap, "fres");
+#endif/*DUMPPIXMAP*/
 	}
 
 	if (m_fullscreen_count == 0) {
