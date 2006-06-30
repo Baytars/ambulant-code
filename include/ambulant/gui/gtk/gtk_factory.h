@@ -40,9 +40,13 @@ namespace gui {
 
 namespace gtk {
 
+#define DUMPPIXMAP
+#ifdef	DUMPPIXMAP
 /// Debug function that dumps a pixmap to a file. An incrementing
 /// count is appended to the filenname, and an extension added.
-void dumpPixmap(GdkPixmap *gtkpm, std::string filename);
+	void gdk_pixmap_dump(GdkPixmap* gpm, std::string filename);
+#endif/*DUMPPIXMAP*/
+	void gdk_pixmap_bitblt(GdkPixmap* dst, int dst_x, int dst_y, GdkPixmap* src, int src_x, int src_y, int width, int height);
 
 class gtk_ambulant_widget;
 
@@ -167,11 +171,6 @@ class ambulant_gtk_window : public common::gui_window {
 	void reset_ambulant_surface(void);
 	void set_ambulant_surface(GdkPixmap* surf);
 	void delete_ambulant_surface();
-
-//#define DUMPPIXMAP
-#ifdef	DUMPPIXMAP
-	void dumpPixmap(GdkPixmap* gpm, std::string filename);
-#endif/*DUMPPIXMAP*/
 
 #ifdef USE_SMIL21
 	void startScreenTransition();

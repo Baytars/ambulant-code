@@ -247,13 +247,12 @@ gtk_transition_blitclass_polylist::update()
 {
 
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_polylist::update(%f)", m_progress);
-	logger::get_logger()->debug("gtk_transition_blitclass_polylist: not yet tested");
 	ambulant_gtk_window *agw = (ambulant_gtk_window *)m_dst->get_gui_window();
 	GdkPixmap *npm, *opm;
 	const lib::point& dst_global_topleft = m_dst->get_global_topleft();
 	setup_transition(m_outtrans, agw, &opm, &npm);
 	GdkRegion* clip_region = gdk_region_new();
-	logger::get_logger()->debug("gtk_transition_blitclass_polylist: m_newpolygonlist.size()=%d", m_newpolygonlist.size());
+	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_polylist: m_newpolygonlist.size()=%d", m_newpolygonlist.size());
 	std::vector< std::vector<point> >::iterator partpolygon;
 	for (partpolygon=m_newpolygonlist.begin(); 
 	     partpolygon!=m_newpolygonlist.end(); partpolygon++) {
@@ -264,7 +263,7 @@ gtk_transition_blitclass_polylist::update()
 		GdkPoint* points = (GdkPoint*) malloc (n_points*sizeof(GdkPoint));
 		uint idx = 0;
 		std::vector<point>::iterator newpoint;
-		logger::get_logger()->debug("gtk_transition_blitclass_polylist: partpolygon.size()=%d", partpolygon->size());
+		AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_polylist: partpolygon.size()=%d", partpolygon->size());
 		for( newpoint=partpolygon->begin();
 		     newpoint != partpolygon->end(); newpoint++) {
 			point p = *newpoint + dst_global_topleft;

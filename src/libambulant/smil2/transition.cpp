@@ -245,7 +245,6 @@ void
 transition_engine_bowtiewipe::compute()
 {
 	lib::rect dstrect = m_dst->get_rect();
-	lib::logger::get_logger()->trace("transitiontype bowTieWipe being implemented");
 	int x0 = dstrect.left();
 	int y0 = dstrect.top();
 	int x1 = dstrect.right();

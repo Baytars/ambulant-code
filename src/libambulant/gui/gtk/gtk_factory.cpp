@@ -99,9 +99,9 @@ isEqualToPrevious(GdkPixmap* gpmP) {
 	//}
 }
 
-/* dumpPixmap on file */
+/* gdk_pixmap_dump on file */
 void
-ambulant_gtk_window::dumpPixmap(GdkPixmap* gpm, std::string filename) {
+gui::gtk::gdk_pixmap_dump(GdkPixmap* gpm, std::string filename) {
 	if ( ! gpm) return;
 	GdkPixbuf* pixbuf = gdk_pixbuf_get_from_drawable(NULL, gpm, 0, 0, 0, 0, 0, -1, -1);
 //QImage img = gpm->convertToImage();
@@ -113,11 +113,16 @@ ambulant_gtk_window::dumpPixmap(GdkPixmap* gpm, std::string filename) {
 		GError* error = NULL;
 		gdk_pixbuf_save(pixbuf, newfile.c_str(), "png", &error, NULL);
 		g_object_unref(G_OBJECT(pixbuf));
-		AM_DBG lib::logger::get_logger()->debug("dumpPixmap(%s)", newfile.c_str());
+		AM_DBG lib::logger::get_logger()->debug("gdk_pixmap_dump(%s)", newfile.c_str());
 	}
 }
 #endif/*DUMPPIXMAP*/
-
+void gui::gtk::gdk_pixmap_bitblt(GdkPixmap* dst, int dst_x, int dst_y, GdkPixmap* src, int src_x, int src_y, int width, int height) {
+	GdkGC *gc = gdk_gc_new (dst);
+	gdk_draw_pixmap(GDK_DRAWABLE(dst), gc, GDK_DRAWABLE(src), src_x, src_y,
+			dst_x, dst_y, width, height);
+	g_object_unref (G_OBJECT (gc));
+};
 //
 // gtk_renderer_factory
 //
@@ -413,15 +418,7 @@ ambulant_gtk_window::redraw(const lib::rect &r)
 #ifdef USE_SMIL21
 	_screenTransitionPostRedraw(r);
 #endif
-	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (m_pixmap));
-	gdk_draw_pixmap(m_ambulant_widget->get_gtk_widget()->window,
-			gc,
-			m_pixmap,
-			r.left(), r.top(), 
-			r.left(), r.top(),
-			r.width(), r.height());
-	g_object_unref (G_OBJECT (gc));	
-
+	gdk_pixmap_bitblt(m_ambulant_widget->get_gtk_widget()->window, r.left(), r.top(), m_pixmap, r.left(), r.top(), r.width(), r.height());
 	GError *error = NULL;
 	gint width; gint height;
 
@@ -441,7 +438,7 @@ ambulant_gtk_window::redraw(const lib::rect &r)
 	}
 	g_object_unref (G_OBJECT (pixbuf));
 #ifdef	DUMPPIXMAP
-	dumpPixmap(m_pixmap, "top");
+	gdk_pixmap_dump(m_pixmap, "top");
 #endif/*DUMPPIXMAP*/
 }
 
@@ -574,22 +571,8 @@ ambulant_gtk_window::get_ambulant_surface()
 GdkPixmap*
 ambulant_gtk_window::get_pixmap_from_screen(const lib::rect &r)
 {
-	// This function does not work
-
-	GdkPixmap *rv = gdk_pixmap_new(m_ambulant_widget->get_gtk_widget()->window,
-                          	r.width(),
-                          	r.height(),
-                          	-1);
-//	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (m_ambulant_widget->get_gtk_widget()));
-	GdkGC *gc = gdk_gc_new (GDK_DRAWABLE (rv));
-
-	// draw the screen into m_pixmap
-	gdk_draw_drawable(GDK_DRAWABLE (rv),
-			gc, GDK_DRAWABLE (m_pixmap),
-			r.left(), r.top(),
-			r.left(), r.top(), 
-			r.width(), r.height());
-	g_object_unref (G_OBJECT (gc));
+	GdkPixmap *rv = gdk_pixmap_new(m_ambulant_widget->get_gtk_widget()->window, r.width(), r.height(), -1);
+	gdk_pixmap_bitblt(rv, r.left(), r.top(), m_pixmap, r.left(), r.top(), r.width(), r.height());
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::get_pixmap_from_screen(0x%x) = 0x%x",(void *)this,(void *)m_pixmap);
 	return rv;
 }
@@ -670,7 +653,7 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		if (m_fullscreen_prev_pixmap) delete m_fullscreen_prev_pixmap;
 		m_fullscreen_prev_pixmap = get_pixmap_from_screen(r); // XXX wrong
 #ifdef	DUMPPIXMAP
-		dumpPixmap(m_fullscreen_prev_pixmap, "snap");
+		gdk_pixmap_dump(m_fullscreen_prev_pixmap, "snap");
 #endif/*DUMPPIXMAP*/
 		return;
 	}
@@ -687,21 +670,15 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		// Do the transition step
 		GdkPixmap* new_src = get_ambulant_surface();
 		if ( ! new_src) new_src = new_ambulant_surface();
-//		bitBlt(m_surface, 0, 0, m_pixmap);
-		GdkGC *gc = gdk_gc_new (m_surface);
-		gdk_draw_pixmap(m_surface, gc,  m_pixmap, r.left(), r.top(), r.left(),  r.top(), r.width(),  r.height());
-		g_object_unref (G_OBJECT (gc));
-//		bitBlt(m_pixmap, 0, 0, m_fullscreen_old_pixmap);
-		GdkGC *gc2 = gdk_gc_new (m_pixmap);
-		gdk_draw_pixmap(m_pixmap, gc2,  m_fullscreen_old_pixmap, r.left(), r.top(), r.left(),  r.top(), r.width(),  r.height());
-		g_object_unref (G_OBJECT (gc2));
+		gdk_pixmap_bitblt(m_surface, 0, 0, m_pixmap, r.left(), r.top(), r.width(), r.height());
+		gdk_pixmap_bitblt(m_pixmap, 0, 0, m_fullscreen_old_pixmap, r.left(), r.top(), r.width(), r.height());
 #ifdef	DUMPPIXMAP
-		dumpPixmap(new_src, "fnew");
-		dumpPixmap(m_pixmap, "fold");
+		gdk_pixmap_dump(new_src, "fnew");
+		gdk_pixmap_dump(m_pixmap, "fold");
 #endif/*DUMPPIXMAP*/
 		m_fullscreen_engine->step(m_fullscreen_now);
 #ifdef	DUMPPIXMAP
-		dumpPixmap(m_pixmap, "fres");
+		gdk_pixmap_dump(m_pixmap, "fres");
 #endif/*DUMPPIXMAP*/
 	}
 
