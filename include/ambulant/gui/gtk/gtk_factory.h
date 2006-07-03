@@ -40,7 +40,7 @@ namespace gui {
 
 namespace gtk {
 
-#define DUMPPIXMAP
+//#define DUMPPIXMAP
 #ifdef	DUMPPIXMAP
 /// Debug function that dumps a pixmap to a file. An incrementing
 /// count is appended to the filenname, and an extension added.
