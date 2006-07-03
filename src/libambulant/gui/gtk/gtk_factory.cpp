@@ -611,7 +611,7 @@ ambulant_gtk_window::startScreenTransition()
 	if (m_fullscreen_count)
 		logger::get_logger()->warn("ambulant_gtk_window::startScreenTransition():multiple Screen transitions in progress (m_fullscreen_count=%d)",m_fullscreen_count);
 	m_fullscreen_count++;
-	if (m_fullscreen_old_pixmap) delete m_fullscreen_old_pixmap;
+	if (m_fullscreen_old_pixmap) g_object_unref(G_OBJECT(m_fullscreen_old_pixmap));
 	m_fullscreen_old_pixmap = m_fullscreen_prev_pixmap;
 	m_fullscreen_prev_pixmap = NULL;
 }
@@ -650,7 +650,7 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 		// Neither in fullscreen transition nor wrapping one up.
 		// Take a snapshot of the screen and return.
 		AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPostRedraw: screen snapshot");
-		if (m_fullscreen_prev_pixmap) delete m_fullscreen_prev_pixmap;
+		if (m_fullscreen_prev_pixmap) g_object_unref(G_OBJECT(m_fullscreen_prev_pixmap));
 		m_fullscreen_prev_pixmap = get_pixmap_from_screen(r); // XXX wrong
 #ifdef	DUMPPIXMAP
 		gdk_pixmap_dump(m_fullscreen_prev_pixmap, "snap");
@@ -685,7 +685,7 @@ ambulant_gtk_window::_screenTransitionPostRedraw(const lib::rect &r)
 	if (m_fullscreen_count == 0) {
 		// Finishing a fullscreen transition.
 		AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::_screenTransitionPostRedraw: cleanup after transition done");
-		if (m_fullscreen_old_pixmap) delete m_fullscreen_old_pixmap;
+		if (m_fullscreen_old_pixmap) g_object_unref(G_OBJECT(m_fullscreen_old_pixmap));
 		m_fullscreen_old_pixmap = NULL;
 		m_fullscreen_engine = NULL;
 	}
