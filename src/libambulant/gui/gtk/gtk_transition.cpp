@@ -238,7 +238,8 @@ gtk_transition_blitclass_poly::update()
         	Wdst = newrect_whole.width(), Hdst = newrect_whole.height();
 	AM_DBG logger::get_logger()->debug("gtk_transition_blitclass_poly::update(): ltwh=(%d,%d,%d,%d)",Ldst,Tdst,Wdst,Hdst);
 	gdk_draw_pixmap(opm, gc, npm, Ldst, Tdst, Ldst, Tdst, Wdst, Hdst);
-	g_object_unref (G_OBJECT (gc)); // clears region as well
+	gdk_region_destroy(region);
+	g_object_unref (G_OBJECT (gc));
 	finalize_transition(m_outtrans, agw, m_dst);
 }
 
@@ -275,6 +276,7 @@ gtk_transition_blitclass_polylist::update()
 		GdkRegion* next_region = gdk_region_polygon(points, n_points, GDK_WINDING_RULE); 
 		free(points);
 		gdk_region_union (clip_region, next_region);
+		gdk_region_destroy(next_region);
 	}
 	rect newrect_whole =  m_dst->get_rect();
 	newrect_whole.translate(dst_global_topleft);
@@ -284,7 +286,8 @@ gtk_transition_blitclass_polylist::update()
 	GdkGC *gc = gdk_gc_new (opm);
 	gdk_gc_set_clip_region(gc, clip_region);
 	gdk_draw_pixmap(opm, gc, npm, Ldst, Tdst, Ldst, Tdst, Wdst, Hdst);
-	g_object_unref (G_OBJECT (gc)); // clears clip_region as well
+	gdk_region_destroy(clip_region);
+	g_object_unref (G_OBJECT (gc));
 	finalize_transition(m_outtrans, agw, m_dst);
 }
 
