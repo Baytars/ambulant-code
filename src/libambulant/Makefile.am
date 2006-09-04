@@ -181,6 +181,21 @@ nokia770_includes=
 toolkit_nokia770_libraries=
 endif # WITH_NOKIA770
 
+if WITH_OSSO_MEDIA_SERVER
+toolkit_osso_libraries = libambulant_osso.la
+
+libambulant_osso_la_LDFLAGS=-losso -ldbus-glib-1 -ldbus-1 -lglib-2.0
+osso_includes = -DWITH_OSSO_MEDIA_SERVER \
+		 $(OSSO_MEDIA_SERVER_CFLAGS)
+
+libambulant_osso_la_SOURCES = 	 	\
+	        gui/osso/osso_media_renderer.cpp	\
+	        gui/osso/osso_media_renderer_factory.cpp
+
+else
+osso_includes=
+toolkit_osso_libraries=
+endif
 
 INCLUDES = \
 	-I$(top_builddir)/include \
@@ -191,6 +206,7 @@ INCLUDES = \
 	$(gstreamer_includes) \
 	$(gtkincludes) \
 	$(nokia770_includes) \
+	$(osso_includes) \
 	$(artsincludes) \
 	$(sdlincludes) \
 	$(ffmpegincludes) \
@@ -206,6 +222,7 @@ lib_LTLIBRARIES = \
 	$(toolkit_arts_libraries) \
 	$(toolkit_sdl_libraries) \
 	$(toolkit_nokia770_libraries) \
+	$(toolkit_osso_libraries) \
 	$(toolkit_ffmpeg_libraries) \
 	$(toolkit_live_libraries)
 
@@ -313,6 +330,7 @@ EXTRA_DIST= \
 	gui/dx \
 	gui/qt \
 	gui/gstreamer \
+	gui/osso \
 	gui/gtk \
 	lib/win32
 

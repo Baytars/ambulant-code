@@ -263,10 +263,10 @@ gstreamer_audio_renderer::_stop()
 {
 	AM_DBG lib::logger::get_logger()->debug("gstreamer_audio_renderer::stop(0x%x)",(void*)this);
 	if (m_player) {
+		m_is_playing = false;
 		m_player->stop_player();
 		m_player = NULL;
 	}
-	_stopped();
 }
 
 void

@@ -23,6 +23,9 @@
 #ifdef WITH_GSTREAMER
 #include "ambulant/gui/gstreamer/gstreamer_renderer_factory.h"
 #endif
+#ifdef WITH_OSSO_MEDIA_SERVER
+#include "ambulant/gui/osso/osso_media_renderer_factory.h"
+#endif
 #ifdef WITH_SDL
 #include "ambulant/gui/SDL/sdl_factory.h"
 #endif
@@ -145,6 +148,12 @@ gtk_mainloop::init_playable_factory()
 {
 	common::global_playable_factory *pf = common::get_global_playable_factory();
 	set_playable_factory(pf);
+
+#ifdef WITH_OSSO_MEDIA_SERVER
+	AM_DBG logger::get_logger()->debug("add factory for Osso_Media_Server");
+	pf->add_factory(gui::osso::create_osso_media_renderer_factory(this));
+	AM_DBG logger::get_logger()->debug("add factory for Osso_Media_Server done");
+#endif
 
 #ifdef WITH_GSTREAMER
 	AM_DBG logger::get_logger()->debug("add factory for GStreamer");
