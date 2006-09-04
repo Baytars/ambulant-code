@@ -559,6 +559,14 @@ net::url::guesstype() const
 		return "audio/mpeg";
 	if (ext == ".wav" || ext == ".WAV")
 		return "audio/wav";
+	if (ext == ".mpe" || ext == ".MPE")
+		return "video/mpeg";
+	if (ext == ".mpeg" || ext == ".MPEG")
+		return "video/mpeg";
+	if (ext == ".mpg" || ext == ".MPG")
+		return "video/mpeg";
+	if (ext == ".mp4" || ext == ".MP4")
+		return "video/mpeg";
 	return "";
 }
 

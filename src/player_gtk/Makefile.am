@@ -108,6 +108,17 @@ extra_nokia770_DEFINES=
 extra_nokia770_LDADD=
 extra_nokia770_ldflags=
 endif # WITH_NOKIA770
+#------------------------------------------------------
+if WITH_OSSO_MEDIA_SERVER
+extra_osso_media_server_LDADD=$(top_builddir)/src/libambulant/.libs/libambulant_osso.a
+extra_osso_media_server_CPPFLAGS=-DWITH_OSSO_MEDIA_SERVER
+
+
+extra_osso_media_server_ldflags=`pkg-config --libs libosso`
+else
+extra_osso_media_server_ldflags=
+extra_osso_media_server_CFLAGS=
+endif # WITH_OSSO_MEDIA_SERVER
 
 #------------------------------------------------------
 #------------------------------------------------------
@@ -128,6 +139,7 @@ AmbulantPlayer_gtk_SOURCES =					\
 LDADD = $(top_builddir)/src/libambulant/.libs/libambulant_gtk.a	\
 	$(extra_arts_LDADD) \
 	$(extra_gstreamer_LDADD) \
+	$(extra_osso_media_server_LDADD) \
 	$(extra_sdl_LDADD) \
 	$(extra_ffmpeg_LDADD) \
 	$(extra_xerces_LDADD) \
@@ -140,6 +152,7 @@ LDADD = $(top_builddir)/src/libambulant/.libs/libambulant_gtk.a	\
 
 AM_LDFLAGS=$(extra_arts_ldflags) \
 	   $(extra_gstreamer_ldflags) \
+	   $(extra_osso_media_server_ldflags) \
 	   $(extra_sdl_ldflags) \
 	   $(extra_ffmpeg_ldflags) \
 	   $(extra_nokia770_ldflags) \
@@ -148,6 +161,7 @@ AM_LDFLAGS=$(extra_arts_ldflags) \
  
 AM_CPPFLAGS = \
 		$(extra_gstreamer_CPPFLAGS) \
+		$(extra_osso_media_server_CPPFLAGS) \
 		-DAMBULANT_DATADIR=\"$(pkgdatadir)\" \
 		$(extra_arts_DEFINES) \
 		$(extra_sdl_DEFINES) \

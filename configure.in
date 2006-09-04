@@ -65,6 +65,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 	include/ambulant/gui/arts/Makefile
 	include/ambulant/gui/SDL/Makefile
 	include/ambulant/gui/gstreamer/Makefile
+	include/ambulant/gui/osso/Makefile
 	third_party_packages/Makefile
 	Documentation/Makefile
 	Extras/Makefile])
@@ -550,6 +551,32 @@ AM_CONDITIONAL(WITH_GSTREAMER, test x$test_gstreamer = xtrue)
 AC_SUBST(GSTREAMER_PREFIX)
 AC_MSG_RESULT($test_gstreamer)
 
+dnl Testing for osso-media-server
+dnl ====================================================================
+
+test_osso_media_server=false
+AC_MSG_CHECKING(for osso-media-server audio/video facility)
+AC_ARG_WITH(osso-media-server,
+     [  --with-osso-media-server		Enable/disable osso-media-server support],
+     [if test "x$withval" = "xyes"; then
+		test_osso_media_server=true	
+      fi
+     ])
+if test "x$test_osso_media_server" = "xtrue"; then
+dnl	PKG_CHECK_MODULES(GTK,[gtk+-2.0 >= 2.6.0], test_osso_media_server=true, test_osso_media_server=false)
+	if test "x$test_nokia770" = "xfalse"; then
+	   AC_MSG_ERROR(--with-osso-media-server requires --with-nokia770);
+	fi
+	PKG_CHECK_MODULES(OSSO_MEDIA_SERVER, libosso >= 1.8, test_osso_media_server=true, test_osso_media_server=false)
+	AC_SUBST(OSSO_MEDIA_SERVER_LIBS)
+	AC_SUBST(OSSO_MEDIA_SERVER_CFLAGS)
+
+ fi
+
+AM_CONDITIONAL(WITH_OSSO_MEDIA_SERVER, test x$test_osso_media_server = xtrue)
+AC_SUBST(OSSO_MEDIA_SERVER_PREFIX)
+AC_MSG_RESULT($test_osso_media_server)
+
 #
 # Test for arts 
 #
@@ -981,6 +1008,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 	Build with GTK:			${test_gtk}
 	Build with gstreamer:		${test_gstreamer}
 	Build with NOKIA770:		${test_nokia770}
+	Build with osso-media-server:	${test_osso_media_server}
 	Build with ARTS support:	${test_arts}
 	Build with live555.com RTSP:	${test_live}
 	Build with Python support:     ${with_python}
