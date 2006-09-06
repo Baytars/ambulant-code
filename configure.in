@@ -77,6 +77,36 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 with_frontend=false
 
 #
+# Do we want MacOSX universal (ppc/intel) binary support?
+#
+AC_MSG_CHECKING(for --with-universalsdk)
+AC_ARG_WITH(universalsdk,
+    AC_HELP_STRING([--with-universalsdk], [Build MacOSX universal binary]),
+[
+    case $withval in
+    yes)
+        withval=/Developer/SDKs/MacOSX10.4u.sdk
+        ;;
+    esac
+    case $withval in
+    no)
+        with_universalsdk=false
+        ;;
+    *)
+        with_universalsdk=true
+        CFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${CFLAGS}"
+        CXXFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${CXXFLAGS}"
+        OBJCFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${OBJCFLAGS}"
+        LDFLAGS="-arch ppc -arch i386 -isysroot ${withval} -L/usr/local/lib ${LDFLAGS}"
+        ;;
+    esac
+],
+[
+    with_universalsdk=false
+])
+AC_MSG_RESULT($with_universalsdk)
+
+#
 #
 # Do we have pkg-config?
 #
@@ -983,8 +1013,9 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 	Build with NOKIA770:		${test_nokia770}
 	Build with ARTS support:	${test_arts}
 	Build with live555.com RTSP:	${test_live}
-	Build with Python support:     ${with_python}
-	Build with Python plugin:      ${with_python_plugin}
+	Build with Python support:      ${with_python}
+	Build with Python plugin:       ${with_python_plugin}
+	Build MacOSX universal binary:  ${with_universalsdk}
      "
 
 if test "x$with_frontend" = "x$false"; then
