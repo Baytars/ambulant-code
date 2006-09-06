@@ -185,6 +185,10 @@ Creating the MacOSX installer
 - Use Applications->Utilities->Disk Utilities to create a .dmg
   disk image from this folder (read only, compressed). Make sure the
   version number is part of the disk image name.
+  
+XXXX Unfinished notes on doing a MacOSX universal build:
+- configure as above, but add --with-universalsdk --disable-dependency-tracking.
+
 
 Creating the Windows desktop installer
 ======================================
