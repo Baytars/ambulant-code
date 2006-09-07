@@ -163,6 +163,9 @@ sdl:
 	  pathname *of the source directory pathname*.
 	- You may need to use "./configure --disable-cdrom" to build SDL
 	  if you've installed xcode 2.2.
+	- SDL always seems to build the dynamic libraries. IF YOU WANT TO
+	  CREATE A SELFCONTAINED INSTALLER YOU MUST REMOVE THESE BEFORE BUILDING,
+	  use "sudo rm /usr/local/bin/libSDL*dylib".
 	- If you want to build a universal (ppc/intel) Ambulant binary you must
 	  build SDL in a different way. The script sdl-osx-fatbuild.sh in this
 	  directory will do the right thing.
@@ -197,6 +200,11 @@ live555.com:
 gettext:
 	On Linux you will usually have gettext pre-installed, on Mac OS X probably
 	not. Download from <htttp://www.gnu.org> and install in the normal way.
+	
+	Except, of course, if you want to build a universal MacOSX installer.
+	Then you need to have to run configure as follows:
+	  CFLAGS="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
+	     configure
 	
 	Alternatively, configure Ambulant with --disable-nls to disable libintl
 	support (and, therefore, localization).
