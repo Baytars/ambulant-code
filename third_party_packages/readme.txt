@@ -51,7 +51,7 @@ Unix (Linux, MacOSX)
 	
 expat-unix:	
 	Build from source. Download the expat source via
-	<http://expat.sourceforge.net> and extract into expat-1.95.7 in this
+	<http://expat.sourceforge.net> and extract into expat-2.0.0 in this
 	directory (.../ambulant/third_party_packages).
 	Then do the following:
 		$ tppdir=`pwd`  # or setenv tppdir `pwd` if you use tcsh
@@ -60,14 +60,10 @@ expat-unix:
 		$ make
 		$ make install
 
-	Note that you really want expat-1.95.7, not 1.95.6: the older
-	version has a bug in the expat.h header file that causes compile
-	time errors for Ambulant.
-
-	Note that if you want to install expat 1.95.7 somewhere else (or you
-	have already installed it) you should specify the location to the
-	--with-expat option on the main ambulant configure: it will normally
-	only look in third_party_packages/expat-unix.
+    If you want to do a MacOSX universal build you need to build
+    expat universally too, by making sure the following environment
+    variable is set when running configure:
+        CFLAGS="-arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 
 xerces-unix:
 	Download xerces-C++ Version 2.7.0 Source Release from
@@ -99,7 +95,15 @@ xerces-unix:
 	To run Ambulantplayer make sure that you have set LD_LIBRARY_PATH to
 	the directory containing libxerces-c.so.
 	
-	XXXX Need to add universal MacOSX instructions.
+	If you want to build a MacOSX universal binary of Ambulant: building
+	Xerces universally is a royal pain, due to the automated build
+	process. This seems to work:
+	- call runConfigure as:
+	   ./runConfigure -p macosx \
+	       -z -arch -z ppc -z -arch -z i386 -z -isysroot \
+	       -z /Developer/SDKs/MacOSX10.4u.sdk -n native
+	- then call make as:
+	   make LDFLAGS="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 
 ffmpeg:
     The best option is to use the the fairly recent frozen cvs-ffmpeg
@@ -139,11 +143,14 @@ ffmpeg:
 	
 	If you want to do a MacOSX universal build of Ambulant you also need
 	to build ffmpeg universally. This is a bit tricky, but there's a script
-	here to help you: ffmpeg-osx-fatbuild.sh. Create an empty directory
-	"ffmpeg-universal". In there, run ffmpeg-osx-fatbuild.sh supplying the full
-	pathname of your ffmpeg sources. This configures, builds and merges the
-	fat ffmpeg libraries. Now pass this folder to the Ambulant configure,
-	with "--with-ffmpeg=third_party_packages/ffmpeg-universal".
+	here to help you: ffmpeg-osx-fatbuild.sh. 
+	- Create an empty directory "ffmpeg-universal".
+	- Make sure the ffmpeg source directory is "make clean"ed.
+	- In fmpeg-universal, run ffmpeg-osx-fatbuild.sh supplying the full
+	  pathname of your ffmpeg sources. This configures, builds and merges the
+	  fat ffmpeg libraries.
+	- Now pass this folder to the Ambulant configure, with 
+	  "--with-ffmpeg=third_party_packages/ffmpeg-universal".
 	
 sdl:
 	Ambulant has been tested with sdl 1.2.5 thru 1.2.11. You find this at

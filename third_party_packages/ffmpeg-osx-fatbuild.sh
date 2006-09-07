@@ -1,14 +1,59 @@
 #!/bin/sh
 #
-srcdir=`cd ../ffmpeg-svn ; pwd`
+srcdir=$1
+case x$srcdir in
+    x)
+        echo Usage: $0 ffmpeg-src-dir '[all|mkdirs|mklinks|configure|clean|build|merge|install] ...'
+        exit
+        ;;
+esac
 
-mkdirs=true
-mklinks=true
-configure=true
-clean=true
-build=true
-merge=true
-install=true
+mkdirs=false
+mklinks=false
+configure=false
+clean=false
+build=false
+merge=false
+install=false
+shift
+for i in $*; do
+    case $i in
+        all)
+            mkdirs=true
+            mklinks=true
+            configure=true
+            clean=true
+            build=true
+            merge=true
+            install=true
+            ;;
+        mkdirs)
+            mkdirs=true
+            ;;
+        mklinks)
+            mklinks=true
+            ;;
+        configure)
+           configure=true
+            ;;
+        clean)
+            clean=true
+            ;;
+        build)
+            build=true
+            ;;
+        merge)
+            merge=true
+            ;;
+        install)
+            install=true
+            ;;
+        *)
+            echo Usage: $0 ffmpeg-src-dir '[all|mkdirs|mklinks|configure|clean|build|merge|install] ...'
+            exit
+            ;;
+    esac
+done
 
 if $mkdirs; then
     echo $0: mkdirs
@@ -33,7 +78,7 @@ if $configure; then
         $srcdir/configure \
             --extra-cflags="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386" \
             --extra-ldflags="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386" \
-            --cpu=i386 --enable-shared
+            --cpu=i386
     )
     echo $0: configure ppc
     (

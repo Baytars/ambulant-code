@@ -97,7 +97,7 @@ AC_ARG_WITH(universalsdk,
         CFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${CFLAGS}"
         CXXFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${CXXFLAGS}"
         OBJCFLAGS="-arch ppc -arch i386 -isysroot ${withval} -I/usr/local/include ${OBJCFLAGS}"
-        LDFLAGS="-arch ppc -arch i386 -isysroot ${withval} -L/usr/local/lib ${LDFLAGS}"
+        #LDFLAGS="-arch ppc -arch i386 -isysroot ${withval} -L/usr/local/lib ${LDFLAGS}"
         ;;
     esac
 ],
@@ -356,7 +356,7 @@ AC_MSG_RESULT($cocoa)
 # http://mail.gnu.org/archive/html/automake/2003-04/msg00105.html
 #
 _AM_DEPENDENCIES([OBJC])
-OBJCFLAGS=-ObjC++
+OBJCFLAGS="-ObjC++ ${OBJCFLAGS}"
 AC_SUBST(OBJCFLAGS)
 
 OBJC=$CC
@@ -669,13 +669,13 @@ if test "x$test_ffmpeg" = "xmanual"; then
 	if test -f ${withval}/libavcodec/avcodec.h; 	then
 			withvalabs=`cd ${withval}; pwd`
 			FFMPEG_CFLAGS="-I${withvalabs}/libavcodec -I${withvalabs}/libavformat"
-			FFMPEG_LIBS="${withvalabs}/libavformat/libavformat.a ${withvalabs}/libavcodec/libavcodec.a"
+			FFMPEG_LIBS="-L${withvalabs}/libavformat -lavformat -L${withvalabs}/libavcodec -lavcodec"
 			dnl
 			dnl See whether this ffmpeg version has libavutil
 			dnl
 			if test -f ${withvalabs}/libavutil/avutil.h; then
 			    FFMPEG_CFLAGS="${FFMPEG_CFLAGS} -I${withvalabs}/libavutil"
-			    FFMPEG_LIBS="${FFMPEG_LIBS} ${withvalabs}/libavutil/libavutil.a"
+			    FFMPEG_LIBS="${FFMPEG_LIBS} -L${withvalabs}/libavutil -lavutil"
 			fi
 			test_ffmpeg=true
 			ffmpeg_path="$withvalabs"
