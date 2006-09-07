@@ -98,6 +98,8 @@ xerces-unix:
 
 	To run Ambulantplayer make sure that you have set LD_LIBRARY_PATH to
 	the directory containing libxerces-c.so.
+	
+	XXXX Need to add universal MacOSX instructions.
 
 ffmpeg:
     The best option is to use the the fairly recent frozen cvs-ffmpeg
@@ -135,8 +137,16 @@ ffmpeg:
 	it will result in an ambulant player that can play no audio (Mac OS
 	X) or no audio and video (Linux).
 	
+	If you want to do a MacOSX universal build of Ambulant you also need
+	to build ffmpeg universally. This is a bit tricky, but there's a script
+	here to help you: ffmpeg-osx-fatbuild.sh. Create an empty directory
+	"ffmpeg-universal". In there, run ffmpeg-osx-fatbuild.sh supplying the full
+	pathname of your ffmpeg sources. This configures, builds and merges the
+	fat ffmpeg libraries. Now pass this folder to the Ambulant configure,
+	with "--with-ffmpeg=third_party_packages/ffmpeg-universal".
+	
 sdl:
-	Ambulant has been tested with sdl 1.2.5 thru 1.2.9. You find this at
+	Ambulant has been tested with sdl 1.2.5 thru 1.2.11. You find this at
 	<http://www.libsdl.org>. Build and install normally, and make sure
 	the sdl-config utility is on your $PATH when running the configure
 	for Ambulant.
@@ -146,6 +156,9 @@ sdl:
 	  pathname *of the source directory pathname*.
 	- You may need to use "./configure --disable-cdrom" to build SDL
 	  if you've installed xcode 2.2.
+	- If you want to build a universal (ppc/intel) Ambulant binary you must
+	  build SDL in a different way. The script sdl-osx-fatbuild.sh in this
+	  directory will do the right thing.
 	
 arts:
 	Linux only.
@@ -165,6 +178,10 @@ live555.com:
 			$ make
 	For MacOSX you need to supply "macosx" or "macosx-before-version-10.4"
 	to genMakefiles in stead of "linux".
+	
+	If you want to create a MacOSX universal installer you need some patches
+	to live first. Extract live-osx-fatbuild-patches.tar into the live
+	source directory, do "./genMakefiles macosxfat" and make, and you're all set.
 	
 	Live does not have an install procedure. If you have installed live
 	in .../ambulant/third_party_packages/live configure will detect
