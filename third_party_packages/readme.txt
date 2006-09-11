@@ -60,11 +60,6 @@ expat-unix:
 		$ make
 		$ make install
 
-    If you want to do a MacOSX universal build you need to build
-    expat universally too, by making sure the following environment
-    variable is set when running configure:
-        CFLAGS="-arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
-
 xerces-unix:
 	Download xerces-C++ Version 2.7.0 Source Release from
 	<http://xerces.apache.org> and extract xerces-c-src_2_7_0 and extract
@@ -95,16 +90,6 @@ xerces-unix:
 	To run Ambulantplayer make sure that you have set LD_LIBRARY_PATH to
 	the directory containing libxerces-c.so.
 	
-	If you want to build a MacOSX universal binary of Ambulant: building
-	Xerces universally is a royal pain, due to the automated build
-	process. This seems to work:
-	- call runConfigure as:
-	   ./runConfigure -p macosx \
-	       -z -arch -z ppc -z -arch -z i386 -z -isysroot \
-	       -z /Developer/SDKs/MacOSX10.4u.sdk -n native
-	- then call make as:
-	   make LDFLAGS="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
-
 ffmpeg:
     The best option is to use the the fairly recent frozen cvs-ffmpeg
     that was created especially for Ambulant. You find this on the
@@ -141,17 +126,6 @@ ffmpeg:
 	it will result in an ambulant player that can play no audio (Mac OS
 	X) or no audio and video (Linux).
 	
-	If you want to do a MacOSX universal build of Ambulant you also need
-	to build ffmpeg universally. This is a bit tricky, but there's a script
-	here to help you: ffmpeg-osx-fatbuild.sh. 
-	- Create an empty directory "ffmpeg-universal".
-	- Make sure the ffmpeg source directory is "make clean"ed.
-	- In fmpeg-universal, run ffmpeg-osx-fatbuild.sh supplying the full
-	  pathname of your ffmpeg sources. This configures, builds and merges the
-	  fat ffmpeg libraries.
-	- Now pass this folder to the Ambulant configure, with 
-	  "--with-ffmpeg=third_party_packages/ffmpeg-universal".
-	
 sdl:
 	Ambulant has been tested with sdl 1.2.5 thru 1.2.11. You find this at
 	<http://www.libsdl.org>. Build and install normally, and make sure
@@ -166,9 +140,6 @@ sdl:
 	- SDL always seems to build the dynamic libraries. IF YOU WANT TO
 	  CREATE A SELFCONTAINED INSTALLER YOU MUST REMOVE THESE BEFORE BUILDING,
 	  use "sudo rm /usr/local/bin/libSDL*dylib".
-	- If you want to build a universal (ppc/intel) Ambulant binary you must
-	  build SDL in a different way. The script sdl-osx-fatbuild.sh in this
-	  directory will do the right thing.
 	
 arts:
 	Linux only.
@@ -189,10 +160,6 @@ live555.com:
 	For MacOSX you need to supply "macosx" or "macosx-before-version-10.4"
 	to genMakefiles in stead of "linux".
 	
-	If you want to create a MacOSX universal installer you need some patches
-	to live first. Extract live-osx-fatbuild-patches.tar into the live
-	source directory, do "./genMakefiles macosxfat" and make, and you're all set.
-	
 	Live does not have an install procedure. If you have installed live
 	in .../ambulant/third_party_packages/live configure will detect
 	live.com.
@@ -200,11 +167,6 @@ live555.com:
 gettext:
 	On Linux you will usually have gettext pre-installed, on Mac OS X probably
 	not. Download from <htttp://www.gnu.org> and install in the normal way.
-	
-	Except, of course, if you want to build a universal MacOSX installer.
-	Then you need to have to run configure as follows:
-	  CFLAGS="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
-	     configure
 	
 	Alternatively, configure Ambulant with --disable-nls to disable libintl
 	support (and, therefore, localization).
