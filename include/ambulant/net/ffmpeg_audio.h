@@ -41,6 +41,7 @@
 #include "ambulant/net/databuffer.h"
 //#include "ambulant/net/posix_datasource.h"
 #include "ambulant/net/datasource.h"
+#include "ambulant/net/demux_datasource.h"
 
 #include "avcodec.h"
 #include "avformat.h"
@@ -128,7 +129,7 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
     AVCodecContext *m_con;
 	audio_format m_fmt;
     lib::event_processor *m_event_processor;
-  	audio_datasource* m_src;
+  	demux_audio_datasource* m_src;
   	timestamp_t m_elapsed;
 	bool m_is_audio_ds;
 	

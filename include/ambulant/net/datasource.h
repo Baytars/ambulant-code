@@ -194,6 +194,8 @@ class audio_format_choices {
 	std::set<std::string> m_named_formats;
 };
 
+typedef std::pair<uint8_t*,int> audio_packet;
+
 /// The interface to an object that supplies data to a consumer.
 /// The consumer calls start() whenever it wants
 /// data. This call returns immedeately and later the datasource arranges
@@ -246,6 +248,8 @@ class audio_datasource : virtual public datasource {
 	virtual timestamp_t get_start_time() = 0;
 	/// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
+
+	audio_packet get_packet() {  return audio_packet(NULL,0); }
 };
 
 /// Implementation of audio_datasource that reads raw audio data from a datasource.
@@ -507,7 +511,7 @@ class demux_datasink {
     
 	/// Data push call: consume data with given size and timestamp. Must copy data
 	/// before returning.
-    virtual void data_avail(timestamp_t pts, const uint8_t *data, int size) = 0;
+    virtual void data_avail(timestamp_t pts, uint8_t *data, int size) = 0;
 	
 	/// Return true if no more data should be pushed right now.
 	virtual bool buffer_full() = 0;
