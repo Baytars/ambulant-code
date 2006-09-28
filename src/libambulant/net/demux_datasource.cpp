@@ -28,6 +28,8 @@
 // Minimum delay
 #define MIN_EVENT_DELAY 1
 
+// How many audio packets we would like to buffer at most
+#define MAX_AUDIO_PACKETS 1000
 // How many video frames we would like to buffer at most
 #define MAX_VIDEO_FRAMES 300
 
@@ -60,7 +62,6 @@ demux_audio_datasource::new_demux_audio_datasource(
 	} 
 
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::new_demux_audio_datasource() looking for the right codec");
-	
 	return new demux_audio_datasource(url, thread, stream_index);
 }
 
@@ -118,9 +119,10 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 		m_client_callback = NULL;
 		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::start(): m_client_callback already set!");
 	}
-	if (m_buffer.buffer_not_empty() || _end_of_file() ) {
-		// We have data (or EOF) available. Don't bother starting up our source again, in stead
-		// immedeately signal our client again
+	if (m_packets.size() > 0 || _end_of_file() ) {
+		// We have data (or EOF) available. Don't bother
+		// starting up our source again.
+		// Instead, immedeately signal our client again
 		if (callbackk) {
 			assert(evp);
 			AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::start: trigger client callback");
@@ -130,22 +132,21 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 		}
 	} else {
-		// We have no data available. Start our source, and in our data available callback we
-		// will signal the client.
+		// We have no data available. Start our source, and in
+		// our data available callback we will signal the client.
 		m_client_callback = callbackk;
 		m_event_processor = evp;
 	}
 	m_lock.leave();
 }
- 
+
 void 
 demux_audio_datasource::readdone(int len)
 {
-	m_lock.enter();
-	m_buffer.readdone(len);
+// Nothing to do
+//	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.readdone : done with %d bytes", len);
-//	restart_input();
-	m_lock.leave();
+//	m_lock.leave();
 }
 
 void 
@@ -171,27 +172,21 @@ demux_audio_datasource::read_ahead(timestamp_t time)
 
 
 void 
-demux_audio_datasource::data_avail(timestamp_t pts, const uint8_t *inbuf, int sz)
+demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *data, int size)
 {
 	// XXX timestamp is ignored, for now
 	m_lock.enter();
-	m_src_end_of_file = (sz == 0);
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", sz, pts);
-	if(sz && !m_buffer.buffer_full()){
-		uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(sz);
-		if (outbuf) {
-			memcpy(outbuf, inbuf, sz);
-			m_buffer.pushdata(sz);
-			// XXX m_src->readdone(sz);
-		} else {
-			lib::logger::get_logger()->debug("Internal error: demux_audio_datasource::data_avail: no room in output buffer");
-			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
-			m_buffer.pushdata(0);
-		}
+	m_src_end_of_file = (size == 0);
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", size, data);
+	if(size > 0){
+	//KB XXX copy data needed ?
+		uint8_t* copy = (uint8_t*) malloc(size);
+		memcpy(copy,data,size);
+		m_packets.push(audio_packet(copy,size));
 	}
 
-	if ( m_client_callback && (m_buffer.buffer_not_empty() || m_src_end_of_file ) ) {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), m_src_end_of_file);
+	if ( m_client_callback && (m_packets.size() > 0 || m_src_end_of_file ) ) {
+		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): calling client callback (%d, %d)", m_packets.size(), m_src_end_of_file);
 		assert(m_event_processor);
 		m_event_processor->add_event(m_client_callback, MIN_EVENT_DELAY, ambulant::lib::ep_med);
 		m_client_callback = NULL;
@@ -216,7 +211,7 @@ bool
 demux_audio_datasource::_end_of_file()
 {
 	// private method - no need to lock
-	if (m_buffer.buffer_not_empty()) return false;
+	if (m_packets.size() > 0) return false;
 	return m_src_end_of_file;
 }
 
@@ -224,25 +219,44 @@ bool
 demux_audio_datasource::buffer_full()
 {
 	m_lock.enter();
-	bool rv = m_buffer.buffer_full();
+	bool rv = m_packets.size() > MAX_AUDIO_PACKETS;
 	m_lock.leave();
 	return rv;
 }	
 
+audio_packet
+demux_audio_datasource::get_packet()
+{
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::get_packet(): obsolete function called");
+	audio_packet rv(NULL, 0);
+	m_lock.enter();
+	if (m_packets.size() > 0) {
+		rv = m_packets.front();
+		m_packets.pop();
+	}
+	m_lock.leave();
+	return rv;
+}
+
 char* 
 demux_audio_datasource::get_read_ptr()
 {
+	lib::logger::get_logger()->fatal("demux_audio_datasource::get_read_ptr(): obsolete function called");
+/*JNK
 	m_lock.enter();
 	char *rv = m_buffer.get_read_ptr();
 	m_lock.leave();
 	return rv;
+JNK*/
+	abort();
+	return NULL;
 }
 
 int 
 demux_audio_datasource::size() const
 {
 	const_cast <demux_audio_datasource*>(this)->m_lock.enter();
-	int rv = m_buffer.size();
+	int rv = m_packets.size();
 	const_cast <demux_audio_datasource*>(this)->m_lock.leave();
 	return rv;
 }	
@@ -456,7 +470,7 @@ write_data(long long int frame_nr, char* data, int sz)
 
 
 void 
-demux_video_datasource::data_avail(timestamp_t pts, const uint8_t *inbuf, int sz)
+demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
 {
 	m_lock.enter();
 
