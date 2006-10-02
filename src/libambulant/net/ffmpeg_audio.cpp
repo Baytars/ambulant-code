@@ -131,9 +131,9 @@ ffmpeg_audio_datasource_factory::new_audio_datasource(const net::url& url, const
 	// XXXX This code should become generalized in datasource_factory
 	if (fmts.contains(ds->get_audio_format())) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: matches!");
-		return ds;
+		return (audio_datasource*) ds; //XXXX KB cast must disappaer
 	}
-	audio_datasource *dds = new ffmpeg_decoder_datasource(ds);
+	audio_datasource *dds = (audio_datasource*) new ffmpeg_decoder_datasource((audio_datasource*) ds);//XXXX
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: decoder ds = 0x%x", (void*)dds);
 	if (dds == NULL) {
 		int rem = ds->release();
@@ -177,7 +177,7 @@ ffmpeg_audio_parser_finder::new_audio_parser(const net::url& url, const audio_fo
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_parser_finder::new_audio_parser: no support for %s", repr(url).c_str());
 		return NULL;
 	}
-	ds = new ffmpeg_decoder_datasource(src);
+	ds = (audio_datasource*) new ffmpeg_decoder_datasource(src); //XXXX KB cast
 	if (ds == NULL) {
 		return NULL;
 	}
@@ -264,7 +264,7 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(const net::url& url, audio_
 
 ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource * src)
 :	m_con(NULL),
-	m_fmt(src->get_audio_format()),
+	m_fmt(audio_format(0,0,0)),
 	m_event_processor(NULL),
 	m_src((demux_audio_datasource*)src),
 	m_elapsed(m_src->get_start_time()),
@@ -273,7 +273,8 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource * src)
 {
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource() -> 0x%x m_buffer=0x%x", (void*)this, (void*)&m_buffer);
 	ffmpeg_init();
-	audio_format fmt = src->get_audio_format();
+	audio_format fmt = m_src->get_audio_format();
+	m_fmt = fmt;
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 	if (!_select_decoder(fmt)) {
 		lib::logger::get_logger()->error(gettext("ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
@@ -380,9 +381,9 @@ ffmpeg_decoder_datasource::data_avail()
 		if (sz && !m_buffer.buffer_full()) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);
 			
-			audio_packet pkt = m_src->get_packet();
-			uint8_t *inbuf = pkt.first;
-			int pkt_sz = pkt.second;
+			packet pkt = m_src->get_packet();
+			uint8_t* inbuf = (uint8_t*) pkt.data;
+			int pkt_sz = pkt.size;
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: %d bytes available", sz);
 			// Note: outsize is only written by avcodec_decode_audio, not read!
 			// You must always supply a buffer that is AVCODEC_MAX_AUDIO_FRAME_SIZE
