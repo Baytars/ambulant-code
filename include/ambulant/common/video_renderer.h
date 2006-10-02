@@ -72,7 +72,8 @@ class video_renderer : public common::renderer_playable {
 	
 	/// Display video data.
 	virtual void show_frame(const char* frame, int size) {};
-    virtual void redraw(const lib::rect &dirty, common::gui_window *window);
+	virtual void redraw(const lib::rect &dirty, common::gui_window *window);
+	
 	
 	void start(double where);
     void stop();

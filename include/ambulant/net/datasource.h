@@ -194,8 +194,6 @@ class audio_format_choices {
 	std::set<std::string> m_named_formats;
 };
 
-typedef std::pair<uint8_t*,int> audio_packet;
-
 /// The interface to an object that supplies data to a consumer.
 /// The consumer calls start() whenever it wants
 /// data. This call returns immedeately and later the datasource arranges
@@ -231,25 +229,22 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 
 /// Interface to an object that supplies audio data to a consumer.
 /// Audio_datasource extends the datasource protocol with methods to obtain
-/// information on the way the audio data is encoded and methods to support
-/// temporal clipping of the audio.
+/// information on the way the audio data is encoded. 
 class audio_datasource : virtual public datasource {
   public:
 	virtual ~audio_datasource() {};
 	/// Returns the native format of the audio data.
 	virtual audio_format& get_audio_format() = 0;
-	/// Tells the datasource to start reading data starting from time t.
+	// Tells the datasource to start reading data starting from time t.
 	virtual void read_ahead(timestamp_t time) = 0; 
-	/// At what timestamp value should the audio playback stop?
+	// At what point in time does the audio playback stop. (-1 plays the audio until the end)
 	virtual timestamp_t get_clip_end() = 0;
-	/// At what timestamp value should audio playback start?	
+	// returns m_clip_begin, the timestamp where the video is suppossed to start	
 	virtual timestamp_t get_clip_begin() = 0;
-	/// returns m_clip_begin if the datasource took care of clip_begin otherwise it returns 0
+	// returns m_clip_begin if the datasource took care of clip_begin otherwise it returns 0
 	virtual timestamp_t get_start_time() = 0;
-	/// Return the duration of the audio data, if known.
+	// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
-
-	audio_packet get_packet() {  return audio_packet(NULL,0); }
 };
 
 /// Implementation of audio_datasource that reads raw audio data from a datasource.
@@ -286,6 +281,71 @@ class raw_audio_datasource:
   	audio_format m_fmt;
   	common::duration m_duration;
 		
+};
+
+
+/// Interface to an object that supplies timestamped audio/video packets to a consumer.
+/// packet_datasource replaces the datasource protocol with methods to obtain
+/// packets with time-stamped data that can be used either to stream audio packets
+/// or video data.
+////
+/// ** For now, it is used for audio only, but it is designed to be useable as a
+/// base class for video as well
+typedef struct _packet { timestamp_t timestamp; char* data; int size; } packet;
+
+class packet_datasource :  virtual public ambulant::lib::ref_counted  {
+  public:
+	virtual ~packet_datasource() {};
+
+
+	/// Called by the client to indicate it wants more data.
+	/// When the data is available (or end of file reached) exactly one
+	/// callback is scheduled through the event_processor.
+	virtual void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
+	
+	/// Called by the client to indicate it wants no more data.
+	virtual void stop() = 0;
+
+	/// Return true if all data has been consumed.
+	virtual bool end_of_file() = 0;
+
+	/// Called by the client to signal it has consumed len bytes.
+        virtual void readdone(int len) = 0;
+
+	/// Returns the native format of the audio data.
+	virtual audio_format& get_audio_format() = 0;
+
+	/// Tells the datasource to start reading data starting from time t.
+	virtual void read_ahead(timestamp_t time) = 0;
+
+	/// At what timestamp value should the audio playback stop?
+	virtual timestamp_t get_clip_end() = 0;
+
+	/// At what timestamp value should audio playback start?	
+	virtual timestamp_t get_clip_begin() = 0;
+
+	/// returns m_clip_begin if the datasource took care of clip_begin otherwise it returns 0
+	virtual timestamp_t get_start_time() = 0;
+
+	/// Return the duration of the audio/video data, if known.
+	virtual common::duration get_dur() = 0;
+
+	/// Return the number of packets available
+	int size();		
+
+	/// Return the packet at the front of the queue with audio/video packets.
+	packet get_packet();
+
+	/// Store a packet at the back of the queue with audio/video packets.
+	void put_packet(packet);
+
+	/// Wraps timestamped data in a packet and stores it at the back of the 
+	/// audio/video packet queue
+	void put_packet(timestamp_t timestamp, char* data, int size);
+
+ private:
+	std::queue<packet> m_packets;
+	lib::critical_section m_lock;
 };
 
 /// Interface to an object that supplies video data to a consumer.

@@ -92,7 +92,7 @@ class ffmpeg_audio_filter_finder : public audio_filter_finder {
 	audio_datasource* new_audio_filter(audio_datasource *src, const audio_format_choices& fmts);
 };
 
-class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public lib::ref_counted_obj {
+class ffmpeg_decoder_datasource: virtual public audio_datasource , virtual public lib::ref_counted_obj {
   public:
 	static bool supported(const audio_format& fmt);
 	static bool supported(const net::url& url);

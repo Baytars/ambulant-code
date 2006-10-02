@@ -74,7 +74,7 @@ namespace net
 {  
 
 class demux_audio_datasource: 
-	public audio_datasource,
+	virtual public packet_datasource,
 	public demux_datasink,
 	virtual public lib::ref_counted_obj
 {
@@ -100,9 +100,7 @@ class demux_audio_datasource:
   	timestamp_t get_clip_end();
 	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_thread->get_start_time(); };
-	audio_packet get_packet();
 	char* get_read_ptr(); // obsolete
-	int size() const;   
 	audio_format& get_audio_format();
 
 	common::duration get_dur();
@@ -114,7 +112,6 @@ class demux_audio_datasource:
 	bool m_src_end_of_file;
 	lib::event_processor *m_event_processor;
 
-	std::queue<audio_packet> m_packets;
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;
@@ -153,7 +150,7 @@ class demux_video_datasource:
 	int frameduration();
   
 	bool has_audio();
-  	audio_datasource* get_audio_datasource();
+	audio_datasource* get_audio_datasource();
 		
 	char* get_read_ptr();
 	int size() const;   
@@ -172,7 +169,7 @@ class demux_video_datasource:
 	ts_frame_pair m_old_frame;
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
-  	audio_datasource* m_audio_src;
+	audio_datasource* m_audio_src;
 	lib::critical_section m_lock;
   	long long int m_frame_nr;
   

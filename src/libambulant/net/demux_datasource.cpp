@@ -119,7 +119,7 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 		m_client_callback = NULL;
 		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::start(): m_client_callback already set!");
 	}
-	if (m_packets.size() > 0 || _end_of_file() ) {
+	if (size() > 0 || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother
 		// starting up our source again.
 		// Instead, immedeately signal our client again
@@ -180,13 +180,13 @@ demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *data, int size)
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", size, data);
 	if(size > 0){
 	//KB XXX copy data needed ?
-		uint8_t* copy = (uint8_t*) malloc(size);
+		char* copy = (char*) malloc(size);
 		memcpy(copy,data,size);
-		m_packets.push(audio_packet(copy,size));
+		put_packet(pts, copy, size);
 	}
 
-	if ( m_client_callback && (m_packets.size() > 0 || m_src_end_of_file ) ) {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): calling client callback (%d, %d)", m_packets.size(), m_src_end_of_file);
+	if ( m_client_callback && (size > 0 || m_src_end_of_file ) ) {
+		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): calling client callback (%d, %d)", packet_datasource::size(), m_src_end_of_file);
 		assert(m_event_processor);
 		m_event_processor->add_event(m_client_callback, MIN_EVENT_DELAY, ambulant::lib::ep_med);
 		m_client_callback = NULL;
@@ -211,7 +211,7 @@ bool
 demux_audio_datasource::_end_of_file()
 {
 	// private method - no need to lock
-	if (m_packets.size() > 0) return false;
+	if (packet_datasource::size() > 0) return false;
 	return m_src_end_of_file;
 }
 
@@ -219,24 +219,10 @@ bool
 demux_audio_datasource::buffer_full()
 {
 	m_lock.enter();
-	bool rv = m_packets.size() > MAX_AUDIO_PACKETS;
+	bool rv = packet_datasource::size() > MAX_AUDIO_PACKETS;
 	m_lock.leave();
 	return rv;
 }	
-
-audio_packet
-demux_audio_datasource::get_packet()
-{
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::get_packet(): obsolete function called");
-	audio_packet rv(NULL, 0);
-	m_lock.enter();
-	if (m_packets.size() > 0) {
-		rv = m_packets.front();
-		m_packets.pop();
-	}
-	m_lock.leave();
-	return rv;
-}
 
 char* 
 demux_audio_datasource::get_read_ptr()
@@ -251,15 +237,6 @@ JNK*/
 	abort();
 	return NULL;
 }
-
-int 
-demux_audio_datasource::size() const
-{
-	const_cast <demux_audio_datasource*>(this)->m_lock.enter();
-	int rv = m_packets.size();
-	const_cast <demux_audio_datasource*>(this)->m_lock.leave();
-	return rv;
-}	
 
 timestamp_t
 demux_audio_datasource::get_clip_end()
@@ -341,12 +318,11 @@ demux_video_datasource::demux_video_datasource(const net::url& url, abstract_dem
 	m_audio_src(NULL),
 	m_frame_nr(0)
 {
-    assert(m_thread);
+	assert(m_thread);
 	m_thread->add_datasink(this, stream_index);
 	int audio_stream_idx = m_thread->audio_stream_nr();
 	if (audio_stream_idx >= 0) 
-		m_audio_src = new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
-	
+	  m_audio_src = (audio_datasource*) new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
 }
 
 demux_video_datasource::~demux_video_datasource()
@@ -467,7 +443,6 @@ write_data(long long int frame_nr, char* data, int sz)
 		fclose(out);
 	}
 }
-
 
 void 
 demux_video_datasource::data_avail(timestamp_t pts, uint8_t *inbuf, int sz)
@@ -648,7 +623,7 @@ demux_video_datasource::get_audio_datasource()
 		audio_format fmt = m_audio_src->get_audio_format();
 		audio_datasource *dds = NULL;
 		if (ffmpeg_decoder_datasource::supported(fmt))
-			dds = new ffmpeg_decoder_datasource(m_audio_src);
+			dds = (audio_datasource*) new ffmpeg_decoder_datasource(m_audio_src); //XXX KB cast
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_audio_datasource: decoder ds = 0x%x", (void*)dds);
 		if (dds == NULL) {
 			lib::logger::get_logger()->warn(gettext("%s: Ignoring audio, unsupported encoding"), m_url.get_url().c_str());
