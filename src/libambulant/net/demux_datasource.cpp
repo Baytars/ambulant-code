@@ -179,7 +179,7 @@ demux_audio_datasource::data_avail(timestamp_t pts, uint8_t *data, int size)
 	m_src_end_of_file = (size == 0);
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", size, data);
 	if(size > 0){
-	//KB XXX copy data needed ?
+		//KB XXXX copy data needed ?
 		char* copy = (char*) malloc(size);
 		memcpy(copy,data,size);
 		put_packet(pts, copy, size);
@@ -322,7 +322,7 @@ demux_video_datasource::demux_video_datasource(const net::url& url, abstract_dem
 	m_thread->add_datasink(this, stream_index);
 	int audio_stream_idx = m_thread->audio_stream_nr();
 	if (audio_stream_idx >= 0) 
-	  m_audio_src = (audio_datasource*) new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
+		m_audio_src = new demux_audio_datasource(m_url, m_thread, audio_stream_idx);
 }
 
 demux_video_datasource::~demux_video_datasource()
@@ -614,16 +614,16 @@ demux_video_datasource::has_audio()
 }
 
 
-audio_datasource*
+packet_datasource*
 demux_video_datasource::get_audio_datasource()
 {
 	m_lock.enter();
 	if (m_audio_src) {
 		//XXX a factory should take care of getting a decoder ds.
 		audio_format fmt = m_audio_src->get_audio_format();
-		audio_datasource *dds = NULL;
+		packet_datasource *dds = NULL;
 		if (ffmpeg_decoder_datasource::supported(fmt))
-			dds = (audio_datasource*) new ffmpeg_decoder_datasource(m_audio_src); //XXX KB cast
+		  dds = (packet_datasource *) new ffmpeg_decoder_datasource((audio_datasource *) m_audio_src); //XXX KB cast
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_audio_datasource: decoder ds = 0x%x", (void*)dds);
 		if (dds == NULL) {
 			lib::logger::get_logger()->warn(gettext("%s: Ignoring audio, unsupported encoding"), m_url.get_url().c_str());
