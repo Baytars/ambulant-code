@@ -150,7 +150,7 @@ class demux_video_datasource:
 	int frameduration();
   
 	bool has_audio();
-	audio_datasource* get_audio_datasource();
+	packet_datasource* get_audio_datasource();
 		
 	char* get_read_ptr();
 	int size() const;   
@@ -169,7 +169,7 @@ class demux_video_datasource:
 	ts_frame_pair m_old_frame;
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
-	audio_datasource* m_audio_src;
+	demux_audio_datasource* m_audio_src;
 	lib::critical_section m_lock;
   	long long int m_frame_nr;
   

@@ -133,7 +133,7 @@ ffmpeg_audio_datasource_factory::new_audio_datasource(const net::url& url, const
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: matches!");
 		return (audio_datasource*) ds; //XXXX KB cast must disappaer
 	}
-	audio_datasource *dds = (audio_datasource*) new ffmpeg_decoder_datasource((audio_datasource*) ds);//XXXX
+	audio_datasource *dds = (audio_datasource*) new ffmpeg_decoder_datasource((audio_datasource*) ds);//XXXX KB cast
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_audio_datasource_factory::new_audio_datasource: decoder ds = 0x%x", (void*)dds);
 	if (dds == NULL) {
 		int rem = ds->release();
@@ -249,7 +249,7 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(const net::url& url, audio_
 :	m_con(NULL),
 	m_fmt(audio_format(0,0,0)),
 	m_event_processor(NULL),
-	m_src((demux_audio_datasource*)src),
+	m_src((demux_audio_datasource*)src), //XXXX KB cast
 	m_elapsed(m_src->get_start_time()),
 	m_is_audio_ds(false),
 	m_client_callback(NULL)
@@ -266,14 +266,14 @@ ffmpeg_decoder_datasource::ffmpeg_decoder_datasource(audio_datasource * src)
 :	m_con(NULL),
 	m_fmt(audio_format(0,0,0)),
 	m_event_processor(NULL),
-	m_src((demux_audio_datasource*)src),
+	m_src((demux_audio_datasource*)src), //XXXX KB cast
 	m_elapsed(m_src->get_start_time()),
 	m_is_audio_ds(true),
 	m_client_callback(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::ffmpeg_decoder_datasource() -> 0x%x m_buffer=0x%x", (void*)this, (void*)&m_buffer);
 	ffmpeg_init();
-	audio_format fmt = m_src->get_audio_format();
+	audio_format fmt = ((packet_datasource*)m_src)->get_audio_format(); //XXXX KB cast
 	m_fmt = fmt;
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: Looking for %s(0x%x) decoder", fmt.name.c_str(), fmt.parameters);
 	if (!_select_decoder(fmt)) {

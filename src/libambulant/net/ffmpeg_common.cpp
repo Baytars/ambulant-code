@@ -408,8 +408,7 @@ ffmpeg_demux::run()
 				
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				
-				sink->data_avail(pts, pkt->data, pkt->size);
-
+				sink->data_avail(pts, (uint8_t*)pkt->data, pkt->size);
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
