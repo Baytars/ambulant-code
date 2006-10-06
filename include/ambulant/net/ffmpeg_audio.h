@@ -41,7 +41,6 @@
 #include "ambulant/net/databuffer.h"
 //#include "ambulant/net/posix_datasource.h"
 #include "ambulant/net/datasource.h"
-#include "ambulant/net/demux_datasource.h"
 
 #include "avcodec.h"
 #include "avformat.h"
@@ -92,22 +91,23 @@ class ffmpeg_audio_filter_finder : public audio_filter_finder {
 	audio_datasource* new_audio_filter(audio_datasource *src, const audio_format_choices& fmts);
 };
 
-class ffmpeg_decoder_datasource: virtual public audio_datasource , virtual public lib::ref_counted_obj {
+class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public lib::ref_counted_obj {
   public:
 	static bool supported(const audio_format& fmt);
 	static bool supported(const net::url& url);
 
-	 ffmpeg_decoder_datasource(const net::url& url, audio_datasource *src);
-	 ffmpeg_decoder_datasource(audio_datasource *src);
-    ~ffmpeg_decoder_datasource();
+	ffmpeg_decoder_datasource(const net::url& url, audio_datasource *src);
+	ffmpeg_decoder_datasource(audio_datasource *src);
+	~ffmpeg_decoder_datasource();
      
 		  
-    void start(lib::event_processor *evp, lib::event *callback);  
+	void start(lib::event_processor *evp, lib::event *callback);  
 	void stop();  
 
-    void readdone(int len);
-    void data_avail();
-    bool end_of_file();
+	void readdone(int len);
+	void data_avail();
+	bool end_of_file();
+	ts_packet_t get_ts_packet_t();
 	bool buffer_full();
 	void read_ahead(timestamp_t clip_begin);
 
@@ -124,12 +124,12 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource , virtual publi
 	  
   private:
 	bool _clip_end() const;
-    bool _end_of_file();
+	bool _end_of_file();
 	void _need_fmt_uptodate();
-    AVCodecContext *m_con;
+	AVCodecContext *m_con;
 	audio_format m_fmt;
-    lib::event_processor *m_event_processor;
-  	demux_audio_datasource* m_src;
+	lib::event_processor *m_event_processor;
+  	audio_datasource* m_src;
   	timestamp_t m_elapsed;
 	bool m_is_audio_ds;
 	
@@ -143,22 +143,23 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource , virtual publi
 
 class ffmpeg_resample_datasource: virtual public audio_datasource, virtual public lib::ref_counted_obj {
   public:
-     ffmpeg_resample_datasource(audio_datasource *src, audio_format_choices fmts);
-    ~ffmpeg_resample_datasource();
+	ffmpeg_resample_datasource(audio_datasource *src, audio_format_choices fmts);
+	~ffmpeg_resample_datasource();
     
-    void start(lib::event_processor *evp, lib::event *callback);  
+	void start(lib::event_processor *evp, lib::event *callback);  
 	void stop();  
 	void read_ahead(timestamp_t time) {};
 
-    void readdone(int len);
-    void data_avail();
+	void readdone(int len);
+	void data_avail();
   
-    bool end_of_file();
-    bool buffer_full();
+	bool end_of_file();
+	ts_packet_t get_ts_packet_t();
+	bool buffer_full();
 		
-    char* get_read_ptr();
-    int size() const;   
-   
+	char* get_read_ptr();
+	int size() const;   
+	   
 //    void get_input_format(audio_context &fmt);  
 //    void get_output_format(audio_context &fmt);
 	audio_format& get_audio_format() { return m_out_fmt; };

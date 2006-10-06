@@ -30,43 +30,6 @@
 using namespace ambulant;
 using namespace net;
 
-// *********************** packet_datasource base class
-
-int
-packet_datasource::size() {
-	m_lock.enter();
-	int rv = m_packets.size();
-	m_lock.leave();
-	return rv;
-}
-
-void
-packet_datasource::put_packet(packet a_packet) {
-	m_lock.enter();
-	m_packets.push(a_packet);
-	m_lock.leave();
-}
-
-void
-packet_datasource::put_packet(timestamp_t timestamp, char* data, int size) {
-	packet p;
-	p.timestamp = timestamp;
-	p.data = data;
-	p.size = size;
-	put_packet(p);
-}
-packet
-packet_datasource::get_packet() {
-	packet rv = {0,NULL,0};
-	m_lock.enter();
-	if (m_packets.size() > 0) { 
-		rv = m_packets.front();
-		m_packets.pop();
-	}
-	m_lock.leave();
-	return rv;
-}
-
 // Helper class for data: urls.
 class mem_datasource : virtual public datasource, virtual public ambulant::lib::ref_counted_obj {  	
   public:
@@ -86,12 +49,18 @@ class mem_datasource : virtual public datasource, virtual public ambulant::lib::
 	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) {
 		evp->add_event(callback, 0, ambulant::lib::ep_med);
 	};
-    void readdone(int len) { m_databuf.readdone(len); };
+	void readdone(int len) { m_databuf.readdone(len); };
 	void stop() {};
 
-    bool end_of_file() { return m_databuf.size() == 0; };
+	bool end_of_file() { return m_databuf.size() == 0; };
 	char* get_read_ptr() { return m_databuf.get_read_ptr(); };
 	int size() const { return m_databuf.size(); } ;
+
+	ts_packet_t get_ts_packet_t()
+	{
+		AM_DBG lib::logger::get_logger()->debug("mem_datasource.:get_ts_packet_t: NOT implemented");
+	}
+
   private:
 	databuffer m_databuf;
 };

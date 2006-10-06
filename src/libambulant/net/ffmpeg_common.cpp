@@ -200,7 +200,7 @@ ffmpeg_demux::supported(const net::url& url)
 	if (url.is_local_file())
 		ffmpeg_name = url.get_file();
 	
-#if 1
+#if 0
 	// There appears to be some support for RTSP in ffmpeg, but it doesn'
 	// seem to work yet. Disable it so we don't get confused by error messages.
 	if (url_str.substr(0, 5) == "rtsp:") return NULL;
@@ -408,7 +408,8 @@ ffmpeg_demux::run()
 				
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				
-				sink->data_avail(pts, (uint8_t*)pkt->data, pkt->size);
+				sink->data_avail(pts, pkt->data, pkt->size);
+
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
