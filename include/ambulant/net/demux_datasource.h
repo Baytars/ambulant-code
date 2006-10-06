@@ -74,7 +74,7 @@ namespace net
 {  
 
 class demux_audio_datasource: 
-	virtual public packet_datasource,
+	virtual public audio_datasource,
 	public demux_datasink,
 	virtual public lib::ref_counted_obj
 {
@@ -82,7 +82,7 @@ class demux_audio_datasource:
 	static demux_audio_datasource *new_demux_audio_datasource(
   		const net::url& url, abstract_demux *thread);
   	
-  		demux_audio_datasource(
+  	demux_audio_datasource(
   		const net::url& url, 
   		abstract_demux *thread, 
   		int stream_index);
@@ -94,13 +94,15 @@ class demux_audio_datasource:
 	void read_ahead(timestamp_t clip_begin);
   	void seek(timestamp_t time);
 	void readdone(int len);
-	void data_avail(timestamp_t pts, uint8_t *data, int size);
+	void data_avail(timestamp_t pts, const uint8_t *data, int size);
 	bool end_of_file();
 	bool buffer_full();
   	timestamp_t get_clip_end();
 	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_thread->get_start_time(); };
-	char* get_read_ptr(); // obsolete
+	char* get_read_ptr();
+	ts_packet_t get_ts_packet_t();
+	int size() const;   
 	audio_format& get_audio_format();
 
 	common::duration get_dur();
@@ -108,10 +110,18 @@ class demux_audio_datasource:
   private:
 	bool _end_of_file();
 	const net::url m_url;
+	//AVFormatContext *m_con;
 	int m_stream_index;
+//	audio_format m_fmt;
 	bool m_src_end_of_file;
 	lib::event_processor *m_event_processor;
 
+#define TS_PACKET_IMPL
+#ifdef	TS_PACKET_IMPL
+	std::queue<ts_packet_t> m_queue;
+#else //TS_PACKET_IMPL
+	databuffer m_buffer;
+#endif//TS_PACKET_IMPL
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;
@@ -125,7 +135,7 @@ class demux_video_datasource:
 	virtual public lib::ref_counted_obj
 {
   public:
-	static demux_video_datasource *new_demux_video_datasource(
+	 static demux_video_datasource *new_demux_video_datasource(
   		const net::url& url, abstract_demux *thread);
   	
   		demux_video_datasource(
@@ -133,14 +143,14 @@ class demux_video_datasource:
   		abstract_demux *thread, 
   		int stream_index);
   
-	~demux_video_datasource();
+    ~demux_video_datasource();
 	void read_ahead(timestamp_t clip_end);
-	void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
-	void stop();  
+    void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
+    void stop();  
 	char* get_frame(timestamp_t now, timestamp_t *timestamp, int *sizep);
-	void frame_done(timestamp_t timestamp, bool keepdata);
-	void data_avail(timestamp_t pts,  uint8_t *data, int size);
-	bool end_of_file();
+    void frame_done(timestamp_t timestamp, bool keepdata);
+    void data_avail(timestamp_t pts, const uint8_t *data, int size);
+    bool end_of_file();
 	bool buffer_full();
   	timestamp_t get_clip_end();
 	timestamp_t get_clip_begin();
@@ -149,8 +159,8 @@ class demux_video_datasource:
   	int height();
 	int frameduration();
   
-	bool has_audio();
-	packet_datasource* get_audio_datasource();
+    bool has_audio();
+  	audio_datasource* get_audio_datasource();
 		
 	char* get_read_ptr();
 	int size() const;   
@@ -160,17 +170,20 @@ class demux_video_datasource:
 	common::duration get_dur();
 
   private:
-	bool _end_of_file();
+    bool _end_of_file();
 	const net::url m_url;
+	//AVFormatContext *m_con;
 	int m_stream_index;
+//	audio_format m_fmt;
 	bool m_src_end_of_file;
-	lib::event_processor *m_event_processor;
+    lib::event_processor *m_event_processor;
 	std::queue<ts_frame_pair > m_frames;
 	ts_frame_pair m_old_frame;
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
-	demux_audio_datasource* m_audio_src;
+  	audio_datasource* m_audio_src;
 	lib::critical_section m_lock;
+  	//FILE *m_file;
   	long long int m_frame_nr;
   
 };

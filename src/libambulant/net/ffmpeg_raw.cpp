@@ -306,3 +306,10 @@ ffmpeg_raw_datasource::size() const
 {
 		return m_buffer.size();
 }
+
+ts_packet_t
+ffmpeg_raw_datasource::get_ts_packet_t()
+{
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_raw_datasource.:get_ts_packet_t: NOT implemented");
+}
+
