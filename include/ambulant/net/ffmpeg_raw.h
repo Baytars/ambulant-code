@@ -108,7 +108,6 @@ class ffmpeg_raw_datasource:
 	char* get_read_ptr();
 	void readdone(int len);
 	bool end_of_file();
-	ts_packet_t get_ts_packet_t();
 	int size() const;   
 
 	int get_sinkbuffer(uint8_t **datap);

@@ -229,7 +229,24 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 
 	/// Called by the client to signal it has consumed len bytes.
 	virtual void readdone(int len) = 0;
+};
 
+class AMBULANTAPI pkt_datasource : virtual public ambulant::lib::ref_counted {  	
+  public:
+	virtual ~pkt_datasource() {};
+
+	/// Called by the client to indicate it wants more data.
+	/// When the data is available (or end of file reached) exactly one
+	/// callback is scheduled through the event_processor.
+	virtual void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
+	
+	/// Called by the client to indicate it wants no more data.
+	virtual void stop() = 0;
+
+	/// Return true if all data has been consumed.
+	virtual bool end_of_file() = 0;
+	
+	/// Return the next timestamped packet and discard it.
 	virtual ts_packet_t get_ts_packet_t() = 0;
 };
 
@@ -237,9 +254,9 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 /// Audio_datasource extends the datasource protocol with methods to obtain
 /// information on the way the audio data is encoded and methods to support
 /// temporal clipping of the audio.
-class audio_datasource : virtual public datasource {
+class audio_datasource_mixin {
   public:
-	virtual ~audio_datasource() {};
+	virtual ~audio_datasource_mixin() {};
 	/// Returns the native format of the audio data.
 	virtual audio_format& get_audio_format() = 0;
 	/// Tells the datasource to start reading data starting from time t.
@@ -252,6 +269,16 @@ class audio_datasource : virtual public datasource {
 	virtual timestamp_t get_start_time() = 0;
 	/// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
+};
+
+class audio_datasource : public datasource, public audio_datasource_mixin {
+  public:
+	virtual ~audio_datasource() {};
+};
+
+class pkt_audio_datasource : public pkt_datasource, public audio_datasource_mixin {
+  public:
+	virtual ~pkt_audio_datasource() {};
 };
 
 /// Implementation of audio_datasource that reads raw audio data from a datasource.
@@ -278,7 +305,6 @@ class raw_audio_datasource:
 	timestamp_t get_clip_begin() { return 0; };
 	timestamp_t get_start_time() { return 0; };
 	char* get_read_ptr() { return m_src->get_read_ptr(); };
-	ts_packet_t get_ts_packet_t() { return m_src->get_ts_packet_t(); };
 	int size() const { return m_src->size(); };   
 	audio_format& get_audio_format() { return m_fmt; };
 
@@ -374,6 +400,17 @@ class AMBULANTAPI audio_datasource_factory  {
   	virtual audio_datasource* new_audio_datasource(const net::url& url, const audio_format_choices& fmt, timestamp_t clip_begin, timestamp_t clip_end) = 0;
 };
 
+class AMBULANTAPI pkt_audio_datasource_factory  {
+  public: 
+    virtual ~pkt_audio_datasource_factory() {}; 	
+
+	/// Create a new audio_datasource to read the given URL.
+	/// The fmt parameter describes the audio formats the client can handle,
+	/// the actual format can then be obtained from the audio_datasource returned.
+	/// Returns NULL if this factory cannot create such a datasource.
+  	virtual pkt_audio_datasource* new_pkt_audio_datasource(const net::url& url, const audio_format_choices& fmt, timestamp_t clip_begin, timestamp_t clip_end) = 0;
+};
+
 /// Factory for finding an audio format parser.
 /// Factory for implementations where the audio_datasource
 /// does only parsing, using a datasource to obtain raw data. The audio_format_choices
@@ -397,6 +434,14 @@ class audio_filter_finder {
 	
 	/// Create a filter that converts audio data from src to a format compatible with fmts.
   	virtual audio_datasource* new_audio_filter(audio_datasource *src, const audio_format_choices& fmts) = 0;
+};
+
+class audio_decoder_finder {
+  public:
+    virtual ~audio_decoder_finder() {};
+	
+	/// Create a filter that converts audio data from src to a format compatible with fmts.
+  	virtual audio_datasource* new_audio_decoder(pkt_audio_datasource *src, const audio_format_choices& fmts) = 0;
 };
 
 /// Factory for finding a raw data filter.
@@ -446,6 +491,8 @@ class AMBULANTAPI datasource_factory :
 	
 	/// Semi-private interface: obtain an audio filter datasource.
 	audio_datasource* new_audio_filter(const net::url& url, const audio_format_choices& fmt, audio_datasource* ds);
+
+	audio_datasource* new_audio_decoder(const net::url& url, const audio_format_choices& fmt, pkt_audio_datasource* ds);
 	
 	/// Provider interface: add a raw_datasource_factory.
   	void add_raw_factory(raw_datasource_factory *df);
@@ -458,6 +505,8 @@ class AMBULANTAPI datasource_factory :
 	
 	/// Provider interface: add an audio_filter_finder.
 	void add_audio_filter_finder(audio_filter_finder *df);
+
+	void add_audio_decoder_finder(audio_decoder_finder *df);
 	
 	/// Provider interface: add a video_datasource_factory.
 	void add_video_factory(video_datasource_factory *df);
@@ -470,6 +519,7 @@ class AMBULANTAPI datasource_factory :
 	std::vector<audio_datasource_factory*> m_audio_factories;
 	std::vector<audio_parser_finder*> m_audio_parser_finders;
 	std::vector<audio_filter_finder*> m_audio_filter_finders;
+	std::vector<audio_decoder_finder*> m_audio_decoder_finders;
 	std::vector<video_datasource_factory*> m_video_factories;
 	std::vector<raw_filter_finder*> m_raw_filters;
 };

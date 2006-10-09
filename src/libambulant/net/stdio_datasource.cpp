@@ -201,9 +201,3 @@ stdio_datasource::readdone(int sz)
 	m_buffer->readdone(sz);
 	m_lock.leave();
 }
-
-ts_packet_t
-stdio_datasource::get_ts_packet_t()
-{
-	AM_DBG lib::logger::get_logger()->debug("stdio_datasource.:get_ts_packet_t: NOT implemented");
-}

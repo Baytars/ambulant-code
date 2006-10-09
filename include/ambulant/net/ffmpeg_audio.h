@@ -79,10 +79,10 @@ class ffmpeg_audio_datasource_factory : public audio_datasource_factory {
 	audio_datasource* new_audio_datasource(const net::url& url, const audio_format_choices& fmts, timestamp_t clip_begin, timestamp_t clip_end);
 };
 
-class ffmpeg_audio_parser_finder : public audio_parser_finder {
+class ffmpeg_audio_decoder_finder : public audio_decoder_finder {
   public:
-	~ffmpeg_audio_parser_finder() {};
-	audio_datasource* new_audio_parser(const net::url& url, const audio_format_choices& hint, audio_datasource *src);
+	~ffmpeg_audio_decoder_finder() {};
+	audio_datasource* new_audio_decoder(pkt_audio_datasource *src, const audio_format_choices& hint);
 };
 
 class ffmpeg_audio_filter_finder : public audio_filter_finder {
@@ -96,8 +96,8 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	static bool supported(const audio_format& fmt);
 	static bool supported(const net::url& url);
 
-	ffmpeg_decoder_datasource(const net::url& url, audio_datasource *src);
-	ffmpeg_decoder_datasource(audio_datasource *src);
+	ffmpeg_decoder_datasource(const net::url& url, pkt_audio_datasource *src);
+	ffmpeg_decoder_datasource(pkt_audio_datasource *src);
 	~ffmpeg_decoder_datasource();
      
 		  
@@ -107,7 +107,6 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	void readdone(int len);
 	void data_avail();
 	bool end_of_file();
-	ts_packet_t get_ts_packet_t();
 	bool buffer_full();
 	void read_ahead(timestamp_t clip_begin);
 
@@ -129,7 +128,7 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	AVCodecContext *m_con;
 	audio_format m_fmt;
 	lib::event_processor *m_event_processor;
-  	audio_datasource* m_src;
+  	pkt_audio_datasource* m_src;
   	timestamp_t m_elapsed;
 	bool m_is_audio_ds;
 	
@@ -154,7 +153,6 @@ class ffmpeg_resample_datasource: virtual public audio_datasource, virtual publi
 	void data_avail();
   
 	bool end_of_file();
-	ts_packet_t get_ts_packet_t();
 	bool buffer_full();
 		
 	char* get_read_ptr();
