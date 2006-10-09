@@ -45,7 +45,7 @@ class raw_video_datasource : virtual public video_datasource {
   	~raw_video_datasource();
   
 	bool has_audio() { return false; };
-	packet_datasource *get_audio_datasource() { return NULL; };
+	audio_datasource *get_audio_datasource() { return NULL; };
 
 	void start_frame(lib::event_processor *evp, lib::event *callback, double timestamp);
   	

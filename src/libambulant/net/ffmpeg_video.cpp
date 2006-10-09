@@ -225,11 +225,11 @@ ffmpeg_video_decoder_datasource::has_audio()
 	return rv;
 }
 
-packet_datasource *
+audio_datasource *
 ffmpeg_video_decoder_datasource::get_audio_datasource()
 {
 	m_lock.enter();
-	packet_datasource *rv = NULL;
+	audio_datasource *rv = NULL;
 	if (m_src) 
 		rv = m_src->get_audio_datasource();
 	m_lock.leave();
