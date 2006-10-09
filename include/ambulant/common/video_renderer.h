@@ -72,8 +72,7 @@ class video_renderer : public common::renderer_playable {
 	
 	/// Display video data.
 	virtual void show_frame(const char* frame, int size) {};
-	virtual void redraw(const lib::rect &dirty, common::gui_window *window);
-	
+    virtual void redraw(const lib::rect &dirty, common::gui_window *window);
 	
 	void start(double where);
     void stop();
@@ -88,7 +87,7 @@ class video_renderer : public common::renderer_playable {
   protected:
 	lib::size m_size;		///< (width, height) of the video data.
   	net::video_datasource* m_src;	///< video datasource.
-  	net::packet_datasource *m_audio_ds;	///< audio datasource.
+  	net::audio_datasource *m_audio_ds;	///< audio datasource.
   	common::playable *m_audio_renderer;	///< the audio playable.
   	empty_playable_notification m_playable_notification;
   private:
