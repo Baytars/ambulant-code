@@ -207,11 +207,4 @@ posix_datasource::readdone(int sz)
 	m_buffer->readdone(sz);
 	m_lock.leave();
 }
-
-ts_packet_t
-posix_datasource::get_ts_packet_t()
-{
-	AM_DBG lib::logger::get_logger()->debug("posix_datasource.:get_ts_packet_t: NOT implemented");
-}
-
   

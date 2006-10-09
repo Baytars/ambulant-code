@@ -62,7 +62,7 @@ live_audio_datasource_factory::new_audio_datasource(const net::url& url, const a
 	}
 	//int stream_index;
 	
-	audio_datasource *ds = demux_audio_datasource::new_demux_audio_datasource(url, thread);
+	pkt_audio_datasource *ds = demux_audio_datasource::new_demux_audio_datasource(url, thread);
 	if (ds == NULL) {
 		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource_factory::new_audio_datasource: could not allocate live_audio_datasource");
 		thread->cancel();
@@ -72,10 +72,6 @@ live_audio_datasource_factory::new_audio_datasource(const net::url& url, const a
 	
 	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource_factory::new_audio_datasource: parser ds = 0x%x", (void*)ds);
 	// XXXX This code should become generalized in datasource_factory
-	if (fmts.contains(ds->get_audio_format())) {
-		AM_DBG lib::logger::get_logger()->debug("live_audio_datasource_factory::new_audio_datasource: matches!");
-		return ds;
-	}
 	audio_datasource *dds = new ffmpeg_decoder_datasource(ds);
 	AM_DBG lib::logger::get_logger()->debug("live_audio_datasource_factory::new_audio_datasource: decoder ds = 0x%x", (void*)dds);
 	if (dds == NULL) {

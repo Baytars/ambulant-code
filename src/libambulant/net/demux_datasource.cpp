@@ -143,18 +143,6 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 }
  
 void 
-demux_audio_datasource::readdone(int len)
-{
-#ifndef	TS_PACKET_IMPL
-	m_lock.enter();
-	m_buffer.readdone(len);
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.readdone : done with %d bytes", len);
-//	restart_input();
-	m_lock.leave();
-#endif//TS_PACKET_IMPL
-}
-
-void 
 demux_audio_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
@@ -251,20 +239,6 @@ demux_audio_datasource::buffer_full()
 #endif//TS_PACKET_IMPL
 }	
 
-char* 
-demux_audio_datasource::get_read_ptr()
-{
-#ifdef	TS_PACKET_IMPL
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.:get_read_ptr: NOT implemented");
-	return NULL;
-#else //TS_PACKET_IMPL
-	m_lock.enter();
-	char *rv = m_buffer.get_read_ptr();
-	m_lock.leave();
-	return rv;
-#endif//TS_PACKET_IMPL
-}
-
 ts_packet_t
 demux_audio_datasource::get_ts_packet_t()
 {
@@ -279,19 +253,6 @@ demux_audio_datasource::get_ts_packet_t()
 #endif//TS_PACKET_IMPL
 	return tsp;
 }
-
-int 
-demux_audio_datasource::size() const
-{
-	const_cast <demux_audio_datasource*>(this)->m_lock.enter();
-#ifdef	TS_PACKET_IMPL
-	int rv = m_queue.size();
-#else //TS_PACKET_IMPL
-	int rv = m_buffer.size();
-#endif//TS_PACKET_IMPL
-	const_cast <demux_audio_datasource*>(this)->m_lock.leave();
-	return rv;
-}	
 
 timestamp_t
 demux_audio_datasource::get_clip_end()
@@ -684,10 +645,10 @@ demux_video_datasource::get_audio_datasource()
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_audio_datasource: decoder ds = 0x%x", (void*)dds);
 		if (dds == NULL) {
 			lib::logger::get_logger()->warn(gettext("%s: Ignoring audio, unsupported encoding"), m_url.get_url().c_str());
-			dds = m_audio_src;
+			pkt_audio_datasource *tmp = m_audio_src;
 			m_audio_src = NULL;
 			m_lock.leave();
-			int rem = dds->release();
+			int rem = tmp->release();
 			assert(rem == 0);
 			return NULL;
 		}

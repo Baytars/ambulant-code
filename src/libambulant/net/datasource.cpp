@@ -56,11 +56,6 @@ class mem_datasource : virtual public datasource, virtual public ambulant::lib::
 	char* get_read_ptr() { return m_databuf.get_read_ptr(); };
 	int size() const { return m_databuf.size(); } ;
 
-	ts_packet_t get_ts_packet_t()
-	{
-		AM_DBG lib::logger::get_logger()->debug("mem_datasource.:get_ts_packet_t: NOT implemented");
-	}
-
   private:
 	databuffer m_databuf;
 };
@@ -307,6 +302,13 @@ datasource_factory::add_audio_parser_finder(audio_parser_finder *df)
 {
 	AM_DBG lib::logger::get_logger()->debug("datasource_factory: add_audio_parser_finder(0x%x)", (void*)df);
 	m_audio_parser_finders.push_back(df);
+}
+
+void
+datasource_factory::add_audio_decoder_finder(audio_decoder_finder *df)
+{
+	AM_DBG lib::logger::get_logger()->debug("datasource_factory: add_audio_decoder_finder(0x%x)", (void*)df);
+	m_audio_decoder_finders.push_back(df);
 }
 
 void
