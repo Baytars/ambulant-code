@@ -112,13 +112,7 @@ class demux_audio_datasource:
 //	audio_format m_fmt;
 	bool m_src_end_of_file;
 	lib::event_processor *m_event_processor;
-
-#define TS_PACKET_IMPL
-#ifdef	TS_PACKET_IMPL
 	std::queue<ts_packet_t> m_queue;
-#else //TS_PACKET_IMPL
-	databuffer m_buffer;
-#endif//TS_PACKET_IMPL
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
 	lib::critical_section m_lock;

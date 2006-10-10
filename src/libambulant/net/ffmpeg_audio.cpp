@@ -365,19 +365,12 @@ ffmpeg_decoder_datasource::data_avail()
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 			return;
 		}	
-#ifdef	TS_PACKET_IMPL
 		if (!m_buffer.buffer_full()) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);
 			
 			ts_packet_t audio_packet = m_src->get_ts_packet_t();
 			uint8_t *inbuf = (uint8_t*) audio_packet.data;
 			sz = audio_packet.size;
-#else //TS_PACKET_IMPL
-		sz = m_src->size();
-		if (sz && !m_buffer.buffer_full()) {
-		    AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);		
-			uint8_t *inbuf = (uint8_t*) m_src->get_read_ptr();
-#endif//TS_PACKET_IMPL
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: %d bytes available", sz);
 			// Note: outsize is only written by avcodec_decode_audio, not read!
 			// You must always supply a buffer that is AVCODEC_MAX_AUDIO_FRAME_SIZE
@@ -393,9 +386,7 @@ ffmpeg_decoder_datasource::data_avail()
 					
 					AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio(0x%x, 0x%x, 0x%x(%d), 0x%x, %d)", (void*)m_con, (void*)outbuf, (void*)&outsize, outsize, (void*)inbuf, sz);
 					int decoded = avcodec_decode_audio(m_con, (short*) outbuf, &outsize, inbuf, cursz);
-#ifdef	TS_PACKET_IMPL
 					free(inbuf);
-#endif//TS_PACKET_IMPL
 					_need_fmt_uptodate();
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : %d bps, %d channels",m_fmt.samplerate, m_fmt.channels);
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : %d bytes decoded  to %d bytes", decoded,outsize );
@@ -431,23 +422,14 @@ ffmpeg_decoder_datasource::data_avail()
 					}
 
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : m_src->readdone(%d) called m_src=0x%x, this=0x%x", decoded,(void*) m_src, (void*) this );
-#ifndef TS_PACKET_IMPL
-					m_src->readdone(decoded);
-#endif
 				} else {
 					m_buffer.pushdata(0);
-#ifndef TS_PACKET_IMPL
-					m_src->readdone(0);
-#endif
 				}
 			} else {
 				lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail: no room in output buffer");
 				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 				m_buffer.pushdata(0);
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail m_src->readdone(0) called this=0x%x");
-#ifndef TS_PACKET_IMPL
-				m_src->readdone(0);
-#endif
 			}
 		//	sz = m_src->size();
 		}

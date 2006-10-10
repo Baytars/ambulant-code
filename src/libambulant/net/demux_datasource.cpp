@@ -118,11 +118,7 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 		m_client_callback = NULL;
 		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::start(): m_client_callback already set!");
 	}
-#ifdef	TS_PACKET_IMPL
 	if (m_queue.size() > 0) {
-#else //TS_PACKET_IMPL
-	if (m_buffer.buffer_not_empty() || _end_of_file() ) {
-#endif//TS_PACKET_IMPL
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
@@ -171,36 +167,11 @@ demux_audio_datasource::data_avail(timestamp_t pts, const uint8_t *inbuf, int sz
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: %d bytes available (ts = %lld)", sz, pts);
-#ifdef	TS_PACKET_IMPL
 	void* data = malloc(sz);
 	assert(data);
 	memcpy(data, inbuf, sz);
 	ts_packet_t tsp(pts,data,sz);
 	m_queue.push(tsp);
-#else //TS_PACKET_IMPL
-	if(sz && !m_buffer.buffer_full()){
-		uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(sz);
-		if (outbuf) {
-			memcpy(outbuf, inbuf, sz);
-			m_buffer.pushdata(sz);
-			// XXX m_src->readdone(sz);
-		} else {
-			lib::logger::get_logger()->debug("Internal error: demux_audio_datasource::data_avail: no room in output buffer");
-			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
-			m_buffer.pushdata(0);
-		}
-	}
-
-	if ( m_client_callback && (m_buffer.buffer_not_empty() || m_src_end_of_file ) ) {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), m_src_end_of_file);
-		assert(m_event_processor);
-		m_event_processor->add_event(m_client_callback, MIN_EVENT_DELAY, ambulant::lib::ep_med);
-		m_client_callback = NULL;
-		//m_event_processor = NULL;
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::data_avail(): No client callback!");
-	}
-#endif//TS_PACKET_IMPL
 	m_lock.leave();
 }
 
@@ -218,39 +189,23 @@ bool
 demux_audio_datasource::_end_of_file()
 {
 	// private method - no need to lock
-#ifdef	TS_PACKET_IMPL
 	return false;
-#else //TS_PACKET_IMPL
-	if (m_buffer.buffer_not_empty()) return false;
-	return m_src_end_of_file;
-#endif//TS_PACKET_IMPL
 }
 
 bool 
 demux_audio_datasource::buffer_full()
 {
-#ifdef	TS_PACKET_IMPL
 	return false;
-#else //TS_PACKET_IMPL
-	m_lock.enter();
-	bool rv = m_buffer.buffer_full();
-	m_lock.leave();
-	return rv;
-#endif//TS_PACKET_IMPL
 }	
 
 ts_packet_t
 demux_audio_datasource::get_ts_packet_t()
 {
 	ts_packet_t tsp(0,NULL,0);
-#ifdef	TS_PACKET_IMPL
 	if (m_queue.size() > 0) {
 		tsp = m_queue.front();
 		m_queue.pop();
 	}
-#else //TS_PACKET_IMPL
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.:get__ts_packet_t: NOT implemented");
-#endif//TS_PACKET_IMPL
 	return tsp;
 }
 
