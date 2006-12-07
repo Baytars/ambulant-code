@@ -329,6 +329,9 @@ class time_node : public schedulable {
 	
 	// this may be called by a second thread
 	bool is_active() const { return m_active;}
+	
+	// For excl children, mainly: return true if the node is in fill mode
+	bool is_filled() const { return m_needs_remove; }
 
 	// Returns the current interval associated with this (maybe invalid)
 	const interval_type& get_current_interval() const {
@@ -594,6 +597,7 @@ class excl : public time_container {
 	void remove(time_node *c);
   private:
 	time_node* get_active_child();
+	time_node* get_filled_child();
 	excl_queue *m_queue;
 	int m_num_classes;
 	typedef priority_attrs* priority_attrs_ptr;

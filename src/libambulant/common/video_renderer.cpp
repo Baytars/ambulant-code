@@ -59,7 +59,7 @@ video_renderer::video_renderer(
 	m_frame_missing(0)
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("video_renderer::video_renderer() (this = 0x%x): Constructor ", (void *) this);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::video_renderer() (this = 0x%x): Constructor ", (void *) this);
 	net::url url = node->get_url("src");
 	
 	_init_clip_begin_end();
@@ -87,7 +87,7 @@ video_renderer::video_renderer(
 video_renderer::~video_renderer() {
 	// m_audio_ds released by audio renderer
 	stop(); // releases m_src, m_audio_renderer (in most cases)
-	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
 	if (m_audio_renderer) m_audio_renderer->release();
 	if (m_src) m_src->release();
