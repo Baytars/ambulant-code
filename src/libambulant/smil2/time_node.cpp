@@ -924,7 +924,7 @@ void time_node::exec(qtime_type timestamp) {
 	
 	// Check for the EOI event
 	if(end_cond(timestamp)) {
-		AM_DBG m_logger->debug("exec: end_cond() returned true for %s", get_sig().c_str());
+		/*AM_DBG*/ m_logger->debug("exec: end_cond() returned true for %s", get_sig().c_str());
 		// This node should go postactive
 		time_type reftime;
 		if(m_interval.end.is_definite()) reftime = m_interval.end;
@@ -2172,14 +2172,40 @@ void excl::built_priorities() {
 }
 
 // Utility: 
-// Returns the first active child
+// Returns the current active child.
+// Check that there is only one.
 time_node*
 excl::get_active_child() {
 	std::list<time_node*> cl;
 	get_children(cl);
+	time_node *candidate = NULL;
+	
 	std::list<time_node*>::iterator it;
-	for(it=cl.begin();it!=cl.end();it++)
-		if((*it)->is_active()) break;
+	for(it=cl.begin();it!=cl.end();it++) {
+		if((*it)->is_active()) {
+			assert(candidate == NULL);
+			candidate = *it;
+		}
+	}
+	return it!=cl.end()?(*it):0;
+}
+
+// Utility: 
+// Returns the current filled child.
+// Check that there is only one.
+time_node*
+excl::get_filled_child() {
+	std::list<time_node*> cl;
+	get_children(cl);
+	time_node *candidate = NULL;
+	
+	std::list<time_node*>::iterator it;
+	for(it=cl.begin();it!=cl.end();it++) {
+		if((*it)->is_filled()) {
+			assert(candidate == NULL);
+			candidate = *it;
+		}
+	}
 	return it!=cl.end()?(*it):0;
 }
 
@@ -2188,6 +2214,10 @@ void excl::interrupt(time_node *c, qtime_type timestamp) {
 	time_node *interrupting_node = c;
 	time_node *active_node = get_active_child();
 	if(active_node == 0) {
+		// Nothing really active. Kill any child that is in fill.
+		active_node = get_filled_child();
+		if (active_node) active_node->remove(timestamp);
+		// Activate the new child and be done with it.
 		interrupting_node->set_state(ts_active, timestamp, this);
 		return;
 	}
