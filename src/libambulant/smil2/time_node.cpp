@@ -924,7 +924,6 @@ void time_node::exec(qtime_type timestamp) {
 	
 	// Check for the EOI event
 	if(end_cond(timestamp)) {
-		/*AM_DBG*/ m_logger->debug("exec: end_cond() returned true for %s", get_sig().c_str());
 		// This node should go postactive
 		time_type reftime;
 		if(m_interval.end.is_definite()) reftime = m_interval.end;
@@ -2187,7 +2186,7 @@ excl::get_active_child() {
 			candidate = *it;
 		}
 	}
-	return it!=cl.end()?(*it):0;
+	return candidate;
 }
 
 // Utility: 
@@ -2206,7 +2205,7 @@ excl::get_filled_child() {
 			candidate = *it;
 		}
 	}
-	return it!=cl.end()?(*it):0;
+	return candidate;
 }
 
 // Implements the excl element behavior
@@ -2216,11 +2215,13 @@ void excl::interrupt(time_node *c, qtime_type timestamp) {
 	if(active_node == 0) {
 		// Nothing really active. Kill any child that is in fill.
 		active_node = get_filled_child();
+		AM_DBG m_logger->debug("excl::interrupt: fillchild 0x%x", active_node);
 		if (active_node) active_node->remove(timestamp);
 		// Activate the new child and be done with it.
 		interrupting_node->set_state(ts_active, timestamp, this);
 		return;
 	}
+	AM_DBG m_logger->debug("excl::interrupt: active child 0x%x", active_node);
 	
 	// Retrieve priority attrs of active and interrupting nodes
 	assert(interrupting_node->priority() < m_num_classes);
@@ -2256,9 +2257,10 @@ void excl::interrupt(time_node *c, qtime_type timestamp) {
 	if(what == int_stop) {
 		// stop active_node
 		active_node->set_state(ts_postactive, timestamp, c);
+		AM_DBG m_logger->debug("excl::interrupt: active_node get_fill() returns %d", (int)ta->get_fill());
 		if(ta->get_fill() == fill_freeze)
 			active_node->remove(timestamp);
-			
+		// XXXXjack m_scheduler->exec();
 		AM_DBG m_logger->debug("%s[%s] int_stop by %s[%s]", ta->get_tag().c_str(), 
 			ta->get_id().c_str(), tai->get_tag().c_str(), tai->get_id().c_str());
 				

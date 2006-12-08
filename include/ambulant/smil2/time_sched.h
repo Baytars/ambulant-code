@@ -49,6 +49,7 @@ class scheduler {
 	time_type exec();
 	void reset_document();
 	void start(time_node *tn);
+	void update_horizon(time_type t);
 	
 	static void reset(time_node *tn);
 	static void set_context(time_node *tn, time_node_context *ctx);
