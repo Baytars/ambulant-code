@@ -80,9 +80,11 @@ class scheduler {
 	void lock();
 	void unlock();
 	bool locked() const { return m_locked;}
-	
+#if 0
+	// Used only locally in scheduler::_exec
 	typedef std::map<time_node::time_type, std::list<time_node*> > event_map_t;
 	event_map_t m_events;
+#endif
 	enum { idle_resolution = 100};
 };
 
