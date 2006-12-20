@@ -838,33 +838,48 @@ void time_node::get_pending_events(std::map<time_type, std::list<time_node*> >& 
 	if(!is_alive() || paused() || deferred()) return;
 	if(m_interval.is_valid()) {
 		if(!is_active()) {
+			// If we are not active we schedule our own begin
 			qtime_type timestamp(sync_node(), m_interval.begin);
-			events[timestamp.to_doc()].push_back(this);
+			time_type doctime = timestamp.to_doc();
+			AM_DBG m_logger->debug("get_pending_events(0x%x %s): schedule begin for %d", this, get_sig().c_str(), doctime());
+			events[doctime].push_back(this);
 		} else if(m_interval.end.is_definite()) {
+			// If we are active and our end is known we schedule our own end
 			qtime_type timestamp(sync_node(), get_interval_end());
 			time_type doctime = timestamp.to_doc();
+			AM_DBG m_logger->debug("get_pending_events(0x%x %s): schedule end for %d", this, get_sig().c_str(), doctime());
 			events[doctime].push_back(this);
 			
 			bool repeats = m_attrs.specified_rdur() || m_attrs.specified_rcount();
 			repeats = repeats && (m_last_cdur.is_definite() && m_last_cdur() != 0);
 			if(repeats) {
+				// And we also schedule our repeat, if applicable
 				qtime_type ts(this, m_last_cdur);
-				events[ts.to_doc()].push_back(this);
+				time_type dt = ts.to_doc();
+				AM_DBG m_logger->debug("get_pending_events(0x%x %s): schedule repeat for %d", this, get_sig().c_str(), dt());
+				events[dt].push_back(this);
 			}
 		}
 	}
 	
 	if(m_update_event.first) {
+		// Jack thinks (but not sure:-) this one has to do with multiple
+		// begin/end times.
 		qtime_type timestamp = m_update_event.second;
-		events[timestamp.to_doc()].push_back(this);
+		time_type doctime = timestamp.to_doc();
+		AM_DBG m_logger->debug("get_pending_events(0x%x %s): schedule update_event for %d", this, get_sig().c_str(), doctime());
+		events[doctime].push_back(this);
 	}
 
 	if(m_transout_sr && !m_ffwd_mode) {
+		// We schedule the start of our outtransition, if applicable
 		time_mset set;
 		m_transout_sr->get_instance_times(set);
 		if(!set.empty()) {
-			qtime_type ts(sync_node(), *set.begin());
-			events[ts.to_doc()].push_back(this);
+			qtime_type timestamp(sync_node(), *set.begin());
+			time_type doctime = timestamp.to_doc();
+			AM_DBG m_logger->debug("get_pending_events(0x%x %s): schedule transout for %d", this, get_sig().c_str(), doctime());
+			events[doctime].push_back(this);
 		}
 	}
 	
@@ -872,6 +887,7 @@ void time_node::get_pending_events(std::map<time_type, std::list<time_node*> >& 
 	get_children(children);
 	std::list<time_node*>::iterator it;
 	for(it = children.begin(); it != children.end(); it++) {
+		// Finally we recursively get all events for our childen.
 		(*it)->get_pending_events(events);
 	}
 	AM_DBG lib::logger::get_logger()->debug(" time_node::get_pending_events: 0x%x", &events);
@@ -1063,8 +1079,10 @@ void time_node::on_eom(qtime_type timestamp) {
 			time_type pt = timestamp.as_node_time(sync_node());
 			m_impldur = pt - m_interval.begin();
 		}
-		raise_update_event(timestamp);
-		sync_node()->raise_update_event(timestamp);
+		if (m_state->ident() == ts_active) {
+			raise_update_event(timestamp);
+			sync_node()->raise_update_event(timestamp);
+		}
 		qtime_type pt = timestamp.as_qtime_down_to(sync_node());
 		qtime_type st = pt.as_qtime_down_to(this);
 		AM_DBG m_logger->debug("%s[%s].on_eom() ST:%ld, PT:%ld, DT:%ld", 
@@ -2258,9 +2276,10 @@ void excl::interrupt(time_node *c, qtime_type timestamp) {
 		// stop active_node
 		active_node->set_state(ts_postactive, timestamp, c);
 		AM_DBG m_logger->debug("excl::interrupt: active_node get_fill() returns %d", (int)ta->get_fill());
+		// Jack added the remove() call to clear the node off the screen
 		if(ta->get_fill() == fill_freeze)
 			active_node->remove(timestamp);
-		// XXXXjack m_scheduler->exec();
+
 		AM_DBG m_logger->debug("%s[%s] int_stop by %s[%s]", ta->get_tag().c_str(), 
 			ta->get_id().c_str(), tai->get_tag().c_str(), tai->get_id().c_str());
 				

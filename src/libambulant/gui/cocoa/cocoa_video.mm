@@ -214,7 +214,7 @@ cocoa_video_renderer::get_dur()
 void
 cocoa_video_renderer::start(double where)
 {
-	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::start()");
+	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::start(0x%x)", this);
 	if (!m_dest) {
 		lib::logger::get_logger()->debug("cocoa_video_renderer::start: no destination surface");
 		m_context->stopped(m_cookie);

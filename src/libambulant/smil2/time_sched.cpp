@@ -246,7 +246,7 @@ scheduler::time_type scheduler::_exec(time_type now) {
 	event_map_t::iterator eit = events.begin();
 	next = (*eit).first();
 	std::list<time_node*>& elist = (*eit).second;
-	AM_DBG lib::logger::get_logger()->debug("scheduler::_exec: now=%d next=%d ", now, next);
+	AM_DBG lib::logger::get_logger()->debug("scheduler::_exec: now=%d next=%d got %d events", now, next, events.size());
 	next = std::max(m_horizon, next);
 	if(now >= next) {
 		time_traits::qtime_type timestamp(m_root, next);
