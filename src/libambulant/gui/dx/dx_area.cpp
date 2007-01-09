@@ -73,7 +73,7 @@ void gui::dx::dx_area::start(double t) {
 	m_dest->need_events(m_wantclicks);
 	m_activated = true;
 	m_context->started(m_cookie);
-	// XXXJACK: m_context->stopped(m_cookie);
+	m_context->stopped(m_cookie);
 }
 
 void gui::dx::dx_area::stop() {

@@ -75,6 +75,8 @@ video_renderer::video_renderer(
 	
 		if (m_audio_ds) {
 			AM_DBG lib::logger::get_logger()->debug("active_video_renderer::active_video_renderer: creating audio renderer !");
+			// XXXX Passing context and cookie to the audio renderer is probably not a good idea: this
+			// means the scheduler will get double started() and stopped() callbacks...
 			m_audio_renderer = factory->get_playable_factory()->new_aux_audio_playable(context, cookie, node, evp, (net::audio_datasource*) m_audio_ds); //KB XXXX cast
 			AM_DBG lib::logger::get_logger()->debug("active_video_renderer::active_video_renderer: audio renderer created(0x%x)!", (void*) m_audio_renderer);
 		} else {
@@ -145,7 +147,7 @@ video_renderer::start (double where)
 		m_audio_renderer->start(where);
 
 	m_dest->show(this);
-
+	m_context->started(m_cookie, 0);
 	m_lock.leave();
 }
 

@@ -494,7 +494,6 @@ gui::sdl::sdl_audio_renderer::stop()
 	if (m_is_playing) {
 		m_lock.leave();
 		unregister_renderer(this);
-		// XXX Should we call stopped_callback?
 		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
 	}
@@ -546,6 +545,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 			m_transition_engine = new smil2::audio_transition_engine();
 			m_transition_engine->init(m_event_processor, false, m_intransition);
 		}
+		m_context->started(m_cookie, 0);
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start: no datasource");
 		m_lock.leave();

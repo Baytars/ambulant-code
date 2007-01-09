@@ -223,6 +223,7 @@ cocoa_video_renderer::start(double where)
 	m_lock.enter();
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
+	m_context->started(m_cookie);
 	m_lock.leave();
 }
 
