@@ -70,10 +70,11 @@ renderer_playable::start(double t)
 	m_activated = true;
 	if (!m_dest) {
 		lib::logger::get_logger()->trace("renderer_playable.start: no destination surface, skipping media item");
-		m_context->stopped(m_cookie, 0);
+		m_context->stopped(m_cookie);
 		return;
 	}
 	m_dest->show(this);
+	m_context->started(m_cookie);
 }
 
 void
@@ -87,6 +88,7 @@ renderer_playable::stop()
 			m_dest->renderer_done(this);
 	}
 	m_activated = false;
+	m_context->stopped(m_cookie);
 }
 
 void
@@ -203,8 +205,8 @@ renderer_playable_ds::stop()
 		m_src->release();
 	}
 	m_src = NULL;
-	if (m_context)
-		m_context->stopped(m_cookie, 0);
+	assert(m_context);
+	m_context->stopped(m_cookie, 0);
 }
 
 renderer_playable_dsall::~renderer_playable_dsall()
