@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: AmbulantPlayer 1.8\n"
@@ -408,7 +407,6 @@ msgid "_Reload"
 msgstr "_Laad Opnieuw"
 
 #: src/player_gtk/gtk_gui.cpp:283
-#, fuzzy
 msgid "Reload current document"
 msgstr "Laad het huidige document opnieuw"
 
@@ -433,34 +431,30 @@ msgid "_Quit"
 msgstr "_Stop"
 
 #: src/player_gtk/gtk_gui.cpp:289
-#, fuzzy
 msgid "Quit Ambulant Player"
-msgstr "Over AmbulantPlayer"
+msgstr "Stop AmbulantPlayer"
 
 #: src/player_gtk/gtk_gui.cpp:292 src/player_gtk/gtk_gui.cpp:293
 msgid "Pla_y"
 msgstr "Spee_l"
 
 #: src/player_gtk/gtk_gui.cpp:294
-#, fuzzy
 msgid "Start document playback"
-msgstr "Stop het document"
+msgstr "Speel het document"
 
 #: src/player_gtk/gtk_gui.cpp:295
 msgid "_Pause"
 msgstr "_Pauzeer"
 
 #: src/player_gtk/gtk_gui.cpp:296
-#, fuzzy
 msgid "Pause document playback"
-msgstr "pauzeer het document"
+msgstr "Pauzeer het document"
 
 #: src/player_gtk/gtk_gui.cpp:297
 msgid "_Stop"
 msgstr "_Stop"
 
 #: src/player_gtk/gtk_gui.cpp:298
-#, fuzzy
 msgid "Stop document playback"
 msgstr "Stop het document"
 
@@ -490,7 +484,7 @@ msgstr "_Logboek"
 
 #: src/player_gtk/gtk_gui.cpp:306
 msgid "Show status output window"
-msgstr ""
+msgstr "Toon statusvenster"
 
 #: src/player_gtk/gtk_gui.cpp:308
 msgid "_Help"
