@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2007-02-15 17:49+0100\n"
+"POT-Creation-Date: 2007-02-21 11:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -276,7 +276,7 @@ msgstr ""
 msgid "Error encountered while reading file %s"
 msgstr ""
 
-#: src/libambulant/net/url.cpp:470
+#: src/libambulant/net/url.cpp:473
 #, c-format
 msgid "%s: Cannot parse URL"
 msgstr ""
