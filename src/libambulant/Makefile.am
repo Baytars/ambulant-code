@@ -261,6 +261,7 @@ libambulant_la_SOURCES = \
 	common/region.cpp \
 	common/renderer_impl.cpp \
 	common/schema.cpp \
+	common/scripting.cpp \
 	common/smil_alignment.cpp \
 	common/smil_handler.cpp \
 	common/plugin_engine.cpp \

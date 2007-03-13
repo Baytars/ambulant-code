@@ -58,7 +58,7 @@ void initambulant();
 #endif
 using namespace ambulant;
 
-#define AMPYTHON_MODULE_NAME "pyamplugin"
+#define AMPYTHON_MODULE_NAME "pyamscriptplugin"
 #define AMPYTHON_METHOD_NAME "initialize"
 
 static ambulant::common::factories * 
