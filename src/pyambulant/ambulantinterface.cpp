@@ -2150,16 +2150,19 @@ factories::factories(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "init_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_datasource_factory");
 		if (!PyObject_HasAttrString(itself, "init_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_parser_factory");
 		if (!PyObject_HasAttrString(itself, "init_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_node_factory");
+		if (!PyObject_HasAttrString(itself, "init_script_component_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: init_script_component_factory");
 		if (!PyObject_HasAttrString(itself, "get_playable_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_playable_factory");
 		if (!PyObject_HasAttrString(itself, "get_window_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_window_factory");
 		if (!PyObject_HasAttrString(itself, "get_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_datasource_factory");
 		if (!PyObject_HasAttrString(itself, "get_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_parser_factory");
 		if (!PyObject_HasAttrString(itself, "get_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_node_factory");
+		if (!PyObject_HasAttrString(itself, "get_script_component_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: get_script_component_factory");
 		if (!PyObject_HasAttrString(itself, "set_playable_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_playable_factory");
 		if (!PyObject_HasAttrString(itself, "set_window_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_window_factory");
 		if (!PyObject_HasAttrString(itself, "set_datasource_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_datasource_factory");
 		if (!PyObject_HasAttrString(itself, "set_parser_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_parser_factory");
 		if (!PyObject_HasAttrString(itself, "set_node_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_node_factory");
+		if (!PyObject_HasAttrString(itself, "set_script_component_factory")) PyErr_Warn(PyExc_Warning, "factories: missing attribute: set_script_component_factory");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -2259,6 +2262,21 @@ void factories::init_node_factory()
 	if (PyErr_Occurred())
 	{
 		PySys_WriteStderr("Python exception during factories::init_node_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::init_script_component_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "init_script_component_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::init_script_component_factory() callback:\n");
 		PyErr_Print();
 	}
 
@@ -2387,6 +2405,30 @@ ambulant::lib::node_factory* factories::get_node_factory() const
 	return _rv;
 }
 
+ambulant::common::global_script_component_factory* factories::get_script_component_factory() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::common::global_script_component_factory* _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "get_script_component_factory", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::get_script_component_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", global_script_component_factoryObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during factories::get_script_component_factory() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
 void factories::set_playable_factory(ambulant::common::global_playable_factory* pf)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
@@ -2473,6 +2515,24 @@ void factories::set_node_factory(ambulant::lib::node_factory* nf)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_nf);
+
+	PyGILState_Release(_GILState);
+}
+
+void factories::set_script_component_factory(ambulant::common::global_script_component_factory* sf)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_sf = Py_BuildValue("O&", global_script_component_factoryObj_New, sf);
+
+	PyObject *py_rv = PyObject_CallMethod(py_factories, "set_script_component_factory", "(O)", py_sf);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during factories::set_script_component_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_sf);
 
 	PyGILState_Release(_GILState);
 }
@@ -6126,6 +6186,240 @@ void animation_destination::set_region_soundalign(ambulant::common::sound_alignm
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_sa);
+
+	PyGILState_Release(_GILState);
+}
+
+/* --------------------- Class script_component --------------------- */
+
+script_component::script_component(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "declare_state")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: declare_state");
+		if (!PyObject_HasAttrString(itself, "bool_expression")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: bool_expression");
+		if (!PyObject_HasAttrString(itself, "set_value")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: set_value");
+		if (!PyObject_HasAttrString(itself, "send")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: send");
+		if (!PyObject_HasAttrString(itself, "string_expression")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: string_expression");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_script_component = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+script_component::~script_component()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_script_component);
+	py_script_component = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+void script_component::declare_state(const ambulant::lib::node* state)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_state = Py_BuildValue("O&", nodeObj_New, state);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "declare_state", "(O)", py_state);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::declare_state() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_state);
+
+	PyGILState_Release(_GILState);
+}
+
+bool script_component::bool_expression(const char* expr)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_expr = Py_BuildValue("s", expr);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "bool_expression", "(O)", py_expr);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::bool_expression() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during script_component::bool_expression() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_expr);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+void script_component::set_value(const char* var, const char* expr)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_var = Py_BuildValue("s", var);
+	PyObject *py_expr = Py_BuildValue("s", expr);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "set_value", "(OO)", py_var, py_expr);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::set_value() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_var);
+	Py_XDECREF(py_expr);
+
+	PyGILState_Release(_GILState);
+}
+
+void script_component::send(const char* submission)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_submission = Py_BuildValue("s", submission);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "send", "(O)", py_submission);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::send() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_submission);
+
+	PyGILState_Release(_GILState);
+}
+
+std::string script_component::string_expression(const char* expr)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	std::string _rv;
+	PyObject *py_expr = Py_BuildValue("s", expr);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "string_expression", "(O)", py_expr);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::string_expression() callback:\n");
+		PyErr_Print();
+	}
+
+	char *_rv_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv_cstr))
+	{
+		PySys_WriteStderr("Python exception during script_component::string_expression() return:\n");
+		PyErr_Print();
+	}
+
+	_rv = _rv_cstr;
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_expr);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+/* ----------------- Class script_component_factory ----------------- */
+
+script_component_factory::script_component_factory(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "new_script_component")) PyErr_Warn(PyExc_Warning, "script_component_factory: missing attribute: new_script_component");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_script_component_factory = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+script_component_factory::~script_component_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_script_component_factory);
+	py_script_component_factory = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+ambulant::common::script_component* script_component_factory::new_script_component(const char* uri)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::common::script_component* _rv;
+	PyObject *py_uri = Py_BuildValue("s", uri);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component_factory, "new_script_component", "(O)", py_uri);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component_factory::new_script_component() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", script_componentObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during script_component_factory::new_script_component() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_uri);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+/* ------------- Class global_script_component_factory -------------- */
+
+global_script_component_factory::global_script_component_factory(PyObject *itself)
+:	::script_component_factory(itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "add_factory")) PyErr_Warn(PyExc_Warning, "global_script_component_factory: missing attribute: add_factory");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_global_script_component_factory = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+global_script_component_factory::~global_script_component_factory()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_global_script_component_factory);
+	py_global_script_component_factory = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+void global_script_component_factory::add_factory(ambulant::common::script_component_factory* sf)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_sf = Py_BuildValue("O&", script_component_factoryObj_New, sf);
+
+	PyObject *py_rv = PyObject_CallMethod(py_global_script_component_factory, "add_factory", "(O)", py_sf);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during global_script_component_factory::add_factory() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_sf);
 
 	PyGILState_Release(_GILState);
 }

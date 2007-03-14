@@ -82,5 +82,6 @@ factories::init_node_factory()
 void
 factories::init_script_component_factory()
 {
+	m_script_component_factory = get_global_script_component_factory();
 }
 

@@ -586,6 +586,10 @@ global_playable_factory_object.othermethods = [
     "ambulant::common::playable* new_playable(ambulant::common::playable_notification*, int, const ambulant::lib::node*, ambulant::lib::event_processor*) { abort(); }", # XXX
     "ambulant::common::playable* new_aux_audio_playable(ambulant::common::playable_notification *context, int, const ambulant::lib::node *node, ambulant::lib::event_processor *evp, ambulant::net::audio_datasource *src) { abort(); }", # XXX
 ]
+
+global_script_component_factory_object.othermethods = [
+    "ambulant::common::script_component* new_script_component(const char*) { abort(); }", # XXX
+]
 datasource_object.othermethods = [
     "long add_ref() { return 1; }",
     "long release() { return 1;}",
