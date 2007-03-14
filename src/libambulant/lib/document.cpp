@@ -39,6 +39,9 @@ using namespace ambulant;
 lib::document::document()
 :	m_root(NULL),
 	m_root_owned(false)
+#ifdef WITH_SMIL30
+	, m_state(NULL)
+#endif // WITH_SMIL30
 {
 }
 
@@ -46,6 +49,9 @@ lib::document::document()
 lib::document::document(node *root, bool owned) 
 :	m_root(root),
 	m_root_owned(owned)
+#ifdef WITH_SMIL30
+	, m_state(NULL)
+#endif // WITH_SMIL30
 {
 	build_id2node_map();
 	read_custom_attributes();
@@ -55,6 +61,9 @@ lib::document::document(node *root, const net::url& src_url)
 :	m_root(root),
 	m_root_owned(xxx),
 	m_src_url(src_url)
+#ifdef WITH_SMIL30
+	, m_state(NULL)
+#endif // WITH_SMIL30
 {
 	build_id2node_map();
 	read_custom_attributes();
@@ -63,6 +72,7 @@ lib::document::document(node *root, const net::url& src_url)
 
 lib::document::~document() {
 	if (m_root_owned) delete m_root;
+	// m_state is borrowed.
 }
 
 lib::node* 

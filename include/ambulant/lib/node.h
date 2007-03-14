@@ -58,6 +58,12 @@
 
 namespace ambulant {
 
+#ifdef WITH_SMIL30
+namespace common {
+class script_component;
+};
+#endif // WITH_SMIL30
+
 namespace lib {
 
 class custom_test;
@@ -297,6 +303,11 @@ class node_context {
 
 	/// Return node with a given ID.
 	virtual const node* get_node(const std::string& idd) const = 0;
+	
+#ifdef WITH_SMIL30
+	/// Return the state engine.
+	virtual common::script_component *get_state() const = 0;
+#endif
 };
 
 /// Interface for factory class that creates node objects.

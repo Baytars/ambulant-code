@@ -120,6 +120,14 @@ class AMBULANTAPI document : public node_context {
 	
 	/// Set the source URL of the document.
 	void set_src_url(ambulant::net::url u) { m_src_url = u;}
+#ifdef WITH_SMIL30
+	/// Return the state engine.
+	common::script_component *get_state() const { return m_state;}
+	
+	/// Set the state engine.
+	void set_state(common::script_component *state) { m_state = state; }	
+#endif // WITH_SMIL30
+
   protected:
 	document();
 //	document(node *root = 0, bool owned=true);
@@ -158,7 +166,9 @@ class AMBULANTAPI document : public node_context {
 	// map of id to nodes
 	std::map<std::string, const node*> m_id2node;
 
-	
+#ifdef WITH_SMIL30
+	common::script_component *m_state;
+#endif // WITH_SMIL30
 };
 
 } // namespace lib
