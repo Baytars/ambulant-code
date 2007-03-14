@@ -65,7 +65,7 @@ global_script_component_factory_impl::new_script_component(const char *uri)
 }
 
 global_script_component_factory *
-get_global_script_component_factory()
+common::get_global_script_component_factory()
 {
 	static global_script_component_factory *gscf;
 	
