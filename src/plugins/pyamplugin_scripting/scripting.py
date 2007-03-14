@@ -6,13 +6,18 @@ class MyScriptComponentFactory(ambulant.script_component_factory):
         
     def new_script_component(self, uri):
         print 'new_script_component, uri=', uri
-        if url == "http://www.ambulantplayer.org/components/pyscript":
+        if uri == "http://www.ambulantplayer.org/components/pyscript":
             return MyScriptComponent()
         return None
         
 class MyScriptComponent(ambulant.script_component):
+    def __init__(self):
+        print 'MyScriptComponent()'
+        
     def declare_state(self, state):
-        print 'declare_state, node=', node
+        print 'declare_state, node=', state
+        import pdb
+        pdb.set_trace()
         
     def bool_expression(self, expr):
         print 'bool_expression, expr=', expr
