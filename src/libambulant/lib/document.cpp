@@ -264,3 +264,33 @@ void lib::document::read_custom_attributes() {
 		}
 	}
 }
+
+#ifdef WITH_SMIL30
+lib::xml_string
+lib::document::apply_avt(const xml_string& name, const xml_string& value) const
+{
+	if (!m_state) return value;
+	/* XXXJACK Check that applying AVT to attribute "name" is allowed */
+	xml_string rv = "";
+	xml_string rest = value;
+	while (rest != "") {
+		int openpos = rest.find('{');
+		int closepos = rest.find('}');
+		if (openpos == std::string::npos && closepos == std::string::npos) {
+			rv += rest;
+			rest = "";
+			break;
+		}
+		if (openpos == std::string::npos || closepos == std::string::npos ||
+				openpos > closepos) {
+			lib::logger::get_logger()->trace("Unmatched {} in %s=\"%s\"", name.c_str(), value.c_str());
+			return value;
+		}
+		rv += rest.substr(0, openpos);
+		xml_string expr = rest.substr(openpos+1, closepos-openpos-1);
+		rv += m_state->string_expression(expr.c_str());
+		rest = rest.substr(closepos+1);
+	}
+	return rv;		
+}
+#endif // WITH_SMIL30
