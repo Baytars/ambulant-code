@@ -174,6 +174,7 @@ void smil_player::create_state_engine() {
 		return;
 	}
 	m_state_engine->declare_state(state);
+	m_state_engine->register_state_test_methods(smil2::test_attrs::get_state_test_methods());
 	m_doc->set_state(m_state_engine);
 }
 #endif

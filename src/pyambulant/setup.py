@@ -10,6 +10,7 @@ WITH_SDL=True
 DEFS =  [
     ('WITH_EXTERNAL_DOM', '1'),
     ('ENABLE_NLS', '1'),
+    ('WITH_SMIL30', '1'),
     ]
     
 EXTRA_LINK_ARGS=[]

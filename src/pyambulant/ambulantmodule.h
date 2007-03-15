@@ -112,6 +112,9 @@ extern int region_infoObj_Convert(PyObject *v, ambulant::common::region_info* *p
 extern PyObject *animation_destinationObj_New(ambulant::common::animation_destination* itself);
 extern int animation_destinationObj_Convert(PyObject *v, ambulant::common::animation_destination* *p_itself);
 
+extern PyObject *state_test_methodsObj_New(ambulant::common::state_test_methods* itself);
+extern int state_test_methodsObj_Convert(PyObject *v, ambulant::common::state_test_methods* *p_itself);
+
 extern PyObject *script_componentObj_New(ambulant::common::script_component* itself);
 extern int script_componentObj_Convert(PyObject *v, ambulant::common::script_component* *p_itself);
 

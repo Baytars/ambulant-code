@@ -68,6 +68,12 @@ public:
 	ambulant::net::url resolve_url(const ambulant::net::url& rurl) const;
 	const ambulant::lib::node* get_root() const;
 	const ambulant::lib::node* get_node(const std::string& idd) const;
+#ifdef WITH_SMIL30
+	ambulant::common::script_component* get_state() const;
+#endif
+#ifdef WITH_SMIL30
+	ambulant::lib::xml_string apply_avt(const ambulant::lib::xml_string& name, const ambulant::lib::xml_string& value) const;
+#endif
 	const custom_test_map* get_custom_tests() const { return NULL; }
   private:
 	PyObject *py_node_context;
@@ -1016,11 +1022,45 @@ inline animation_destination *Py_WrapAs_animation_destination(PyObject *o)
 	return rv;
 }
 
+class state_test_methods : public cpppybridge, public ambulant::common::state_test_methods {
+public:
+	state_test_methods(PyObject *itself);
+	virtual ~state_test_methods();
+
+	bool smil_audio_desc() const;
+	int smil_bitrate() const;
+	bool smil_captions() const;
+	bool smil_component(std::string uri) const;
+	bool smil_custom_test(std::string name) const;
+	std::string smil_cpu() const;
+	bool smil_language(std::string lang) const;
+	std::string smil_operating_system() const;
+	std::string smil_overdub_or_subtitle() const;
+	bool smil_required(std::string uri) const;
+	int smil_screen_depth() const;
+	int smil_screen_height() const;
+	int smil_screen_width() const;
+  private:
+	PyObject *py_state_test_methods;
+
+	friend PyObject *state_test_methodsObj_New(ambulant::common::state_test_methods *itself);
+};
+#define BGEN_BACK_SUPPORT_state_test_methods
+inline state_test_methods *Py_WrapAs_state_test_methods(PyObject *o)
+{
+	state_test_methods *rv = dynamic_cast<state_test_methods*>(pycppbridge_getwrapper(o));
+	if (rv) return rv;
+	rv = new state_test_methods(o);
+	pycppbridge_setwrapper(o, rv);
+	return rv;
+}
+
 class script_component : public cpppybridge, public ambulant::common::script_component {
 public:
 	script_component(PyObject *itself);
 	virtual ~script_component();
 
+	void register_state_test_methods(ambulant::common::state_test_methods* stm);
 	void declare_state(const ambulant::lib::node* state);
 	bool bool_expression(const char* expr);
 	void set_value(const char* var, const char* expr);

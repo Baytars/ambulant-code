@@ -89,6 +89,7 @@ OBJECTS=[
 	("animation_destination", "ambulant::common::animation_destination", "region_info"),
 	
 	"common/scripting.h",
+	("state_test_methods", "ambulant::common::state_test_methods", None),
 	("script_component", "ambulant::common::script_component", None),
 	("script_component_factory", "ambulant::common::script_component_factory", None),
 	("global_script_component_factory", "ambulant::common::global_script_component_factory", "script_component_factory"),

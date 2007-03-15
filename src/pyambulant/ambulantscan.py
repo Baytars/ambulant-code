@@ -146,6 +146,12 @@ class MyScanner(CxxScanner):
                 'create_live_audio_datasource_factory',
                 ]
             ),
+            ('#ifdef WITH_SMIL30', [
+                'apply_avt',
+                'set_state',
+                'get_state',
+                ]
+            ),
         ]
 
     def makerepairinstructions(self):

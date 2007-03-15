@@ -24,7 +24,7 @@ where=0
   </head>
   <body>
    <seq>
-    <text expr="where != 0" src="data:,Restarting at slide {where}..." region="Captions" dur="2s">
+    <text expr="where != 0" src="data:,Restarting at slide {where}, bitrate={smil_bitrate()}..." region="Captions" dur="2s">
       <param name="color" value="white"/>
     </text>
     <par id="AdvancedPPCSlideshow">

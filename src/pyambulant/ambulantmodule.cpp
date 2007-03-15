@@ -285,6 +285,47 @@ static PyObject *node_contextObj_get_node(node_contextObject *_self, PyObject *_
 	return _res;
 }
 
+#ifdef WITH_SMIL30
+
+static PyObject *node_contextObj_get_state(node_contextObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::script_component* _rv = _self->ob_itself->get_state();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     script_componentObj_New, _rv);
+	return _res;
+}
+#endif
+
+#ifdef WITH_SMIL30
+
+static PyObject *node_contextObj_apply_avt(node_contextObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string name;
+	ambulant::lib::xml_string value;
+	char *name_cstr;
+	char *value_cstr;
+	if (!PyArg_ParseTuple(_args, "ss",
+	                      &name_cstr,
+	                      &value_cstr))
+		return NULL;
+	name = name_cstr;
+	value = value_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::xml_string _rv = _self->ob_itself->apply_avt(name,
+	                                                            value);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+#endif
+
 static PyMethodDef node_contextObj_methods[] = {
 	{"set_prefix_mapping", (PyCFunction)node_contextObj_set_prefix_mapping, 1,
 	 PyDoc_STR("(std::string prefix, std::string uri) -> None")},
@@ -296,6 +337,16 @@ static PyMethodDef node_contextObj_methods[] = {
 	 PyDoc_STR("() -> (const ambulant::lib::node* _rv)")},
 	{"get_node", (PyCFunction)node_contextObj_get_node, 1,
 	 PyDoc_STR("(std::string idd) -> (const ambulant::lib::node* _rv)")},
+
+#ifdef WITH_SMIL30
+	{"get_state", (PyCFunction)node_contextObj_get_state, 1,
+	 PyDoc_STR("() -> (ambulant::common::script_component* _rv)")},
+#endif
+
+#ifdef WITH_SMIL30
+	{"apply_avt", (PyCFunction)node_contextObj_apply_avt, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string name, ambulant::lib::xml_string value) -> (ambulant::lib::xml_string _rv)")},
+#endif
 	{NULL, NULL, 0}
 };
 
@@ -1682,6 +1733,65 @@ static PyObject *documentObj_set_src_url(documentObject *_self, PyObject *_args)
 	return _res;
 }
 
+#ifdef WITH_SMIL30
+
+static PyObject *documentObj_get_state(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::common::script_component* _rv = _self->ob_itself->get_state();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     script_componentObj_New, _rv);
+	return _res;
+}
+#endif
+
+#ifdef WITH_SMIL30
+
+static PyObject *documentObj_set_state(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::common::script_component* state;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      script_componentObj_Convert, &state))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->set_state(state);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+#endif
+
+#ifdef WITH_SMIL30
+
+static PyObject *documentObj_apply_avt(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string name;
+	ambulant::lib::xml_string value;
+	char *name_cstr;
+	char *value_cstr;
+	if (!PyArg_ParseTuple(_args, "ss",
+	                      &name_cstr,
+	                      &value_cstr))
+		return NULL;
+	name = name_cstr;
+	value = value_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::xml_string _rv = _self->ob_itself->apply_avt(name,
+	                                                            value);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+#endif
+
 static PyMethodDef documentObj_methods[] = {
 	{"get_root_1", (PyCFunction)documentObj_get_root_1, 1,
 	 PyDoc_STR("(bool detach) -> (ambulant::lib::node* _rv)")},
@@ -1705,6 +1815,21 @@ static PyMethodDef documentObj_methods[] = {
 	 PyDoc_STR("(std::string idd) -> (const ambulant::lib::node* _rv)")},
 	{"set_src_url", (PyCFunction)documentObj_set_src_url, 1,
 	 PyDoc_STR("(ambulant::net::url u) -> None")},
+
+#ifdef WITH_SMIL30
+	{"get_state", (PyCFunction)documentObj_get_state, 1,
+	 PyDoc_STR("() -> (ambulant::common::script_component* _rv)")},
+#endif
+
+#ifdef WITH_SMIL30
+	{"set_state", (PyCFunction)documentObj_set_state, 1,
+	 PyDoc_STR("(ambulant::common::script_component* state) -> None")},
+#endif
+
+#ifdef WITH_SMIL30
+	{"apply_avt", (PyCFunction)documentObj_apply_avt, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string name, ambulant::lib::xml_string value) -> (ambulant::lib::xml_string _rv)")},
+#endif
 	{NULL, NULL, 0}
 };
 
@@ -10691,6 +10816,378 @@ PyTypeObject animation_destination_Type = {
 /* ------------- End object type animation_destination -------------- */
 
 
+/* ----------------- Object type state_test_methods ----------------- */
+
+extern PyTypeObject state_test_methods_Type;
+
+inline bool state_test_methodsObj_Check(PyObject *x)
+{
+	return ((x)->ob_type == &state_test_methods_Type);
+}
+
+typedef struct state_test_methodsObject {
+	PyObject_HEAD
+	void *ob_dummy_wrapper; // Overlays bridge object storage
+	ambulant::common::state_test_methods* ob_itself;
+} state_test_methodsObject;
+
+PyObject *state_test_methodsObj_New(ambulant::common::state_test_methods* itself)
+{
+	state_test_methodsObject *it;
+	if (itself == NULL)
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+#ifdef BGEN_BACK_SUPPORT_state_test_methods
+	state_test_methods *encaps_itself = dynamic_cast<state_test_methods *>(itself);
+	if (encaps_itself && encaps_itself->py_state_test_methods)
+	{
+		Py_INCREF(encaps_itself->py_state_test_methods);
+		return encaps_itself->py_state_test_methods;
+	}
+#endif
+	it = PyObject_NEW(state_test_methodsObject, &state_test_methods_Type);
+	if (it == NULL) return NULL;
+	/* XXXX Should we tp_init or tp_new our basetype? */
+	it->ob_dummy_wrapper = NULL; // XXXX Should be done in base class
+	it->ob_itself = itself;
+	return (PyObject *)it;
+}
+
+int state_test_methodsObj_Convert(PyObject *v, ambulant::common::state_test_methods* *p_itself)
+{
+	if (v == Py_None)
+	{
+		*p_itself = NULL;
+		return 1;
+	}
+#ifdef BGEN_BACK_SUPPORT_state_test_methods
+	if (!state_test_methodsObj_Check(v))
+	{
+		*p_itself = Py_WrapAs_state_test_methods(v);
+		if (*p_itself) return 1;
+	}
+#endif
+	if (!state_test_methodsObj_Check(v))
+	{
+		PyErr_SetString(PyExc_TypeError, "state_test_methods required");
+		return 0;
+	}
+	*p_itself = ((state_test_methodsObject *)v)->ob_itself;
+	return 1;
+}
+
+static void state_test_methodsObj_dealloc(state_test_methodsObject *self)
+{
+	pycppbridge_Type.tp_dealloc((PyObject *)self);
+}
+
+static PyObject *state_test_methodsObj_smil_audio_desc(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_audio_desc();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_bitrate(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	int _rv = _self->ob_itself->smil_bitrate();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("i",
+	                     _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_captions(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_captions();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_component(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	std::string uri;
+	char *uri_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &uri_cstr))
+		return NULL;
+	uri = uri_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_component(uri);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_custom_test(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	std::string name;
+	char *name_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &name_cstr))
+		return NULL;
+	name = name_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_custom_test(name);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_cpu(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	std::string _rv = _self->ob_itself->smil_cpu();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_language(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	std::string lang;
+	char *lang_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &lang_cstr))
+		return NULL;
+	lang = lang_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_language(lang);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_operating_system(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	std::string _rv = _self->ob_itself->smil_operating_system();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_overdub_or_subtitle(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	std::string _rv = _self->ob_itself->smil_overdub_or_subtitle();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_required(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	std::string uri;
+	char *uri_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &uri_cstr))
+		return NULL;
+	uri = uri_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->smil_required(uri);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_screen_depth(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	int _rv = _self->ob_itself->smil_screen_depth();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("i",
+	                     _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_screen_height(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	int _rv = _self->ob_itself->smil_screen_height();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("i",
+	                     _rv);
+	return _res;
+}
+
+static PyObject *state_test_methodsObj_smil_screen_width(state_test_methodsObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	int _rv = _self->ob_itself->smil_screen_width();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("i",
+	                     _rv);
+	return _res;
+}
+
+static PyMethodDef state_test_methodsObj_methods[] = {
+	{"smil_audio_desc", (PyCFunction)state_test_methodsObj_smil_audio_desc, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"smil_bitrate", (PyCFunction)state_test_methodsObj_smil_bitrate, 1,
+	 PyDoc_STR("() -> (int _rv)")},
+	{"smil_captions", (PyCFunction)state_test_methodsObj_smil_captions, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
+	{"smil_component", (PyCFunction)state_test_methodsObj_smil_component, 1,
+	 PyDoc_STR("(std::string uri) -> (bool _rv)")},
+	{"smil_custom_test", (PyCFunction)state_test_methodsObj_smil_custom_test, 1,
+	 PyDoc_STR("(std::string name) -> (bool _rv)")},
+	{"smil_cpu", (PyCFunction)state_test_methodsObj_smil_cpu, 1,
+	 PyDoc_STR("() -> (std::string _rv)")},
+	{"smil_language", (PyCFunction)state_test_methodsObj_smil_language, 1,
+	 PyDoc_STR("(std::string lang) -> (bool _rv)")},
+	{"smil_operating_system", (PyCFunction)state_test_methodsObj_smil_operating_system, 1,
+	 PyDoc_STR("() -> (std::string _rv)")},
+	{"smil_overdub_or_subtitle", (PyCFunction)state_test_methodsObj_smil_overdub_or_subtitle, 1,
+	 PyDoc_STR("() -> (std::string _rv)")},
+	{"smil_required", (PyCFunction)state_test_methodsObj_smil_required, 1,
+	 PyDoc_STR("(std::string uri) -> (bool _rv)")},
+	{"smil_screen_depth", (PyCFunction)state_test_methodsObj_smil_screen_depth, 1,
+	 PyDoc_STR("() -> (int _rv)")},
+	{"smil_screen_height", (PyCFunction)state_test_methodsObj_smil_screen_height, 1,
+	 PyDoc_STR("() -> (int _rv)")},
+	{"smil_screen_width", (PyCFunction)state_test_methodsObj_smil_screen_width, 1,
+	 PyDoc_STR("() -> (int _rv)")},
+	{NULL, NULL, 0}
+};
+
+#define state_test_methodsObj_getsetlist NULL
+
+
+static int state_test_methodsObj_compare(state_test_methodsObject *self, state_test_methodsObject *other)
+{
+	if ( self->ob_itself > other->ob_itself ) return 1;
+	if ( self->ob_itself < other->ob_itself ) return -1;
+	return 0;
+}
+
+#define state_test_methodsObj_repr NULL
+
+static int state_test_methodsObj_hash(state_test_methodsObject *self)
+{
+	return (int)self->ob_itself;
+}
+static int state_test_methodsObj_tp_init(PyObject *_self, PyObject *_args, PyObject *_kwds)
+{
+	ambulant::common::state_test_methods* itself;
+	Py_KEYWORDS_STRING_TYPE *kw[] = {"itself", 0};
+
+	if (PyArg_ParseTupleAndKeywords(_args, _kwds, "O&", kw, state_test_methodsObj_Convert, &itself))
+	{
+		((state_test_methodsObject *)_self)->ob_itself = itself;
+		return 0;
+	}
+	return -1;
+}
+
+#define state_test_methodsObj_tp_alloc PyType_GenericAlloc
+
+static PyObject *state_test_methodsObj_tp_new(PyTypeObject *type, PyObject *_args, PyObject *_kwds)
+{
+	PyObject *_self;
+
+	if ((_self = type->tp_alloc(type, 0)) == NULL) return NULL;
+	((state_test_methodsObject *)_self)->ob_itself = NULL;
+	return _self;
+}
+
+#define state_test_methodsObj_tp_free PyObject_Del
+
+
+PyTypeObject state_test_methods_Type = {
+	PyObject_HEAD_INIT(NULL)
+	0, /*ob_size*/
+	"ambulant.state_test_methods", /*tp_name*/
+	sizeof(state_test_methodsObject), /*tp_basicsize*/
+	0, /*tp_itemsize*/
+	/* methods */
+	(destructor) state_test_methodsObj_dealloc, /*tp_dealloc*/
+	0, /*tp_print*/
+	(getattrfunc)0, /*tp_getattr*/
+	(setattrfunc)0, /*tp_setattr*/
+	(cmpfunc) state_test_methodsObj_compare, /*tp_compare*/
+	(reprfunc) state_test_methodsObj_repr, /*tp_repr*/
+	(PyNumberMethods *)0, /* tp_as_number */
+	(PySequenceMethods *)0, /* tp_as_sequence */
+	(PyMappingMethods *)0, /* tp_as_mapping */
+	(hashfunc) state_test_methodsObj_hash, /*tp_hash*/
+	0, /*tp_call*/
+	0, /*tp_str*/
+	PyObject_GenericGetAttr, /*tp_getattro*/
+	PyObject_GenericSetAttr, /*tp_setattro */
+	0, /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE, /* tp_flags */
+	0, /*tp_doc*/
+	0, /*tp_traverse*/
+	0, /*tp_clear*/
+	0, /*tp_richcompare*/
+	0, /*tp_weaklistoffset*/
+	0, /*tp_iter*/
+	0, /*tp_iternext*/
+	state_test_methodsObj_methods, /* tp_methods */
+	0, /*tp_members*/
+	state_test_methodsObj_getsetlist, /*tp_getset*/
+	0, /*tp_base*/
+	0, /*tp_dict*/
+	0, /*tp_descr_get*/
+	0, /*tp_descr_set*/
+	0, /*tp_dictoffset*/
+	state_test_methodsObj_tp_init, /* tp_init */
+	state_test_methodsObj_tp_alloc, /* tp_alloc */
+	state_test_methodsObj_tp_new, /* tp_new */
+	state_test_methodsObj_tp_free, /* tp_free */
+};
+
+/* --------------- End object type state_test_methods --------------- */
+
+
 /* ------------------ Object type script_component ------------------ */
 
 extern PyTypeObject script_component_Type;
@@ -10756,6 +11253,21 @@ int script_componentObj_Convert(PyObject *v, ambulant::common::script_component*
 static void script_componentObj_dealloc(script_componentObject *self)
 {
 	pycppbridge_Type.tp_dealloc((PyObject *)self);
+}
+
+static PyObject *script_componentObj_register_state_test_methods(script_componentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::common::state_test_methods* stm;
+	if (!PyArg_ParseTuple(_args, "O&",
+	                      state_test_methodsObj_Convert, &stm))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->register_state_test_methods(stm);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
 }
 
 static PyObject *script_componentObj_declare_state(script_componentObject *_self, PyObject *_args)
@@ -10837,6 +11349,8 @@ static PyObject *script_componentObj_string_expression(script_componentObject *_
 }
 
 static PyMethodDef script_componentObj_methods[] = {
+	{"register_state_test_methods", (PyCFunction)script_componentObj_register_state_test_methods, 1,
+	 PyDoc_STR("(ambulant::common::state_test_methods* stm) -> None")},
 	{"declare_state", (PyCFunction)script_componentObj_declare_state, 1,
 	 PyDoc_STR("(ambulant::lib::node* state) -> None")},
 	{"bool_expression", (PyCFunction)script_componentObj_bool_expression, 1,
@@ -15497,6 +16011,11 @@ void initambulant(void)
 	if (PyType_Ready(&animation_destination_Type) < 0) return;
 	Py_INCREF(&animation_destination_Type);
 	PyModule_AddObject(m, "animation_destination", (PyObject *)&animation_destination_Type);
+	state_test_methods_Type.ob_type = &PyType_Type;
+	state_test_methods_Type.tp_base = &pycppbridge_Type;
+	if (PyType_Ready(&state_test_methods_Type) < 0) return;
+	Py_INCREF(&state_test_methods_Type);
+	PyModule_AddObject(m, "state_test_methods", (PyObject *)&state_test_methods_Type);
 	script_component_Type.ob_type = &PyType_Type;
 	script_component_Type.tp_base = &pycppbridge_Type;
 	if (PyType_Ready(&script_component_Type) < 0) return;
