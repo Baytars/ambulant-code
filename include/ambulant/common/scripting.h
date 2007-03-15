@@ -31,9 +31,35 @@
 namespace ambulant {
 namespace common {
 
+/// API that allows scripting components to obtain systemTest and customTest
+/// values.
+class state_test_methods {
+  public:
+	virtual ~state_test_methods() {}
+	
+	virtual bool smil_audio_desc() const = 0;
+	virtual int smil_bitrate() const = 0;
+	virtual bool smil_captions() const = 0;
+	virtual bool smil_component(std::string uri) const = 0;
+	virtual bool smil_custom_test(std::string name) const = 0;
+	virtual std::string smil_cpu() const = 0;
+	virtual bool smil_language(std::string lang) const = 0;
+	virtual std::string smil_operating_system() const = 0;
+	virtual std::string smil_overdub_or_subtitle() const = 0;
+	virtual bool smil_required(std::string uri) const = 0;
+	virtual int smil_screen_depth() const = 0;
+	virtual int smil_screen_height() const = 0;
+	virtual int smil_screen_width() const = 0;
+};
+
+/// API exported by scripting components, and used by Ambulant to implement
+/// SMIL state.
 class script_component {
   public:
 	virtual ~script_component() {};
+	
+	/// Register the systemTest/customTest API
+	virtual void register_state_test_methods(state_test_methods *stm) = 0;
   
     /// Declare the state in the document
     virtual void declare_state(const lib::node *state) = 0;

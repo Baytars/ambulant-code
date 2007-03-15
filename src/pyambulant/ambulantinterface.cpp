@@ -22,6 +22,8 @@ node_context::node_context(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "resolve_url")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: resolve_url");
 		if (!PyObject_HasAttrString(itself, "get_root")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_root");
 		if (!PyObject_HasAttrString(itself, "get_node")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_node");
+		if (!PyObject_HasAttrString(itself, "get_state")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_state");
+		if (!PyObject_HasAttrString(itself, "apply_avt")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: apply_avt");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -160,6 +162,64 @@ const ambulant::lib::node* node_context::get_node(const std::string& idd) const
 	PyGILState_Release(_GILState);
 	return _rv;
 }
+
+#ifdef WITH_SMIL30
+ambulant::common::script_component* node_context::get_state() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::common::script_component* _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_context, "get_state", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_context::get_state() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", script_componentObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node_context::get_state() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+#endif
+
+#ifdef WITH_SMIL30
+ambulant::lib::xml_string node_context::apply_avt(const ambulant::lib::xml_string& name, const ambulant::lib::xml_string& value) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::lib::xml_string _rv;
+	PyObject *py_name = Py_BuildValue("s", name.c_str());
+	PyObject *py_value = Py_BuildValue("s", value.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_context, "apply_avt", "(OO)", py_name, py_value);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_context::apply_avt() callback:\n");
+		PyErr_Print();
+	}
+
+	char *_rv_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv_cstr))
+	{
+		PySys_WriteStderr("Python exception during node_context::apply_avt() return:\n");
+		PyErr_Print();
+	}
+
+	_rv = _rv_cstr;
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_name);
+	Py_XDECREF(py_value);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+#endif
 
 /* --------------------------- Class node --------------------------- */
 
@@ -6190,6 +6250,369 @@ void animation_destination::set_region_soundalign(ambulant::common::sound_alignm
 	PyGILState_Release(_GILState);
 }
 
+/* -------------------- Class state_test_methods -------------------- */
+
+state_test_methods::state_test_methods(PyObject *itself)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	if (itself)
+	{
+		if (!PyObject_HasAttrString(itself, "smil_audio_desc")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_audio_desc");
+		if (!PyObject_HasAttrString(itself, "smil_bitrate")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_bitrate");
+		if (!PyObject_HasAttrString(itself, "smil_captions")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_captions");
+		if (!PyObject_HasAttrString(itself, "smil_component")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_component");
+		if (!PyObject_HasAttrString(itself, "smil_custom_test")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_custom_test");
+		if (!PyObject_HasAttrString(itself, "smil_cpu")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_cpu");
+		if (!PyObject_HasAttrString(itself, "smil_language")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_language");
+		if (!PyObject_HasAttrString(itself, "smil_operating_system")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_operating_system");
+		if (!PyObject_HasAttrString(itself, "smil_overdub_or_subtitle")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_overdub_or_subtitle");
+		if (!PyObject_HasAttrString(itself, "smil_required")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_required");
+		if (!PyObject_HasAttrString(itself, "smil_screen_depth")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_screen_depth");
+		if (!PyObject_HasAttrString(itself, "smil_screen_height")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_screen_height");
+		if (!PyObject_HasAttrString(itself, "smil_screen_width")) PyErr_Warn(PyExc_Warning, "state_test_methods: missing attribute: smil_screen_width");
+	}
+	if (itself == NULL) itself = Py_None;
+
+	py_state_test_methods = itself;
+	Py_XINCREF(itself);
+	PyGILState_Release(_GILState);
+}
+
+state_test_methods::~state_test_methods()
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	Py_XDECREF(py_state_test_methods);
+	py_state_test_methods = NULL;
+	PyGILState_Release(_GILState);
+}
+
+
+bool state_test_methods::smil_audio_desc() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_audio_desc", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_audio_desc() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_audio_desc() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+int state_test_methods::smil_bitrate() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	int _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_bitrate", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_bitrate() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "i", &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_bitrate() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool state_test_methods::smil_captions() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_captions", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_captions() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_captions() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool state_test_methods::smil_component(std::string uri) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_uri = Py_BuildValue("s", uri.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_component", "(O)", py_uri);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_component() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_component() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_uri);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool state_test_methods::smil_custom_test(std::string name) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_name = Py_BuildValue("s", name.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_custom_test", "(O)", py_name);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_custom_test() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_custom_test() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_name);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+std::string state_test_methods::smil_cpu() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	std::string _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_cpu", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_cpu() callback:\n");
+		PyErr_Print();
+	}
+
+	char *_rv_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv_cstr))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_cpu() return:\n");
+		PyErr_Print();
+	}
+
+	_rv = _rv_cstr;
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool state_test_methods::smil_language(std::string lang) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_lang = Py_BuildValue("s", lang.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_language", "(O)", py_lang);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_language() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_language() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_lang);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+std::string state_test_methods::smil_operating_system() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	std::string _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_operating_system", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_operating_system() callback:\n");
+		PyErr_Print();
+	}
+
+	char *_rv_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv_cstr))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_operating_system() return:\n");
+		PyErr_Print();
+	}
+
+	_rv = _rv_cstr;
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+std::string state_test_methods::smil_overdub_or_subtitle() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	std::string _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_overdub_or_subtitle", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_overdub_or_subtitle() callback:\n");
+		PyErr_Print();
+	}
+
+	char *_rv_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &_rv_cstr))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_overdub_or_subtitle() return:\n");
+		PyErr_Print();
+	}
+
+	_rv = _rv_cstr;
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+bool state_test_methods::smil_required(std::string uri) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_uri = Py_BuildValue("s", uri.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_required", "(O)", py_uri);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_required() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_required() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_uri);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+int state_test_methods::smil_screen_depth() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	int _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_screen_depth", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_depth() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "i", &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_depth() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+int state_test_methods::smil_screen_height() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	int _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_screen_height", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_height() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "i", &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_height() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+int state_test_methods::smil_screen_width() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	int _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_state_test_methods, "smil_screen_width", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_width() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "i", &_rv))
+	{
+		PySys_WriteStderr("Python exception during state_test_methods::smil_screen_width() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
 /* --------------------- Class script_component --------------------- */
 
 script_component::script_component(PyObject *itself)
@@ -6197,6 +6620,7 @@ script_component::script_component(PyObject *itself)
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	if (itself)
 	{
+		if (!PyObject_HasAttrString(itself, "register_state_test_methods")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: register_state_test_methods");
 		if (!PyObject_HasAttrString(itself, "declare_state")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: declare_state");
 		if (!PyObject_HasAttrString(itself, "bool_expression")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: bool_expression");
 		if (!PyObject_HasAttrString(itself, "set_value")) PyErr_Warn(PyExc_Warning, "script_component: missing attribute: set_value");
@@ -6218,6 +6642,24 @@ script_component::~script_component()
 	PyGILState_Release(_GILState);
 }
 
+
+void script_component::register_state_test_methods(ambulant::common::state_test_methods* stm)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_stm = Py_BuildValue("O&", state_test_methodsObj_New, stm);
+
+	PyObject *py_rv = PyObject_CallMethod(py_script_component, "register_state_test_methods", "(O)", py_stm);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during script_component::register_state_test_methods() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_stm);
+
+	PyGILState_Release(_GILState);
+}
 
 void script_component::declare_state(const ambulant::lib::node* state)
 {
