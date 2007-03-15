@@ -307,6 +307,9 @@ class node_context {
 #ifdef WITH_SMIL30
 	/// Return the state engine.
 	virtual common::script_component *get_state() const = 0;
+	
+	/// Apply XSLT Attribute Value Template
+	virtual lib::xml_string apply_avt(const lib::xml_string& name, const lib::xml_string& value) const = 0;
 #endif
 };
 

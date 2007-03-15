@@ -397,7 +397,19 @@ lib::node_impl::get_attribute(const char *name) const {
 	if(!name || !name[0]) return 0;
 	q_attributes_list::const_iterator it;
 	for(it = m_qattrs.begin(); it != m_qattrs.end(); it++)
-		if((*it).first.second == name) return (*it).second.c_str();
+		if((*it).first.second == name) {
+#ifdef WITH_SMIL30
+			if (m_context) {
+				const xml_string ns = name;
+				const xml_string& attrval = (*it).second;
+				if (attrval.find('{') != std::string::npos) {
+					const_cast<lib::node_impl*>(this)->m_avtcache[ns] = m_context->apply_avt(ns, attrval);
+					return const_cast<lib::node_impl*>(this)->m_avtcache[ns].c_str();
+				}
+			}
+#endif
+			return (*it).second.c_str();
+		}
 	return 0;
 }
 
