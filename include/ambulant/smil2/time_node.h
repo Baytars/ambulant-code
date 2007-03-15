@@ -192,6 +192,10 @@ class time_node : public schedulable {
 	// Animations are special internal playables
 	void start_animation(time_type offset);
 	void stop_animation();
+#ifdef WITH_SMIL30
+	// State commands (setvalue, send) are special internal playables
+	void start_statecommand(time_type offset);
+#endif // WITH_SMIL30
 	
 	// Std xml tree navigation interface
 	const time_node *down() const { return m_child;}
@@ -270,6 +274,9 @@ class time_node : public schedulable {
 	bool is_a() const { return m_attrs.get_tag() == "a";}
 	bool is_link() const { return is_area() || is_a();}
 	bool is_animation() const;
+#ifdef WITH_SMIL30
+	bool is_statecommand() const;
+#endif
 	bool is_playable() const;
 
 	const time_attrs* get_time_attrs() const { return &m_attrs;}

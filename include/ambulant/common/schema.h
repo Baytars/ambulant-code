@@ -90,6 +90,11 @@ class schema {
 	/// Return true if an element with tag qname is an animation.
 	bool is_animation(const lib::q_name_pair& qname) const;
 	
+#ifdef WITH_SMIL30
+	/// Return true if an element with tag qname is a state command.
+	bool is_statecommand(const lib::q_name_pair& qname) const;
+#endif // WITH_SMIL30
+
  	schema();
  	~schema();
 	
@@ -99,6 +104,9 @@ class schema {
 	std::set<std::string> m_continuous;
 	std::set<std::string> m_animations;
 	std::set<std::string> m_layout_elements;
+#ifdef WITH_SMIL30
+	std::set<std::string> m_statecommands;
+#endif // WITH_SMIL30
 };
 
 } // namespace common

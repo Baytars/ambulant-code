@@ -48,6 +48,11 @@ static const char* layout_elements[] = {
 	"root-layout", "topLayout", "region"
 };
 
+#ifdef WITH_SMIL30
+static const char* statecommand_elements[] = {
+	"setvalue", "send"
+};
+#endif // WITH_SMIL30
 // Create the smplest possible schema factory
 // Its sole purpose is to create privately the schema singleton.
 namespace ambulant {
@@ -93,6 +98,15 @@ schema::schema() {
 		m_animations.insert(animate_elements[i]);
 	}
 		
+#ifdef WITH_SMIL30
+	n = sizeof(statecommand_elements)/sizeof(const char *);
+	for(i =0;i<n;i++) {
+		m_time_elements.insert(statecommand_elements[i]);
+		m_discrete.insert(statecommand_elements[i]);
+		m_statecommands.insert(statecommand_elements[i]);
+	}
+#endif // WITH_SMIL30
+		
 	n = sizeof(layout_elements)/sizeof(const char *);
 	for(i=0; i<n; i++) {
 		m_layout_elements.insert(layout_elements[i]);
@@ -120,6 +134,12 @@ bool schema::is_discrete(const lib::q_name_pair& qname) const {
 bool schema::is_animation(const lib::q_name_pair& qname) const {
 	return m_animations.find(qname.second) != m_animations.end();
 }
+
+#ifdef WITH_SMIL30
+bool schema::is_statecommand(const lib::q_name_pair& qname) const {
+	return m_statecommands.find(qname.second) != m_statecommands.end();
+}
+#endif // WITH_SMIL30
 
 const char* 
 ambulant::common::time_container_type_as_str(time_container_type t) {
