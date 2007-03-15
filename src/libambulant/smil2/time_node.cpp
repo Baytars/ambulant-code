@@ -748,6 +748,10 @@ void time_node::start_statecommand(time_type offset) {
 			return;
 		}
 		sc->set_value(ref, value);
+		// XXXJACK Raising the state_change_event here is also a bit of a hack
+		time_node *root = get_root();
+		assert(root);
+		root->raise_state_change(std::pair<qtime_type, std::string>(timestamp, ref));
 	} else if (tag == "send") {
 		const char *submission = m_node->get_attribute("submission");
 		if (!submission) {
@@ -1526,6 +1530,80 @@ void time_node::on_add_instance(qtime_type timestamp, smil2::sync_event ev,
 	}
 }
 
+#ifdef WITH_SMIL30
+// XXXJACK I *know* this can be done with templates, but how: this method is
+// 100% identical to the previous one.
+// Update dependents for an event instance
+// Asserts that the same event is not used to update the same element twice.
+void time_node::on_add_instance(qtime_type timestamp, smil2::sync_event ev, 
+	time_node::time_type instance, std::string data, time_node *filter) {
+	dependency_map::iterator dit = m_dependents.find(ev);
+	if(dit == m_dependents.end() || (*dit).second == 0) {
+		/*AM_DBG*/ m_logger->debug("No dependents for on_add_instance event on 0x%x", (void*)this);
+		// no dependents
+		return;
+	}
+	
+	// List of rules to update 
+	rule_list *p = (*dit).second;
+	
+	// Set of dependents
+	std::set<time_node*> dset;
+	
+	// 1. add event to not active
+	// 1.1 begin
+	rule_list::iterator it;
+	for(it=p->begin();it!=p->end();it++) {
+		time_node* owner = (*it)->get_target();
+		/*AM_DBG*/ m_logger->debug("%s[%s].on_add_instance() --> %s[%s]", 
+			m_attrs.get_tag().c_str(), m_attrs.get_id().c_str(), 
+			owner->get_time_attrs()->get_tag().c_str(), owner->get_time_attrs()->get_id().c_str()); 
+		rule_type rt = (*it)->get_target_attr();
+		if(!owner->is_active() && rt == rt_begin && dset.find(owner) == dset.end()) {
+			if(!filter || !nnhelper::is_descendent(owner, filter)) {
+				(*it)->add_instance(timestamp, instance, data);
+				dset.insert(owner);
+			}
+		}
+	}
+	// 1.2 end
+	for(it=p->begin();it!=p->end();it++) {
+		time_node* owner = (*it)->get_target();
+		rule_type rt = (*it)->get_target_attr();
+		if(!owner->is_active() && rt == rt_end && dset.find(owner) == dset.end()) {
+			if(!filter || !nnhelper::is_descendent(owner, filter)) {
+				(*it)->add_instance(timestamp, instance, data);
+				dset.insert(owner);
+			}
+		}
+	}
+	
+	// 2. add event to active
+	// 2.1 end
+	for(it=p->begin();it!=p->end();it++) {
+		time_node* owner = (*it)->get_target();
+		rule_type rt = (*it)->get_target_attr();
+		if(owner->is_active() && rt == rt_end && dset.find(owner) == dset.end()) {
+			if(!filter || !nnhelper::is_descendent(owner, filter)) {
+				(*it)->add_instance(timestamp, instance, data);
+				dset.insert(owner);
+			}
+		}
+	}
+	// 2.2 begin
+	for(it=p->begin();it!=p->end();it++) {
+		time_node* owner = (*it)->get_target();
+		rule_type rt = (*it)->get_target_attr();
+		if(owner->is_active() && rt == rt_begin && dset.find(owner) == dset.end()) {
+			if(!filter || !nnhelper::is_descendent(owner, filter)) {
+				(*it)->add_instance(timestamp, instance, data);
+				dset.insert(owner);
+			}
+		}
+	}
+}
+#endif // WITH_SMIL30
+
 ////////////////////
 // Raising events: 
 // beginEvent, repeat event, endEvent
@@ -1679,6 +1757,21 @@ void time_node::raise_accesskey(std::pair<qtime_type, int> accesskey) {
 		timestamp.as_doc_time_value());
 	on_add_instance(timestamp, accesskey_event, timestamp.second, ch);
 }
+
+#ifdef WITH_SMIL30
+void time_node::raise_state_change(std::pair<qtime_type, std::string> statearg) {
+	qtime_type timestamp = statearg.first;
+	std::string statevar = statearg.second;
+// XXXJACK	timestamp.to_descendent(sync_node());
+	/*AM_DBG*/ m_logger->debug("%s[%s].raise_state_change_event(%s) ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
+		m_attrs.get_id().c_str(),
+		statevar.c_str(),
+		timestamp.as_time_value_down_to(this),
+		timestamp.second(), 
+		timestamp.as_doc_time_value());
+	on_add_instance(timestamp, state_change_event, timestamp.second, statevar);
+}
+#endif
 
 void time_node::raise_update_event(qtime_type timestamp) {
 	m_update_event.first = true;

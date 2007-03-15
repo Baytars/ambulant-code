@@ -152,6 +152,9 @@ class time_node : public schedulable {
 	virtual void raise_focusin_event(qtime_type timestamp);
 	virtual void raise_focusout_event(qtime_type timestamp);
 	virtual void raise_accesskey(std::pair<qtime_type, int> accesskey);
+#ifdef WITH_SMIL30
+	virtual void raise_state_change(std::pair<qtime_type, std::string> statearg);
+#endif
 	virtual void raise_update_event(qtime_type timestamp);
 	
 	// Interval manipulators	
@@ -314,6 +317,7 @@ class time_node : public schedulable {
 	void on_cancel_instance(qtime_type timestamp, sync_event ev, time_type instance, time_node *filter=0);
 	void on_update_instance(qtime_type timestamp, sync_event ev, time_type instance, time_type old_instance, time_node *filter=0);
 	void on_add_instance(qtime_type timestamp, sync_event ev, time_type instance, int data = 0, time_node *filter=0);
+	void on_add_instance(qtime_type timestamp, sync_event ev, time_type instance, std::string data, time_node *filter=0);
 		
 	// Returns the lifetime state handler object of this time node
 	time_state* get_state() { return m_state;}
