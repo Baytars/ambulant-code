@@ -19,7 +19,6 @@ class MyScriptComponent(ambulant.script_component):
         
     def register_state_test_methods(self, stm):
         print 'register_state_test_methods, stm=', stm
-        print 'dir:', dir(stm)
         # Export things to the scripts
         for name in dir(stm):
             if name[:5] == 'smil_':
@@ -41,8 +40,9 @@ class MyScriptComponent(ambulant.script_component):
         return rv
         
     def set_value(self, var, expr):
-        print 'set_value, var=', var, 'expr=', expr
-        exec "%s = %s" % (var, expr) in self.scope, self.globscope
+        stmt = "%s = %s" % (var, expr)
+        print 'set_value, statement=', stmt
+        exec stmt in self.scope, self.globscope
         
     def send(self, submission):
         print 'send, submission=', submission

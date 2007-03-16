@@ -351,7 +351,7 @@ void timegraph::add_begin_sync_rules(time_node *tn) {
 			tn->add_begin_rule(sr);
 #ifdef WITH_SMIL30
 		} else if(svs.type == sv_state_change) {
-			/*AM_DBG*/ m_logger->debug("Adding state change event to 0x%x\n", m_root);
+			AM_DBG m_logger->debug("Adding state change event to 0x%x\n", m_root);
 			sync_rule *sr = new event_rule(m_root, state_change_event, svs.offset, svs.sparam);
 			tn->add_begin_rule(sr);
 #endif // WITH_SMIL30

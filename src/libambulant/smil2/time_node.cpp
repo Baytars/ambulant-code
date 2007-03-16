@@ -1539,7 +1539,7 @@ void time_node::on_add_instance(qtime_type timestamp, smil2::sync_event ev,
 	time_node::time_type instance, std::string data, time_node *filter) {
 	dependency_map::iterator dit = m_dependents.find(ev);
 	if(dit == m_dependents.end() || (*dit).second == 0) {
-		/*AM_DBG*/ m_logger->debug("No dependents for on_add_instance event on 0x%x", (void*)this);
+		AM_DBG m_logger->debug("No dependents for on_add_instance event on 0x%x", (void*)this);
 		// no dependents
 		return;
 	}
@@ -1555,9 +1555,10 @@ void time_node::on_add_instance(qtime_type timestamp, smil2::sync_event ev,
 	rule_list::iterator it;
 	for(it=p->begin();it!=p->end();it++) {
 		time_node* owner = (*it)->get_target();
-		/*AM_DBG*/ m_logger->debug("%s[%s].on_add_instance() --> %s[%s]", 
-			m_attrs.get_tag().c_str(), m_attrs.get_id().c_str(), 
-			owner->get_time_attrs()->get_tag().c_str(), owner->get_time_attrs()->get_id().c_str()); 
+		AM_DBG m_logger->debug("%s[%s 0x%x].on_add_instance() --> %s[%s 0x%x]", 
+			m_attrs.get_tag().c_str(), m_attrs.get_id().c_str(), (void*)this,
+			owner->get_time_attrs()->get_tag().c_str(), owner->get_time_attrs()->get_id().c_str(),
+			(void*)owner); 
 		rule_type rt = (*it)->get_target_attr();
 		if(!owner->is_active() && rt == rt_begin && dset.find(owner) == dset.end()) {
 			if(!filter || !nnhelper::is_descendent(owner, filter)) {
@@ -1750,8 +1751,9 @@ void time_node::raise_accesskey(std::pair<qtime_type, int> accesskey) {
 	qtime_type timestamp = accesskey.first;
 	int ch = accesskey.second;
 	timestamp.to_descendent(sync_node());
-	AM_DBG m_logger->debug("%s[%s].raise_activate_event() ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
+	AM_DBG m_logger->debug("%s[%s].raise_accesskey_event(%c) ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str(), 
+		ch,
 		timestamp.as_time_value_down_to(this),
 		timestamp.second(), 
 		timestamp.as_doc_time_value());
@@ -1762,8 +1764,9 @@ void time_node::raise_accesskey(std::pair<qtime_type, int> accesskey) {
 void time_node::raise_state_change(std::pair<qtime_type, std::string> statearg) {
 	qtime_type timestamp = statearg.first;
 	std::string statevar = statearg.second;
-// XXXJACK	timestamp.to_descendent(sync_node());
-	/*AM_DBG*/ m_logger->debug("%s[%s].raise_state_change_event(%s) ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
+	timestamp.to_ancestor(sync_node());
+	// ??timestamp.to_node
+	AM_DBG m_logger->debug("%s[%s].raise_state_change_event(%s) ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str(),
 		statevar.c_str(),
 		timestamp.as_time_value_down_to(this),
