@@ -317,6 +317,8 @@ void time_attrs::parse_statechange(const std::string& s, sync_value_struct& svs,
 		m_logger->warn(gettext("Error in SMIL timing info in document"));
 		return;
 	}	
+	AM_DBG m_logger->debug("%s[%s].%s += [%s] (for state-variable %d)", 
+		m_tag.c_str(), m_id.c_str(), time_spec_id(sl), repr(svs).c_str(), svs.sparam.c_str());
 	sl.push_back(svs);
 }
 #endif // WITH_SMIL30
