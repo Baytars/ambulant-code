@@ -64,7 +64,8 @@ public:
 	virtual ~node_context();
 
 	void set_prefix_mapping(const std::string& prefix, const std::string& uri);
-	const char * get_namespace_prefix(const ambulant::lib::xml_string& uri) const;
+	const ambulant::lib::xml_string& get_namespace_prefix(const ambulant::lib::xml_string& uri) const;
+	bool is_supported_prefix(const ambulant::lib::xml_string& prefix) const;
 	ambulant::net::url resolve_url(const ambulant::net::url& rurl) const;
 	const ambulant::lib::node* get_root() const;
 	const ambulant::lib::node* get_node(const std::string& idd) const;
@@ -77,6 +78,7 @@ public:
 	const custom_test_map* get_custom_tests() const { return NULL; }
   private:
 	PyObject *py_node_context;
+	ambulant::lib::xml_string get_namespace_prefix_rvkeepref;
 
 	friend PyObject *node_contextObj_New(ambulant::lib::node_context *itself);
 };
@@ -120,7 +122,6 @@ public:
 	void append_data(const ambulant::lib::xml_string& str);
 	void set_attribute(const char* name, const char* value);
 	void set_attribute(const char* name, const ambulant::lib::xml_string& value);
-	void set_namespace(const ambulant::lib::xml_string& ns);
 	const ambulant::lib::xml_string& get_namespace() const;
 	const ambulant::lib::xml_string& get_local_name() const;
 	const ambulant::lib::q_name_pair& get_qname() const;

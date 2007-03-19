@@ -32,6 +32,7 @@
 #include "ambulant/lib/sax_types.h"
 
 #include <map>
+#include <set>
 
 namespace ambulant {
 

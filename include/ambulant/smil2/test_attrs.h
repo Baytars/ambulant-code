@@ -81,6 +81,7 @@ class AMBULANTAPI test_attrs {
 	static bool test_system_bitrate(const char *value);
 	static bool test_system_screen_depth(const char *value);
 	static bool test_system_screen_size(const char *value);
+	static bool test_system_required(const char *value, const lib::node_context *ctx);
 	bool test_custom_attribute(const char *value) const;
 	
 	// the target node

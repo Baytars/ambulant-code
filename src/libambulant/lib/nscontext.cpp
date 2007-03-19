@@ -152,6 +152,11 @@ nscontext::init_supported_namespaces() {
 		"http://www.w3.org/2005/SMIL21/NestedTimeContainers",
 		"http://www.w3.org/2005/SMIL21/SMIL20DeprecatedFeatures",
 		"http://www.w3.org/2005/SMIL21/SMIL10DeprecatedFeatures",
+		// Ambulant-specific features, for use with systemRequired
+#ifdef WITH_SMIL30
+		"http://www.ambulantplayer.org/Namespaces/SMIL30-WD-20061220",
+#endif
+		// Ambulant-specific features, for use with systemComponent
 		NULL
 	};
 	const char **nsp;

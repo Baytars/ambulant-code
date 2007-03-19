@@ -129,6 +129,11 @@ bool test_attrs::selected() const {
 	if(value && !test_custom_attribute(value))
 		return false;
 	
+	// systemRequired, rather different from the others
+	value = m_node->get_attribute("systemRequired");
+	if(value && !test_system_required(value, m_node->get_context()))
+		return false;
+	
 	return true;
 }
 
@@ -156,6 +161,16 @@ bool test_attrs::test_system_component(const char *value) {
 		if((*it) == value) return true;
 	}
 	return false;
+}
+
+bool test_attrs::test_system_required(const char *value, const lib::node_context *ctx) {
+	std::list<std::string> list;
+	lib::split_trim_list(value, list, '+');
+	std::list<std::string>::const_iterator it;
+	for(it = list.begin(); it!=list.end();it++) {
+		if(!ctx->is_supported_prefix((*it))) return false;
+	}
+	return true;
 }
 
 bool test_attrs::test_system_bitrate(const char *value) {
@@ -346,7 +361,7 @@ class smil2::state_test_methods_impl : public common::state_test_methods {
 		return test_attrs::test_system_component(uri.c_str());
 	}
 	bool smil_custom_test(std::string name) const {
-		lib::logger::get_logger()->trace("smil-customTest() not implemented");
+		lib::logger::get_logger()->trace("smil-customTest() not implemented yet");
 		return true;
 	}
 	std::string smil_cpu() const {
@@ -362,7 +377,7 @@ class smil2::state_test_methods_impl : public common::state_test_methods {
 		return get_test_attribute("systemOverdubOrSubtitle");
 	}
 	bool smil_required(std::string uri) const {
-		lib::logger::get_logger()->trace("smil-required() not implemented");
+		lib::logger::get_logger()->trace("smil-required() not implemented yet");
 		return true;
 	}
 	int smil_screen_depth() const {

@@ -233,10 +233,27 @@ static PyObject *node_contextObj_get_namespace_prefix(node_contextObject *_self,
 		return NULL;
 	uri = uri_cstr;
 	PyThreadState *_save = PyEval_SaveThread();
-	const char * _rv = _self->ob_itself->get_namespace_prefix(uri);
+	const ambulant::lib::xml_string& _rv = _self->ob_itself->get_namespace_prefix(uri);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("z",
-	                     _rv);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+
+static PyObject *node_contextObj_is_supported_prefix(node_contextObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string prefix;
+	char *prefix_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &prefix_cstr))
+		return NULL;
+	prefix = prefix_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_supported_prefix(prefix);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
 	return _res;
 }
 
@@ -330,7 +347,9 @@ static PyMethodDef node_contextObj_methods[] = {
 	{"set_prefix_mapping", (PyCFunction)node_contextObj_set_prefix_mapping, 1,
 	 PyDoc_STR("(std::string prefix, std::string uri) -> None")},
 	{"get_namespace_prefix", (PyCFunction)node_contextObj_get_namespace_prefix, 1,
-	 PyDoc_STR("(ambulant::lib::xml_string uri) -> (const char * _rv)")},
+	 PyDoc_STR("(ambulant::lib::xml_string uri) -> (const ambulant::lib::xml_string& _rv)")},
+	{"is_supported_prefix", (PyCFunction)node_contextObj_is_supported_prefix, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string prefix) -> (bool _rv)")},
 	{"resolve_url", (PyCFunction)node_contextObj_resolve_url, 1,
 	 PyDoc_STR("(ambulant::net::url rurl) -> (ambulant::net::url _rv)")},
 	{"get_root", (PyCFunction)node_contextObj_get_root, 1,
@@ -873,23 +892,6 @@ static PyObject *nodeObj_set_attribute_2(nodeObject *_self, PyObject *_args)
 	return _res;
 }
 
-static PyObject *nodeObj_set_namespace(nodeObject *_self, PyObject *_args)
-{
-	PyObject *_res = NULL;
-	ambulant::lib::xml_string ns;
-	char *ns_cstr;
-	if (!PyArg_ParseTuple(_args, "s",
-	                      &ns_cstr))
-		return NULL;
-	ns = ns_cstr;
-	PyThreadState *_save = PyEval_SaveThread();
-	_self->ob_itself->set_namespace(ns);
-	PyEval_RestoreThread(_save);
-	Py_INCREF(Py_None);
-	_res = Py_None;
-	return _res;
-}
-
 static PyObject *nodeObj_get_namespace(nodeObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -1161,8 +1163,6 @@ static PyMethodDef nodeObj_methods[] = {
 	 PyDoc_STR("(char* name, char* value) -> None")},
 	{"set_attribute_2", (PyCFunction)nodeObj_set_attribute_2, 1,
 	 PyDoc_STR("(char* name, ambulant::lib::xml_string value) -> None")},
-	{"set_namespace", (PyCFunction)nodeObj_set_namespace, 1,
-	 PyDoc_STR("(ambulant::lib::xml_string ns) -> None")},
 	{"get_namespace", (PyCFunction)nodeObj_get_namespace, 1,
 	 PyDoc_STR("() -> (const ambulant::lib::xml_string& _rv)")},
 	{"get_local_name", (PyCFunction)nodeObj_get_local_name, 1,
@@ -1679,10 +1679,44 @@ static PyObject *documentObj_get_namespace_prefix(documentObject *_self, PyObjec
 		return NULL;
 	uri = uri_cstr;
 	PyThreadState *_save = PyEval_SaveThread();
-	const char * _rv = _self->ob_itself->get_namespace_prefix(uri);
+	const ambulant::lib::xml_string& _rv = _self->ob_itself->get_namespace_prefix(uri);
 	PyEval_RestoreThread(_save);
-	_res = Py_BuildValue("z",
-	                     _rv);
+	_res = Py_BuildValue("s",
+	                     _rv.c_str());
+	return _res;
+}
+
+static PyObject *documentObj_is_supported_prefix(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string prefix;
+	char *prefix_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &prefix_cstr))
+		return NULL;
+	prefix = prefix_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_supported_prefix(prefix);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
+static PyObject *documentObj_is_supported_namespace(documentObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string uri;
+	char *uri_cstr;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &uri_cstr))
+		return NULL;
+	uri = uri_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_supported_namespace(uri);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
 	return _res;
 }
 
@@ -1808,7 +1842,11 @@ static PyMethodDef documentObj_methods[] = {
 	{"set_prefix_mapping", (PyCFunction)documentObj_set_prefix_mapping, 1,
 	 PyDoc_STR("(std::string prefix, std::string uri) -> None")},
 	{"get_namespace_prefix", (PyCFunction)documentObj_get_namespace_prefix, 1,
-	 PyDoc_STR("(ambulant::lib::xml_string uri) -> (const char * _rv)")},
+	 PyDoc_STR("(ambulant::lib::xml_string uri) -> (const ambulant::lib::xml_string& _rv)")},
+	{"is_supported_prefix", (PyCFunction)documentObj_is_supported_prefix, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string prefix) -> (bool _rv)")},
+	{"is_supported_namespace", (PyCFunction)documentObj_is_supported_namespace, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string uri) -> (bool _rv)")},
 	{"resolve_url", (PyCFunction)documentObj_resolve_url, 1,
 	 PyDoc_STR("(ambulant::net::url rurl) -> (ambulant::net::url _rv)")},
 	{"get_node", (PyCFunction)documentObj_get_node, 1,
