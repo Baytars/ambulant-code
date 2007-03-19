@@ -19,6 +19,7 @@ node_context::node_context(PyObject *itself)
 	{
 		if (!PyObject_HasAttrString(itself, "set_prefix_mapping")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: set_prefix_mapping");
 		if (!PyObject_HasAttrString(itself, "get_namespace_prefix")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_namespace_prefix");
+		if (!PyObject_HasAttrString(itself, "is_supported_prefix")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: is_supported_prefix");
 		if (!PyObject_HasAttrString(itself, "resolve_url")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: resolve_url");
 		if (!PyObject_HasAttrString(itself, "get_root")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_root");
 		if (!PyObject_HasAttrString(itself, "get_node")) PyErr_Warn(PyExc_Warning, "node_context: missing attribute: get_node");
@@ -61,10 +62,10 @@ void node_context::set_prefix_mapping(const std::string& prefix, const std::stri
 	PyGILState_Release(_GILState);
 }
 
-const char * node_context::get_namespace_prefix(const ambulant::lib::xml_string& uri) const
+const ambulant::lib::xml_string& node_context::get_namespace_prefix(const ambulant::lib::xml_string& uri) const
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
-	const char * _rv;
+	ambulant::lib::xml_string get_namespace_prefix;
 	PyObject *py_uri = Py_BuildValue("s", uri.c_str());
 
 	PyObject *py_rv = PyObject_CallMethod(py_node_context, "get_namespace_prefix", "(O)", py_uri);
@@ -74,14 +75,43 @@ const char * node_context::get_namespace_prefix(const ambulant::lib::xml_string&
 		PyErr_Print();
 	}
 
-	if (py_rv && !PyArg_Parse(py_rv, "z", &_rv))
+	char *get_namespace_prefix_cstr;
+	if (py_rv && !PyArg_Parse(py_rv, "s", &get_namespace_prefix_cstr))
 	{
 		PySys_WriteStderr("Python exception during node_context::get_namespace_prefix() return:\n");
 		PyErr_Print();
 	}
 
+	get_namespace_prefix = get_namespace_prefix_cstr;
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_uri);
+
+	PyGILState_Release(_GILState);
+	const_cast<node_context *>(this)->get_namespace_prefix_rvkeepref = get_namespace_prefix;
+	return get_namespace_prefix_rvkeepref;
+}
+
+bool node_context::is_supported_prefix(const ambulant::lib::xml_string& prefix) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_prefix = Py_BuildValue("s", prefix.c_str());
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_context, "is_supported_prefix", "(O)", py_prefix);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_context::is_supported_prefix() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node_context::is_supported_prefix() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_prefix);
 
 	PyGILState_Release(_GILState);
 	return _rv;
@@ -253,7 +283,6 @@ node::node(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "append_data")) PyErr_Warn(PyExc_Warning, "node: missing attribute: append_data");
 		if (!PyObject_HasAttrString(itself, "set_attribute")) PyErr_Warn(PyExc_Warning, "node: missing attribute: set_attribute");
 		if (!PyObject_HasAttrString(itself, "set_attribute")) PyErr_Warn(PyExc_Warning, "node: missing attribute: set_attribute");
-		if (!PyObject_HasAttrString(itself, "set_namespace")) PyErr_Warn(PyExc_Warning, "node: missing attribute: set_namespace");
 		if (!PyObject_HasAttrString(itself, "get_namespace")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_namespace");
 		if (!PyObject_HasAttrString(itself, "get_local_name")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_local_name");
 		if (!PyObject_HasAttrString(itself, "get_qname")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_qname");
@@ -851,24 +880,6 @@ void node::set_attribute(const char* name, const ambulant::lib::xml_string& valu
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_name);
 	Py_XDECREF(py_value);
-
-	PyGILState_Release(_GILState);
-}
-
-void node::set_namespace(const ambulant::lib::xml_string& ns)
-{
-	PyGILState_STATE _GILState = PyGILState_Ensure();
-	PyObject *py_ns = Py_BuildValue("s", ns.c_str());
-
-	PyObject *py_rv = PyObject_CallMethod(py_node, "set_namespace", "(O)", py_ns);
-	if (PyErr_Occurred())
-	{
-		PySys_WriteStderr("Python exception during node::set_namespace() callback:\n");
-		PyErr_Print();
-	}
-
-	Py_XDECREF(py_rv);
-	Py_XDECREF(py_ns);
 
 	PyGILState_Release(_GILState);
 }

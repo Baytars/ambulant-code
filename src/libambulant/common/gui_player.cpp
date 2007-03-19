@@ -259,6 +259,14 @@ gui_player::create_document(const net::url& url)
 	} else {
 		lib::logger::get_logger()->trace("%s: Failed to parse document ", m_url.get_url().c_str());
 	}
+	// Check that the <smil> tag does not use unsupported features
+	const lib::node *root = rv->get_root();
+	smil2::test_attrs ta(root);
+	if (!ta.selected()) {
+		lib::logger::get_logger()->trace("%s: systemTest attributes on <smil> node not satisfied", m_url.get_url().c_str());
+		lib::logger::get_logger()->warn(gettext("%s: Requires unavailable features, will attempt to continue anyway"),
+			m_url.get_url().c_str());
+	}
 	return rv;
 }	
 
