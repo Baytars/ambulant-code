@@ -145,7 +145,7 @@ cocoa_renderer_factory::new_playable(
 {
 	playable *rv;
 	
-	xml_string tag = node->get_qname().second;
+	xml_string tag = node->get_local_name();
 	if (tag == "img") {
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "image/vnd.ambulant-ink") {

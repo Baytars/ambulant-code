@@ -181,17 +181,17 @@ time_node*
 timegraph::create_time_node(const node* n, time_node* tparent) const {
 	time_node *tn = 0;
 	time_container_type tct =
-		m_schema->get_time_type(n->get_qname());
+		m_schema->get_time_type(n->get_local_name());
 	if(tct == tc_seq) 
 		tn = new seq(m_context, n);
 	else if(tct == tc_par) 
 		tn = new par(m_context, n);
 	else if(tct == tc_excl) 
 		tn = new excl(m_context, n);
-	else if(m_schema->is_animation(n->get_qname())) 
+	else if(m_schema->is_animation(n->get_local_name())) 
 		tn = animate_node::new_instance(m_context, n, tparent->dom_node());
 	else 
-		tn = new time_node(m_context, n, tc_none, m_schema->is_discrete(n->get_qname()));
+		tn = new time_node(m_context, n, tc_none, m_schema->is_discrete(n->get_local_name()));
 	(*m_dom2tn)[n->get_numid()] = tn;
 	return tn;
 }

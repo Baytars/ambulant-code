@@ -1198,6 +1198,13 @@
 		047846BC0989712000A3E39F /* gui_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 047846B60989712000A3E39F /* gui_player.h */; };
 		0478D956060B382C004224C0 /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		0478D958060B383E004224C0 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
+		048142AB0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142AC0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142AD0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142AE0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142AF0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142B00BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
+		048142B10BAEAB0A006A8BF1 /* nscontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */; };
 		048399DE08ED2FDD008505C3 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048399DD08ED2FDC008505C3 /* WebKit.framework */; };
 		048399DF08ED2FDD008505C3 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048399DD08ED2FDC008505C3 /* WebKit.framework */; };
 		048399E008ED2FDD008505C3 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048399DD08ED2FDC008505C3 /* WebKit.framework */; };
@@ -2056,6 +2063,7 @@
 		0478D955060B382C004224C0 /* stdio_datasource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = stdio_datasource.h; sourceTree = "<group>"; };
 		0478D957060B383E004224C0 /* stdio_datasource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = stdio_datasource.cpp; sourceTree = "<group>"; };
 		0480D5E907208FB600D39BB5 /* libxerces-c.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libxerces-c.dylib"; path = "../../../../packages/xerces-unix/lib/libxerces-c.dylib"; sourceTree = SOURCE_ROOT; };
+		048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = nscontext.cpp; sourceTree = "<group>"; };
 		048255F706F16299008A283F /* Dutch */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Dutch; path = Dutch.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		048399DD08ED2FDC008505C3 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		04878D3C061AB9A5008573FA /* systemTestSettings.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = systemTestSettings.xml; sourceTree = "<group>"; };
@@ -2700,6 +2708,7 @@
 		0444D328051F2EEF0010C447 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				048142AA0BAEAB0A006A8BF1 /* nscontext.cpp */,
 				042125D607A7EBF900D20F9D /* event_processor.cpp */,
 				04C65256071FC0AF001E3C7B /* parser_factory.cpp */,
 				04E976BB067FA5F500AE60D0 /* gpaths.cpp */,
@@ -4405,6 +4414,7 @@
 				047846B10989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD050B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156720BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142B00BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4502,6 +4512,7 @@
 				047846B50989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD000B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566D0BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142AB0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4597,6 +4608,7 @@
 				047846B40989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD020B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566F0BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142AD0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4694,6 +4706,7 @@
 				047846B20989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD040B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156710BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142AF0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4789,6 +4802,7 @@
 				047846B30989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD030B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156700BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142AE0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4884,6 +4898,7 @@
 				04D336040992B50200BAEEA7 /* gui_player.cpp in Sources */,
 				046ECD010B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566E0BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142AC0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4979,6 +4994,7 @@
 				047846B00989710800A3E39F /* gui_player.cpp in Sources */,
 				046ECD060B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156730BA6FD5700E09D93 /* scripting.cpp in Sources */,
+				048142B10BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

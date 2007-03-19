@@ -236,6 +236,7 @@ libambulant_la_SOURCES = \
 	lib/logger.cpp \
 	lib/nfa.cpp \
 	lib/node.cpp \
+	lib/nscontext.cpp \
 	lib/parselets.cpp \
 	lib/string_util.cpp \
 	lib/timer.cpp \
