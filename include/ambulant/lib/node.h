@@ -201,17 +201,15 @@ class node_interface {
 	/// Note: attrs are as per expat parser
 	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
 	virtual void set_attributes(const char **attrs) = 0;
-	
-	/// Set the namespace for this node.
-	virtual void set_namespace(const xml_string& ns) = 0;
-	
+		
 	/////////////////////
 	// data queries
 
 	/// Return the namespace part of the tag for this node.
 	virtual const xml_string& get_namespace() const = 0;
 	
-	/// Return the local part of the tag for this node.
+	/// Return the local part of the tag for this node IFF the namespace
+	/// part refers to a namespace we implement.
 	virtual const xml_string& get_local_name() const = 0;
 	
 	/// Return namespace and local part of the tag for this node.
@@ -290,7 +288,10 @@ class node_context {
 	virtual void set_prefix_mapping(const std::string& prefix, const std::string& uri) = 0;
 	
 	/// Return the default XML namespace URI for the document.
-	virtual const char*get_namespace_prefix(const xml_string& uri) const = 0;
+	virtual const xml_string& get_namespace_prefix(const xml_string& uri) const = 0;
+	
+	/// Is this namespace prefix one that we understand?
+	virtual bool is_supported_prefix(const xml_string& prefix) const = 0;
 	
 	/// Resolve relative URLs.
 	virtual net::url resolve_url(const net::url& rurl) const = 0;

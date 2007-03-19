@@ -106,7 +106,9 @@ class AMBULANTAPI document : public node_context {
 	
 	// node_context interface
 	void set_prefix_mapping(const std::string& prefix, const std::string& uri);	
-	const char* get_namespace_prefix(const xml_string& uri) const;
+	const xml_string& get_namespace_prefix(const xml_string& uri) const;
+	bool is_supported_prefix(const xml_string& prefix) const;
+	bool is_supported_namespace(const xml_string& uri) const;
 	net::url resolve_url(const net::url& rurl) const;
 	// Returns the node with the provided id or null on none
 	const node* get_node(const std::string& idd) const {

@@ -141,6 +141,7 @@ int lib::node_impl::node_counter = 0;
 
 lib::node_impl::node_impl(const char *local_name, const char **attrs, const node_context *ctx)
 :	m_qname("",(local_name?local_name:"error")),
+	m_local_name(local_name?local_name:"error"),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
 	set_attributes(attrs);
@@ -149,6 +150,7 @@ lib::node_impl::node_impl(const char *local_name, const char **attrs, const node
 
 lib::node_impl::node_impl(const xml_string& local_name, const char **attrs, const node_context *ctx)
 :   m_qname("", local_name),
+	m_local_name(local_name),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
 	set_attributes(attrs);
@@ -156,14 +158,25 @@ lib::node_impl::node_impl(const xml_string& local_name, const char **attrs, cons
 }
 
 lib::node_impl::node_impl(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
-:	m_qname(qn), m_qattrs(qattrs), m_context(ctx),
-	m_parent(0), m_next(0), m_child(0){
+:	m_qname(qn),
+	m_qattrs(qattrs),
+	m_context(ctx),
+	m_parent(0), m_next(0), m_child(0)
+{
+	if (m_context) {
+		if(m_context->is_supported_prefix(m_qname.first))
+			m_local_name = m_qname.second;
+		else
+			m_local_name = m_qname.first + ":" + m_qname.second;
+	} else
+		m_local_name = m_qname.second;
 	m_numid = ++node_counter;
 }
 
 // shallow copy from other
 lib::node_impl::node_impl(const node_impl* other)
 :   m_qname(other->get_qname()),
+	m_local_name(other->get_local_name()),
 	m_qattrs(other->get_attrs()),
 	m_data(other->get_data()),
 	m_context(other->get_context()),
@@ -211,10 +224,10 @@ lib::node_impl*
 lib::node_impl::get_first_child(const char *name) {
 	node_impl *e = down();
 	if(!e) return 0;
-	if(e->m_qname.second == name) return e;
+	if(e->m_local_name == name) return e;
 	e = e->next();
 	while(e != 0) {
-		if(e->m_qname.second == name) 
+		if(e->m_local_name == name) 
 			return e;
 		e = e->next();
 	}
@@ -225,10 +238,10 @@ const lib::node_impl*
 lib::node_impl::get_first_child(const char *name) const {
 	const node_impl *e = down();
 	if(!e) return 0;
-	if(e->m_qname.second == name) return e;
+	if(e->m_local_name == name) return e;
 	e = e->next();
 	while(e != 0) {
-		if(e->m_qname.second == name) 
+		if(e->m_local_name == name) 
 			return e;
 		e = e->next();
 	}
@@ -355,10 +368,6 @@ void lib::node_impl::set_attributes(const char **attrs) {
 		set_attribute(attrs[i], attrs[i+1]);
 }
 	
-void lib::node_impl::set_namespace(const xml_string& ns) {
-	m_qname.first = ns;
-}
-
 // create a deep copy of this
 lib::node_impl* 
 lib::node_impl::clone() const {
@@ -478,7 +487,7 @@ lib::node_impl::xmlrepr() const {
 
 std::string lib::node_impl::get_sig() const {
 	std::string s = "<";
-	s += m_qname.second;
+	s += m_local_name;
 	const char *pid = get_attribute("id");
 	if (pid) {
 		s += " id=\"";

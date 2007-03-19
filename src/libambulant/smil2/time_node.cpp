@@ -777,7 +777,7 @@ bool time_node::is_playable() const {
 bool time_node::is_animation() const {
 	const common::schema *sch = common::schema::get_instance();
 	AM_DBG lib::logger::get_logger()->debug("is_animation: 0x%x %s\n", m_node, m_node->get_sig().c_str());
-	const lib::q_name_pair& qn = m_node->get_qname();
+	const lib::xml_string& qn = m_node->get_local_name();
 	AM_DBG lib::logger::get_logger()->debug("is_animation: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
 	return sch->is_animation(qn);
 }
@@ -787,7 +787,7 @@ bool time_node::is_animation() const {
 bool time_node::is_statecommand() const {
 	const common::schema *sch = common::schema::get_instance();
 	AM_DBG lib::logger::get_logger()->debug("is_statecommand: 0x%x %s\n", m_node, m_node->get_sig().c_str());
-	const lib::q_name_pair& qn = m_node->get_qname();
+	const lib::xml_string& qn = m_node->get_local_name();
 	AM_DBG lib::logger::get_logger()->debug("is_statecommand: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
 	return sch->is_statecommand(qn);
 }

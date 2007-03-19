@@ -193,10 +193,7 @@ class node_impl : public node_interface {
 	/// Note: attrs are as per expat parser
 	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
 	void set_attributes(const char **attrs);
-	
-	/// Set the namespace for this node.
-	void set_namespace(const xml_string& ns);
-	
+		
 	/////////////////////
 	// data queries
 
@@ -204,7 +201,7 @@ class node_impl : public node_interface {
 	const xml_string& get_namespace() const { return m_qname.first;}
 	
 	/// Return the local part of the tag for this node.
-	const xml_string& get_local_name() const { return m_qname.second;}
+	const xml_string& get_local_name() const { return m_local_name;}
 	
 	/// Return namespace and local part of the tag for this node.
 	const q_name_pair& get_qname() const { return m_qname;}
@@ -283,7 +280,10 @@ class node_impl : public node_interface {
 	// the qualified name of this element as std::pair
 	q_name_pair m_qname;
 	
-	// the qualified name of this element as std::pair
+	// the local name of this element, if in one of our namespaces
+	xml_string m_local_name;
+	
+	// the attributes of this element
 	q_attributes_list m_qattrs;
 	
 	// the text data of this node

@@ -182,9 +182,19 @@ lib::document::set_prefix_mapping(const std::string& prefix, const std::string& 
 	m_namespaces.set_prefix_mapping(prefix, uri);
 }
 
-const char* 
+const lib::xml_string& 
 lib::document::get_namespace_prefix(const xml_string& uri) const {
 	return m_namespaces.get_namespace_prefix(uri);
+}
+
+bool 
+lib::document::is_supported_prefix(const xml_string& prefix) const {
+	return m_namespaces.is_supported_prefix(prefix) || m_namespaces.is_supported_namespace(prefix);
+}
+
+bool 
+lib::document::is_supported_namespace(const xml_string& uri) const {
+	return m_namespaces.is_supported_namespace(uri);
 }
 
 net::url 
