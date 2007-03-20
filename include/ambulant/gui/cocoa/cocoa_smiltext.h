@@ -30,6 +30,7 @@
 
 #include "ambulant/gui/cocoa/cocoa_renderer.h"
 #include "ambulant/lib/mtsync.h"
+#include "ambulant/smil2/smiltext.h"
 #include <Cocoa/Cocoa.h>
 
 namespace ambulant {
@@ -58,6 +59,7 @@ class cocoa_smiltext_renderer : public cocoa_renderer<renderer_playable> {
 	NSTextContainer *m_text_container;
 	NSColor *m_text_color;
 	NSFont *m_text_font;
+	smil2::smiltext_engine m_engine;
 	critical_section m_lock;
 };
 
