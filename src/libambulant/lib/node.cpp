@@ -350,7 +350,6 @@ void lib::node_impl::append_data(const char *data, size_t len) {
 	if(len>0) m_data.append(data, len);
 }
 
-#if 0
 void lib::node_impl::append_data(const char *c_str) { 
 	if(c_str == 0 || c_str[0] == 0) return;
 	m_data.append(c_str, strlen(c_str));
@@ -358,7 +357,6 @@ void lib::node_impl::append_data(const char *c_str) {
 
 void lib::node_impl::append_data(const xml_string& str)
 	{ m_data += str;}
-#endif
 
 void lib::node_impl::set_attribute(const char *name, const char *value){ 
 	if(name && name[0]) {

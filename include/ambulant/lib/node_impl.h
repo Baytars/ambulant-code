@@ -180,13 +180,11 @@ class node_impl : public node_interface {
 	/// Append data to the data of this node.
 	void append_data(const char *data, size_t len);
 	
-#if 0
 	/// Append c_str to the data of this node.
 	void append_data(const char *c_str);
 	
 	/// Append str to the data of this node.
 	void append_data(const xml_string& str);
-#endif
 
 	/// Add an attribute/value pair.
 	void set_attribute(const char *name, const char *value);

@@ -957,6 +957,19 @@ static PyObject *nodeObj_get_data(nodeObject *_self, PyObject *_args)
 	return _res;
 }
 
+static PyObject *nodeObj_is_data_node(nodeObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	if (!PyArg_ParseTuple(_args, ""))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->is_data_node();
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
 static PyObject *nodeObj_get_trimmed_data(nodeObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -1173,6 +1186,8 @@ static PyMethodDef nodeObj_methods[] = {
 	 PyDoc_STR("() -> (int _rv)")},
 	{"get_data", (PyCFunction)nodeObj_get_data, 1,
 	 PyDoc_STR("() -> (const ambulant::lib::xml_string& _rv)")},
+	{"is_data_node", (PyCFunction)nodeObj_is_data_node, 1,
+	 PyDoc_STR("() -> (bool _rv)")},
 	{"get_trimmed_data", (PyCFunction)nodeObj_get_trimmed_data, 1,
 	 PyDoc_STR("() -> (ambulant::lib::xml_string _rv)")},
 	{"get_attribute_1", (PyCFunction)nodeObj_get_attribute_1, 1,
@@ -1398,11 +1413,31 @@ static PyObject *node_factoryObj_new_node_2(node_factoryObject *_self, PyObject 
 	return _res;
 }
 
+static PyObject *node_factoryObj_new_data_node(node_factoryObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	char* data;
+	int size;
+	if (!PyArg_ParseTuple(_args, "si",
+	                      &data,
+	                      &size))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	ambulant::lib::node* _rv = _self->ob_itself->new_data_node(data,
+	                                                           size);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     nodeObj_New, _rv);
+	return _res;
+}
+
 static PyMethodDef node_factoryObj_methods[] = {
 	{"new_node_1", (PyCFunction)node_factoryObj_new_node_1, 1,
 	 PyDoc_STR("(ambulant::lib::q_name_pair qn, ambulant::lib::q_attributes_list qattrs, ambulant::lib::node_context* ctx) -> (ambulant::lib::node* _rv)")},
 	{"new_node_2", (PyCFunction)node_factoryObj_new_node_2, 1,
 	 PyDoc_STR("(ambulant::lib::node* other) -> (ambulant::lib::node* _rv)")},
+	{"new_data_node", (PyCFunction)node_factoryObj_new_data_node, 1,
+	 PyDoc_STR("(char* data, int size) -> (ambulant::lib::node* _rv)")},
 	{NULL, NULL, 0}
 };
 

@@ -185,13 +185,11 @@ class node_interface {
 	/// Append data to the data of this node.
 	virtual void append_data(const char *data, size_t len) = 0;
 	
-#if 0
 	/// Append c_str to the data of this node.
 	virtual void append_data(const char *c_str) = 0;
 	
 	/// Append str to the data of this node.
 	virtual void append_data(const xml_string& str) = 0;
-#endif
 
 	/// Add an attribute/value pair.
 	virtual void set_attribute(const char *name, const char *value) = 0;
