@@ -185,11 +185,13 @@ class node_interface {
 	/// Append data to the data of this node.
 	virtual void append_data(const char *data, size_t len) = 0;
 	
+#if 0
 	/// Append c_str to the data of this node.
 	virtual void append_data(const char *c_str) = 0;
 	
 	/// Append str to the data of this node.
 	virtual void append_data(const xml_string& str) = 0;
+#endif
 
 	/// Add an attribute/value pair.
 	virtual void set_attribute(const char *name, const char *value) = 0;
@@ -220,6 +222,9 @@ class node_interface {
 	
 	/// Return the data for this node.
 	virtual const xml_string& get_data() const = 0;
+	
+	/// Return true if this is a pure data node (i.e. no tag/attrs)
+	virtual bool is_data_node() const = 0;
 	
 	/// Return the trimmed data for this node.
 	virtual xml_string get_trimmed_data() const = 0;
@@ -333,6 +338,8 @@ class node_factory {
 
 	// shallow copy from other.
 	virtual node *new_node(const node* other) = 0;
+	
+	virtual node *new_data_node(const char *data, int size) = 0;
 };
 
 /// Return singleton node_factory object that returns node_impl nodes.

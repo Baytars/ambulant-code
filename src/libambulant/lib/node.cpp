@@ -142,6 +142,7 @@ int lib::node_impl::node_counter = 0;
 lib::node_impl::node_impl(const char *local_name, const char **attrs, const node_context *ctx)
 :	m_qname("",(local_name?local_name:"error")),
 	m_local_name(local_name?local_name:"error"),
+	m_is_data_node(false),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
 	set_attributes(attrs);
@@ -151,6 +152,7 @@ lib::node_impl::node_impl(const char *local_name, const char **attrs, const node
 lib::node_impl::node_impl(const xml_string& local_name, const char **attrs, const node_context *ctx)
 :   m_qname("", local_name),
 	m_local_name(local_name),
+	m_is_data_node(false),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {
 	set_attributes(attrs);
@@ -160,6 +162,7 @@ lib::node_impl::node_impl(const xml_string& local_name, const char **attrs, cons
 lib::node_impl::node_impl(const q_name_pair& qn, const q_attributes_list& qattrs, const node_context *ctx)
 :	m_qname(qn),
 	m_qattrs(qattrs),
+	m_is_data_node(false),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0)
 {
@@ -179,7 +182,18 @@ lib::node_impl::node_impl(const node_impl* other)
 	m_local_name(other->get_local_name()),
 	m_qattrs(other->get_attrs()),
 	m_data(other->get_data()),
+	m_is_data_node(false),
 	m_context(other->get_context()),
+	m_parent(0), m_next(0), m_child(0) {
+	m_numid = ++node_counter;
+}
+
+// Data node
+lib::node_impl::node_impl(const char *data, int size)
+:	m_local_name(""),
+	m_data(lib::xml_string(data, size)),
+	m_is_data_node(true),
+	m_context(0),
 	m_parent(0), m_next(0), m_child(0) {
 	m_numid = ++node_counter;
 }
@@ -336,6 +350,7 @@ void lib::node_impl::append_data(const char *data, size_t len) {
 	if(len>0) m_data.append(data, len);
 }
 
+#if 0
 void lib::node_impl::append_data(const char *c_str) { 
 	if(c_str == 0 || c_str[0] == 0) return;
 	m_data.append(c_str, strlen(c_str));
@@ -343,6 +358,7 @@ void lib::node_impl::append_data(const char *c_str) {
 
 void lib::node_impl::append_data(const xml_string& str)
 	{ m_data += str;}
+#endif
 
 void lib::node_impl::set_attribute(const char *name, const char *value){ 
 	if(name && name[0]) {
@@ -614,7 +630,9 @@ void output_visitor<Node>::operator()(std::pair<bool, const Node*> x) {
 	const Node*& pe = x.second;
 	if(x.first) {
 		// start tag
-		if(!pe->down()) 
+		if(pe->is_data_node())
+			os << pe->get_data();
+		else if(!pe->down()) 
 			write_start_tag_no_children(pe);
 		else 
 			write_start_tag_with_children(pe);
@@ -703,6 +721,7 @@ class builtin_node_factory : public lib::node_factory {
 	lib::node *new_node(const lib::xml_string& local_name, const char **attrs = 0, const lib::node_context *ctx = 0);
 	lib::node *new_node(const lib::q_name_pair& qn, const lib::q_attributes_list& qattrs, const lib::node_context *ctx = 0);
 	lib::node *new_node(const lib::node* other);
+	lib::node *new_data_node(const char *data, int size);
 };
 
 // If we are building a player with an (optional) external DOM implementation
@@ -745,6 +764,13 @@ builtin_node_factory::new_node(const lib::node* other)
 #else
 	return new lib::node_impl(other);
 #endif
+}
+
+// create data node
+lib::node *
+builtin_node_factory::new_data_node(const char *data, int size)
+{
+	return new lib::node_impl(data, size);
 }
 
 lib::node_factory *lib::get_builtin_node_factory()
