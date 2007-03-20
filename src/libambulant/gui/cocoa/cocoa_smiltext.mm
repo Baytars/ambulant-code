@@ -99,8 +99,17 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	/*AM_DBG*/ logger::get_logger()->debug("cocoa_smiltext_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
 	if (!m_text_storage) {
-		const char *data = m_node->get_trimmed_data().c_str();
-		NSString *the_string = [NSString stringWithCString: data length: strlen(data)];
+		lib::xml_string data;
+		const lib::node *child = m_node->down();
+		while (child) {
+			if (child->is_data_node()) {
+				data += trim(child->get_trimmed_data());
+			} else {
+				data += child->get_sig();
+			}
+			child = child->next();
+		}
+		NSString *the_string = [NSString stringWithCString: data.c_str() length: data.size()];
 		m_text_storage = [[NSTextStorage alloc] initWithString:the_string];
 		if (m_text_color)
 			[m_text_storage setForegroundColor: m_text_color];

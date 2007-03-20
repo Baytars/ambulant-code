@@ -208,9 +208,15 @@ lib::tree_builder::end_element(const q_name_pair& qn) {
 
 void 
 lib::tree_builder::characters(const char *buf, size_t len) {
-	if(m_current != 0)
+	if(m_current != 0) {
+#ifdef WITH_SMIL30
+		// The <smiltext> tag has embedded data and tags 
+		lib::node *p = m_node_factory->new_data_node(buf, len);
+		m_current->append_child(p);
+#else
 		m_current->append_data(buf, len);
-	else
+#endif // WITH_SMIL30
+	} else
 		m_well_formed = false;
 }
 

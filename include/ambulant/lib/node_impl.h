@@ -71,6 +71,9 @@ class node_impl : public node_interface {
 	
 	// shallow copy from other.
 	node_impl(const node_impl* other);
+	
+	/// Construct a new data node.
+	node_impl(const char *data, int size);
 
 	/// Destruct this node and its contents.
 	/// If this node is part of a tree, detach it first
@@ -177,11 +180,13 @@ class node_impl : public node_interface {
 	/// Append data to the data of this node.
 	void append_data(const char *data, size_t len);
 	
+#if 0
 	/// Append c_str to the data of this node.
 	void append_data(const char *c_str);
 	
 	/// Append str to the data of this node.
 	void append_data(const xml_string& str);
+#endif
 
 	/// Add an attribute/value pair.
 	void set_attribute(const char *name, const char *value);
@@ -209,6 +214,9 @@ class node_impl : public node_interface {
 	/// Return the unique numeric ID for this node.
 	int get_numid() const {return m_numid;}
 	
+	/// Return true if this is a pure data node (i.e. no tag/attrs)
+	bool is_data_node() const { return m_is_data_node; };
+
 	/// Return the data for this node.
 	const xml_string& get_data() const { return m_data;}
 	
@@ -288,6 +296,9 @@ class node_impl : public node_interface {
 	
 	// the text data of this node
 	xml_string m_data;
+	
+	// True if this is a pure data ndoe
+	bool m_is_data_node;
 	
 	// the context of this node
 	const node_context *m_context;
