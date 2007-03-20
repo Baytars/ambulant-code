@@ -50,7 +50,8 @@ cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 :	cocoa_renderer<renderer_playable>(context, cookie, node, evp),
 	m_text_storage(NULL),
 	m_text_color(NULL),
-	m_text_font(NULL)
+	m_text_font(NULL),
+	m_engine(smil2::smiltext_engine(node, evp, NULL))
 {
 	// XXX These parameter names are tentative
 	smil2::params *params = smil2::params::for_node(node);
@@ -81,6 +82,7 @@ cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 					green:greenf(text_color)
 					blue:bluef(text_color)
 					alpha:1.0];
+	m_engine.start(); // XXXJACK wrong, do in start()
 }
 
 cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
@@ -100,14 +102,10 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 
 	if (!m_text_storage) {
 		lib::xml_string data;
-		const lib::node *child = m_node->down();
-		while (child) {
-			if (child->is_data_node()) {
-				data += trim(child->get_trimmed_data());
-			} else {
-				data += child->get_sig();
-			}
-			child = child->next();
+		smil2::smiltext_runs::const_iterator i = m_engine.begin();
+		while (i != m_engine.end()) {
+			data += (*i).m_data;
+			i++;
 		}
 		NSString *the_string = [NSString stringWithCString: data.c_str() length: data.size()];
 		m_text_storage = [[NSTextStorage alloc] initWithString:the_string];
