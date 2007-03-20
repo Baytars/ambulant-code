@@ -806,6 +806,20 @@
 		04382C5605D7AEE700CFA029 /* time_state.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B9005D7AEE600CFA029 /* time_state.h */; };
 		04382C5705D7AEE700CFA029 /* timegraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B9105D7AEE600CFA029 /* timegraph.h */; };
 		04382C5805D7AEE700CFA029 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B9205D7AEE600CFA029 /* version.h */; };
+		043EA8580BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA8590BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA85A0BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA85B0BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA85C0BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA85D0BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA85E0BB01610009C20D2 /* cocoa_smiltext.h in Headers */ = {isa = PBXBuildFile; fileRef = 043EA8570BB01610009C20D2 /* cocoa_smiltext.h */; };
+		043EA8630BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8640BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8650BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8660BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8670BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8680BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
+		043EA8690BB01656009C20D2 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */; };
 		043FA58C097275AB007EA0C2 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 043FA58B097275AB007EA0C2 /* AudioUnit.framework */; };
 		043FA58D097275AB007EA0C2 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 043FA58B097275AB007EA0C2 /* AudioUnit.framework */; };
 		043FA58E097275AB007EA0C2 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 043FA58B097275AB007EA0C2 /* AudioUnit.framework */; };
@@ -1978,6 +1992,8 @@
 		04382B9205D7AEE600CFA029 /* version.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		04383C7706F4600F006338F5 /* Dutch */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Dutch; path = Dutch.lproj/Credits.rtf; sourceTree = "<group>"; };
 		04383CCD06F4639B006338F5 /* Dutch */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Dutch; path = Dutch.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		043EA8570BB01610009C20D2 /* cocoa_smiltext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cocoa_smiltext.h; sourceTree = "<group>"; };
+		043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_smiltext.mm; sourceTree = "<group>"; };
 		043FA58B097275AB007EA0C2 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		0440807509E9B8FE00527A4F /* libvorbis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbis.a; path = /usr/local/lib/libvorbis.a; sourceTree = "<absolute>"; };
 		0440807609E9B8FE00527A4F /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = /usr/local/lib/libogg.a; sourceTree = "<absolute>"; };
@@ -2499,6 +2515,7 @@
 		04382B0F05D7AEE600CFA029 /* cocoa */ = {
 			isa = PBXGroup;
 			children = (
+				043EA8570BB01610009C20D2 /* cocoa_smiltext.h */,
 				046ECCF70B9DB9DA002E50E6 /* cocoa_ink.h */,
 				042EBB4408EC849700DB2F0E /* cocoa_html.h */,
 				046C3FA40676052300F22EF7 /* cocoa_renderer.h */,
@@ -2679,6 +2696,7 @@
 		0444D324051F2EEF0010C447 /* cocoa */ = {
 			isa = PBXGroup;
 			children = (
+				043EA8620BB01656009C20D2 /* cocoa_smiltext.mm */,
 				046ECCFF0B9DB9F6002E50E6 /* cocoa_ink.mm */,
 				042EBB4A08EC84B500DB2F0E /* cocoa_html.mm */,
 				046C3FA60676062900F22EF7 /* cocoa_renderer.mm */,
@@ -3085,6 +3103,7 @@
 				046B0A43098E75E200A7D964 /* node_impl.h in Headers */,
 				046ECCFD0B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156570BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA85D0BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3224,6 +3243,7 @@
 				046E9BDA09C066850084E401 /* smil_handler.h in Headers */,
 				046ECCF80B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156520BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA8580BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3361,6 +3381,7 @@
 				046E9BD909C066840084E401 /* smil_handler.h in Headers */,
 				046ECCFA0B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156540BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA85A0BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3500,6 +3521,7 @@
 				046B0A44098E75E200A7D964 /* node_impl.h in Headers */,
 				046ECCFC0B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156560BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA85C0BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3637,6 +3659,7 @@
 				046B0A41098E75E200A7D964 /* node_impl.h in Headers */,
 				046ECCFB0B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156550BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA85B0BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3774,6 +3797,7 @@
 				046E9BDB09C066860084E401 /* smil_handler.h in Headers */,
 				046ECCF90B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156530BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA8590BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3911,6 +3935,7 @@
 				046B0A42098E75E200A7D964 /* node_impl.h in Headers */,
 				046ECCFE0B9DB9DA002E50E6 /* cocoa_ink.h in Headers */,
 				04A156580BA6FA1D00E09D93 /* scripting.h in Headers */,
+				043EA85E0BB01610009C20D2 /* cocoa_smiltext.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4415,6 +4440,7 @@
 				046ECD050B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156720BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142B00BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8680BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4513,6 +4539,7 @@
 				046ECD000B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566D0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AB0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8630BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4609,6 +4636,7 @@
 				046ECD020B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566F0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AD0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8650BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4707,6 +4735,7 @@
 				046ECD040B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156710BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AF0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8670BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4803,6 +4832,7 @@
 				046ECD030B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156700BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AE0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8660BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4899,6 +4929,7 @@
 				046ECD010B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A1566E0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AC0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8640BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4995,6 +5026,7 @@
 				046ECD060B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
 				04A156730BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142B10BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
+				043EA8690BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

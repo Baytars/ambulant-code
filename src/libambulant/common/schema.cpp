@@ -34,6 +34,9 @@ static const char* time_containers[] = {
 };
 static const char* discrete_leafs[] = {
 	"text", "img", "ref", "brush"
+#ifdef WITH_SMIL30
+	, "smiltext"
+#endif
 };
 
 static const char* continuous_leafs[] = {
