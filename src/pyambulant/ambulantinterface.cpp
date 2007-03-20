@@ -288,6 +288,7 @@ node::node(PyObject *itself)
 		if (!PyObject_HasAttrString(itself, "get_qname")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_qname");
 		if (!PyObject_HasAttrString(itself, "get_numid")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_numid");
 		if (!PyObject_HasAttrString(itself, "get_data")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_data");
+		if (!PyObject_HasAttrString(itself, "is_data_node")) PyErr_Warn(PyExc_Warning, "node: missing attribute: is_data_node");
 		if (!PyObject_HasAttrString(itself, "get_trimmed_data")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_trimmed_data");
 		if (!PyObject_HasAttrString(itself, "get_attribute")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_attribute");
 		if (!PyObject_HasAttrString(itself, "get_attribute")) PyErr_Warn(PyExc_Warning, "node: missing attribute: get_attribute");
@@ -1021,6 +1022,30 @@ const ambulant::lib::xml_string& node::get_data() const
 	return get_data_rvkeepref;
 }
 
+bool node::is_data_node() const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+
+	PyObject *py_rv = PyObject_CallMethod(py_node, "is_data_node", "()");
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node::is_data_node() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node::is_data_node() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
 ambulant::lib::xml_string node::get_trimmed_data() const
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
@@ -1296,6 +1321,7 @@ node_factory::node_factory(PyObject *itself)
 	{
 		if (!PyObject_HasAttrString(itself, "new_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_node");
 		if (!PyObject_HasAttrString(itself, "new_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_node");
+		if (!PyObject_HasAttrString(itself, "new_data_node")) PyErr_Warn(PyExc_Warning, "node_factory: missing attribute: new_data_node");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -1364,6 +1390,34 @@ ambulant::lib::node* node_factory::new_node(const ambulant::lib::node* other)
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_other);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
+
+ambulant::lib::node* node_factory::new_data_node(const char* data, int size)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	ambulant::lib::node* _rv;
+	PyObject *py_data = Py_BuildValue("s", data);
+	PyObject *py_size = Py_BuildValue("i", size);
+
+	PyObject *py_rv = PyObject_CallMethod(py_node_factory, "new_data_node", "(OO)", py_data, py_size);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_data_node() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", nodeObj_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during node_factory::new_data_node() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_data);
+	Py_XDECREF(py_size);
 
 	PyGILState_Release(_GILState);
 	return _rv;

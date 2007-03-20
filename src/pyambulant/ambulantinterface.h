@@ -127,6 +127,7 @@ public:
 	const ambulant::lib::q_name_pair& get_qname() const;
 	int get_numid() const;
 	const ambulant::lib::xml_string& get_data() const;
+	bool is_data_node() const;
 	ambulant::lib::xml_string get_trimmed_data() const;
 	const char * get_attribute(const char* name) const;
 	const char * get_attribute(const std::string& name) const;
@@ -166,6 +167,7 @@ public:
 
 	ambulant::lib::node* new_node(const ambulant::lib::q_name_pair& qn, const ambulant::lib::q_attributes_list& qattrs, const ambulant::lib::node_context* ctx);
 	ambulant::lib::node* new_node(const ambulant::lib::node* other);
+	ambulant::lib::node* new_data_node(const char* data, int size);
 	ambulant::lib::node *new_node(const char *local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };
 	ambulant::lib::node *new_node(const ambulant::lib::xml_string& local_name, const char **attrs = 0, const ambulant::lib::node_context *ctx = 0) { abort(); };
   private:
