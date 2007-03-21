@@ -31,6 +31,8 @@
 #include "ambulant/lib/colors.h"
 #include "ambulant/lib/event_processor.h"
 
+#include <stack>
+
 #ifdef WITH_SMIL30
 namespace ambulant {
 
@@ -40,6 +42,12 @@ namespace smil2 {
 /// such as font, color, etc
 class smiltext_run {
   public:
+	smiltext_run()
+	:	m_data(""),
+		m_font(""),
+		m_fontsize(0),
+		m_color(lib::color_t(0))
+	{}
 	lib::xml_string m_data;
 	const char *	m_font;
 	int				m_fontsize;
@@ -68,6 +76,7 @@ class smiltext_engine {
 		m_event_processor(ep),
 		m_client(client)
 	{
+		m_tree_iterator++;
 	}
 	~smiltext_engine() {}
 	
@@ -107,6 +116,7 @@ class smiltext_engine {
 	smiltext_notification *m_client;
 	bool m_finished;
 	smiltext_runs m_runs;
+	std::stack<smiltext_run> m_run_stack;
 	smiltext_runs::const_iterator m_newbegin;
 };
 

@@ -32,6 +32,8 @@ namespace smil2 {
 /// Start the engine.
 void
 smiltext_engine::start() {
+	smiltext_run stdrun;
+	m_run_stack.push(stdrun);
 	_update();
 }
 
@@ -48,29 +50,44 @@ smiltext_engine::stop() {
 void
 smiltext_engine::_update() {
 	while (!m_tree_iterator.is_end()) {
+		assert(!m_run_stack.empty());
+		const lib::node *item = (*m_tree_iterator).second;
 		if (!(*m_tree_iterator).first) {
-			/* XXX Should pop font/size/etc */
+			// Pop the stack, if needed
+			if (item->get_local_name() == "span")
+				m_run_stack.pop();
 			m_tree_iterator++;
 			continue;
 		}
-		const lib::node *item = (*m_tree_iterator).second;
-		/* XXX Should break for tev */
-		smiltext_run run;
-		run.m_font = "";
-		run.m_fontsize = 10;
-		run.m_color = lib::color_t(0xff0000);
 		
-		if (!item->is_data_node()) {
-			run.m_data = item->get_sig();
-		} else {
+		if (item->is_data_node()) {
+			// Characters. Add them to the run with current font/size/etc
+			smiltext_run run = m_run_stack.top();
 			run.m_data = item->get_trimmed_data();
-		}
-		
-		if (run.m_data != "") {
-			m_runs.push_back(run);
-			if (m_newbegin == m_runs.end()) {
-				m_newbegin = m_runs.end();
-				m_newbegin--;
+			if (run.m_data != "") {
+				m_runs.push_back(run);
+				if (m_newbegin == m_runs.end()) {
+					m_newbegin = m_runs.end();
+					m_newbegin--;
+				}
+			}
+		} else {
+			// Element. Check what it is.
+			lib::xml_string tag = item->get_local_name();
+			if (tag == "tev") {
+				lib::logger::get_logger()->debug("smiltext: ignoring <tev>");
+			} else if (tag == "clear") {
+				lib::logger::get_logger()->debug("smiltext: ignoring <clear>");
+			} else if (tag == "span") {
+				smiltext_run run = m_run_stack.top();
+				// XXXJACK Just guessing here what the attribute names are
+				const char *font = item->get_attribute("font");
+				if (font) run.m_font = font;
+				const char *fontsize = item->get_attribute("fontSize");
+				if (fontsize) run.m_fontsize = atoi(fontsize);
+				const char *color = item->get_attribute("color");
+				if (color) run.m_color = lib::to_color(color);
+				m_run_stack.push(run);
 			}
 		}
 		m_tree_iterator++;

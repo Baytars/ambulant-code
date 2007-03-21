@@ -101,18 +101,50 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	/*AM_DBG*/ logger::get_logger()->debug("cocoa_smiltext_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
 	if (!m_text_storage) {
+		m_text_storage = [[NSTextStorage alloc] initWithString:@""];
 		lib::xml_string data;
 		smil2::smiltext_runs::const_iterator i = m_engine.begin();
+		[m_text_storage beginEditing];
 		while (i != m_engine.end()) {
-			data += (*i).m_data;
+			NSRange newrange;
+			// Add the new characters
+			newrange.location = [m_text_storage length];
+			newrange.length = 0;
+			NSString *newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
+			[m_text_storage replaceCharactersInRange:newrange withString:newdata];
+			
+			// Prepare for setting the attribute info
+			NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
+			newrange.length = (*i).m_data.length();
+			// Find font info
+			NSFont *text_font = NULL;
+			if ((*i).m_font != "") {
+				NSString *nsfontname = [NSString stringWithCString: (*i).m_font];
+				text_font = [NSFont fontWithName: nsfontname size: (*i).m_fontsize];
+				if (text_font == NULL)
+					lib::logger::get_logger()->trace("smiltext: font-family \"%s\" unknown", (*i).m_font);
+			} else if ((*i).m_fontsize) {
+				text_font = [NSFont userFontOfSize: (*i).m_fontsize];
+				if (text_font == NULL)
+					lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", (*i).m_fontsize);
+			}
+			if (text_font)
+				[attrs setValue:text_font forKey:NSFontAttributeName];
+				
+			// Find color info
+			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
+					green:greenf((*i).m_color)
+					blue:bluef((*i).m_color)
+					alpha:1.0];
+			[attrs setValue:color forKey:NSForegroundColorAttributeName];
+			
+			// Set the attributes
+			[m_text_storage setAttributes:attrs range:newrange];
+			
 			i++;
 		}
-		NSString *the_string = [NSString stringWithCString: data.c_str() length: data.size()];
-		m_text_storage = [[NSTextStorage alloc] initWithString:the_string];
-		if (m_text_color)
-			[m_text_storage setForegroundColor: m_text_color];
-		if (m_text_font)
-			[m_text_storage setFont: m_text_font];
+		[m_text_storage endEditing];
+
 		m_layout_manager = [[NSLayoutManager alloc] init];
 		m_text_container = [[NSTextContainer alloc] init];
 		[m_layout_manager addTextContainer:m_text_container];
