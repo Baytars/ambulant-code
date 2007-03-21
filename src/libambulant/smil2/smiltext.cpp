@@ -109,7 +109,7 @@ smiltext_engine::_update() {
 		} else {
 			// Element. Check what it is.
 			lib::xml_string tag = item->get_local_name();
-			if (tag == "tev") {
+			if (tag == "tev" || tag == "clear") {
 				const char *time_str = item->get_attribute("next");
 				if (!time_str) {
 					lib::logger::get_logger()->trace("smiltext: tev without next attribute ignored");
@@ -122,12 +122,16 @@ smiltext_engine::_update() {
 					m_tree_time = time;
 				lib::timer::time_type ttime = m_epoch + int(time*1000);
 				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
-				m_update_event = new update_callback(this, &smiltext_engine::_update);
-				m_event_processor->add_event(m_update_event, ttime-now, lib::ep_med);
-				m_tree_iterator++;
-				break;
-			} else if (tag == "clear") {
-				lib::logger::get_logger()->debug("smiltext: ignoring <clear>");
+				if (ttime > now) {
+					m_update_event = new update_callback(this, &smiltext_engine::_update);
+					m_event_processor->add_event(m_update_event, ttime-now, lib::ep_med);
+					break;
+				}
+				// else this time has already passed and we continue the loop
+				if (tag == "clear") {
+					m_runs.clear();
+					m_newbegin = m_runs.end();
+				}
 			} else if (tag == "span") {
 				smiltext_run run = m_run_stack.top();
 				// XXXJACK Just guessing here what the attribute names are
