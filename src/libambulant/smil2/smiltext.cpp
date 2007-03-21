@@ -90,7 +90,8 @@ smiltext_engine::_update() {
 		const lib::node *item = (*m_tree_iterator).second;
 		if (!(*m_tree_iterator).first) {
 			// Pop the stack, if needed
-			if (item->get_local_name() == "span")
+			const lib::xml_string &tag = item->get_local_name();
+			if (tag == "span" || tag == "pre")
 				m_run_stack.pop();
 			continue;
 		}
@@ -98,12 +99,22 @@ smiltext_engine::_update() {
 		if (item->is_data_node()) {
 			// Characters. Add them to the run with current font/size/etc
 			smiltext_run run = m_run_stack.top();
-			run.m_data = item->get_trimmed_data();
-			if (run.m_data != "") {
-				m_runs.push_back(run);
-				if (m_newbegin == m_runs.end()) {
-					m_newbegin = m_runs.end();
-					m_newbegin--;
+			// Trim all space characters. BUT if there is whitespace at the
+			// end leave one space there.
+			lib::xml_string data = item->get_data();
+			// XXX <pre>!
+			size_t first_nonblank = data.find_first_not_of(" \t\r\n");
+			size_t last_nonblank = data.find_last_not_of(" \t\r\n");
+			bool space_at_end = last_nonblank < data.size()-1;
+			if (first_nonblank != std::string::npos && last_nonblank != std::string::npos) {
+				run.m_data = data.substr(first_nonblank, last_nonblank-first_nonblank+1);
+				if (space_at_end) run.m_data += ' ';
+				if (run.m_data != "") {
+					m_runs.push_back(run);
+					if (m_newbegin == m_runs.end()) {
+						m_newbegin = m_runs.end();
+						m_newbegin--;
+					}
 				}
 			}
 		} else {
@@ -142,6 +153,31 @@ smiltext_engine::_update() {
 				const char *color = item->get_attribute("color");
 				if (color) run.m_color = lib::to_color(color);
 				m_run_stack.push(run);
+			} else if (tag == "pre") {
+				smiltext_run run = m_run_stack.top();
+				// XXXJACK Just guessing here what the attribute names are
+				run.m_pre = true;
+				m_run_stack.push(run);
+			} else if (tag == "br") {
+				smiltext_run run = m_run_stack.top();
+				run.m_command = stc_break;
+				m_runs.push_back(run);
+				if (m_newbegin == m_runs.end()) {
+					m_newbegin = m_runs.end();
+					m_newbegin--;
+				}
+#if 0
+			} else if (tag == "p") {
+				smiltext_run run = m_run_stack.top();
+				run.m_command = stc_para;
+				m_runs.push_back(run);
+				if (m_newbegin == m_runs.end()) {
+					m_newbegin = m_runs.end();
+					m_newbegin--;
+				}
+#endif
+			} else {
+				lib::logger::get_logger()->trace("smiltext: unknown tag <%s>", tag.c_str());
 			}
 		}
 	}

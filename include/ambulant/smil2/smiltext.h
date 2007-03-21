@@ -38,20 +38,30 @@ namespace ambulant {
 
 namespace smil2 {
 
+enum smiltext_command {
+	stc_data,
+	stc_break,
+	stc_para
+};
+
 /// A sequence of characters with a common set of attributes
 /// such as font, color, etc
 class smiltext_run {
   public:
 	smiltext_run()
-	:	m_data(""),
+	:	m_command(stc_data),
+		m_data(""),
 		m_font(""),
 		m_fontsize(0),
-		m_color(lib::color_t(0))
+		m_color(lib::color_t(0)),
+		m_pre(false)
 	{}
+	smiltext_command m_command;
 	lib::xml_string m_data;
 	const char *	m_font;
 	int				m_fontsize;
 	lib::color_t	m_color;
+	bool			m_pre;
 };
 
 typedef std::vector<smiltext_run> smiltext_runs;

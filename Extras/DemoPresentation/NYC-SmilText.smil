@@ -41,7 +41,7 @@
         <par id="ImageTextAudio-2">
           <img id="Ferry1" region="Images" dur="5s" src="NYCdata/Ferry1.gif" transIn="fade"/>
           <smiltext id="CapF1" region="Captions" dur="5s">
-            The
+            The 
             <tev next="0.25"/>
             lines 
             <tev next="0.75"/>
@@ -53,7 +53,7 @@
             <tev next="1.25"/>
             car 
             <tev next="1.5"/>
-            deck</span> 
+            deck </span> 
             <tev next="1.75"/>
             provide 
             <tev next="2.20"/>
@@ -74,14 +74,14 @@
         <par id="ImageTextAudio-3">
           <img id="Ferry2" region="Images" dur="5s" src="NYCdata/Ferry2.gif"/>
           <smiltext id="CapF2" region="Captions" dur="5s">
-            The <span font="Times">artwork</span> also flows along the passenger loading platforms.
+            The <span font="Times" fontSize="30" color="green">artwork </span> also flows <br/>along the passenger loading platforms.
           </smiltext>
           <audio id="SIF-0" region="audio_1" src="NYCdata/SIF-2.mp3"/>
         </par>
         <par id="ImageTextAudio-4">
           <img id="Ferry3" region="Images" dur="5s" src="NYCdata/Ferry3.gif"/>
           <smiltext id="CapF3" region="Captions" dur="5s">
-            <span color="red">The <span fontSize="20">engines</span> start</span>
+            <span color="red">The <span fontSize="20">engines </span> start</span>
             <clear next="2"/>
             and all of the lines seem to move in different directions.
           </smiltext>
