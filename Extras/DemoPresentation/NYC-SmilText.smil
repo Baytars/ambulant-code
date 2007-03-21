@@ -41,8 +41,33 @@
         <par id="ImageTextAudio-2">
           <img id="Ferry1" region="Images" dur="5s" src="NYCdata/Ferry1.gif" transIn="fade"/>
           <smiltext id="CapF1" region="Captions" dur="5s">
-            The lines of the <span color="red">lower car deck</span> provide 
-            a honeycomb pattern near the water.
+            The
+            <tev next="0.25"/>
+            lines 
+            <tev next="0.75"/>
+            of 
+            <tev next="0.8"/>
+            the 
+            <tev next="1"/>
+            <span color="red">lower 
+            <tev next="1.25"/>
+            car 
+            <tev next="1.5"/>
+            deck</span> 
+            <tev next="1.75"/>
+            provide 
+            <tev next="2.20"/>
+            a 
+            <tev next="2.25"/>
+            honeycomb 
+            <tev next="2.75"/>
+            pattern 
+            <tev next="3.15"/>
+            near 
+            <tev next="3.3"/>
+            the 
+            <tev next="3.5"/>
+            water.
           </smiltext>
           <audio id="SIF" region="audio_1" src="NYCdata/SIF-1.mp3"/>
         </par>
