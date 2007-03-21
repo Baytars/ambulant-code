@@ -22,6 +22,7 @@
  */
 
 #include "ambulant/smil2/smiltext.h"
+#include "ambulant/lib/callback.h"
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -29,11 +30,36 @@
 
 namespace ambulant {
 namespace smil2 {
+
+typedef lib::no_arg_callback<smiltext_engine> update_callback;
+
+smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, smiltext_notification *client)
+:	m_node(n),
+	m_tree_iterator(n->begin()),
+	m_event_processor(ep),
+	m_client(client),
+	m_update_event(NULL)
+{
+	m_tree_iterator++;
+	m_newbegin = m_runs.end();
+}
+
+smiltext_engine::~smiltext_engine()
+{
+	if (m_update_event&&m_event_processor)
+		m_event_processor->cancel_event(m_update_event, lib::ep_med);
+//	delete m_update_event;
+	m_update_event = NULL;
+}
+
 /// Start the engine.
 void
 smiltext_engine::start(double t) {
 	smiltext_run stdrun;
 	m_run_stack.push(stdrun);
+	// XXX Need to allow for "t"
+	m_epoch = m_event_processor->get_timer()->elapsed();
+	m_tree_time = 0;
 	_update();
 }
 
@@ -49,20 +75,23 @@ smiltext_engine::stop() {
 	m_tree_iterator = m_node->end();
 	m_runs.clear();
 	m_newbegin = m_runs.begin();
-	// XXX Cancel outstanding callback
-	_update();
+	if (m_update_event&&m_event_processor)
+		m_event_processor->cancel_event(m_update_event, lib::ep_med);
+//	delete m_update_event;
+	m_update_event = NULL;
 }
 
 void
 smiltext_engine::_update() {
-	while (!m_tree_iterator.is_end()) {
+	/*AM_DBG*/ lib::logger::get_logger()->debug("smiltext_engine::_update()");
+	m_update_event = NULL;
+	for( ; !m_tree_iterator.is_end(); m_tree_iterator++) {
 		assert(!m_run_stack.empty());
 		const lib::node *item = (*m_tree_iterator).second;
 		if (!(*m_tree_iterator).first) {
 			// Pop the stack, if needed
 			if (item->get_local_name() == "span")
 				m_run_stack.pop();
-			m_tree_iterator++;
 			continue;
 		}
 		
@@ -81,7 +110,22 @@ smiltext_engine::_update() {
 			// Element. Check what it is.
 			lib::xml_string tag = item->get_local_name();
 			if (tag == "tev") {
-				lib::logger::get_logger()->debug("smiltext: ignoring <tev>");
+				const char *time_str = item->get_attribute("next");
+				if (!time_str) {
+					lib::logger::get_logger()->trace("smiltext: tev without next attribute ignored");
+					continue;
+				}
+				double time = atof(time_str); // XXXJACK
+				if (time_str[0] == '+')
+					m_tree_time = m_tree_time + time;
+				else
+					m_tree_time = time;
+				lib::timer::time_type ttime = m_epoch + int(time*1000);
+				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
+				m_update_event = new update_callback(this, &smiltext_engine::_update);
+				m_event_processor->add_event(m_update_event, ttime-now, lib::ep_med);
+				m_tree_iterator++;
+				break;
 			} else if (tag == "clear") {
 				lib::logger::get_logger()->debug("smiltext: ignoring <clear>");
 			} else if (tag == "span") {
@@ -96,7 +140,6 @@ smiltext_engine::_update() {
 				m_run_stack.push(run);
 			}
 		}
-		m_tree_iterator++;
 	}
 	if (m_client)
 		m_client->smiltext_changed();

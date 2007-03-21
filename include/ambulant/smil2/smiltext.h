@@ -70,16 +70,8 @@ class smiltext_notification {
 /// Engine to process smiltext
 class smiltext_engine {
   public:
-	smiltext_engine(const lib::node *n, lib::event_processor *ep, smiltext_notification *client)
-	:	m_node(n),
-		m_tree_iterator(n->begin()),
-		m_event_processor(ep),
-		m_client(client)
-	{
-		m_tree_iterator++;
-		m_newbegin = m_runs.end();
-	}
-	~smiltext_engine() {}
+	smiltext_engine(const lib::node *n, lib::event_processor *ep, smiltext_notification *client);
+	~smiltext_engine();
 	
 	/// Start the engine.
 	void start(double t);
@@ -111,16 +103,22 @@ class smiltext_engine {
 	/// Called when the client has processed all runs.
 	void done() { m_newbegin = m_runs.end(); }
 	
+	/// HACK! We simulate the ref_counted interface
+	void add_ref() {}
+	void release() {}
   private:
 	void _update();
 	
-	const lib::node *m_node;
-	lib::node::const_iterator m_tree_iterator;
+	const lib::node *m_node;			// The root of the smiltext nodes
+	lib::node::const_iterator m_tree_iterator;	// Where we currently are in that tree
 	lib::event_processor *m_event_processor;
-	smiltext_notification *m_client;
-	smiltext_runs m_runs;
-	std::stack<smiltext_run> m_run_stack;
-	smiltext_runs::const_iterator m_newbegin;
+	smiltext_notification *m_client;	// The renderer
+	smiltext_runs m_runs;				// Currently active text runs
+	std::stack<smiltext_run> m_run_stack;	// Stack of runs for nested spans
+	smiltext_runs::const_iterator m_newbegin;	// Items in m_runs before this were seen previously
+	lib::event *m_update_event;			// event_processor callback to _update
+	lib::timer::time_type m_epoch;		// event_processor time corresponding to smiltext time=0
+	double m_tree_time;					// smiltext time for m_tree_iterator
 };
 
 } // namespace smil2

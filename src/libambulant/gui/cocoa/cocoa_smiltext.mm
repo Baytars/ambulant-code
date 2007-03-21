@@ -89,6 +89,7 @@ void
 cocoa_smiltext_renderer::smiltext_changed()
 {
 //	m_lock.enter();
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	assert(m_text_storage);
 	if (!m_engine.is_changed()) return;
 	lib::xml_string data;
@@ -147,7 +148,9 @@ cocoa_smiltext_renderer::smiltext_changed()
 	}
 	[m_text_storage endEditing];
 	m_engine.done();
+	[pool release];
 //	m_lock.leave();
+	m_dest->need_redraw();
 }
 
 void
