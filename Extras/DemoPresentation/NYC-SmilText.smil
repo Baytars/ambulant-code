@@ -81,7 +81,9 @@
         <par id="ImageTextAudio-4">
           <img id="Ferry3" region="Images" dur="5s" src="NYCdata/Ferry3.gif"/>
           <smiltext id="CapF3" region="Captions" dur="5s">
-            <span color="red">The <span fontSize="20">engines</span> start</span> and all of the lines seem to move in different directions.
+            <span color="red">The <span fontSize="20">engines</span> start</span>
+            <clear next="2"/>
+            and all of the lines seem to move in different directions.
           </smiltext>
           <audio id="SIF-1" region="audio_1" src="NYCdata/SIF-3.mp3"/>
         </par>
