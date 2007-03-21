@@ -42,7 +42,10 @@ namespace gui {
 
 namespace cocoa {
 
-class cocoa_smiltext_renderer : public cocoa_renderer<renderer_playable> {
+class cocoa_smiltext_renderer : 
+	public cocoa_renderer<renderer_playable>,
+	public smil2::smiltext_notification
+{
   public:
 	cocoa_smiltext_renderer(
 		playable_notification *context,
@@ -52,13 +55,15 @@ class cocoa_smiltext_renderer : public cocoa_renderer<renderer_playable> {
         ~cocoa_smiltext_renderer();
 	
     void redraw_body(const rect &dirty, gui_window *window);
-	void seek(double t) {}
+	void start(double t);
+	void seek(double t);
+	void stop();
+	// Callback from the engine
+	void smiltext_changed();
   private:
     NSTextStorage *m_text_storage;
 	NSLayoutManager *m_layout_manager;
 	NSTextContainer *m_text_container;
-	NSColor *m_text_color;
-	NSFont *m_text_font;
 	smil2::smiltext_engine m_engine;
 	critical_section m_lock;
 };

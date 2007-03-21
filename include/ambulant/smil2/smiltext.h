@@ -77,11 +77,15 @@ class smiltext_engine {
 		m_client(client)
 	{
 		m_tree_iterator++;
+		m_newbegin = m_runs.end();
 	}
 	~smiltext_engine() {}
 	
 	/// Start the engine.
-	void start();
+	void start(double t);
+	
+	/// Seek the engine in time.
+	void seek(double t);
 	
 	/// Stop the engine.
 	void stop();
@@ -114,7 +118,6 @@ class smiltext_engine {
 	lib::node::const_iterator m_tree_iterator;
 	lib::event_processor *m_event_processor;
 	smiltext_notification *m_client;
-	bool m_finished;
 	smiltext_runs m_runs;
 	std::stack<smiltext_run> m_run_stack;
 	smiltext_runs::const_iterator m_newbegin;

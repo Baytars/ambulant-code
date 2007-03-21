@@ -49,40 +49,11 @@ cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 		event_processor *evp)
 :	cocoa_renderer<renderer_playable>(context, cookie, node, evp),
 	m_text_storage(NULL),
-	m_text_color(NULL),
-	m_text_font(NULL),
-	m_engine(smil2::smiltext_engine(node, evp, NULL))
+	m_layout_manager(NULL),
+	m_text_container(NULL),
+	m_engine(smil2::smiltext_engine(node, evp, this))
 {
-	// XXX These parameter names are tentative
-	smil2::params *params = smil2::params::for_node(node);
-	color_t text_color = lib::to_color(0, 0, 0);
-	if (params) {
-		const char *fontname = params->get_str("font-family");
-//		const char *fontstyle = params->get_str("font-style");
-		float fontsize = 0.0;
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		text_color = params->get_color("color", text_color);
-		fontsize = params->get_float("font-size", 0.0);
-		AM_DBG NSLog(@"params found, color=(%d, %d, %d), font-family=%s, font-size=%g", 
-			redc(text_color), greenc(text_color), bluec(text_color), fontname, fontsize);
-		if (fontname) {
-			NSString *nsfontname = [NSString stringWithCString: fontname];
-			m_text_font = [NSFont fontWithName: nsfontname size: fontsize];
-			if (m_text_font == NULL)
-				lib::logger::get_logger()->trace("param: font-family \"%s\" unknown", fontname);
-		} else if (fontsize) {
-			m_text_font = [NSFont userFontOfSize: fontsize];
-			if (m_text_font == NULL)
-				lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", fontsize);
-		}
-		delete params;
-		[pool release];
-	}
-	m_text_color = [NSColor colorWithCalibratedRed:redf(text_color)
-					green:greenf(text_color)
-					blue:bluef(text_color)
-					alpha:1.0];
-	m_engine.start(); // XXXJACK wrong, do in start()
+	m_text_storage = [[NSTextStorage alloc] initWithString:@""];
 }
 
 cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
@@ -94,57 +65,99 @@ cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
 }
 
 void
+cocoa_smiltext_renderer::start(double t)
+{
+	m_engine.start(t);
+	renderer_playable::start(t);
+}
+
+void
+cocoa_smiltext_renderer::seek(double t)
+{
+	m_engine.seek(t);
+	//renderer_playable::seek(t);
+}
+
+void
+cocoa_smiltext_renderer::stop()
+{
+	m_engine.stop();
+	renderer_playable::stop();
+}
+
+void
+cocoa_smiltext_renderer::smiltext_changed()
+{
+//	m_lock.enter();
+	assert(m_text_storage);
+	if (!m_engine.is_changed()) return;
+	lib::xml_string data;
+	smil2::smiltext_runs::const_iterator i;
+	[m_text_storage beginEditing];
+	if (1||m_engine.is_cleared()) {
+		// Completely new text. Clear our copy and render everything.
+		NSRange all;
+		all.location = 0;
+		all.length = [m_text_storage length];
+		if (all.length);
+			[m_text_storage deleteCharactersInRange:all];
+		i = m_engine.begin();
+	} else {
+		// Only additions. Don't clear and only render the new stuff.
+		i = m_engine.newbegin();
+	}
+	while (i != m_engine.end()) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_smiltext: another run");
+		NSRange newrange;
+		// Add the new characters
+		newrange.location = [m_text_storage length];
+		newrange.length = 0;
+		NSString *newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
+		[m_text_storage replaceCharactersInRange:newrange withString:newdata];
+		
+		// Prepare for setting the attribute info
+		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
+		newrange.length = (*i).m_data.length();
+		// Find font info
+		NSFont *text_font = NULL;
+		if ((*i).m_font != "") {
+			NSString *nsfontname = [NSString stringWithCString: (*i).m_font];
+			text_font = [NSFont fontWithName: nsfontname size: (*i).m_fontsize];
+			if (text_font == NULL)
+				lib::logger::get_logger()->trace("smiltext: font-family \"%s\" unknown", (*i).m_font);
+		} else if ((*i).m_fontsize) {
+			text_font = [NSFont userFontOfSize: (*i).m_fontsize];
+			if (text_font == NULL)
+				lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", (*i).m_fontsize);
+		}
+		if (text_font)
+			[attrs setValue:text_font forKey:NSFontAttributeName];
+			
+		// Find color info
+		NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
+				green:greenf((*i).m_color)
+				blue:bluef((*i).m_color)
+				alpha:1.0];
+		[attrs setValue:color forKey:NSForegroundColorAttributeName];
+		
+		// Set the attributes
+		[m_text_storage setAttributes:attrs range:newrange];
+		
+		i++;
+	}
+	[m_text_storage endEditing];
+	m_engine.done();
+//	m_lock.leave();
+}
+
+void
 cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
 	/*AM_DBG*/ logger::get_logger()->debug("cocoa_smiltext_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
-
-	if (!m_text_storage) {
-		m_text_storage = [[NSTextStorage alloc] initWithString:@""];
-		lib::xml_string data;
-		smil2::smiltext_runs::const_iterator i = m_engine.begin();
-		[m_text_storage beginEditing];
-		while (i != m_engine.end()) {
-			NSRange newrange;
-			// Add the new characters
-			newrange.location = [m_text_storage length];
-			newrange.length = 0;
-			NSString *newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
-			[m_text_storage replaceCharactersInRange:newrange withString:newdata];
-			
-			// Prepare for setting the attribute info
-			NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
-			newrange.length = (*i).m_data.length();
-			// Find font info
-			NSFont *text_font = NULL;
-			if ((*i).m_font != "") {
-				NSString *nsfontname = [NSString stringWithCString: (*i).m_font];
-				text_font = [NSFont fontWithName: nsfontname size: (*i).m_fontsize];
-				if (text_font == NULL)
-					lib::logger::get_logger()->trace("smiltext: font-family \"%s\" unknown", (*i).m_font);
-			} else if ((*i).m_fontsize) {
-				text_font = [NSFont userFontOfSize: (*i).m_fontsize];
-				if (text_font == NULL)
-					lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", (*i).m_fontsize);
-			}
-			if (text_font)
-				[attrs setValue:text_font forKey:NSFontAttributeName];
-				
-			// Find color info
-			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
-					green:greenf((*i).m_color)
-					blue:bluef((*i).m_color)
-					alpha:1.0];
-			[attrs setValue:color forKey:NSForegroundColorAttributeName];
-			
-			// Set the attributes
-			[m_text_storage setAttributes:attrs range:newrange];
-			
-			i++;
-		}
-		[m_text_storage endEditing];
-
+	if (!m_layout_manager) {
+		// Initialize the text engine
 		m_layout_manager = [[NSLayoutManager alloc] init];
 		m_text_container = [[NSTextContainer alloc] init];
 		[m_layout_manager addTextContainer:m_text_container];

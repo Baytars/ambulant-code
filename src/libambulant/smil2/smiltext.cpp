@@ -31,10 +31,16 @@ namespace ambulant {
 namespace smil2 {
 /// Start the engine.
 void
-smiltext_engine::start() {
+smiltext_engine::start(double t) {
 	smiltext_run stdrun;
 	m_run_stack.push(stdrun);
 	_update();
+}
+
+/// Seek the engine
+void
+smiltext_engine::seek(double t) {
+	// To be provided
 }
 
 /// Stop the engine.
@@ -92,7 +98,8 @@ smiltext_engine::_update() {
 		}
 		m_tree_iterator++;
 	}
-	/* XXX Should schedule callback */
+	if (m_client)
+		m_client->smiltext_changed();
 }
 	
 }
