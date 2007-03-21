@@ -113,7 +113,13 @@ cocoa_smiltext_renderer::smiltext_changed()
 		// Add the new characters
 		newrange.location = [m_text_storage length];
 		newrange.length = 0;
-		NSString *newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
+		NSString *newdata;
+		if ((*i).m_command == smil2::stc_break)
+			newdata = @"\n";
+		else if ((*i).m_command == smil2::stc_para)
+			newdata = @"\n\n";
+		else
+			newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
 		[m_text_storage replaceCharactersInRange:newrange withString:newdata];
 		
 		// Prepare for setting the attribute info
