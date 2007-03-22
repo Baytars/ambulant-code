@@ -42,6 +42,39 @@ namespace gui {
 
 namespace cocoa {
 
+static NSFont *
+_select_font(const char *family, smil2::smiltext_font_style style, smil2::smiltext_font_weight weight, int size)
+{
+	NSFont *font = [NSFont userFontOfSize: (float)size];
+	NSFontTraitMask mask;
+	NSFontManager *fm = [NSFontManager sharedFontManager];
+	
+	if (strcmp(family, "serif") == 0) 
+		font = [fm convertFont: font toFamily: @"Times"];
+	if (strcmp(family, "monospace") == 0) mask |= NSFixedPitchFontMask;
+	switch(style) {
+	case smil2::sts_normal:
+	case smil2::sts_reverse_oblique: // Not supported
+		mask |= NSUnitalicFontMask;
+		break;
+	case smil2::sts_italic:
+	case smil2::sts_oblique:
+		mask |= NSItalicFontMask;
+		break;
+	}
+	switch(weight) {
+	case smil2::stw_normal:
+		mask |= NSUnboldFontMask;
+		break;
+	case smil2::stw_bold:
+		mask |= NSBoldFontMask;
+		break;
+	}
+	
+	font = [fm convertFont: font toHaveTrait: mask];
+	return font;
+}
+
 cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
@@ -116,8 +149,6 @@ cocoa_smiltext_renderer::smiltext_changed()
 		NSString *newdata;
 		if ((*i).m_command == smil2::stc_break)
 			newdata = @"\n";
-		else if ((*i).m_command == smil2::stc_para)
-			newdata = @"\n\n";
 		else
 			newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
 		[m_text_storage replaceCharactersInRange:newrange withString:newdata];
@@ -126,26 +157,26 @@ cocoa_smiltext_renderer::smiltext_changed()
 		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
 		newrange.length = (*i).m_data.length();
 		// Find font info
-		NSFont *text_font = NULL;
-		if ((*i).m_font != "") {
-			NSString *nsfontname = [NSString stringWithCString: (*i).m_font];
-			text_font = [NSFont fontWithName: nsfontname size: (*i).m_fontsize];
-			if (text_font == NULL)
-				lib::logger::get_logger()->trace("smiltext: font-family \"%s\" unknown", (*i).m_font);
-		} else if ((*i).m_fontsize) {
-			text_font = [NSFont userFontOfSize: (*i).m_fontsize];
-			if (text_font == NULL)
-				lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", (*i).m_fontsize);
-		}
+		NSFont *text_font = _select_font((*i).m_font_family, (*i).m_font_style, (*i).m_font_weight, (*i).m_font_size);
 		if (text_font)
 			[attrs setValue:text_font forKey:NSFontAttributeName];
 			
-		// Find color info
-		NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
-				green:greenf((*i).m_color)
-				blue:bluef((*i).m_color)
-				alpha:1.0];
-		[attrs setValue:color forKey:NSForegroundColorAttributeName];
+		if (!(*i).m_transparent) {
+			// Find color info
+			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
+					green:greenf((*i).m_color)
+					blue:bluef((*i).m_color)
+					alpha:1.0];
+			[attrs setValue:color forKey:NSForegroundColorAttributeName];
+		}
+		if (!(*i).m_bg_transparent) {
+			// Find color info
+			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
+					green:greenf((*i).m_bg_color)
+					blue:bluef((*i).m_bg_color)
+					alpha:1.0];
+			[attrs setValue:color forKey:NSBackgroundColorAttributeName];
+		}
 		
 		// Set the attributes
 		[m_text_storage setAttributes:attrs range:newrange];
