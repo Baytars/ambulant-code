@@ -40,28 +40,51 @@ namespace smil2 {
 
 enum smiltext_command {
 	stc_data,
-	stc_break,
-	stc_para
+	stc_break
+};
+
+enum smiltext_direction {
+	std_ltr,
+	std_rtl
+};
+
+enum smiltext_align {
+	sta_start,
+	sta_end,
+	sta_left,
+	sta_right,
+	sta_center
+};
+
+enum smiltext_font_style {
+	sts_normal,
+	sts_italic,
+	sts_oblique,
+	sts_reverse_oblique
+};
+
+enum smiltext_font_weight {
+	stw_normal,
+	stw_bold
 };
 
 /// A sequence of characters with a common set of attributes
 /// such as font, color, etc
 class smiltext_run {
   public:
-	smiltext_run()
-	:	m_command(stc_data),
-		m_data(""),
-		m_font(""),
-		m_fontsize(0),
-		m_color(lib::color_t(0)),
-		m_pre(false)
-	{}
 	smiltext_command m_command;
 	lib::xml_string m_data;
-	const char *	m_font;
-	int				m_fontsize;
-	lib::color_t	m_color;
-	bool			m_pre;
+	
+	const char *			m_font_family;
+	smiltext_font_style		m_font_style;
+	smiltext_font_weight	m_font_weight;
+	int						m_font_size;
+	bool					m_transparent;
+	lib::color_t			m_color;
+	bool					m_bg_transparent;
+	lib::color_t			m_bg_color;
+	smiltext_align			m_align;
+	smiltext_direction		m_direction;
 };
 
 typedef std::vector<smiltext_run> smiltext_runs;
@@ -117,7 +140,12 @@ class smiltext_engine {
 	void add_ref() {}
 	void release() {}
   private:
+	// Callback routine that updates the text runs to the current state.
 	void _update();
+	// Fill a run with the formatting parameters from a node.
+	void _get_formatting(smiltext_run& dst, const lib::node *src);
+	// Fill a run with the defaulty formatting.
+	void _get_default_formatting(smiltext_run& dst);
 	
 	const lib::node *m_node;			// The root of the smiltext nodes
 	lib::node::const_iterator m_tree_iterator;	// Where we currently are in that tree
@@ -129,6 +157,7 @@ class smiltext_engine {
 	lib::event *m_update_event;			// event_processor callback to _update
 	lib::timer::time_type m_epoch;		// event_processor time corresponding to smiltext time=0
 	double m_tree_time;					// smiltext time for m_tree_iterator
+	bool m_append;
 };
 
 } // namespace smil2

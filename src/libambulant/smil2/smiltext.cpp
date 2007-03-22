@@ -28,6 +28,8 @@
 #define AM_DBG if(0)
 #endif
 
+#ifdef WITH_SMIL30
+
 namespace ambulant {
 namespace smil2 {
 
@@ -40,8 +42,21 @@ smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, s
 	m_client(client),
 	m_update_event(NULL)
 {
+	// Initialize the iterators to the correct place
 	m_tree_iterator++;
 	m_newbegin = m_runs.end();
+	
+	// Initialize the default formatting and apply node attributes
+	smiltext_run stdrun;
+	_get_default_formatting(stdrun);
+	const char *rgn = n->get_attribute("region");
+	if (rgn) {
+		const lib::node *rgn_node = n->get_context()->get_node(rgn);
+		if (rgn_node)
+			_get_formatting(stdrun, rgn_node);
+	}
+	_get_formatting(stdrun, n);
+	m_run_stack.push(stdrun);
 }
 
 smiltext_engine::~smiltext_engine()
@@ -55,8 +70,6 @@ smiltext_engine::~smiltext_engine()
 /// Start the engine.
 void
 smiltext_engine::start(double t) {
-	smiltext_run stdrun;
-	m_run_stack.push(stdrun);
 	// XXX Need to allow for "t"
 	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_tree_time = 0;
@@ -145,18 +158,7 @@ smiltext_engine::_update() {
 				}
 			} else if (tag == "span") {
 				smiltext_run run = m_run_stack.top();
-				// XXXJACK Just guessing here what the attribute names are
-				const char *font = item->get_attribute("font");
-				if (font) run.m_font = font;
-				const char *fontsize = item->get_attribute("fontSize");
-				if (fontsize) run.m_fontsize = atoi(fontsize);
-				const char *color = item->get_attribute("color");
-				if (color) run.m_color = lib::to_color(color);
-				m_run_stack.push(run);
-			} else if (tag == "pre") {
-				smiltext_run run = m_run_stack.top();
-				// XXXJACK Just guessing here what the attribute names are
-				run.m_pre = true;
+				_get_formatting(run, item);
 				m_run_stack.push(run);
 			} else if (tag == "br") {
 				smiltext_run run = m_run_stack.top();
@@ -184,9 +186,113 @@ smiltext_engine::_update() {
 	if (m_client)
 		m_client->smiltext_changed();
 }
-	
-}
+
+// Fill a run with the formatting parameters from a node.
+void
+smiltext_engine::_get_formatting(smiltext_run& dst, const lib::node *src)
+{
+	const char *style = src->get_attribute("textStyle");
+	if (style) {
+		const lib::node_context *ctx = src->get_context();
+		assert(ctx);
+		const lib::node *stylenode = ctx->get_node(style);
+		if (stylenode) {
+			// XXX check that stylenode.tag == textStyle
+			_get_formatting(dst, stylenode);
+		} else {
+			lib::logger::get_logger()->trace("%s: textStyle=\"%s\": ID not found", src->get_sig().c_str(), style);
+		}
+	}
+	const char *align = src->get_attribute("textAlign");
+	if (align) {
+		if (strcmp(align, "start") == 0) dst.m_align = sta_start;
+		else if (strcmp(align, "end") == 0) dst.m_align = sta_end;
+		else if (strcmp(align, "left") == 0) dst.m_align = sta_left;
+		else if (strcmp(align, "right") == 0) dst.m_align = sta_right;
+		else if (strcmp(align, "center") == 0) dst.m_align = sta_center;
+		else if (strcmp(align, "inherit") == 0) /* no-op */;
+		else {
+			lib::logger::get_logger()->trace("%s: textAlign=\"%s\": unknown alignment", src->get_sig().c_str(), align);
+		}
+	}
+	const char *bg_color = src->get_attribute("textBackgroundColor");
+	if (bg_color) {
+		dst.m_bg_transparent = false;
+		dst.m_bg_color = lib::to_color(bg_color);
+	}
+	const char *color = src->get_attribute("textColor");
+	if (color) {
+		dst.m_transparent = false;
+		dst.m_color = lib::to_color(color);
+	}
+	const char *direction = src->get_attribute("textDirection");
+	if (direction) {
+		if (strcmp(direction, "ltr") == 0) dst.m_direction = std_ltr;
+		else if (strcmp(direction, "rtl") == 0) dst.m_direction = std_rtl;
+		else if (strcmp(direction, "inherit") == 0) /* no-op */;
+		else {
+			lib::logger::get_logger()->trace("%s: textDirection=\"%s\": unknown direction", src->get_sig().c_str(), direction);
+		}
+		
+	}
+	const char *font_family = src->get_attribute("textFontFamily");
+	if (font_family) {
+		dst.m_font_family = font_family;
+	}
+	const char *font_size = src->get_attribute("textFontSize");
+	if (font_size) {
+		if (strcmp(font_size, "xx-small") == 0) dst.m_font_size = 8;
+		else if (strcmp(font_size, "x-small") == 0) dst.m_font_size = 10;
+		else if (strcmp(font_size, "small") == 0) dst.m_font_size = 12;
+		else if (strcmp(font_size, "normal") == 0) dst.m_font_size = 14;
+		else if (strcmp(font_size, "large") == 0) dst.m_font_size = 16;
+		else if (strcmp(font_size, "x-large") == 0) dst.m_font_size = 18;
+		else if (strcmp(font_size, "xx-large") == 0) dst.m_font_size = 20;
+		else if (strcmp(font_size, "smaller") == 0) dst.m_font_size -= 2;
+		else if (strcmp(font_size, "larger") == 0) dst.m_font_size += 2;
+		else if (strcmp(font_size, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textFontSize=\"%s\": unknown size", src->get_sig().c_str(), font_size);
+		}
+	}
+	const char *font_weight = src->get_attribute("textFontWeight");
+	if (font_weight) {
+		if (strcmp(font_weight, "normal") == 0) dst.m_font_weight = stw_normal;
+		else if (strcmp(font_weight, "bold") == 0) dst.m_font_weight = stw_bold;
+		else if (strcmp(font_weight, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textFontWeight=\"%s\": unknown weight", src->get_sig().c_str(), font_weight);
+		}
+	}
+	const char *font_style = src->get_attribute("textFontStyle");
+	if (font_style) {
+		if (strcmp(font_style, "normal") == 0) dst.m_font_style = sts_normal;
+		else if (strcmp(font_style, "italic") == 0) dst.m_font_style = sts_italic;
+		else if (strcmp(font_style, "oblique") == 0) dst.m_font_style = sts_oblique;
+		else if (strcmp(font_style, "reverseOblique") == 0) dst.m_font_style = sts_reverse_oblique;
+		else if (strcmp(font_style, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textFontStyle=\"%s\": unknown style", src->get_sig().c_str(), font_style);
+		}
+	}
 }
 
-#ifdef WITH_SMIL30
+// Fill a run with the defaulty formatting.
+void
+smiltext_engine::_get_default_formatting(smiltext_run& dst)
+{
+	dst.m_font_family = "monospace";
+	dst.m_font_style = sts_normal;
+	dst.m_font_weight = stw_normal;
+	dst.m_font_size = 12;
+	dst.m_transparent = false;
+	dst.m_color = lib::color_t(0);
+	dst.m_bg_transparent = true;
+	dst.m_bg_color = lib::color_t(0);
+	dst.m_align = sta_start;
+	dst.m_direction = std_ltr;
+}
+
+}
+}
 #endif // WITH_SMIL30
