@@ -12,7 +12,7 @@
       <region id="audio_2"/>
       <region id="bkgd_image" left="0" width="240" top="0" height="270"/>
       <region id="Images" left="18" width="220" top="6" height="240" z-index="1" fit="meet"/>
-      <region id="Captions" left="19" width="220" top="184" height="85" z-index="2"/>
+      <region id="Captions" left="19" width="140" top="184" height="85" z-index="2"/>
     </layout>
     <transition id="slideover" type="slideWipe"/>
     <transition id="fade" type="fade"/>
@@ -40,10 +40,12 @@
 -->
         <par id="ImageTextAudio-2">
           <img id="Ferry1" region="Images" dur="5s" src="NYCdata/Ferry1.gif" transIn="fade"/>
-          <smiltext id="CapF1" region="Captions" dur="5s">
+          <smiltext id="CapF1" region="Captions" dur="5s" textMode="crawl" textRate="100" textWrapOption="noWrap">
             The 
             <tev next="0.25"/>
+            <span textBackgroundColor="blue">
             lines 
+            </span>
             <tev next="0.75"/>
             of 
             <tev next="0.8"/>
@@ -73,7 +75,7 @@
         </par>
         <par id="ImageTextAudio-3">
           <img id="Ferry2" region="Images" dur="5s" src="NYCdata/Ferry2.gif"/>
-          <smiltext id="CapF2" region="Captions" dur="5s">
+          <smiltext id="CapF2" region="Captions" dur="5s" textWrapOption="noWrap">
             The <span textFontFamily="serif" textFontSize="xx-large" textColor="green">artwork </span> also flows <br/>along the passenger loading platforms.
           </smiltext>
           <audio id="SIF-0" region="audio_1" src="NYCdata/SIF-2.mp3"/>
@@ -82,7 +84,7 @@
           <img id="Ferry3" region="Images" dur="5s" src="NYCdata/Ferry3.gif"/>
           <smiltext id="CapF3" region="Captions" dur="5s">
             <span textColor="red">The <span textFontSize="x-large">engines </span> start</span>
-            <clear next="2"/>
+            <clear next="1.6"/>
             and all of the lines seem to move in different directions.
           </smiltext>
           <audio id="SIF-1" region="audio_1" src="NYCdata/SIF-3.mp3"/>
