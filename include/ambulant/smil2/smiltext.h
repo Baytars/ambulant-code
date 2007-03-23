@@ -38,16 +38,39 @@ namespace ambulant {
 
 namespace smil2 {
 
+/// Various modes the smiltext can be displayed in.
+enum smiltext_mode {
+	stm_replace,		/// New text is timed, replaces everything, no scrolling
+	stm_append,			/// New text is timed, appended to the end, no scrolling
+	stm_scroll,			/// Timing is ignored, text auto-scrolls upward
+	stm_crawl,			/// Timing is ignored, text scrolls right-to-left
+	stm_jump,			/// New text is timed, appended to end, scrolls up if needed
+};
+
+/// Global parameters of a smiltext node.
+/// These are the parameters for smiltext only, additionally the
+/// renderer is expected to take care of all the normal timing/region/etc
+/// attributes.
+struct smiltext_params {
+	smiltext_mode m_mode;	/// How the text is rendered
+	bool	m_loop;			/// Loop mode, valid for scroll/crawl
+	int		m_rate;			/// Rate, in pixels/second
+	bool	m_wrap;			/// Text should be line-wrapped
+};
+	
+/// Layout commands that the engine can send to the renderer
 enum smiltext_command {
 	stc_data,
 	stc_break
 };
 
+/// Values for the textDirection attribute of text spans
 enum smiltext_direction {
 	std_ltr,
 	std_rtl
 };
 
+/// Values for the textAlign attribute of text spans
 enum smiltext_align {
 	sta_start,
 	sta_end,
@@ -56,6 +79,7 @@ enum smiltext_align {
 	sta_center
 };
 
+/// Values for the textFontSyle attribute of text spans
 enum smiltext_font_style {
 	sts_normal,
 	sts_italic,
@@ -63,13 +87,16 @@ enum smiltext_font_style {
 	sts_reverse_oblique
 };
 
+/// Values for the textFontWeight attribute of text spans
 enum smiltext_font_weight {
 	stw_normal,
 	stw_bold
 };
 
 /// A sequence of characters with a common set of attributes
-/// such as font, color, etc
+/// such as font, color, etc. Alternatively, if m_command
+/// is not stc_data, it is a layout command (currently only
+/// br is supported).
 class smiltext_run {
   public:
 	smiltext_command m_command;
@@ -87,6 +114,8 @@ class smiltext_run {
 	smiltext_direction		m_direction;
 };
 
+/// A vector of smiltext_run objects is what the renderer is
+/// supposed to draw on the screen.
 typedef std::vector<smiltext_run> smiltext_runs;
 
 /// Interface that engine of the client should provide. The
@@ -100,11 +129,15 @@ class smiltext_notification {
 	virtual void smiltext_changed() = 0;
 };
 
-/// Engine to process smiltext
+/// Engine to process smiltext.
 class smiltext_engine {
   public:
 	smiltext_engine(const lib::node *n, lib::event_processor *ep, smiltext_notification *client);
 	~smiltext_engine();
+	
+	/// Get the mode parameters
+	
+	const smiltext_params& get_params() const { return m_params; }
 	
 	/// Start the engine.
 	void start(double t);
@@ -146,6 +179,10 @@ class smiltext_engine {
 	void _get_formatting(smiltext_run& dst, const lib::node *src);
 	// Fill a run with the defaulty formatting.
 	void _get_default_formatting(smiltext_run& dst);
+	// Fill smiltext_params from a node
+	void _get_params(smiltext_params& params, const lib::node *src);
+	// Fill default smiltext_params
+	void _get_default_params(smiltext_params& params);
 	
 	const lib::node *m_node;			// The root of the smiltext nodes
 	lib::node::const_iterator m_tree_iterator;	// Where we currently are in that tree
@@ -157,7 +194,7 @@ class smiltext_engine {
 	lib::event *m_update_event;			// event_processor callback to _update
 	lib::timer::time_type m_epoch;		// event_processor time corresponding to smiltext time=0
 	double m_tree_time;					// smiltext time for m_tree_iterator
-	bool m_append;
+	smiltext_params m_params;			// global parameters
 };
 
 } // namespace smil2

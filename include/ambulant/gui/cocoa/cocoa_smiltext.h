@@ -65,6 +65,7 @@ class cocoa_smiltext_renderer :
 	NSLayoutManager *m_layout_manager;
 	NSTextContainer *m_text_container;
 	smil2::smiltext_engine m_engine;
+	const smil2::smiltext_params& m_params;
 	critical_section m_lock;
 };
 
