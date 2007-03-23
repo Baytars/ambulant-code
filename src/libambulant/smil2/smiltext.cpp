@@ -46,16 +46,21 @@ smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, s
 	m_tree_iterator++;
 	m_newbegin = m_runs.end();
 	
+	// Initialize the global para
 	// Initialize the default formatting and apply node attributes
 	smiltext_run stdrun;
 	_get_default_formatting(stdrun);
+	_get_default_params(m_params);
 	const char *rgn = n->get_attribute("region");
 	if (rgn) {
 		const lib::node *rgn_node = n->get_context()->get_node(rgn);
-		if (rgn_node)
+		if (rgn_node) {
 			_get_formatting(stdrun, rgn_node);
+			_get_params(m_params, rgn_node);
+		}
 	}
 	_get_formatting(stdrun, n);
+	_get_params(m_params, n);
 	m_run_stack.push(stdrun);
 }
 
@@ -292,6 +297,58 @@ smiltext_engine::_get_default_formatting(smiltext_run& dst)
 	dst.m_align = sta_start;
 	dst.m_direction = std_ltr;
 }
+
+// Fill smiltext_params from a node
+void
+smiltext_engine::_get_params(smiltext_params& params, const lib::node *src)
+{
+	const char *mode = src->get_attribute("textMode");
+	if (mode) {
+		if (strcmp(mode, "replace") == 0) params.m_mode = stm_replace;
+		else if (strcmp(mode, "append") == 0) params.m_mode = stm_append;
+		else if (strcmp(mode, "scroll") == 0) params.m_mode = stm_scroll;
+		else if (strcmp(mode, "crawl") == 0) params.m_mode = stm_crawl;
+		else if (strcmp(mode, "jump") == 0) params.m_mode = stm_jump;
+		else if (strcmp(mode, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textMode=\"%s\": unknown mode", src->get_sig().c_str(), mode);
+		}
+	}
+	const char *loop = src->get_attribute("textLoop");
+	if (loop) {
+		if (strcmp(loop, "true") == 0) params.m_loop = true;
+		else if (strcmp(loop, "false") == 0) params.m_loop = false;
+		else if (strcmp(loop, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textLoop=\"%s\": must be true or false", src->get_sig().c_str(), loop);
+		}
+	}
+	const char *rate = src->get_attribute("textRate");
+	if (rate) {
+		int rate_i = atoi(rate); // XXXX
+		params.m_rate = rate_i;
+	}
+	const char *wrap = src->get_attribute("textWrap");
+	if (wrap) {
+		if (strcmp(wrap, "true") == 0) params.m_wrap = true;
+		else if (strcmp(wrap, "false") == 0) params.m_wrap = false;
+		else if (strcmp(wrap, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: textWrap=\"%s\": must be true or false", src->get_sig().c_str(), wrap);
+		}
+	}
+}
+
+// Fill default smiltext_params
+void
+smiltext_engine::_get_default_params(smiltext_params& params)
+{
+	params.m_mode = stm_append;
+	params.m_loop = false;
+	params.m_rate = 0;
+	params.m_wrap = true;
+}
+
 
 }
 }
