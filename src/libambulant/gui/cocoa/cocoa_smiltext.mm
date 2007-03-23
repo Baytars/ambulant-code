@@ -88,6 +88,7 @@ cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 	m_params(m_engine.get_params())
 {
 	m_text_storage = [[NSTextStorage alloc] initWithString:@""];
+	m_render_offscreen = (m_params.m_mode != smil2::stm_replace && m_params.m_mode != smil2::stm_append) || !m_params.m_wrap;
 }
 
 cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
@@ -101,6 +102,7 @@ cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
 void
 cocoa_smiltext_renderer::start(double t)
 {
+	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_engine.start(t);
 	renderer_playable::start(t);
 }
@@ -197,32 +199,79 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
 	/*AM_DBG*/ logger::get_logger()->debug("cocoa_smiltext_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
-	if (!m_layout_manager) {
-		// Initialize the text engine
-		m_layout_manager = [[NSLayoutManager alloc] init];
-		m_text_container = [[NSTextContainer alloc] init];
-		[m_layout_manager addTextContainer:m_text_container];
-		[m_text_container release];	// The layoutManager will retain the textContainer
-		[m_text_storage addLayoutManager:m_layout_manager];
-		[m_layout_manager release];	// The textStorage will retain the layoutManager
-	}
 
+	// Determine current position and size.
 	cocoa_window *cwindow = (cocoa_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
 	NSRect cocoa_dstrect = [view NSRectForAmbulantRect: &dstrect];
-	if (m_text_storage && m_layout_manager) {
-		NSPoint origin = NSMakePoint(NSMinX(cocoa_dstrect), NSMinY(cocoa_dstrect));
-		NSSize size = NSMakeSize(NSWidth(cocoa_dstrect), NSHeight(cocoa_dstrect));
-		if (1 /*size != [m_text_container containerSize]*/) {
-			AM_DBG logger::get_logger()->debug("cocoa_smiltext_renderer.redraw: setting size to (%f, %f)", size.width, size.height);
-			[m_text_container setContainerSize: size];
-		}
-		AM_DBG logger::get_logger()->debug("cocoa_smiltext_renderer.redraw at Cocoa-point (%f, %f)", origin.x, origin.y);
-		NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
-		//[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: origin];
-		[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: origin];
+	NSPoint visible_origin = NSMakePoint(NSMinX(cocoa_dstrect), NSMinY(cocoa_dstrect));
+	NSSize visible_size = NSMakeSize(NSWidth(cocoa_dstrect), NSHeight(cocoa_dstrect));
+
+// Determine text container layout size. This depends on the type of container.
+#define INFINITE_WIDTH 1000000
+#define INFINITE_HEIGHT 1000000
+	NSSize layout_size = visible_size;
+	switch(m_params.m_mode) {
+	case smil2::stm_replace:
+	case smil2::stm_append:
+		if (!m_params.m_wrap)
+			layout_size.width = INFINITE_WIDTH;
+		break;
+	case smil2::stm_scroll:
+	case smil2::stm_jump:
+		layout_size.height = INFINITE_HEIGHT;
+		break;
+	case smil2::stm_crawl:
+		layout_size.width = INFINITE_WIDTH;
+		break;
+	}
+
+	NSSize old_layout_size;
+	// Initialize the text engine if we have not already done so.
+	if (!m_layout_manager) {
+		// Initialize the text engine
+		m_layout_manager = [[NSLayoutManager alloc] init];
+		m_text_container = [[NSTextContainer alloc] initWithContainerSize: layout_size];
+		old_layout_size = layout_size;	// Force resize
+		[m_text_container setHeightTracksTextView: false];
+		[m_text_container setWidthTracksTextView: false];
+		[m_layout_manager addTextContainer:m_text_container];
+		[m_text_container release];	// The layoutManager will retain the textContainer
+		[m_text_storage addLayoutManager:m_layout_manager];
+		[m_layout_manager release];	// The textStorage will retain the layoutManager
+	} else {
+		old_layout_size = [m_text_container containerSize];
+	}
+	assert(m_layout_manager);
+	assert(m_text_container);
+	assert(m_text_storage);
+	
+	// If the layout size has changed (due to smil animation or so) change it
+	if (!NSEqualSizes(old_layout_size, layout_size)) {
+		[m_text_container setContainerSize: layout_size];
+	}
+
+	// Next compute the layout position of what we want to draw at visible_origin
+	NSPoint logical_origin = NSMakePoint(0, 0);
+	if (m_params.m_mode == smil2::stm_crawl) {
+		double now = m_event_processor->get_timer()->elapsed() - m_epoch;
+		logical_origin.x += now * m_params.m_rate / 1000;
+	}
+	AM_DBG logger::get_logger()->debug("cocoa_smiltext_renderer.redraw at Cocoa-point (%f, %f)", visible_origin.x, visible_origin.y);
+	if (m_render_offscreen) {
+	}
+#if 0
+	NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
+#else
+	NSRect logical_rect = NSMakeRect(logical_origin.x, logical_origin.y, visible_size.width, visible_size.height);
+	NSRange glyph_range = [m_layout_manager glyphRangeForBoundingRect: logical_rect inTextContainer: m_text_container];
+#endif
+	[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
+	[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: visible_origin];
+	layout_size = [m_text_container containerSize];
+	if (m_render_offscreen) {
 	}
 	m_lock.leave();
 }

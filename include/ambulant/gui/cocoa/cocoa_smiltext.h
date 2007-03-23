@@ -66,6 +66,8 @@ class cocoa_smiltext_renderer :
 	NSTextContainer *m_text_container;
 	smil2::smiltext_engine m_engine;
 	const smil2::smiltext_params& m_params;
+	bool m_render_offscreen;			// True if m_params does not allows rendering in-place
+	lib::timer::time_type m_epoch;
 	critical_section m_lock;
 };
 

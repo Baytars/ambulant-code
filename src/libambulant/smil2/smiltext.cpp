@@ -328,13 +328,13 @@ smiltext_engine::_get_params(smiltext_params& params, const lib::node *src)
 		int rate_i = atoi(rate); // XXXX
 		params.m_rate = rate_i;
 	}
-	const char *wrap = src->get_attribute("textWrap");
+	const char *wrap = src->get_attribute("textWrapOption");
 	if (wrap) {
-		if (strcmp(wrap, "true") == 0) params.m_wrap = true;
-		else if (strcmp(wrap, "false") == 0) params.m_wrap = false;
+		if (strcmp(wrap, "wrap") == 0) params.m_wrap = true;
+		else if (strcmp(wrap, "noWrap") == 0) params.m_wrap = false;
 		else if (strcmp(wrap, "inherit") == 0) /* no-op */ ;
 		else {
-			lib::logger::get_logger()->trace("%s: textWrap=\"%s\": must be true or false", src->get_sig().c_str(), wrap);
+			lib::logger::get_logger()->trace("%s: textWrapOption=\"%s\": must be wrap or noWrap", src->get_sig().c_str(), wrap);
 		}
 	}
 }
