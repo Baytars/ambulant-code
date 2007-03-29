@@ -40,11 +40,14 @@ smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, s
 	m_tree_iterator(n->begin()),
 	m_event_processor(ep),
 	m_client(client),
+	m_newbegin_valid(false),
 	m_update_event(NULL)
 {
+	lib::logger::get_logger()->debug("smiltext_engine(0x%x).smiltext_engine(%s)", this, m_node->get_sig().c_str());
 	// Initialize the iterators to the correct place
 	m_tree_iterator++;
 	m_newbegin = m_runs.end();
+	m_newbegin_valid = false;
 	
 	// Initialize the global para
 	// Initialize the default formatting and apply node attributes
@@ -70,12 +73,15 @@ smiltext_engine::~smiltext_engine()
 		m_event_processor->cancel_event(m_update_event, lib::ep_med);
 //	delete m_update_event;
 	m_update_event = NULL;
+	m_client = NULL;
+	m_node = NULL;
 }
 
 /// Start the engine.
 void
 smiltext_engine::start(double t) {
 	// XXX Need to allow for "t"
+	lib::logger::get_logger()->debug("smiltext_engine(0x%x).start(%s)", this, m_node->get_sig().c_str());
 	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_tree_time = 0;
 	_update();
@@ -90,17 +96,21 @@ smiltext_engine::seek(double t) {
 /// Stop the engine.
 void
 smiltext_engine::stop() {
-	m_tree_iterator = m_node->end();
-	m_runs.clear();
-	m_newbegin = m_runs.begin();
 	if (m_update_event&&m_event_processor)
 		m_event_processor->cancel_event(m_update_event, lib::ep_med);
 //	delete m_update_event;
 	m_update_event = NULL;
+	m_tree_iterator = m_node->end();
+	m_runs.clear();
+	m_newbegin = m_runs.end();
+	m_newbegin_valid = false;
+	m_node = NULL;
 }
 
 void
 smiltext_engine::_update() {
+	assert(m_node);
+	lib::timer::time_type next_update_needed = 0;
 	/*AM_DBG*/ lib::logger::get_logger()->debug("smiltext_engine::_update()");
 	m_update_event = NULL;
 	for( ; !m_tree_iterator.is_end(); m_tree_iterator++) {
@@ -128,10 +138,10 @@ smiltext_engine::_update() {
 				run.m_data = data.substr(first_nonblank, last_nonblank-first_nonblank+1);
 				if (space_at_end) run.m_data += ' ';
 				if (run.m_data != "") {
-					m_runs.push_back(run);
-					if (m_newbegin == m_runs.end()) {
-						m_newbegin = m_runs.end();
-						m_newbegin--;
+					smiltext_runs::const_iterator where = m_runs.insert(m_runs.end(), run);
+					if (!m_newbegin_valid) {
+						m_newbegin = where;
+						m_newbegin_valid = true;
 					}
 				}
 			}
@@ -152,14 +162,14 @@ smiltext_engine::_update() {
 				lib::timer::time_type ttime = m_epoch + int(time*1000);
 				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
 				if (ttime > now) {
-					m_update_event = new update_callback(this, &smiltext_engine::_update);
-					m_event_processor->add_event(m_update_event, ttime-now, lib::ep_med);
+					next_update_needed = ttime-now;
 					break;
 				}
 				// else this time has already passed and we continue the loop
 				if (tag == "clear") {
 					m_runs.clear();
 					m_newbegin = m_runs.end();
+					m_newbegin_valid = false;
 				}
 			} else if (tag == "span") {
 				smiltext_run run = m_run_stack.top();
@@ -167,22 +177,13 @@ smiltext_engine::_update() {
 				m_run_stack.push(run);
 			} else if (tag == "br") {
 				smiltext_run run = m_run_stack.top();
+				run.m_data = "";
 				run.m_command = stc_break;
-				m_runs.push_back(run);
-				if (m_newbegin == m_runs.end()) {
-					m_newbegin = m_runs.end();
-					m_newbegin--;
+				smiltext_runs::const_iterator where = m_runs.insert( m_runs.end(), run);
+				if (!m_newbegin_valid) {
+					m_newbegin = where;
+					m_newbegin_valid = true;
 				}
-#if 0
-			} else if (tag == "p") {
-				smiltext_run run = m_run_stack.top();
-				run.m_command = stc_para;
-				m_runs.push_back(run);
-				if (m_newbegin == m_runs.end()) {
-					m_newbegin = m_runs.end();
-					m_newbegin--;
-				}
-#endif
 			} else {
 				lib::logger::get_logger()->trace("smiltext: unknown tag <%s>", tag.c_str());
 			}
@@ -190,6 +191,19 @@ smiltext_engine::_update() {
 	}
 	if (m_client)
 		m_client->smiltext_changed();
+	if (m_params.m_rate > 0 && m_update_event == NULL) {
+		// We need to schedule another update event to keep the scrolling/crawling going.
+		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
+		int delay = 1000 / m_params.m_rate;
+		if (delay < 40) delay = 40;
+		if (next_update_needed > delay || next_update_needed == 0) {
+			next_update_needed = delay;
+		}
+	}
+	if (next_update_needed > 0) {
+		m_update_event = new update_callback(this, &smiltext_engine::_update);
+		m_event_processor->add_event(m_update_event, next_update_needed, lib::ep_med);
+	}
 }
 
 // Fill a run with the formatting parameters from a node.
