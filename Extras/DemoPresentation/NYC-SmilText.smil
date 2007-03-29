@@ -40,7 +40,7 @@
 -->
         <par id="ImageTextAudio-2">
           <img id="Ferry1" region="Images" dur="5s" src="NYCdata/Ferry1.gif" transIn="fade"/>
-          <smiltext id="CapF1" region="Captions" dur="5s" textMode="crawl" textRate="100" textWrapOption="noWrap">
+          <smiltext id="CapF1" region="Captions" dur="5s" >
             The 
             <tev next="0.25"/>
             <span textBackgroundColor="blue">
@@ -75,16 +75,15 @@
         </par>
         <par id="ImageTextAudio-3">
           <img id="Ferry2" region="Images" dur="5s" src="NYCdata/Ferry2.gif"/>
-          <smiltext id="CapF2" region="Captions" dur="5s" textWrapOption="noWrap">
+          <smiltext id="CapF2" region="Captions" dur="5s" textMode="crawl" textRate="20">
             The <span textFontFamily="serif" textFontSize="xx-large" textColor="green">artwork </span> also flows <br/>along the passenger loading platforms.
           </smiltext>
           <audio id="SIF-0" region="audio_1" src="NYCdata/SIF-2.mp3"/>
         </par>
         <par id="ImageTextAudio-4">
           <img id="Ferry3" region="Images" dur="5s" src="NYCdata/Ferry3.gif"/>
-          <smiltext id="CapF3" region="Captions" dur="5s">
+          <smiltext id="CapF3" region="Captions" dur="5s" textMode="scroll" textRate="20">
             <span textColor="red">The <span textFontSize="x-large">engines </span> start</span>
-            <clear next="1.6"/>
             and all of the lines seem to move in different directions.
           </smiltext>
           <audio id="SIF-1" region="audio_1" src="NYCdata/SIF-3.mp3"/>

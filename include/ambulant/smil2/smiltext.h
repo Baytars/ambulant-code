@@ -152,22 +152,22 @@ class smiltext_engine {
 	bool is_finished() { return m_tree_iterator.is_end(); }
 	
 	/// Returns true if the text has changed since the last done() call.
-	bool is_changed() { return m_newbegin != m_runs.end(); }
+	bool is_changed() { return m_newbegin_valid; }
 	
 	/// Returns true if the text has been cleared and should be re-rendered from scratch.
-	bool is_cleared() { return m_newbegin == m_runs.begin(); }
+	bool is_cleared() { return m_newbegin_valid && m_newbegin == m_runs.begin(); }
 	
 	/// Returns an iterator pointing to the first smiltext_run.
 	smiltext_runs::const_iterator begin() { return m_runs.begin(); }
 	
 	/// Returns an iterator pointing to the first unseen smiltext_run.
-	smiltext_runs::const_iterator newbegin() { return m_newbegin; }
+	smiltext_runs::const_iterator newbegin() { return m_newbegin_valid ? m_newbegin : (smiltext_runs::const_iterator)m_runs.end(); }
 	
 	/// Returns an iterator pointing to the end of the smiltext_runs.
 	smiltext_runs::const_iterator end() { return m_runs.end(); }
 	
 	/// Called when the client has processed all runs.
-	void done() { m_newbegin = m_runs.end(); }
+	void done() { m_newbegin = m_runs.end(); m_newbegin_valid = false; }
 	
 	/// HACK! We simulate the ref_counted interface
 	void add_ref() {}
@@ -191,6 +191,7 @@ class smiltext_engine {
 	smiltext_runs m_runs;				// Currently active text runs
 	std::stack<smiltext_run> m_run_stack;	// Stack of runs for nested spans
 	smiltext_runs::const_iterator m_newbegin;	// Items in m_runs before this were seen previously
+	bool m_newbegin_valid;				// True if m_newbegin is valid.
 	lib::event *m_update_event;			// event_processor callback to _update
 	lib::timer::time_type m_epoch;		// event_processor time corresponding to smiltext time=0
 	double m_tree_time;					// smiltext time for m_tree_iterator

@@ -124,72 +124,73 @@ cocoa_smiltext_renderer::stop()
 void
 cocoa_smiltext_renderer::smiltext_changed()
 {
-//	m_lock.enter();
+	m_lock.enter();
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	assert(m_text_storage);
-	if (!m_engine.is_changed()) return;
-	lib::xml_string data;
-	smil2::smiltext_runs::const_iterator i;
-	[m_text_storage beginEditing];
-	if (1||m_engine.is_cleared()) {
-		// Completely new text. Clear our copy and render everything.
-		NSRange all;
-		all.location = 0;
-		all.length = [m_text_storage length];
-		if (all.length);
-			[m_text_storage deleteCharactersInRange:all];
-		i = m_engine.begin();
-	} else {
-		// Only additions. Don't clear and only render the new stuff.
-		i = m_engine.newbegin();
-	}
-	while (i != m_engine.end()) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_smiltext: another run");
-		NSRange newrange;
-		// Add the new characters
-		newrange.location = [m_text_storage length];
-		newrange.length = 0;
-		NSString *newdata;
-		if ((*i).m_command == smil2::stc_break)
-			newdata = @"\n";
-		else
-			newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
-		[m_text_storage replaceCharactersInRange:newrange withString:newdata];
-		
-		// Prepare for setting the attribute info
-		NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
-		newrange.length = (*i).m_data.length();
-		// Find font info
-		NSFont *text_font = _select_font((*i).m_font_family, (*i).m_font_style, (*i).m_font_weight, (*i).m_font_size);
-		if (text_font)
-			[attrs setValue:text_font forKey:NSFontAttributeName];
+	if (m_engine.is_changed()) {
+		lib::xml_string data;
+		smil2::smiltext_runs::const_iterator i;
+		[m_text_storage beginEditing];
+		if (m_engine.is_cleared()) {
+			// Completely new text. Clear our copy and render everything.
+			NSRange all;
+			all.location = 0;
+			all.length = [m_text_storage length];
+			if (all.length);
+				[m_text_storage deleteCharactersInRange:all];
+			i = m_engine.begin();
+		} else {
+			// Only additions. Don't clear and only render the new stuff.
+			i = m_engine.newbegin();
+		}
+		while (i != m_engine.end()) {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_smiltext: another run");
+			NSRange newrange;
+			// Add the new characters
+			newrange.location = [m_text_storage length];
+			newrange.length = 0;
+			NSString *newdata;
+			if ((*i).m_command == smil2::stc_break)
+				newdata = @"\n";
+			else
+				newdata = [[NSString alloc] initWithCString:(*i).m_data.c_str()];
+			[m_text_storage replaceCharactersInRange:newrange withString:newdata];
 			
-		if (!(*i).m_transparent) {
-			// Find color info
-			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
-					green:greenf((*i).m_color)
-					blue:bluef((*i).m_color)
-					alpha:1.0];
-			[attrs setValue:color forKey:NSForegroundColorAttributeName];
+			// Prepare for setting the attribute info
+			NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
+			newrange.length = (*i).m_data.length();
+			// Find font info
+			NSFont *text_font = _select_font((*i).m_font_family, (*i).m_font_style, (*i).m_font_weight, (*i).m_font_size);
+			if (text_font)
+				[attrs setValue:text_font forKey:NSFontAttributeName];
+				
+			if (!(*i).m_transparent) {
+				// Find color info
+				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
+						green:greenf((*i).m_color)
+						blue:bluef((*i).m_color)
+						alpha:1.0];
+				[attrs setValue:color forKey:NSForegroundColorAttributeName];
+			}
+			if (!(*i).m_bg_transparent) {
+				// Find color info
+				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
+						green:greenf((*i).m_bg_color)
+						blue:bluef((*i).m_bg_color)
+						alpha:1.0];
+				[attrs setValue:color forKey:NSBackgroundColorAttributeName];
+			}
+			
+			// Set the attributes
+			[m_text_storage setAttributes:attrs range:newrange];
+			
+			i++;
 		}
-		if (!(*i).m_bg_transparent) {
-			// Find color info
-			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
-					green:greenf((*i).m_bg_color)
-					blue:bluef((*i).m_bg_color)
-					alpha:1.0];
-			[attrs setValue:color forKey:NSBackgroundColorAttributeName];
-		}
-		
-		// Set the attributes
-		[m_text_storage setAttributes:attrs range:newrange];
-		
-		i++;
+		[m_text_storage endEditing];
+		m_engine.done();
 	}
-	[m_text_storage endEditing];
-	m_engine.done();
 	[pool release];
-//	m_lock.leave();
+	m_lock.leave();
 	m_dest->need_redraw();
 }
 
@@ -258,6 +259,12 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	if (m_params.m_mode == smil2::stm_crawl) {
 		double now = m_event_processor->get_timer()->elapsed() - m_epoch;
 		logical_origin.x += now * m_params.m_rate / 1000;
+		visible_origin.x -= now * m_params.m_rate / 1000;
+	}
+	if (m_params.m_mode == smil2::stm_scroll) {
+		double now = m_event_processor->get_timer()->elapsed() - m_epoch;
+		logical_origin.y += now * m_params.m_rate / 1000;
+		visible_origin.y -= now * m_params.m_rate / 1000;
 	}
 	AM_DBG logger::get_logger()->debug("cocoa_smiltext_renderer.redraw at Cocoa-point (%f, %f)", visible_origin.x, visible_origin.y);
 	if (m_render_offscreen) {
@@ -265,11 +272,32 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 #if 0
 	NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
 #else
+	// Now we need to determine which glyphs to draw. Unfortunately glyphRangeForBoundingRect gives us
+	// full lines (which is apparently more efficient, google for details) which is not good enough
+	// for ticker tape, so we adjust.
 	NSRect logical_rect = NSMakeRect(logical_origin.x, logical_origin.y, visible_size.width, visible_size.height);
 	NSRange glyph_range = [m_layout_manager glyphRangeForBoundingRect: logical_rect inTextContainer: m_text_container];
+	NSLog(@"Glyph range was %d, %d, origin-x %f", glyph_range.location, glyph_range.length, logical_origin.x);
+#if 0
+	float fraction;
+	unsigned leftpoint = [ m_layout_manager glyphIndexForPoint: logical_origin inTextContainer: m_text_container 
+		fractionOfDistanceThroughGlyph: &fraction];
+	if (fraction > 0.01) leftpoint++;
+	if (leftpoint > glyph_range.location) {
+		glyph_range.length += (glyph_range.location-leftpoint); // XXXX unsigned
+		glyph_range.location = leftpoint;
+	}
+	if (glyph_range.location > 0 && glyph_range.length > 0) {
+		NSRect used_rect = [m_layout_manager boundingRectForGlyphRange: glyph_range inTextContainer: m_text_container];
+		visible_origin.x -= used_rect.origin.x;
+	}
+	NSLog(@"Glyph range is now %d, %d", glyph_range.location, glyph_range.length);
 #endif
-	[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
-	[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: visible_origin];
+#endif
+	if (glyph_range.location >= 0 && glyph_range.length > 0) {
+		[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
+		[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: visible_origin];
+	}
 	layout_size = [m_text_container containerSize];
 	if (m_render_offscreen) {
 	}
