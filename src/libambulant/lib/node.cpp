@@ -170,6 +170,9 @@ lib::node_impl::node_impl(const q_name_pair& qn, const q_attributes_list& qattrs
 		if(m_context->is_supported_prefix(m_qname.first))
 			m_local_name = m_qname.second;
 		else
+		if (m_qname.first == "")
+			m_local_name = m_qname.second;
+		else
 			m_local_name = m_qname.first + ":" + m_qname.second;
 	} else
 		m_local_name = m_qname.second;
