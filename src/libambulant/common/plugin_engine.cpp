@@ -341,7 +341,7 @@ plugin_engine::load_plugins(std::string dirname)
 				dirname +
  				"\\" +
 				fn_conv.c_str();
-			if (strncmp(PYTHON_PLUGIN_ENGINE_PREFIX, fn_conv.c_str(), sizeof(PYTHON_PLUGIN_ENGINE_PREFIX)-1) != 0) {
+			if (strncmp(PYTHON_PLUGIN_ENGINE_PREFIX, fn_conv.c_str(), sizeof(PYTHON_PLUGIN_ENGINE_PREFIX)-1) == 0) {
 #ifdef WITH_PYTHON_PLUGIN
 				m_python_plugin_engine = pathname;
 #else
