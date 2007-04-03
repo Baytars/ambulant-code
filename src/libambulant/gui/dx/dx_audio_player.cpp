@@ -26,7 +26,7 @@
 #include "ambulant/lib/logger.h"
 #include <math.h>
 
-#include <vfwmsgs.h>
+// VS8 #include <vfwmsgs.h>
 
 using namespace ambulant;
 
@@ -165,6 +165,9 @@ bool gui::dx::audio_player::open(const std::string& url) {
 	WCHAR wsz[MAX_PATH];
 	MultiByteToWideChar(CP_ACP,0, url.c_str(), -1, wsz, MAX_PATH);
 	hr = m_graph_builder->RenderFile(wsz, 0);
+#ifndef VFW_E_CANNOT_CONNECT
+#define VFW_E_CANNOT_CONNECT 0x80040217
+#endif
 	if(FAILED(hr)){
 		if (hr == 0x800c000d)  // XXX This value experimentally determined:-)
 			logger::get_logger()->error("%s: Unsupported URL protocol", url.c_str());

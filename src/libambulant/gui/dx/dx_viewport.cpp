@@ -24,7 +24,7 @@
 
 #define INITGUID
 #include <objbase.h>
-#include <ddrawex.h>
+#include <ddraw.h>	// VS8. Was: ddrawex.h
 #include <uuids.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -271,6 +271,7 @@ gui::dx::viewport::viewport(int width, int height, HWND hwnd)
 	
 	viewport_logger = lib::logger::get_logger();
 	
+#if 0 // VS8
 	IDirectDrawFactory *pDDF = NULL;
     HRESULT hr = CoCreateInstance(CLSID_DirectDrawFactory,
                               NULL, CLSCTX_INPROC_SERVER,
@@ -283,6 +284,12 @@ gui::dx::viewport::viewport(int width, int height, HWND hwnd)
 	IDirectDraw  *pDD1=NULL;
 	hr = pDDF->CreateDirectDraw(NULL, m_hwnd, DDSCL_NORMAL , 0, NULL, &pDD1);
 	pDDF->Release();
+#else
+	HRESULT hr;
+	IDirectDraw  *pDD1=NULL;
+	hr = DirectDrawCreate(NULL, &pDD1, NULL);
+#endif
+
 	if (FAILED(hr)){
 		seterror("CreateDirectDraw()", hr);
 		return;

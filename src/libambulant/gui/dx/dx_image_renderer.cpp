@@ -22,7 +22,7 @@
  */
 
 #include <objbase.h>
-#include <ddrawex.h>
+#include <ddraw.h> // VS8: was ddrawex.h
 #include <windows.h>
 
 #include "ambulant/gui/dx/dx_image_renderer.h"
