@@ -29,7 +29,7 @@ REM JPEG static library
 copy %TPP_HOME%\jpeg\win32\Release\libjpeg.lib %AMB_HOME%\lib\win32\libjpeg.lib
 
 REM Xerces lib, if it exists
-set XER_BUILD=%TPP_HOME%\xerces-c-src_2_7_0\Build\Win32\VC7.1\Release
+set XER_BUILD=%TPP_HOME%\xerces-c-src_2_7_0\Build\Win32\VC8\Release
 if exist %XER_BUILD% copy %XER_BUILD%\xerces-c_2.lib %AMB_HOME%\lib\win32\xerces-c_2.lib
 if exist %XER_BUILD% copy %XER_BUILD%\xerces-c_2_7.dll %AMB_HOME%\bin\win32\xerces-c_2_7.dll
 @echo on

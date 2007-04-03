@@ -1,7 +1,6 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libambulant_win32", "libambulant\libambulant_win32.vcproj", "{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AmbulantPlayer", "player_mfc\AmbulantPlayer.vcproj", "{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -14,62 +13,61 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plugin", "plugins\plugin.vc
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug = Debug
-		DebugNoXerces = DebugNoXerces
-		DebugNoXercesNoHtml = DebugNoXercesNoHtml
-		DebugShlib = DebugShlib
-		Release = Release
-		ReleaseNoXerces = ReleaseNoXerces
-		ReleaseNoXercesNoHtml = ReleaseNoXercesNoHtml
-		ReleaseShlib = ReleaseShlib
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugNoXerces|Win32 = DebugNoXerces|Win32
+		DebugNoXercesNoHtml|Win32 = DebugNoXercesNoHtml|Win32
+		DebugShlib|Win32 = DebugShlib|Win32
+		Release|Win32 = Release|Win32
+		ReleaseNoXerces|Win32 = ReleaseNoXerces|Win32
+		ReleaseNoXercesNoHtml|Win32 = ReleaseNoXercesNoHtml|Win32
+		ReleaseShlib|Win32 = ReleaseShlib|Win32
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Debug.ActiveCfg = Debug|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Debug.Build.0 = Debug|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXerces.ActiveCfg = DebugNoXerces|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXerces.Build.0 = DebugNoXerces|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXercesNoHtml.ActiveCfg = DebugNoXercesNoHtml|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXercesNoHtml.Build.0 = DebugNoXercesNoHtml|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugShlib.ActiveCfg = DebugShlib|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugShlib.Build.0 = DebugShlib|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Release.ActiveCfg = Release|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Release.Build.0 = Release|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXerces.ActiveCfg = ReleaseNoXerces|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXerces.Build.0 = ReleaseNoXerces|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib.ActiveCfg = ReleaseShlib|Win32
-		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib.Build.0 = ReleaseShlib|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug.ActiveCfg = Debug|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug.Build.0 = Debug|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXerces.ActiveCfg = DebugNoXerces|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXerces.Build.0 = DebugNoXerces|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXercesNoHtml.ActiveCfg = DebugNoXercesNoHtml|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXercesNoHtml.Build.0 = DebugNoXercesNoHtml|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugShlib.ActiveCfg = DebugShlib|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugShlib.Build.0 = DebugShlib|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Release.ActiveCfg = Release|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Release.Build.0 = Release|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXerces.ActiveCfg = ReleaseNoXerces|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXerces.Build.0 = ReleaseNoXerces|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml.ActiveCfg = ReleaseNoXercesNoHtml|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml.Build.0 = ReleaseNoXercesNoHtml|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib.ActiveCfg = ReleaseShlib|Win32
-		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib.Build.0 = ReleaseShlib|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.Debug.ActiveCfg = Debug|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugNoXerces.ActiveCfg = Debug|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugNoXercesNoHtml.ActiveCfg = Debug|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugShlib.ActiveCfg = Debug|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugShlib.Build.0 = Debug|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.Release.ActiveCfg = Release|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseNoXerces.ActiveCfg = Release|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseNoXercesNoHtml.ActiveCfg = Release|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseShlib.ActiveCfg = Release|Win32
-		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseShlib.Build.0 = Release|Win32
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Debug|Win32.Build.0 = Debug|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXerces|Win32.ActiveCfg = DebugNoXerces|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXerces|Win32.Build.0 = DebugNoXerces|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXercesNoHtml|Win32.ActiveCfg = DebugNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugNoXercesNoHtml|Win32.Build.0 = DebugNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugShlib|Win32.ActiveCfg = DebugShlib|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.DebugShlib|Win32.Build.0 = DebugShlib|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Release|Win32.ActiveCfg = Release|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.Release|Win32.Build.0 = Release|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXerces|Win32.ActiveCfg = ReleaseNoXerces|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXerces|Win32.Build.0 = ReleaseNoXerces|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml|Win32.ActiveCfg = ReleaseNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseNoXercesNoHtml|Win32.Build.0 = ReleaseNoXercesNoHtml|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib|Win32.ActiveCfg = ReleaseShlib|Win32
+		{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}.ReleaseShlib|Win32.Build.0 = ReleaseShlib|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Debug|Win32.Build.0 = Debug|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXerces|Win32.ActiveCfg = DebugNoXerces|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXerces|Win32.Build.0 = DebugNoXerces|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXercesNoHtml|Win32.ActiveCfg = DebugNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugNoXercesNoHtml|Win32.Build.0 = DebugNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugShlib|Win32.ActiveCfg = DebugShlib|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.DebugShlib|Win32.Build.0 = DebugShlib|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Release|Win32.ActiveCfg = Release|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.Release|Win32.Build.0 = Release|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXerces|Win32.ActiveCfg = ReleaseNoXerces|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXerces|Win32.Build.0 = ReleaseNoXerces|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml|Win32.ActiveCfg = ReleaseNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseNoXercesNoHtml|Win32.Build.0 = ReleaseNoXercesNoHtml|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib|Win32.ActiveCfg = ReleaseShlib|Win32
+		{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}.ReleaseShlib|Win32.Build.0 = ReleaseShlib|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugNoXerces|Win32.ActiveCfg = Debug|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugNoXercesNoHtml|Win32.ActiveCfg = Debug|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugShlib|Win32.ActiveCfg = Debug|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.DebugShlib|Win32.Build.0 = Debug|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.Release|Win32.ActiveCfg = Release|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseNoXerces|Win32.ActiveCfg = Release|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseNoXercesNoHtml|Win32.ActiveCfg = Release|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseShlib|Win32.ActiveCfg = Release|Win32
+		{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}.ReleaseShlib|Win32.Build.0 = Release|Win32
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

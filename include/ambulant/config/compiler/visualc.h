@@ -66,7 +66,7 @@
 #  define AMBULANT_NO_SWPRINTF
 #endif
 
-#if _MSC_VER <= 1310
+#if _MSC_VER <= 1310  // XXXJACK: Unsure for VC8
 #  define AMBULANT_NO_MEMBER_TEMPLATE_FRIENDS
 #endif
 
@@ -103,6 +103,8 @@
 #   define AMBULANT_COMPILER_VERSION 7.0
 # elif _MSC_VER == 1310
 #   define AMBULANT_COMPILER_VERSION 7.1
+# elif _MSC_VER == 1400
+#   define AMBULANT_COMPILER_VERSION 8.0
 # else
 #   define AMBULANT_COMPILER_VERSION _MSC_VER
 # endif
@@ -116,8 +118,8 @@
 #error "Compiler not supported or configured - please reconfigure"
 #endif
 //
-// last known and checked version is 1310:
-#if (_MSC_VER > 1310)
+// last known and checked version is 1400:
+#if (_MSC_VER > 1400)
 #  if defined(AMBULANT_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  else
