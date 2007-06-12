@@ -322,11 +322,32 @@ ffmpeg_demux::add_datasink(demux_datasink *parent, int stream_index)
 }
 
 void
-ffmpeg_demux::seek(timestamp_t time)
+ffmpeg_demux::read_ahead(timestamp_t time)
 {
 	m_lock.enter();
 	m_clip_begin = time;
 	m_clip_begin_set = false;
+	m_lock.leave();
+}
+
+void
+ffmpeg_demux::seek(timestamp_t time)
+{
+	m_lock.enter();
+	if (m_con) {
+#if LIBAVFORMAT_BUILD > 4628
+		int seekresult = av_seek_frame(m_con, -1, time, 0);
+#else
+		int seekresult = av_seek_frame(m_con, -1, time);
+#endif
+		if (seekresult < 0) {
+			lib::logger::get_logger()->debug("ffmpeg_demux: av_seek_frame() returned %d", seekresult);
+//#if LIBAVFORMAT_BUILD > 4628
+//			// ffmpeg has discarded data if av_seek_frame() failed
+//			av_seek_frame(m_con, -1, 0, AVSEEK_FLAG_BYTE);
+//#endif
+		}
+	}
 	m_lock.leave();
 }
 
