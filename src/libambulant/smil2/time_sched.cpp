@@ -113,7 +113,7 @@ void scheduler::goto_next(time_node *tn) {
 	}
 	/*AM_DBG*/ lib::logger::get_logger()->debug("goto_next: synchronize media to node clocks");
 	sync_playable_clocks(m_root, tn);
-	AM_DBG lib::logger::get_logger()->debug("goto_next: finished");
+	/*AM_DBG*/ lib::logger::get_logger()->debug("goto_next: finished");
 }
 
 // Starts a hyperlink target that has played. 

@@ -513,7 +513,7 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	int nbytes = m_buffer.size();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek(%d): flushing %d bytes\n", time, nbytes);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek(%d): flushing %d bytes\n", time, nbytes);
 	if (nbytes) {
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);
