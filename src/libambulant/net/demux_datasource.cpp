@@ -152,12 +152,14 @@ demux_audio_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	assert(m_thread);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
 	while (m_queue.size() > 0) {
 		m_queue.pop();
 	}
-	m_thread->seek(time);
 	m_lock.leave();
+	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
+	// thread trying to deliver new data to this demux_datasource.
+	m_thread->seek(time);
 }
 
 void 
@@ -391,8 +393,10 @@ demux_video_datasource::seek(timestamp_t time)
 		m_frames.pop();
 	}
 
-	m_thread->seek(time);
 	m_lock.leave();
+	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
+	// thread trying to deliver new data to this demux_datasource.
+	m_thread->seek(time);
 }
 
 void 
