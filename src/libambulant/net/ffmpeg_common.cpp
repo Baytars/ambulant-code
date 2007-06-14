@@ -336,7 +336,9 @@ ffmpeg_demux::seek(timestamp_t time)
 	m_lock.enter();
 	if (m_con) {
 #if LIBAVFORMAT_BUILD > 4628
-		int seekresult = av_seek_frame(m_con, -1, time, 0);
+		// The name of the flag is misleading. It means: seek to a keyframe before the wanted
+		// timestamp (as opposed to after the wanted timestamp).
+		int seekresult = av_seek_frame(m_con, -1, time, AVSEEK_FLAG_BACKWARD);
 #else
 		int seekresult = av_seek_frame(m_con, -1, time);
 #endif
