@@ -399,7 +399,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	still_busy = (size != 0);
 	still_busy |= restart_audio_input();
 	if (!still_busy) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
 		// We cannot call unregister_renderer from here, because we are called from the
 		// SDL callback and already holding the m_global_lock. So, in stead
 		// we use the event processor to unregister ourselves later.
@@ -490,7 +490,7 @@ void
 gui::sdl::sdl_audio_renderer::stop()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop(0x%x)",(void*)this);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop(0x%x)",(void*)this);
 	if (m_is_playing) {
 		m_lock.leave();
 		unregister_renderer(this);
@@ -529,7 +529,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	m_lock.enter();
     if (!m_node) abort();
 		
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x, %s, where=%f)", 
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x, %s, where=%f)", 
 		(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
 	
@@ -558,7 +558,7 @@ void
 gui::sdl::sdl_audio_renderer::seek(double where)
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
+	AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
 	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000));
 	// XXXJACK: Should restart SDL
 	m_lock.leave();

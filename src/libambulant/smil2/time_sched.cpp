@@ -91,7 +91,7 @@ void scheduler::activate_node(time_node *tn) {
 		if(next == infinity && !tn->is_active()) {
 			// This is a problem: this node is apparently blocked waiting for something
 			// with an infinite duration. Try again (which won't help, except debugging).
-			/*AM_DBG*/ lib::logger::get_logger()->debug("scheduler:::activate_node:(%s %s) waiting for ever, killing blockers", tn->get_sig().c_str(), tn->get_state()->name());
+			AM_DBG lib::logger::get_logger()->debug("scheduler:::activate_node:(%s %s) waiting for ever, killing blockers", tn->get_sig().c_str(), tn->get_state()->name());
 			time_traits::qtime_type timestamp(m_root, m_timer->elapsed());
 			tn->kill_blockers(timestamp, m_root);
 //			next = _exec(next);
@@ -112,16 +112,16 @@ void scheduler::goto_next(time_node *tn) {
 		time_node *parent = *it; cit = it;
 		time_node *child = *++cit;
 		assert(cit != tnpath.end());
-		/*AM_DBG*/ lib::logger::get_logger()->debug("goto_next: parent=%s child=%s, time=%d", parent->get_sig().c_str(), child->get_sig().c_str(), m_timer->elapsed());
+		AM_DBG lib::logger::get_logger()->debug("goto_next: parent=%s child=%s, time=%d", parent->get_sig().c_str(), child->get_sig().c_str(), m_timer->elapsed());
 		if(parent->is_seq()) activate_seq_child(parent, child);
 		else if(parent->is_par()) activate_par_child(parent, child);
 		else if(parent->is_excl()) activate_excl_child(parent, child);
 		else activate_media_child(parent, child);
 		if(child == tnpath.back()) break;
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("goto_next: synchronize media to node clocks, time=%d", m_timer->elapsed());
+	AM_DBG lib::logger::get_logger()->debug("goto_next: synchronize media to node clocks, time=%d", m_timer->elapsed());
 	sync_playable_clocks(m_root, tn);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("goto_next: finished, time=%d", m_timer->elapsed());
+	AM_DBG lib::logger::get_logger()->debug("goto_next: finished, time=%d", m_timer->elapsed());
 }
 
 // Starts a hyperlink target that has played. 
@@ -175,7 +175,7 @@ void scheduler::activate_seq_child(time_node *parent, time_node *child) {
 		AM_DBG lib::logger::get_logger()->debug("activate_seq_child: activate %s", (*it)->get_sig().c_str());
 		activate_node((*it));
 		if(!(*it)->is_active()) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("activate_seq_child: failed to activate %s", (*it)->get_sig().c_str());
+			AM_DBG lib::logger::get_logger()->debug("activate_seq_child: failed to activate %s", (*it)->get_sig().c_str());
 		}
 	}
 	AM_DBG lib::logger::get_logger()->debug("activate_seq_child: activate wanted %s", child->get_sig().c_str());
