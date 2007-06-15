@@ -1869,14 +1869,15 @@ void time_node::kill_children(qtime_type timestamp, time_node *oproot) {
 }
 
 void time_node::kill_blockers(qtime_type timestamp, time_node *oproot) {
-	/*AM_DBG*/ m_logger->debug("kill_blockers(%s): %d in m_begin_list", get_sig().c_str(), m_begin_list.size());
+	AM_DBG m_logger->debug("kill_blockers(%s): %d in m_begin_list", get_sig().c_str(), m_begin_list.size());
 	rule_list::iterator it;
 	for (it=m_begin_list.begin(); it != m_begin_list.end(); it++) {
 		time_node *blocker = (*it)->get_syncbase();
-		/*AM_DBG*/ m_logger->debug("kill_blockers(%s): depends on %s %s", 
+		AM_DBG m_logger->debug("kill_blockers(%s): depends on %s %s", 
 			get_sig().c_str(), blocker->get_sig().c_str(), blocker->get_state()->name());
-		if (blocker->is_alive()) 
-			blocker->set_state(ts_postactive, timestamp, oproot);
+		if (blocker->is_alive()) {
+			blocker->set_state(ts_postactive, timestamp, blocker);
+		}
 	}
 }
 
