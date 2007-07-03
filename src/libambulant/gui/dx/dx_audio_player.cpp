@@ -246,10 +246,10 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 	}
 	// Either the filter exists or we haven't tried yet. Let's try to create
 	// it and remember whether it worked.
-	IBaseFilter *pIBF = NULL;
+	IBaseFilter *pNewFilter = NULL;
 	HRESULT res;
 	res = CoCreateInstance(CLSID_TPBVupp10, NULL, CLSCTX_INPROC_SERVER,
-		IID_IBaseFilter, (void**)&pIBF);
+		IID_IBaseFilter, (void**)&pNewFilter);
 
 	if (res != S_OK) {
 		lib::logger::get_logger()->trace("dx_audio_player: Speedup filter not available, error 0x%x", res);
@@ -257,10 +257,10 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 		speedup_filter_available_valid = true;
 		return;
 	}
-	res = m_graph_builder->AddFilter(pIBF, NULL);
+	res = m_graph_builder->AddFilter(pNewFilter, NULL);
 	if (res != S_OK) {
 		lib::logger::get_logger()->trace("dx_audio_player: AddFilter(Speedup filter): error 0x%x", res);
-		pIBF->Release();
+		pNewFilter->Release();
 		return;
 	}
 	speedup_filter_available = true;
@@ -271,6 +271,7 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 	// We iterate over the filter graph, then for each item in the graph
 	// we iterate over the connected output pins util we find one we like.
 	IPin *pOutputPin = NULL;
+	IPin *pInputPin = NULL;
 	IEnumFilters *pEnumFilters = NULL;
 	res = m_graph_builder->EnumFilters(&pEnumFilters);
 	if (res != S_OK) {
@@ -300,21 +301,29 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 			PIN_DIRECTION curPinDir;
 			res = pCurPin->QueryDirection(&curPinDir);
 			HRESULT res2 = pCurPin->ConnectionMediaType(&mediaType);
-			WAVEFORMATEX *waveFormat = (WAVEFORMATEX*) mediaType.pbFormat;
 			if (res == S_OK && 
 					res2 == S_OK && 
 					curPinDir == PINDIR_OUTPUT &&
 					mediaType.majortype == MEDIATYPE_Audio&& 
 					mediaType.subtype == MEDIASUBTYPE_PCM){
-				lib::logger::get_logger()->debug("dx_audio_filter: found an output pin");
 				pOutputPin = pCurPin;
+				res = pOutputPin->ConnectedTo(&pInputPin);
+				if (res != S_OK) {
+					// This output pin was the correct type, but not connected.
+					// So it cannot be the one we're looking for.
+					pOutputPin = pInputPin = NULL;
+				} else {
+					// Found it!
+					pOutputPin->AddRef();
+					pInputPin->AddRef();
+				}
 			}
 			if (res2 == S_OK) {
 				if (mediaType.cbFormat != 0) {
 					CoTaskMemFree((PVOID)mediaType.pbFormat);
 				}
 			}
-			if (pCurPin != pOutputPin) pCurPin->Release();
+			pCurPin->Release();
 		}
 		if (res != S_FALSE && res != S_OK) 
 			lib::logger::get_logger()->trace("dx_audio_filter: enumerating pins: error 0x%x", res);
@@ -325,13 +334,77 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 		lib::logger::get_logger()->trace("dx_audio_filter: enumerating filters: error 0x%x", res);
 
 	pEnumFilters->Release();
-	// We have the correct pin now.
+	// We have the correct pins now.
 	if (pOutputPin) {
-		lib::logger::get_logger()->trace("dx_audio_filter: found the right pin!");
-		pOutputPin->Release();
+		lib::logger::get_logger()->trace("dx_audio_filter: found the right pins!");
 	} else {
 		lib::logger::get_logger()->trace("dx_audio_filter: could not find a good pin");
+		pOutputPin->Release();
+		pInputPin->Release();
+		return;
 	}
+	// Now we need to find the pins on our speedup filter.
+	IPin *pFilterInputPin = NULL;
+	IPin *pFilterOutputPin = NULL;
+	IEnumPins *pEnumPins;
+	res = pNewFilter->EnumPins(&pEnumPins);
+	IPin *pCurPin;
+	while (res=pEnumPins->Next(1, &pCurPin, NULL) == S_OK) {
+		PIN_DIRECTION pinDir;
+		res = pCurPin->QueryDirection(&pinDir);
+		assert(res == S_OK);
+		if (pinDir == PINDIR_INPUT) {
+			if (pFilterInputPin) {
+				lib::logger::get_logger()->trace("dx_audio_filter: multiple input pins on filter");
+				goto bad;
+			}
+			pFilterInputPin = pCurPin;
+			pFilterInputPin->AddRef();
+		} else {
+			if (pFilterOutputPin) {
+				lib::logger::get_logger()->trace("dx_audio_filter: multiple output pins on filter");
+				goto bad;
+			}
+			pFilterOutputPin = pCurPin;
+			pFilterOutputPin->AddRef();
+		}
+	}
+	if (!pFilterInputPin) {
+		lib::logger::get_logger()->trace("dx_audio_filter: no input pin on filter");
+		goto bad;
+	}
+	if (!pFilterOutputPin) {
+		lib::logger::get_logger()->trace("dx_audio_filter: no output pin on filter");
+		goto bad;
+	}
+	// We have everything. Sever the old connection and insert the filter.
+	res = m_graph_builder->Disconnect(pOutputPin);
+	if (res) {
+		lib::logger::get_logger()->trace("dx_audio_filter: Severing old connection: error 0x%x", res);
+		goto bad;
+	}
+	res = m_graph_builder->Disconnect(pInputPin);
+	if (res) {
+		lib::logger::get_logger()->trace("dx_audio_filter: Severing old connection: error 0x%x", res);
+		goto bad;
+	}
+	res = m_graph_builder->Connect(pOutputPin, pFilterInputPin);
+	if (res) {
+		lib::logger::get_logger()->trace("dx_audio_filter: Creating filter input connection: error 0x%x", res);
+		goto bad;
+	}
+	res = m_graph_builder->Connect(pFilterOutputPin, pInputPin);
+	if (res) {
+		lib::logger::get_logger()->trace("dx_audio_filter: Creating filter output connection: error 0x%x", res);
+		goto bad;
+	}
+bad:
+	if (pOutputPin) pOutputPin->Release();
+	if (pInputPin) pInputPin->Release();
+	if (pFilterOutputPin) pFilterOutputPin->Release();
+	if (pFilterInputPin) pFilterInputPin->Release();
+	return;
+
 }
 #endif
 
