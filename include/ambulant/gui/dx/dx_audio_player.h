@@ -39,15 +39,24 @@
 #include "ambulant/lib/win32/win32_error.h"
 #include "ambulant/lib/logger.h"
 
-// CLSID_FilterGraph
-#include <uuids.h>
-
 #ifndef AMBULANT_PLATFORM_WIN32_WCE
 #pragma comment (lib,"winmm.lib")
 #pragma comment (lib,"amstrmid.lib")
 #endif
 #pragma comment (lib,"strmiids.lib")
 #pragma comment (lib,"uuid.lib")
+
+#define WITH_TPB_AUDIO_SPEEDUP
+
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+// If this option is active during build (which is true when building
+// for AmisAmbulant) we try to insert the TPB Audio Speedup/Slowdown
+// filter into our filtergraph. This allows for changing audio playback
+// speed without altering pitch.
+// If the TPB DirectShow filter is not available we do nothing.
+DEFINE_GUID(CLSID_TPBVupp10, 
+	0x66172967, 0x56c5, 0x4b89, 0xaa, 0x92, 0xc9, 0xef, 0xec, 0x56, 0x46, 0x7b);
+#endif // WITH_TPB_AUDIO_SPEEDUP
 
 namespace ambulant {
 
@@ -103,6 +112,9 @@ class audio_player : public common::playable {
 	IMediaPosition *m_media_position;
 	IMediaEvent *m_media_event;
 	IBasicAudio *m_basic_audio;
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+	void initialize_speedup_filter();
+#endif
 };
 	
 } // namespace dx
