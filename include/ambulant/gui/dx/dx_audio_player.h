@@ -158,13 +158,17 @@ class audio_player : public common::playable {
 	IMediaEvent *m_media_event;
 	IBasicAudio *m_basic_audio;
 #ifdef WITH_TPB_AUDIO_SPEEDUP
+  public:
+	void set_rate(double rate);
+	static void set_global_rate(double rate);
+	static double change_global_rate(double adjustment);
+  private:
 	IVuppInterface *m_audio_speedup;
 	void initialize_speedup_filter();
-	void set_playback_rate(double rate);
 	static void register_player(audio_player *cur);
 	static void unregister_player(audio_player *cur);
-	static void set_global_playback_rate(double rate);
 	static std::set<audio_player *> s_active_players;
+	static double s_current_playback_rate;
 #endif
 };
 	
