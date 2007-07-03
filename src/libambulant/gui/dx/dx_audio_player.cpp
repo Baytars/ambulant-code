@@ -230,12 +230,16 @@ void gui::dx::audio_player::release_player() {
 			m_basic_audio->Release();
 			m_basic_audio = 0;
 		}
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+		if(m_audio_speedup) {
+			m_audio_speedup->Release();
+			m_audio_speedup = 0;
+		}
+		unregister_player(this);
+#endif
 		m_graph_builder->Release();
 		m_graph_builder = 0;
 	}
-#ifdef WITH_TPB_AUDIO_SPEEDUP
-	// XXX Release
-#endif
 }
 
 #ifdef WITH_TPB_AUDIO_SPEEDUP
@@ -398,6 +402,14 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 		lib::logger::get_logger()->trace("dx_audio_filter: Creating filter output connection: error 0x%x", res);
 		goto bad;
 	}
+	// Finally remember the interface to set speedup/slowdown, and register ourselves
+	// in the global pool (so Amis can change our speed).
+	res = pNewFilter->QueryInterface(IID_IVuppInterface, (void**) &m_audio_speedup);
+	if (res != S_OK) {
+		lib::logger::get_logger()->trace("dx_audio_filter: filter does not provide IVuppInterface");
+		goto bad;
+	}
+	register_player(this);
 bad:
 	if (pOutputPin) pOutputPin->Release();
 	if (pInputPin) pInputPin->Release();
@@ -406,6 +418,30 @@ bad:
 	return;
 
 }
+
+std::set<gui::dx::audio_player *> gui::dx::audio_player::s_active_players;
+
+void gui::dx::audio_player::register_player(gui::dx::audio_player *cur) {
+	s_active_players.insert(cur);
+}
+
+void gui::dx::audio_player::unregister_player(audio_player *cur) {
+	s_active_players.erase(cur);
+}
+
+void gui::dx::audio_player::set_playback_rate(double rate) {
+	if (m_audio_speedup) {
+		m_audio_speedup->setCycleSpeed((short)(rate*100));
+	}
+}
+
+void gui::dx::audio_player::set_global_playback_rate(double rate) {
+	std::set<gui::dx::audio_player *>::iterator i;
+
+	for(i=s_active_players.begin(); i!=s_active_players.end(); i++)
+		(*i)->set_playback_rate(rate);
+}
+
 #endif
 
 #if 0
