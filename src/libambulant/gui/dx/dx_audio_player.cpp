@@ -24,9 +24,15 @@
 #include "ambulant/gui/dx/dx_audio_player.h"
 
 #include "ambulant/lib/logger.h"
+#include "ambulant/lib/textptr.h"
 #include <math.h>
-
 #include <vfwmsgs.h>
+// CLSID_FilterGraph
+#include <uuids.h>
+
+#ifndef AM_DBG
+#define AM_DBG if(0)
+#endif
 
 using namespace ambulant;
 
@@ -34,6 +40,11 @@ using ambulant::lib::win32::win_report_error;
 using ambulant::lib::win32::win_trace_error;
 using ambulant::lib::logger;
 const ULONGLONG MILLIS_FACT = 10000;
+
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+bool speedup_filter_available;
+bool speedup_filter_available_valid;
+#endif 
 
 gui::dx::audio_player::audio_player(const std::string& url)
 :	m_url(url),
@@ -174,6 +185,9 @@ bool gui::dx::audio_player::open(const std::string& url) {
 			logger::get_logger()->error("%s: DirectX error 0x%x", url.c_str(), hr);
 		return false;
 	}
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+	initialize_speedup_filter();
+#endif
 		
 	hr = m_graph_builder->QueryInterface(IID_IMediaControl, (void **) &m_media_control);
 	if(FAILED(hr)) {
@@ -219,7 +233,107 @@ void gui::dx::audio_player::release_player() {
 		m_graph_builder->Release();
 		m_graph_builder = 0;
 	}
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+	// XXX Release
+#endif
 }
+
+#ifdef WITH_TPB_AUDIO_SPEEDUP
+void gui::dx::audio_player::initialize_speedup_filter() {
+	if (speedup_filter_available_valid && !speedup_filter_available) {
+		// We don't seem to have the filter. Too bad.
+		return;
+	}
+	// Either the filter exists or we haven't tried yet. Let's try to create
+	// it and remember whether it worked.
+	IBaseFilter *pIBF = NULL;
+	HRESULT res;
+	res = CoCreateInstance(CLSID_TPBVupp10, NULL, CLSCTX_INPROC_SERVER,
+		IID_IBaseFilter, (void**)&pIBF);
+
+	if (res != S_OK) {
+		lib::logger::get_logger()->trace("dx_audio_player: Speedup filter not available, error 0x%x", res);
+		speedup_filter_available = false;
+		speedup_filter_available_valid = true;
+		return;
+	}
+	res = m_graph_builder->AddFilter(pIBF, NULL);
+	if (res != S_OK) {
+		lib::logger::get_logger()->trace("dx_audio_player: AddFilter(Speedup filter): error 0x%x", res);
+		pIBF->Release();
+		return;
+	}
+	speedup_filter_available = true;
+	speedup_filter_available_valid = true;
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_audio_player: added speedup filter to graph");
+
+	// Next step: find out where we want to add the filter to the graph.
+	// We iterate over the filter graph, then for each item in the graph
+	// we iterate over the connected output pins util we find one we like.
+	IPin *pOutputPin = NULL;
+	IEnumFilters *pEnumFilters = NULL;
+	res = m_graph_builder->EnumFilters(&pEnumFilters);
+	if (res != S_OK) {
+		lib::logger::get_logger()->trace("dx_audio_filter: EnumFilters: error 0x%x", res);
+		return;
+	}
+
+	IBaseFilter *pCurFilter;
+	while (pOutputPin == NULL && (res=pEnumFilters->Next(1, &pCurFilter, NULL)) == S_OK) {
+		/*AM_DBG*/ {
+			FILTER_INFO info;
+			LPWSTR vendorInfo;
+			res = pCurFilter->QueryFilterInfo(&info);
+			if (res != S_OK) info.achName[0] = 0;
+			res = pCurFilter->QueryVendorInfo(&vendorInfo);
+			if (res != S_OK) vendorInfo = L"";
+			lib::textptr tInfo(info.achName);
+			lib::textptr tVendorInfo(vendorInfo);
+			lib::logger::get_logger()->debug("dx_audio_filter: filter found: '%s' vendor '%s'",
+				tInfo.c_str(), tVendorInfo.c_str());
+		}
+		IEnumPins *pEnumPins;
+		res = pCurFilter->EnumPins(&pEnumPins);
+		IPin *pCurPin;
+		while (pOutputPin == NULL && (res=pEnumPins->Next(1, &pCurPin, NULL)) == S_OK) {
+			AM_MEDIA_TYPE mediaType;
+			PIN_DIRECTION curPinDir;
+			res = pCurPin->QueryDirection(&curPinDir);
+			HRESULT res2 = pCurPin->ConnectionMediaType(&mediaType);
+			WAVEFORMATEX *waveFormat = (WAVEFORMATEX*) mediaType.pbFormat;
+			if (res == S_OK && 
+					res2 == S_OK && 
+					curPinDir == PINDIR_OUTPUT &&
+					mediaType.majortype == MEDIATYPE_Audio&& 
+					mediaType.subtype == MEDIASUBTYPE_PCM){
+				lib::logger::get_logger()->debug("dx_audio_filter: found an output pin");
+				pOutputPin = pCurPin;
+			}
+			if (res2 == S_OK) {
+				if (mediaType.cbFormat != 0) {
+					CoTaskMemFree((PVOID)mediaType.pbFormat);
+				}
+			}
+			if (pCurPin != pOutputPin) pCurPin->Release();
+		}
+		if (res != S_FALSE && res != S_OK) 
+			lib::logger::get_logger()->trace("dx_audio_filter: enumerating pins: error 0x%x", res);
+		pEnumPins->Release();
+		pCurFilter->Release();
+	}
+	if (res != S_FALSE && res != S_OK)
+		lib::logger::get_logger()->trace("dx_audio_filter: enumerating filters: error 0x%x", res);
+
+	pEnumFilters->Release();
+	// We have the correct pin now.
+	if (pOutputPin) {
+		lib::logger::get_logger()->trace("dx_audio_filter: found the right pin!");
+		pOutputPin->Release();
+	} else {
+		lib::logger::get_logger()->trace("dx_audio_filter: could not find a good pin");
+	}
+}
+#endif
 
 #if 0
 int gui::dx::audio_player::get_progress() {
