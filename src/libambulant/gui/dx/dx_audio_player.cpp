@@ -409,6 +409,7 @@ void gui::dx::audio_player::initialize_speedup_filter() {
 		lib::logger::get_logger()->trace("dx_audio_filter: filter does not provide IVuppInterface");
 		goto bad;
 	}
+	set_rate(s_current_playback_rate);
 	register_player(this);
 bad:
 	if (pOutputPin) pOutputPin->Release();
@@ -420,6 +421,7 @@ bad:
 }
 
 std::set<gui::dx::audio_player *> gui::dx::audio_player::s_active_players;
+double gui::dx::audio_player::s_current_playback_rate = 1.0;
 
 void gui::dx::audio_player::register_player(gui::dx::audio_player *cur) {
 	s_active_players.insert(cur);
@@ -429,17 +431,24 @@ void gui::dx::audio_player::unregister_player(audio_player *cur) {
 	s_active_players.erase(cur);
 }
 
-void gui::dx::audio_player::set_playback_rate(double rate) {
+void gui::dx::audio_player::set_rate(double rate) {
 	if (m_audio_speedup) {
 		m_audio_speedup->setCycleSpeed((short)(rate*100));
 	}
 }
 
-void gui::dx::audio_player::set_global_playback_rate(double rate) {
+void gui::dx::audio_player::set_global_rate(double rate) {
+	s_current_playback_rate = rate;
 	std::set<gui::dx::audio_player *>::iterator i;
 
 	for(i=s_active_players.begin(); i!=s_active_players.end(); i++)
-		(*i)->set_playback_rate(rate);
+		(*i)->set_rate(rate);
+}
+
+double gui::dx::audio_player::change_global_rate(double adjustment) {
+	if (adjustment != 1.0)
+		set_global_rate(s_current_playback_rate*adjustment);
+	return s_current_playback_rate;
 }
 
 #endif
