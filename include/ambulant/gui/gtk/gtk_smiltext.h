@@ -84,8 +84,7 @@ class gtk_smiltext_renderer :
 	PangoLayout* m_layout;
 	PangoAttrList* m_bg_pango_attr_list;
 	PangoLayout* m_bg_layout;
-	const color_t m_transparent; // needed for blending
-	const color_t m_alternative; // when m_transparent to be drawn
+	const color_t m_transparent;
 };
 
 } // namespace gtk
