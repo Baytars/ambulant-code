@@ -222,7 +222,7 @@ static const char *
 getext(const net::url &url)
 {
 	const char *curl = url.get_path().c_str();
-	const char *dotpos = rindex(curl, '.');
+	const char *dotpos = strrchr(curl, '.');
 	if (dotpos) return dotpos+1;
 	return NULL;
 }

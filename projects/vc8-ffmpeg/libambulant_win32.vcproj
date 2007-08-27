@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng128;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib;&quot;..\..\third_party_packages\xerces-c-src_2_7_0\src\&quot;;&quot;..\..\..\xerces-c-src\src&quot;"
+				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng128;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib;&quot;..\..\third_party_packages\xerces-c-src_2_7_0\src\&quot;;..\..\third_party_packages\ffmpeg\libavutil;..\..\third_party_packages\ffmpeg\libavcodec;..\..\third_party_packages\ffmpeg\libavformat;&quot;..\..\third_party_packages\ffmpeg-windows-compat&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;WITH_EXPAT;XML_STATIC;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_FFMPEG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -1121,6 +1121,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\libambulant\net\ffmpeg_audio.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\libambulant\net\ffmpeg_common.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\libambulant\net\ffmpeg_raw.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\libambulant\net\ffmpeg_video.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\libambulant\net\stdio_datasource.cpp"
 					>
 				</File>
@@ -1741,6 +1757,26 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\net\datasource.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\ffmpeg_audio.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\ffmpeg_common.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\ffmpeg_factory.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\ffmpeg_raw.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\ffmpeg_video.h"
 						>
 					</File>
 					<File
