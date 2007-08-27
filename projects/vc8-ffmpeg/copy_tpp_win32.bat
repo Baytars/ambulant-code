@@ -34,4 +34,12 @@ if exist %XER_BUILD% copy %XER_BUILD%\Release\xerces-c_2.lib %AMB_HOME%\lib\win3
 if exist %XER_BUILD% copy %XER_BUILD%\Release\xerces-c_2_7.dll %AMB_HOME%\bin\win32\xerces-c_2_7.dll
 if exist %XER_BUILD% copy %XER_BUILD%\Debug\xerces-c_2D.lib %AMB_HOME%\lib\win32\xerces-c_2D.lib
 if exist %XER_BUILD% copy %XER_BUILD%\Debug\xerces-c_2_7D.dll %AMB_HOME%\bin\win32\xerces-c_2_7D.dll
+
+REM ffmpeg
+copy %TPP_HOME%\ffmpeg\libavcodec\avcodec-51.dll %AMB_HOME%\bin\win32\avcodec-51.dll
+copy %TPP_HOME%\ffmpeg\libavcodec\avcodec-51.lib %AMB_HOME%\lib\win32\avcodec.lib
+copy %TPP_HOME%\ffmpeg\libavformat\avformat-51.dll %AMB_HOME%\bin\win32\avformat-51.dll
+copy %TPP_HOME%\ffmpeg\libavformat\avformat-51.lib %AMB_HOME%\lib\win32\avformat.lib
+copy %TPP_HOME%\ffmpeg\libavutil\avutil-49.dll %AMB_HOME%\bin\win32\avutil-49.dll
+copy %TPP_HOME%\ffmpeg\libavutil\avutil-49.lib %AMB_HOME%\lib\win32\avutil.lib
 @echo on
