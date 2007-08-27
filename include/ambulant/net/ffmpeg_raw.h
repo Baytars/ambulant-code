@@ -28,7 +28,9 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/lib/event_processor.h"
+#ifdef AMBULANT_PLATFORM_UNIX
 #include "ambulant/lib/unix/unix_thread.h"
+#endif
 #include "ambulant/net/databuffer.h"
 #include "ambulant/net/datasource.h"
 

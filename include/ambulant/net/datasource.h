@@ -32,9 +32,15 @@
 #include "ambulant/common/playable.h"
 #include "ambulant/net/url.h"
 #include "ambulant/net/databuffer.h"
-#ifdef AMBULANT_PLATFORM_UNIX
 #include <stdint.h>
+#include <inttypes.h>
+#ifdef AMBULANT_PLATFORM_UNIX
 #include "ambulant/lib/unix/unix_thread.h"
+#define BASE_THREAD lib::unix::thread
+#endif
+#ifdef AMBULANT_PLATFORM_WIN32
+#include "ambulant/lib/win32/win32_thread.h"
+#define BASE_THREAD lib::win32::thread
 #endif
 #ifdef _MSC_VER
 #pragma warning(disable : 4251)
@@ -559,7 +565,7 @@ class AMBULANTAPI filter_datasource_impl :
 	lib::critical_section m_lock;
 };
 
-#ifdef AMBULANT_PLATFORM_UNIX
+#if 1 // XXXJACK was: ifdef AMBULANT_PLATFORM_UNIX
 /// Interface for clients of abstract_demux.
 /// Abstract_demux implementations will read a stream and split it into its
 /// constituent substreams (usually one audio stream and one video stream). The
@@ -571,8 +577,8 @@ class demux_datasink {
     
 	/// Data push call: consume data with given size and timestamp. Must copy data
 	/// before returning.
-    virtual void data_avail(timestamp_t pts, const uint8_t *data, int size) = 0;
-	
+	virtual void data_avail(timestamp_t pts, const uint8_t *data, int size) = 0;
+
 	/// Return true if no more data should be pushed right now.
 	virtual bool buffer_full() = 0;
 };
@@ -586,7 +592,7 @@ class demux_datasink {
 /// substreams, and that it is possible up-front to decide on stream numbers
 /// to use as the main audio and video stream. These are then used, any
 /// data for unused streams is discarded.
-class abstract_demux : public lib::unix::thread, public lib::ref_counted_obj {
+class abstract_demux : public BASE_THREAD, public lib::ref_counted_obj {
   public:
 	virtual ~abstract_demux() {};	
  
