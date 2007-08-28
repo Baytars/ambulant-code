@@ -230,7 +230,7 @@ ffmpeg_demux::cancel()
 int 
 ffmpeg_demux::audio_stream_nr() 
 {
-	int stream_index;
+	unsigned int stream_index;
 	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
 		if (am_get_codec_var(m_con->streams[stream_index]->codec, codec_type) == CODEC_TYPE_AUDIO)
 			return stream_index;
@@ -242,7 +242,7 @@ ffmpeg_demux::audio_stream_nr()
 int 
 ffmpeg_demux::video_stream_nr() 
 {
-	int stream_index;
+	unsigned int stream_index;
 	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
 		if (am_get_codec_var(m_con->streams[stream_index]->codec, codec_type) == CODEC_TYPE_VIDEO) {
 			return stream_index;
