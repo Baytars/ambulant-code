@@ -39,9 +39,11 @@
 #include "ambulant/net/databuffer.h"
 #include "ambulant/net/datasource.h"
 
+extern "C" {
 #include "avformat.h"
 #include "avio.h"
 #include "common.h"
+}
 
 // temporary debug messages
 #include <iostream>
