@@ -45,7 +45,17 @@ ffmpeg:
 	Follow the build instructions on 
 	<http://arrozcru.no-ip.org/ffmpeg_wiki/tiki-index.php>. There are other webpages
 	with instructions, but these are the only ones that worked for me.
-
+	
+SDL:
+	Experminental, for when you want to use the SDL renderers on Windows. 
+	There are two options:
+	-Pre-built Development Libraries:
+		Download development libraries for win32(VC8) from <http://www.libsdl.org/download-1.2.php>, 
+		and then follow the instructions of section "Creating a Project with SDL" of VisualC.html 
+		in the root folder of unzipped sdl folder.
+	-Source Code:
+		Download the source code of SDL from <http://www.libsdl.org/download-1.2.php>, and then follow
+		the instructions of section "Building SDL" of VisualC.html in the root folder of unzipped sdl folder.
 	
 others:
 	For this release we don't fully remember where we got the other
