@@ -42,4 +42,9 @@ copy %TPP_HOME%\ffmpeg\libavformat\avformat-51.dll %AMB_HOME%\bin\win32\avformat
 copy %TPP_HOME%\ffmpeg\libavformat\avformat-51.lib %AMB_HOME%\lib\win32\avformat.lib
 copy %TPP_HOME%\ffmpeg\libavutil\avutil-49.dll %AMB_HOME%\bin\win32\avutil-49.dll
 copy %TPP_HOME%\ffmpeg\libavutil\avutil-49.lib %AMB_HOME%\lib\win32\avutil.lib
+
+REM sdl
+copy %TPP_HOME%\SDL-1.2.12\lib\SDL.dll %AMB_HOME%\bin\win32\SDL.dll
+copy %TPP_HOME%\SDL-1.2.12\lib\SDL.lib %AMB_HOME%\lib\win32\SDL.lib
+copy %TPP_HOME%\SDL-1.2.12\lib\SDLmain.lib %AMB_HOME%\lib\win32\SDLmain.lib
 @echo on

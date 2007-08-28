@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="libambulant_win32"
 	ProjectGUID="{DBD4EFC0-7551-4FBA-AF5A-BFBFDA7D6785}"
 	RootNamespace="libambulant_win32"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng128;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib;&quot;..\..\third_party_packages\xerces-c-src_2_7_0\src\&quot;;..\..\third_party_packages\ffmpeg\libavutil;..\..\third_party_packages\ffmpeg\libavcodec;..\..\third_party_packages\ffmpeg\libavformat;&quot;..\..\third_party_packages\ffmpeg-windows-compat&quot;"
+				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\expat\lib;..\..\third_party_packages\jpeg;..\..\third_party_packages\lpng128;..\..\third_party_packages\zlib;..\..\third_party_packages\mp3lib;&quot;..\..\third_party_packages\xerces-c-src_2_7_0\src\&quot;;..\..\third_party_packages\ffmpeg\libavutil;..\..\third_party_packages\ffmpeg\libavcodec;..\..\third_party_packages\ffmpeg\libavformat;&quot;..\..\third_party_packages\ffmpeg-windows-compat&quot;;&quot;..\..\third_party_packages\SDL-1.2.12\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;WITH_EXPAT;XML_STATIC;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_FFMPEG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -976,6 +976,14 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
+				<Filter
+					Name="SDL"
+					>
+					<File
+						RelativePath="..\..\src\libambulant\gui\SDL\sdl_audio.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="lib"
@@ -1536,6 +1544,14 @@
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\gui\dg\png_decoder.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="SDL"
+						>
+						<File
+							RelativePath="..\..\include\ambulant\gui\SDL\sdl_audio.h"
 							>
 						</File>
 					</Filter>
