@@ -96,6 +96,9 @@
 // Datasources
 #include "ambulant/net/datasource.h"
 #include "ambulant/net/win32_datasource.h"
+#ifdef WITH_FFMPEG
+#include "ambulant/net/ffmpeg_factory.h"
+#endif
 //#define AM_DBG
 
 #ifndef AM_DBG
@@ -186,9 +189,25 @@ gui::dx::dx_player::init_datasource_factory()
 {
 	net::datasource_factory *df = new net::datasource_factory();
 	set_datasource_factory(df);
-	// Add the datasource factories. For now we only need a raw
-	// datasource factory.
+#ifdef WITH_LIVE	
+	AM_DBG m_logger->debug("dx_player: add live_audio_datasource_factory");
+	df->add_video_factory(net::create_live_video_datasource_factory());
+	df->add_audio_factory(net::create_live_audio_datasource_factory()); 
+#endif
+#ifdef WITH_FFMPEG
+    AM_DBG m_logger->debug("dx_player: add ffmpeg_audio_datasource_factory");
+	df->add_audio_factory(net::get_ffmpeg_audio_datasource_factory());
+    AM_DBG m_logger->debug("dx_player: add ffmpeg_audio_decoder_finder");
+	df->add_audio_decoder_finder(net::get_ffmpeg_audio_decoder_finder());
+    AM_DBG m_logger->debug("dx_player: add ffmpeg_audio_filter_finder");
+	df->add_audio_filter_finder(net::get_ffmpeg_audio_filter_finder());
+	AM_DBG m_logger->debug("dx_player: add ffmpeg_video_datasource_factory");
+	df->add_video_factory(net::get_ffmpeg_video_datasource_factory());
+    AM_DBG m_logger->debug("dx_player: add ffmpeg_raw_datasource_factory");
+	df->add_raw_factory(net::get_ffmpeg_raw_datasource_factory());
+#endif
 	df->add_raw_factory(net::get_win32_datasource_factory());
+
 }
 
 void

@@ -1141,6 +1141,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\libambulant\net\demux_datasource.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\libambulant\net\ffmpeg_audio.cpp"
 					>
 				</File>
@@ -1789,6 +1793,10 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\net\datasource.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\net\demux_datasource.h"
 						>
 					</File>
 					<File

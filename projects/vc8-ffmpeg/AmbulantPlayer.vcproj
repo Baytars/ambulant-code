@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libexpat.lib libpng.lib zlib.lib xerces-c_2.lib SDL.lib"
+				AdditionalDependencies="libjpeg.lib libexpat.lib libpng.lib zlib.lib xerces-c_2.lib SDL.lib avformat.lib avcodec.lib avutil.lib"
 				OutputFile="../../bin/win32/$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\lib\win32"
