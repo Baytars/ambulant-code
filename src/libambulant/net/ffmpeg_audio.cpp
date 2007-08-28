@@ -437,7 +437,7 @@ ffmpeg_decoder_datasource::data_avail()
 						if (old_elapsed < m_src->get_clip_begin()) {
 							timestamp_t delta_t_unwanted = m_src->get_clip_begin() - old_elapsed;
 							assert(delta_t_unwanted > 0);
-							int bytes_unwanted = (delta_t_unwanted * ((m_fmt.samplerate* m_fmt.channels * m_fmt.bits)/(sizeof(uint8_t)*8)))/1000000;
+							int bytes_unwanted = (int)(delta_t_unwanted * ((m_fmt.samplerate* m_fmt.channels * m_fmt.bits)/(sizeof(uint8_t)*8))/1000000);
 							bytes_unwanted &= ~3;
 							AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: clip_begin within buffer, dropping %lld us, %d bytes", delta_t_unwanted, bytes_unwanted);
 							(void)m_buffer.get_read_ptr();
@@ -580,7 +580,7 @@ ffmpeg_decoder_datasource::size() const
 		timestamp_t delta_t_unwanted = m_elapsed - clip_end;
 		assert(delta_t_unwanted >= 0);
 		// ((double) outsize)* sizeof(uint8_t)*8 / (m_fmt.samplerate* m_fmt.channels * m_fmt.bits);
-		int bytes_unwanted = (delta_t_unwanted * ((m_fmt.samplerate* m_fmt.channels * m_fmt.bits)/(sizeof(uint8_t)*8)))/1000000;
+		int bytes_unwanted = (int)((delta_t_unwanted * ((m_fmt.samplerate* m_fmt.channels * m_fmt.bits)/(sizeof(uint8_t)*8)))/1000000);
 		assert(bytes_unwanted >= 0);
 		rv -= bytes_unwanted;
 		rv &= ~3;
@@ -817,7 +817,8 @@ ffmpeg_resample_datasource::data_avail()
 		}
 		
 		timestamp_t tmp = (timestamp_t)((insamples+1) * m_out_fmt.samplerate * m_out_fmt.channels * sizeof(short) / m_in_fmt.samplerate);
-		timestamp_t outsz = tmp;
+		int outsz = (int)tmp;
+		assert(tmp == outsz);
 		
 
 		if (!cursize && !m_src->end_of_file()) {

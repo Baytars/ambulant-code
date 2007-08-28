@@ -187,9 +187,9 @@ demux_audio_datasource::data_avail(timestamp_t pts, const uint8_t *inbuf, int sz
 	memcpy(data, inbuf, sz);
 	ts_packet_t tsp(pts,data,sz);
 	m_queue.push(tsp);
-	int new_queue_size = m_queue.size();
-	if (m_queue.size() > MAX_AUDIO_PACKETS) {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: m_queue.size()(=%d) exceeds desired maximum(=%d)", m_queue.size(), MAX_AUDIO_PACKETS);
+	size_t new_queue_size = m_queue.size();
+	if (new_queue_size > MAX_AUDIO_PACKETS) {
+		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.data_avail: m_queue.size()(=%d) exceeds desired maximum(=%d)", new_queue_size, MAX_AUDIO_PACKETS);
 	}
 	m_lock.leave();
 }
@@ -597,7 +597,7 @@ int
 demux_video_datasource::size() const
 {
 	const_cast <demux_video_datasource*>(this)->m_lock.enter();
-	int rv = m_frames.size();
+	int rv = (int)m_frames.size();
 	const_cast <demux_video_datasource*>(this)->m_lock.leave();
 	return rv;
 }
@@ -631,10 +631,10 @@ demux_video_datasource::height()
 	return fmt.height;
 }
 
-int
+timestamp_t
 demux_video_datasource::frameduration()
 {//STUB CODE, not to be used currently
-	
+	assert(0);
 	return 0;
 }
 bool 

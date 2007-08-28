@@ -17,7 +17,7 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -367,11 +367,11 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 				m_volcount = 0;
 			else if (leftlevel == rightlevel) {
 				m_volcount = 1;
-				m_volumes[0] = leftlevel;
+				m_volumes[0] = (float)leftlevel;
 			} else {
 				m_volcount = 2;
-				m_volumes[0] = leftlevel;
-				m_volumes[1] = rightlevel;
+				m_volumes[0] = (float)leftlevel;
+				m_volumes[1] = (float)rightlevel;
 			}
 		}
 	}

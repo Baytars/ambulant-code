@@ -257,7 +257,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 		if (callbackk) {
 			assert(evp);
 			if (timestamp < 0) timestamp = 0;
-			lib::timer::time_type timestamp_milli = timestamp/1000; // micro to milli
+			lib::timer::time_type timestamp_milli = (lib::timer::time_type)(timestamp/1000); // micro to milli
 			lib::timer::time_type now_milli = evp->get_timer()->elapsed();
 			lib::timer::time_type delta_milli = 0;
 			if (now_milli < timestamp_milli)
@@ -304,7 +304,7 @@ print_frames(sorted_frames frames) {
 	return;
 }
 
-ts_pointer_pair 
+void 
 ffmpeg_video_decoder_datasource::_pop_top_frame() {
 	// pop a frame, return the new top frame
 	// the old top frame is remembered in m_old_frame
@@ -319,12 +319,11 @@ ffmpeg_video_decoder_datasource::_pop_top_frame() {
 	
 	if (m_frames.empty()) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource._pop_top_frame():no more frames left returning m_old_frame");
-		return m_old_frame;
+		return;
 	}
 
 	m_old_frame = m_frames.top();
 	m_frames.pop();
-	return m_frames.top();
 }
 
 void 
@@ -367,7 +366,8 @@ ffmpeg_video_decoder_datasource::height()
 	return m_fmt.height;
 }
 
-int ffmpeg_video_decoder_datasource::frameduration()
+timestamp_t
+ffmpeg_video_decoder_datasource::frameduration()
 {
 	if(m_fmt.frameduration <=0)
 		_need_fmt_uptodate();
