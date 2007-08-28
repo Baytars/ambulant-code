@@ -40,9 +40,14 @@ libxml2:
 	WM5 notes TBD.
 
 ffmpeg:
-	Experminental, for when you want to use the ffmpeg renderers on Windows.
+	Experimental, for when you want to use the ffmpeg renderers on Windows.
 	Needs to be built using MinGW,can then be linked into Visual Studio projects.
-	Follow the build instructions on 
+	
+	The easiest way to get this is to download the prebuilt version from
+	our sourceforge download page. Package "ffmpeg for Ambulant", release
+	"20070828-win32-prebuilt".
+
+	If you want to build from source, follow the build instructions on 
 	<http://arrozcru.no-ip.org/ffmpeg_wiki/tiki-index.php>. There are other webpages
 	with instructions, but these are the only ones that worked for me.
 	
