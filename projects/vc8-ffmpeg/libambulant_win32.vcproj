@@ -648,6 +648,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\libambulant\gui\dx\dx_dsvideo.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\libambulant\gui\dx\dx_html_renderer.cpp"
 						>
 						<FileConfiguration
@@ -1368,6 +1372,10 @@
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\gui\dx\dx_brush.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\dx\dx_dsvideo.h"
 							>
 						</File>
 						<File
