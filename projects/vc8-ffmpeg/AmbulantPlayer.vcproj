@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\ffmpeg-windows-compat"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;WITH_HTML_WIDGET;WITH_FFMPEG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
