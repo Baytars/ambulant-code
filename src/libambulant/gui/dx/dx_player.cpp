@@ -55,20 +55,28 @@
 #endif/*WITH_SMIL30*/
 #include "ambulant/gui/dx/dx_html_renderer.h"
 #include "ambulant/gui/dx/dx_img.h"
+#include "ambulant/gui/dx/dx_brush.h"
+
+// Select audio renderer to use
 #ifdef WITH_FFMPEG
 #include "ambulant/gui/SDL/sdl_audio.h"
 #else
 #include "ambulant/gui/dx/dx_audio.h"
 #endif/*WITH_FFMPEG*/
-#ifdef AMBULANT_PLATFORM_WIN32_WCE
+
+// Select video renderer to use
+#ifdef WITH_FFMPEG
+#define USE_DS_VIDEO
+#elif defined(AMBULANT_PLATFORM_WIN32_WCE)
 #define USE_BASIC_VIDEO
 #endif
-#ifdef USE_BASIC_VIDEO
+#ifdef USE_DS_VIDEO
+#include "ambulant/gui/dx/dx_dsvideo.h"
+#elif defined(USE_BASIC_VIDEO)
 #include "ambulant/gui/dx/dx_basicvideo.h"
 #else
 #include "ambulant/gui/dx/dx_video.h"
 #endif
-#include "ambulant/gui/dx/dx_brush.h"
 
 // "Renderer" playables
 #include "ambulant/gui/dx/dx_audio.h"
@@ -464,7 +472,9 @@ gui::dx::dx_playable_factory::new_playable(
 		p = new dx_audio_renderer(context, cookie, node, evp);
 #endif/*WITH_FFMPEG*/
 	} else if(tag == "video") {
-#ifdef USE_BASIC_VIDEO
+#if defined(USE_DS_VIDEO)
+		p = new dx_dsvideo_renderer(context, cookie, node, evp, m_factory);
+#elif defined(USE_BASIC_VIDEO)
 		p = new dx_basicvideo_renderer(context, cookie, node, evp, m_dxplayer);
 #else
 		p = new dx_video_renderer(context, cookie, node, evp, m_dxplayer);
