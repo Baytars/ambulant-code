@@ -55,7 +55,11 @@
 #endif/*WITH_SMIL30*/
 #include "ambulant/gui/dx/dx_html_renderer.h"
 #include "ambulant/gui/dx/dx_img.h"
+#ifdef WITH_FFMPEG
+#include "ambulant/gui/SDL/sdl_audio.h"
+#else
 #include "ambulant/gui/dx/dx_audio.h"
+#endif/*WITH_FFMPEG*/
 #ifdef AMBULANT_PLATFORM_WIN32_WCE
 #define USE_BASIC_VIDEO
 #endif
