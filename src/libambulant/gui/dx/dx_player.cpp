@@ -454,7 +454,11 @@ gui::dx::dx_playable_factory::new_playable(
 	} else if(tag == "img") {
 		p = new dx_img_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 	} else if(tag == "audio") {
+#ifdef WITH_FFMPEG
+		p = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory);
+#else
 		p = new dx_audio_renderer(context, cookie, node, evp);
+#endif/*WITH_FFMPEG*/
 	} else if(tag == "video") {
 #ifdef USE_BASIC_VIDEO
 		p = new dx_basicvideo_renderer(context, cookie, node, evp, m_dxplayer);
