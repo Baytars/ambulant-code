@@ -24,6 +24,10 @@
 #include "ambulant/gui/dx/dx_dsvideo.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/smil_alignment.h"
+#include "ambulant/gui/dx/dx_window.h"
+#include "ambulant/gui/dx/dx_viewport.h"
+#include "ambulant/lib/win32/win32_error.h"
+using ambulant::lib::win32::win_report_error;
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -38,82 +42,68 @@ namespace gui {
 
 namespace dx {
 
+class video_dib_surface {
+  public:
+	HBITMAP get_handle() { return NULL;}
+};
+
 dx_dsvideo_renderer::dx_dsvideo_renderer(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
 	event_processor *evp,
 	common::factories *factory)
-:	common::video_renderer(context, cookie, node, evp, factory)
+:	common::video_renderer(context, cookie, node, evp, factory),
+	m_ddsurf(NULL),
+	m_dibsurf(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("dx_dsvideo_renderer(): 0x%x created", (void*)this);
+}
+
+void
+dx_dsvideo_renderer::_init_surfaces(common::gui_window *window)
+{
+	dx_window *dxwindow = static_cast<dx_window*>(window);
+	viewport *v = dxwindow->get_viewport();
+	m_ddsurf = v->create_surface(m_size);
+	// m_dibsurf = xxxx;
 }
 
 dx_dsvideo_renderer::~dx_dsvideo_renderer()
 {
 	m_lock.enter();
 	AM_DBG logger::get_logger()->debug("~dx_dsvideo_renderer(0x%x)", (void *)this);
-#if 0
-	if (m_image)
-		[m_image release];
-	m_image = NULL;
-#endif
+	if (m_ddsurf)
+		m_ddsurf->Release();
+	m_ddsurf = NULL;
+	if (m_dibsurf)
+			delete m_dibsurf;
+	m_dibsurf = 0;
 	m_lock.leave();
 }
 	
 void
 dx_dsvideo_renderer::show_frame(const char* frame, int size)
 {
+	if (m_ddsurf == NULL || m_dibsurf == NULL) return;
 	m_lock.enter();
-#if 0
-	if (m_image) {
-		[m_image release];
-		m_image = NULL;
-	}
-#endif
 	AM_DBG lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame: size=%d", size);
-#if 0
 	assert(size == (int)(m_size.w * m_size.h * 4));
-	// XXXX Who keeps reference to frame?
-	NSSize nssize = NSMakeSize(m_size.w, m_size.h);
-	m_image = [[NSImage alloc] initWithSize: nssize];
-	if (!m_image) {
-		logger::get_logger()->trace("dx_dsvideo_renderer::show_frame: cannot allocate NSImage");
-		logger::get_logger()->error(gettext("Out of memory while showing video"));
+	// xxx_copy(frame, m_dibsurf, size);
+	HRESULT hr;
+	HDC hdc = ::GetDC(NULL);
+	hr = m_ddsurf->GetDC(&hdc);
+	if (FAILED(hr)) {
+		win_report_error("DirectDrawSurface::GetDC()", hr);
 		m_lock.leave();
 		return;
 	}
-	NSBitmapImageRep *bitmaprep = [[NSBitmapImageRep alloc]
-		initWithBitmapDataPlanes: NULL
-		pixelsWide: m_size.w
-		pixelsHigh: m_size.h
-		bitsPerSample: 8
-		samplesPerPixel: 3
-		hasAlpha: NO
-		isPlanar: NO
-		colorSpaceName: NSDeviceRGBColorSpace
-#ifdef __BIG_ENDIAN__
-		bitmapFormat: NSAlphaFirstBitmapFormat
-#else
-		bitmapFormat: (NSBitmapFormat)0
-#endif
-		bytesPerRow: m_size.w * 4
-		bitsPerPixel: 32];
-	if (!bitmaprep) {
-		logger::get_logger()->trace("dx_dsvideo_renderer::show_frame: cannot allocate NSBitmapImageRep");
-		logger::get_logger()->error(gettext("Out of memory while showing video"));
-		m_lock.leave();
-		return;
-	}
-#if 1
-	memcpy([bitmaprep bitmapData], frame, size);
-#else
-	swab(frame, [bitmaprep bitmapData], size);
-#endif
-	[m_image addRepresentation: bitmaprep];
-	[m_image setFlipped: true];
-	[bitmaprep release];
-#endif
+	HDC bmp_hdc = CreateCompatibleDC(hdc);
+	HBITMAP hbmp_old = (HBITMAP) SelectObject(bmp_hdc, m_dibsurf->get_handle());
+	::BitBlt(hdc, 0, 0, m_size.w, m_size.h, bmp_hdc, 0, 0, SRCCOPY);
+	SelectObject(bmp_hdc, hbmp_old);
+	DeleteDC(bmp_hdc);
+	m_ddsurf->ReleaseDC(hdc);
 	if (m_dest) m_dest->need_redraw();
 	m_lock.leave();
 }
@@ -122,6 +112,14 @@ void
 dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
+	if (m_ddsurf == NULL || m_dibsurf == NULL) {
+		// This is really the wrong place to initialize the surfaces: it
+		// will make us lose the first frame. Need to rethink, maybe do in
+		// set_surface?
+		_init_surfaces(window);
+		m_lock.leave();
+		return;
+	}
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("dx_dsvideo_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 #if 0	

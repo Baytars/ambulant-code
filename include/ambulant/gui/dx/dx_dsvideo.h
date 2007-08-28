@@ -26,6 +26,13 @@
 #ifndef AMBULANT_GUI_DX_DX_DSVIDEO_H
 #define AMBULANT_GUI_DX_DX_DSVIDEO_H
 
+#include "ambulant/config/config.h"
+#include <objbase.h>
+#ifdef AMBULANT_DDRAW_EX
+#include <ddrawex.h>
+#else
+#include <ddraw.h>
+#endif
 #include "ambulant/common/video_renderer.h"
 #include "ambulant/lib/mtsync.h"
 
@@ -37,6 +44,8 @@ using namespace common;
 namespace gui {
 
 namespace dx {
+
+class video_dib_surface;
 
 class dx_dsvideo_renderer : 
 	public common::video_renderer {
@@ -56,6 +65,9 @@ class dx_dsvideo_renderer :
 	void set_intransition(const lib::transition_info *info) {};
 	void start_outtransition(const lib::transition_info *info) {};
   private:
+    void _init_surfaces(gui_window *window);
+    video_dib_surface *m_dibsurf;	// Temporary storage for image data
+	IDirectDrawSurface *m_ddsurf;	// Where we are drawing to
 	critical_section m_lock;
 };
 
