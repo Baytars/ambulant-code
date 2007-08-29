@@ -47,4 +47,10 @@ REM sdl
 copy %TPP_HOME%\SDL-1.2.12\lib\SDL.dll %AMB_HOME%\bin\win32\SDL.dll
 copy %TPP_HOME%\SDL-1.2.12\lib\SDL.lib %AMB_HOME%\lib\win32\SDL.lib
 copy %TPP_HOME%\SDL-1.2.12\lib\SDLmain.lib %AMB_HOME%\lib\win32\SDLmain.lib
+
+REM Live555
+copy %TPP_HOME%\live\BasicUsageEnvironment\Debug\BasicUsageEnvironment.lib %AMB_HOME%\lib\win32\BasicUsageEnvironment.lib
+copy %TPP_HOME%\live\groupsock\Debug\groupsock.lib %AMB_HOME%\lib\win32\groupsock.lib
+copy %TPP_HOME%\live\liveMedia\Debug\liveMedia.lib %AMB_HOME%\lib\win32\liveMedia.lib
+copy %TPP_HOME%\live\UsageEnvironment\Debug\UsageEnvironment.lib %AMB_HOME%\lib\win32\UsageEnvironment.lib
 @echo on
