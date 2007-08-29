@@ -26,7 +26,8 @@
 using namespace ambulant;
 using namespace net;
 
-#define AM_DBG
+//#define AM_DBG 
+// turn on the AM_DBG will hang on ambulant when use rtp over tcp
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -302,7 +303,11 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		int buf_size = increaseReceiveBufferTo(*context->env, rtp_sock_num, desired_buf_size);
 		(void)buf_size; // Forestall compiler warning
 #endif
+#if 0 //xxxBo setup over udp
 		if(!context->rtsp_client->setupMediaSubsession(*subsession, false, false)) {
+#else //xxxBo setup over tcp
+		if(!context->rtsp_client->setupMediaSubsession(*subsession, false, 1)) {
+#endif
 			lib::logger::get_logger()->error("ambulant::net::rtsp_demux(net::url& url) failed to send setup command to subsesion");
 			//lib::logger::get_logger()->error("RTSP Connection Failed");
 			delete context;
