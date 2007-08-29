@@ -98,6 +98,7 @@
 #include "ambulant/net/win32_datasource.h"
 #ifdef WITH_FFMPEG
 #include "ambulant/net/ffmpeg_factory.h"
+#include "ambulant/net/rtsp_factory.h"
 #endif
 //#define AM_DBG
 
