@@ -65,7 +65,7 @@ SDL:
 Live555:
 	Experimental, for when you want to use the Live555 to provide rtsp support on Windows.
 	
-	Download source from <http://http://live555.com/liveMedia/public/>.
+	Download source from <http://live555.com/liveMedia/public/>.
 	Copy the extracted folder "live" into third_party_packages (if the name has changed you
 	may need to change some Ambulant projects to refer to the new name). Check out the relevent 
 	solution and project files from the path of /ambulant/third_party_packages/live at ambulant's 
