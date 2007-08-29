@@ -71,7 +71,7 @@ Live555:
 	solution and project files from the path of /ambulant/third_party_packages/live at ambulant's 
 	CVS repository.
     
-	Building Live555 should be handled by the projects/*/live/Live555.com.sln.
+	Building Live555 should be handled by the /ambulant/third_party_packages/live/Live555.com.sln.
 		
 others:
 	For this release we don't fully remember where we got the other
