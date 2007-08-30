@@ -303,11 +303,11 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		int buf_size = increaseReceiveBufferTo(*context->env, rtp_sock_num, desired_buf_size);
 		(void)buf_size; // Forestall compiler warning
 #endif
-#if 0 //xxxBo setup over udp
+#ifndef WITH_TCP  //xxxBo setup RTP over udp
 		if(!context->rtsp_client->setupMediaSubsession(*subsession, false, false)) {
-#else //xxxBo setup over tcp
+#else //xxxBo setup RTP over tcp
 		if(!context->rtsp_client->setupMediaSubsession(*subsession, false, 1)) {
-#endif
+#endif /*WITH_TCP*/
 			lib::logger::get_logger()->error("ambulant::net::rtsp_demux(net::url& url) failed to send setup command to subsesion");
 			//lib::logger::get_logger()->error("RTSP Connection Failed");
 			delete context;
