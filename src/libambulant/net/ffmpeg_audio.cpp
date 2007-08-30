@@ -397,13 +397,17 @@ ffmpeg_decoder_datasource::data_avail()
 					int decoded = avcodec_decode_audio(m_con, (short*) outbuf, &outsize, inbuf, cursz);
 
 					while (decoded > 0 && decoded < cursz) {
-					  inbuf += decoded;
-					  cursz -= decoded;
-					  m_buffer.pushdata(outsize);
-					  outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-					  outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize);
-					  decoded = avcodec_decode_audio(m_con, (short*) outbuf, &outsize, inbuf, cursz);
+						inbuf += decoded;
+						cursz -= decoded;
+						m_buffer.pushdata(outsize);
+						outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+						outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize);
+						decoded = avcodec_decode_audio(m_con, (short*) outbuf, &outsize, inbuf, cursz);
 					}
+					// If this loop ends with decoded == 0 and cursz > 0, it means that not all bytes 
+					// have been fed to the decoder.
+					if (decoded == 0 && cursz > 0)
+						lib::logger::get_logger()->trace("ffmpeg_audio_decoder: last %d bytes of packet dropped");
 
 					inbuf = (uint8_t*) audio_packet.data;
 					free(inbuf);
