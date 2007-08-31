@@ -91,7 +91,7 @@ class dx_smiltext_renderer :
 	// instance variables
 	net::datasource_factory *m_df;
 	smil2::smiltext_layout_engine m_layout_engine;
-	critical_section m_lock;
+	lib::critical_section m_lock;
 	// Windows GDI data
 	ambulant::lib::size m_size;
 	viewport* m_viewport;
