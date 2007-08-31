@@ -23,8 +23,6 @@
 #include "ambulant/common/renderer_impl.h"
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/gui_player.h"
-#undef WITH_LIVE
-#undef WITH_FFMPEG
 #ifdef WITH_LIVE
 #include "ambulant/net/rtsp_factory.h"
 #endif
