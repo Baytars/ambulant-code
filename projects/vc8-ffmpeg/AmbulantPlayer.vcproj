@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1253"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="AmbulantPlayer"
 	ProjectGUID="{C9A73F92-DB87-46D2-8808-0CE9CC4B093F}"
 	RootNamespace="AmbulantPlayer"
