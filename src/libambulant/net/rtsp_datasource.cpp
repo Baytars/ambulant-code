@@ -571,6 +571,8 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	}
 	context->video_packet  = NULL;
 
+	// xxxbo In the case that context->time_left is a negative from the beginning for some reason,
+	// Ambulant should render the video other than stop at the beginning.
 	if (context->time_left >= 0 && context->last_pts >= context->time_left) {
 		lib::logger::get_logger()->debug("after_reading_video: last_pts = %ld", context->last_pts);
 	 	context->eof = true;
