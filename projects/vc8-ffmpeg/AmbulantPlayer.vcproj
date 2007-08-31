@@ -133,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include"
+				AdditionalIncludeDirectories="..\..\include;..\..\third_party_packages\ffmpeg-windows-compat"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;WITH_HTML_WIDGET;WITH_FFMPEG"
 				MinimalRebuild="false"
 				RuntimeLibrary="0"
