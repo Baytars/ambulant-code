@@ -571,7 +571,7 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	}
 	context->video_packet  = NULL;
 
-	if (context->last_pts >= context->time_left) {
+	if (context->time_left >= 0 && context->last_pts >= context->time_left) {
 		lib::logger::get_logger()->debug("after_reading_video: last_pts = %ld", context->last_pts);
 	 	context->eof = true;
 	}
