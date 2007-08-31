@@ -49,8 +49,13 @@ copy %TPP_HOME%\SDL-1.2.12\lib\SDL.lib %AMB_HOME%\lib\win32\SDL.lib
 copy %TPP_HOME%\SDL-1.2.12\lib\SDLmain.lib %AMB_HOME%\lib\win32\SDLmain.lib
 
 REM Live555
-copy %TPP_HOME%\live\BasicUsageEnvironment\Debug\BasicUsageEnvironment.lib %AMB_HOME%\lib\win32\BasicUsageEnvironment.lib
-copy %TPP_HOME%\live\groupsock\Debug\groupsock.lib %AMB_HOME%\lib\win32\groupsock.lib
-copy %TPP_HOME%\live\liveMedia\Debug\liveMedia.lib %AMB_HOME%\lib\win32\liveMedia.lib
-copy %TPP_HOME%\live\UsageEnvironment\Debug\UsageEnvironment.lib %AMB_HOME%\lib\win32\UsageEnvironment.lib
+copy %TPP_HOME%\live_VC8\BUILD\BasicUsageEnvironment-Release\BasicUsageEnvironment.lib %AMB_HOME%\lib\win32\BasicUsageEnvironment.lib
+copy %TPP_HOME%\live_VC8\BUILD\groupsock\Release-groupsock.lib %AMB_HOME%\lib\win32\groupsock.lib
+copy %TPP_HOME%\live_VC8\BUILD\liveMedia\Release-liveMedia.lib %AMB_HOME%\lib\win32\liveMedia.lib
+copy %TPP_HOME%\live_VC8\BUILD\UsageEnvironment-Release\UsageEnvironment.lib %AMB_HOME%\lib\win32\UsageEnvironment.lib
+
+REM copy %TPP_HOME%\live_VC8\BUILD\BasicUsageEnvironment-Debug\BasicUsageEnvironmentD.lib %AMB_HOME%\lib\win32\BasicUsageEnvironmentD.lib
+REM copy %TPP_HOME%\live_VC8\BUILD\groupsock-Debug\groupsockD.lib %AMB_HOME%\lib\win32\groupsockD.lib
+REM copy %TPP_HOME%\live_VC8\BUILD\liveMedia-Debug\liveMediaD.lib %AMB_HOME%\lib\win32\liveMediaD.lib
+REM copy %TPP_HOME%\live_VC8\BUILD\UsageEnvironment-Debug\UsageEnvironmentD.lib %AMB_HOME%\lib\win32\UsageEnvironmentD.lib
 @echo on
