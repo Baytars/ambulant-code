@@ -32,13 +32,12 @@
 #include "ambulant/common/playable.h"
 #include "ambulant/net/url.h"
 #include "ambulant/net/databuffer.h"
-#include <stdint.h>
-#include <inttypes.h>
 #ifdef AMBULANT_PLATFORM_UNIX
 #include "ambulant/lib/unix/unix_thread.h"
 #define BASE_THREAD lib::unix::thread
 #endif
 #ifdef AMBULANT_PLATFORM_WIN32
+typedef unsigned char uint8_t;
 #include "ambulant/lib/win32/win32_thread.h"
 #define BASE_THREAD lib::win32::thread
 #endif
