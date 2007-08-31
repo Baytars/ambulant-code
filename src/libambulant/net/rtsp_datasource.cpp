@@ -50,7 +50,11 @@ ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context, timestamp_t clip_
 {
 	m_context->audio_fmt.parameters = (void*) m_context->audio_codec_name;
 	m_context->video_fmt.parameters = (void*) m_context->video_codec_name;
+#if 0
 	m_context->vbuffer = (unsigned char*)malloc(20000);
+#else //xxxbo increase the vbuffer to 40000 for renderering mpg
+	m_context->vbuffer = (unsigned char*)malloc(40000);
+#endif
 	m_context->vbufferlen = 0;
 	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::rtsp_demux(0x%x)", (void*) this);
 	
@@ -537,7 +541,11 @@ after_reading_video(void* data, unsigned sz, unsigned truncated, struct timeval 
 	//If the frame is bigger than 20kb display the rest next time
 	//TODO display what I have currently as well : the impartial frame.
 	 if (rpts == context->last_pts) {
+#if 0
 		 if((sz + context->vbufferlen)>20000)
+#else //xxxbo increase the vbuffer to 40000 for renderering mpg
+		 if((sz + context->vbufferlen)>40000)
+#endif
 		 {
 			 lib::logger::get_logger()->trace("Frame too large to display");
 			 context->vbufferlen=0;
