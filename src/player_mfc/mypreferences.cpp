@@ -46,6 +46,7 @@ mypreferences::load_preferences()
 	m_use_plugins = (bool)pApp->GetProfileInt(_T("Settings"), _T("use_plugins"), 0);
 	val = pApp->GetProfileString(_T("Settings"), _T("plugin_dir"),0);
 	m_plugin_dir = T2CA((LPCTSTR)val);
+	m_prefer_ffmpeg = (bool)pApp->GetProfileIntW(_T("Settings"), _T("use_ffmpeg"), 0);
 
 	return true;
 }
@@ -64,6 +65,7 @@ mypreferences::save_preferences()
 	pApp->WriteProfileInt(_T("Settings"), _T("log_level"), m_log_level);
 	pApp->WriteProfileInt(_T("Settings"), _T("use_plugins"), m_use_plugins);
 	pApp->WriteProfileString(_T("Settings"), _T("plugin_dir"), A2CT(m_plugin_dir.c_str()));
+	pApp->WriteProfileInt(_T("Settings"), _T("use_ffmpeg"), m_prefer_ffmpeg);
 	
 	return true;
 }

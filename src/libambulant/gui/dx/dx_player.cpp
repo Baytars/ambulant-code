@@ -465,7 +465,9 @@ gui::dx::dx_playable_factory::new_playable(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *const evp) {
+	lib::event_processor *const evp)
+{
+	bool use_ffmpeg = common::preferences::get_preferences()->m_prefer_ffmpeg;
 	common::playable *p = 0;
 	lib::xml_string tag = node->get_qname().second;
 	AM_DBG m_logger->debug("dx_player::new_playable: %s", tag.c_str());
@@ -489,15 +491,24 @@ gui::dx::dx_playable_factory::new_playable(
 #ifdef WITH_FFMPEG
 		p = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory);
 #else
-		p = new dx_audio_renderer(context, cookie, node, evp);
+		if (use_ffmpeg)
+			lib::logger::get_logger()->debug("dx_player: DirectShow audio renderer disabled by preference");
+		else
+			p = new dx_audio_renderer(context, cookie, node, evp);
 #endif/*WITH_FFMPEG*/
 	} else if(tag == "video") {
 #if defined(USE_DS_VIDEO)
 		p = new dx_dsvideo_renderer(context, cookie, node, evp, m_factory);
 #elif defined(USE_BASIC_VIDEO)
-		p = new dx_basicvideo_renderer(context, cookie, node, evp, m_dxplayer);
+		if (use_ffmpeg)
+			lib::logger::get_logger()->debug("dx_player: DirectShow video renderer disabled by preference");
+		else
+			p = new dx_basicvideo_renderer(context, cookie, node, evp, m_dxplayer);
 #else
-		p = new dx_video_renderer(context, cookie, node, evp, m_dxplayer);
+		if (use_ffmpeg)
+			lib::logger::get_logger()->debug("dx_player: DirectShow video renderer disabled by preference");
+		else
+			p = new dx_video_renderer(context, cookie, node, evp, m_dxplayer);
 #endif
 	} else if(tag == "area") {
 		p = new dx_area(context, cookie, node, evp);

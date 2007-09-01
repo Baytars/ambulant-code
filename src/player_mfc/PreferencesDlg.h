@@ -27,6 +27,7 @@ private:
 //	int m_do_dtd;
 	int m_validation_schema_full_checking;
 	int m_do_plugins;
+	int m_do_ffmpeg;
 	CString m_plugin_dir;
 public:
 	afx_msg void OnBnClickedOK();

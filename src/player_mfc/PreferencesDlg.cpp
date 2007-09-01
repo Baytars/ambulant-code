@@ -24,6 +24,7 @@ PreferencesDlg::PreferencesDlg(CWnd* pParent /*=NULL*/)
 	m_validation_schema_full_checking = prefs->m_validation_schema_full_checking;
 	m_do_plugins = prefs->m_use_plugins;
 	m_plugin_dir = prefs->m_plugin_dir.c_str();
+	m_do_ffmpeg = prefs->m_prefer_ffmpeg;
 }
 
 BOOL
@@ -54,6 +55,7 @@ void PreferencesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_VALIDATION_SCHEMA_FULL_CHECKING, m_validation_schema_full_checking);
 	DDX_Check(pDX, IDC_DO_PLUGINS, m_do_plugins);
 	DDX_Text(pDX, IDC_PLUGIN_DIR, m_plugin_dir);
+	DDX_Check(pDX, IDC_DO_FFMPEG, m_do_ffmpeg);
 }
 
 
@@ -79,7 +81,7 @@ void PreferencesDlg::OnBnClickedOK()
 	prefs->m_validation_schema_full_checking = (bool)m_validation_schema_full_checking;
 	prefs->m_use_plugins = m_do_plugins;
 	prefs->m_plugin_dir = T2CA((LPCTSTR)m_plugin_dir);
-	
+	prefs->m_prefer_ffmpeg = m_do_ffmpeg;
 	prefs->save_preferences();
 }
 

@@ -941,7 +941,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="AmbulantPlayer.rc"
+			Value="\ufs\jack\src\ambulant\src\player_mfc\AmbulantPlayer.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

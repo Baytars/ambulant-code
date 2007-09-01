@@ -188,6 +188,38 @@
 				RelativePath="..\live\groupsock\include\GroupEId.hh"
 				>
 			</File>
+			<File
+				RelativePath="..\live\groupsock\include\Groupsock.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\groupsock_version.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\GroupsockHelper.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\IOHandlers.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\NetAddress.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\NetCommon.h"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\NetInterface.hh"
+				>
+			</File>
+			<File
+				RelativePath="..\live\groupsock\include\TunnelEncaps.hh"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
