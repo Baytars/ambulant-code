@@ -28,12 +28,13 @@ copy %TPP_HOME%\lpng128\projects\visualc71\Win32_LIB_Release\zlib\zlib.lib %AMB_
 REM JPEG static library
 copy %TPP_HOME%\jpeg\win32\Release\libjpeg.lib %AMB_HOME%\lib\win32\libjpeg.lib
 
-REM Xerces lib, if it exists
-set XER_BUILD=%TPP_HOME%\xerces-c-src_2_7_0\Build\Win32\VC8
-if exist %XER_BUILD% copy %XER_BUILD%\Release\xerces-c_2.lib %AMB_HOME%\lib\win32\xerces-c_2.lib
-if exist %XER_BUILD% copy %XER_BUILD%\Release\xerces-c_2_7.dll %AMB_HOME%\bin\win32\xerces-c_2_7.dll
-if exist %XER_BUILD% copy %XER_BUILD%\Debug\xerces-c_2D.lib %AMB_HOME%\lib\win32\xerces-c_2D.lib
-if exist %XER_BUILD% copy %XER_BUILD%\Debug\xerces-c_2_7D.dll %AMB_HOME%\bin\win32\xerces-c_2_7D.dll
+REM Xerces lib, if it exists. Note the "VC7", this is a bug in the xerces projects.
+set XER_BUILD=%TPP_HOME%\xerces-c-src_2_7_0\Build\Win32\VC8\Release
+set XERD_BUILD=%TPP_HOME%\xerces-c-src_2_7_0\Build\Win32\VC7\Debug
+if exist %XER_BUILD% copy %XER_BUILD%\xerces-c_2.lib %AMB_HOME%\lib\win32\xerces-c_2.lib
+if exist %XER_BUILD% copy %XER_BUILD%\xerces-c_2_7.dll %AMB_HOME%\bin\win32\xerces-c_2_7.dll
+if exist %XER_BUILD% copy %XERD_BUILD%\xerces-c_2D.lib %AMB_HOME%\lib\win32\xerces-c_2D.lib
+if exist %XER_BUILD% copy %XERD_BUILD%\xerces-c_2_7D.dll %AMB_HOME%\bin\win32\xerces-c_2_7D.dll
 
 REM ffmpeg
 copy %TPP_HOME%\ffmpeg\libavcodec\avcodec-51.dll %AMB_HOME%\bin\win32\avcodec-51.dll
