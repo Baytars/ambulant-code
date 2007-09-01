@@ -4,7 +4,11 @@ libraries. It is originally part of the Ambulant Player distribution
 
 Download a live555 source distribution from live555.com, put it
 in a folder "live" beside this folder (i.e. "..\live" should contain
-a normal distribution) and build with live555.com.sln.
+a normal distribution).
+
+Next, copy Locale.cpp to ..\live\liveMedia\Locale.cpp.
+
+Finally, build using live555.com.sln.
 
 Both normal and debug libraries are built. Everything is deposited in
 the BUILD subfolder, with per-project per-target subdirectories.
