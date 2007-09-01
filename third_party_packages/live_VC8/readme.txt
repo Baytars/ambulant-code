@@ -6,7 +6,10 @@ Download a live555 source distribution from live555.com, put it
 in a folder "live" beside this folder (i.e. "..\live" should contain
 a normal distribution).
 
-Next, copy Locale.cpp to ..\live\liveMedia\Locale.cpp.
+Next, copy three files from live555-mods to ..\live:
+- Locale.cpp to ..\live\liveMedia\Locale.cpp.
+- Groupsock.cpp to ..\live\groupsock\Groupsock.cpp
+- NetInterface.cpp to ..\live\groupsock\NetInterface.cpp
 
 Finally, build using live555.com.sln.
 
