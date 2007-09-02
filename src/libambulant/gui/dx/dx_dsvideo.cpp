@@ -71,7 +71,7 @@ dx_dsvideo_renderer::_init_bitmap()
 	// Create a HBITMAP for which we also have the data pointer (so we can
 	// copy frames into it later)
 	void *pBits = NULL;
-	BITMAPINFO *pbmpi = get_bmp_info(m_size.w, -m_size.h, 32);
+	BITMAPINFO *pbmpi = get_bmp_info(m_size.w, -(int)m_size.h, 32);
 	m_bitmap = CreateDIBSection(NULL, pbmpi, DIB_RGB_COLORS, &pBits, NULL, 0);
 	if(m_bitmap==NULL || pBits==NULL) {
 		lib::logger::get_logger()->error("CreateDIBSection() failed");
@@ -158,7 +158,7 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 
 #ifdef WITH_SMIL30
 	lib::rect croprect = m_dest->get_crop_rect(m_size);
-	img_reg_rc = m_dest->get_fit_rect(croprect, srcsize, &img_rect1, m_alignment);
+	img_reg_rc = m_dest->get_fit_rect(croprect, m_size, &img_rect1, m_alignment);
 #else
 	// Get fit rectangles
 	img_reg_rc = m_dest->get_fit_rect(m_size, &img_rect1, m_alignment);
