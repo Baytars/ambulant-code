@@ -32,12 +32,48 @@
 #ifdef WITH_SDL
 #include "ambulant/gui/SDL/sdl_factory.h"
 #endif
+#ifdef WITH_DSVIDEO
+#include "ambulant/gui/dx/dx_dsvideo.h"
+#endif
 
 //#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
 using namespace ambulant;
+
+#ifdef WITH_DSVIDEO
+class dsvideo_renderer_factory : public common::playable_factory {
+  public:
+
+	dsvideo_renderer_factory(common::factories *factory)
+	:   m_factory(factory) {}
+	~dsvideo_renderer_factory() {}
+		
+	common::playable *new_playable(
+		common::playable_notification *context,
+		common::playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp)
+	{
+		lib::xml_string tag = node->get_local_name();
+		if (tag == "video")
+			return new gui::dx::dx_dsvideo_renderer(context, cookie, node, evp, m_factory);
+		return NULL;
+	}
+		
+	common::playable *new_aux_audio_playable(
+		common::playable_notification *context,
+		common::playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp,
+		net::audio_datasource *src) { return NULL; }	
+		
+  private:
+	common::factories *m_factory;
+	
+};
+#endif // WITH_DSVIDEO
 
 static ambulant::common::factories * 
 bug_workaround(ambulant::common::factories* factory)
@@ -70,6 +106,10 @@ void initialize(
 #ifdef WITH_SDL
 		pf->add_factory(gui::sdl::create_sdl_playable_factory(factory));
     	lib::logger::get_logger()->trace("ffmpeg_plugin: SDL playable factory registered");
+#endif
+#ifdef WITH_DSVIDEO
+		pf->add_factory(new dsvideo_renderer_factory(factory));
+    	lib::logger::get_logger()->trace("ffmpeg_plugin: video playable factory registered");
 #endif
 	}
 	// Same for datasource foactories

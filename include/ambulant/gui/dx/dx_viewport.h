@@ -57,7 +57,7 @@ class dx_transition;
 
 // A viewport is a top-level DD surface.
 
-class viewport {
+class AMBULANTAPI viewport {
   public:
 	viewport(int width = common::default_layout_width, 
 		int height = common::default_layout_height, HWND hwnd = NULL);
