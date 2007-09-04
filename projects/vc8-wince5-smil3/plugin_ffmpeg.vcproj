@@ -68,6 +68,7 @@
 				OutputFile="..\..\bin\wince\libampluginD_ffmpeg.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="..\..\lib\wince-arm"
+				IgnoreDefaultLibraryNames="winsock.lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/plugin.pdb"
