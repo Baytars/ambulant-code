@@ -41,7 +41,7 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;&quot;..\..\third_party_packages\ffmpeg-wm5\libavformat&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5\libavcodec&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5\libavutil&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5-compat&quot;;&quot;..\..\third_party_packages\SDL-1.2.12\include&quot;"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;WITH_SMIL30"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;WITH_SMIL30;WITH_DSVIDEO;WITH_FFMPEG"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
