@@ -41,7 +41,7 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;&quot;..\..\third_party_packages\ffmpeg-wm5\libavformat&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5\libavcodec&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5\libavutil&quot;;&quot;..\..\third_party_packages\ffmpeg-wm5-compat&quot;;&quot;..\..\third_party_packages\SDL-1.2.12\include&quot;"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;WITH_SMIL30;WITH_DSVIDEO;WITH_FFMPEG"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;WITH_SMIL30;WITH_DSVIDEO;WITH_FFMPEG;WITH_SDL"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -64,14 +64,15 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="avformat.lib avcodec.lib avutil.lib"
+				AdditionalDependencies="avformat.lib avcodec.lib avutil.lib SDL.lib"
 				OutputFile="..\..\bin\wince\libampluginD_ffmpeg.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="..\..\lib\wince-arm"
-				IgnoreDefaultLibraryNames="winsock.lib"
+				IgnoreDefaultLibraryNames=""
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/plugin.pdb"
+				GenerateMapFile="true"
 				SubSystem="0"
 				StackReserveSize="65536"
 				StackCommitSize="4096"
@@ -232,7 +233,6 @@
 					>
 					<FileConfiguration
 						Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -244,7 +244,6 @@
 					>
 					<FileConfiguration
 						Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-						ExcludedFromBuild="true"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
