@@ -97,7 +97,7 @@
 				ForceDirty="-1"
 				RemoteDirectory="%CSIDL_PROGRAM_FILES%\AmbulantPlayer"
 				RegisterOutput="0"
-				AdditionalFiles="avcodec-51.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0;avformat-51.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0;avutil-49.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0"
+				AdditionalFiles="avcodec-51.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0;avformat-51.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0;avutil-49.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0;SDL.dll|..\..\bin\wince|%CSIDL_PROGRAM_FILES%\AmbulantPlayer|0"
 			/>
 			<DebuggerTool
 			/>
@@ -231,24 +231,10 @@
 				<File
 					RelativePath="..\..\src\libambulant\gui\SDL\sdl.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\libambulant\gui\SDL\sdl_audio.cpp"
 					>
-					<FileConfiguration
-						Name="Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-						/>
-					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
