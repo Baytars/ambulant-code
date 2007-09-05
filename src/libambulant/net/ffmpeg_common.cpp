@@ -230,6 +230,14 @@ ffmpeg_demux::cancel()
 int 
 ffmpeg_demux::audio_stream_nr() 
 {
+#if 1
+	// On Windows Mobile nb_streams can be preposterous (after an error?),
+	// cater for that.
+	if (m_con->nb_streams > MAX_STREAMS) {
+		lib::logger::get_logger()->trace("ffmpeg_demux::audio_stream_nr: ignoring preposterous #streams %d", m_con->nb_streams);
+		return -1;
+	}
+#endif
 	unsigned int stream_index;
 	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
 		if (am_get_codec_var(m_con->streams[stream_index]->codec, codec_type) == CODEC_TYPE_AUDIO)
@@ -242,6 +250,14 @@ ffmpeg_demux::audio_stream_nr()
 int 
 ffmpeg_demux::video_stream_nr() 
 {
+#if 1
+	// On Windows Mobile nb_streams can be preposterous (after an error?),
+	// cater for that.
+	if (m_con->nb_streams > MAX_STREAMS) {
+		lib::logger::get_logger()->trace("ffmpeg_demux::video_stream_nr: ignoring preposterous #streams %d", m_con->nb_streams);
+		return -1;
+	}
+#endif
 	unsigned int stream_index;
 	for (stream_index=0; stream_index < m_con->nb_streams; stream_index++) {
 		if (am_get_codec_var(m_con->streams[stream_index]->codec, codec_type) == CODEC_TYPE_VIDEO) {
