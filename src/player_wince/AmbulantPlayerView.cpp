@@ -18,6 +18,7 @@
 #include "ambulant/lib/win32/win32_fstream.h"
 #include "ambulant/smil2/test_attrs.h"
 #include "ambulant/net/url.h"
+#include "ambulant/version.h"
 
 #ifdef _DEBUG
 #pragma comment (lib,"mp3lib_D.lib")
@@ -32,6 +33,19 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 using namespace ambulant;
+#ifdef DEBUG
+class logger_trace : public ambulant::lib::ostream {
+	bool is_open() const {return true;}
+	void close() {}
+	int write(const unsigned char *buffer, int nbytes) {return write("ostream use of buffer, size not implemented for trace");}
+	int write(const char *cstr) {
+		ATLTRACE(atlTraceGeneral, 0, _T("%S"), cstr);
+		return 0;
+	}
+	void write(ambulant::lib::byte_buffer& bb) {write("ostream use of byte_buffer not implemented for trace");}
+	void flush() {}
+};
+#endif
 
 typedef gui::dx::dx_player dg_or_dx_player;
 typedef gui::dx::dx_player_callbacks gui_callbacks;
@@ -157,9 +171,28 @@ int CAmbulantPlayerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	s_hwnd = GetSafeHwnd();
 	
 
+#ifdef DEBUG
+	// Log to the debugger output window in VS2005
+	lib::logger::get_logger()->set_ostream(new logger_trace());
+#else
+	// Log to a file
 	lib::win32::fstream *fs = new lib::win32::fstream();
 	if(fs->open_for_writing(TEXT("\\Program Files\\AmbulantPlayer\\amlog.txt")))
 		lib::logger::get_logger()->set_ostream(fs);
+#endif
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: built on %s for WindowsCE/MFC"), __DATE__);
+#if ENABLE_NLS
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: localization enabled (english)"));
+#endif
+#ifdef AMBULANT_USE_DLL
+	lib::logger::get_logger()->debug(gettext("Ambulant Player: using AmbulantPlayer in DLL"));
+#endif
+#ifdef AM_PLAYER_DG
+	lib::logger::get_logger()->debug("Ambulant Player: using DG Player");
+#else
+	lib::logger::get_logger()->debug("Ambulant Player: using DX Player");
+#endif
 #if 1
 	common::preferences *prefs = common::preferences::get_preferences();
 	prefs->m_prefer_ffmpeg = true;
