@@ -381,7 +381,7 @@ ffmpeg_demux::run()
 		int ret = av_read_packet(m_con, pkt);
 #endif
 		m_lock.enter();
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%lld, 0x%x, %d)", ret, pkt->pts ,pkt->data, pkt->size);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size);
 		if (ret < 0) break;
 		pkt_nr++;
 		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet number : %d",pkt_nr);
@@ -391,7 +391,7 @@ ffmpeg_demux::run()
 		if (sink == NULL) {
 			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
 		} else {
-			/*AM_DBG*/ lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink (stream %d) (%lld, %lld, 0x%x, %d)", pts, pkt->stream_index, pkt->pts ,pkt->data, pkt->size);
+			/*AM_DBG*/ lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink (stream %d) (%lld, %lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
 			// Wait until there is room in the buffer
 			while (sink && sink->buffer_full() && !exit_requested()) {
 				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space for stream %d", pkt->stream_index);

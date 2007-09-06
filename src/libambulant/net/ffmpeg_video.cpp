@@ -576,6 +576,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 					if (!drop_this_frame) {
 						std::pair<timestamp_t, char*> element(pts, framedata);
 						m_frames.push(element);
+					} else {
+						free(framedata);
 					}
 					m_elapsed = pts;
 				} else {
