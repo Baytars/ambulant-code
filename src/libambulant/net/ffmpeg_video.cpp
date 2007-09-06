@@ -45,7 +45,11 @@
 // On second thoughts this seems a bad idea, so setting MIN_VIDEO_FRAMES to zero.
 #define MIN_VIDEO_FRAMES 0
 // How many video frames we would like to buffer at most.
+#ifdef WITH_SMALL_BUFFERS
+#define MAX_VIDEO_FRAMES 30
+#else
 #define MAX_VIDEO_FRAMES 100
+#endif
 
 // This construction is needed to get the CVS version of ffmpeg to work:
 // AVStream.codec got changed from AVCodecContext to AVCodecContext*
@@ -500,7 +504,12 @@ ffmpeg_video_decoder_datasource::data_avail()
 					assert(m_size);
 					char *framedata = (char*) malloc(m_size);
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:framedata=0x%x", framedata);
-					assert(framedata != NULL);
+					if (framedata == NULL) {
+						lib::logger::get_logger()->error("ffmpeg_video_decoder: out of memory");
+						m_src->stop();
+						sz = 0;
+						goto out_of_memory;
+					}
 					dst_pic_fmt = PIX_FMT_RGBA32;
 					dummy2 = avpicture_fill(&picture, (uint8_t*) framedata, dst_pic_fmt, w, h);
 					// The format we have is already in frame. Convert.
@@ -579,7 +588,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
 		m_src->frame_done(0, false);
   	}
-	av_free(frame);
+	if (frame) av_free(frame);
+  out_of_memory:
 	// Now tell our client, if we have data available or are at end of file.
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): m_frames.size() returns %d, (eof=%d)", m_frames.size(), m_src->end_of_file());
 	if ( m_frames.size() > MIN_VIDEO_FRAMES || m_src->end_of_file()) {
