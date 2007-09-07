@@ -558,6 +558,143 @@
             {
                 "Keys"
                 {
+                    "{B1EBC968-6B66-4532-A885-748B79AF4477}:_5BDC08795CFD411ABD5B74AAD88E7668"
+                    {
+                    "Name" = "8:SmilDocument"
+                    "Condition" = "8:"
+                        "Keys"
+                        {
+                            "{B1EBC968-6B66-4532-A885-748B79AF4477}:_404EDFEBDC5149D9A63A6A368EDFEDF2"
+                            {
+                            "Name" = "8:shell"
+                            "Condition" = "8:"
+                                "Keys"
+                                {
+                                    "{B1EBC968-6B66-4532-A885-748B79AF4477}:_E2E92C7A9B324AAC9A614638C1DF8DFB"
+                                    {
+                                    "Name" = "8:open"
+                                    "Condition" = "8:"
+                                        "Keys"
+                                        {
+                                            "{B1EBC968-6B66-4532-A885-748B79AF4477}:_EDA3BEF3B65D4117B2F4797A4D764698"
+                                            {
+                                            "Name" = "8:command"
+                                            "Condition" = "8:"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_4B57C1AF41D84D81ABDAD6C5CF11F6D0"
+                                                    {
+                                                    "Name" = "8:"
+                                                    "Condition" = "8:"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:\"\\Program Files\\Ambulant\\AmbulantPlayer_shared.exe\" \"%%1\""
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                    "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_75EBB1A1EDBF4879B9E69571C08E9ECB"
+                                    {
+                                    "Name" = "8:"
+                                    "Condition" = "8:"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:open"
+                                    }
+                                }
+                            }
+                            "{B1EBC968-6B66-4532-A885-748B79AF4477}:_96ED5896EEBC4488B88712F64E4CED31"
+                            {
+                            "Name" = "8:DefaultIcon"
+                            "Condition" = "8:"
+                                "Keys"
+                                {
+                                }
+                                "Values"
+                                {
+                                    "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_119F66344BE94B6E803FCBF48B1F893F"
+                                    {
+                                    "Name" = "8:"
+                                    "Condition" = "8:"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:\\Program Files\\Ambulant\\AmbulantPlayer_shared.exe,131"
+                                    }
+                                }
+                            }
+                        }
+                        "Values"
+                        {
+                            "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_0764B1ACB8294925BBD5B9FE1CA4757F"
+                            {
+                            "Name" = "8:"
+                            "Condition" = "8:"
+                            "ValueTypes" = "3:1"
+                            "Value" = "8:SMIL multimedia presentation"
+                            }
+                            "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_9DE43D1F18E44DE391AA7CAC4FA114C3"
+                            {
+                            "Name" = "8:EditFlags"
+                            "Condition" = "8:"
+                            "ValueTypes" = "3:4"
+                            "Value" = "8:00000000"
+                            }
+                        }
+                    }
+                    "{B1EBC968-6B66-4532-A885-748B79AF4477}:_6030C15A53674437B78E5056FC80C6A2"
+                    {
+                    "Name" = "8:.smil"
+                    "Condition" = "8:"
+                        "Keys"
+                        {
+                            "{B1EBC968-6B66-4532-A885-748B79AF4477}:_AF67464237DA4B20B5FD68BAAB46736D"
+                            {
+                            "Name" = "8:OpenWithList"
+                            "Condition" = "8:"
+                                "Keys"
+                                {
+                                    "{B1EBC968-6B66-4532-A885-748B79AF4477}:_9FA6C31E60FB43B1AAF9942AE2CB4454"
+                                    {
+                                    "Name" = "8:AmbulantPlayer_shared.exe"
+                                    "Condition" = "8:"
+                                        "Keys"
+                                        {
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                }
+                            }
+                        }
+                        "Values"
+                        {
+                            "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_29A011B3920F4ECAB9D23A0D93CED69E"
+                            {
+                            "Name" = "8:"
+                            "Condition" = "8:"
+                            "ValueTypes" = "3:1"
+                            "Value" = "8:SmilDocument"
+                            }
+                            "{C3684F64-58E2-4092-8E3C-D7483080DE5A}:_2A1C00DACD2A4B3FAD7C4CF2B7BB6151"
+                            {
+                            "Name" = "8:ContentType"
+                            "Condition" = "8:"
+                            "ValueTypes" = "3:1"
+                            "Value" = "8:application/smil"
+                            }
+                        }
+                    }
                 }
             }
             "HKU"
