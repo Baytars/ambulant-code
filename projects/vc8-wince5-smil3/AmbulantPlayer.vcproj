@@ -744,6 +744,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\player_wince\res\AmbulantPlayerDoc.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\player_wince\res\Cmdbar.bmp"
 				>
 			</File>
