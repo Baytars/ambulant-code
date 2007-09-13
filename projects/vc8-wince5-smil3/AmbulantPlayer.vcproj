@@ -104,6 +104,9 @@
 			/>
 			<Tool
 				Name="VCCodeSignTool"
+				AuthenticodeSignature="false"
+				Certificate="SHA-1 Hash=1049B790EDA3C369E9C206B44AF16B2657CC1555|1049B790EDA3C369E9C206B44AF16B2657CC1555"
+				ProvisionDevice="0"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
