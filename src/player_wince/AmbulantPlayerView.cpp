@@ -177,7 +177,7 @@ int CAmbulantPlayerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #else
 	// Log to a file
 	lib::win32::fstream *fs = new lib::win32::fstream();
-	if(fs->open_for_writing(TEXT("\\Program Files\\AmbulantPlayer\\amlog.txt")))
+	if(fs->open_for_writing(TEXT("\\Program Files\\Ambulant\\amlog.txt")))
 		lib::logger::get_logger()->set_ostream(fs);
 #endif
 	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
@@ -193,7 +193,7 @@ int CAmbulantPlayerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #else
 	lib::logger::get_logger()->debug("Ambulant Player: using DX Player");
 #endif
-#if 1
+#if 0
 	common::preferences *prefs = common::preferences::get_preferences();
 	prefs->m_prefer_ffmpeg = true;
 #endif
