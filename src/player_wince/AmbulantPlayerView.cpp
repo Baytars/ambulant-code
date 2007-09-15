@@ -7,6 +7,7 @@
 #include "AmbulantPlayerDoc.h"
 #include "AmbulantPlayerView.h"
 #include "SelectDlg.h"
+#include "PreferencesDlg.h"
 
 // DX player
 #include "ambulant/gui/dx/dx_player.h"
@@ -132,6 +133,7 @@ BEGIN_MESSAGE_MAP(CAmbulantPlayerView, CView)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_HELP_WELCOME, OnHelpWelcome)
 	ON_COMMAND(ID_FILE_SELECT, OnFileSelect)
+	ON_COMMAND(ID_FILE_PREFERENCES, OnPreferences)
 	ON_COMMAND(ID_FILE_LOADSETTINGS, OnFileLoadSettings)
 	ON_MESSAGE(WM_REPLACE_DOC, OnReplaceDoc)
 	//}}AFX_MSG_MAP
@@ -398,3 +400,10 @@ LPARAM CAmbulantPlayerView::OnReplaceDoc(WPARAM wParam, LPARAM lParam) {
 	delete purlstr;
 	return 0;
 }
+
+void CAmbulantPlayerView::OnPreferences()
+{
+	PrefPropertySheet dlg;
+	if(dlg.DoModal() != IDOK) return;
+}
+

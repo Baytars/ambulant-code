@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "AmbulantPlayer.h"
+#include "mypreferences.h"
 
 #include "MainFrm.h"
 
@@ -77,7 +78,8 @@ BOOL CAmbulantPlayerApp::InitInstance()
 	// You should modify this string to be something appropriate
 	// such as the name of your company or organization.
 	SetRegistryKey(_T("Ambulant"));
-
+//	LoadStdProfileSettings(4);
+	mypreferences::install_singleton();
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views.
 
