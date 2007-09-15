@@ -9,28 +9,157 @@
 
 #pragma warning( disable: 4800)  // Disable performance warning "forcing value to bool true of false"
 
-// PreferencesDlg dialog
+// Logging property page
 
-IMPLEMENT_DYNAMIC(PreferencesDlg, CDialog)
-PreferencesDlg::PreferencesDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(PreferencesDlg::IDD, pParent)
+BEGIN_MESSAGE_MAP(PrefLoggingPropertyPage, CPropertyPage)
+END_MESSAGE_MAP()
+
+IMPLEMENT_DYNAMIC(PrefLoggingPropertyPage, CPropertyPage)
+PrefLoggingPropertyPage::PrefLoggingPropertyPage()
+	: CPropertyPage(PrefLoggingPropertyPage::IDD)
 {
 	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
 	m_log_level = prefs->m_log_level;
+}
+
+BOOL
+PrefLoggingPropertyPage::OnInitDialog()
+{
+	CPropertyPage::OnInitDialog();
+	return TRUE;
+}
+
+PrefLoggingPropertyPage::~PrefLoggingPropertyPage()
+{
+}
+
+void PrefLoggingPropertyPage::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_CBIndex(pDX, IDC_LOG_LEVEL, m_log_level);
+}
+
+// PreferencesDlg message handlers
+
+void PrefLoggingPropertyPage::OnOK()
+{
+	USES_CONVERSION;
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_log_level = m_log_level;
+	CPropertyPage::OnOK();
+}
+
+// Media property page
+BEGIN_MESSAGE_MAP(PrefMediaPropertyPage, CPropertyPage)
+END_MESSAGE_MAP()
+
+
+IMPLEMENT_DYNAMIC(PrefMediaPropertyPage, CPropertyPage)
+PrefMediaPropertyPage::PrefMediaPropertyPage()
+	: CPropertyPage(PrefMediaPropertyPage::IDD)
+{
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	m_do_ffmpeg = prefs->m_prefer_ffmpeg;
+}
+
+BOOL
+PrefMediaPropertyPage::OnInitDialog()
+{
+	CPropertyPage::OnInitDialog();
+	return TRUE;
+}
+
+PrefMediaPropertyPage::~PrefMediaPropertyPage()
+{
+}
+
+void PrefMediaPropertyPage::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_Check(pDX, IDC_DO_FFMPEG, m_do_ffmpeg);
+}
+
+// PreferencesDlg message handlers
+
+void PrefMediaPropertyPage::OnOK()
+{
+	USES_CONVERSION;
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_prefer_ffmpeg = m_do_ffmpeg;
+	prefs->save_preferences();
+	CPropertyPage::OnOK();
+}
+
+// Parser property page
+BEGIN_MESSAGE_MAP(PrefParserPropertyPage, CPropertyPage)
+END_MESSAGE_MAP()
+
+
+IMPLEMENT_DYNAMIC(PrefParserPropertyPage, CPropertyPage)
+PrefParserPropertyPage::PrefParserPropertyPage()
+	: CPropertyPage(PrefParserPropertyPage::IDD)
+{
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
 	m_parser_id = prefs->m_parser_id.c_str();
 	m_validation_scheme = prefs->m_validation_scheme.c_str();
 	m_do_namespaces = prefs->m_do_namespaces;
 	m_do_schema = prefs->m_do_schema;
 	m_validation_schema_full_checking = prefs->m_validation_schema_full_checking;
-	m_do_plugins = prefs->m_use_plugins;
-	m_plugin_dir = prefs->m_plugin_dir.c_str();
-	m_do_ffmpeg = prefs->m_prefer_ffmpeg;
 }
 
 BOOL
-PreferencesDlg::OnInitDialog()
+PrefParserPropertyPage::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CPropertyPage::OnInitDialog();
+	return TRUE;
+}
+
+PrefParserPropertyPage::~PrefParserPropertyPage()
+{
+}
+
+void PrefParserPropertyPage::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_PARSER_ID, m_parser_id);
+	DDX_Text(pDX, IDC_VALIDATION_SCHEME, m_validation_scheme);
+	DDX_Check(pDX, IDC_DO_NAMESPACES, m_do_namespaces);
+	DDX_Radio(pDX, IDC_DO_SCHEMA, m_do_schema);
+	DDX_Check(pDX, IDC_VALIDATION_SCHEMA_FULL_CHECKING, m_validation_schema_full_checking);
+}
+
+// PreferencesDlg message handlers
+
+void PrefParserPropertyPage::OnOK()
+{
+	USES_CONVERSION;
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_parser_id = T2CA((LPCTSTR)m_parser_id);
+	prefs->m_validation_scheme = T2CA((LPCTSTR)m_validation_scheme);
+	prefs->m_do_namespaces = (bool)m_do_namespaces;
+	prefs->m_do_schema = (bool)m_do_schema;
+	prefs->m_validation_schema_full_checking = (bool)m_validation_schema_full_checking;
+	CPropertyPage::OnOK();
+}
+
+// Plugins property page
+BEGIN_MESSAGE_MAP(PrefPluginsPropertyPage, CPropertyPage)
+END_MESSAGE_MAP()
+
+
+IMPLEMENT_DYNAMIC(PrefPluginsPropertyPage, CPropertyPage)
+PrefPluginsPropertyPage::PrefPluginsPropertyPage()
+	: CPropertyPage(PrefPluginsPropertyPage::IDD)
+{
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	m_do_plugins = prefs->m_use_plugins;
+	m_plugin_dir = prefs->m_plugin_dir.c_str();
+}
+
+BOOL
+PrefPluginsPropertyPage::OnInitDialog()
+{
+	CPropertyPage::OnInitDialog();
 #ifdef WITH_WINDOWS_PLUGINS
 	CWnd *item = GetDlgItem(IDC_DO_PLUGINS);
 	item->EnableWindow();
@@ -40,53 +169,38 @@ PreferencesDlg::OnInitDialog()
 	return TRUE;
 }
 
-PreferencesDlg::~PreferencesDlg()
+PrefPluginsPropertyPage::~PrefPluginsPropertyPage()
 {
 }
 
-void PreferencesDlg::DoDataExchange(CDataExchange* pDX)
+void PrefPluginsPropertyPage::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_CBIndex(pDX, IDC_LOG_LEVEL, m_log_level);
-	DDX_Text(pDX, IDC_PARSER_ID, m_parser_id);
-	DDX_Text(pDX, IDC_VALIDATION_SCHEME, m_validation_scheme);
-	DDX_Check(pDX, IDC_DO_NAMESPACES, m_do_namespaces);
-	DDX_Radio(pDX, IDC_DO_SCHEMA, m_do_schema);
-	DDX_Check(pDX, IDC_VALIDATION_SCHEMA_FULL_CHECKING, m_validation_schema_full_checking);
 	DDX_Check(pDX, IDC_DO_PLUGINS, m_do_plugins);
 	DDX_Text(pDX, IDC_PLUGIN_DIR, m_plugin_dir);
-	DDX_Check(pDX, IDC_DO_FFMPEG, m_do_ffmpeg);
 }
-
-
-BEGIN_MESSAGE_MAP(PreferencesDlg, CDialog)
-//	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
-	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
-	ON_BN_CLICKED(IDOK, OnBnClickedOK)
-END_MESSAGE_MAP()
-
 
 // PreferencesDlg message handlers
 
-void PreferencesDlg::OnBnClickedOK()
+void PrefPluginsPropertyPage::OnOK()
 {
 	USES_CONVERSION;
-	OnOK();
 	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
-	prefs->m_log_level = m_log_level;
-	prefs->m_parser_id = T2CA((LPCTSTR)m_parser_id);
-	prefs->m_validation_scheme = T2CA((LPCTSTR)m_validation_scheme);
-	prefs->m_do_namespaces = (bool)m_do_namespaces;
-	prefs->m_do_schema = (bool)m_do_schema;
-	prefs->m_validation_schema_full_checking = (bool)m_validation_schema_full_checking;
 	prefs->m_use_plugins = m_do_plugins;
 	prefs->m_plugin_dir = T2CA((LPCTSTR)m_plugin_dir);
-	prefs->m_prefer_ffmpeg = m_do_ffmpeg;
 	prefs->save_preferences();
+	CPropertyPage::OnOK();
 }
+BEGIN_MESSAGE_MAP(PrefPropertySheet, CPropertySheet)
+END_MESSAGE_MAP()
 
-void PreferencesDlg::OnBnClickedCancel()
+
+IMPLEMENT_DYNAMIC(PrefPropertySheet, CPropertySheet)
+PrefPropertySheet::PrefPropertySheet(CWnd* pWndParent)
+:	CPropertySheet(_T("Preferences"), pWndParent)
 {
-	// TODO: Add your control notification handler code here
-	OnCancel();
+	AddPage(&m_page1);
+	AddPage(&m_page2);
+	AddPage(&m_page3);
+	AddPage(&m_page4);
 }
