@@ -32,7 +32,6 @@
 #define IDC_EDIT1                       1017
 #define IDC_PLUGIN_DIR                  1017
 #define IDC_DO_FFMPEG                   1018
-
 #define ID_PLAY                         32771
 #define ID_PAUSE                        32772
 #define ID_STOP                         32773
@@ -42,13 +41,16 @@
 #define ID_MENU_FILE                    32777
 #define ID_MENU_PLAY                    32778
 #define ID_FILE_PREFERENCES             32779
+#define ID_MENU_VIEW                    32780
+#define ID_VIEW_SOURCE                  32781
+#define ID_VIEW_LOG                     32782
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32780
+#define _APS_NEXT_COMMAND_VALUE         32783
 #define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

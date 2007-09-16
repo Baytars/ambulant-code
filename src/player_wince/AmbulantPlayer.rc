@@ -121,6 +121,11 @@ BEGIN
             MENUITEM "Pa&use",                      ID_PAUSE
             MENUITEM "&Stop",                       ID_STOP
         END
+        POPUP "View"
+        BEGIN
+            MENUITEM "Source",                      ID_VIEW_SOURCE
+            MENUITEM "Log",                         ID_VIEW_LOG
+        END
         POPUP "&Help"
         BEGIN
             MENUITEM "&Welcome",                    ID_HELP_WELCOME

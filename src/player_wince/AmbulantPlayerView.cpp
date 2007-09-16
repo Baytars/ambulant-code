@@ -34,6 +34,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 using namespace ambulant;
+
+text_char *log_name = TEXT("\\Program Files\\Ambulant\\amlog.txt");
 #ifdef DEBUG
 class logger_trace : public ambulant::lib::ostream {
 	bool is_open() const {return true;}
@@ -135,6 +137,9 @@ BEGIN_MESSAGE_MAP(CAmbulantPlayerView, CView)
 	ON_COMMAND(ID_FILE_SELECT, OnFileSelect)
 	ON_COMMAND(ID_FILE_PREFERENCES, OnPreferences)
 	ON_COMMAND(ID_FILE_LOADSETTINGS, OnFileLoadSettings)
+	ON_COMMAND(ID_VIEW_SOURCE, OnViewSource)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_SOURCE, OnUpdateViewSource)
+	ON_COMMAND(ID_VIEW_LOG, OnViewLog)
 	ON_MESSAGE(WM_REPLACE_DOC, OnReplaceDoc)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -179,7 +184,7 @@ int CAmbulantPlayerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 #else
 	// Log to a file
 	lib::win32::fstream *fs = new lib::win32::fstream();
-	if(fs->open_for_writing(TEXT("\\Program Files\\Ambulant\\amlog.txt")))
+	if(fs->open_for_writing(log_name))
 		lib::logger::get_logger()->set_ostream(fs);
 #endif
 	lib::logger::get_logger()->debug(gettext("Ambulant Player: compile time version %s, runtime version %s"), AMBULANT_VERSION, ambulant::get_version());
@@ -407,3 +412,40 @@ void CAmbulantPlayerView::OnPreferences()
 	if(dlg.DoModal() != IDOK) return;
 }
 
+void CAmbulantPlayerView::OnViewSource() {
+	USES_CONVERSION;
+	CString cmd = TEXT("-opendoc \"");
+	std::string ustr = T2CA(LPCTSTR(m_curDocFilename));
+	net::url u = net::url::from_url(ustr);
+	if (!u.is_local_file()) {
+		lib::logger::get_logger()->error("View Source: only for local files...");
+		return;
+	}
+	assert(u.is_local_file());
+	// XXXX Also check OnUpdateViewSource
+	cmd += u.get_file().c_str(); // XXXX Incorrect
+	cmd += "\"";
+	CreateProcess(_T("pword.exe"), cmd, NULL, NULL, false, 0, NULL, NULL, NULL, NULL);	
+}
+
+void CAmbulantPlayerView::OnUpdateViewSource(CCmdUI *pCmdUI) {
+	USES_CONVERSION;
+	bool b = player && !m_curDocFilename.IsEmpty() && net::url::from_url(T2CA(LPCTSTR(m_curDocFilename))).is_local_file();
+	pCmdUI->Enable(b?TRUE:FALSE);
+}
+
+void CAmbulantPlayerView::OnViewLog() {
+	// Logging to file: open the file in notepad.
+#if 0
+	TCHAR buf[_MAX_PATH];
+	GetModuleFileName(NULL, buf, _MAX_PATH);
+	TCHAR *p1 = text_strrchr(buf,TCHAR('\\'));
+	if(p1 != NULL) *p1= TCHAR('\0');
+	text_strcat(buf, TEXT("\\"));
+	text_strcat(buf, log_name);
+#endif
+	CString cmd = TEXT("-opendoc \"");
+	cmd += log_name;
+	cmd += "\"";
+	CreateProcess(_T("pword.exe"), cmd, NULL, NULL, false, 0, NULL, NULL, NULL, NULL);	
+}
