@@ -42,10 +42,10 @@ namespace smil2 {
 /// Various modes the smiltext can be displayed in.
 enum smiltext_mode {
 	stm_replace,		/// New text is timed, replaces everything, no scrolling
-	stm_append,			/// New text is timed, appended to the end, no scrolling
-	stm_scroll,			/// Timing is ignored, text auto-scrolls upward
-	stm_crawl,			/// Timing is ignored, text scrolls right-to-left
-	stm_jump,			/// New text is timed, appended to end, scrolls up if needed
+	stm_append,		/// New text is timed, appended to the end, no scrolling
+	stm_scroll,		/// Timing is ignored, text auto-scrolls upward
+	stm_crawl,		/// Timing is ignored, text scrolls right-to-left
+	stm_jump,		/// New text is timed, appended to end, scrolls up if needed
 };
 
 /// Global parameters of a smiltext node.
@@ -54,9 +54,9 @@ enum smiltext_mode {
 /// attributes.
 struct smiltext_params {
 	smiltext_mode m_mode;	/// How the text is rendered
-	bool	m_loop;			/// Loop mode, valid for scroll/crawl
-	int		m_rate;			/// Rate, in pixels/second
-	bool	m_wrap;			/// Text should be line-wrapped
+	bool	m_loop;		/// Loop mode, valid for scroll/crawl
+	int	m_rate;		/// Rate, in pixels/second
+	bool	m_wrap;		/// Text should be line-wrapped
 };
 	
 /// Layout commands that the engine can send to the renderer
@@ -94,6 +94,12 @@ enum smiltext_font_weight {
 	stw_bold
 };
 
+/// Values for the xml:space attribute of text spans
+enum smiltext_xml_space {
+	stx_default,
+	stx_preserve
+};
+
 /// A sequence of characters with a common set of attributes
 /// such as font, color, etc. Alternatively, if m_command
 /// is not stc_data, it is a layout command (currently only
@@ -113,6 +119,7 @@ class smiltext_run {
 	lib::color_t			m_bg_color;
 	smiltext_align			m_align;
 	smiltext_direction		m_direction;
+	smiltext_xml_space		m_xml_space;
 };
 
 /// A list of smiltext_run objects is what the renderer is
@@ -187,9 +194,13 @@ class smiltext_engine {
 	void _get_params(smiltext_params& params, const lib::node *src);
 	// Fill default smiltext_params
 	void _get_default_params(smiltext_params& params);
-	// generate a sequence of runs each containing a single word
-	// without spacing but with the formatting and styling parameters
-	void _split_into_words(lib::xml_string data);	
+	// generate a sequence of runs each containing a single word with
+	// spacing if needed and with the formatting and styling parameters
+	void _split_into_words(lib::xml_string data, smiltext_xml_space);	
+	// generate a sequence of runs each containing a stc_break command
+	// of a stc_data command without any line-feed (newline) character
+	// but with the formatting and styling parameters
+	lib::xml_string _split_into_lines(lib::xml_string data, size_t lf_pos, size_t limit);
 
 	const bool m_word_mode;
 	const lib::node *m_node;			// The root of the smiltext nodes
@@ -204,6 +215,7 @@ class smiltext_engine {
 	lib::timer::time_type m_epoch;		// event_processor time corresponding to smiltext time=0
 	double m_tree_time;					// smiltext time for m_tree_iterator. XXXJACK: unused and unneeded?
 	smiltext_params m_params;			// global parameters
+	bool m_process_lf;			// turn all \n chars int <br/> commands
 };
 
 /// Extra classes for smiltext layout
@@ -222,8 +234,8 @@ class smiltext_metrics {
 
 	~smiltext_metrics() {}
 
-	unsigned int get_ascent()	{ return m_ascent; }
-	unsigned int get_descent()	{ return m_descent; };
+	const unsigned int get_ascent()	{ return m_ascent; }
+	const unsigned int get_descent(){ return m_descent; };
 	unsigned int get_height()	{ return m_height; };
 	unsigned int get_width()	{ return m_width; };
 	unsigned int get_line_spacing() { return m_line_spacing; };
@@ -247,9 +259,68 @@ class smiltext_layout_provider {
 	virtual void render_smiltext(const smiltext_run& str, const lib::rect& r, unsigned int word_spacing) = 0;
 };
 
+#define	NEW_LAYOUT_ENGINE
+#ifdef	NEW_LAYOUT_ENGINE
+#else //NEW_LAYOUT_ENGINE
+#endif//NEW_LAYOUT_ENGINE
+
+#ifdef	NEW_LAYOUT_ENGINE
+class smiltext_layout_word {
+
+  public:
+	smiltext_layout_word(smiltext_run run, smiltext_metrics stm, int);
+	smiltext_run m_run;
+	int m_leading_breaks;
+	smiltext_metrics m_metrics;
+	lib::rect m_bounding_box;
+};
+
+/// A helper class to be used by a renderer which can't do text layout
 class smiltext_layout_engine {
   public:
-	smiltext_layout_engine (const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client);
+  smiltext_layout_engine (const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client, bool process_lf);
+	/// Start the engine.
+	void start(double t);
+	
+	/// Seek the engine in time.
+	void seek(double t);
+	
+	/// Stop the engine.
+	void stop();
+	
+	/// Returns true if all text has been received.
+	bool is_finished() { return m_finished; }
+
+	/// Redraw a rectangle.on screen 
+	void redraw(const lib::rect& r);
+
+	/// Set destination rectangle.on screen
+	void set_dest_rect(const lib::rect& r);
+
+	void smiltext_changed();
+
+  private:
+	void get_initial_values(lib::rect rct, smiltext_layout_word* stlw_p, int* x_start_p, int* y_start_p, int* x_dir_p, int* y_dir_p);
+	bool smiltext_disjunct(const lib::rect& r1, const lib::rect& r2);
+	bool smiltext_fits(const lib::rect& r1, const lib::rect& r2);
+	void smiltext_render(const smil2::smiltext_run run, const lib::rect& r, const lib::point& p);
+
+	lib::critical_section m_lock;
+	smiltext_engine m_engine;
+	bool m_finished;
+	bool m_process_lf;
+	lib::event_processor *m_event_processor;
+	lib::timer::time_type m_epoch;
+	smiltext_params m_params;	// global parameters
+	lib::rect m_dest_rect; // JNK
+	smiltext_layout_provider* m_provider;
+
+	std::vector<smiltext_layout_word> m_words;
+};
+#else //NEW_LAYOUT_ENGINE
+class smiltext_layout_engine {
+  public:
+	smiltext_layout_engine (const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client, bool process_lf);
 	/// Start the engine.
 	void start(double t);
 	
@@ -275,6 +346,7 @@ class smiltext_layout_engine {
 
 	smiltext_engine m_engine;
 	bool m_finished;
+	bool m_process_lf;
 	lib::event_processor *m_event_processor;
 	lib::timer::time_type m_epoch;
 	smiltext_params m_params;			// global parameters
@@ -285,6 +357,7 @@ class smiltext_layout_engine {
 	unsigned int m_max_ascent;
 	unsigned int m_max_descent;
 };
+#endif//NEW_LAYOUT_ENGINE
 
 
 } // namespace smil2

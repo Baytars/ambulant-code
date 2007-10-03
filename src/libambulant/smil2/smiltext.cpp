@@ -24,6 +24,7 @@
 #include "ambulant/smil2/smiltext.h"
 #include "ambulant/lib/callback.h"
 
+//#define AM_DBG if(1)
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -42,6 +43,7 @@ smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, s
 	m_client(client),
 	m_word_mode(word_mode),
 	m_newbegin_valid(false),
+	m_process_lf(true),
 	m_update_event(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("smiltext_engine(0x%x).smiltext_engine(%s)", this, m_node->get_sig().c_str());
@@ -53,7 +55,7 @@ smiltext_engine::smiltext_engine(const lib::node *n, lib::event_processor *ep, s
 	// Initialize the global para
 	// Initialize the default formatting and apply node attributes
 	smiltext_run stdrun;
-	stdrun.m_command = (smiltext_command)0;
+	stdrun.m_command = stc_data;
 	_get_default_formatting(stdrun);
 	_get_default_params(m_params);
 	const char *rgn = n->get_attribute("region");
@@ -109,25 +111,68 @@ smiltext_engine::stop() {
 	m_node = NULL;
 }
 
+lib::xml_string
+smiltext_engine::_split_into_lines(lib::xml_string data, size_t lf_pos, size_t limit) {
+	if (lf_pos > 0) {
+		smiltext_run run = m_run_stack.top();
+		run.m_command = stc_data;
+		run.m_data = data.substr(0, lf_pos);
+		smiltext_runs::const_iterator where = m_runs.insert( m_runs.end(), run);
+		if (!m_newbegin_valid) {
+			m_newbegin = where;
+			m_newbegin_valid = true;
+		}
+	}
+	while (lf_pos++ < limit) {
+		smiltext_run run = m_run_stack.top();
+		run.m_command = stc_break;
+		smiltext_runs::const_iterator where = m_runs.insert( m_runs.end(), run);
+		if (!m_newbegin_valid) {
+			m_newbegin = where;
+			m_newbegin_valid = true;
+		}
+		if (data[lf_pos] != '\n') {
+			break;  
+		}
+	}
+	return data.substr(lf_pos);
+}
+
 void
-smiltext_engine::_split_into_words(lib::xml_string data) {
-	size_t first_nonblank;
-	std::string blanks(" \f\n\r\t\v");
-	while ((first_nonblank = data.find_first_not_of(blanks)) != std::string::npos) {
-		size_t first_blank = data.find_first_of(blanks, first_nonblank);
-		if (first_blank == std::string::npos)
-			first_blank = data.length();
-		if (first_blank > 0) {
+smiltext_engine::_split_into_words(lib::xml_string data, smil2::smiltext_xml_space xml_space) {
+	// same semantics as isspace, used by tree_builder
+	std::string spacechar(" \f\n\r\t\v");
+	size_t first_nonspace, first_char;
+	while (data.length() > 0) {
+		// find non-space after any leading space
+		first_nonspace = data.find_first_not_of(spacechar);
+		if (first_nonspace == std::string::npos)
+			first_nonspace = data.length();
+		// skip leading space if applicable
+		first_char = xml_space == stx_preserve ? 0 : first_nonspace;
+		// find trailing space
+		size_t first_trailing_space = data.find_first_of(spacechar, first_nonspace);
+		if (first_trailing_space == std::string::npos)
+			first_trailing_space = data.length();
+		if ((first_trailing_space - first_char) > 0) {
+			size_t  lf_pos;
+			if (m_process_lf && xml_space == stx_preserve
+			    && (lf_pos = data.find('\n' != std::string::npos) )
+			    && lf_pos <  first_nonspace) {
+				// found line-feed characters in leading space
+				data = _split_into_lines(data, lf_pos, first_nonspace);
+				continue;
+			}
 			smiltext_run run = m_run_stack.top();
 			run.m_command = stc_data;
-			run.m_data = data.substr(first_nonblank, first_blank-first_nonblank);
+			run.m_data = data.substr(first_char, first_trailing_space-first_char);
 			AM_DBG lib::logger::get_logger()->debug("dx_smiltext_changed(): bg_col=0x%x, color=0x%x, data=%s", run.m_bg_color, run.m_color, run.m_data.c_str());
 			smiltext_runs::const_iterator where = m_runs.insert( m_runs.end(), run);
 			if (!m_newbegin_valid) {
 				m_newbegin = where;
 				m_newbegin_valid = true;
 			}
-			data = data.substr(first_blank);
+			data = data.substr(first_trailing_space);
 		} else {
 			data = data.substr(data.length());
 		}
@@ -159,23 +204,10 @@ smiltext_engine::_update() {
 			lib::xml_string data = item->get_data();
 			// XXX <pre>!
 			if (m_word_mode) {
-				_split_into_words(data);
+				_split_into_words(data, run.m_xml_space);
 				continue;
 			}
-			size_t first_nonblank = data.find_first_not_of(" \t\r\n");
-			size_t last_nonblank = data.find_last_not_of(" \t\r\n");
-			bool space_at_end = last_nonblank < data.size()-1;
-			if (first_nonblank != std::string::npos && last_nonblank != std::string::npos) {
-				run.m_data = data.substr(first_nonblank, last_nonblank-first_nonblank+1);
-				if (space_at_end) run.m_data += ' ';
-				if (run.m_data != "") {
-					smiltext_runs::const_iterator where = m_runs.insert(m_runs.end(), run);
-					if (!m_newbegin_valid) {
-						m_newbegin = where;
-						m_newbegin_valid = true;
-					}
-				}
-			}
+			run.m_data = data;
 		} else {
 			// Element. Check what it is.
 			lib::xml_string tag = item->get_local_name();
@@ -339,6 +371,16 @@ smiltext_engine::_get_formatting(smiltext_run& dst, const lib::node *src)
 			lib::logger::get_logger()->trace("%s: textFontStyle=\"%s\": unknown style", src->get_sig().c_str(), font_style);
 		}
 	}
+	// xml:space attribute
+	const char *xml_space = src->get_attribute("space");
+	if (xml_space) {
+		if (strcmp(xml_space, "preserve") == 0)     dst.m_xml_space = stx_preserve;
+		else if (strcmp(xml_space, "default") == 0) dst.m_xml_space = stx_default;
+		else if (strcmp(xml_space, "inherit") == 0) /* no-op */ ;
+		else {
+			lib::logger::get_logger()->trace("%s: xml:space=\"%s\": must be default or preserve", src->get_sig().c_str(), xml_space);
+		}
+	}
 }
 
 // Fill a run with the default formatting.
@@ -409,9 +451,10 @@ smiltext_engine::_get_default_params(smiltext_params& params)
 }
 
 // smiltext_layout_engine
-smiltext_layout_engine::smiltext_layout_engine(const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client)
+smiltext_layout_engine::smiltext_layout_engine(const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client, bool process_lf)
   :	m_engine(smiltext_engine(n, ep, client, true)),
 	m_finished(false),
+	m_process_lf(process_lf),
 	m_event_processor(ep),
 	m_provider(provider),
 	m_params(m_engine.get_params()),
@@ -421,24 +464,287 @@ smiltext_layout_engine::smiltext_layout_engine(const lib::node *n, lib::event_pr
 
 void
 smiltext_layout_engine::start(double t) {
-    m_epoch = m_event_processor->get_timer()->elapsed();
+//	m_lock.enter();
+	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_engine.start(t);
+//	m_lock.leave();
 }
 	
 void
 smiltext_layout_engine::seek(double t) {
+	m_lock.enter();
 	m_engine.seek(t);
+	m_lock.leave();
 }
 	
 void
 smiltext_layout_engine::stop() {
+	m_lock.enter();
 	m_engine.stop();
+	m_lock.leave();
 }
 	
 void
 smiltext_layout_engine::set_dest_rect( const lib::rect& r) {
+	m_lock.enter();
 	m_dest_rect = r;
+	m_lock.leave();
 }
+
+#ifdef	NEW_LAYOUT_ENGINE
+#else //NEW_LAYOUT_ENGINE
+#endif//NEW_LAYOUT_ENGINE
+
+#ifdef	NEW_LAYOUT_ENGINE
+smiltext_layout_word::smiltext_layout_word(smiltext_run run, smiltext_metrics stm, int nbr)
+  :	m_run(run),
+	m_leading_breaks(nbr),
+	m_metrics(stm)
+{
+	m_bounding_box = lib::rect(lib::point(0,0),
+				   lib::size(stm.get_width(), 
+					     stm.get_height()));
+}
+
+void
+smiltext_layout_engine::smiltext_changed() {
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::smiltext_changed(0x%x)", this);
+	if (m_engine.is_changed()) {
+		lib::xml_string data;
+		smil2::smiltext_runs::const_iterator i;
+
+		if (m_engine.is_cleared()) {
+			// Completely new text, clear the copy.
+	        	m_words.clear();
+			i = m_engine.begin();
+		} else {
+			// Only additions. Don't clear, store new stuff.
+			i = m_engine.newbegin();
+		}
+		int nbr = 0;
+		while (i != m_engine.end()) {
+			switch (i->m_command) {
+			case stc_break:
+		  		if (m_params.m_mode != stm_crawl 
+				    &&! m_params.m_wrap)
+				nbr++;
+				break;
+			case stc_data:
+				smiltext_metrics stm =
+					m_provider->get_smiltext_metrics (*i);
+				smiltext_layout_word word_info(*i, stm, nbr);
+				m_words.push_back(word_info);
+				nbr = 0;	
+			}			
+			i++;
+		}
+	}
+	m_lock.leave();
+}
+
+void
+smiltext_layout_engine::get_initial_values(//JNK lib::point shifted_origin,
+					   lib::rect rct,
+					   smiltext_layout_word* stlw_p,
+					   int* x_start_p,
+					   int* y_start_p, 
+					   int* x_dir_p,
+					   int* y_dir_p) {
+	switch (stlw_p->m_run.m_direction) {
+	default:
+	case std_ltr:
+		*x_start_p = rct.left();
+		*x_dir_p = 1;
+		break;
+	case std_rtl:
+		*x_start_p = rct.right();
+		*x_dir_p = -1;
+		break;
+	}
+	*y_start_p = rct.top();
+	/* TBD impl. textPlace attribute/
+	switch (i->m_run.m_place) {
+	default:
+	case stp_from_top:
+		*y_dir_p = 1;
+		*y_start_p = r.top() + shifted_origin.y;
+		break;
+	case stp_from_bottom:
+		//*y_dir_p = -1;
+		*y_dir_p = 1;
+		*y_start_p = r.bottom() + shifted_origin.y
+				- stlw_p->m_bounding_box.h;
+		break;
+	}
+	*/
+}
+
+void
+smiltext_layout_engine::redraw(const lib::rect& r) {
+	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x) r=(L=%d,T=%d,W=%d,H=%d", this,r.left(),r.top(),r.width(),r.height());
+	int nbr = 0; // number of breaks (newlines) before current line
+	m_lock.enter();
+
+	// Compute the shifted position of what we want to draw w.r.t. the visible origin
+	lib::point shifted_origin(0, 0);
+	if (m_params.m_mode == smil2::stm_crawl) {
+		long int elapsed = m_event_processor->get_timer()->elapsed();
+		double now = elapsed - m_epoch;
+		shifted_origin.x += (int) now * m_params.m_rate / 1000;
+		if (shifted_origin.x < 0)
+			AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): strange: shifted_x=%d, m_epoch=%ld, elpased=%ld !", this, shifted_origin.x, m_epoch, elapsed);
+	}
+	if (m_params.m_mode == smil2::stm_scroll) {
+		long int elapsed = m_event_processor->get_timer()->elapsed();
+		double now = elapsed - m_epoch;
+		shifted_origin.y += (int) now * m_params.m_rate / 1000;
+	}
+	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: shifted_origin(%d,%d)", shifted_origin.x, shifted_origin.y);
+
+	bool linefeed_processing = m_params.m_wrap 
+				&& m_params.m_mode != stm_crawl;
+
+	//TBD implement Align, Direction, Place, etc. by giving
+	// x_start, y_start, x_dir, y_dir proper initial values
+	int x_start = 0, y_start = 0, x_dir = 1, y_dir = 1;
+	get_initial_values(r, &*m_words.begin(),
+			   &x_start, &y_start, &x_dir, &y_dir);
+	int prev_max_ascent = 0, prev_max_descent = 0; 
+	std::vector<smiltext_layout_word>::iterator bol,// begin of line
+						    eol,// end of line
+						    word;
+	for (bol = m_words.begin(); bol != m_words.end(); bol = eol) {
+		unsigned int max_ascent = 0, max_descent = 0;
+		int x = x_start;
+		int y = y_start;
+		bool first_word = true;
+
+		// find end of line
+		for (word = bol; word != m_words.end(); word++) {
+			if (word != bol && word->m_leading_breaks != 0)
+				break;
+			// for each word on this line see if it fits
+			// for rtl, x==word->m_bounding_box.right()
+			if (word->m_run.m_direction == std_rtl)
+				word->m_bounding_box.x =
+					 x - word->m_bounding_box.w;
+			else	word->m_bounding_box.x = x;
+ 
+
+			word->m_bounding_box.y = y;
+			// first word in a line is shown always,
+			// because otherwise nothing would be shown:
+			// if it doesn't fit on a line it won't fit
+			// on the next line in a rectangle either
+			if (linefeed_processing && ! first_word
+			    &&  ! smiltext_fits(word->m_bounding_box,
+						r) ) {
+				if (word->m_leading_breaks == 0)
+					word->m_leading_breaks++;
+				break;
+			}
+			first_word = false;
+			// compute x-position of next word
+			x += (word->m_metrics.get_width() +
+			      word->m_metrics.get_word_spacing()
+			      ) * x_dir;
+			// find max. height (ascent+descent) of all words
+			if (word->m_metrics.get_ascent() > max_ascent)
+				max_ascent = 
+					word->m_metrics.get_ascent();
+			if (word->m_metrics.get_descent() > max_descent)
+				max_descent = 
+					word->m_metrics.get_descent();
+		}
+		eol = word;
+		std::vector<smiltext_layout_word>::iterator lol =
+					        word - 1;  // last on line
+		// alignment processing
+		int x_align = 0, x_min, x_max;
+		if (bol->m_run.m_direction == std_rtl) {
+	        	x_min = lol->m_bounding_box.left();
+			x_max = bol->m_bounding_box.right();
+		} else {
+			x_min = bol->m_bounding_box.left();
+			x_max = lol->m_bounding_box.right();
+		}
+		switch (bol->m_run.m_align) {
+		default:
+		case sta_left:
+			if (bol->m_run.m_direction == std_rtl
+			    && x_min > r.left())
+		  		x_align = r.left() - x_min;
+			break;
+		case sta_center:
+			if (bol->m_run.m_direction == std_ltr) {
+				if (x_max < r.right())
+					x_align = (r.right() - x_max)
+							  / 2;
+			} else {
+				if (x_min > r.left())
+					x_align = (r.left() - x_min)
+							  / 2;
+			}
+			break;
+		case sta_right:
+			if (bol->m_run.m_direction == std_ltr
+			    && x_max < r.right())
+		  		x_align = r.right() - x_max;
+			break;
+		}
+		if (linefeed_processing) {
+			// if a run starts with blank lines, take the
+			// height of the first line as line distance 
+			if (prev_max_ascent == 0)
+				prev_max_ascent = max_ascent;
+			if (prev_max_descent == 0)
+				prev_max_descent = max_descent;
+			// compute y-position of next line
+			y_start += (prev_max_ascent + prev_max_descent) *
+				bol->m_leading_breaks * y_dir;
+		}
+		for (word = bol; word != eol; word++) {
+			// alignment correction
+			word->m_bounding_box.x += x_align;
+			// baseline correction
+			word->m_bounding_box.y = 
+				y_start + max_ascent -
+				word->m_metrics.get_ascent();
+		}
+		prev_max_ascent = max_ascent;
+		prev_max_descent = max_descent;
+	}
+	// layout done, render the run
+	for (word = m_words.begin(); word != m_words.end(); word++) {
+		if (smiltext_disjunct (word->m_bounding_box, r))
+			continue;
+		int word_spacing = 0;
+		if (word != m_words.begin()) {
+			word_spacing = word->m_metrics.get_word_spacing();
+		}
+		word->m_bounding_box -= shifted_origin;
+		m_provider->render_smiltext(word->m_run,
+					    word->m_bounding_box,
+					    word_spacing);
+	}
+	m_lock.leave();
+}
+
+// return true if r1 completely fits horizontally in r2
+bool
+smiltext_layout_engine::smiltext_fits(const lib::rect& r1, const lib::rect& r2) {
+  return r2.left() <=  r1.left() && r1.right() <= r2.right();
+}
+
+// return true if r1 and r2 have a zero intersection
+bool
+smiltext_layout_engine::smiltext_disjunct(const lib::rect& r1, const lib::rect& r2) {
+	return (r1 & r2) == lib::rect();
+}
+
+
+#else //NEW_LAYOUT_ENGINE
 
 void
 smiltext_layout_engine::redraw(const lib::rect& r) {
@@ -479,7 +785,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	while (cur != m_engine.end()) {
 		// compute layout of next line
 		smil2::smiltext_runs::const_iterator bol = cur; // begin of line pointer
-		bool fits = false;
+		bool fits = true;
 		m_x = ldr.x;
 		if (nbr > 0 && (m_max_ascent != 0 || m_max_descent != 0)) {
 			// correct m_y for proper size of previous line
@@ -494,7 +800,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 				break;
 			cur++;
 		}
-		m_x = ldr.x; // m_x was modified by qt_smiltext_fits()
+		m_x = ldr.x; // m_x was modified by smiltext_fits()
 		// move down number of breaks times height of current line
 		m_y += (m_max_ascent + m_max_descent) * nbr;
 		if ((m_y-logical_origin.y) > m_dest_rect.bottom())
@@ -544,7 +850,6 @@ smiltext_layout_engine::smiltext_fits(const smil2::smiltext_run strun, const lib
 		m_max_descent = stm.get_descent();
 	return true;
 }
-
 lib::rect
 smiltext_layout_engine::smiltext_compute(const smil2::smiltext_run strun, const lib::rect& r, unsigned int* word_spacing) {
 
@@ -572,6 +877,8 @@ smiltext_layout_engine::smiltext_compute(const smil2::smiltext_run strun, const 
 
 	return rv;
 }
+#endif//NEW_LAYOUT_ENGINE
+
 
 
 }

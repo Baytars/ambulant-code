@@ -55,7 +55,7 @@ gui::qt::qt_smiltext_renderer::qt_smiltext_renderer(
 	m_bgopacity(1.0),
 	m_blending(false),
 	qt_renderer<renderer_playable>(context, cookie, node, evp),
-	m_layout_engine(smil2::smiltext_layout_engine(node, evp, this, this))
+	m_layout_engine(smil2::smiltext_layout_engine(node, evp, this, this, true))
 {
 	AM_DBG lib::logger::get_logger()->debug("qt_smiltext_renderer(0x%x)", this);
 }
@@ -121,6 +121,9 @@ gui::qt::qt_smiltext_renderer::marker_seen(const char *name)
 
 void
 gui::qt::qt_smiltext_renderer::smiltext_changed() {
+#ifdef	NEW_LAYOUT_ENGINE
+	m_layout_engine.smiltext_changed();
+#endif//NEW_LAYOUT_ENGINE
 	m_dest->need_redraw();
 }
 
@@ -209,7 +212,7 @@ gui::qt::qt_smiltext_renderer::render_smiltext(const smil2::smiltext_run& strun,
 	QPainter tx_paint, bg_paint;
 	lib::color_t text_color = strun.m_color;
 	lib::color_t bg_color = strun.m_bg_color;
-	if (ri->is_chromakey_specified()) {
+	if (ri && ri->is_chromakey_specified()) {
 		if (color_t_in_range (text_color, chroma_low, chroma_high))
 			alpha_media = alpha_chroma;
 		if (color_t_in_range (bg_color, chroma_low, chroma_high))
@@ -368,4 +371,26 @@ gui::qt::qt_smiltext_renderer::redraw_body(const lib::rect& dirty, common::gui_w
 
 }
 #endif //WITH_SMIL30
+
+#ifdef JUNK
+	if (m_engine.is_changed()) {
+		lib::xml_string data;
+		smil2::smiltext_runs::const_iterator i;
+		[m_text_storage beginEditing];
+		if (m_engine.is_cleared()) {
+			// Completely new text. Clear our copy and render everything.
+			NSRange all;
+			all.location = 0;
+			all.length = [m_text_storage length];
+			if (all.length);
+				[m_text_storage deleteCharactersInRange:all];
+			i = m_engine.begin();
+		} else {
+			// Only additions. Don't clear and only render the new stuff.
+			i = m_engine.newbegin();
+		}
+		while (i != m_engine.end()) {
+//#ifdef	NEW_LAYOUT_ENGINE
+#else //NEW_LAYOUT_ENGINE
+#endif//NEW_LAYOUT_ENGINE
 
