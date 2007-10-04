@@ -527,7 +527,7 @@ smiltext_layout_engine::smiltext_changed() {
 			switch (i->m_command) {
 			case stc_break:
 		  		if (m_params.m_mode != stm_crawl 
-				    &&! m_params.m_wrap)
+				    && m_params.m_wrap)
 				nbr++;
 				break;
 			case stc_data:
@@ -558,12 +558,14 @@ smiltext_layout_engine::get_initial_values(//JNK lib::point shifted_origin,
 		*x_dir_p = 1;
 		break;
 	case std_rtl:
+		// in right-to-left mode, everything is computed
+		//  w.r.t. the right-top corner of the bounding box
 		*x_start_p = rct.right();
 		*x_dir_p = -1;
 		break;
 	}
 	*y_start_p = rct.top();
-	/* TBD impl. textPlace attribute/
+	/* impl. textPlace attribute/
 	switch (i->m_run.m_place) {
 	default:
 	case stp_from_top:
@@ -586,19 +588,54 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	int nbr = 0; // number of breaks (newlines) before current line
 	m_lock.enter();
 
+	int x_start = 0, y_start = 0, x_dir = 1, y_dir = 1;
+	get_initial_values(r, &*m_words.begin(),
+			   &x_start, &y_start, &x_dir, &y_dir);
+	smil2::smiltext_align align = m_words.begin()->m_run.m_align;
+	smil2::smiltext_direction direction = m_words.begin()->m_run.m_direction;
+	if (direction == std_rtl)
+	  switch (align) {
+	  case sta_start:
+	  	align = sta_right;
+		break;
+	  case sta_end:
+	  	align = sta_left;
+	  default:
+	  	break;
+	  }
 	// Compute the shifted position of what we want to draw w.r.t. the visible origin
 	lib::point shifted_origin(0, 0);
 	if (m_params.m_mode == smil2::stm_crawl) {
 		long int elapsed = m_event_processor->get_timer()->elapsed();
 		double now = elapsed - m_epoch;
-		shifted_origin.x += (int) now * m_params.m_rate / 1000;
+		shifted_origin.x += (int) now * m_params.m_rate / 1000 * x_dir;
 		if (shifted_origin.x < 0)
 			AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): strange: shifted_x=%d, m_epoch=%ld, elpased=%ld !", this, shifted_origin.x, m_epoch, elapsed);
+		switch (align) {
+		default:
+		case sta_start:
+		case sta_left:
+			break;
+		case sta_center:
+			x_start = r.left() + (r.right() - r.left()) 
+							/ 2;
+			y_start = r.top() + (r.bottom() - r.top())
+							/ 2
+				- (m_words.begin()->m_bounding_box.height()) 
+						/ 2;
+			break;
+		case sta_right:
+		case sta_end:
+			if (direction == std_rtl)
+				x_start = r.left();
+			else	x_start = r.right();
+			break;
+		}
 	}
 	if (m_params.m_mode == smil2::stm_scroll) {
 		long int elapsed = m_event_processor->get_timer()->elapsed();
 		double now = elapsed - m_epoch;
-		shifted_origin.y += (int) now * m_params.m_rate / 1000;
+		shifted_origin.y += (int) now * m_params.m_rate / 1000 * y_dir;
 	}
 	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: shifted_origin(%d,%d)", shifted_origin.x, shifted_origin.y);
 
@@ -607,9 +644,6 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 
 	//TBD implement Align, Direction, Place, etc. by giving
 	// x_start, y_start, x_dir, y_dir proper initial values
-	int x_start = 0, y_start = 0, x_dir = 1, y_dir = 1;
-	get_initial_values(r, &*m_words.begin(),
-			   &x_start, &y_start, &x_dir, &y_dir);
 	int prev_max_ascent = 0, prev_max_descent = 0; 
 	std::vector<smiltext_layout_word>::iterator bol,// begin of line
 						    eol,// end of line
@@ -630,8 +664,6 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 				word->m_bounding_box.x =
 					 x - word->m_bounding_box.w;
 			else	word->m_bounding_box.x = x;
- 
-
 			word->m_bounding_box.y = y;
 			// first word in a line is shown always,
 			// because otherwise nothing would be shown:
@@ -658,26 +690,27 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 					word->m_metrics.get_descent();
 		}
 		eol = word;
-		std::vector<smiltext_layout_word>::iterator lol =
-					        word - 1;  // last on line
+		std::vector<smiltext_layout_word>::iterator lwl =
+					word - 1;  // last word on line
 		// alignment processing
 		int x_align = 0, x_min, x_max;
 		if (bol->m_run.m_direction == std_rtl) {
-	        	x_min = lol->m_bounding_box.left();
+	        	x_min = lwl->m_bounding_box.left();
 			x_max = bol->m_bounding_box.right();
 		} else {
 			x_min = bol->m_bounding_box.left();
-			x_max = lol->m_bounding_box.right();
+			x_max = lwl->m_bounding_box.right();
 		}
-		switch (bol->m_run.m_align) {
+		switch (align) {
 		default:
+		case sta_start:
 		case sta_left:
-			if (bol->m_run.m_direction == std_rtl
+			if (direction == std_rtl
 			    && x_min > r.left())
 		  		x_align = r.left() - x_min;
 			break;
 		case sta_center:
-			if (bol->m_run.m_direction == std_ltr) {
+			if (direction == std_ltr) {
 				if (x_max < r.right())
 					x_align = (r.right() - x_max)
 							  / 2;
@@ -687,8 +720,9 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 							  / 2;
 			}
 			break;
+		case sta_end:
 		case sta_right:
-			if (bol->m_run.m_direction == std_ltr
+			if (direction == std_ltr
 			    && x_max < r.right())
 		  		x_align = r.right() - x_max;
 			break;
@@ -717,13 +751,13 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	}
 	// layout done, render the run
 	for (word = m_words.begin(); word != m_words.end(); word++) {
-		if (smiltext_disjunct (word->m_bounding_box, r))
-			continue;
 		int word_spacing = 0;
 		if (word != m_words.begin()) {
 			word_spacing = word->m_metrics.get_word_spacing();
 		}
 		word->m_bounding_box -= shifted_origin;
+		if (smiltext_disjunct (word->m_bounding_box, r))
+			continue; // nothing to de displayed
 		m_provider->render_smiltext(word->m_run,
 					    word->m_bounding_box,
 					    word_spacing);

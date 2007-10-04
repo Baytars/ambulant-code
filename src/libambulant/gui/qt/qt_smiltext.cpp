@@ -97,6 +97,7 @@ gui::qt::qt_smiltext_renderer::start(double t) {
 	if ( ! (alpha_media == 1.0 && alpha_media_bg == 1.0 && alpha_chroma == 1.0) ) {
 		m_blending = true;
 	}
+	m_context->started(m_cookie);
 	m_lock.leave();
 }
 
@@ -371,26 +372,3 @@ gui::qt::qt_smiltext_renderer::redraw_body(const lib::rect& dirty, common::gui_w
 
 }
 #endif //WITH_SMIL30
-
-#ifdef JUNK
-	if (m_engine.is_changed()) {
-		lib::xml_string data;
-		smil2::smiltext_runs::const_iterator i;
-		[m_text_storage beginEditing];
-		if (m_engine.is_cleared()) {
-			// Completely new text. Clear our copy and render everything.
-			NSRange all;
-			all.location = 0;
-			all.length = [m_text_storage length];
-			if (all.length);
-				[m_text_storage deleteCharactersInRange:all];
-			i = m_engine.begin();
-		} else {
-			// Only additions. Don't clear and only render the new stuff.
-			i = m_engine.newbegin();
-		}
-		while (i != m_engine.end()) {
-//#ifdef	NEW_LAYOUT_ENGINE
-#else //NEW_LAYOUT_ENGINE
-#endif//NEW_LAYOUT_ENGINE
-
