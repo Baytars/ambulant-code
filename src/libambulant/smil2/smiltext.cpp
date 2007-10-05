@@ -526,9 +526,8 @@ smiltext_layout_engine::smiltext_changed() {
 		while (i != m_engine.end()) {
 			switch (i->m_command) {
 			case stc_break:
-		  		if (m_params.m_mode != stm_crawl 
-				    && m_params.m_wrap)
-				nbr++;
+				if (m_params.m_mode != stm_crawl )
+					nbr++;
 				break;
 			case stc_data:
 				smiltext_metrics stm =
@@ -639,8 +638,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	}
 	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: shifted_origin(%d,%d)", shifted_origin.x, shifted_origin.y);
 
-	bool linefeed_processing = m_params.m_wrap 
-				&& m_params.m_mode != stm_crawl;
+	bool linefeed_processing = m_params.m_mode != stm_crawl;
 
 	//TBD implement Align, Direction, Place, etc. by giving
 	// x_start, y_start, x_dir, y_dir proper initial values
@@ -667,11 +665,12 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			word->m_bounding_box.y = y;
 			// first word in a line is shown always,
 			// because otherwise nothing would be shown:
-			// if it doesn't fit on a line it won't fit
-			// on the next line in a rectangle either
-			if (linefeed_processing && ! first_word
-			    &&  ! smiltext_fits(word->m_bounding_box,
-						r) ) {
+			// if it doesn't fit on this line it won't fit
+			// on the next line in the rectangle either
+			if (linefeed_processing
+			    && ! first_word
+			    && m_params.m_wrap 
+			    &&  ! smiltext_fits(word->m_bounding_box,r)) {
 				if (word->m_leading_breaks == 0)
 					word->m_leading_breaks++;
 				break;
