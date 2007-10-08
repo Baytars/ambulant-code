@@ -115,9 +115,9 @@ gui::qt::qt_smiltext_renderer::stop() {
 void
 gui::qt::qt_smiltext_renderer::marker_seen(const char *name)
 {
-	m_lock.enter();
+//KB	m_lock.enter();
 	m_context->marker_seen(m_cookie, name);
-	m_lock.leave();
+//KB	m_lock.leave();
 }
 
 void

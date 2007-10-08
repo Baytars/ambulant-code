@@ -212,28 +212,20 @@ smiltext_engine::_update() {
 			// Element. Check what it is.
 			lib::xml_string tag = item->get_local_name();
 			if (tag == "tev" || tag == "clear") {
-				bool relative_time = false;
 				const char *time_str = item->get_attribute("begin");
-				if (!time_str) {
-					time_str = item->get_attribute("next");
-					if (!time_str) {
-						lib::logger::get_logger()->trace("smiltext: tev without begin or next attribute ignored");
-						continue;
-					}
-					relative_time = true;
-				}
-				double time = atof(time_str); // XXXJACK
-				if (relative_time)
-					m_tree_time = m_tree_time + time;
-				else
+				double time = 0;
+				if (time_str) {
+					time = atof(time_str); // XXXJACK
 					m_tree_time = time;
-				lib::timer::time_type ttime = m_epoch + int(time*1000);
-				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
-				if (ttime > now) {
-					next_update_needed = ttime-now;
-					break;
+				} else if (time_str = item->get_attribute("next")) {
+					time = atof(time_str);
+					m_tree_time = m_tree_time + time;
+				} else  {
+					lib::logger::get_logger()->trace("smiltext: tev without begin or next attribute ignored");
+					continue;
 				}
-				// else this time has already passed and we continue the loop
+				lib::timer::time_type ttime = m_epoch + int(round(m_tree_time*1000));
+				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
 				//
 				// If the node has an ID we raise a marker event. In the SMIL code this
 				// is actually specified as a beginEvent but there's magic in the parsing
@@ -243,11 +235,17 @@ smiltext_engine::_update() {
 				if (id) {
 					m_client->marker_seen(id);
 				}
-				if (tag == "clear") {
+				if (tag == "clear" || m_params.m_mode == stm_replace) {
 					m_runs.clear();
 					m_newbegin = m_runs.end();
 					m_newbegin_valid = false;
 				}
+				if (ttime > now) {
+					next_update_needed = ttime-now;
+					m_tree_iterator++;
+					break;
+				}
+				// else this time has already passed and we continue the loop
 			} else if (tag == "span") {
 				smiltext_run run = m_run_stack.top();
 				_get_formatting(run, item);
@@ -268,7 +266,9 @@ smiltext_engine::_update() {
 	}
 	if (m_client)
 		m_client->smiltext_changed();
-	if (m_params.m_rate > 0 && m_update_event == NULL) {
+	if (m_params.m_rate > 0
+	    && (m_params.m_mode == stm_crawl || m_params.m_mode == stm_jump
+		|| m_params.m_mode == stm_scroll)) {
 		// We need to schedule another update event to keep the scrolling/crawling going.
 		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
 		unsigned int delay = 1000 / m_params.m_rate;
@@ -890,7 +890,6 @@ smiltext_layout_engine::smiltext_compute(const smil2::smiltext_run strun, const 
 	smiltext_metrics stm = m_provider->get_smiltext_metrics (strun);
 	*word_spacing = stm.get_word_spacing();
 	rv.x += m_x + *word_spacing;
-//KB rv.w = stm.get_width()+ *word_spacing;
 	rv.w = stm.get_width();
 	m_x  += rv.w + *word_spacing;
 
