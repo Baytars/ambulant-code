@@ -199,15 +199,32 @@ smiltext_engine::_update() {
 		if (item->is_data_node()) {
 			// Characters. Add them to the run with current font/size/etc
 			smiltext_run run = m_run_stack.top();
-			// Trim all space characters. BUT if there is whitespace at the
-			// end leave one space there.
 			lib::xml_string data = item->get_data();
 			// XXX <pre>!
 			if (m_word_mode) {
 				_split_into_words(data, run.m_xml_space);
 				continue;
 			}
-			run.m_data = data;
+			// Trim all space characters. BUT if there is whitespace at the
+			// end leave one space there.
+			size_t first_nonblank = data.find_first_not_of(" \t\r\n");
+			size_t last_nonblank = data.find_last_not_of(" \t\r\n");
+			bool space_at_end = last_nonblank < data.size()-1;
+			if (run.m_xml_space != stx_preserve
+			    && first_nonblank != std::string::npos
+			    && last_nonblank != std::string::npos) {
+				run.m_data = data.substr(first_nonblank,
+							 last_nonblank-first_nonblank+1);
+				if (space_at_end) run.m_data += ' ';
+			} else run.m_data = data;
+			if (run.m_data != "") {
+				smiltext_runs::const_iterator where = 
+				  m_runs.insert(m_runs.end(), run);
+				if (!m_newbegin_valid) {
+					m_newbegin = where;
+					m_newbegin_valid = true;
+				}
+			}
 		} else {
 			// Element. Check what it is.
 			lib::xml_string tag = item->get_local_name();
@@ -224,13 +241,16 @@ smiltext_engine::_update() {
 					lib::logger::get_logger()->trace("smiltext: tev without begin or next attribute ignored");
 					continue;
 				}
-				lib::timer::time_type ttime = m_epoch + int(round(m_tree_time*1000));
-				lib::timer::time_type now = m_event_processor->get_timer()->elapsed();
+				lib::timer::time_type ttime = 
+					m_epoch + int(round(m_tree_time*1000));
+				lib::timer::time_type now =
+					m_event_processor->get_timer()->elapsed();
 				//
-				// If the node has an ID we raise a marker event. In the SMIL code this
-				// is actually specified as a beginEvent but there's magic in the parsing
-				// of the begin attribute to translate this to a marker event on the smiltext
-				// node in case the beginEvent references a tev/clear.
+				// If the node has an ID we raise a marker event.
+				// In the SMIL code this is actually specified as a beginEvent
+				// but there's magic in the parsing of the begin attribute
+				// to translate this to a marker event on the smiltext node
+				// in case the beginEvent references a tev/clear.
 				const char *id = item->get_attribute("id");
 				if (id) {
 					m_client->marker_seen(id);
@@ -254,7 +274,8 @@ smiltext_engine::_update() {
 				smiltext_run run = m_run_stack.top();
 				run.m_data = "";
 				run.m_command = stc_break;
-				smiltext_runs::const_iterator where = m_runs.insert( m_runs.end(), run);
+				smiltext_runs::const_iterator where =
+					m_runs.insert( m_runs.end(), run);
 				if (!m_newbegin_valid) {
 					m_newbegin = where;
 					m_newbegin_valid = true;
@@ -269,7 +290,7 @@ smiltext_engine::_update() {
 	if (m_params.m_rate > 0
 	    && (m_params.m_mode == stm_crawl || m_params.m_mode == stm_jump
 		|| m_params.m_mode == stm_scroll)) {
-		// We need to schedule another update event to keep the scrolling/crawling going.
+		// We need to schedule another update event to keep the scroll/crawl going.
 		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
 		unsigned int delay = 1000 / m_params.m_rate;
 		if (delay < 40) delay = 40;
