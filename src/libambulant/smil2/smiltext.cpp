@@ -157,7 +157,7 @@ smiltext_engine::_split_into_words(lib::xml_string data, smil2::smiltext_xml_spa
 		if ((first_trailing_space - first_char) > 0) {
 			size_t  lf_pos;
 			if (m_process_lf && xml_space == stx_preserve
-			    && (lf_pos = data.find('\n' != std::string::npos) )
+			    && (lf_pos = data.find('\n')) != std::string::npos
 			    && lf_pos <  first_nonspace) {
 				// found line-feed characters in leading space
 				data = _split_into_lines(data, lf_pos, first_nonspace);
@@ -607,7 +607,10 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x) r=(L=%d,T=%d,W=%d,H=%d", this,r.left(),r.top(),r.width(),r.height());
 	int nbr = 0; // number of breaks (newlines) before current line
 	m_lock.enter();
-
+	if (&*m_words.begin() == NULL) {
+		m_lock.leave();
+		return;
+	}
 	int x_start = 0, y_start = 0, x_dir = 1, y_dir = 1;
 	get_initial_values(r, &*m_words.begin(),
 			   &x_start, &y_start, &x_dir, &y_dir);
@@ -757,6 +760,9 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			// compute y-position of next line
 			y_start += (prev_max_ascent + prev_max_descent) *
 				bol->m_leading_breaks * y_dir;
+			if (m_params.m_mode == smil2::stm_jump
+			    && y_start + max_ascent + max_descent > r.bottom())
+				shifted_origin.y += max_ascent + max_descent;
 		}
 		for (word = bol; word != eol; word++) {
 			// alignment correction
