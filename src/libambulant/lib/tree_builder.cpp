@@ -255,9 +255,9 @@ lib::tree_builder::characters(const char *buf, size_t len) {
 			const char* s = buf;
 			char* d = m_buf;
 			int si = 0, di = 0;
-			if (m_bufsize < len) 
+			if (m_bufsize < (len+1)) 
 				// ensure m_buf is big enough
-				m_buf = (char*) realloc (m_buf, m_bufsize = len);
+				m_buf = (char*) realloc (m_buf, m_bufsize = (len+1));
 			assert(m_buf);
 			while (si < len) {
 				// trim leading space

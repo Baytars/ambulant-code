@@ -256,13 +256,14 @@ gui::qt::qt_smiltext_renderer::render_smiltext(const smil2::smiltext_run& strun,
 		tx_paint.setPen(Qt::NoPen);
 		tx_paint.drawRect(L,T,W,H);
 	}
+	int flags = Qt::AlignAuto;
 	tx_paint.setPen(qt_color);
 	if (m_blending)
 		tx_paint.drawText(word_spacing,0,W-word_spacing,H,
-				  Qt::AlignAuto, strun.m_data);
+				  flags, strun.m_data);
 	else
 		tx_paint.drawText(L+word_spacing,T,W-word_spacing,H,
-				  Qt::AlignAuto, strun.m_data);
+				  flags, strun.m_data);
 	tx_paint.flush();
 	tx_paint.end();
 	
