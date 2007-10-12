@@ -23,6 +23,8 @@
 
 #include "ambulant/smil2/smiltext.h"
 #include "ambulant/lib/callback.h"
+#include <math.h>
+#define round(x) ((int)((x)+0.5))
 
 //#define AM_DBG if(1)
 #ifndef AM_DBG
@@ -242,7 +244,7 @@ smiltext_engine::_update() {
 					continue;
 				}
 				lib::timer::time_type ttime = 
-					m_epoch + int(round(m_tree_time*1000));
+					m_epoch + round(m_tree_time*1000);
 				lib::timer::time_type now =
 					m_event_processor->get_timer()->elapsed();
 				//

@@ -261,10 +261,10 @@ lib::tree_builder::characters(const char *buf, size_t len) {
 			assert(m_buf);
 			while (si < len) {
 				// trim leading space
-				while (*s && isspace(*s) && si++ < len)
+				while (*s && *s > 0 && isspace(*s) && si++ < len)
 					s++;
 				// copy non-space characters
-				while (*s && ! isspace(*s) && si++ < len)
+				while (*s &&  *s > 0 && ! isspace(*s) && si++ < len)
 					*d++ = *s++;
 				if (si < len)
 					*d++ = ' ';
