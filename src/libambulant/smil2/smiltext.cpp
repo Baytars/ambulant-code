@@ -290,8 +290,7 @@ smiltext_engine::_update() {
 	if (m_client)
 		m_client->smiltext_changed();
 	if (m_params.m_rate > 0
-	    && (m_params.m_mode == stm_crawl || m_params.m_mode == stm_jump
-		|| m_params.m_mode == stm_scroll)) {
+	    && (m_params.m_mode == stm_crawl || m_params.m_mode == stm_scroll)) {
 		// We need to schedule another update event to keep the scroll/crawl going.
 		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
 		unsigned int delay = 1000 / m_params.m_rate;
@@ -344,16 +343,6 @@ smiltext_engine::_get_formatting(smiltext_run& dst, const lib::node *src)
 		dst.m_transparent = false;
 		dst.m_color = lib::to_color(color);
 	}
-	const char *direction = src->get_attribute("textDirection");
-	if (direction) {
-		if (strcmp(direction, "ltr") == 0) dst.m_direction = std_ltr;
-		else if (strcmp(direction, "rtl") == 0) dst.m_direction = std_rtl;
-		else if (strcmp(direction, "inherit") == 0) /* no-op */;
-		else {
-			lib::logger::get_logger()->trace("%s: textDirection=\"%s\": unknown direction", src->get_sig().c_str(), direction);
-		}
-		
-	}
 	const char *font_family = src->get_attribute("textFontFamily");
 	if (font_family) {
 		dst.m_font_family = font_family;
@@ -394,6 +383,28 @@ smiltext_engine::_get_formatting(smiltext_run& dst, const lib::node *src)
 			lib::logger::get_logger()->trace("%s: textFontStyle=\"%s\": unknown style", src->get_sig().c_str(), font_style);
 		}
 	}
+	const char *text_place = src->get_attribute("textPlace");
+	if (text_place) {
+		if (strcmp(text_place, "fromTop") == 0) dst.m_text_place = stp_from_top;
+		else if (strcmp(text_place, "fromBottom") == 0) dst.m_text_place = stp_from_bottom;
+		else if (strcmp(text_place, "inherit") == 0) /* no-op */;
+		else {
+			lib::logger::get_logger()->trace("%s: textPlace=\"%s\": unknown textPlace", src->get_sig().c_str(), text_place);
+		}
+	}
+	const char *writing_mode = src->get_attribute("textWritingMode");
+	if (writing_mode) {
+		if (strcmp(writing_mode, "lr") == 0) dst.m_writing_mode = stw_lr_tb;
+		else if (strcmp(writing_mode, "lr-tb") == 0) dst.m_writing_mode = stw_lr_tb;
+		else if (strcmp(writing_mode, "rl") == 0) dst.m_writing_mode = stw_rl_tb;
+		else if (strcmp(writing_mode, "rl-tb") == 0) dst.m_writing_mode = stw_rl_tb;
+		else if (strcmp(writing_mode, "tb-lr") == 0) dst.m_writing_mode = stw_tb_lr;
+		else if (strcmp(writing_mode, "tb-rl") == 0) dst.m_writing_mode = stw_tb_rl;
+		else if (strcmp(writing_mode, "inherit") == 0) /* no-op */;
+		else {
+			lib::logger::get_logger()->trace("%s: textWritingMode=\"%s\": unknown writing_mode", src->get_sig().c_str(), writing_mode);
+		}
+	}
 	// xml:space attribute
 	const char *xml_space = src->get_attribute("space");
 	if (xml_space) {
@@ -419,7 +430,7 @@ smiltext_engine::_get_default_formatting(smiltext_run& dst)
 	dst.m_bg_transparent = true;
 	dst.m_bg_color = lib::color_t(0);
 	dst.m_align = sta_start;
-	dst.m_direction = std_ltr;
+	dst.m_writing_mode = stw_lr_tb;
 }
 
 // Fill smiltext_params from a node
@@ -566,20 +577,20 @@ smiltext_layout_engine::smiltext_changed() {
 }
 
 void
-smiltext_layout_engine::get_initial_values(//JNK lib::point shifted_origin,
+smiltext_layout_engine::get_initial_values(
 					   lib::rect rct,
 					   smiltext_layout_word* stlw_p,
 					   int* x_start_p,
 					   int* y_start_p, 
 					   int* x_dir_p,
 					   int* y_dir_p) {
-	switch (stlw_p->m_run.m_direction) {
+	switch (stlw_p->m_run.m_writing_mode) {
 	default:
-	case std_ltr:
+	case stw_lr_tb:
 		*x_start_p = rct.left();
 		*x_dir_p = 1;
 		break;
-	case std_rtl:
+	case stw_rl_tb:
 		// in right-to-left mode, everything is computed
 		//  w.r.t. the right-top corner of the bounding box
 		*x_start_p = rct.right();
@@ -587,21 +598,19 @@ smiltext_layout_engine::get_initial_values(//JNK lib::point shifted_origin,
 		break;
 	}
 	*y_start_p = rct.top();
-	/* impl. textPlace attribute/
-	switch (i->m_run.m_place) {
+	/* implementation of textPlace attribute */
+	switch (stlw_p->m_run.m_text_place) {
 	default:
 	case stp_from_top:
 		*y_dir_p = 1;
-		*y_start_p = r.top() + shifted_origin.y;
+		*y_start_p = rct.top();
 		break;
 	case stp_from_bottom:
 		//*y_dir_p = -1;
 		*y_dir_p = 1;
-		*y_start_p = r.bottom() + shifted_origin.y
-				- stlw_p->m_bounding_box.h;
+		*y_start_p = rct.bottom() - stlw_p->m_bounding_box.h;
 		break;
 	}
-	*/
 }
 
 void
@@ -617,8 +626,8 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 	get_initial_values(r, &*m_words.begin(),
 			   &x_start, &y_start, &x_dir, &y_dir);
 	smil2::smiltext_align align = m_words.begin()->m_run.m_align;
-	smil2::smiltext_direction direction = m_words.begin()->m_run.m_direction;
-	if (direction == std_rtl)
+	smil2::smiltext_writing_mode writing_mode = m_words.begin()->m_run.m_writing_mode;
+	if (writing_mode == stw_rl_tb)
 	  switch (align) {
 	  case sta_start:
 	  	align = sta_right;
@@ -651,7 +660,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			break;
 		case sta_right:
 		case sta_end:
-			if (direction == std_rtl)
+			if (writing_mode == stw_rl_tb)
 				x_start = r.left();
 			else	x_start = r.right();
 			break;
@@ -666,7 +675,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 
 	bool linefeed_processing = m_params.m_mode != stm_crawl;
 
-	//TBD implement Align, Direction, Place, etc. by giving
+	//TBD implement Align, writing_mode, Place, etc. by giving
 	// x_start, y_start, x_dir, y_dir proper initial values
 	int prev_max_ascent = 0, prev_max_descent = 0; 
 	std::vector<smiltext_layout_word>::iterator bol,// begin of line
@@ -684,7 +693,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 				break;
 			// for each word on this line see if it fits
 			// for rtl, x==word->m_bounding_box.right()
-			if (word->m_run.m_direction == std_rtl)
+			if (word->m_run.m_writing_mode == stw_rl_tb)
 				word->m_bounding_box.x =
 					 x - word->m_bounding_box.w;
 			else	word->m_bounding_box.x = x;
@@ -719,7 +728,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 					word - 1;  // last word on line
 		// alignment processing
 		int x_align = 0, x_min, x_max;
-		if (bol->m_run.m_direction == std_rtl) {
+		if (bol->m_run.m_writing_mode == stw_rl_tb) {
 	        	x_min = lwl->m_bounding_box.left();
 			x_max = bol->m_bounding_box.right();
 		} else {
@@ -730,12 +739,12 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 		default:
 		case sta_start:
 		case sta_left:
-			if (direction == std_rtl
+			if (writing_mode == stw_rl_tb
 			    && x_min > r.left())
 		  		x_align = r.left() - x_min;
 			break;
 		case sta_center:
-			if (direction == std_ltr) {
+			if (writing_mode == stw_lr_tb) {
 				if (x_max < r.right())
 					x_align = (r.right() - x_max)
 							  / 2;
@@ -747,7 +756,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			break;
 		case sta_end:
 		case sta_right:
-			if (direction == std_ltr
+			if (writing_mode == stw_lr_tb
 			    && x_max < r.right())
 		  		x_align = r.right() - x_max;
 			break;
@@ -763,7 +772,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			y_start += (prev_max_ascent + prev_max_descent) *
 				bol->m_leading_breaks * y_dir;
 			if (m_params.m_mode == smil2::stm_jump
-			    && y_start + max_ascent + max_descent > r.bottom())
+			    && y_start + (int) max_ascent + (int) max_descent > r.bottom())
 				shifted_origin.y += max_ascent + max_descent;
 		}
 		for (word = bol; word != eol; word++) {

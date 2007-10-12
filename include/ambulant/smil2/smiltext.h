@@ -55,7 +55,7 @@ enum smiltext_mode {
 struct smiltext_params {
 	smiltext_mode m_mode;	/// How the text is rendered
 	bool	m_loop;		/// Loop mode, valid for scroll/crawl
-	int	m_rate;		/// Rate, in pixels/second
+	int		m_rate;		/// Rate, in pixels/second
 	bool	m_wrap;		/// Text should be line-wrapped
 };
 	
@@ -63,12 +63,6 @@ struct smiltext_params {
 enum smiltext_command {
 	stc_data,
 	stc_break
-};
-
-/// Values for the textDirection attribute of text spans
-enum smiltext_direction {
-	std_ltr,
-	std_rtl
 };
 
 /// Values for the textAlign attribute of text spans
@@ -92,6 +86,20 @@ enum smiltext_font_style {
 enum smiltext_font_weight {
 	stw_normal,
 	stw_bold
+};
+
+/// Values for the textPlace attribute of smilText elements
+enum smiltext_place {
+	stp_from_top,
+	stp_from_bottom
+};
+
+/// Values for the textWritingMode attribute of smilText elements
+enum smiltext_writing_mode {
+	stw_lr_tb,
+	stw_rl_tb,
+	stw_tb_lr,
+	stw_tb_rl
 };
 
 /// Values for the xml:space attribute of text spans
@@ -118,7 +126,8 @@ class smiltext_run {
 	bool					m_bg_transparent;
 	lib::color_t			m_bg_color;
 	smiltext_align			m_align;
-	smiltext_direction		m_direction;
+	smiltext_place			m_text_place;
+	smiltext_writing_mode	m_writing_mode;
 	smiltext_xml_space		m_xml_space;
 };
 
