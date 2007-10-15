@@ -193,8 +193,21 @@ smiltext_engine::_update() {
 		if (!(*m_tree_iterator).first) {
 			// Pop the stack, if needed
 			const lib::xml_string &tag = item->get_local_name();
-			if (tag == "span" || tag == "pre")
+			if (tag == "div" || tag == "p" || tag == "span") {
+				if (tag == "div" || tag == "p") {
+					// insert implicit line break
+					smiltext_run run = m_run_stack.top();
+					run.m_data = "";
+					run.m_command = stc_break;
+					smiltext_runs::const_iterator where =
+						m_runs.insert( m_runs.end(), run);
+					if (!m_newbegin_valid) {
+						m_newbegin = where;
+						m_newbegin_valid = true;
+					}
+				}
 				m_run_stack.pop();
+			}
 			continue;
 		}
 		
@@ -268,19 +281,23 @@ smiltext_engine::_update() {
 					break;
 				}
 				// else this time has already passed and we continue the loop
-			} else if (tag == "span") {
-				smiltext_run run = m_run_stack.top();
-				_get_formatting(run, item);
-				m_run_stack.push(run);
-			} else if (tag == "br") {
-				smiltext_run run = m_run_stack.top();
-				run.m_data = "";
-				run.m_command = stc_break;
-				smiltext_runs::const_iterator where =
-					m_runs.insert( m_runs.end(), run);
-				if (!m_newbegin_valid) {
-					m_newbegin = where;
-					m_newbegin_valid = true;
+			} else if (tag == "br" || tag == "span" || tag == "p" || tag == "div") {
+				if (tag != "br") {
+					smiltext_run run = m_run_stack.top();
+					_get_formatting(run, item);
+					m_run_stack.push(run);
+				}
+				if (tag == "br" || tag == "div" || tag == "p") {
+					// insert line break
+					smiltext_run run = m_run_stack.top();
+					run.m_data = "";
+					run.m_command = stc_break;
+					smiltext_runs::const_iterator where =
+						m_runs.insert( m_runs.end(), run);
+					if (!m_newbegin_valid) {
+						m_newbegin = where;
+						m_newbegin_valid = true;
+					}
 				}
 			} else {
 				lib::logger::get_logger()->trace("smiltext: unknown tag <%s>", tag.c_str());
@@ -772,8 +789,15 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 			y_start += (prev_max_ascent + prev_max_descent) *
 				bol->m_leading_breaks * y_dir;
 			if (m_params.m_mode == smil2::stm_jump
-			    && y_start + (int) max_ascent + (int) max_descent > r.bottom())
-				shifted_origin.y += max_ascent + max_descent;
+			    && (y_start - shifted_origin.y
+				+ (int) max_ascent + (int) max_descent)
+			    				> r.bottom()) {
+				int rate = 1;
+				if (m_params.m_rate > 1)
+					rate = m_params.m_rate;
+				shifted_origin.y += rate *
+						    (max_ascent + max_descent);
+			}
 		}
 		for (word = bol; word != eol; word++) {
 			// alignment correction
