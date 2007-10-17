@@ -146,7 +146,6 @@ gui::dx::dx_smiltext_renderer::marker_seen(const char *name)
 
 void
 gui::dx::dx_smiltext_renderer::smiltext_changed() {
-#ifdef	NEW_LAYOUT_ENGINE
 	bool got_hdc = false;
 	if (m_hdc == NULL) {
 		m_hdc = CreateCompatibleDC(m_hdc);
@@ -163,7 +162,6 @@ gui::dx::dx_smiltext_renderer::smiltext_changed() {
 		}	
 		m_hdc = NULL;
 	}
-#endif//NEW_LAYOUT_ENGINE
 	m_dest->need_redraw();
 }
 

@@ -190,20 +190,24 @@ smiltext_engine::_update() {
 	for( ; !m_tree_iterator.is_end(); m_tree_iterator++) {
 		assert(!m_run_stack.empty());
 		const lib::node *item = (*m_tree_iterator).second;
+
 		if (!(*m_tree_iterator).first) {
 			// Pop the stack, if needed
 			const lib::xml_string &tag = item->get_local_name();
 			if (tag == "div" || tag == "p" || tag == "span") {
-				if (tag == "div" || tag == "p") {
-					// insert implicit line break
+				if (m_params.m_mode != stm_crawl 
+				    && (tag == "div" || tag == "p")) {
 					smiltext_run run = m_run_stack.top();
-					run.m_data = "";
-					run.m_command = stc_break;
-					smiltext_runs::const_iterator where =
-						m_runs.insert( m_runs.end(), run);
-					if (!m_newbegin_valid) {
-						m_newbegin = where;
-						m_newbegin_valid = true;
+					if (run.m_xml_space != stx_preserve) {
+						// insert implicit line break
+						run.m_data = "";
+						run.m_command = stc_break;
+						smiltext_runs::const_iterator where =
+							m_runs.insert(m_runs.end(), run);
+						if (!m_newbegin_valid) {
+							m_newbegin = where;
+							m_newbegin_valid = true;
+						}
 					}
 				}
 				m_run_stack.pop();
@@ -258,7 +262,7 @@ smiltext_engine::_update() {
 				}
 				lib::timer::time_type ttime = 
 					m_epoch + round(m_tree_time*1000);
-				lib::timer::time_type now =
+				lib::timer::time_type  now =
 					m_event_processor->get_timer()->elapsed();
 				//
 				// If the node has an ID we raise a marker event.
@@ -287,16 +291,20 @@ smiltext_engine::_update() {
 					_get_formatting(run, item);
 					m_run_stack.push(run);
 				}
-				if (tag == "br" || tag == "div" || tag == "p") {
-					// insert line break
+				if (m_params.m_mode != stm_crawl 
+					&& (tag == "br" 
+					    || tag == "div" || tag == "p")) {
 					smiltext_run run = m_run_stack.top();
-					run.m_data = "";
-					run.m_command = stc_break;
-					smiltext_runs::const_iterator where =
+					if (run.m_xml_space != stx_preserve) {
+						// insert line break
+						run.m_data = "";
+						run.m_command = stc_break;
+							smiltext_runs::const_iterator where =
 						m_runs.insert( m_runs.end(), run);
-					if (!m_newbegin_valid) {
-						m_newbegin = where;
-						m_newbegin_valid = true;
+						if (!m_newbegin_valid) {
+							m_newbegin = where;
+							m_newbegin_valid = true;
+						}
 					}
 				}
 			} else {
@@ -542,11 +550,6 @@ smiltext_layout_engine::set_dest_rect( const lib::rect& r) {
 	m_lock.leave();
 }
 
-#ifdef	NEW_LAYOUT_ENGINE
-#else //NEW_LAYOUT_ENGINE
-#endif//NEW_LAYOUT_ENGINE
-
-#ifdef	NEW_LAYOUT_ENGINE
 smiltext_layout_word::smiltext_layout_word(smiltext_run run, smiltext_metrics stm, int nbr)
   :	m_run(run),
 	m_leading_breaks(nbr),
@@ -692,8 +695,8 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 
 	bool linefeed_processing = m_params.m_mode != stm_crawl;
 
-	//TBD implement Align, writing_mode, Place, etc. by giving
-	// x_start, y_start, x_dir, y_dir proper initial values
+	// textAlign, textWritingMode, textPlace, etc. is  implemented
+	// by giving x_start|y_start|x_dir|y_dir proper initial values
 	int prev_max_ascent = 0, prev_max_descent = 0; 
 	std::vector<smiltext_layout_word>::iterator bol,// begin of line
 						    eol,// end of line
@@ -703,7 +706,7 @@ smiltext_layout_engine::redraw(const lib::rect& r) {
 		int x = x_start;
 		int y = y_start;
 		bool first_word = true;
-
+		align = bol->m_run.m_align;
 		// find end of line
 		for (word = bol; word != m_words.end(); word++) {
 			if (word != bol && word->m_leading_breaks != 0)
@@ -837,142 +840,6 @@ bool
 smiltext_layout_engine::smiltext_disjunct(const lib::rect& r1, const lib::rect& r2) {
 	return (r1 & r2) == lib::rect();
 }
-
-
-#else //NEW_LAYOUT_ENGINE
-
-void
-smiltext_layout_engine::redraw(const lib::rect& r) {
-	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x) r=(L=%d,T=%d,W=%d,H=%d", this,r.left(),r.top(),r.width(),r.height());
-	int nbr = 0; // number of breaks (newlines) before current line
-
-	// Compute the shifted position of what we want to draw w.r.t. the visible origin
-	lib::point logical_origin(0, 0);
-	if (m_params.m_mode == smil2::stm_crawl) {
-		long int elapsed = m_event_processor->get_timer()->elapsed();
-		double now = elapsed - m_epoch;
-		logical_origin.x += (int) now * m_params.m_rate / 1000;
-		if (logical_origin.x < 0)
-			AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): strange: logical_x=%d, m_epoch=%ld, elpased=%ld !", this, logical_origin.x, m_epoch, elapsed);
-	}
-	if (m_params.m_mode == smil2::stm_scroll) {
-		long int elapsed = m_event_processor->get_timer()->elapsed();
-		double now = elapsed - m_epoch;
-		logical_origin.y += (int) now * m_params.m_rate / 1000;
-	}
-	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: logical_origin(%d,%d)", logical_origin.x, logical_origin.y);
-
-	// Always re-compute and re-render everything when new text is added.
-	// E.g. word with bigger font may need adjustment of prior text 
-	// Therefore, m_engine.newbegin() is can NOT be used
-	smil2::smiltext_runs::const_iterator cur = m_engine.begin();
-	lib::rect ldr = m_dest_rect; // logical destination rectangle
-
-	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): ldr=(L=%d,T=%d,W=%d,H=%d", this,ldr.left(),ldr.top(),ldr.width(),ldr.height());
-
-	m_y = ldr.y;
-	m_max_ascent = m_max_descent = 0;
-	// count number of initial breaks before first line
-	while (cur->m_command == smil2::stc_break) {
-		nbr++;
-		cur++;
-	}
-	while (cur != m_engine.end()) {
-		// compute layout of next line
-		smil2::smiltext_runs::const_iterator bol = cur; // begin of line pointer
-		bool fits = true;
-		m_x = ldr.x;
-		if (nbr > 0 && (m_max_ascent != 0 || m_max_descent != 0)) {
-			// correct m_y for proper size of previous line
-			m_y += (m_max_ascent + m_max_descent);
-			nbr--;
-		}
-		m_max_ascent = m_max_descent = 0;
-		AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(): command=%d data=%s",cur->m_command,cur->m_data.c_str()==NULL?"(null)":cur->m_data.c_str());
-		while (cur != m_engine.end()) {
-			fits = smiltext_fits(*cur, m_dest_rect);
-			if ( ! fits || cur->m_command == smil2::stc_break)
-				break;
-			cur++;
-		}
-		m_x = ldr.x; // m_x was modified by smiltext_fits()
-		// move down number of breaks times height of current line
-		m_y += (m_max_ascent + m_max_descent) * nbr;
-		if ((m_y-logical_origin.y) > m_dest_rect.bottom())
-			// line falls outside visible rect
-			break;
-		// count number of breaks in front of next line
-		nbr = 0;
-		while (cur != m_engine.end() && cur->m_command == smil2::stc_break) {
-			nbr++;
-			cur++;
-		}
-		if ( ! fits && nbr == 0)
-			nbr = 1;
-		bool initial = true;
-		while (bol != cur) {
-			assert(bol != m_engine.end());
-			// compute rectangle where to render this text
-			unsigned int word_spacing;
-			lib::rect cr = smiltext_compute(*bol, r, &word_spacing);
-			cr.x -= logical_origin.x;
-			cr.y -= logical_origin.y;
-			AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(): x=%d\ty=%d\tcommand=%d data=%s", cr.x, cr.y, bol->m_command,bol->m_data.c_str()==NULL?"(null)":bol->m_data.c_str());
-			m_provider->render_smiltext(*bol, cr, initial?0:word_spacing);
-			if (initial)
-				initial = false;
-			bol++;
-		}
-	}
-	m_engine.done();
-	m_finished = m_engine.is_finished();
-}
-
-bool
-smiltext_layout_engine::smiltext_fits(const smil2::smiltext_run strun, const lib::rect& r) {
-
-	smiltext_metrics stm =  m_provider->get_smiltext_metrics (strun);
-
-	int x = m_x;
-	x += stm.get_word_spacing();
-	x += stm.get_width();
-	if (x > r.right())
-		return false;
-	m_x = x;
- 	if (stm.get_ascent() > m_max_ascent)
-		m_max_ascent = stm.get_ascent();
-	if (stm.get_descent() > m_max_descent)
-		m_max_descent = stm.get_descent();
-	return true;
-}
-lib::rect
-smiltext_layout_engine::smiltext_compute(const smil2::smiltext_run strun, const lib::rect& r, unsigned int* word_spacing) {
-
-	lib::rect rv = r;
-	smiltext_metrics stm = m_provider->get_smiltext_metrics (strun);
-	*word_spacing = stm.get_word_spacing();
-	rv.x += m_x + *word_spacing;
-	rv.w = stm.get_width();
-	m_x  += rv.w + *word_spacing;
-
-	rv.y += (m_y + m_max_ascent - stm.get_ascent());
-	rv.h = stm.get_height();
-	/* clip rectangle */
-	if (rv.x >= r.x + (int) r.w)
-		rv.w = 0;
-	else if (rv.x + (int) rv.w > r.x + (int) r.w)
-		rv.w = (unsigned int) (r.x + (int) r.w - rv.x);
-	if (rv.y >= r.y + (int)r.h)
-		rv.h = 0;
-	else if (rv.y + (int)rv.h > r.y + (int)r.h)
-		rv.h = (unsigned int) (r.y + (int)r.h - rv.y);
-
-	AM_DBG lib::logger::get_logger()->debug("smiltext_compute(): x=%d\ty=%d\tcommand=%d data=%s", rv.x, rv.y, strun.m_command, strun.m_data.c_str()==NULL?"(null)":strun.m_data.c_str());
-
-	return rv;
-}
-#endif//NEW_LAYOUT_ENGINE
-
 
 
 }

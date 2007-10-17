@@ -270,12 +270,6 @@ class smiltext_layout_provider {
 	virtual void render_smiltext(const smiltext_run& str, const lib::rect& r, unsigned int word_spacing) = 0;
 };
 
-#define	NEW_LAYOUT_ENGINE
-#ifdef	NEW_LAYOUT_ENGINE
-#else //NEW_LAYOUT_ENGINE
-#endif//NEW_LAYOUT_ENGINE
-
-#ifdef	NEW_LAYOUT_ENGINE
 class smiltext_layout_word {
 
   public:
@@ -328,47 +322,6 @@ class smiltext_layout_engine {
 
 	std::vector<smiltext_layout_word> m_words;
 };
-#else //NEW_LAYOUT_ENGINE
-class smiltext_layout_engine {
-  public:
-	smiltext_layout_engine (const lib::node *n, lib::event_processor *ep, smiltext_layout_provider* provider, smiltext_notification* client, bool process_lf);
-	/// Start the engine.
-	void start(double t);
-	
-	/// Seek the engine in time.
-	void seek(double t);
-	
-	/// Stop the engine.
-	void stop();
-	
-	/// Returns true if all text has been received.
-	bool is_finished() { return m_finished; }
-
-	/// Redraw a rectangle.on screen 
-	void redraw(const lib::rect& r);
-
-	/// Set destination rectangle.on screen
-	void set_dest_rect(const lib::rect& r);
-
-  private:
-	bool smiltext_fits(const smil2::smiltext_run run, const lib::rect& r);
-	lib::rect smiltext_compute(const smil2::smiltext_run run, const lib::rect& r, unsigned int* word_spacing);
-	void smiltext_render(const smil2::smiltext_run run, const lib::rect& r, const lib::point& p);
-
-	smiltext_engine m_engine;
-	bool m_finished;
-	bool m_process_lf;
-	lib::event_processor *m_event_processor;
-	lib::timer::time_type m_epoch;
-	smiltext_params m_params;			// global parameters
-	lib::rect m_dest_rect;
-	smiltext_layout_provider* m_provider;
-	int m_x; // (L,T) of current word in <smiltext/> during computations
-	int m_y;
-	unsigned int m_max_ascent;
-	unsigned int m_max_descent;
-};
-#endif//NEW_LAYOUT_ENGINE
 
 
 } // namespace smil2
