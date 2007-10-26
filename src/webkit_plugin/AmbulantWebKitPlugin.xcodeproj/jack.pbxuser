@@ -37,10 +37,10 @@
 			{
 				active = YES;
 				name = AMBULANT_PLUGIN_DIR;
-				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
+				value = "/Users/jack/Library/Internet Plug-Ins/AmbulantWebKitPlugin.plugin/Contents/PlugIns";
 			},
 			{
-				active = YES;
+				active = NO;
 				name = DYLD_FORCE_FLAT_NAMESPACE;
 				value = 1;
 			},
@@ -50,17 +50,17 @@
 				value = "/Users/jack/src/ambulant/build-smil30/src/libambulant/.libs";
 			},
 			{
-				active = YES;
+				active = NO;
 				name = DYLD_PRINT_LIBRARIES;
 				value = 1;
 			},
 			{
-				active = YES;
+				active = NO;
 				name = PYTHONPATH;
 				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
 			},
 			{
-				active = YES;
+				active = NO;
 				name = PYTHONVERBOSE;
 				value = 1;
 			},

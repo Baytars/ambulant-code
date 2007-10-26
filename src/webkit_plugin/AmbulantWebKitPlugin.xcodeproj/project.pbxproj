@@ -24,6 +24,9 @@
 		04C0A4610CD2942F00CEDCA9 /* libambulant.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45D0CD2942F00CEDCA9 /* libambulant.dylib */; };
 		04C0A4620CD2942F00CEDCA9 /* libambulant_live.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45E0CD2942F00CEDCA9 /* libambulant_live.dylib */; };
 		04C0A46A0CD294BD00CEDCA9 /* libambulant_sdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B290958C23900C194EE /* libambulant_sdl.a */; };
+		04C0A49C0CD2A19B00CEDCA9 /* pyamplugin_webkitscripting in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4990CD2A19B00CEDCA9 /* pyamplugin_webkitscripting */; };
+		04C0A4B30CD2A44A00CEDCA9 /* libamplugin_python.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4B20CD2A44A00CEDCA9 /* libamplugin_python.0 */; };
+		04C0A4BD0CD2A61700CEDCA9 /* libamplugin_python.la in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4BC0CD2A61700CEDCA9 /* libamplugin_python.la */; };
 		04C26AE90CBE0E1400CB8EFE /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AE80CBE0E1400CB8EFE /* QTKit.framework */; };
 		04C26AEB0CBE0E2700CB8EFE /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AEA0CBE0E2700CB8EFE /* AudioUnit.framework */; };
 		04C26AED0CBE0E3700CB8EFE /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AEC0CBE0E3700CB8EFE /* Carbon.framework */; };
@@ -32,6 +35,21 @@
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		04C0A4A90CD2A26300CEDCA9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				04C0A49C0CD2A19B00CEDCA9 /* pyamplugin_webkitscripting in CopyFiles */,
+				04C0A4B30CD2A44A00CEDCA9 /* libamplugin_python.0 in CopyFiles */,
+				04C0A4BD0CD2A61700CEDCA9 /* libamplugin_python.la in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		045D0B210958C14700C194EE /* libambulant.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant.a; path = src/libambulant/.libs/libambulant.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
@@ -57,6 +75,9 @@
 		04C0A45D0CD2942F00CEDCA9 /* libambulant.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libambulant.dylib; path = "../../build-smil30/src/libambulant/.libs/libambulant.dylib"; sourceTree = SOURCE_ROOT; };
 		04C0A45E0CD2942F00CEDCA9 /* libambulant_live.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libambulant_live.dylib; path = "../../build-smil30/src/libambulant/.libs/libambulant_live.dylib"; sourceTree = SOURCE_ROOT; };
 		04C0A4670CD2948E00CEDCA9 /* libambulant_sdl.dylib */ = {isa = PBXFileReference; lastKnownFileType = file; name = libambulant_sdl.dylib; path = "../../build-smil30/src/libambulant/.libs/libambulant_sdl.dylib"; sourceTree = SOURCE_ROOT; };
+		04C0A4990CD2A19B00CEDCA9 /* pyamplugin_webkitscripting */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pyamplugin_webkitscripting; path = PlugIns/pyamplugin_webkitscripting; sourceTree = "<group>"; };
+		04C0A4B20CD2A44A00CEDCA9 /* libamplugin_python.0 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = libamplugin_python.0; path = "../../build-smil30/src/plugins/.libs/libamplugin_python.0"; sourceTree = SOURCE_ROOT; };
+		04C0A4BC0CD2A61700CEDCA9 /* libamplugin_python.la */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = libamplugin_python.la; path = "../../build-smil30/src/plugins/libamplugin_python.la"; sourceTree = SOURCE_ROOT; };
 		04C26AE80CBE0E1400CB8EFE /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		04C26AEA0CBE0E2700CB8EFE /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		04C26AEC0CBE0E3700CB8EFE /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
@@ -117,11 +138,22 @@
 			name = Ambulant;
 			sourceTree = "<group>";
 		};
+		04C0A4980CD2A17F00CEDCA9 /* PlugIns */ = {
+			isa = PBXGroup;
+			children = (
+				04C0A4990CD2A19B00CEDCA9 /* pyamplugin_webkitscripting */,
+				04C0A4B20CD2A44A00CEDCA9 /* libamplugin_python.0 */,
+				04C0A4BC0CD2A61700CEDCA9 /* libamplugin_python.la */,
+			);
+			name = PlugIns;
+			sourceTree = "<group>";
+		};
 		089C166AFE841209C02AAC07 /* AmbulantWebKitPlugin */ = {
 			isa = PBXGroup;
 			children = (
 				08FB77AFFE84173DC02AAC07 /* Classes */,
 				32C88E010371C26100C91783 /* Other Sources */,
+				04C0A4980CD2A17F00CEDCA9 /* PlugIns */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
@@ -215,6 +247,7 @@
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
 				04C26E450CBE22E300CB8EFE /* ShellScript */,
+				04C0A4A90CD2A26300CEDCA9 /* CopyFiles */,
 			);
 			buildRules = (
 			);

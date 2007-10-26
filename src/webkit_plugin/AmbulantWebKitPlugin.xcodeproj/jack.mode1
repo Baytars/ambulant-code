@@ -255,6 +255,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateExpansionKey</key>
 							<array>
 								<string>089C166AFE841209C02AAC07</string>
+								<string>04C0A4980CD2A17F00CEDCA9</string>
+								<string>04C0A4990CD2A19B00CEDCA9</string>
 								<string>089C167CFE841241C02AAC07</string>
 								<string>089C167DFE841241C02AAC07</string>
 								<string>089C1671FE841209C02AAC07</string>
@@ -262,6 +264,8 @@
 								<string>04C0A4850CD2999800CEDCA9</string>
 								<string>04C0A4860CD2999800CEDCA9</string>
 								<string>089C167DFE841241C02AAC07</string>
+								<string>04C0A4AA0CD2A26300CEDCA9</string>
+								<string>04C0A4990CD2A19B00CEDCA9</string>
 								<string>1C37FAAC04509CD000000102</string>
 								<string>1C37FABC05509CD000000102</string>
 							</array>
@@ -273,7 +277,7 @@
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {244, 338}}</string>
+							<string>{{0, 367}, {244, 338}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -512,12 +516,12 @@
 		<string>04C0A4390CD28B6D00CEDCA9</string>
 		<string>04C0A43A0CD28B6D00CEDCA9</string>
 		<string>04C0A4340CD28B2A00CEDCA9</string>
-		<string>04C0A4330CD28B2A00CEDCA9</string>
-		<string>04EC0D360CBD8E2B009B6B85</string>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
-		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
-		<string>04C0A4870CD2999800CEDCA9</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>04C0A4330CD28B2A00CEDCA9</string>
+		<string>1C0AD2B3069F1EA900FABCE6</string>
+		<string>04C0A4870CD2999800CEDCA9</string>
+		<string>04EC0D360CBD8E2B009B6B85</string>
+		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
 	<string>789 278 690 397 0 0 1680 1028 </string>
@@ -721,7 +725,7 @@
 			<key>WindowToolGUID</key>
 			<string>1CD10A99069EF8BA00B06720</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>
@@ -980,7 +984,7 @@
 			<key>WindowToolGUID</key>
 			<string>1C0AD2B3069F1EA900FABCE6</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>
