@@ -29,15 +29,54 @@
 		dylibVariantSuffix = "";
 		enableDebugStr = 1;
 		environmentEntries = (
+			{
+				active = YES;
+				name = AMBULANT_LOGGER_NOWINDOW;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = AMBULANT_PLUGIN_DIR;
+				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
+			},
+			{
+				active = YES;
+				name = DYLD_FORCE_FLAT_NAMESPACE;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = "/Users/jack/src/ambulant/build-smil30/src/libambulant/.libs";
+			},
+			{
+				active = YES;
+				name = DYLD_PRINT_LIBRARIES;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = PYTHONPATH;
+				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
+			},
+			{
+				active = YES;
+				name = PYTHONVERBOSE;
+				value = 1;
+			},
 		);
 		executableSystemSymbolLevel = 0;
 		executableUserSymbolLevel = 0;
 		launchableReference = 04239D230CD2895A00152474 /* Safari.app */;
 		libgmallocEnabled = 0;
 		name = Safari;
+		savedGlobals = {
+		};
 		sourceDirectories = (
 		);
 		startupPath = "<<ProjectDirectory>>";
+		variableFormatDictionary = {
+		};
 	};
 	04239D230CD2895A00152474 /* Safari.app */ = {
 		isa = PBXFileReference;
@@ -52,6 +91,49 @@
 			sepNavSelRange = "{1944, 31}";
 			sepNavVisRect = "{{0, 733}, {751, 649}}";
 		};
+	};
+	04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */ = {
+		isa = XCBreakpointsBucket;
+		name = "Project Breakpoints";
+		objects = (
+			04C0A4840CD2998200CEDCA9 /* initialize */,
+			04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */,
+		);
+	};
+	04C0A4840CD2998200CEDCA9 /* initialize */ = {
+		isa = PBXSymbolicBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 1;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		hitCount = 1;
+		location = libamplugin_python.0;
+		modificationTime = 215128529.123077;
+		state = 1;
+		symbolName = initialize;
+	};
+	04C0A4890CD299E600CEDCA9 /* pythonplugin.cpp */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.cpp.cpp;
+		name = pythonplugin.cpp;
+		path = "/Users/jack/src/ambulant/build-smil30/src/plugins/../../../src/plugins/pythonplugin.cpp";
+		sourceTree = "<absolute>";
+	};
+	04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 04C0A4890CD299E600CEDCA9 /* pythonplugin.cpp */;
+		functionName = "initialize()";
+		hitCount = 1;
+		lineNumber = 138;
+		location = libamplugin_python.0;
+		modificationTime = 215128554.816441;
+		state = 1;
 	};
 	04EC0D310CBD8D22009B6B85 /* Source Control */ = {
 		isa = PBXSourceControlManager;
@@ -69,18 +151,48 @@
 		activeBuildConfigurationName = Debug;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
+		addToTargets = (
+			8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */,
+		);
+		breakpoints = (
+			04C0A4840CD2998200CEDCA9 /* initialize */,
+			04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */,
+		);
+		breakpointsGroup = 04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */;
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
 		executables = (
 			04239D220CD2895A00152474 /* Safari */,
 		);
 		perUserDictionary = {
+			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBreakpointsDataSource_BreakpointID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					210,
+					20,
+					110,
+					109,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBreakpointsDataSource_ActionID,
+					PBXBreakpointsDataSource_TypeID,
+					PBXBreakpointsDataSource_BreakpointID,
+					PBXBreakpointsDataSource_UseID,
+					PBXBreakpointsDataSource_LocationID,
+					PBXBreakpointsDataSource_ConditionID,
+					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
 				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					131,
+					73,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -93,7 +205,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					243,
+					185,
 					20,
 					48,
 					43,
@@ -116,9 +228,9 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
 					200,
-					63,
+					10,
 					20,
-					48.1626,
+					48,
 					43,
 					43,
 				);
@@ -132,8 +244,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215120340;
-			PBXWorkspaceStateSaveDate = 215120340;
+			PBXPerProjectTemplateStateSaveDate = 215124599;
+			PBXWorkspaceStateSaveDate = 215124599;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
