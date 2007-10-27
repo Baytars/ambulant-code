@@ -85,11 +85,18 @@
 		path = /Applications/Safari.app;
 		sourceTree = "<absolute>";
 	};
+	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {751, 649}}";
+			sepNavSelRange = "{620, 0}";
+			sepNavVisRect = "{{0, 0}, {751, 649}}";
+		};
+	};
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 2030}}";
-			sepNavSelRange = "{1944, 31}";
-			sepNavVisRect = "{{0, 733}, {751, 649}}";
+			sepNavIntBoundsRect = "{{0, 0}, {751, 2366}}";
+			sepNavSelRange = "{1685, 0}";
+			sepNavVisRect = "{{0, 706}, {751, 649}}";
 		};
 	};
 	04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */ = {
@@ -244,8 +251,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215124599;
-			PBXWorkspaceStateSaveDate = 215124599;
+			PBXPerProjectTemplateStateSaveDate = 215214474;
+			PBXWorkspaceStateSaveDate = 215214474;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
