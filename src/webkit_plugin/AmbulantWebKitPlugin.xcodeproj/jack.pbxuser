@@ -7,7 +7,7 @@
 			YES,
 		);
 		argumentStrings = (
-			WelcomeButtons.html,
+			StateTest.html,
 		);
 		autoAttachOnCrash = 1;
 		configStateDict = {

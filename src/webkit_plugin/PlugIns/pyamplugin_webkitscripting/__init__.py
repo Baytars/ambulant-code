@@ -15,6 +15,12 @@ def initialize(*args):
     import objc
     import WebKit
     print "STEP FOUR - pyobjc objc and WebKit imported!"
-    print "embedder is", embedder
+    print "WebPlugInContainer is", embedder
     embedder.webPlugInContainerShowStatus_("AmbulantWebKitPlugin: glue loaded")
-	
+    webframe = embedder.webFrame()
+    print "WebFrame is", webframe
+    domdocument = webframe.DOMDocument()
+    print "DOMDocument is", domdocument
+    statenode = domdocument.getElementById_("smilstate")
+    print "smilstate element is", statenode
+    
