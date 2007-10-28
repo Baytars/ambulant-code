@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		040DE08F0CD533A300A68D91 /* libambulant_sdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B290958C23900C194EE /* libambulant_sdl.a */; };
 		042AF3D4095AFF780003E706 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8D5B49B7048680CD000E48DA /* Info.plist */; };
 		045D0B350958C26800C194EE /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B340958C26800C194EE /* QuickTime.framework */; };
 		045D0B5C0958C36B00C194EE /* libintl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B5B0958C36B00C194EE /* libintl.a */; };
@@ -23,7 +24,6 @@
 		04C0A4600CD2942F00CEDCA9 /* libambulant_cocoa.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45C0CD2942F00CEDCA9 /* libambulant_cocoa.dylib */; };
 		04C0A4610CD2942F00CEDCA9 /* libambulant.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45D0CD2942F00CEDCA9 /* libambulant.dylib */; };
 		04C0A4620CD2942F00CEDCA9 /* libambulant_live.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45E0CD2942F00CEDCA9 /* libambulant_live.dylib */; };
-		04C0A46A0CD294BD00CEDCA9 /* libambulant_sdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B290958C23900C194EE /* libambulant_sdl.a */; };
 		04C0A49C0CD2A19B00CEDCA9 /* pyamplugin_webkitscripting in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4990CD2A19B00CEDCA9 /* pyamplugin_webkitscripting */; };
 		04C0A4B30CD2A44A00CEDCA9 /* libamplugin_python.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4B20CD2A44A00CEDCA9 /* libamplugin_python.0 */; };
 		04C0A4BD0CD2A61700CEDCA9 /* libamplugin_python.la in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04C0A4BC0CD2A61700CEDCA9 /* libamplugin_python.la */; };
@@ -114,7 +114,7 @@
 				04C0A4600CD2942F00CEDCA9 /* libambulant_cocoa.dylib in Frameworks */,
 				04C0A4610CD2942F00CEDCA9 /* libambulant.dylib in Frameworks */,
 				04C0A4620CD2942F00CEDCA9 /* libambulant_live.dylib in Frameworks */,
-				04C0A46A0CD294BD00CEDCA9 /* libambulant_sdl.a in Frameworks */,
+				040DE08F0CD533A300A68D91 /* libambulant_sdl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
