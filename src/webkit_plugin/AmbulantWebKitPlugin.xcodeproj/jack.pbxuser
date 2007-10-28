@@ -95,8 +95,8 @@
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {751, 2366}}";
-			sepNavSelRange = "{1685, 0}";
-			sepNavVisRect = "{{0, 706}, {751, 649}}";
+			sepNavSelRange = "{1439, 28}";
+			sepNavVisRect = "{{0, 655}, {751, 649}}";
 		};
 	};
 	04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */ = {
@@ -116,7 +116,7 @@
 		delayBeforeContinue = 0;
 		hitCount = 1;
 		location = libamplugin_python.0;
-		modificationTime = 215128529.123077;
+		modificationTime = 215302403.213164;
 		state = 1;
 		symbolName = initialize;
 	};
@@ -126,6 +126,11 @@
 		name = pythonplugin.cpp;
 		path = "/Users/jack/src/ambulant/build-smil30/src/plugins/../../../src/plugins/pythonplugin.cpp";
 		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {832, 3416}}";
+			sepNavSelRange = "{8388, 0}";
+			sepNavVisRect = "{{0, 2980}, {832, 159}}";
+		};
 	};
 	04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */ = {
 		isa = PBXFileBreakpoint;
@@ -139,7 +144,7 @@
 		hitCount = 1;
 		lineNumber = 138;
 		location = libamplugin_python.0;
-		modificationTime = 215128554.816441;
+		modificationTime = 215302403.291982;
 		state = 1;
 	};
 	04EC0D310CBD8D22009B6B85 /* Source Control */ = {
@@ -251,8 +256,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215214474;
-			PBXWorkspaceStateSaveDate = 215214474;
+			PBXPerProjectTemplateStateSaveDate = 215298116;
+			PBXWorkspaceStateSaveDate = 215298116;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
