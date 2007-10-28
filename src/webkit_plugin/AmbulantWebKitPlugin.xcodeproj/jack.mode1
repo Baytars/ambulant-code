@@ -270,13 +270,12 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>3</integer>
-									<integer>1</integer>
-									<integer>0</integer>
+									<integer>42</integer>
+									<integer>41</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 0}, {244, 338}}</string>
+							<string>{{0, 502}, {244, 338}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -519,7 +518,6 @@
 		<string>040DE0A70CD5415200A68D91</string>
 		<string>04EC0D360CBD8E2B009B6B85</string>
 		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
-		<string>040DE0C20CD542BB00A68D91</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
 	</array>
 	<key>WindowString</key>
@@ -949,7 +947,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1275, 434}}</string>
 								<key>RubberWindowFrame</key>
-								<string>200 300 1275 475 0 0 1680 1028 </string>
+								<string>78 221 1275 475 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXRunSessionModule</string>
@@ -979,7 +977,7 @@
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
 			<key>WindowString</key>
-			<string>200 300 1275 475 0 0 1680 1028 </string>
+			<string>78 221 1275 475 0 0 1680 1028 </string>
 			<key>WindowToolGUID</key>
 			<string>1C0AD2B3069F1EA900FABCE6</string>
 			<key>WindowToolIsVisible</key>
