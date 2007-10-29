@@ -41,17 +41,30 @@ class MyStateComponent(ambulant.state_component):
         
     def bool_expression(self, expr):
         print 'bool_expression, expr=', expr
-        rv = False
-##        rv = eval(expr, self.scope, self.globscope)
-##        print 'bool_expression returning', rv
-##        rv = not not rv
-##        print 'bool_expression returning casted', rv
-        return rv
+        strexpr = self.string_expression(expr)
+        if not strexpr:
+            return False
+        try:
+            number = int(strexpr)
+        except:
+            pass
+        else:
+            return not not number
+        return True
         
     def set_value(self, var, expr):
-        stmt = "%s = %s" % (var, expr)
-        print 'set_value, statement=', stmt
-##        exec stmt in self.scope, self.globscope
+        print 'set_value', (var, expr)
+        value = self.string_expression(expr)
+        nodelist = self.statenode.getElementsByTagName_(var)
+        node = nodelist.item_(0)
+        if not node:
+            print 'set_value: no such node:', var
+            return
+        valuenode = node.firstChild()
+        if not valuenode:
+            print 'set_value: not yet imp: node has no data yet:', node
+            return
+        valuenode.setNodeValue_(value)
         
     def new_value(self, ref, where, name, expr):
         print 'set_value, statement=', (ref, where, name, expr)
