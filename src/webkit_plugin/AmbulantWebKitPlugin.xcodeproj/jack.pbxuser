@@ -126,11 +126,6 @@
 		name = pythonplugin.cpp;
 		path = "/Users/jack/src/ambulant/build-smil30/src/plugins/../../../src/plugins/pythonplugin.cpp";
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {832, 3416}}";
-			sepNavSelRange = "{8388, 0}";
-			sepNavVisRect = "{{0, 2980}, {832, 159}}";
-		};
 	};
 	04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */ = {
 		isa = PBXFileBreakpoint;
@@ -198,6 +193,20 @@
 					PBXBreakpointsDataSource_ContinueID,
 				);
 			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXErrorsWarningsDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					300,
+					75.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXErrorsWarningsDataSource_TypeID,
+					PBXErrorsWarningsDataSource_MessageID,
+					PBXErrorsWarningsDataSource_LocationID,
+				);
+			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
 				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
 				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
@@ -256,8 +265,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215298116;
-			PBXWorkspaceStateSaveDate = 215298116;
+			PBXPerProjectTemplateStateSaveDate = 215343270;
+			PBXWorkspaceStateSaveDate = 215343270;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
