@@ -274,14 +274,14 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>20</integer>
-									<integer>18</integer>
-									<integer>17</integer>
+									<integer>10</integer>
+									<integer>9</integer>
+									<integer>8</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 204}, {244, 338}}</string>
+							<string>{{0, 0}, {244, 338}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -517,8 +517,9 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
 		<string>04EC0D360CBD8E2B009B6B85</string>
+		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
+		<string>1C0AD2B3069F1EA900FABCE6</string>
 	</array>
 	<key>WindowString</key>
 	<string>598 220 690 397 0 0 1440 878 </string>
@@ -947,7 +948,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1275, 434}}</string>
 								<key>RubberWindowFrame</key>
-								<string>78 221 1275 475 0 0 1680 1028 </string>
+								<string>132 160 1275 475 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXRunSessionModule</string>
@@ -970,14 +971,14 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>040DE0920CD533AC00A68D91</string>
+				<string>041DFA030CD5E6C600E30854</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>040DE0930CD533AC00A68D91</string>
+				<string>041DFA040CD5E6C600E30854</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
 			<key>WindowString</key>
-			<string>78 221 1275 475 0 0 1680 1028 </string>
+			<string>132 160 1275 475 0 0 1440 878 </string>
 			<key>WindowToolGUID</key>
 			<string>1C0AD2B3069F1EA900FABCE6</string>
 			<key>WindowToolIsVisible</key>
