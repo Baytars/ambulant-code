@@ -243,6 +243,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB913A08733D840010E9CD /* Build configuration list for PBXNativeTarget "AmbulantWebKitPlugin" */;
 			buildPhases = (
+				041DF9F00CD5E14700E30854 /* ShellScript */,
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
@@ -287,6 +288,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		041DF9F00CD5E14700E30854 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\namlibdir=../../build-smil30/src/libambulant/.libs\ncd $amlibdir\nrm -f libambulant.dylib\nln -s libambulant.0 libambulant.dylib\nrm -f libambulant_sdl.dylib\nln -s libambulant_sdl.0 libambulant_sdl.dylib\nrm -f libambulant_live.dylib\nln -s libambulant_live.0 libambulant_live.dylib\nrm -f libambulant_ffmpeg.dylib\nln -s libambulant_ffmpeg.0 libambulant_ffmpeg.dylib\n";
+		};
 		04C26E450CBE22E300CB8EFE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
