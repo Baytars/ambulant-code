@@ -58,8 +58,8 @@ class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factor
 
 - (void)webPlugInStart
 {
+	NSDictionary *webPluginAttributesObj = [m_arguments objectForKey:WebPlugInAttributesKey];
     if (!m_mainloop) {
-        NSDictionary *webPluginAttributesObj = [m_arguments objectForKey:WebPlugInAttributesKey];
 		container = [m_arguments objectForKey:WebPlugInContainerKey];
 		if (container) {
 			[container webPlugInContainerShowStatus: @"Ambulant Plugin: Loaded"];
@@ -80,7 +80,9 @@ class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factor
 			}
 		}
     }
-	if (m_mainloop) {
+	NSString *autostartString = [webPluginAttributesObj objectForKey:@"autostart"];
+	BOOL autostart = autostartString == nil || [autostartString isEqualToString: @"true"];
+	if (m_mainloop && autostart) {
 		[self startPlayer];
 	}
 }

@@ -5,6 +5,15 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title>Ambulant SMILState in a webpage</title>
 	<meta name="generator" content="BBEdit 8.7" />
+	<script language="javascript">
+		var embed = document.embeds[0];
+		
+		function StartPlayer()
+		{
+		  embed.startPlayer();
+		}
+	</script>
+
 </head>
 <body>
 <h1>Ambulant SMILState in a webpage</h1>
@@ -25,9 +34,12 @@ plugin. </p>
 </p>
 
 <h2>SMIL presentation</h2>
-<p>In a while</p>
+<form>
+ <input type="button" value="Start" onClick="StartPlayer()" />
+</form>
 <object width="241" height="271" type="application/smil+xml">
  <param name="src" value="StateTest.smil" />
+ <param name="autostart" value="false" />
 </object>
 </body>
 </html>
