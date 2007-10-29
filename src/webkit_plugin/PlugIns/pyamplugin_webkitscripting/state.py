@@ -9,14 +9,57 @@ class MyStateComponentFactory(ambulant.state_component_factory):
         if uri == "http://www.w3.org/TR/1999/REC-xpath-19991116":
             return MyStateComponent(self.domdocument)
         return None
+
+class MicroXpath:
+    def __init__(self, domdoc, domnode):
+        self.domdoc = domdoc
+        self.domnode = domnode
+        
+    def __getitem__(self, name):
+        nodelist = self.domnode.getElementsByTagName_(name)
+        if not nodelist:
+            raise KeyError("No XML nodes named '%s'" % name)
+        node = nodelist.item_(0)
+        if not node:
+            raise KeyError("No XML node named '%s'" % name)
+        valuenode = node.firstChild()
+        if not valuenode:
+            return ''
+        value = valuenode.nodeValue()
+        try:
+            value = int(value)
+        except ValueError:
+            pass
+        return value
+        
+    def __setitem__(self, name, value):
+        value = unicode(value)
+        nodelist = self.domnode.getElementsByTagName_(name)
+        node = nodelist.item_(0)
+        if not nodelist or not node:
+            # It does not exist yet. Create it.
+            node = self.domdoc.createElement_(name)
+            valuenode = self.domdoc.createTextNode_(value)
+            node.appendChild_(valuenode)
+            self.domnode.appendChild_(node)
+            return
+        valuenode = node.firstChild()
+        if not valuenode:
+            valuenode = self.domdoc.createTextNode_(value)
+            node.appendChild_(valuenode)
+            return
+        valuenode.setNodeValue_(value)        
         
 class MyStateComponent(ambulant.state_component):
     def __init__(self, domdocument):
         print 'MyStateComponent()'
         self.globscope = {}
+        self.localscope = None
         self.domdocument = domdocument
+        print 'DOMDocument is', self.domdocument
+        print 'DOMDocument has', dir(self.domdocument)
         self.statenode = None
-        # What dowe want to export to scope???
+        # What do we want to export to scope???
         
     def register_state_test_methods(self, stm):
         print 'register_state_test_methods, stm=', stm
@@ -37,7 +80,7 @@ class MyStateComponent(ambulant.state_component):
         print "state id is", src[1:]
         self.statenode = self.domdocument.getElementById_(src[1:])
         print "state node is", self.statenode
-        print "dir", dir(self.statenode)
+        self.localscope = MicroXpath(self.domdocument, self.statenode)
         
     def bool_expression(self, expr):
         print 'bool_expression, expr=', expr
@@ -78,10 +121,9 @@ class MyStateComponent(ambulant.state_component):
         
     def string_expression(self, expr):
         print 'string_expression, expr=', expr
-        rv = expr
-##        rv = eval(expr, self.scope, self.globscope)
-##        print 'string_expression returning', rv
-##        rv = str(rv)
-##        print 'string_expression returning casted', rv
+        rv = eval(expr, self.globscope, self.localscope)
+        print 'string_expression returning', rv
+        rv = str(rv)
+        print 'string_expression returning casted', rv
         return rv
         
