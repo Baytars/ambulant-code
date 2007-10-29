@@ -270,7 +270,9 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>48</integer>
+									<integer>3</integer>
+									<integer>1</integer>
+									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -510,8 +512,10 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
 		<string>04EC0D360CBD8E2B009B6B85</string>
+		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
+		<string>0472A7040CD69E23005437C5</string>
+		<string>0472A7050CD69E23005437C5</string>
 		<string>1C0AD2B3069F1EA900FABCE6</string>
 	</array>
 	<key>WindowString</key>
@@ -605,7 +609,7 @@
 			<key>WindowToolGUID</key>
 			<string>04EC0D360CBD8E2B009B6B85</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>
