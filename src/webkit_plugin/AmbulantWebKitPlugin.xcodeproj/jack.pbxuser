@@ -7,7 +7,7 @@
 			YES,
 		);
 		argumentStrings = (
-			StateTest.html,
+			StateTestXHTML.html,
 		);
 		autoAttachOnCrash = 1;
 		configStateDict = {
@@ -284,9 +284,9 @@
 	};
 	8D5B49B7048680CD000E48DA /* Info.plist */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {751, 756}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {751, 649}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1096, 756}}";
+			sepNavSelRange = "{1200, 0}";
+			sepNavVisRect = "{{0, 87}, {1096, 665}}";
 		};
 	};
 }
