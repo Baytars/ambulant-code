@@ -15,6 +15,7 @@ class MyStateComponent(ambulant.state_component):
         print 'MyStateComponent()'
         self.globscope = {}
         self.domdocument = domdocument
+        self.statenode = None
         # What dowe want to export to scope???
         
     def register_state_test_methods(self, stm):
@@ -26,7 +27,6 @@ class MyStateComponent(ambulant.state_component):
         
     def declare_state(self, state):
         print 'declare_state, node=', state
-        print 'contents', dir(state)
         src = state.get_attribute_1("src")
         if not src:
             print "webkitpluginstate: only state with src attribute allowed"
@@ -34,6 +34,10 @@ class MyStateComponent(ambulant.state_component):
         if src[0] != "#":
             print "webkitpluginstate: only #id allowed for src attribute on state"
             return
+        print "state id is", src[1:]
+        self.statenode = self.domdocument.getElementById_(src[1:])
+        print "state node is", self.statenode
+        print "dir", dir(self.statenode)
         
     def bool_expression(self, expr):
         print 'bool_expression, expr=', expr

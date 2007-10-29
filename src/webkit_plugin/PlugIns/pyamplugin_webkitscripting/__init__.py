@@ -25,6 +25,7 @@ def initialize(apiversion, factories, gui_player):
     embedder.webPlugInContainerShowStatus_("AmbulantWebKitPlugin: glue loaded")
     webframe = embedder.webFrame()
     print "pyamplugin_webkitscripting: WebFrame is", webframe
+    print "contents", dir(webframe)
     domdocument = webframe.DOMDocument()
 
     sf = pyamplugin_webkitscripting.state.MyStateComponentFactory(domdocument)
