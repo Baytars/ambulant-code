@@ -1,4 +1,5 @@
 import ambulant
+import Foundation
 
 class MyStateComponentFactory(ambulant.state_component_factory):
     def __init__(self, domdocument):
@@ -69,6 +70,7 @@ class MyStateComponent(ambulant.state_component):
                 self.globscope[name] = getattr(stm, name)
         
     def declare_state(self, state):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'declare_state, node=', state
         src = state.get_attribute_1("src")
         if not src:
@@ -83,6 +85,7 @@ class MyStateComponent(ambulant.state_component):
         self.localscope = MicroXpath(self.domdocument, self.statenode)
         
     def bool_expression(self, expr):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'bool_expression, expr=', expr
         strexpr = self.string_expression(expr)
         if not strexpr:
@@ -96,6 +99,7 @@ class MyStateComponent(ambulant.state_component):
         return True
         
     def set_value(self, var, expr):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'set_value', (var, expr)
         value = self.string_expression(expr)
         nodelist = self.statenode.getElementsByTagName_(var)
@@ -110,16 +114,20 @@ class MyStateComponent(ambulant.state_component):
         valuenode.setNodeValue_(value)
         
     def new_value(self, ref, where, name, expr):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'set_value, statement=', (ref, where, name, expr)
 ##        exec stmt in self.scope, self.globscope
         
     def del_value(self, ref):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'del_value, ref=', ref
         
     def send(self, submission):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'send, submission=', submission
         
     def string_expression(self, expr):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
         print 'string_expression, expr=', expr
         rv = eval(expr, self.globscope, self.localscope)
         print 'string_expression returning', rv
