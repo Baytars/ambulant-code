@@ -103,44 +103,7 @@
 		isa = XCBreakpointsBucket;
 		name = "Project Breakpoints";
 		objects = (
-			04C0A4840CD2998200CEDCA9 /* initialize */,
-			04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */,
 		);
-	};
-	04C0A4840CD2998200CEDCA9 /* initialize */ = {
-		isa = PBXSymbolicBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 1;
-		continueAfterActions = 0;
-		delayBeforeContinue = 0;
-		hitCount = 1;
-		location = libamplugin_python.0;
-		modificationTime = 215302403.213164;
-		state = 1;
-		symbolName = initialize;
-	};
-	04C0A4890CD299E600CEDCA9 /* pythonplugin.cpp */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.cpp.cpp;
-		name = pythonplugin.cpp;
-		path = "/Users/jack/src/ambulant/build-smil30/src/plugins/../../../src/plugins/pythonplugin.cpp";
-		sourceTree = "<absolute>";
-	};
-	04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		delayBeforeContinue = 0;
-		fileReference = 04C0A4890CD299E600CEDCA9 /* pythonplugin.cpp */;
-		functionName = "initialize()";
-		hitCount = 1;
-		lineNumber = 138;
-		location = libamplugin_python.0;
-		modificationTime = 215302403.291982;
-		state = 1;
 	};
 	04EC0D310CBD8D22009B6B85 /* Source Control */ = {
 		isa = PBXSourceControlManager;
@@ -162,8 +125,6 @@
 			8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */,
 		);
 		breakpoints = (
-			04C0A4840CD2998200CEDCA9 /* initialize */,
-			04C0A48B0CD299E600CEDCA9 /* pythonplugin.cpp:138 */,
 		);
 		breakpointsGroup = 04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */;
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
