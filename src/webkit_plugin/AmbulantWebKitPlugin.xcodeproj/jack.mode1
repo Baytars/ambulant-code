@@ -521,9 +521,9 @@
 		<string>04C0A4340CD28B2A00CEDCA9</string>
 		<string>1CD10A99069EF8BA00B06720</string>
 		<string>04E58BA00CD76CB300A1B23C</string>
+		<string>1C0AD2B3069F1EA900FABCE6</string>
 		<string>04EC0D360CBD8E2B009B6B85</string>
 		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
 	</array>
 	<key>WindowString</key>
 	<string>597 220 690 397 0 0 1440 878 </string>
@@ -950,7 +950,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1275, 434}}</string>
 								<key>RubberWindowFrame</key>
-								<string>99 292 1275 475 0 0 1440 878 </string>
+								<string>172 306 1275 475 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXRunSessionModule</string>
@@ -980,11 +980,11 @@
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
 			<key>WindowString</key>
-			<string>99 292 1275 475 0 0 1440 878 </string>
+			<string>172 306 1275 475 0 0 1440 878 </string>
 			<key>WindowToolGUID</key>
 			<string>1C0AD2B3069F1EA900FABCE6</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>Identifier</key>
