@@ -25,25 +25,26 @@ def initialize(apiversion, factories, gui_player):
     embedder.webPlugInContainerShowStatus_("AmbulantWebKitPlugin: glue loaded")
     webframe = embedder.webFrame()
     print "pyamplugin_webkitscripting: WebFrame is", webframe
-    print "contents", dir(webframe)
+##    print "Pyamplugin_webkitscripting: WebFrame version is", webframe.version
+##    print "contents", dir(webframe)
+##    import pdb; pdb.set_trace()
     domdocument = webframe.DOMDocument()
-
-    sf = pyamplugin_webkitscripting.state.MyStateComponentFactory(domdocument)
+    #
+    # Distinguish between Safari 2 and 3
+    #
+    if hasattr(domdocument, "evaluate_____"):
+        print "pyamplugin_webkitscripting: Apparently Safari 3 (with XPath support)"
+        import pyamplugin_webkitscripting.state_xpath
+        state = pyamplugin_webkitscripting.state_xpath
+    else:
+        print "pyamplugin_webkitscripting: Apparently Safari 2 (without XPath support)"
+        import pyamplugin_webkitscripting.state
+        state = pyamplugin_webkitscripting.state
+        
+    sf = state.MyStateComponentFactory(domdocument)
     gsf = factories.get_state_component_factory()
     if not gsf:
         gsf = ambulant.get_global_state_component_factory()
         factories.set_state_component_factory(gsf)
     gsf.add_factory(sf)
-
-##    statenode = domdocument.getElementById_("smilstate")
-##    print "smilstate element is", statenode
-##    firstlist = statenode.getElementsByTagName_("varone")
-##    first = firstlist.item_(0)
-##    print "first variable is", first
-##    firstvalue = first.firstChild()
-##    print "first variable value is", firstvalue
-##    print "value was", firstvalue.nodeValue()
-##    firstvalue.setNodeValue_("Een")
-##    print "after setting, it is", firstvalue.nodeValue()
-##    
     
