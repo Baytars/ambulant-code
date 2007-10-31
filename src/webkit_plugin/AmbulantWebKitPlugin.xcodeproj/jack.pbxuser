@@ -2,7 +2,6 @@
 {
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
-		activeArgIndex = 0;
 		activeArgIndices = (
 			YES,
 		);
@@ -10,6 +9,7 @@
 			StateTestXHTML.html,
 		);
 		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -85,6 +85,13 @@
 		path = /Applications/Safari.app;
 		sourceTree = "<absolute>";
 	};
+	045D0B7F0958C53F00C194EE /* mainloop.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {805, 784}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1420}";
+		};
+	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {751, 649}}";
@@ -99,12 +106,6 @@
 			sepNavVisRect = "{{0, 655}, {751, 649}}";
 		};
 	};
-	04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */ = {
-		isa = XCBreakpointsBucket;
-		name = "Project Breakpoints";
-		objects = (
-		);
-	};
 	04EC0D310CBD8D22009B6B85 /* Source Control */ = {
 		isa = PBXSourceControlManager;
 		fallbackIsa = XCSourceControlManager;
@@ -118,7 +119,8 @@
 		indexTemplatePath = "";
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeBuildConfigurationName = Debug;
+		activeArchitecture = i386;
+		activeBuildConfigurationName = "Debug-i686";
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		addToTargets = (
@@ -126,7 +128,6 @@
 		);
 		breakpoints = (
 		);
-		breakpointsGroup = 04C0A4660CD2946800CEDCA9 /* XCBreakpointsBucket */;
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
 		executables = (
 			04239D220CD2895A00152474 /* Safari */,
@@ -225,8 +226,8 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					200,
-					10,
+					145,
+					60,
 					20,
 					48,
 					43,
@@ -242,8 +243,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215433363;
-			PBXWorkspaceStateSaveDate = 215433363;
+			PBXPerProjectTemplateStateSaveDate = 215520564;
+			PBXWorkspaceStateSaveDate = 215520564;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
