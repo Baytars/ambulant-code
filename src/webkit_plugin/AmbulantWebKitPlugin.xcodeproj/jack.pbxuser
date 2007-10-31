@@ -1,5 +1,33 @@
 // !$*UTF8*$!
 {
+	041D6A3C0CD932DD00AFC79A /* objc_util.m */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.objc;
+		name = objc_util.m;
+		path = /Users/jack/src/pyobjc/Modules/objc/objc_util.m;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {812, 12180}}";
+			sepNavSelRange = "{6390, 0}";
+			sepNavVisRange = "{6241, 167}";
+		};
+	};
+	041D6A3E0CD932DD00AFC79A /* objc_util.m:252 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 041D6A3C0CD932DD00AFC79A /* objc_util.m */;
+		functionName = "PyObjCErr_ToObjCWithGILState()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 252;
+		modificationTime = 215564198.694422;
+		state = 0;
+	};
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
 		activeArgIndices = (
@@ -9,7 +37,7 @@
 			StateTestXHTML.html,
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 0;
+		breakpointsEnabled = 1;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -101,8 +129,9 @@
 	};
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {751, 2366}}";
-			sepNavSelRange = "{1439, 28}";
+			sepNavIntBoundsRect = "{{0, 0}, {812, 2072}}";
+			sepNavSelRange = "{2122, 0}";
+			sepNavVisRange = "{2028, 436}";
 			sepNavVisRect = "{{0, 655}, {751, 649}}";
 		};
 	};
@@ -120,13 +149,14 @@
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecture = i386;
-		activeBuildConfigurationName = "Debug-i686";
+		activeBuildConfigurationName = Debug;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		addToTargets = (
 			8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */,
 		);
 		breakpoints = (
+			041D6A3E0CD932DD00AFC79A /* objc_util.m:252 */,
 		);
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
 		executables = (
@@ -153,6 +183,20 @@
 					PBXBreakpointsDataSource_LocationID,
 					PBXBreakpointsDataSource_ConditionID,
 					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXBookmarksDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBookmarksDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					200,
+					200,
+					57.58349609375,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBookmarksDataSource_LocationID,
+					PBXBookmarksDataSource_NameID,
+					PBXBookmarksDataSource_CommentsID,
 				);
 			};
 			PBXConfiguration.PBXFileTableDataSource3.PBXErrorsWarningsDataSource = {
@@ -243,8 +287,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215520564;
-			PBXWorkspaceStateSaveDate = 215520564;
+			PBXPerProjectTemplateStateSaveDate = 215534568;
+			PBXWorkspaceStateSaveDate = 215534568;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
