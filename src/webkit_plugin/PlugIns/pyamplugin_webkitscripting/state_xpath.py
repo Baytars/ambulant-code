@@ -1,5 +1,8 @@
 import ambulant
 import Foundation
+import traceback
+
+DEBUG=False
 
 class MyStateComponentFactory(ambulant.state_component_factory):
     def __init__(self, domdocument):
@@ -25,8 +28,12 @@ class MainThreadCaller(Foundation.NSObject):
         return self.rv
     
     def call_(self, (func, args, kwargs)):
-        self.rv = func(*args, **kwargs)
-
+        try:
+            self.rv = func(*args, **kwargs)
+        except:
+            print 'webkitpluginstate: HELP! Exception!'
+            traceback.print_exc()
+ 
 def callWait(func, *args, **kwargs):
     """call a function on the main thread (sync)"""
     pool = Foundation.NSAutoreleasePool.alloc().init()
@@ -35,16 +42,16 @@ def callWait(func, *args, **kwargs):
 
 class MyStateComponent(ambulant.state_component):
     def __init__(self, domdocument):
-        print 'MyStateComponent()'
+        if DEBUG: print 'MyStateComponent()'
         self.globscope = {}
         self.domdocument = domdocument
-        print 'DOMDocument is', self.domdocument
-        print 'DOMDocument has', dir(self.domdocument)
+        if DEBUG: print 'DOMDocument is', self.domdocument
+        if DEBUG: print 'DOMDocument has', dir(self.domdocument)
         self.statenode = None
         # What do we want to export to scope???
         
     def register_state_test_methods(self, stm):
-        print 'register_state_test_methods, stm=', stm
+        if DEBUG: print 'register_state_test_methods, stm=', stm
         # Export things to the scripts
         for name in dir(stm):
             if name[:5] == 'smil_':
@@ -52,7 +59,7 @@ class MyStateComponent(ambulant.state_component):
         
     def declare_state(self, state):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'declare_state, node=', state
+        if DEBUG: print 'declare_state, node=', state
         src = state.get_attribute_1("src")
         if not src:
             print "webkitpluginstate: only state with src attribute allowed"
@@ -60,13 +67,28 @@ class MyStateComponent(ambulant.state_component):
         if src[0] != "#":
             print "webkitpluginstate: only #id allowed for src attribute on state"
             return
-        print "state id is", src[1:]
-        self.statenode = self.domdocument.getElementById_(src[1:])
-        print "state node is", self.statenode
+        if DEBUG: print "state id is", src[1:]
+        statecontainer = self.domdocument.getElementById_(src[1:])
+        if DEBUG: print "state container node is", statecontainer
+        ch = statecontainer.firstChild()
+        while ch and ch.nodeType() != 1:
+            ch = ch.nextSibling()
+        if not ch:
+            print "webkitpluginstate: state container",src,"is empty"
+            return
+        self.statenode = ch
+        ch = ch.nextSibling()
+        while ch:
+            if ch.nodeType() == 1:
+                print "webkitpluginstate: state container", src, "has more than one child"
+                self.statenode = None
+                return
+            ch = ch.nextSibling()
+        if DEBUG: print "state node is", self.statenode
         
     def bool_expression(self, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'bool_expression, expr=', expr
+        if DEBUG: print 'bool_expression, expr=', expr
         strexpr = self.string_expression(expr)
         if not strexpr:
             return False
@@ -84,41 +106,45 @@ class MyStateComponent(ambulant.state_component):
     
     def _set_value(self, var, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'set_value', (var, expr)
+        if DEBUG: print 'set_value', (var, expr)
         value = self.string_expression(expr)
         nodelist = self.statenode.getElementsByTagName_(var)
         node = nodelist.item_(0)
         if not node:
-            print 'set_value: no such node:', var
+            print 'webkitpluginstate: set_value: no such node:', var
             return
         valuenode = node.firstChild()
         if not valuenode:
-            print 'set_value: not yet imp: node has no data yet:', node
+            print 'webkitpluginstate: set_value: not yet imp: node has no data yet:', node
             return
         valuenode.setNodeValue_(value)
         
     def new_value(self, ref, where, name, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'set_value, statement=', (ref, where, name, expr)
+        if DEBUG: print 'set_value, statement=', (ref, where, name, expr)
 ##        exec stmt in self.scope, self.globscope
         
     def del_value(self, ref):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'del_value, ref=', ref
+        print 'NOT IMPLEMENTED: del_value, ref=', ref
         
     def send(self, submission):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'send, submission=', submission
+        print 'NOT IMPLEMENTED: send, submission=', submission
         
     def string_expression(self, expr):
         #pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'string_expression, expr=', expr
+        if DEBUG: print 'string_expression, expr=', expr
         rv = self.domdocument.evaluate_____(expr, self.statenode, None, 0, None)
-        import pdb ; pdb.set_trace()
-        print 'string_expression returned', rv
-        if rv.resultType() <= 3: # any, number, string, boolean
+        if DEBUG: print 'string_expression returned', rv
+##       import pdb ; pdb.set_trace()
+        if rv.resultType() == 1:
+            return str(rv.numberValue())
+        if rv.resultType() == 2:
+            return str(rv.booleanValue())
+        if rv.resultType() == 3:
             return rv.stringValue()
-        if rv.resultType() <= 5: # node iterators
+        if rv.resultType() == 4: # node iterators
             node = rv.iterateNext()
             if not node:
                 print 'string_expression: does not match a node:', expr
