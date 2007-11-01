@@ -6,11 +6,6 @@
 		name = objc_util.m;
 		path = /Users/jack/src/pyobjc/Modules/objc/objc_util.m;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 12180}}";
-			sepNavSelRange = "{6390, 0}";
-			sepNavVisRange = "{6241, 167}";
-		};
 	};
 	041D6A3E0CD932DD00AFC79A /* objc_util.m:252 */ = {
 		isa = PBXFileBreakpoint;
@@ -25,16 +20,18 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 252;
-		modificationTime = 215564198.694422;
-		state = 0;
+		modificationTime = 215653535.918921;
+		state = 1;
 	};
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
 		activeArgIndices = (
+			NO,
 			YES,
 		);
 		argumentStrings = (
 			StateTestXHTML.html,
+			../../../mmdocuments/NoBudgetStateDemo/index.html,
 		);
 		autoAttachOnCrash = 1;
 		breakpointsEnabled = 1;
@@ -45,7 +42,11 @@
 				PBXLSLaunchStdioStyle = 2;
 				PBXLSLaunchStyle = 0;
 				class = PBXLSRunLaunchConfig;
+				commandLineArgs = (
+				);
 				displayName = "Executable Runner";
+				environment = {
+				};
 				identifier = com.apple.Xcode.launch.runConfig;
 				remoteHostInfo = "";
 				startActionInfo = "";
@@ -219,7 +220,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					73,
+					72.58349609375,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -287,8 +288,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215534568;
-			PBXWorkspaceStateSaveDate = 215534568;
+			PBXPerProjectTemplateStateSaveDate = 215647618;
+			PBXWorkspaceStateSaveDate = 215647618;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
