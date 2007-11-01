@@ -2,7 +2,10 @@ import ambulant
 import Foundation
 import traceback
 
-DEBUG=False
+DEBUG=True
+
+NS_XFORMS="http://www.w3.org/2002/xforms"
+NS_XPATH="http://www.w3.org/TR/1999/REC-xpath-19991116"
 
 class MyStateComponentFactory(ambulant.state_component_factory):
     def __init__(self, domdocument):
@@ -10,7 +13,7 @@ class MyStateComponentFactory(ambulant.state_component_factory):
         
     def new_state_component(self, uri):
         print 'new_state_component, uri=', uri
-        if uri == "http://www.w3.org/TR/1999/REC-xpath-19991116":
+        if uri == NS_XPATH:
             return MyStateComponent(self.domdocument)
         return None
 
@@ -48,6 +51,7 @@ class MyStateComponent(ambulant.state_component):
         if DEBUG: print 'DOMDocument is', self.domdocument
         if DEBUG: print 'DOMDocument has', dir(self.domdocument)
         self.statenode = None
+        self.nsresolver = None
         # What do we want to export to scope???
         
     def register_state_test_methods(self, stm):
@@ -60,18 +64,27 @@ class MyStateComponent(ambulant.state_component):
     def declare_state(self, state):
         pool = Foundation.NSAutoreleasePool.alloc().init()
         if DEBUG: print 'declare_state, node=', state
-        src = state.get_attribute_1("src")
-        if not src:
-            print "webkitpluginstate: only state with src attribute allowed"
-            return
-        if src[0] != "#":
-            print "webkitpluginstate: only #id allowed for src attribute on state"
-            return
-        if DEBUG: print "state id is", src[1:]
-        statecontainer = self.domdocument.getElementById_(src[1:])
+        if 0:
+            # "correct" way, which does not work:
+            src = state.get_attribute_1("src")
+            if not src:
+                print "webkitpluginstate: only state with src attribute allowed"
+                return
+            if src[0] != "#":
+                print "webkitpluginstate: only #id allowed for src attribute on state"
+                return
+            if DEBUG: print "state id is", src[1:]
+            statecontainer = self.domdocument.getElementById_(src[1:])
+        else:
+            # Hack, which does work, maybe
+            elements = self.domdocument.getElementsByTagNameNS__(NS_XFORMS, "instance")
+            statecontainer = elements.item_(0)
+            if not statecontainer:
+                import pdb ; pdb.set_trace()
         if DEBUG: print "state container node is", statecontainer
         ch = statecontainer.firstChild()
         while ch and ch.nodeType() != 1:
+            if DEBUG: print 'webkitpluginstate: Skip', ch
             ch = ch.nextSibling()
         if not ch:
             print "webkitpluginstate: state container",src,"is empty"
@@ -79,6 +92,7 @@ class MyStateComponent(ambulant.state_component):
         self.statenode = ch
         ch = ch.nextSibling()
         while ch:
+            print 'webkitpluginstate: examine', ch
             if ch.nodeType() == 1:
                 print "webkitpluginstate: state container", src, "has more than one child"
                 self.statenode = None
@@ -121,7 +135,7 @@ class MyStateComponent(ambulant.state_component):
         
     def new_value(self, ref, where, name, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        if DEBUG: print 'set_value, statement=', (ref, where, name, expr)
+        if DEBUG: print 'NOTIMPLEMENTED: new_value, statement=', (ref, where, name, expr)
 ##        exec stmt in self.scope, self.globscope
         
     def del_value(self, ref):
@@ -133,9 +147,15 @@ class MyStateComponent(ambulant.state_component):
         print 'NOT IMPLEMENTED: send, submission=', submission
         
     def string_expression(self, expr):
+        pool = Foundation.NSAutoreleasePool.alloc().init()
+        return callWait(self._string_expression, expr)
+
+    def _string_expression(self, expr):
         #pool = Foundation.NSAutoreleasePool.alloc().init()
         if DEBUG: print 'string_expression, expr=', expr
-        rv = self.domdocument.evaluate_____(expr, self.statenode, None, 0, None)
+        if not self.nsresolver:
+            self.nsresolver = self.domdocument.createNSResolver_(self.statenode)
+        rv = self.domdocument.evaluate_____(expr, self.statenode, self.nsresolver, 0, None)
         if DEBUG: print 'string_expression returned', rv
 ##       import pdb ; pdb.set_trace()
         if rv.resultType() == 1:
