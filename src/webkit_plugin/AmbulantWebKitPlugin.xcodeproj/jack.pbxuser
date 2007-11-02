@@ -13,18 +13,17 @@
 		);
 		breakpointStyle = 0;
 		continueAfterActions = 0;
-		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = 041D6A3C0CD932DD00AFC79A /* objc_util.m */;
 		functionName = "PyObjCErr_ToObjCWithGILState()";
 		hitCount = 0;
-		ignoreCount = 0;
 		lineNumber = 252;
 		modificationTime = 215653535.918921;
 		state = 1;
 	};
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
+		activeArgIndex = 1;
 		activeArgIndices = (
 			NO,
 			YES,
@@ -34,7 +33,6 @@
 			../../../mmdocuments/NoBudgetStateDemo/index.html,
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 1;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -89,7 +87,7 @@
 				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
 			},
 			{
-				active = NO;
+				active = YES;
 				name = PYTHONVERBOSE;
 				value = 1;
 			},
@@ -149,7 +147,6 @@
 		indexTemplatePath = "";
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeArchitecture = i386;
 		activeBuildConfigurationName = Debug;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
@@ -220,7 +217,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					72.58349609375,
+					72.5835,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -288,8 +285,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215647618;
-			PBXWorkspaceStateSaveDate = 215647618;
+			PBXPerProjectTemplateStateSaveDate = 215705244;
+			PBXWorkspaceStateSaveDate = 215705244;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {

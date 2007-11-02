@@ -16,6 +16,17 @@ class MyStateComponentFactory(ambulant.state_component_factory):
         if uri == NS_XPATH:
             return MyStateComponent(self.domdocument)
         return None
+        
+class MyFormFacesStateComponentFactory(ambulant.state_component_factory):
+    def __init__(self, domdocument, scriptobject):
+        self.domdocument = domdocument
+        self.scriptobject = scriptobject
+        
+    def new_state_component(self, uri):
+        print 'new_state_component, uri=', uri
+        if uri == NS_XPATH:
+            return MyFormFacesStateComponent(self.domdocument, self.scriptobject)
+        return None
 
 class MainThreadCaller(Foundation.NSObject):
     
@@ -49,7 +60,6 @@ class MyStateComponent(ambulant.state_component):
         self.globscope = {}
         self.domdocument = domdocument
         if DEBUG: print 'DOMDocument is', self.domdocument
-        if DEBUG: print 'DOMDocument has', dir(self.domdocument)
         self.statenode = None
         self.nsresolver = None
         # What do we want to export to scope???
@@ -61,27 +71,24 @@ class MyStateComponent(ambulant.state_component):
             if name[:5] == 'smil_':
                 self.globscope[name] = getattr(stm, name)
         
+    def get_state_container(self, node_id):
+        if DEBUG: print "state id is", src[1:]
+        statecontainer = self.domdocument.getElementById_(src[1:])
+        if DEBUG: print "state container node is", statecontainer
+        if DEBUG: self._dump(statecontainer)
+        return statecontainer
+        
     def declare_state(self, state):
         pool = Foundation.NSAutoreleasePool.alloc().init()
         if DEBUG: print 'declare_state, node=', state
-        if 0:
-            # "correct" way, which does not work:
-            src = state.get_attribute_1("src")
-            if not src:
-                print "webkitpluginstate: only state with src attribute allowed"
-                return
-            if src[0] != "#":
-                print "webkitpluginstate: only #id allowed for src attribute on state"
-                return
-            if DEBUG: print "state id is", src[1:]
-            statecontainer = self.domdocument.getElementById_(src[1:])
-        else:
-            # Hack, which does work, maybe
-            elements = self.domdocument.getElementsByTagNameNS__(NS_XFORMS, "instance")
-            statecontainer = elements.item_(0)
-            if not statecontainer:
-                import pdb ; pdb.set_trace()
-        if DEBUG: print "state container node is", statecontainer
+        src = state.get_attribute_1("src")
+        if not src:
+            print "webkitpluginstate: only state with src attribute allowed"
+            return
+        if src[0] != "#":
+            print "webkitpluginstate: only #id allowed for src attribute on state"
+            return
+        statecontainer = self.get_state_container(src[1:])
         ch = statecontainer.firstChild()
         while ch and ch.nodeType() != 1:
             if DEBUG: print 'webkitpluginstate: Skip', ch
@@ -105,13 +112,16 @@ class MyStateComponent(ambulant.state_component):
         if DEBUG: print 'bool_expression, expr=', expr
         strexpr = self.string_expression(expr)
         if not strexpr:
+            if DEBUG: print 'bool_expression: empty string -> False'
             return False
         try:
             number = int(strexpr)
         except:
             pass
         else:
+            if DEBUG: print 'bool_expression: number ->', not not number
             return not not number
+        if DEBUG: print 'bool_expression: nonempty string -> True'
         return True
         
     def set_value(self, var, expr):
@@ -178,3 +188,26 @@ class MyStateComponent(ambulant.state_component):
             return value
         print 'string_expression: XPath returned unknown type, resultType=', rv.resultType()
         
+    def _dump(self, domnode, indent=0):
+        if not domnode: return
+        print ' '*indent, domnode
+        ch = domnode.firstChild()
+        self._dump(ch, indent+2)
+        if indent > 0:
+            self._dump(domnode.nextSibling(), indent)
+        
+class MyFormFacesStateComponent(MyStateComponent):
+    def __init__(self, domdocument, scriptengine):
+        MyStateComponent.__init__(self, domdocument)
+        self.scriptengine = scriptengine
+        
+    def get_state_container(self, node_id):
+        stateinstance = self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').getInstanceDocument('jacksinstance')" )
+        print 'stateinstance=', stateinstance
+        return stateinstance
+##        xform = self.scriptengine.evaluateWebScript_("xform")
+##        if xform == None:
+##            print 'webkitplugin: no "xform" variable, is this really FormFaces?'
+##            return
+##        print "xform=", xform
+##        print "dir(xform)=", dir(xform)

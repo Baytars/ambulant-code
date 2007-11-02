@@ -220,8 +220,6 @@
 			<key>Layout</key>
 			<array>
 				<dict>
-					<key>BecomeActive</key>
-					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -273,9 +271,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>3</integer>
-									<integer>1</integer>
-									<integer>0</integer>
+									<integer>45</integer>
+									<integer>44</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -298,7 +295,7 @@
 							<real>244</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>597 220 690 397 0 0 1440 878 </string>
+						<string>625 251 690 397 0 0 1440 878 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -335,7 +332,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {424, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>597 220 690 397 0 0 1440 878 </string>
+								<string>625 251 690 397 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -343,6 +340,8 @@
 							<string>0pt</string>
 						</dict>
 						<dict>
+							<key>BecomeActive</key>
+							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -355,7 +354,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {424, 351}}</string>
 								<key>RubberWindowFrame</key>
-								<string>597 220 690 397 0 0 1440 878 </string>
+								<string>625 251 690 397 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -379,9 +378,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>04E58B950CD7409B00A1B23C</string>
+				<string>042B6A050CDB6FFF00598C2F</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>04E58B960CD7409B00A1B23C</string>
+				<string>042B6A060CDB6FFF00598C2F</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -515,18 +514,11 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>04E58BA40CD76CB300A1B23C</string>
-		<string>04E58BA70CD76CB900A1B23C</string>
-		<string>04E58BA80CD76CB900A1B23C</string>
-		<string>04C0A4340CD28B2A00CEDCA9</string>
-		<string>1CD10A99069EF8BA00B06720</string>
-		<string>04E58BA00CD76CB300A1B23C</string>
-		<string>1C0AD2B3069F1EA900FABCE6</string>
 		<string>04EC0D360CBD8E2B009B6B85</string>
 		<string>/Users/jack/src/ambulant/src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>597 220 690 397 0 0 1440 878 </string>
+	<string>625 251 690 397 0 0 1440 878 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>
@@ -603,7 +595,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>04EC0D360CBD8E2B009B6B85</string>
-				<string>04E58B970CD7409B00A1B23C</string>
+				<string>042B6A070CDB6FFF00598C2F</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -950,7 +942,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {1275, 434}}</string>
 								<key>RubberWindowFrame</key>
-								<string>172 306 1275 475 0 0 1440 878 </string>
+								<string>203 233 1275 475 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXRunSessionModule</string>
@@ -973,18 +965,18 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C0AD2B3069F1EA900FABCE6</string>
-				<string>04E58BA20CD76CB300A1B23C</string>
+				<string>04F427EA0CDB201800DE80D5</string>
 				<string>1CD0528B0623707200166675</string>
-				<string>04E58BA30CD76CB300A1B23C</string>
+				<string>04F427EB0CDB201800DE80D5</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.run</string>
 			<key>WindowString</key>
-			<string>172 306 1275 475 0 0 1440 878 </string>
+			<string>203 233 1275 475 0 0 1440 878 </string>
 			<key>WindowToolGUID</key>
 			<string>1C0AD2B3069F1EA900FABCE6</string>
 			<key>WindowToolIsVisible</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>Identifier</key>

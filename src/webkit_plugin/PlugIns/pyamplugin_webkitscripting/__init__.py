@@ -29,19 +29,28 @@ def initialize(apiversion, factories, gui_player):
 ##    print "contents", dir(webframe)
 ##    import pdb; pdb.set_trace()
     domdocument = webframe.DOMDocument()
+
     #
     # Distinguish between Safari 2 and 3
     #
     if hasattr(domdocument, "evaluate_____"):
+        print "pyamplugin_webkitscripting: Apparently Safari 3 (with XPath support), assume FormFaces"
+        webview = webframe.webView()
+        scriptobject = webview.windowScriptObject()
+        import pyamplugin_webkitscripting.state_xpath
+        state = pyamplugin_webkitscripting.state_xpath
+        sf = state.MyFormFacesStateComponentFactory(domdocument, scriptobject)
+    elif 0:  # Safari 3 with another XForms implementation
         print "pyamplugin_webkitscripting: Apparently Safari 3 (with XPath support)"
         import pyamplugin_webkitscripting.state_xpath
         state = pyamplugin_webkitscripting.state_xpath
+        sf = state.MyStateComponentFactory(domdocument)
     else:
         print "pyamplugin_webkitscripting: Apparently Safari 2 (without XPath support)"
         import pyamplugin_webkitscripting.state
         state = pyamplugin_webkitscripting.state
+        sf = state.MyStateComponentFactory(domdocument)
         
-    sf = state.MyStateComponentFactory(domdocument)
     gsf = factories.get_state_component_factory()
     if not gsf:
         gsf = ambulant.get_global_state_component_factory()
