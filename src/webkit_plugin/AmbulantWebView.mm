@@ -10,6 +10,8 @@
 #import <WebKit/WebKit.h>
 #include "ambulant/config/config.h"
 #include "ambulant/common/plugin_engine.h"
+#include "ambulant/common/preferences.h"
+
 void
 set_statusline(void *view, const char *msg)
 {
@@ -58,6 +60,10 @@ class my_cocoa_window_factory : public ambulant::gui::cocoa::cocoa_window_factor
 
 - (void)webPlugInStart
 {
+#if 1
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_prefer_ffmpeg = false;
+#endif
 	NSDictionary *webPluginAttributesObj = [m_arguments objectForKey:WebPlugInAttributesKey];
     if (!m_mainloop) {
 		container = [m_arguments objectForKey:WebPlugInContainerKey];
