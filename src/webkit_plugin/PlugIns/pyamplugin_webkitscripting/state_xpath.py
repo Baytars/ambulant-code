@@ -78,6 +78,9 @@ class MyStateComponent(ambulant.state_component):
         if DEBUG: self._dump(statecontainer)
         return statecontainer
         
+    def _recalculate(self):
+        pass
+        
     def declare_state(self, state):
         pool = Foundation.NSAutoreleasePool.alloc().init()
         if DEBUG: print 'declare_state, node=', state
@@ -123,6 +126,22 @@ class MyStateComponent(ambulant.state_component):
             return not not number
         if DEBUG: print 'bool_expression: nonempty string -> True'
         return True
+    
+    def _find_node(self, ref):
+        if not self.nsresolver:
+            self.nsresolver = self.domdocument.createNSResolver_(self.statenode)
+        rv = self.domdocument.evaluate_____(ref, self.statenode, self.nsresolver, 0, None)
+        if rv == None or rv.resultType() != 4:
+            print 'webkitpluginstate: ref="%s": did not return a nodeset' % ref
+            return None
+        node = rv.iterateNext()
+        if not node:
+            print 'webkitpluginstate: ref="%s": empty nodeset' % ref
+            return None
+        if rv.iterateNext():
+            print 'webkitpluginstate: ref="%s": more than one item in nodeset' % ref
+        print '_find_node("%s")->%s' % (ref, node)
+        return node
         
     def set_value(self, var, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
@@ -131,26 +150,49 @@ class MyStateComponent(ambulant.state_component):
     def _set_value(self, var, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
         if DEBUG: print 'set_value', (var, expr)
-        value = self.string_expression(expr)
-        nodelist = self.statenode.getElementsByTagName_(var)
-        node = nodelist.item_(0)
+        value = self._string_expression(expr)
+        node = self._find_node(var)
         if not node:
-            print 'webkitpluginstate: set_value: no such node:', var
             return
+        print 'setvalue: NODE', node
+##        print 'DIR()', dir(node)
+##        print 'DIR(document)', dir(self.domdocument)
         valuenode = node.firstChild()
         if not valuenode:
-            print 'webkitpluginstate: set_value: not yet imp: node has no data yet:', node
-            return
+            valuenode = self.domdocument.createTextNode_(value)
+            node.appendChild_(valuenode)
         valuenode.setNodeValue_(value)
+        self._recalculate()
+        print '_set_value: node is now', self._string_expression(var)
         
     def new_value(self, ref, where, name, expr):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        if DEBUG: print 'NOTIMPLEMENTED: new_value, statement=', (ref, where, name, expr)
-##        exec stmt in self.scope, self.globscope
+        return callWait(self._new_value, ref, where, name, expr)
+    
+    def _new_value(self, ref, where, name, expr):
+        parentnode = self._find_node(ref)
+        if not parentnode:
+            return
+        value = self._string_expression(expr)
+        if where and where != 'child':
+            print 'XXX newvalue: only child supported'
+        newnode = self.domdocument.createElement_(name)
+        valuenode = self.domdocument.createTextNode_(value)
+        newnode.appendChild_(valuenode)
+        parentnode.appendChild_(newnode)
+        self._recalculate()
         
     def del_value(self, ref):
         pool = Foundation.NSAutoreleasePool.alloc().init()
-        print 'NOT IMPLEMENTED: del_value, ref=', ref
+        return callWait(self._del_value, ref)
+        
+    def _del_value(self, ref):
+        node = self._find_node(ref)
+        if not node: return
+        parent = node.parentElement()
+        parentElement.removeChild_(node)
+        print 'XXX delete', node
+        self._recalculate()
         
     def send(self, submission):
         pool = Foundation.NSAutoreleasePool.alloc().init()
@@ -211,3 +253,7 @@ class MyFormFacesStateComponent(MyStateComponent):
 ##            return
 ##        print "xform=", xform
 ##        print "dir(xform)=", dir(xform)
+
+    def _recalculcate(self):
+        self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').recalculate()")
+        
