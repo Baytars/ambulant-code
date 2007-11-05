@@ -78,7 +78,7 @@ class MyStateComponent(ambulant.state_component):
         if DEBUG: self._dump(statecontainer)
         return statecontainer
         
-    def _recalculate(self):
+    def _recalculate(self, node):
         pass
         
     def declare_state(self, state):
@@ -162,7 +162,7 @@ class MyStateComponent(ambulant.state_component):
             valuenode = self.domdocument.createTextNode_(value)
             node.appendChild_(valuenode)
         valuenode.setNodeValue_(value)
-        self._recalculate()
+        self._recalculate(node)
         print '_set_value: node is now', self._string_expression(var)
         
     def new_value(self, ref, where, name, expr):
@@ -170,6 +170,7 @@ class MyStateComponent(ambulant.state_component):
         return callWait(self._new_value, ref, where, name, expr)
     
     def _new_value(self, ref, where, name, expr):
+        if DEBUG: print 'newvalue', (ref, where, name, expr)
         parentnode = self._find_node(ref)
         if not parentnode:
             return
@@ -177,10 +178,14 @@ class MyStateComponent(ambulant.state_component):
         if where and where != 'child':
             print 'XXX newvalue: only child supported'
         newnode = self.domdocument.createElement_(name)
-        valuenode = self.domdocument.createTextNode_(value)
-        newnode.appendChild_(valuenode)
+        if value:
+            valuenode = self.domdocument.createTextNode_(value)
+            newnode.appendChild_(valuenode)
         parentnode.appendChild_(newnode)
-        self._recalculate()
+        self._recalculate(parentnode)
+        print 'newvalue: all done'
+        x = self._string_expression(ref+'/'+name)
+        print 'newvalue:', ref+'/'+name, 'is now', x
         
     def del_value(self, ref):
         pool = Foundation.NSAutoreleasePool.alloc().init()
@@ -192,7 +197,7 @@ class MyStateComponent(ambulant.state_component):
         parent = node.parentElement()
         parentElement.removeChild_(node)
         print 'XXX delete', node
-        self._recalculate()
+        self._recalculate(parentElement)
         
     def send(self, submission):
         pool = Foundation.NSAutoreleasePool.alloc().init()
@@ -209,13 +214,14 @@ class MyStateComponent(ambulant.state_component):
             self.nsresolver = self.domdocument.createNSResolver_(self.statenode)
         rv = self.domdocument.evaluate_____(expr, self.statenode, self.nsresolver, 0, None)
         if DEBUG: print 'string_expression returned', rv
+        if DEBUG: print 'string_expression resultType', rv.resultType()
 ##       import pdb ; pdb.set_trace()
         if rv.resultType() == 1:
             return str(rv.numberValue())
         if rv.resultType() == 2:
-            return str(rv.booleanValue())
-        if rv.resultType() == 3:
             return rv.stringValue()
+        if rv.resultType() == 3:
+            return str(rv.booleanValue())
         if rv.resultType() == 4: # node iterators
             node = rv.iterateNext()
             if not node:
@@ -254,6 +260,11 @@ class MyFormFacesStateComponent(MyStateComponent):
 ##        print "xform=", xform
 ##        print "dir(xform)=", dir(xform)
 
-    def _recalculcate(self):
+    def _recalculate(self, node):
+        ##node.revalidate()
+        self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').rebuild()")
         self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').recalculate()")
+        self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').revalidate()")
+        self.scriptengine.evaluateWebScript_("document.getElementById('jacksmodel').refresh()")
+        ##import pdb ; pdb.set_trace()
         
