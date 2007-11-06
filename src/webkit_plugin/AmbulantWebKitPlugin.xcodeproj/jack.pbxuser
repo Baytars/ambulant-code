@@ -20,7 +20,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 252;
-		modificationTime = 215967433.380747;
+		modificationTime = 216018618.006405;
 		state = 0;
 	};
 	04239D220CD2895A00152474 /* Safari */ = {
@@ -89,7 +89,7 @@
 				value = "/Applications/Ambulant Player.app/Contents/PlugIns";
 			},
 			{
-				active = YES;
+				active = NO;
 				name = PYTHONVERBOSE;
 				value = 1;
 			},
@@ -130,9 +130,9 @@
 	};
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {805, 2408}}";
+			sepNavIntBoundsRect = "{{0, 0}, {805, 2422}}";
 			sepNavSelRange = "{331, 0}";
-			sepNavVisRange = "{0, 911}";
+			sepNavVisRange = "{0, 948}";
 			sepNavVisRect = "{{0, 655}, {751, 649}}";
 		};
 	};
@@ -220,7 +220,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					72.58349609375,
+					73,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -288,8 +288,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215964838;
-			PBXWorkspaceStateSaveDate = 215964838;
+			PBXPerProjectTemplateStateSaveDate = 216017696;
+			PBXWorkspaceStateSaveDate = 216017696;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
