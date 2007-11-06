@@ -174,13 +174,14 @@ class MyStateComponent(ambulant.state_component):
         parentnode = self._find_node(ref)
         if not parentnode:
             return
-        value = self._string_expression(expr)
         if where and where != 'child':
             print 'XXX newvalue: only child supported'
         newnode = self.domdocument.createElement_(name)
-        if value:
-            valuenode = self.domdocument.createTextNode_(value)
-            newnode.appendChild_(valuenode)
+        if expr:
+            value = self._string_expression(expr)
+            if value:
+                valuenode = self.domdocument.createTextNode_(value)
+                newnode.appendChild_(valuenode)
         parentnode.appendChild_(newnode)
         self._recalculate(parentnode)
         print 'newvalue: all done'

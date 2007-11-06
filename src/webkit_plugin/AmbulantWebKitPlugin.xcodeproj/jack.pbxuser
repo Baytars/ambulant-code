@@ -20,8 +20,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 252;
-		modificationTime = 215965758.196344;
-		state = 1;
+		modificationTime = 215967433.380747;
+		state = 0;
 	};
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
