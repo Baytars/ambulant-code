@@ -4,6 +4,10 @@
 
 using namespace ambulant;
 
+#ifndef AM_DBG
+#define AM_DBG if(0)
+#endif
+
 lib::node_factory *
 create_wkdom_node_factory(void *webframe)
 {
@@ -46,8 +50,9 @@ wkdom_node_factory::new_node(const char *local_name, const char **attrs , const 
 		NSString *nsattrname = [NSString stringWithCString: attrname];
 		NSString *nsattrvalue = [NSString stringWithCString: attrvalue];
 		[w setAttribute: nsattrname : nsattrvalue];
+		NSLog(@"wkdom_node: <%@>.set_attribute(%@, %@)", [w tagName], nsattrname, nsattrvalue);
 	}
-	return wkdom_node::id2node(w);
+	return wkdom_node::id2node(w, ctx);
 }
 
 
@@ -66,8 +71,9 @@ wkdom_node_factory::new_node(const lib::xml_string& local_name, const char **att
 		NSString *nsattrname = [NSString stringWithCString: attrname];
 		NSString *nsattrvalue = [NSString stringWithCString: attrvalue];
 		[w setAttribute: nsattrname : nsattrvalue];
+		NSLog(@"wkdom_node: <%@>.set_attribute(%@, %@)", [w tagName], nsattrname, nsattrvalue);
 	}
-	return wkdom_node::id2node(w);
+	return wkdom_node::id2node(w, ctx);
 }
 
 lib::node *
@@ -86,9 +92,15 @@ wkdom_node_factory::new_node(const lib::q_name_pair& qn, const lib::q_attributes
 		NSString *nsattruri = [NSString stringWithCString: attruri.c_str()];
 		NSString *nsattrname = [NSString stringWithCString: attrname.c_str()];
 		NSString *nsattrvalue = [NSString stringWithCString: attrvalue.c_str()];
-		[w setAttributeNS: nsattruri : nsattrname : nsattrvalue];
+		if ([nsattruri length] == 0) {
+			[w setAttribute: nsattrname : nsattrvalue];
+			NSLog(@"wkdom_node: <%@>.set_attribute(%@, %@)", [w tagName], nsattrname, nsattrvalue);
+		} else {
+			[w setAttributeNS: nsattruri : nsattrname : nsattrvalue];
+			NSLog(@"wkdom_node: <%@>.set_attribute(%@:%@, %@)", [w tagName], nsattruri, nsattrname, nsattrvalue);
+		}
 	}
-	return wkdom_node::id2node(w);
+	return wkdom_node::id2node(w, ctx);
 }
 
 lib::node *
@@ -97,7 +109,7 @@ wkdom_node_factory::new_node(const lib::node* other)
 	const wkdom_node *o = dynamic_cast<const wkdom_node *>(other);
 	assert(o);
 	DOMNode *w = [o->m_self cloneNode: true];
-	return wkdom_node::id2node(w);
+	return wkdom_node::id2node(w, o->get_context());
 }
 
 lib::node *
@@ -107,41 +119,23 @@ wkdom_node_factory::new_data_node(const char *data, size_t size, const lib::node
 	assert(doc);
 	NSString *str = [[NSString alloc] initWithBytes: data length: size encoding:NSUTF8StringEncoding];
 	DOMText *w = [doc createTextNode: str];
-	return wkdom_node::id2node(w);
+	return wkdom_node::id2node(w, ctx);
 }
-
-#if 0
-wkdom_node::wkdom_node(const char *local_name, const char **attrs, const lib::node_context *ctx)
-{
-}
-
-wkdom_node::wkdom_node(const lib::xml_string& local_name, const char **attrs, const lib::node_context *ctx)
-{
-}
-
-wkdom_node::wkdom_node(const lib::q_name_pair& qn, const lib::q_attributes_list& qattrs, const lib::node_context *ctx)
-{
-}
-
-wkdom_node::wkdom_node(const lib::node* other)
-{
-}
-
-wkdom_node::wkdom_node(const char *data, size_t size, const lib::node_context *ctx)
-{
-}
-#endif
 
 std::map<const DOMNode *, wkdom_node *> wkdom_node::s_id2node;
 wkdom_node *
-wkdom_node::id2node(const DOMNode *w)
+wkdom_node::id2node(const DOMNode *w, const lib::node_context *ctx)
 {
+	if (w == NULL) return NULL;
 	std::map<const DOMNode *, wkdom_node *>::iterator i = s_id2node.find(w);
 	if (i == s_id2node.end()) {
-		wkdom_node *wrapper = new wkdom_node(w);
+		wkdom_node *wrapper = new wkdom_node(w, ctx);
+		assert(wrapper);
 		s_id2node[w] = wrapper;
+		AM_DBG lib::logger::get_logger()->debug("id2node: NEW 0x%x -> 0x%x", w, wrapper);
 		return wrapper;
 	}
+	AM_DBG lib::logger::get_logger()->debug("id2node:     0x%x -> 0x%x", w, (*i).second);
 	return (*i).second;
 }
 
@@ -193,37 +187,37 @@ wkdom_node::~wkdom_node() {
 const wkdom_node *
 wkdom_node::down() const
 {
-	return id2node([m_self firstChild]);
+	return id2node([m_self firstChild], m_context);
 }
 
 const wkdom_node *
 wkdom_node::up() const
 {
-	return id2node([m_self parentNode]);
+	return id2node([m_self parentNode], m_context);
 }
 
 const wkdom_node *
 wkdom_node::next() const
 {
-	return id2node([m_self nextSibling]);
+	return id2node([m_self nextSibling], m_context);
 }
 
 wkdom_node *
 wkdom_node::down()
 {
-	return id2node([m_self firstChild]);
+	return id2node([m_self firstChild], m_context);
 }
 
 wkdom_node *
 wkdom_node::up()
 {
-	return id2node([m_self parentNode]);
+	return id2node([m_self parentNode], m_context);
 }
 
 wkdom_node *
 wkdom_node::next()
 {
-	return id2node([m_self nextSibling]);
+	return id2node([m_self nextSibling], m_context);
 }
 
 //////////////////////
@@ -264,12 +258,12 @@ wkdom_node::next(wkdom_node *n)
 
 const wkdom_node* 
 wkdom_node::previous() const { 
-	return id2node([m_self previousSibling]); 
+	return id2node([m_self previousSibling], m_context); 
 }
 
 const wkdom_node* 
 wkdom_node::get_last_child() const { 
-	return id2node([m_self lastChild]);
+	return id2node([m_self lastChild], m_context);
 }
 
 void wkdom_node::get_children(std::list<const lib::node*>& l) const {
@@ -371,7 +365,7 @@ std::string wkdom_node::get_path_display_desc() const {
 	
 wkdom_node* 
 wkdom_node::append_child(wkdom_node* child) { 
-	return id2node([m_self appendChild: child->m_self]);
+	return id2node([m_self appendChild: child->m_self], m_context);
 }
 		
 wkdom_node* 
@@ -381,7 +375,7 @@ wkdom_node::append_child(const char *name) {
 	assert(doc);
 	NSString *tag = [NSString stringWithCString: name];
 	DOMElement *w = [doc createElement: tag];
-	append_child(id2node(w));
+	append_child(id2node(w, m_context));
 }
 
 wkdom_node* 
@@ -410,13 +404,17 @@ void wkdom_node::append_data(const lib::xml_string& str) {
 void wkdom_node::set_attribute(const char *name, const char *value) { 
 	NSString *nsattrname = [NSString stringWithCString: name];
 	NSString *nsattrvalue = [NSString stringWithCString: value];
+	assert([m_self nodeType] == DOM_ELEMENT_NODE);
 	[(DOMElement *)m_self setAttribute: nsattrname : nsattrvalue];
+	NSLog(@"wkdom_node: <%@>.set_attribute(%@, %@)", [(DOMElement *)m_self tagName], nsattrname, nsattrvalue);
 }
 
 void wkdom_node::set_attribute(const char *name, const lib::xml_string& value) {
 	NSString *nsattrname = [NSString stringWithCString: name];
 	NSString *nsattrvalue = [NSString stringWithCString: value.c_str()];
+	assert([m_self nodeType] == DOM_ELEMENT_NODE);
 	[(DOMElement *)m_self setAttribute: nsattrname : nsattrvalue];
+	NSLog(@"wkdom_node: <%@>.set_attribute(%@, %@)", [(DOMElement *)m_self tagName], nsattrname, nsattrvalue);
 }
 
 // Note: attrs are as per expat parser
@@ -435,7 +433,7 @@ wkdom_node::set_prefix_mapping(const std::string& prefix, const std::string& uri
 // create a deep copy of this
 wkdom_node* 
 wkdom_node::clone() const {
-	return id2node([m_self cloneNode: true]);
+	return id2node([m_self cloneNode: true], m_context);
 }
 
 ////////////////////////
@@ -453,8 +451,12 @@ const lib::xml_string&
 wkdom_node::get_local_name() const
 {
 	static lib::xml_string rv; // XXXX bad static!
-	NSString *nstag = [(DOMElement *)m_self tagName];
-	rv = lib::xml_string([nstag cStringUsingEncoding: NSUTF8StringEncoding]);
+	if([m_self nodeType] == DOM_ELEMENT_NODE) {
+		NSString *nstag = [(DOMElement *)m_self tagName];
+		rv = lib::xml_string([nstag cStringUsingEncoding: NSUTF8StringEncoding]);
+	} else {
+		rv = lib::xml_string("");
+	}
 	return rv;
 }
 
@@ -494,9 +496,16 @@ wkdom_node::get_trimmed_data() const {
 
 const char *
 wkdom_node::get_attribute(const char *name) const {
+	if ([m_self nodeType] != DOM_ELEMENT_NODE)
+		return NULL;
 	NSString *attrname = [NSString stringWithCString: name];
+	if (![(DOMElement *)m_self hasAttribute: attrname]) {
+		NSLog(@"wkdom_node: <%@>.get_attribute(%@) -> NULL", [(DOMElement *)m_self tagName], attrname);
+		return NULL;
+	}
 	NSString *attrvalue = [(DOMElement *)m_self getAttribute: attrname];
 	if (attrvalue == NULL) return NULL;
+	NSLog(@"wkdom_node: <%@>.get_attribute(%@) -> %@", [(DOMElement *)m_self tagName], attrname, attrvalue);
 	return [attrvalue cStringUsingEncoding: NSUTF8StringEncoding];
 }
 
@@ -504,6 +513,7 @@ void
 wkdom_node::del_attribute(const char *name)
 {
 	NSString *attrname = [NSString stringWithCString: name];
+	assert([m_self nodeType] == DOM_ELEMENT_NODE);
 	[(DOMElement *)m_self removeAttribute: attrname];
 }
 
@@ -518,7 +528,7 @@ wkdom_node::get_url(const char *attrname) const {
 	const char *rurl = get_attribute(attrname);
 	if(!rurl) return net::url();
 	net::url url = net::url::from_url(rurl);
-	unimplemented(); // Should resolve the URL against the base URL for this document
+	return m_context ? m_context->resolve_url(url) : url;
 	return url;
 }
 
@@ -577,8 +587,7 @@ wkdom_node::size() const {
 const lib::node_context*
 wkdom_node::get_context() const
 {
-	unimplemented();
-	return NULL;
+	return m_context;
 }
 
 /// Set the node_context for this node.

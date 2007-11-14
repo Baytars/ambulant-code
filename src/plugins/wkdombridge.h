@@ -35,32 +35,16 @@ class wkdom_node : public lib::node_interface {
 	friend class wkdom_node_factory;
   private:
 
-#if 0    // Constructors
-	wkdom_node(const char *local_name, const char **attrs, const lib::node_context *ctx);
-
-	/// Construct a new, unconnected, node.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	wkdom_node(const lib::xml_string& local_name, const char **attrs, const lib::node_context *ctx);
-
-	/// Construct a new, unconnected, node.
-	/// Note: attrs are as per expat parser
-	/// e.g. const char* attrs[] = {"attr_name", "attr_value", ..., 0};
-	wkdom_node(const lib::q_name_pair& qn, const lib::q_attributes_list& qattrs, const lib::node_context *ctx);
-
-	// shallow copy from other.
-	wkdom_node(const lib::node* other);
-	
-	wkdom_node(const char *data, size_t size, const lib::node_context *ctx);
-#endif
   private:
-  	wkdom_node(DOMElement *w)
-  	:	m_self(w) {}
+  	wkdom_node(DOMElement *w, const lib::node_context *ctx)
+  	:	m_self(w),
+  		m_context(ctx) {}
   	DOMNode *m_self;
+  	const lib::node_context *m_context;
   	static std::map<const DOMNode *, wkdom_node *> s_id2node; // XXXX Temp static
   	static std::map<const lib::node_context *, DOMDocument *> s_ctx2doc; // XXXX Temp static
   	static DOMImplementation *s_implementation;
-	static wkdom_node *id2node(const DOMNode *w);
+	static wkdom_node *id2node(const DOMNode *w, const lib::node_context *);
 	static DOMDocument *ctx2doc(const lib::node_context *ctx);
 	
   public:

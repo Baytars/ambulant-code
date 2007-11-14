@@ -13,18 +13,17 @@
 		);
 		breakpointStyle = 0;
 		continueAfterActions = 0;
-		countType = 0;
 		delayBeforeContinue = 0;
 		fileReference = 041D6A3C0CD932DD00AFC79A /* objc_util.m */;
 		functionName = "PyObjCErr_ToObjCWithGILState()";
-		hitCount = 0;
-		ignoreCount = 0;
+		hitCount = 1;
 		lineNumber = 252;
-		modificationTime = 216018618.006405;
+		modificationTime = 216746936.701282;
 		state = 0;
 	};
 	04239D220CD2895A00152474 /* Safari */ = {
 		isa = PBXExecutable;
+		activeArgIndex = 1;
 		activeArgIndices = (
 			NO,
 			YES,
@@ -34,7 +33,6 @@
 			../../../mmdocuments/NoBudgetStateDemo/index.html,
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 1;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -121,19 +119,114 @@
 			sepNavVisRange = "{0, 1420}";
 		};
 	};
+	048B3E620CEB2934006102B3 /* XCBreakpointsBucket */ = {
+		isa = XCBreakpointsBucket;
+		name = AmbulantWebKitPlugin;
+		objects = (
+			041D6A3E0CD932DD00AFC79A /* objc_util.m:252 */,
+		);
+	};
+	048B3E7F0CEB3328006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "error: redeclaration of 'void* edptr'";
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		rLen = 1;
+		rLoc = 78;
+		rType = 1;
+	};
+	048B3E800CEB3328006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3E930CEB33B2006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3E940CEB33B2006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3E980CEB3580006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3E990CEB3582006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3E9F0CEB360C006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3EA50CEB37CC006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
+	048B3EA90CEB37CF006102B3 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
+		name = "AmbulantWebView.mm: 79";
+		rLen = 0;
+		rLoc = 1993;
+		rType = 0;
+		vrLen = 630;
+		vrLoc = 1669;
+	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {751, 649}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1096, 665}}";
 			sepNavSelRange = "{620, 0}";
-			sepNavVisRect = "{{0, 0}, {751, 649}}";
+			sepNavVisRect = "{{0, 0}, {1096, 665}}";
 		};
 	};
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {805, 2422}}";
-			sepNavSelRange = "{331, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1096, 2562}}";
+			sepNavSelRange = "{2210, 0}";
 			sepNavVisRange = "{0, 948}";
-			sepNavVisRect = "{{0, 655}, {751, 649}}";
+			sepNavVisRect = "{{0, 801}, {1096, 665}}";
 		};
 	};
 	04EC0D310CBD8D22009B6B85 /* Source Control */ = {
@@ -149,7 +242,6 @@
 		indexTemplatePath = "";
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeArchitecture = i386;
 		activeBuildConfigurationName = Debug;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
@@ -159,6 +251,7 @@
 		breakpoints = (
 			041D6A3E0CD932DD00AFC79A /* objc_util.m:252 */,
 		);
+		breakpointsGroup = 048B3E620CEB2934006102B3 /* XCBreakpointsBucket */;
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
 		executables = (
 			04239D220CD2895A00152474 /* Safari */,
@@ -220,7 +313,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					73,
+					72.5835,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -288,8 +381,19 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 216017696;
-			PBXWorkspaceStateSaveDate = 216017696;
+			PBXPerProjectTemplateStateSaveDate = 216738067;
+			PBXWorkspaceStateSaveDate = 216738067;
+		};
+		perUserProjectItems = {
+			048B3E7F0CEB3328006102B3 /* PBXTextBookmark */ = 048B3E7F0CEB3328006102B3 /* PBXTextBookmark */;
+			048B3E800CEB3328006102B3 /* PBXTextBookmark */ = 048B3E800CEB3328006102B3 /* PBXTextBookmark */;
+			048B3E930CEB33B2006102B3 /* PBXTextBookmark */ = 048B3E930CEB33B2006102B3 /* PBXTextBookmark */;
+			048B3E940CEB33B2006102B3 /* PBXTextBookmark */ = 048B3E940CEB33B2006102B3 /* PBXTextBookmark */;
+			048B3E980CEB3580006102B3 /* PBXTextBookmark */ = 048B3E980CEB3580006102B3 /* PBXTextBookmark */;
+			048B3E990CEB3582006102B3 /* PBXTextBookmark */ = 048B3E990CEB3582006102B3 /* PBXTextBookmark */;
+			048B3E9F0CEB360C006102B3 /* PBXTextBookmark */ = 048B3E9F0CEB360C006102B3 /* PBXTextBookmark */;
+			048B3EA50CEB37CC006102B3 /* PBXTextBookmark */ = 048B3EA50CEB37CC006102B3 /* PBXTextBookmark */;
+			048B3EA90CEB37CF006102B3 /* PBXTextBookmark */ = 048B3EA90CEB37CF006102B3 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
