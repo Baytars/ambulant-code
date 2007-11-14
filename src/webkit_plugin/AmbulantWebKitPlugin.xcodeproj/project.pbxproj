@@ -13,6 +13,8 @@
 		045D0B5C0958C36B00C194EE /* libintl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B5B0958C36B00C194EE /* libintl.a */; };
 		045D0B800958C53F00C194EE /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 045D0B7E0958C53F00C194EE /* mainloop.cpp */; };
 		045D0B930958C71E00C194EE /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 045D0B920958C71E00C194EE /* libexpat.a */; };
+		048B3E720CEB32EF006102B3 /* libamplugin_wkdom.la in CopyFiles */ = {isa = PBXBuildFile; fileRef = 048B3E700CEB32EF006102B3 /* libamplugin_wkdom.la */; };
+		048B3E730CEB32EF006102B3 /* libamplugin_wkdom.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 048B3E710CEB32EF006102B3 /* libamplugin_wkdom.0 */; };
 		049775AC0958AC7600A7690F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049775AB0958AC7600A7690F /* WebKit.framework */; };
 		049775B90958ADC500A7690F /* AmbulantWebView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 049775B80958ADC500A7690F /* AmbulantWebView.mm */; };
 		0499E8970959B22200A7FDF8 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0499E8960959B22200A7FDF8 /* libavcodec.a */; };
@@ -46,6 +48,8 @@
 				04C0A49C0CD2A19B00CEDCA9 /* pyamplugin_webkitscripting in CopyFiles */,
 				04C0A4B30CD2A44A00CEDCA9 /* libamplugin_python.0 in CopyFiles */,
 				04C0A4BD0CD2A61700CEDCA9 /* libamplugin_python.la in CopyFiles */,
+				048B3E730CEB32EF006102B3 /* libamplugin_wkdom.0 in CopyFiles */,
+				048B3E720CEB32EF006102B3 /* libamplugin_wkdom.la in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +66,8 @@
 		045D0B7E0958C53F00C194EE /* mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop.cpp; path = ../player_macosx/mainloop.cpp; sourceTree = SOURCE_ROOT; };
 		045D0B7F0958C53F00C194EE /* mainloop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mainloop.h; path = ../player_macosx/mainloop.h; sourceTree = SOURCE_ROOT; };
 		045D0B920958C71E00C194EE /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = "third_party_packages/expat-unix/lib/libexpat.a"; sourceTree = PREBUILT_AMBULANT_ROOT; };
+		048B3E700CEB32EF006102B3 /* libamplugin_wkdom.la */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = libamplugin_wkdom.la; path = "../../build-smil30/src/plugins/.libs/libamplugin_wkdom.la"; sourceTree = SOURCE_ROOT; };
+		048B3E710CEB32EF006102B3 /* libamplugin_wkdom.0 */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; name = libamplugin_wkdom.0; path = "../../build-smil30/src/plugins/.libs/libamplugin_wkdom.0"; sourceTree = SOURCE_ROOT; };
 		049775AB0958AC7600A7690F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		049775B70958ADC500A7690F /* AmbulantWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantWebView.h; sourceTree = "<group>"; };
 		049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AmbulantWebView.mm; sourceTree = "<group>"; };
@@ -144,6 +150,8 @@
 				04C0A4990CD2A19B00CEDCA9 /* pyamplugin_webkitscripting */,
 				04C0A4B20CD2A44A00CEDCA9 /* libamplugin_python.0 */,
 				04C0A4BC0CD2A61700CEDCA9 /* libamplugin_python.la */,
+				048B3E710CEB32EF006102B3 /* libamplugin_wkdom.0 */,
+				048B3E700CEB32EF006102B3 /* libamplugin_wkdom.la */,
 			);
 			name = PlugIns;
 			sourceTree = "<group>";
@@ -266,7 +274,6 @@
 		089C1669FE841209C02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB913E08733D840010E9CD /* Build configuration list for PBXProject "AmbulantWebKitPlugin" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 089C166AFE841209C02AAC07 /* AmbulantWebKitPlugin */;
 			projectDirPath = "";
