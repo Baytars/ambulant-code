@@ -36,9 +36,7 @@ class wkdom_node : public lib::node_interface {
   private:
 
   private:
-  	wkdom_node(DOMElement *w, const lib::node_context *ctx)
-  	:	m_self(w),
-  		m_context(ctx) {}
+  	wkdom_node(DOMElement *w, const lib::node_context *ctx);
   	DOMNode *m_self;
   	const lib::node_context *m_context;
   	static std::map<const DOMNode *, wkdom_node *> s_id2node; // XXXX Temp static
