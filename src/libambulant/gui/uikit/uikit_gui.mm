@@ -22,7 +22,7 @@
 //#include "ambulant/gui/uikit/uikit_html.h"
 //#include "ambulant/gui/uikit/uikit_image.h"
 //#include "ambulant/gui/uikit/uikit_ink.h"
-//#include "ambulant/gui/uikit/uikit_fill.h"
+#include "ambulant/gui/uikit/uikit_fill.h"
 //#include "ambulant/gui/uikit/uikit_video.h"
 //#include "ambulant/gui/uikit/uikit_dsvideo.h"
 #ifdef WITH_SMIL30
@@ -33,7 +33,7 @@
 
 #include <UIKit/UIKit.h>
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -167,10 +167,8 @@ uikit_renderer_factory::new_playable(
 		}
 #endif
 	} else if ( tag == "brush") {
-#if NOT_YET_UIKIT
 		rv = new uikit_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_fill_renderer 0x%x", (void *)node, (void *)rv);
-#endif
 	} else if ( tag == "video") {
 #if NOT_YET_UIKIT
 		if (common::preferences::get_preferences()->m_prefer_ffmpeg ) {
@@ -278,11 +276,7 @@ uikit_window_factory::init_window_size(uikit_window *window, const std::string &
 common::bgrenderer *
 uikit_window_factory::new_background_renderer(const common::region_info *src)
 {
-#if NOT_YET_UIKIT
 	return new uikit_background_renderer(src);
-#else
-	return NULL;
-#endif
 }
 
 void
