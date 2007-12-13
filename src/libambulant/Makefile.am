@@ -63,6 +63,28 @@ toolkit_cocoa_libraries =
 platlibs =
 endif
 
+if WITH_UIKIT
+toolkit_uikit_libraries = libambulant_uikit.la
+# XXX Should LIBINTL depend on USE_NLS?
+platlibs = $(LIBINTL) -framework UIKit -framework CoreFoundation
+libambulant_uikit_la_SOURCES = \
+	gui/uikit/uikit_gui.m
+#	gui/uikit/uikit_fill.m \
+#	gui/uikit/uikit_html.m \
+#	gui/uikit/uikit_image.m \
+#	gui/uikit/uikit_ink.m \
+#	gui/uikit/uikit_text.m \
+#	gui/uikit/uikit_renderer.m \
+#	gui/uikit/uikit_smiltext.m \
+#	gui/uikit/uikit_transition.m \
+#	gui/uikit/uikit_audio.m \
+#	gui/uikit/uikit_video.m \
+#	gui/uikit/uikit_dsvideo.m
+else
+toolkit_uikit_libraries =
+platlibs =
+endif
+
 if WITH_GTK
 toolkit_gtk_libraries = libambulant_gtk.la
 gtkincludes =$(GTK_CFLAGS)
@@ -207,6 +229,7 @@ INCLUDES = \
 lib_LTLIBRARIES = \
 	libambulant.la \
 	$(toolkit_cocoa_libraries) \
+	$(toolkit_uikit_libraries) \
 	$(toolkit_qt_libraries) \
 	$(toolkit_gstreamer_libraries) \
 	$(toolkit_gtk_libraries) \
@@ -311,6 +334,7 @@ EXTRA_DIST= \
 	gui/SDL \
 	gui/arts \
 	gui/cocoa \
+	gui/uikit \
 	gui/dg \
 	gui/dx \
 	gui/qt \
