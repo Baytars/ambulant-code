@@ -98,11 +98,15 @@ uikit_fill_renderer::redraw_body(const rect &dirty, gui_window *window)
 	if (ri) alfa = ri->get_mediaopacity();
 #endif
 	float components[] = {redf(color), greenf(color), bluef(color), alfa};
-	CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
+//	CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
 			
-//	XYZZY_[nscolor set];
-//	XYXXY_CGRectFillUsingOperation(uikit_dstrect_whole, NSCompositeSourceAtop);
-	CGColorRelease(cgcolor);
+//	PLOVER [nscolor set];
+//	PLOVER CGRectFillUsingOperation(uikit_dstrect_whole, NSCompositeSourceAtop);
+	CGContextRef myContext = UICurrentContext();
+//	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextSetFillColor(myContext, components);
+	CGContextFillRect(myContext, uikit_dstrect_whole);
+//	CGColorRelease(cgcolor);
 	m_lock.leave();
 }
 
@@ -121,6 +125,8 @@ uikit_background_renderer::redraw(const lib::rect &dirty, common::gui_window *wi
 	
 	uikit_window *cwindow = (uikit_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
+	CGContextRef myContext = UICurrentContext();
+//	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
 	AM_DBG lib::logger::get_logger()->debug("uikit_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
 	rect dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
@@ -132,17 +138,20 @@ uikit_background_renderer::redraw(const lib::rect &dirty, common::gui_window *wi
 		color_t bgcolor = m_src->get_bgcolor();
 		AM_DBG lib::logger::get_logger()->debug("uikit_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)bgcolor, opacity);
 		float components[] = {redf(bgcolor), greenf(bgcolor), bluef(bgcolor), opacity};
-		CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
-//		XYZZY_[uikit_bgcolor set];
-//		XYZZY_CGRectFillUsingOperation(uikit_dstrect_whole, NSCompositeSourceAtop);
-		CGColorRelease(cgcolor);
+//		CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
+//		PLOVER [uikit_bgcolor set];
+//		PLOVER CGRectFillUsingOperation(uikit_dstrect_whole, NSCompositeSourceAtop);
+		CGContextSetFillColor(myContext, components);
+		CGContextFillRect(myContext, uikit_dstrect_whole);
+//		CGColorRelease(cgcolor);
 	}
 	if (m_bgimage) {
 		AM_DBG lib::logger::get_logger()->debug("uikit_background_renderer::redraw(): drawing image");
-		CGRect srcrect = CGRectMake(0, 0, 
-			CGImageGetWidth(m_bgimage), CGImageGetHeight(m_bgimage));
-//		XYZZY [m_bgimage drawInRect: uikit_dstrect_whole fromRect: srcrect
+//		CGRect srcrect = CGRectMake(0, 0, 
+//			CGImageGetWidth(m_bgimage), CGImageGetHeight(m_bgimage));
+//		PLOVER [m_bgimage drawInRect: uikit_dstrect_whole fromRect: srcrect
 //			operation: NSCompositeSourceAtop fraction: 1.0];
+		CGContextDrawImage (myContext, uikit_dstrect_whole, m_bgimage); 
 	}
 }
 
@@ -160,10 +169,14 @@ uikit_background_renderer::highlight(common::gui_window *window)
 	color_t hicolor = 0x0000ff;
 	AM_DBG lib::logger::get_logger()->debug("uikit_bg_renderer::highlight: framing with color 0x%x", (long)hicolor);
 	float components[] = {redf(hicolor), greenf(hicolor), bluef(hicolor), 1.0};
-	CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
-//	XYZZY [cgcolor set];
-//	XYZZY NSFrameRect(uikit_dstrect_whole);
-	CGColorRelease(cgcolor);
+//	CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
+//	PLOVER [cgcolor set];
+//	PLOVER NSFrameRect(uikit_dstrect_whole);
+	CGContextRef myContext = UICurrentContext();
+//	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextSetStrokeColor(myContext, components);
+	CGContextStrokeRect(myContext, uikit_dstrect_whole);
+//	CGColorRelease(cgcolor);
 }
 
 void

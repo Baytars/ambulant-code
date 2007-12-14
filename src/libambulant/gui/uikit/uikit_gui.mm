@@ -76,14 +76,12 @@ uikit_window::need_redraw(const rect &r)
 		logger::get_logger()->fatal("uikit_window::need_redraw: no m_view");
 		return;
 	}
-#if NOT_YET_UIKIT
 	AmbulantView *my_view = (AmbulantView *)m_view;
 	CGRect my_rect = [my_view CGRectForAmbulantRect: &r];
 	NSRectHolder *arect = [[NSRectHolder alloc] initWithRect: my_rect];
 	// XXX Is it safe to cast C++ objects to ObjC id's?
 	[my_view performSelectorOnMainThread: @selector(asyncRedrawForAmbulantRect:) 
 		withObject: arect waitUntilDone: NO];
-#endif // NOT_YET_UIKIT
 }
 
 void
@@ -361,7 +359,6 @@ bad:
 }
 @end
 
-#if NOT_YET_UIKIT
 // Helper class: NSRect as an object
 @implementation NSRectHolder
 
@@ -376,7 +373,6 @@ bad:
 	return rect;
 }
 @end
-#endif
 
 @implementation AmbulantView
 
