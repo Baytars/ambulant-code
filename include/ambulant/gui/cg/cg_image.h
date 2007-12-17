@@ -29,7 +29,7 @@
 #include "ambulant/gui/cg/cg_renderer.h"
 //#include "ambulant/smil2/transition.h"
 //#include "ambulant/lib/mtsync.h"
-#include <CoreGraphics/CoreGraphics.h>
+//#include <CoreGraphics/CoreGraphics.h>
 
 namespace ambulant {
 

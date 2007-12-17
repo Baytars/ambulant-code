@@ -93,7 +93,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	}
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
-	CGContextRef myContext = UICurrentContext();
+	CGContextRef myContext = [view getCGContext];
 	
 	// Now find both source and destination area for the bitblit.
 	rect srcrect;
@@ -157,7 +157,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	bool flipped = [view isFlipped];
 	if (flipped) {
 		CGContextSaveGState(myContext);
-		float view_height = CGRectGetHeight([view bounds]);
+		float view_height = CGRectGetHeight(CGRectFromViewRect([view bounds]));
 		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, cg_dstrect.origin.y);
 		cg_dstrect.origin.y = 0;
 		CGContextConcatCTM(myContext, matrix);

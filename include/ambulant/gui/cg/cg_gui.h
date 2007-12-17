@@ -35,9 +35,17 @@
 #ifdef WITH_UIKIT
 #include <UIKit/UIKit.h>
 #define VIEW_SUPERCLASS UIView
+inline CGRect CGRectFromViewRect(CGRect rect) { return rect; }
+inline CGRect ViewRectFromCGRect(CGRect rect) { return rect; }
+inline CGPoint CGPointFromViewPoint(CGPoint point) { return point; }
+inline CGSize CGSizeFromViewSize(CGSize size) { return size; }
 #else
 #include <AppKit/AppKit.h>
 #define VIEW_SUPERCLASS NSView
+inline CGRect CGRectFromViewRect(NSRect rect) { return *(CGRect*)&rect; }
+inline NSRect ViewRectFromCGRect(CGRect rect) { return *(NSRect*)&rect; }
+inline CGPoint CGPointFromViewPoint(NSPoint point) { return *(CGPoint*)&point; }
+inline CGSize CGSizeFromViewSize(NSSize size) { return *(CGSize*)&size; }
 #endif
 #endif // __OBJC__
 
@@ -169,6 +177,7 @@ AMBULANTAPI common::playable_factory *create_cg_renderer_factory(common::factori
 - (bool)ignoreResize;
 - (BOOL)isFlipped;
 
+- (CGContextRef) getCGContext;
 - (CGRect) CGRectForAmbulantRect: (const ambulant::lib::rect *)arect;
 - (ambulant::lib::rect) ambulantRectForCGRect: (const CGRect *)nsrect;
 
