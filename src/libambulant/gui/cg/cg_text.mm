@@ -26,7 +26,7 @@
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
 
-#include <CoreGraphics/CoreGraphics.h>
+//#include <CoreGraphics/CoreGraphics.h>
 
 #define AM_DBG
 #ifndef AM_DBG

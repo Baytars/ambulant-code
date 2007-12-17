@@ -31,7 +31,7 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/preferences.h"
 
-#include <CoreGraphics/CoreGraphics.h>
+//#include <CoreGraphics/CoreGraphics.h>
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -224,7 +224,7 @@ cg_window_factory::get_default_size()
 {
 	if (m_defaultwindow_view == NULL)
 		return lib::size(common::default_layout_width, common::default_layout_height);
-	CGSize size = [(AmbulantView *)m_defaultwindow_view bounds].size;
+	CGSize size = CGSizeFromViewSize([(AmbulantView *)m_defaultwindow_view bounds].size);
 	return lib::size((int)size.width, (int)size.height);
 }
 
@@ -284,7 +284,7 @@ void
 cg_gui_screen::get_size(int *width, int *height)
 {
 	AmbulantView *view = (AmbulantView *)m_view;
-	CGRect bounds = [view bounds];
+	CGRect bounds = CGRectFromViewRect([view bounds]);
 	*width = int(bounds.size.width);
 	*height = int(bounds.size.height);
 }
@@ -352,7 +352,7 @@ bad:
 #ifdef __OBJC__
 
 // Helper class: flipped view
-@interface MyFlippedView : UIView
+@interface MyFlippedView : VIEW_SUPERCLASS
 - (BOOL) isFlipped;
 @end
 @implementation MyFlippedView
@@ -385,7 +385,7 @@ bad:
 
 - (id)initWithFrame:(CGRect)frameRect
 {
-	[super initWithFrame: frameRect];
+	[super initWithFrame: ViewRectFromCGRect(frameRect)];
 	ambulant_window = NULL;
 //	transition_surface = NULL;
 //	transition_tmpsurface = NULL;
@@ -411,10 +411,21 @@ bad:
 //	overlay_window = NULL;
     [super dealloc];
 
-}- (CGRect) CGRectForAmbulantRect: (const ambulant::lib::rect *)arect
+}
+
+- (CGContextRef) getCGContext
+{
+#ifdef WITH_UIKIT
+	return UICurrentContext();
+#else
+	return (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
+#endif
+}
+
+- (CGRect) CGRectForAmbulantRect: (const ambulant::lib::rect *)arect
 {
 #ifdef USE_COCOA_BOTLEFT
-	float bot_delta = CGRectGetMaxY([self bounds]) - arect->bottom();
+	float bot_delta = CGRectGetMaxY(CGRectFromViewRect([self bounds])) - arect->bottom();
 	return CGRectMake(arect->left(), bot_delta, arect->width(), arect->height());
 #else
 	return CGRectMake(arect->left(), arect->top(), arect->width(), arect->height());
@@ -424,7 +435,7 @@ bad:
 - (ambulant::lib::rect) ambulantRectForCGRect: (const CGRect *)nsrect
 {
 #ifdef USE_COCOA_BOTLEFT
-	float top_delta = CGRectGetMaxY([self bounds]) - CGRectGetMaxY(*nsrect);
+	float top_delta = CGRectGetMaxY(CGRectFromViewRect([self bounds])) - CGRectGetMaxY(*nsrect);
 	ambulant::lib::rect arect = ambulant::lib::rect(
                 ambulant::lib::point(int(CGRectGetMinX(*nsrect)), int(top_delta)),
 				ambulant::lib::size(int(CGRectGetWidth(*nsrect)), int(CGRectGetHeight(*nsrect))));
@@ -442,7 +453,7 @@ bad:
 	CGRect my_rect = [arect rect];
 	[arect release];
     AM_DBG NSLog(@"AmbulantView.asyncRedrawForAmbulantRect: self=0x%x rect=(%f,%f,%f,%f)", self, CGRectGetMinX(my_rect), CGRectGetMinY(my_rect), CGRectGetMaxX(my_rect), CGRectGetMaxY(my_rect));
-	[self setNeedsDisplayInRect: my_rect];
+	[self setNeedsDisplayInRect: ViewRectFromCGRect(my_rect)];
 }
 
 - (void) syncDisplayIfNeeded: (id) dummy
@@ -497,7 +508,7 @@ bad:
 		// If we have seen transitions we always redraw the whole view
 		// XXXJACK interaction of fullscreen transitions and overlay windows
 		// is completely untested, and probably broken.
-		if (transition_count) rect = [self bounds];
+		if (transition_count) rect = CGRectFromViewRect([self bounds]);
         ambulant::lib::rect arect = [self ambulantRectForCGRect: &rect];
 //		[self _screenTransitionPreRedraw];
         ambulant_window->redraw(arect);

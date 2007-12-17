@@ -25,7 +25,7 @@
 #include "ambulant/gui/cg/cg_fill.h"
 //#include "ambulant/gui/cg/cg_transition.h"
 #include "ambulant/common/region_info.h"
-#include <CoreGraphics/CoreGraphics.h>
+//#include <CoreGraphics/CoreGraphics.h>
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -101,7 +101,7 @@ cg_fill_renderer::redraw_body(const rect &dirty, gui_window *window)
 			
 //	PLOVER [nscolor set];
 //	PLOVER CGRectFillUsingOperation(cg_dstrect_whole, NSCompositeSourceAtop);
-	CGContextRef myContext = UICurrentContext();
+	CGContextRef myContext = [view getCGContext];
 //	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetFillColor(myContext, components);
 	CGContextFillRect(myContext, cg_dstrect_whole);
@@ -124,7 +124,7 @@ cg_background_renderer::redraw(const lib::rect &dirty, common::gui_window *windo
 	
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
-	CGContextRef myContext = UICurrentContext();
+	CGContextRef myContext = [view getCGContext];
 //	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
 	AM_DBG lib::logger::get_logger()->debug("cg_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
 	rect dstrect_whole = r;
@@ -171,7 +171,7 @@ cg_background_renderer::highlight(common::gui_window *window)
 //	CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
 //	PLOVER [cgcolor set];
 //	PLOVER NSFrameRect(cg_dstrect_whole);
-	CGContextRef myContext = UICurrentContext();
+	CGContextRef myContext = [view getCGContext];
 //	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetStrokeColor(myContext, components);
 	CGContextStrokeRect(myContext, cg_dstrect_whole);
