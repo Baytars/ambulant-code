@@ -21,11 +21,10 @@
  * @$Id$ 
  */
 
-#include "ambulant/gui/uikit/uikit_gui.h"
-#include "ambulant/gui/uikit/uikit_renderer.h"
+#include "ambulant/gui/cg/cg_gui.h"
+#include "ambulant/gui/cg/cg_renderer.h"
 //#include "ambulant/gui/cocoa/cocoa_transition.h"
 
-//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -36,10 +35,10 @@ using namespace lib;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
 #if UIKIT_NOT_YET
-uikit_transition_renderer::~uikit_transition_renderer()
+cg_transition_renderer::~cg_transition_renderer()
 {
 	stop();
 	m_lock.enter();
@@ -50,7 +49,7 @@ uikit_transition_renderer::~uikit_transition_renderer()
 }
 	
 void
-uikit_transition_renderer::set_surface(common::surface *dest)
+cg_transition_renderer::set_surface(common::surface *dest)
 {
 	m_transition_dest = dest;
 	if (m_transition_dest && m_intransition && m_intransition->m_scope == scope_screen)

@@ -21,12 +21,12 @@
  * @$Id$ 
  */
 
-#include "ambulant/gui/uikit/uikit_text.h"
-#include "ambulant/gui/uikit/uikit_gui.h"
+#include "ambulant/gui/cg/cg_text.h"
+#include "ambulant/gui/cg/cg_gui.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
 
-#include <UIKit/UIKit.h>
+#include <CoreGraphics/CoreGraphics.h>
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -39,15 +39,15 @@ using namespace lib;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-uikit_text_renderer::uikit_text_renderer(
+cg_text_renderer::cg_text_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp,
 		common::factories *factory)
-:	uikit_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory)
+:	cg_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory)
 {
 	// XXX These parameter names are tentative
 	smil2::params *params = smil2::params::for_node(node);
@@ -78,7 +78,7 @@ uikit_text_renderer::uikit_text_renderer(
 	}
 }
 
-uikit_text_renderer::~uikit_text_renderer()
+cg_text_renderer::~cg_text_renderer()
 {
 	m_lock.enter();
 //	[m_text_storage release];
@@ -87,11 +87,11 @@ uikit_text_renderer::~uikit_text_renderer()
 }
 
 void
-uikit_text_renderer::redraw_body(const rect &dirty, gui_window *window)
+cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
-	AM_DBG logger::get_logger()->debug("uikit_text_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
 #if UIKIT_NOT_YET
 	if (m_data && !m_text_storage) {
@@ -125,19 +125,19 @@ uikit_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		[m_layout_manager release];	// The textStorage will retain the layoutManager
 	}
 
-	uikit_window *cwindow = (uikit_window *)window;
+	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
-	NSRect uikit_dstrect = [view NSRectForAmbulantRect: &dstrect];
+	NSRect cg_dstrect = [view NSRectForAmbulantRect: &dstrect];
 	if (m_text_storage && m_layout_manager) {
-		NSPoint origin = NSMakePoint(NSMinX(uikit_dstrect), NSMinY(uikit_dstrect));
-		NSSize size = NSMakeSize(NSWidth(uikit_dstrect), NSHeight(uikit_dstrect));
+		NSPoint origin = NSMakePoint(NSMinX(cg_dstrect), NSMinY(cg_dstrect));
+		NSSize size = NSMakeSize(NSWidth(cg_dstrect), NSHeight(cg_dstrect));
 		if (1 /*size != [m_text_container containerSize]*/) {
-			AM_DBG logger::get_logger()->debug("uikit_text_renderer.redraw: setting size to (%f, %f)", size.width, size.height);
+			AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw: setting size to (%f, %f)", size.width, size.height);
 			[m_text_container setContainerSize: size];
 		}
-		AM_DBG logger::get_logger()->debug("uikit_text_renderer.redraw at Cocoa-point (%f, %f)", origin.x, origin.y);
+		AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw at Cocoa-point (%f, %f)", origin.x, origin.y);
 		NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
 		//[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: origin];
 		[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: origin];
@@ -146,7 +146,7 @@ uikit_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	m_lock.leave();
 }
 
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
 

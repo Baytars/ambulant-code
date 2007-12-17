@@ -21,12 +21,12 @@
  * @$Id$ 
  */
 
-#include "ambulant/gui/uikit/uikit_gui.h"
-#include "ambulant/gui/uikit/uikit_image.h"
+#include "ambulant/gui/cg/cg_gui.h"
+#include "ambulant/gui/cg/cg_image.h"
 #include "ambulant/common/region_dim.h"
 #include "ambulant/common/region_info.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -37,12 +37,12 @@ using namespace lib;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-uikit_image_renderer::~uikit_image_renderer()
+cg_image_renderer::~cg_image_renderer()
 {
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("~uikit_image_renderer(0x%x)", (void *)this);
+	AM_DBG logger::get_logger()->debug("~cg_image_renderer(0x%x)", (void *)this);
 	CGImageRelease(m_image);
 	m_image = NULL;
 	CGImageRelease(m_image_cropped);
@@ -51,7 +51,7 @@ uikit_image_renderer::~uikit_image_renderer()
 }
 
 CGImage *
-uikit_image_renderer::_cropped_image(const lib::rect& rect)
+cg_image_renderer::_cropped_image(const lib::rect& rect)
 {
 	if (!m_image) return NULL;
 	if (rect == lib::rect(lib::point(0,0), m_size)) return m_image;
@@ -59,20 +59,20 @@ uikit_image_renderer::_cropped_image(const lib::rect& rect)
 	CGImageRelease(m_image_cropped);
 	m_image_cropped = NULL;
 	m_rect_cropped = rect;
-	CGRect uikit_rect = CGRectMake(rect.left(), rect.top(), rect.width(), rect.height());
-	m_image_cropped = CGImageCreateWithImageInRect(m_image, uikit_rect);
+	CGRect cg_rect = CGRectMake(rect.left(), rect.top(), rect.width(), rect.height());
+	m_image_cropped = CGImageCreateWithImageInRect(m_image, cg_rect);
 	return m_image_cropped;
 }
 
 void
-uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
+cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
-	AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	
 	if (m_data && !m_image) {
-		AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: creating image");
+		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: creating image");
 		m_nsdata = (CFDataRef)[NSData dataWithBytesNoCopy: m_data length: m_data_size freeWhenDone: NO];
 		CGImageSourceRef rdr = CGImageSourceCreateWithData(m_nsdata, NULL);
 		if (rdr == NULL) {
@@ -87,24 +87,24 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	}
 
 	if (!m_image) {
-		AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: nothing to draw");
+		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: nothing to draw");
 		m_lock.leave();
 		return;
 	}
-	uikit_window *cwindow = (uikit_window *)window;
+	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	CGContextRef myContext = UICurrentContext();
 	
 	// Now find both source and destination area for the bitblit.
 	rect srcrect;
 	rect dstrect;
-	CGRect uikit_dstrect;
+	CGRect cg_dstrect;
 	CGImage *cropped_image;
 	// While rendering background images only, check for tiling. This code is
 	// convoluted, it knows that the node and the region we're painting to are
 	// really the same node.
 	if (m_node->get_attribute("backgroundImage") && m_dest->is_tiled()) {
-		AM_DBG lib::logger::get_logger()->debug("uikit_image_renderer.redraw: drawing tiled image");
+		AM_DBG lib::logger::get_logger()->debug("cg_image_renderer.redraw: drawing tiled image");
 		dstrect = m_dest->get_rect();
 		dstrect.translate(m_dest->get_global_topleft());
 		common::tile_positions tiles = m_dest->get_tiles(m_size, dstrect);
@@ -113,10 +113,10 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 			srcrect = (*it).first;
 			dstrect = (*it).second;
 			cropped_image = _cropped_image(srcrect);
-			uikit_dstrect = [view CGRectForAmbulantRect: &dstrect];
-//			AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", uikit_srcsize.width, uikit_srcsize.height, CGRectGetMinX(uikit_dstrect), CGRectGetMinY(uikit_dstrect), CGRectGetMaxX(uikit_dstrect), CGRectGetMaxY(uikit_dstrect));
+			cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
+//			AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", cg_srcsize.width, cg_srcsize.height, CGRectGetMinX(cg_dstrect), CGRectGetMinY(cg_dstrect), CGRectGetMaxX(cg_dstrect), CGRectGetMaxY(cg_dstrect));
 			// XXXX Need to do transform!
-			CGContextDrawImage (myContext, uikit_dstrect, cropped_image);
+			CGContextDrawImage (myContext, cg_dstrect, cropped_image);
 		}
 		m_lock.leave();
 		return;
@@ -125,7 +125,7 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	// Unfortunately (well, for us, in this case) Cocoa does some magic scaling on the image.
 	// I.e. [m_image size] can lie about the size. We have to adjust our coordinates too.
 	lib::rect croprect = m_dest->get_crop_rect(m_size);
-	AM_DBG logger::get_logger()->debug("uikit_image::redraw, clip 0x%x (%d %d) -> (%d, %d, %d, %d)", m_dest, m_size.w, m_size.h, croprect.x, croprect.y, croprect.w, croprect.h);
+	AM_DBG logger::get_logger()->debug("cg_image::redraw, clip 0x%x (%d %d) -> (%d, %d, %d, %d)", m_dest, m_size.w, m_size.h, croprect.x, croprect.y, croprect.w, croprect.h);
 #if 0
 	double x_factor = m_size.w == 0 ? 1 : (double)srcsize.w / (double)m_size.w;
 	double y_factor = m_size.h == 0 ? 1 : (double)srcsize.h / (double)m_size.h;
@@ -141,11 +141,11 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	dstrect = m_dest->get_fit_rect(m_size, &srcrect, m_alignment);
 #endif
 	dstrect.translate(m_dest->get_global_topleft());
-	uikit_dstrect = [view CGRectForAmbulantRect: &dstrect];
+	cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
 #if UIKIT_NOT_YET
-	AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: draw image (%f, %f, %f %f) -> (%f, %f, %f, %f)",
-		NSMinX(uikit_srcrect), NSMinY(uikit_srcrect), NSMaxX(uikit_srcrect), NSMaxY(uikit_srcrect),
-		NSMinX(uikit_dstrect), NSMinY(uikit_dstrect), NSMaxX(uikit_dstrect), NSMaxY(uikit_dstrect));
+	AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: draw image (%f, %f, %f %f) -> (%f, %f, %f, %f)",
+		NSMinX(cg_srcrect), NSMinY(cg_srcrect), NSMaxX(cg_srcrect), NSMaxY(cg_srcrect),
+		NSMinX(cg_dstrect), NSMinY(cg_dstrect), NSMaxX(cg_dstrect), NSMaxY(cg_dstrect));
 #endif
 	double alfa = 1.0;
 #ifdef WITH_SMIL30
@@ -158,11 +158,11 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	if (flipped) {
 		CGContextSaveGState(myContext);
 		float view_height = CGRectGetHeight([view bounds]);
-		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, uikit_dstrect.origin.y);
-		uikit_dstrect.origin.y = 0;
+		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, cg_dstrect.origin.y);
+		cg_dstrect.origin.y = 0;
 		CGContextConcatCTM(myContext, matrix);
 	}
-	CGContextDrawImage(myContext, uikit_dstrect, cropped_image);
+	CGContextDrawImage(myContext, cg_dstrect, cropped_image);
 	
 	if (flipped) {
 		CGContextRestoreGState(myContext);
@@ -170,7 +170,7 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	m_lock.leave();
 }
 
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
 

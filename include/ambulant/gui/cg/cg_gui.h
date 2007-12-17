@@ -23,8 +23,8 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_UIKIT_UIKIT_GUI_H
-#define AMBULANT_GUI_UIKIT_UIKIT_GUI_H
+#ifndef AMBULANT_GUI_CG_CG_GUI_H
+#define AMBULANT_GUI_CG_CG_GUI_H
 
 #include "ambulant/common/factory.h"
 #include "ambulant/common/layout.h"
@@ -32,8 +32,14 @@
 #include "ambulant/common/gui_player.h"
 #include "ambulant/smil2/transition.h"
 #ifdef __OBJC__
+#ifdef WITH_UIKIT
 #include <UIKit/UIKit.h>
+#define VIEW_SUPERCLASS UIView
+#else
+#include <AppKit/AppKit.h>
+#define VIEW_SUPERCLASS NSView
 #endif
+#endif // __OBJC__
 
 // The following define enables code that allows drawing things
 // on top of quicktime movies, using a separate overlay window.
@@ -45,14 +51,14 @@ namespace ambulant {
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-class uikit_window : public common::gui_window {
+class cg_window : public common::gui_window {
   public:
-  	uikit_window(const std::string &name, lib::size bounds, void *_view, common::gui_events *handler)
+  	cg_window(const std::string &name, lib::size bounds, void *_view, common::gui_events *handler)
   	:	common::gui_window(handler),
   		m_view(_view) {};
-	~uikit_window();
+	~cg_window();
   		
 	void need_redraw(const lib::rect &r);
 	void redraw_now();
@@ -68,23 +74,23 @@ class uikit_window : public common::gui_window {
 };
 
 ;
-class uikit_window_factory : public common::window_factory {
+class cg_window_factory : public common::window_factory {
   public:
-  	uikit_window_factory(void *view)
+  	cg_window_factory(void *view)
   	:	m_defaultwindow_view(view) {}
   	
 	lib::size get_default_size();
 	common::gui_window *new_window(const std::string &name, lib::size bounds, common::gui_events *handler);
 	common::bgrenderer *new_background_renderer(const common::region_info *src);
   protected:
-	virtual void init_window_size(uikit_window *window, const std::string &name, lib::size bounds);
+	virtual void init_window_size(cg_window *window, const std::string &name, lib::size bounds);
   private:
     void *m_defaultwindow_view;
 };
 
-class uikit_renderer_factory : public common::playable_factory {
+class cg_renderer_factory : public common::playable_factory {
   public:
-  	uikit_renderer_factory(common::factories *factory)
+  	cg_renderer_factory(common::factories *factory)
 	:   m_factory(factory) {}
   	
 	common::playable *new_playable(
@@ -103,9 +109,9 @@ class uikit_renderer_factory : public common::playable_factory {
     common::factories *m_factory;
 };
 
-class uikit_gui_screen : public common::gui_screen {
+class cg_gui_screen : public common::gui_screen {
   public:
-	uikit_gui_screen(void *view)
+	cg_gui_screen(void *view)
 	:	m_view(view)
 	{}
 	void get_size(int *width, int *height);
@@ -114,10 +120,10 @@ class uikit_gui_screen : public common::gui_screen {
 	void *m_view;
 };
 
-AMBULANTAPI common::window_factory *create_uikit_window_factory(void *view);
-AMBULANTAPI common::playable_factory *create_uikit_renderer_factory(common::factories *factory);
+AMBULANTAPI common::window_factory *create_cg_window_factory(void *view);
+AMBULANTAPI common::playable_factory *create_cg_renderer_factory(common::factories *factory);
 
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
  
@@ -133,9 +139,9 @@ AMBULANTAPI common::playable_factory *create_uikit_renderer_factory(common::fact
 - (CGRect)rect;
 @end
 
-@interface AmbulantView : UIView
+@interface AmbulantView : VIEW_SUPERCLASS
 {
-    ambulant::gui::uikit::uikit_window *ambulant_window;
+    ambulant::gui::cg::cg_window *ambulant_window;
 //	NSImage *transition_surface;
 //	NSImage *transition_tmpsurface;
 	int transition_count;
@@ -157,7 +163,7 @@ AMBULANTAPI common::playable_factory *create_uikit_renderer_factory(common::fact
 - (id)initWithFrame:(CGRect)frameRect;
 - (void)dealloc;
 
-- (void)setAmbulantWindow: (ambulant::gui::uikit::uikit_window *)window;
+- (void)setAmbulantWindow: (ambulant::gui::cg::cg_window *)window;
 - (void)ambulantWindowClosed;
 - (bool)isAmbulantWindowInUse;
 - (bool)ignoreResize;
@@ -234,4 +240,4 @@ AMBULANTAPI common::playable_factory *create_uikit_renderer_factory(common::fact
 @end
 
 #endif // __OBJC__
-#endif // AMBULANT_GUI_UIKIT_UIKIT_GUI_H
+#endif // AMBULANT_GUI_CG_CG_GUI_H

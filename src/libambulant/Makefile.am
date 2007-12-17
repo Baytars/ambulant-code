@@ -63,25 +63,25 @@ toolkit_cocoa_libraries =
 platlibs =
 endif
 
-if WITH_UIKIT
-toolkit_uikit_libraries = libambulant_uikit.la
+if WITH_CG
+toolkit_cg_libraries = libambulant_cg.la
 # XXX Should LIBINTL depend on USE_NLS?
-platlibs = $(LIBINTL) -framework UIKit -framework CoreFoundation
-libambulant_uikit_la_SOURCES = \
-	gui/uikit/uikit_fill.m \
-	gui/uikit/uikit_gui.m \
-	gui/uikit/uikit_image.m \
-	gui/uikit/uikit_renderer.m \
-	gui/uikit/uikit_text.m
-#	gui/uikit/uikit_html.m \
-#	gui/uikit/uikit_ink.m \
-#	gui/uikit/uikit_smiltext.m \
-#	gui/uikit/uikit_transition.m \
-#	gui/uikit/uikit_audio.m \
-#	gui/uikit/uikit_video.m \
-#	gui/uikit/uikit_dsvideo.m
+platlibs = $(LIBINTL) -framework CoreGraphics -framework CoreFoundation
+libambulant_cg_la_SOURCES = \
+	gui/cg/cg_fill.m \
+	gui/cg/cg_gui.m \
+	gui/cg/cg_image.m \
+	gui/cg/cg_renderer.m \
+	gui/cg/cg_text.m
+#	gui/cg/cg_html.m \
+#	gui/cg/cg_ink.m \
+#	gui/cg/cg_smiltext.m \
+#	gui/cg/cg_transition.m \
+#	gui/cg/cg_audio.m \
+#	gui/cg/cg_video.m \
+#	gui/cg/cg_dsvideo.m
 else
-toolkit_uikit_libraries =
+toolkit_cg_libraries =
 platlibs =
 endif
 
@@ -229,7 +229,7 @@ INCLUDES = \
 lib_LTLIBRARIES = \
 	libambulant.la \
 	$(toolkit_cocoa_libraries) \
-	$(toolkit_uikit_libraries) \
+	$(toolkit_cg_libraries) \
 	$(toolkit_qt_libraries) \
 	$(toolkit_gstreamer_libraries) \
 	$(toolkit_gtk_libraries) \
@@ -334,7 +334,7 @@ EXTRA_DIST= \
 	gui/SDL \
 	gui/arts \
 	gui/cocoa \
-	gui/uikit \
+	gui/cg \
 	gui/dg \
 	gui/dx \
 	gui/qt \
