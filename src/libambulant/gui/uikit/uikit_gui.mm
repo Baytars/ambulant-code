@@ -38,6 +38,7 @@
 #define AM_DBG if(0)
 #endif
 
+#define USE_COCOA_BOTLEFT
 
 namespace ambulant {
 
@@ -357,7 +358,11 @@ bad:
 @implementation MyFlippedView
 - (BOOL) isFlipped
 {
-	return YES;
+#ifdef USE_COCOA_BOTLEFT
+	return false;
+#else
+	return true;
+#endif
 }
 @end
 
@@ -409,7 +414,7 @@ bad:
 }- (CGRect) CGRectForAmbulantRect: (const ambulant::lib::rect *)arect
 {
 #ifdef USE_COCOA_BOTLEFT
-	float bot_delta = NSMaxY([self bounds]) - arect->bottom();
+	float bot_delta = CGRectGetMaxY([self bounds]) - arect->bottom();
 	return CGRectMake(arect->left(), bot_delta, arect->width(), arect->height());
 #else
 	return CGRectMake(arect->left(), arect->top(), arect->width(), arect->height());
@@ -419,7 +424,7 @@ bad:
 - (ambulant::lib::rect) ambulantRectForCGRect: (const CGRect *)nsrect
 {
 #ifdef USE_COCOA_BOTLEFT
-	float top_delta = NSMaxY([self bounds]) - NSMaxY(*nsrect);
+	float top_delta = CGRectGetMaxY([self bounds]) - CGRectGetMaxY(*nsrect);
 	ambulant::lib::rect arect = ambulant::lib::rect(
                 ambulant::lib::point(int(CGRectGetMinX(*nsrect)), int(top_delta)),
 				ambulant::lib::size(int(CGRectGetWidth(*nsrect)), int(CGRectGetHeight(*nsrect))));

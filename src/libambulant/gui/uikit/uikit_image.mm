@@ -86,15 +86,14 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 		
 	}
 
-	uikit_window *cwindow = (uikit_window *)window;
-	AmbulantView *view = (AmbulantView *)cwindow->view();
-	CGContextRef myContext = UICurrentContext();
-
 	if (!m_image) {
 		AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: nothing to draw");
 		m_lock.leave();
 		return;
 	}
+	uikit_window *cwindow = (uikit_window *)window;
+	AmbulantView *view = (AmbulantView *)cwindow->view();
+	CGContextRef myContext = UICurrentContext();
 	
 	// Now find both source and destination area for the bitblit.
 	rect srcrect;
@@ -116,6 +115,7 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 			cropped_image = _cropped_image(srcrect);
 			uikit_dstrect = [view CGRectForAmbulantRect: &dstrect];
 //			AM_DBG logger::get_logger()->debug("uikit_image_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", uikit_srcsize.width, uikit_srcsize.height, CGRectGetMinX(uikit_dstrect), CGRectGetMinY(uikit_dstrect), CGRectGetMaxX(uikit_dstrect), CGRectGetMaxY(uikit_dstrect));
+			// XXXX Need to do transform!
 			CGContextDrawImage (myContext, uikit_dstrect, cropped_image);
 		}
 		m_lock.leave();
@@ -154,8 +154,19 @@ uikit_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	// XXX Need to set alpha
 #endif
 	cropped_image = _cropped_image(srcrect);
+	bool flipped = [view isFlipped];
+	if (flipped) {
+		CGContextSaveGState(myContext);
+		float view_height = CGRectGetHeight([view bounds]);
+		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, uikit_dstrect.origin.y);
+		uikit_dstrect.origin.y = 0;
+		CGContextConcatCTM(myContext, matrix);
+	}
 	CGContextDrawImage(myContext, uikit_dstrect, cropped_image);
 	
+	if (flipped) {
+		CGContextRestoreGState(myContext);
+	}
 	m_lock.leave();
 }
 
