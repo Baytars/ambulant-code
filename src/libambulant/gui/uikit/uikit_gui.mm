@@ -18,9 +18,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "ambulant/gui/uikit/uikit_gui.h"
-//#include "ambulant/gui/uikit/uikit_text.h"
+#include "ambulant/gui/uikit/uikit_text.h"
 //#include "ambulant/gui/uikit/uikit_html.h"
-//#include "ambulant/gui/uikit/uikit_image.h"
+#include "ambulant/gui/uikit/uikit_image.h"
 //#include "ambulant/gui/uikit/uikit_ink.h"
 #include "ambulant/gui/uikit/uikit_fill.h"
 //#include "ambulant/gui/uikit/uikit_video.h"
@@ -148,22 +148,24 @@ uikit_renderer_factory::new_playable(
 		if (url.guesstype() == "image/vnd.ambulant-ink") {
 			rv = new uikit_ink_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_ink_renderer 0x%x", (void *)node, (void *)rv);
-		} else {
+		} else
+#endif
+		{
 			rv = new uikit_image_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_image_renderer 0x%x", (void *)node, (void *)rv);
 		}
-#endif
 	} else if ( tag == "text") {
 #if NOT_YET_UIKIT
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "text/html") {
 			rv = new uikit_html_renderer(context, cookie, node, evp);
 			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_html_renderer 0x%x", (void *)node, (void *)rv);
-		} else {
+		} else
+#endif
+		{
 			rv = new uikit_text_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_text_renderer 0x%x", (void *)node, (void *)rv);
 		}
-#endif
 	} else if ( tag == "brush") {
 		rv = new uikit_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_fill_renderer 0x%x", (void *)node, (void *)rv);
