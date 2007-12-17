@@ -17,21 +17,21 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "ambulant/gui/uikit/uikit_gui.h"
-#include "ambulant/gui/uikit/uikit_text.h"
-//#include "ambulant/gui/uikit/uikit_html.h"
-#include "ambulant/gui/uikit/uikit_image.h"
-//#include "ambulant/gui/uikit/uikit_ink.h"
-#include "ambulant/gui/uikit/uikit_fill.h"
-//#include "ambulant/gui/uikit/uikit_video.h"
-//#include "ambulant/gui/uikit/uikit_dsvideo.h"
+#include "ambulant/gui/cg/cg_gui.h"
+#include "ambulant/gui/cg/cg_text.h"
+//#include "ambulant/gui/cg/cg_html.h"
+#include "ambulant/gui/cg/cg_image.h"
+//#include "ambulant/gui/cg/cg_ink.h"
+#include "ambulant/gui/cg/cg_fill.h"
+//#include "ambulant/gui/cg/cg_video.h"
+//#include "ambulant/gui/cg/cg_dsvideo.h"
 #ifdef WITH_SMIL30
-//#include "ambulant/gui/uikit/uikit_smiltext.h"
+//#include "ambulant/gui/cg/cg_smiltext.h"
 #endif
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/preferences.h"
 
-#include <UIKit/UIKit.h>
+#include <CoreGraphics/CoreGraphics.h>
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -46,21 +46,21 @@ using namespace lib;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
 common::window_factory *
-create_uikit_window_factory(void *view)
+create_cg_window_factory(void *view)
 {
-    return new uikit_window_factory(view);
+    return new cg_window_factory(view);
 }
 
 common::playable_factory *
-create_uikit_renderer_factory(common::factories *factory)
+create_cg_renderer_factory(common::factories *factory)
 {
-    return new uikit_renderer_factory(factory);
+    return new cg_renderer_factory(factory);
 }
 
-uikit_window::~uikit_window()
+cg_window::~cg_window()
 {
 	if (m_view) {
 		AmbulantView *my_view = (AmbulantView *)m_view;
@@ -70,11 +70,11 @@ uikit_window::~uikit_window()
 }
 	
 void
-uikit_window::need_redraw(const rect &r)
+cg_window::need_redraw(const rect &r)
 {
-	AM_DBG logger::get_logger()->debug("uikit_window::need_redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG logger::get_logger()->debug("cg_window::need_redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	if (!m_view) {
-		logger::get_logger()->fatal("uikit_window::need_redraw: no m_view");
+		logger::get_logger()->fatal("cg_window::need_redraw: no m_view");
 		return;
 	}
 	AmbulantView *my_view = (AmbulantView *)m_view;
@@ -86,7 +86,7 @@ uikit_window::need_redraw(const rect &r)
 }
 
 void
-uikit_window::redraw_now()
+cg_window::redraw_now()
 {
 	AmbulantView *my_view = (AmbulantView *)m_view;
 	[my_view performSelectorOnMainThread: @selector(syncDisplayIfNeeded:) 
@@ -94,26 +94,26 @@ uikit_window::redraw_now()
 }
 
 void
-uikit_window::redraw(const rect &r)
+cg_window::redraw(const rect &r)
 {
-	AM_DBG logger::get_logger()->debug("uikit_window::redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG logger::get_logger()->debug("cg_window::redraw(0x%x, ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	m_handler->redraw(r, this);
 }
 
 void
-uikit_window::user_event(const point &where, int what)
+cg_window::user_event(const point &where, int what)
 {
-	AM_DBG logger::get_logger()->debug("uikit_window::user_event(0x%x, (%d, %d), %d)", (void *)this, where.x, where.y, what);
+	AM_DBG logger::get_logger()->debug("cg_window::user_event(0x%x, (%d, %d), %d)", (void *)this, where.x, where.y, what);
 	m_handler->user_event(where, what);
 }
 
 void
-uikit_window::need_events(bool want)
+cg_window::need_events(bool want)
 {
 	// This code needs to be run in the main thread.
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	AM_DBG logger::get_logger()->debug("uikit_window::need_events(0x%x, %d)", (void *)this, want);
+	AM_DBG logger::get_logger()->debug("cg_window::need_events(0x%x, %d)", (void *)this, want);
 #if NOT_YET_UIKIT
 		
 	AmbulantView *my_view = (AmbulantView *)m_view;
@@ -134,7 +134,7 @@ uikit_window::need_events(bool want)
 }
 
 common::playable *
-uikit_renderer_factory::new_playable(
+cg_renderer_factory::new_playable(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
@@ -147,69 +147,69 @@ uikit_renderer_factory::new_playable(
 #if NOT_YET_UIKIT
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "image/vnd.ambulant-ink") {
-			rv = new uikit_ink_renderer(context, cookie, node, evp, m_factory);
-			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_ink_renderer 0x%x", (void *)node, (void *)rv);
+			rv = new cg_ink_renderer(context, cookie, node, evp, m_factory);
+			AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_ink_renderer 0x%x", (void *)node, (void *)rv);
 		} else
 #endif
 		{
-			rv = new uikit_image_renderer(context, cookie, node, evp, m_factory);
-			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_image_renderer 0x%x", (void *)node, (void *)rv);
+			rv = new cg_image_renderer(context, cookie, node, evp, m_factory);
+			AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_image_renderer 0x%x", (void *)node, (void *)rv);
 		}
 	} else if ( tag == "text") {
 #if NOT_YET_UIKIT
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "text/html") {
-			rv = new uikit_html_renderer(context, cookie, node, evp);
-			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_html_renderer 0x%x", (void *)node, (void *)rv);
+			rv = new cg_html_renderer(context, cookie, node, evp);
+			AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_html_renderer 0x%x", (void *)node, (void *)rv);
 		} else
 #endif
 		{
-			rv = new uikit_text_renderer(context, cookie, node, evp, m_factory);
-			AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_text_renderer 0x%x", (void *)node, (void *)rv);
+			rv = new cg_text_renderer(context, cookie, node, evp, m_factory);
+			AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_text_renderer 0x%x", (void *)node, (void *)rv);
 		}
 	} else if ( tag == "brush") {
-		rv = new uikit_fill_renderer(context, cookie, node, evp);
-		AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_fill_renderer 0x%x", (void *)node, (void *)rv);
+		rv = new cg_fill_renderer(context, cookie, node, evp);
+		AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_fill_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "video") {
 #if NOT_YET_UIKIT
 		if (common::preferences::get_preferences()->m_prefer_ffmpeg ) {
-			rv = new uikit_dsvideo_renderer(context, cookie, node, evp, m_factory);
+			rv = new cg_dsvideo_renderer(context, cookie, node, evp, m_factory);
 			if (rv) {
 				logger::get_logger()->trace("video: using native Ambulant renderer");
-				AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
+				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
 			} else {
-				rv = new uikit_video_renderer(context, cookie, node, evp);
+				rv = new cg_video_renderer(context, cookie, node, evp);
 				if (rv) logger::get_logger()->trace("video: using QuickTime renderer");
-				AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_video_renderer 0x%x", (void *)node, (void *)rv);
+				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_video_renderer 0x%x", (void *)node, (void *)rv);
 			}
 		} else {
-			rv = new uikit_video_renderer(context, cookie, node, evp);
+			rv = new cg_video_renderer(context, cookie, node, evp);
 			if (rv) {
 				logger::get_logger()->trace("video: using QuickTime renderer");
-				AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_video_renderer 0x%x", (void *)node, (void *)rv);
+				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_video_renderer 0x%x", (void *)node, (void *)rv);
 			} else {
-				rv = new uikit_dsvideo_renderer(context, cookie, node, evp, m_factory);
+				rv = new cg_dsvideo_renderer(context, cookie, node, evp, m_factory);
 				if (rv) logger::get_logger()->trace("video: using ffmpeg renderer");
-				AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
+				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
 			}
 #endif
 	}
 #ifdef WITH_SMIL30
 	else if ( tag == "smilText") {
 #if NOT_YET_UIKIT
-		rv = new uikit_smiltext_renderer(context, cookie, node, evp);
-		AM_DBG logger::get_logger()->debug("uikit_renderer_factory: node 0x%x: returning uikit_smiltext_renderer 0x%x", (void *)node, (void *)rv);
+		rv = new cg_smiltext_renderer(context, cookie, node, evp);
+		AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_smiltext_renderer 0x%x", (void *)node, (void *)rv);
 #endif
 #endif // WITH_SMIL30
 	} else {
-		// logger::get_logger()->error(gettext("uikit_renderer_factory: no UIKit renderer for tag \"%s\""), tag.c_str());
+		// logger::get_logger()->error(gettext("cg_renderer_factory: no CoreGraphics renderer for tag \"%s\""), tag.c_str());
 		return NULL;
 	}
 	return rv;
 }
 
 common::playable *
-uikit_renderer_factory::new_aux_audio_playable(
+cg_renderer_factory::new_aux_audio_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
@@ -220,7 +220,7 @@ uikit_renderer_factory::new_aux_audio_playable(
 }
 
 lib::size
-uikit_window_factory::get_default_size()
+cg_window_factory::get_default_size()
 {
 	if (m_defaultwindow_view == NULL)
 		return lib::size(common::default_layout_width, common::default_layout_height);
@@ -229,14 +229,14 @@ uikit_window_factory::get_default_size()
 }
 
 common::gui_window *
-uikit_window_factory::new_window(const std::string &name, size bounds, common::gui_events *handler)
+cg_window_factory::new_window(const std::string &name, size bounds, common::gui_events *handler)
 {
 	if ([(AmbulantView *)m_defaultwindow_view isAmbulantWindowInUse]) {
 		// XXXX Should create new toplevel window and put an ambulantview in it
 		logger::get_logger()->error(gettext("Unsupported: AmbulantPlayer cannot open second toplevel window yet"));
 		return NULL;
 	}
-	uikit_window *window = new uikit_window(name, bounds, m_defaultwindow_view, handler);
+	cg_window *window = new cg_window(name, bounds, m_defaultwindow_view, handler);
 	// And we need to inform the object about it
 	AmbulantView *view = (AmbulantView *)window->view();
 	[view setAmbulantWindow: window];
@@ -247,7 +247,7 @@ uikit_window_factory::new_window(const std::string &name, size bounds, common::g
 }
 
 void
-uikit_window_factory::init_window_size(uikit_window *window, const std::string &name, lib::size bounds)
+cg_window_factory::init_window_size(cg_window *window, const std::string &name, lib::size bounds)
 {
 	AM_DBG lib::logger::get_logger()->debug("init_window_size(...,'%s',...)", name.c_str());
 #if NOT_YET_UIKIT
@@ -266,22 +266,22 @@ uikit_window_factory::init_window_size(uikit_window *window, const std::string &
 		}
 		// And set the window size
 		AM_DBG NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
-		CGSize uikit_size = NSMakeSize(bounds.w + origin.x, bounds.h + origin.y);
-		[[view window] setContentSize: uikit_size];
-		AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", [view window], uikit_size.width, uikit_size.height);
+		CGSize cg_size = NSMakeSize(bounds.w + origin.x, bounds.h + origin.y);
+		[[view window] setContentSize: cg_size];
+		AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", [view window], cg_size.width, cg_size.height);
 	}
 	[[view window] makeKeyAndOrderFront: view];
 #endif
 }
 
 common::bgrenderer *
-uikit_window_factory::new_background_renderer(const common::region_info *src)
+cg_window_factory::new_background_renderer(const common::region_info *src)
 {
-	return new uikit_background_renderer(src);
+	return new cg_background_renderer(src);
 }
 
 void
-uikit_gui_screen::get_size(int *width, int *height)
+cg_gui_screen::get_size(int *width, int *height)
 {
 	AmbulantView *view = (AmbulantView *)m_view;
 	CGRect bounds = [view bounds];
@@ -290,7 +290,7 @@ uikit_gui_screen::get_size(int *width, int *height)
 }
 
 bool
-uikit_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_size)
+cg_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_size)
 {
 #if NOT_YET_UIKIT
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -343,7 +343,7 @@ bad:
 	return false;
 }
 
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
 
@@ -530,7 +530,7 @@ bad:
 //	redraw_lock.leave();
 }
 
-- (void)setAmbulantWindow: (ambulant::gui::uikit::uikit_window *)window
+- (void)setAmbulantWindow: (ambulant::gui::cg::cg_window *)window
 {
 //	[[self window] setAcceptsMouseMovedEvents: true];
     ambulant_window = window;

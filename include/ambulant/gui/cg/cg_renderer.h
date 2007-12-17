@@ -23,13 +23,12 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_UIKIT_UIKIT_RENDERER_H
-#define AMBULANT_GUI_UIKIT_UIKIT_RENDERER_H
+#ifndef AMBULANT_GUI_CG_CG_RENDERER_H
+#define AMBULANT_GUI_CG_CG_RENDERER_H
 
 #include "ambulant/common/renderer_impl.h"
 #include "ambulant/smil2/transition.h"
 #include "ambulant/lib/mtsync.h"
-#include <UIKit/UIKit.h>
 
 namespace ambulant {
 
@@ -38,7 +37,7 @@ using namespace common;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
 #if UIKIT_NOT_YET
 class cocoa_transition_renderer : public ref_counted_obj {
@@ -72,9 +71,9 @@ class cocoa_transition_renderer : public ref_counted_obj {
 #endif
 
 template <class RP_Base>
-class uikit_renderer : public RP_Base {
+class cg_renderer : public RP_Base {
   public:
-	uikit_renderer(
+	cg_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
@@ -82,14 +81,14 @@ class uikit_renderer : public RP_Base {
 		common::factories *factory)
 	:	RP_Base(context, cookie, node, evp, factory)
 		{};
-	uikit_renderer(
+	cg_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp)
 	:	RP_Base(context, cookie, node, evp)
 		{};
-	~uikit_renderer() {
+	~cg_renderer() {
 	}
 
 	void set_surface(common::surface *dest) {
@@ -119,10 +118,10 @@ class uikit_renderer : public RP_Base {
 
 };
 
-} // namespace cocoa
+} // namespace cg
 
 } // namespace gui
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_UIKIT_UIKIT_RENDERER_H
+#endif // AMBULANT_GUI_CG_CG_RENDERER_H

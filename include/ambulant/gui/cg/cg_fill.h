@@ -23,13 +23,13 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_UIKIT_UIKIT_IMAGE_H
-#define AMBULANT_GUI_UIKIT_UIKIT_IMAGE_H
+#ifndef AMBULANT_GUI_CG_CG_FILL_H
+#define AMBULANT_GUI_CG_CG_FILL_H
 
-#include "ambulant/gui/uikit/uikit_renderer.h"
-//#include "ambulant/smil2/transition.h"
-//#include "ambulant/lib/mtsync.h"
-#include <UIKit/UIKit.h>
+#include "ambulant/smil2/transition.h"
+#include "ambulant/lib/mtsync.h"
+#include "ambulant/gui/cg/cg_renderer.h"
+#include <CoreGraphics/CoreGraphics.h>
 
 namespace ambulant {
 
@@ -38,38 +38,44 @@ using namespace common;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-class uikit_image_renderer : public uikit_renderer<renderer_playable_dsall> {
+class cg_fill_renderer : public cg_renderer<renderer_playable> {
   public:
-	uikit_image_renderer(
+	cg_fill_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		event_processor *evp,
-		common::factories *factory)
-	:	uikit_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
-		m_nsdata(NULL),
-		m_image(NULL),
-		m_image_cropped(NULL) {};
-	~uikit_image_renderer();
+		event_processor *evp)
+	:	cg_renderer<renderer_playable>(context, cookie, node, evp) {};
+	~cg_fill_renderer();
+
+//	void freeze() {}
+	void start(double where);
+	void seek(double t) {}
 
     void redraw_body(const rect &dirty, gui_window *window);
   private:
-  	CGImage *_cropped_image(const lib::rect& rect);
-	
-  	CFDataRef m_nsdata;
-  	CGImageRef m_image;
-	lib::size m_size;
-  	CGImageRef m_image_cropped;
-  	lib::rect m_rect_cropped;
 	critical_section m_lock;
 };
 
-} // namespace uikit
+class cg_background_renderer : public background_renderer {
+  public:
+    cg_background_renderer(const common::region_info *src)
+	:   background_renderer(src),
+		m_bgimage(NULL) {}
+	~cg_background_renderer();
+	void redraw(const lib::rect &dirty, common::gui_window *window);
+	void keep_as_background();
+	void highlight(common::gui_window *window);
+  private:
+	CGImageRef m_bgimage;
+};
+
+} // namespace cg
 
 } // namespace gui
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_UIKIT_UIKIT_IMAGE_H
+#endif // AMBULANT_GUI_CG_CG_FILL_H

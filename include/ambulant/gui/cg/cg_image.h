@@ -23,12 +23,13 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_TEXT_TEXT_TEXT_H
-#define AMBULANT_GUI_TEXT_TEXT_TEXT_H
+#ifndef AMBULANT_GUI_CG_CG_IMAGE_H
+#define AMBULANT_GUI_CG_CG_IMAGE_H
 
-#include "ambulant/gui/uikit/uikit_renderer.h"
-#include "ambulant/lib/mtsync.h"
-#include <UIKit/UIKit.h>
+#include "ambulant/gui/cg/cg_renderer.h"
+//#include "ambulant/smil2/transition.h"
+//#include "ambulant/lib/mtsync.h"
+#include <CoreGraphics/CoreGraphics.h>
 
 namespace ambulant {
 
@@ -37,32 +38,38 @@ using namespace common;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-class uikit_text_renderer : public uikit_renderer<renderer_playable_dsall> {
+class cg_image_renderer : public cg_renderer<renderer_playable_dsall> {
   public:
-	uikit_text_renderer(
+	cg_image_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp,
-		common::factories *factory);
-        ~uikit_text_renderer();
-	
+		common::factories *factory)
+	:	cg_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+		m_nsdata(NULL),
+		m_image(NULL),
+		m_image_cropped(NULL) {};
+	~cg_image_renderer();
+
     void redraw_body(const rect &dirty, gui_window *window);
   private:
-//    NSTextStorage *m_text_storage;
-//	NSLayoutManager *m_layout_manager;
-//	NSTextContainer *m_text_container;
-	lib::color_t m_text_color;
-//	NSFont *m_text_font;
+  	CGImage *_cropped_image(const lib::rect& rect);
+	
+  	CFDataRef m_nsdata;
+  	CGImageRef m_image;
+	lib::size m_size;
+  	CGImageRef m_image_cropped;
+  	lib::rect m_rect_cropped;
 	critical_section m_lock;
 };
 
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_TEXT_TEXT_TEXT_H
+#endif // AMBULANT_GUI_CG_CG_IMAGE_H

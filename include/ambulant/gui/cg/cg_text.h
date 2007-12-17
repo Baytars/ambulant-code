@@ -23,13 +23,11 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_UIKIT_UIKIT_FILL_H
-#define AMBULANT_GUI_UIKIT_UIKIT_FILL_H
+#ifndef AMBULANT_GUI_CG_TEXT_TEXT_H
+#define AMBULANT_GUI_CG_TEXT_TEXT_H
 
-#include "ambulant/smil2/transition.h"
+#include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/lib/mtsync.h"
-#include "ambulant/gui/uikit/uikit_renderer.h"
-#include <UIKit/UIKit.h>
 
 namespace ambulant {
 
@@ -38,44 +36,32 @@ using namespace common;
 
 namespace gui {
 
-namespace uikit {
+namespace cg {
 
-class uikit_fill_renderer : public uikit_renderer<renderer_playable> {
+class cg_text_renderer : public cg_renderer<renderer_playable_dsall> {
   public:
-	uikit_fill_renderer(
+	cg_text_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
-		event_processor *evp)
-	:	uikit_renderer<renderer_playable>(context, cookie, node, evp) {};
-	~uikit_fill_renderer();
-
-//	void freeze() {}
-	void start(double where);
-	void seek(double t) {}
-
+		event_processor *evp,
+		common::factories *factory);
+        ~cg_text_renderer();
+	
     void redraw_body(const rect &dirty, gui_window *window);
   private:
+//    NSTextStorage *m_text_storage;
+//	NSLayoutManager *m_layout_manager;
+//	NSTextContainer *m_text_container;
+	lib::color_t m_text_color;
+//	NSFont *m_text_font;
 	critical_section m_lock;
 };
 
-class uikit_background_renderer : public background_renderer {
-  public:
-    uikit_background_renderer(const common::region_info *src)
-	:   background_renderer(src),
-		m_bgimage(NULL) {}
-	~uikit_background_renderer();
-	void redraw(const lib::rect &dirty, common::gui_window *window);
-	void keep_as_background();
-	void highlight(common::gui_window *window);
-  private:
-	CGImageRef m_bgimage;
-};
-
-} // namespace uikit
+} // namespace cg
 
 } // namespace gui
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_UIKIT_UIKIT_FILL_H
+#endif // AMBULANT_GUI_CG_TEXT_TEXT_H
