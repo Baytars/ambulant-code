@@ -70,11 +70,11 @@ platlibs = $(LIBINTL) -framework UIKit -framework CoreFoundation
 libambulant_uikit_la_SOURCES = \
 	gui/uikit/uikit_fill.m \
 	gui/uikit/uikit_gui.m \
-	gui/uikit/uikit_renderer.m
+	gui/uikit/uikit_image.m \
+	gui/uikit/uikit_renderer.m \
+	gui/uikit/uikit_text.m
 #	gui/uikit/uikit_html.m \
-#	gui/uikit/uikit_image.m \
 #	gui/uikit/uikit_ink.m \
-#	gui/uikit/uikit_text.m \
 #	gui/uikit/uikit_smiltext.m \
 #	gui/uikit/uikit_transition.m \
 #	gui/uikit/uikit_audio.m \
