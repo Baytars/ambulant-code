@@ -28,6 +28,7 @@
 
 #include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/lib/mtsync.h"
+#include <ApplicationServices/ApplicationServices.h>
 
 namespace ambulant {
 
@@ -50,11 +51,11 @@ class cg_text_renderer : public cg_renderer<renderer_playable_dsall> {
 	
     void redraw_body(const rect &dirty, gui_window *window);
   private:
-//    NSTextStorage *m_text_storage;
-//	NSLayoutManager *m_layout_manager;
-//	NSTextContainer *m_text_container;
+	UniChar *m_text_storage;
+	UniCharCount m_text_storage_length;
+	ATSUStyle m_style;
+	ATSUTextLayout m_layout_manager;
 	lib::color_t m_text_color;
-//	NSFont *m_text_font;
 	critical_section m_lock;
 };
 
