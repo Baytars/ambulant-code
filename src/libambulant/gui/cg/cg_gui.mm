@@ -114,23 +114,19 @@ cg_window::need_events(bool want)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	AM_DBG logger::get_logger()->debug("cg_window::need_events(0x%x, %d)", (void *)this, want);
-#if NOT_YET_UIKIT
 		
 	AmbulantView *my_view = (AmbulantView *)m_view;
-	NSWindow *my_window = [my_view window];
-	AM_DBG NSLog(@"my_window acceptsMouseMovedEvents = %d", [my_window acceptsMouseMovedEvents]);
-	// See whether the mouse is actually in our area
-	NSPoint where = [my_window mouseLocationOutsideOfEventStream];
-	if (!NSPointInRect(where, [my_view frame])) {
-		AM_DBG NSLog(@"mouse outside our frame");
-		return;
-	}
-	// Get the main thread to do the real work
-	[my_view performSelectorOnMainThread: @selector(pseudoMouseMove:) 
-		withObject: nil waitUntilDone: NO];
-#endif	
+	[my_view ambulantNeedEvents: want];
 	[pool release];
 
+}
+
+void
+cg_window::set_size(lib::size bounds)
+{
+
+	AmbulantView *view = (AmbulantView *)m_view;
+	[view ambulantSetSize: bounds];
 }
 
 common::playable *
@@ -241,37 +237,9 @@ cg_window_factory::new_window(const std::string &name, size bounds, common::gui_
 	AmbulantView *view = (AmbulantView *)window->view();
 	[view setAmbulantWindow: window];
 	// And set the window size
-	init_window_size(window, name, bounds);
+	window->set_size(bounds);
 	
 	return (common::gui_window *)window;
-}
-
-void
-cg_window_factory::init_window_size(cg_window *window, const std::string &name, lib::size bounds)
-{
-	AM_DBG lib::logger::get_logger()->debug("init_window_size(...,'%s',...)", name.c_str());
-#if NOT_YET_UIKIT
-	AmbulantView *view = (AmbulantView *)window->view();
-	// Get the position of our view in window coordinates
-	NSPoint origin = NSMakePoint(0,0);
-	NSView *superview = [view superview];
-	int32_t     shieldLevel = CGShieldingWindowLevel();
-	if ([view ignoreResize] || [[view window] level] >= shieldLevel) {
-		// We don't muck around with fullscreen windows or windows in other apps (browsers, etc). 
-		// What we should actually do is recenter the content, but that is for later.
-	} else {
-		if (superview) {
-			CGRect rect = [superview convertRect: [view frame] toView: nil];
-			origin = rect.origin;
-		}
-		// And set the window size
-		AM_DBG NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
-		CGSize cg_size = NSMakeSize(bounds.w + origin.x, bounds.h + origin.y);
-		[[view window] setContentSize: cg_size];
-		AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", [view window], cg_size.width, cg_size.height);
-	}
-	[[view window] makeKeyAndOrderFront: view];
-#endif
 }
 
 common::bgrenderer *
@@ -562,6 +530,53 @@ bad:
 - (bool)ignoreResize
 {
 	return false;
+}
+
+- (void)ambulantSetSize: (ambulant::lib::size) bounds
+{
+#if WITH_UIKIT
+	NSLog(@"ambulantSetSize: not yet implemented for UIKit");
+#else
+	// Get the position of our view in window coordinates
+	NSPoint origin = NSMakePoint(0,0);
+	NSView *superview = [self superview];
+	NSWindow *window = [self window];
+	int32_t     shieldLevel = CGShieldingWindowLevel();
+	if ([self ignoreResize] || [window level] >= shieldLevel) {
+		// We don't muck around with fullscreen windows or windows in other apps (browsers, etc). 
+		// What we should actually do is recenter the content, but that is for later.
+	} else {
+		if (superview) {
+			NSRect rect = [superview convertRect: [self frame] toView: nil];
+			origin = rect.origin;
+		}
+		// And set the window size
+		AM_DBG NSLog(@"Size changed request: (%d, %d)", bounds.w, bounds.h);
+		NSSize ns_size = NSMakeSize(bounds.w + origin.x, bounds.h + origin.y);
+		[window setContentSize: ns_size];
+		AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", window, ns_size.width, ns_size.height);
+	}
+	[window makeKeyAndOrderFront: self];
+#endif
+}
+
+- (void)ambulantNeedEvents: (bool)want
+{
+#if WITH_UIKIT
+	NSLog(@"ambulantNeedEvents: not implemented yet for UIKit");
+#else
+	NSWindow *my_window = [self window];
+	AM_DBG NSLog(@"my_window acceptsMouseMovedEvents = %d", [self acceptsMouseMovedEvents]);
+	// See whether the mouse is actually in our area
+	NSPoint where = [my_window mouseLocationOutsideOfEventStream];
+	if (!NSPointInRect(where, [self frame])) {
+		AM_DBG NSLog(@"mouse outside our frame");
+		return;
+	}
+	// Get the main thread to do the real work
+	[self performSelectorOnMainThread: @selector(pseudoMouseMove:) 
+		withObject: nil waitUntilDone: NO];
+#endif	
 }
 
 - (BOOL)isFlipped
