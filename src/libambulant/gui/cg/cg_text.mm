@@ -47,102 +47,167 @@ cg_text_renderer::cg_text_renderer(
 		const lib::node *node,
 		event_processor *evp,
 		common::factories *factory)
-:	cg_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory)
+:	cg_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+	m_text_storage(NULL),
+	m_style(NULL),
+	m_layout_manager(NULL)
 {
-	// XXX These parameter names are tentative
+	OSStatus err;
+    ATSUAttributeTag tags[1];
+    ByteCount sizes[1];
+    ATSUAttributeValuePtr values[1];
 	smil2::params *params = smil2::params::for_node(node);
 	color_t text_color = lib::to_color(0, 0, 0);
+	err = ATSUCreateStyle(&m_style);
+	assert(err == 0);
 	if (params) {
 		const char *fontname = params->get_str("font-family");
-//		const char *fontstyle = params->get_str("font-style");
-		float fontsize = 0.0;
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		m_text_color = params->get_color("color", text_color);
-		fontsize = params->get_float("font-size", 0.0);
-		AM_DBG NSLog(@"params found, color=(%d, %d, %d), font-family=%s, font-size=%g", 
-			redc(text_color), greenc(text_color), bluec(text_color), fontname, fontsize);
-#if UIKIT_NOT_YET
 		if (fontname) {
-			NSString *nsfontname = [NSString stringWithCString: fontname];
-			m_text_font = [NSFont fontWithName: nsfontname size: fontsize];
-			if (m_text_font == NULL)
-				lib::logger::get_logger()->trace("param: font-family \"%s\" unknown", fontname);
-		} else if (fontsize) {
-			m_text_font = [NSFont userFontOfSize: fontsize];
-			if (m_text_font == NULL)
-				lib::logger::get_logger()->trace("param: font-size \"%g\" unknown", fontsize);
+			ATSUFontID font;
+
+			err = ATSUFindFontFromName(fontname, strlen(fontname), kFontFullName, kFontNoPlatform, kFontNoScript, kFontNoLanguage, &font);
+			if (err) {
+				lib::logger::get_logger()->trace("%s: font \"%s\" not found", m_node->get_sig().c_str(), fontname);
+			} else {
+				tags[0] = kATSUFontTag;
+				sizes[0] = sizeof(ATSUFontID);
+				values[0] = &font;
+				err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
+				assert(err == 0);
+			}
 		}
-#endif
+
+//		const char *fontstyle = params->get_str("font-style");
+		float fontsize = params->get_float("font-size", 0.0);
+		if (fontsize) {
+			Fixed ffontsize = FloatToFixed(fontsize);
+			tags[0] = kATSUSizeTag;
+			sizes[0] = sizeof(Fixed);
+			values[0] = &ffontsize;
+			err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
+			assert(err == 0);
+		}
+		m_text_color = params->get_color("color", text_color);
 		delete params;
-		[pool release];
 	}
 }
 
 cg_text_renderer::~cg_text_renderer()
 {
 	m_lock.enter();
-//	[m_text_storage release];
-//	m_text_storage = NULL;
+	if (m_style) ATSUDisposeStyle(m_style);
+	m_style = NULL;
+	if (m_layout_manager) ATSUDisposeTextLayout(m_layout_manager);
+	m_layout_manager = NULL;
+	if (m_text_storage) free(m_text_storage);
+	m_text_storage = NULL;
 	m_lock.leave();
 }
 
 void
 cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
+	OSStatus err;
+    ATSUAttributeTag tags[1];
+    ByteCount sizes[1];
+    ATSUAttributeValuePtr values[1];
+
 	m_lock.enter();
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
-#if UIKIT_NOT_YET
 	if (m_data && !m_text_storage) {
-		NSString *the_string = [NSString stringWithCString: (char *)m_data length: m_data_size];
-		m_text_storage = [[NSTextStorage alloc] initWithString:the_string];
-		if (m_text_color) {
-#ifdef WITH_SMIL30
-			// XXXJACK will not work, too early for m_dest to be set
-			double alfa = 1.0;
-			const common::region_info *ri = m_dest->get_info();
-			if (ri) alfa = ri->get_mediaopacity();
-			NSColor *nscolor = [NSColor colorWithCalibratedRed:redf(m_text_color)
-					green:greenf(m_text_color)
-					blue:bluef(m_text_color)
-					alpha:alfa];
-#else
-			NSColor *nscolor = [NSColor colorWithCalibratedRed:redf(m_text_color)
-					green:greenf(m_text_color)
-					blue:bluef(m_text_color)
-					alpha:1.0];
-#endif
-			[m_text_storage setForegroundColor: nscolor];
+		// Convert through NSString. We hope this will get the unicode intricacies right.
+		NSString *the_string = [[NSString alloc] initWithBytesNoCopy: m_data 
+				length: m_data_size
+				encoding: NSUTF8StringEncoding
+				freeWhenDone: NO];
+		m_text_storage_length = [the_string length];
+		m_text_storage = (UniChar *)malloc(m_text_storage_length*sizeof(UniChar));
+		if (m_text_storage == NULL) {
+			lib::logger::get_logger()->trace("%s: out of memory", m_node->get_sig().c_str());
 		}
-		if (m_text_font)
-			[m_text_storage setFont: m_text_font];
-		m_layout_manager = [[NSLayoutManager alloc] init];
-		m_text_container = [[NSTextContainer alloc] init];
-		[m_layout_manager addTextContainer:m_text_container];
-		[m_text_container release];	// The layoutManager will retain the textContainer
-		[m_text_storage addLayoutManager:m_layout_manager];
-		[m_layout_manager release];	// The textStorage will retain the layoutManager
+		[the_string getCharacters: m_text_storage];
+		[the_string release];
 	}
+	
+	if (m_text_storage && !m_layout_manager) {
+		// Only now can we set the color: the alfa comes from the region.
+		double alfa = 1.0;
+#ifdef WITH_SMIL30
+		const common::region_info *ri = m_dest->get_info();
+		if (ri) alfa = ri->get_mediaopacity();
+#endif
+		ATSURGBAlphaColor acolor = {redf(m_text_color), greenf(m_text_color), bluef(m_text_color), alfa};
+		tags[0] = kATSURGBAlphaColorTag;
+		sizes[0] = sizeof(ATSURGBAlphaColor);
+		values[0] = &acolor;
+		err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
+		assert(err == 0);
 
+		err = ATSUCreateTextLayout(&m_layout_manager);
+		assert(err == 0);
+		
+		err = ATSUSetTextPointerLocation(m_layout_manager, m_text_storage, kATSUFromTextBeginning, kATSUToTextEnd, m_text_storage_length);
+		assert(err == 0);
+		
+		err = ATSUSetRunStyle(m_layout_manager, m_style, kATSUFromTextBeginning, kATSUToTextEnd);
+		assert(err == 0);
+	}
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
-	NSRect cg_dstrect = [view NSRectForAmbulantRect: &dstrect];
-	if (m_text_storage && m_layout_manager) {
-		NSPoint origin = NSMakePoint(NSMinX(cg_dstrect), NSMinY(cg_dstrect));
-		NSSize size = NSMakeSize(NSWidth(cg_dstrect), NSHeight(cg_dstrect));
-		if (1 /*size != [m_text_container containerSize]*/) {
-			AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw: setting size to (%f, %f)", size.width, size.height);
-			[m_text_container setContainerSize: size];
+	// NSRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
+	if (m_layout_manager) {
+		// Setup context
+		CGContextRef ctx = [view getCGContext];
+		tags[0] = kATSUCGContextTag;
+		sizes[0] = sizeof(CGContextRef);
+		values[0] = &ctx;
+		err = ATSUSetLayoutControls(m_layout_manager, 1, tags, sizes, values);
+		assert(err == 0);
+		
+		// Find line breaks.
+		Fixed flinewidth = FloatToFixed(dstrect.width());
+		tags[0] = kATSULineWidthTag;
+		sizes[0] = sizeof(Fixed);
+		values[0] = &flinewidth;
+		err = ATSUSetLayoutControls(m_layout_manager, 1, tags, sizes, values);
+		assert(err == 0);
+		
+		ItemCount nlines;
+		err = ATSUBatchBreakLines(m_layout_manager, kATSUFromTextBeginning, m_text_storage_length, flinewidth, &nlines);
+		assert(err == 0);
+//		err = ATSUGetSoftLineBreaks(layout, kATSUFromTextBeginning, kATSUToTextEnd, 0, NULL, &numSoftBreaks);
+//		assert(err == 0);
+		UniCharArrayOffset *breaks = (UniCharArrayOffset *) malloc((nlines+1) * sizeof(UniCharArrayOffset));
+		assert(breaks);
+		err = ATSUGetSoftLineBreaks(m_layout_manager, kATSUFromTextBeginning, kATSUToTextEnd, nlines, breaks, NULL);
+		assert(err == 0);
+		breaks[nlines++] = m_text_storage_length;
+		
+		// Draw each line
+		UniCharArrayOffset lbegin, lend;
+		int i;
+		Fixed x = dstrect.left();
+		Fixed y = dstrect.top();
+		lbegin = 0;
+		for(i=0; i<nlines; i++) {
+			lend = breaks[i];
+			ATSUTextMeasurement ascent, descent;
+			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineAscentTag, sizeof(ATSUTextMeasurement), &ascent, NULL);
+			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineDescentTag, sizeof(ATSUTextMeasurement), &descent, NULL);
+
+			y += Fix2X(ascent);
+			err = ATSUDrawText(m_layout_manager, lbegin, lend-lbegin, X2Fix(x), X2Fix(y));
+			assert(err == 0);
+			y += Fix2X(descent);
+			
+			lbegin = lend;
 		}
-		AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw at Cocoa-point (%f, %f)", origin.x, origin.y);
-		NSRange glyph_range = [m_layout_manager glyphRangeForTextContainer: m_text_container];
-		//[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: origin];
-		[m_layout_manager drawGlyphsForGlyphRange: glyph_range atPoint: origin];
+		free(breaks);
 	}
-#endif
 	m_lock.leave();
 }
 
