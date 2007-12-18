@@ -77,21 +77,21 @@ class cg_window : public common::gui_window {
 
 	void *view() { return m_view; }
 	
+	void set_size(lib::size bounds);
+	
   private:
     void *m_view;
 };
 
-;
 class cg_window_factory : public common::window_factory {
   public:
   	cg_window_factory(void *view)
-  	:	m_defaultwindow_view(view) {}
+  	:	m_defaultwindow_view(view)
+	{}
   	
 	lib::size get_default_size();
 	common::gui_window *new_window(const std::string &name, lib::size bounds, common::gui_events *handler);
 	common::bgrenderer *new_background_renderer(const common::region_info *src);
-  protected:
-	virtual void init_window_size(cg_window *window, const std::string &name, lib::size bounds);
   private:
     void *m_defaultwindow_view;
 };
@@ -176,6 +176,9 @@ AMBULANTAPI common::playable_factory *create_cg_renderer_factory(common::factori
 - (bool)isAmbulantWindowInUse;
 - (bool)ignoreResize;
 - (BOOL)isFlipped;
+
+- (void)ambulantSetSize: (ambulant::lib::size) bounds;
+- (void)ambulantNeedEvents: (bool) want;
 
 - (CGContextRef) getCGContext;
 - (CGRect) CGRectForAmbulantRect: (const ambulant::lib::rect *)arect;

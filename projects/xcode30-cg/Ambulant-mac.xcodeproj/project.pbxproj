@@ -41,7 +41,6 @@
 		043782F00D1726E100BC01BD /* cg_renderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043782E60D1726E100BC01BD /* cg_renderer.mm */; };
 		043782F10D1726E100BC01BD /* cg_text.mm in Sources */ = {isa = PBXBuildFile; fileRef = 043782E70D1726E100BC01BD /* cg_text.mm */; };
 		043782F90D17271600BC01BD /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 043782F80D17271600BC01BD /* Makefile.am */; };
-		0437832D0D172EFF00BC01BD /* libfaad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0480CCFF0CDD1D5C0025344B /* libfaad.a */; };
 		043902490BD78B0500E13028 /* Welcome.smil in Resources */ = {isa = PBXBuildFile; fileRef = 0439020C0BD78B0500E13028 /* Welcome.smil */; };
 		043902760BD78B0500E13028 /* pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 0439023C0BD78B0500E13028 /* pause.png */; };
 		043902770BD78B0500E13028 /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = 0439023D0BD78B0500E13028 /* play.png */; };
@@ -799,7 +798,6 @@
 				049656A70BCAEA7D002C00DF /* libSDL.a in Frameworks */,
 				049656A80BCAEA7D002C00DF /* libz.dylib in Frameworks */,
 				049656B30BCAEC13002C00DF /* Carbon.framework in Frameworks */,
-				0437832D0D172EFF00BC01BD /* libfaad.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1813,7 +1811,6 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Ambulant-mac" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
