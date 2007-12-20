@@ -68,6 +68,7 @@ toolkit_cg_libraries = libambulant_cg.la
 # XXX Should LIBINTL depend on USE_NLS?
 platlibs = $(LIBINTL) -framework CoreGraphics -framework CoreFoundation
 libambulant_cg_la_SOURCES = \
+	gui/cg/atsui_text.m \
 	gui/cg/cg_fill.m \
 	gui/cg/cg_gui.m \
 	gui/cg/cg_image.m \
