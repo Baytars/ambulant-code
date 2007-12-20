@@ -158,7 +158,7 @@ atsui_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
-	// NSRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
+	CGRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
 	if (m_layout_manager) {
 		// Setup context
 		CGContextRef ctx = [view getCGContext];
@@ -169,7 +169,7 @@ atsui_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		assert(err == 0);
 		
 		// Find line breaks.
-		Fixed flinewidth = FloatToFixed(dstrect.width());
+		Fixed flinewidth = FloatToFixed(CGRectGetWidth(cg_dstrect));
 		tags[0] = kATSULineWidthTag;
 		sizes[0] = sizeof(Fixed);
 		values[0] = &flinewidth;
@@ -190,8 +190,8 @@ atsui_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		// Draw each line
 		UniCharArrayOffset lbegin, lend;
 		int i;
-		Fixed x = dstrect.left();
-		Fixed y = dstrect.top();
+		Fixed x = CGRectGetMinX(cg_dstrect);
+		Fixed y = CGRectGetMaxY(cg_dstrect);
 		lbegin = 0;
 		for(i=0; i<nlines; i++) {
 			lend = breaks[i];
@@ -199,10 +199,10 @@ atsui_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineAscentTag, sizeof(ATSUTextMeasurement), &ascent, NULL);
 			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineDescentTag, sizeof(ATSUTextMeasurement), &descent, NULL);
 
-			y += Fix2X(ascent);
+			y -= Fix2X(ascent);
 			err = ATSUDrawText(m_layout_manager, lbegin, lend-lbegin, X2Fix(x), X2Fix(y));
 			assert(err == 0);
-			y += Fix2X(descent);
+			y -= Fix2X(descent);
 			
 			lbegin = lend;
 		}
