@@ -1,5 +1,6 @@
 library_includedir=$(includedir)/ambulant/gui/cg
 library_include_HEADERS= \
+	atsui_text.h \
 	cg_fill.h \
 	cg_gui.h \
 	cg_image.h \

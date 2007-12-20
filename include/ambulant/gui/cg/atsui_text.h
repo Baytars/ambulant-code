@@ -23,8 +23,8 @@
  * @$Id$ 
  */
 
-#ifndef AMBULANT_GUI_CG_GC_TEXT_H
-#define AMBULANT_GUI_CG_GC_TEXT_H
+#ifndef AMBULANT_GUI_CG_ATSUI_TEXT_H
+#define AMBULANT_GUI_CG_ATSUI_TEXT_H
 
 #include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/lib/mtsync.h"
@@ -39,15 +39,15 @@ namespace gui {
 
 namespace cg {
 
-class cg_text_renderer : public cg_renderer<renderer_playable_dsall> {
+class atsui_text_renderer : public cg_renderer<renderer_playable_dsall> {
   public:
-	cg_text_renderer(
+	atsui_text_renderer(
 		playable_notification *context,
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp,
 		common::factories *factory);
-        ~cg_text_renderer();
+        ~atsui_text_renderer();
 	
     void redraw_body(const rect &dirty, gui_window *window);
   private:
@@ -65,4 +65,4 @@ class cg_text_renderer : public cg_renderer<renderer_playable_dsall> {
  
 } // namespace ambulant
 
-#endif // AMBULANT_GUI_CG_GC_TEXT_H
+#endif // AMBULANT_GUI_CG_ATSUI_TEXT_H
