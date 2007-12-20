@@ -480,6 +480,15 @@ bad:
 	if (!ambulant_window) {
         AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
     } else {
+#ifdef WITH_UIKIT
+		CGRect bounds = [self bounds];
+		/*AM_DBG*/ NSLog(@"ambulantview: bounds (%f, %f, %f, %f)", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
+		CGContextRef myContext = [self getCGContext];
+		CGContextSaveGState(myContext);
+		float view_height = CGRectGetHeight(CGRectFromViewRect([self bounds]));
+		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
+		CGContextConcatCTM(myContext, matrix);
+#endif
 		// If we have seen transitions we always redraw the whole view
 		// XXXJACK interaction of fullscreen transitions and overlay windows
 		// is completely untested, and probably broken.
@@ -488,6 +497,9 @@ bad:
 //		[self _screenTransitionPreRedraw];
         ambulant_window->redraw(arect);
 //		[self _screenTransitionPostRedraw];
+#ifdef WITH_UIKIT
+		CGContextRestoreGState(myContext);
+#endif
 #ifdef DUMP_REDRAW
 		// Debug code: dump the contents of the view into an image
 		[self dumpToImageID: "redraw"];
