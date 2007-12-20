@@ -48,102 +48,41 @@ cg_text_renderer::cg_text_renderer(
 		event_processor *evp,
 		common::factories *factory)
 :	cg_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
-	m_text_storage(NULL),
-	m_style(NULL),
-	m_layout_manager(NULL)
+	m_font_name(NULL),
+	m_font_size(0.0)
 {
-	OSStatus err;
-    ATSUAttributeTag tags[1];
-    ByteCount sizes[1];
-    ATSUAttributeValuePtr values[1];
 	smil2::params *params = smil2::params::for_node(node);
-	color_t text_color = lib::to_color(0, 0, 0);
-	err = ATSUCreateStyle(&m_style);
-	assert(err == 0);
+
 	if (params) {
-		const char *fontname = params->get_str("font-family");
-		if (fontname) {
-			ATSUFontID font;
-
-			err = ATSUFindFontFromName(fontname, strlen(fontname), kFontFullName, kFontNoPlatform, kFontNoScript, kFontNoLanguage, &font);
-			if (err) {
-				lib::logger::get_logger()->trace("%s: font \"%s\" not found", m_node->get_sig().c_str(), fontname);
-			} else {
-				tags[0] = kATSUFontTag;
-				sizes[0] = sizeof(ATSUFontID);
-				values[0] = &font;
-				err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
-				assert(err == 0);
-			}
-		}
-
-//		const char *fontstyle = params->get_str("font-style");
-		float fontsize = params->get_float("font-size", 0.0);
-		if (fontsize) {
-			Fixed ffontsize = FloatToFixed(fontsize);
-			tags[0] = kATSUSizeTag;
-			sizes[0] = sizeof(Fixed);
-			values[0] = &ffontsize;
-			err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
-			assert(err == 0);
-		}
-		m_text_color = params->get_color("color", text_color);
-		delete params;
+		m_font_name = params->get_str("font-family");
+		m_font_size = params->get_float("font-size", 14.0);
+	} else {
+		m_font_name = "Helvetica";
+		m_font_size = 14.0;
 	}
 }
 
 cg_text_renderer::~cg_text_renderer()
 {
 	m_lock.enter();
-	if (m_style) ATSUDisposeStyle(m_style);
-	m_style = NULL;
-	if (m_layout_manager) ATSUDisposeTextLayout(m_layout_manager);
-	m_layout_manager = NULL;
-	if (m_text_storage) free(m_text_storage);
-	m_text_storage = NULL;
 	m_lock.leave();
 }
 
 void
 cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
-	OSStatus err;
-    ATSUAttributeTag tags[1];
-    ByteCount sizes[1];
-    ATSUAttributeValuePtr values[1];
 
 	m_lock.enter();
+	if (!m_data) {
+		m_lock.leave();
+		return;
+	}
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("cg_text_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d))", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
-	if (m_data && !m_text_storage) {
-		// Convert through NSString. We hope this will get the unicode intricacies right.
-		NSString *the_string = [[NSString alloc] initWithBytesNoCopy: m_data 
-				length: m_data_size
-				encoding: NSUTF8StringEncoding
-				freeWhenDone: NO];
-		m_text_storage_length = [the_string length];
-		m_text_storage = (UniChar *)malloc(m_text_storage_length*sizeof(UniChar));
-		if (m_text_storage == NULL) {
-			lib::logger::get_logger()->trace("%s: out of memory", m_node->get_sig().c_str());
-		}
-		[the_string getCharacters: m_text_storage];
-		[the_string release];
-	}
-	
+#if 0	
 	if (m_text_storage && !m_layout_manager) {
 		// Only now can we set the color: the alfa comes from the region.
-		double alfa = 1.0;
-#ifdef WITH_SMIL30
-		const common::region_info *ri = m_dest->get_info();
-		if (ri) alfa = ri->get_mediaopacity();
-#endif
-		ATSURGBAlphaColor acolor = {redf(m_text_color), greenf(m_text_color), bluef(m_text_color), alfa};
-		tags[0] = kATSURGBAlphaColorTag;
-		sizes[0] = sizeof(ATSURGBAlphaColor);
-		values[0] = &acolor;
-		err = ATSUSetAttributes(m_style, 1, tags, sizes, values);
-		assert(err == 0);
 
 		err = ATSUCreateTextLayout(&m_layout_manager);
 		assert(err == 0);
@@ -154,62 +93,77 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		err = ATSUSetRunStyle(m_layout_manager, m_style, kATSUFromTextBeginning, kATSUToTextEnd);
 		assert(err == 0);
 	}
+#endif
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
+	CGContextRef ctx = [view getCGContext];
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
-	// NSRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
-	if (m_layout_manager) {
-		// Setup context
-		CGContextRef ctx = [view getCGContext];
-		tags[0] = kATSUCGContextTag;
-		sizes[0] = sizeof(CGContextRef);
-		values[0] = &ctx;
-		err = ATSUSetLayoutControls(m_layout_manager, 1, tags, sizes, values);
-		assert(err == 0);
-		
-		// Find line breaks.
-		Fixed flinewidth = FloatToFixed(dstrect.width());
-		tags[0] = kATSULineWidthTag;
-		sizes[0] = sizeof(Fixed);
-		values[0] = &flinewidth;
-		err = ATSUSetLayoutControls(m_layout_manager, 1, tags, sizes, values);
-		assert(err == 0);
-		
-		ItemCount nlines;
-		err = ATSUBatchBreakLines(m_layout_manager, kATSUFromTextBeginning, m_text_storage_length, flinewidth, &nlines);
-		assert(err == 0);
-//		err = ATSUGetSoftLineBreaks(layout, kATSUFromTextBeginning, kATSUToTextEnd, 0, NULL, &numSoftBreaks);
-//		assert(err == 0);
-		UniCharArrayOffset *breaks = (UniCharArrayOffset *) malloc((nlines+1) * sizeof(UniCharArrayOffset));
-		assert(breaks);
-		err = ATSUGetSoftLineBreaks(m_layout_manager, kATSUFromTextBeginning, kATSUToTextEnd, nlines, breaks, NULL);
-		assert(err == 0);
-		breaks[nlines++] = m_text_storage_length;
-		
-		// Draw each line
-		UniCharArrayOffset lbegin, lend;
-		int i;
-		Fixed x = dstrect.left();
-		Fixed y = dstrect.top();
-		lbegin = 0;
-		for(i=0; i<nlines; i++) {
-			lend = breaks[i];
-			ATSUTextMeasurement ascent, descent;
-			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineAscentTag, sizeof(ATSUTextMeasurement), &ascent, NULL);
-			ATSUGetLineControl(m_layout_manager, lbegin, kATSULineDescentTag, sizeof(ATSUTextMeasurement), &descent, NULL);
+	CGRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
 
-			y += Fix2X(ascent);
-			err = ATSUDrawText(m_layout_manager, lbegin, lend-lbegin, X2Fix(x), X2Fix(y));
-			assert(err == 0);
-			y += Fix2X(descent);
-			
-			lbegin = lend;
-		}
-		free(breaks);
+	// Set the color
+	double alfa = 1.0;
+#ifdef WITH_SMIL30
+	const common::region_info *ri = m_dest->get_info();
+	if (ri) alfa = ri->get_mediaopacity();
+#endif
+	float components[] = {redf(m_text_color), greenf(m_text_color), bluef(m_text_color), alfa};
+	CGContextSetFillColor(ctx, components);
+	CGContextSetStrokeColor(ctx, components);
+	// Set the font
+	/*AM_DBG*/ lib::logger::get_logger()->debug("cg_text: select font %s, size %f", m_font_name, m_font_size);
+	CGContextSelectFont(ctx, m_font_name, m_font_size, kCGEncodingMacRoman);
+	// Calculate sizes
+	float x = CGRectGetMinX(cg_dstrect);
+	float y = CGRectGetMaxY(cg_dstrect);
+	float w = CGRectGetWidth(cg_dstrect); 
+	int lbegin, lend;
+	const char *cdata = (char *)m_data;
+	lbegin = 0;
+	lend = 0;
+	float lineheight = m_font_size;
+	while(_calc_fit(ctx, w, lbegin, lend) ) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("cg_text: draw line at (%f, %f)", x, y);
+		CGContextSetTextPosition(ctx, x, y);
+		CGContextSetTextDrawingMode(ctx, kCGTextFillStroke);
+		CGContextShowText(ctx, cdata+lbegin, lend-lbegin);
+		lbegin = lend;
+		y -= lineheight;
 	}
 	m_lock.leave();
 }
+
+bool
+cg_text_renderer::_calc_fit(CGContextRef ctx, float width, int& lbegin, int& lend)
+{
+	const char *cdata = (const char *)m_data;
+	// Find beginning point
+	if (lbegin > 0)
+		while (isspace(cdata[lbegin])) lbegin++;
+	if (cdata[lbegin] == '\0') return false;
+	lend = lbegin+1;
+	int lendcand = lend;
+	do {
+		while (cdata[lendcand] != '\0' && !isspace(cdata[lendcand])) lendcand++;
+		if (!_fits(ctx, width, cdata+lbegin, lendcand-lbegin))
+			return true;
+		lend = lendcand;
+		while (isspace(cdata[lendcand])) lendcand++;
+	} while(cdata[lendcand] != '\0');
+	return true;
+}
+
+bool
+cg_text_renderer::_fits(CGContextRef ctx, float maxwidth, const char *data, int datalen)
+{
+	CGPoint beginpos = CGContextGetTextPosition(ctx);
+	CGContextSetTextDrawingMode(ctx, kCGTextInvisible);
+	CGContextShowText(ctx, data, datalen);
+	CGPoint endpos = CGContextGetTextPosition(ctx);
+	float width = endpos.x - beginpos.x;
+	return width <= maxwidth;
+}
+	
 
 } // namespace cg
 
