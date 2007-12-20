@@ -28,7 +28,12 @@
 
 #include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/lib/mtsync.h"
-#include <ApplicationServices/ApplicationServices.h>
+//#include <CoreGraphics/CGContext.h>
+#ifdef WITH_UIKIT
+#include <UIKit/UIKit.h>
+#else
+#include <AppKit/AppKit.h>
+#endif
 
 namespace ambulant {
 
@@ -51,10 +56,10 @@ class cg_text_renderer : public cg_renderer<renderer_playable_dsall> {
 	
     void redraw_body(const rect &dirty, gui_window *window);
   private:
-	UniChar *m_text_storage;
-	UniCharCount m_text_storage_length;
-	ATSUStyle m_style;
-	ATSUTextLayout m_layout_manager;
+	bool _calc_fit(CGContextRef ctx, float width, int& lbegin, int& lend);
+	bool _fits(CGContextRef ctx, float width, const char *str, int strlen);
+	const char *m_font_name;
+	float m_font_size;
 	lib::color_t m_text_color;
 	critical_section m_lock;
 };

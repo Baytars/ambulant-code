@@ -161,7 +161,7 @@ cg_renderer_factory::new_playable(
 		} else
 #endif
 		{
-#ifdef WITH_UIKIT
+#if 1 // def WITH_UIKIT
 			rv = new cg_text_renderer(context, cookie, node, evp, m_factory);
 			AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_text_renderer 0x%x", (void *)node, (void *)rv);
 #else
