@@ -155,6 +155,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 #endif
 	cropped_image = _cropped_image(srcrect);
 	bool flipped = [view isFlipped];
+	flipped = false; // XXXJACK
 	if (flipped) {
 		CGContextSaveGState(myContext);
 		float view_height = CGRectGetHeight(CGRectFromViewRect([view bounds]));
