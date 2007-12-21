@@ -25,7 +25,7 @@
 //#include "ambulant/gui/cg/cg_ink.h"
 #include "ambulant/gui/cg/cg_fill.h"
 //#include "ambulant/gui/cg/cg_video.h"
-//#include "ambulant/gui/cg/cg_dsvideo.h"
+#include "ambulant/gui/cg/cg_dsvideo.h"
 #ifdef WITH_SMIL30
 //#include "ambulant/gui/cg/cg_smiltext.h"
 #endif
@@ -174,18 +174,20 @@ cg_renderer_factory::new_playable(
 		rv = new cg_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_fill_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "video") {
-#if NOT_YET_UIKIT
 		if (common::preferences::get_preferences()->m_prefer_ffmpeg ) {
 			rv = new cg_dsvideo_renderer(context, cookie, node, evp, m_factory);
 			if (rv) {
 				logger::get_logger()->trace("video: using native Ambulant renderer");
 				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
 			} else {
+#if NOT_YET_UIKIT
 				rv = new cg_video_renderer(context, cookie, node, evp);
 				if (rv) logger::get_logger()->trace("video: using QuickTime renderer");
 				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_video_renderer 0x%x", (void *)node, (void *)rv);
+#endif
 			}
 		} else {
+#if NOT_YET_UIKIT
 			rv = new cg_video_renderer(context, cookie, node, evp);
 			if (rv) {
 				logger::get_logger()->trace("video: using QuickTime renderer");
@@ -196,6 +198,7 @@ cg_renderer_factory::new_playable(
 				AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_dsvideo_renderer 0x%x", (void *)node, (void *)rv);
 			}
 #endif
+		}
 	}
 #ifdef WITH_SMIL30
 	else if ( tag == "smilText") {
@@ -585,7 +588,7 @@ bad:
 	NSLog(@"ambulantNeedEvents: not implemented yet for UIKit");
 #else
 	NSWindow *my_window = [self window];
-	AM_DBG NSLog(@"my_window acceptsMouseMovedEvents = %d", [self acceptsMouseMovedEvents]);
+	AM_DBG NSLog(@"my_window acceptsMouseMovedEvents = %d", [my_window acceptsMouseMovedEvents]);
 	// See whether the mouse is actually in our area
 	NSPoint where = [my_window mouseLocationOutsideOfEventStream];
 	if (!NSPointInRect(where, [self frame])) {
