@@ -109,8 +109,12 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	if (ri) alfa = ri->get_mediaopacity();
 #endif
 	float components[] = {redf(m_text_color), greenf(m_text_color), bluef(m_text_color), alfa};
+	CGColorSpaceRef genericColorSpace = CGColorSpaceCreateDeviceRGB();
+	CGContextSetFillColorSpace(ctx, genericColorSpace); 
 	CGContextSetFillColor(ctx, components);
+    CGContextSetStrokeColorSpace(ctx, genericColorSpace); 
 	CGContextSetStrokeColor(ctx, components);
+	CGColorSpaceRelease(genericColorSpace);
 	// Set the font
 	/*AM_DBG*/ lib::logger::get_logger()->debug("cg_text: select font %s, size %f", m_font_name, m_font_size);
 	CGContextSelectFont(ctx, m_font_name, m_font_size, kCGEncodingMacRoman);
