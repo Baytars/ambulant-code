@@ -73,12 +73,23 @@ cg_dsvideo_renderer::show_frame(const char* frame, int size)
 	// XXXX Who keeps reference to frame?
 	CGSize nssize = CGSizeMake(m_size.w, m_size.h);
 	m_image = NULL; // [[NSImage alloc] initWithSize: nssize];
+	CFDataRef cfdata = CFDataCreate(NULL, (const UInt8 *)frame, size);
+	assert(cfdata);
+	CGDataProviderRef provider = CGDataProviderCreateWithCFData(cfdata);
+	assert(provider);
+	CFRelease(cfdata);
+	CGColorSpaceRef genericColorSpace = CGColorSpaceCreateDeviceRGB();
+	assert(genericColorSpace);
+	CGBitmapInfo bitmapInfo = 0; // XXXJACK may need to cater for endianness
+	m_image = CGImageCreate( m_size.w, m_size.h, 8, 32, m_size.w*4, genericColorSpace, bitmapInfo, provider, NULL, true, kCGRenderingIntentDefault);
+	CGDataProviderRelease(provider);
+	CGColorSpaceRelease(genericColorSpace);
 	if (!m_image) {
-//		logger::get_logger()->trace("cg_dsvideo_renderer::show_frame: cannot allocate NSImage");
-//		logger::get_logger()->error(gettext("Out of memory while showing video"));
+		logger::get_logger()->trace("cg_dsvideo_renderer::show_frame: cannot create CGImage");
 		m_lock.leave();
 		return;
 	}
+	lib::logger::get_logger()->debug("cg_dsvideo_renderer::show_frame: created CGImage 0x%x", m_image);
 #if UIKIT_NOT_YET
 	NSBitmapImageRep *bitmaprep = [[NSBitmapImageRep alloc]
 		initWithBitmapDataPlanes: NULL
@@ -142,26 +153,26 @@ cg_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		}
 	}
 #endif
-#ifdef UIKIT_NOT_YET
 	if (m_image) {
 		// Now find both source and destination area for the bitblit.
-		CGSize cg_srcsize = [m_image size];
-		size srcsize = size((int)cg_srcsize.width, (int)cg_srcsize.height);
+		CGSize cg_srcsize = CGSizeMake(m_size.w, m_size.h);
 		rect srcrect = rect(size(0, 0));
-		rect dstrect = m_dest->get_fit_rect(srcsize, &srcrect, m_alignment);
+		rect dstrect = m_dest->get_fit_rect(m_size, &srcrect, m_alignment);
 		dstrect.translate(m_dest->get_global_topleft());
 		
 		CGRect cg_srcrect = CGRectMake(0, 0, srcrect.width(), srcrect.height()); // XXXX 0, 0 is wrong
 		CGRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
-		AM_DBG logger::get_logger()->debug("cg_dsvideo_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", cg_srcsize.width, cg_srcsize.height, NSMinX(cg_dstrect), NSMinY(cg_dstrect), NSMaxX(cg_dstrect), NSMaxY(cg_dstrect));
-#ifdef WITH_SMIL30
+		/*AM_DBG*/ logger::get_logger()->debug("cg_dsvideo_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", cg_srcsize.width, cg_srcsize.height, CGRectGetMinX(cg_dstrect), CGRectGetMinY(cg_dstrect), CGRectGetMaxX(cg_dstrect), CGRectGetMaxY(cg_dstrect));
+		// XXX Crop the image, if needed.
+		CGImageRef cropped_image = m_image;
+		CGContextRef myContext = [view getCGContext];
 		double alfa = 1.0;
+#ifdef WITH_SMIL30
 		const common::region_info *ri = m_dest->get_info();
 		if (ri) alfa = ri->get_mediaopacity();
-		[m_image drawInRect: cg_dstrect fromRect: cg_srcrect operation: NSCompositeSourceAtop fraction: alfa];
-#else
-		[m_image drawInRect: cg_dstrect fromRect: cg_srcrect operation: NSCompositeSourceAtop fraction: 1.0];
 #endif
+		CGContextDrawImage (myContext, cg_dstrect, cropped_image); // ignoring alfa, for now
+		// XXX  release cropped_image
 	} else {
 	}
 #if 0
@@ -176,7 +187,6 @@ cg_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer.redraw: now=%d, schedule step for %d", m_event_processor->get_timer()->elapsed(), m_event_processor->get_timer()->elapsed()+delay);
 		m_event_processor->add_event(ev, delay);
 	}
-#endif
 #endif
 
 	m_lock.leave();
