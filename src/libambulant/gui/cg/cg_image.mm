@@ -68,9 +68,13 @@ void
 cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
+#ifdef WITH_SMIL30
+	const common::region_info *ri = m_dest->get_info();
+#endif
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	
+	// First we load the image data
 	if (m_data && !m_image) {
 		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: creating image");
 		m_nsdata = (CFDataRef)[NSData dataWithBytesNoCopy: m_data length: m_data_size freeWhenDone: NO];
@@ -91,6 +95,29 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 		m_lock.leave();
 		return;
 	}
+#ifdef WITH_SMIL30
+	// Next we apply chroma keying.
+	// XXXJACK: by doing this here we disregard animation on chromaKeying 
+	if (ri->is_chromakey_specified()) {
+		double opacity = ri->get_chromakeyopacity();
+		if (opacity != 0.0 && opacity != 1.0) {
+			lib::logger::get_logger()->trace("%s: only chromaKeyOpacity values 0.0 and 1.0 supported on MacOS", m_node->get_sig().c_str());
+		}
+		if (opacity < 0.5) {
+			lib::color_t chromakey = ri->get_chromakey();
+			lib::color_t tolerance = ri->get_chromakeytolerance();
+			float components[8] = {
+				redf(chromakey)-redf(tolerance), redf(chromakey)+redf(tolerance),
+				greenf(chromakey)-greenf(tolerance), greenf(chromakey)+greenf(tolerance),
+				bluef(chromakey)-bluef(tolerance), bluef(chromakey)+bluef(tolerance),
+				0.0, 0.0
+			};
+			CGImageRef new_image = CGImageCreateWithMaskingColors(m_image, components);
+			CGImageRelease(m_image);
+			m_image = new_image;
+		}
+	}
+#endif
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	CGContextRef myContext = [view getCGContext];
@@ -149,7 +176,6 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 #endif
 	double alfa = 1.0;
 #ifdef WITH_SMIL30
-	const common::region_info *ri = m_dest->get_info();
 	if (ri) alfa = ri->get_mediaopacity();
 	// XXX Need to set alpha
 #endif
