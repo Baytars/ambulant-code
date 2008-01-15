@@ -75,12 +75,12 @@ libambulant_cg_la_SOURCES = \
 	gui/cg/cg_renderer.m \
 	gui/cg/cg_text.m \
 	gui/cg/cg_dsvideo.m
-#	gui/cg/cg_html.m \
-#	gui/cg/cg_ink.m \
-#	gui/cg/cg_smiltext.m \
-#	gui/cg/cg_transition.m \
-#	gui/cg/cg_audio.m \
-#	gui/cg/cg_video.m \
+#	gui/cg/cg_html.m
+#	gui/cg/cg_ink.m
+#	gui/cg/cg_smiltext.m
+#	gui/cg/cg_transition.m
+#	gui/cg/cg_audio.m
+#	gui/cg/cg_video.m
 else
 toolkit_cg_libraries =
 platlibs =

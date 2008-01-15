@@ -236,7 +236,8 @@ library_include_HEADERS = \
 	cg_gui.h \
 	cg_image.h \
 	cg_renderer.h \
-	cg_text.h
+	cg_text.h \
+	cg_dsvideo.h
 
 all: all-am
 
@@ -468,13 +469,12 @@ uninstall-am: uninstall-library_includeHEADERS
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-library_includeHEADERS
 
-#	cg_audio.h \
-#	cg_html.h \
-#	cg_ink.h \
-#	cg_smiltext.h \
-#	cg_transition.h \
-#	cg_video.h \
-#	cg_dsvideo.h
+#	cg_audio.h
+#	cg_html.h
+#	cg_ink.h
+#	cg_smiltext.h
+#	cg_transition.h
+#	cg_video.h 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

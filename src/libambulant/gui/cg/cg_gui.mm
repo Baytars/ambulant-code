@@ -174,7 +174,7 @@ cg_renderer_factory::new_playable(
 		rv = new cg_fill_renderer(context, cookie, node, evp);
 		AM_DBG logger::get_logger()->debug("cg_renderer_factory: node 0x%x: returning cg_fill_renderer 0x%x", (void *)node, (void *)rv);
 	} else if ( tag == "video") {
-		if (common::preferences::get_preferences()->m_prefer_ffmpeg ) {
+		if (1 /*common::preferences::get_preferences()->m_prefer_ffmpeg */) {
 			rv = new cg_dsvideo_renderer(context, cookie, node, evp, m_factory);
 			if (rv) {
 				logger::get_logger()->trace("video: using native Ambulant renderer");
