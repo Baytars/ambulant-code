@@ -428,7 +428,12 @@ bad:
 
 - (void) asyncRedrawForAmbulantRect: (NSRectHolder *)arect
 {
+#if 1
+	// Something goes wrong with flipping coordinate systems. For now, redraw everything always.
+	CGRect my_rect = [self bounds];
+#else
 	CGRect my_rect = [arect rect];
+#endif
 	[arect release];
     AM_DBG NSLog(@"AmbulantView.asyncRedrawForAmbulantRect: self=0x%x rect=(%f,%f,%f,%f)", self, CGRectGetMinX(my_rect), CGRectGetMinY(my_rect), CGRectGetMaxX(my_rect), CGRectGetMaxY(my_rect));
 	[self setNeedsDisplayInRect: ViewRectFromCGRect(my_rect)];
@@ -485,7 +490,7 @@ bad:
     } else {
 #ifdef WITH_UIKIT
 		CGRect bounds = [self bounds];
-		/*AM_DBG*/ NSLog(@"ambulantview: bounds (%f, %f, %f, %f)", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
+		AM_DBG NSLog(@"ambulantview: bounds (%f, %f, %f, %f)", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
 		CGContextRef myContext = [self getCGContext];
 		CGContextSaveGState(myContext);
 		float view_height = CGRectGetHeight(CGRectFromViewRect([self bounds]));

@@ -116,7 +116,7 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	CGContextSetStrokeColor(ctx, components);
 	CGColorSpaceRelease(genericColorSpace);
 	// Set the font
-	/*AM_DBG*/ lib::logger::get_logger()->debug("cg_text: select font %s, size %f", m_font_name, m_font_size);
+	AM_DBG lib::logger::get_logger()->debug("cg_text: select font %s, size %f", m_font_name, m_font_size);
 	CGContextSelectFont(ctx, m_font_name, m_font_size, kCGEncodingMacRoman);
 	// Calculate sizes
 	float x = CGRectGetMinX(cg_dstrect);
@@ -128,10 +128,10 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	lend = 0;
 	float lineheight = m_font_size;
 	while(_calc_fit(ctx, w, lbegin, lend) ) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cg_text: draw line at (%f, %f)", x, y);
+		AM_DBG lib::logger::get_logger()->debug("cg_text: draw line at (%f, %f)", x, y);
 		CGContextSetTextPosition(ctx, x, y);
-		/*AM_DBG*/{ CGAffineTransform mtx = CGContextGetTextMatrix(ctx); lib::logger::get_logger()->debug("cg_text: textmatrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
-		/*AM_DBG*/{ CGAffineTransform mtx = CGContextGetCTM(ctx); lib::logger::get_logger()->debug("cg_text: matrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
+		AM_DBG{ CGAffineTransform mtx = CGContextGetTextMatrix(ctx); lib::logger::get_logger()->debug("cg_text: textmatrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
+		AM_DBG{ CGAffineTransform mtx = CGContextGetCTM(ctx); lib::logger::get_logger()->debug("cg_text: matrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
 		CGContextSetTextDrawingMode(ctx, kCGTextFillStroke);
 		CGContextShowText(ctx, cdata+lbegin, lend-lbegin);
 		lbegin = lend;
