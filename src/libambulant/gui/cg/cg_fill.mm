@@ -123,13 +123,13 @@ void
 cg_background_renderer::redraw(const lib::rect &dirty, common::gui_window *window)
 {
 	const rect &r =  m_dst->get_rect();
-	/*AM_DBG*/ logger::get_logger()->debug("cg_bg_renderer::drawbackground(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
+	AM_DBG logger::get_logger()->debug("cg_bg_renderer::drawbackground(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	
 	cg_window *cwindow = (cg_window *)window;
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	CGContextRef myContext = [view getCGContext];
 //	CGContextRef myContext = [[NSGraphicsContext currentContext] graphicsPort];
-	/*AM_DBG*/ lib::logger::get_logger()->debug("cg_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
+	AM_DBG lib::logger::get_logger()->debug("cg_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
 	rect dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
 	CGRect cg_dstrect_whole = [view CGRectForAmbulantRect: &dstrect_whole];
@@ -138,7 +138,7 @@ cg_background_renderer::redraw(const lib::rect &dirty, common::gui_window *windo
 		// First find our whole area (which we have to clear to background color)
 		// XXXX Fill with background color
 		color_t bgcolor = m_src->get_bgcolor();
-		/*AM_DBG*/ lib::logger::get_logger()->debug("cg_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)bgcolor, opacity);
+		AM_DBG lib::logger::get_logger()->debug("cg_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)bgcolor, opacity);
 		float components[] = {redf(bgcolor), greenf(bgcolor), bluef(bgcolor), opacity};
 //		CGColorRef cgcolor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), components);
 //		PLOVER [cg_bgcolor set];
