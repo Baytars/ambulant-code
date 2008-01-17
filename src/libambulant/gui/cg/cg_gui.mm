@@ -34,7 +34,7 @@
 
 //#include <CoreGraphics/CoreGraphics.h>
 
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -613,6 +613,12 @@ bad:
 #else
 	return true;
 #endif
+}
+
+- (void)tappedWithPoint: (CGPoint) where
+{
+	ambulant::lib::point amwhere = ambulant::lib::point((int)where.x, (int)where.y);
+	if (ambulant_window) ambulant_window->user_event(amwhere);
 }
 
 #if NOT_YET_UIKIT
