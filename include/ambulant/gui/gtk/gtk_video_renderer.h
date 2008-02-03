@@ -52,7 +52,7 @@ class gtk_video_renderer :  public gtk_renderer<common::video_renderer>  {
 				 common::factories *factory);
 	
 	~gtk_video_renderer();
-   	void show_frame(const char* frame, int size);
+   	void push_frame(char* frame, int size);
 	void redraw_body(const lib::rect &r, common::gui_window* w);
 private:
  	std::queue< std::pair<int, char*> > m_frames;

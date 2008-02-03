@@ -52,7 +52,7 @@ namespace qt {
 				 common::factories *factory);
 	
 	~qt_video_renderer();
-	void show_frame(const char* frame, int size);
+	void push_frame(char* frame, int size);
 	void redraw_body(const lib::rect &r, common::gui_window* w);
  
  private:

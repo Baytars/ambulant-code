@@ -62,20 +62,20 @@ cocoa_dsvideo_renderer::~cocoa_dsvideo_renderer()
 }
 	
 void
-cocoa_dsvideo_renderer::show_frame(const char* frame, int size)
+cocoa_dsvideo_renderer::push_frame(char* frame, int size)
 {
 	m_lock.enter();
 	if (m_image) {
 		[m_image release];
 		m_image = NULL;
 	}
-	AM_DBG lib::logger::get_logger()->debug("cocoa_dsvideo_renderer::show_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
+	AM_DBG lib::logger::get_logger()->debug("cocoa_dsvideo_renderer::push_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
 	assert(size == (int)(m_size.w * m_size.h * 4));
 	// XXXX Who keeps reference to frame?
 	NSSize nssize = NSMakeSize(m_size.w, m_size.h);
 	m_image = [[NSImage alloc] initWithSize: nssize];
 	if (!m_image) {
-		logger::get_logger()->trace("cocoa_dsvideo_renderer::show_frame: cannot allocate NSImage");
+		logger::get_logger()->trace("cocoa_dsvideo_renderer::push_frame: cannot allocate NSImage");
 		logger::get_logger()->error(gettext("Out of memory while showing video"));
 		m_lock.leave();
 		return;
@@ -97,7 +97,7 @@ cocoa_dsvideo_renderer::show_frame(const char* frame, int size)
 		bytesPerRow: m_size.w * 4
 		bitsPerPixel: 32];
 	if (!bitmaprep) {
-		logger::get_logger()->trace("cocoa_dsvideo_renderer::show_frame: cannot allocate NSBitmapImageRep");
+		logger::get_logger()->trace("cocoa_dsvideo_renderer::push_frame: cannot allocate NSBitmapImageRep");
 		logger::get_logger()->error(gettext("Out of memory while showing video"));
 		m_lock.leave();
 		return;
@@ -107,6 +107,7 @@ cocoa_dsvideo_renderer::show_frame(const char* frame, int size)
 #else
 	swab(frame, [bitmaprep bitmapData], size);
 #endif
+	free(frame);
 	[m_image addRepresentation: bitmaprep];
 	[m_image setFlipped: true];
 	[bitmaprep release];

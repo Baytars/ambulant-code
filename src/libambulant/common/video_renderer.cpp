@@ -315,7 +315,8 @@ video_renderer::data_avail()
 		// re-displaying.
 		if (frame_ts_micros > m_last_frame_timestamp ) {
 			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
-			show_frame(buf, size);
+			push_frame(buf, size);
+			m_src->frame_acquired(frame_ts_micros, buf);
 			m_dest->need_redraw();
 			m_last_frame_timestamp = frame_ts_micros;
 			m_frame_displayed++;
@@ -323,7 +324,7 @@ video_renderer::data_avail()
 			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: skip frame (timestamp = %lld)", frame_ts_micros);
 			m_frame_duplicate++;
 		}
-		m_src->frame_done(frame_ts_micros, true);
+		m_src->frame_processed(frame_ts_micros);
 		// Now we need to decide when we want the next callback, by computing what the timestamp
 		// of the next frame is expected to be.
 		if(!(frame_ts_micros <  (now_micros - 2*frame_duration)))//if the current frames time was older than one frameduration don't increment the time to callback

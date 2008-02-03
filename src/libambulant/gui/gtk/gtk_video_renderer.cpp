@@ -72,27 +72,30 @@ gtk_video_renderer::~gtk_video_renderer()
 }
 
 void 
-gtk_video_renderer::show_frame(const char* frame, int size)
+gtk_video_renderer::push_frame(char* frame, int size)
 {
 
 	m_lock.enter();
 	
-	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: frame=0x%x, size=%d, this=0x%x", (void*) frame, size, (void*) this);
+	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.push_frame: frame=0x%x, size=%d, this=0x%x", (void*) frame, size, (void*) this);
+	// XXXJACK: don't reallocate if the size is the same!
 	if (m_data)
 		free(m_data);	
-	
-    	m_data = (char*) malloc(size);
+	m_data = (char*) malloc(size);
 
 	// This is needed to convert the colors to GTK+
+	// XXXJACK need to check whether we can get RGBA in stead of BGRA data from video_renderer, to save a copy.
 	for(int i=0;i < size;i=i+4){
 		m_data[i] = frame[i+2];		/*R Red*/
 		m_data[i+1] = frame[i+1];	/*G GREEN*/
 		m_data[i+2] = frame[i];		/*B BLUE*/
 		m_data[i+3] = frame[i+3];	/*  A ALPHA*/		    
 	}
-	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: About to calll need_redraw, (m_dest=0x%x)", (void*) m_dest);
-	m_dest->need_redraw();	
-	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame: need_redraw called");
+	free(frame);
+//	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.push_frame: About to calll need_redraw, (m_dest=0x%x)", (void*) m_dest);
+// XXXJACK: need_redraw() will be called by video_renderer.
+//	m_dest->need_redraw();	
+//	AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.push_frame: need_redraw called");
 
 	m_lock.leave();
 }
@@ -141,7 +144,7 @@ gtk_video_renderer::redraw_body(const lib::rect &dirty, common::gui_window* w)
 
 		int width = m_size.w;
 		int height = m_size.h;
-		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.show_frame(0x%x): width = %d, height = %d",(void *)this, width, height);
+		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw_body(0x%x): width = %d, height = %d",(void *)this, width, height);
 		m_image =  gdk_pixbuf_new_from_data ((const guchar*) m_data, GDK_COLORSPACE_RGB, TRUE, 8, width, height, (width*4), NULL, NULL);
 
 		if (m_image) {
