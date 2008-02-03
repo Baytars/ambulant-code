@@ -115,6 +115,7 @@ class ffmpeg_video_decoder_datasource:
   	timestamp_t get_clip_end() { return m_src->get_clip_end(); };
   	timestamp_t get_clip_begin() { return m_src->get_clip_begin(); };
 	timestamp_t get_start_time() { return m_src->get_start_time(); };
+	void set_pixel_layout(pixel_order l) { m_pixel_layout = l; };
 	common::duration get_dur();
 	
   private:
@@ -147,6 +148,7 @@ class ffmpeg_video_decoder_datasource:
     lib::critical_section m_lock;
 	timestamp_t m_elapsed;
 	bool m_start_input;		// True when m_src->start_frame() is needed
+	pixel_order m_pixel_layout;	// Per-pixel format receiver wants.
 	//FILE* m_file;
   	
 };

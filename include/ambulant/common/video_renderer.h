@@ -61,6 +61,11 @@ class video_renderer : public common::renderer_playable {
 
   	virtual ~video_renderer();
 	
+	/// The pixel format this renderer wants. Override in subclass to fit
+	/// what the hardware wants (so we don't need to do an extra pass of
+	/// byte reordering).
+	virtual net::pixel_order pixel_layout() { return net::pixel_argb; }
+	
 	/// Return true if video is paused.
   	bool is_paused() { return m_is_paused; };
 	
