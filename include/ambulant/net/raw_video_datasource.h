@@ -52,7 +52,8 @@ class raw_video_datasource : virtual public video_datasource {
   	bool end_of_file();
   	
   	char* get_frame(double *timestamp, int *size); 
-  	void frame_done(double timestamp, bool keepdata);
+	void frame_acquired(timestamp_t timestamp, char *data);
+  	void frame_processed(double timestamp);
   
   private:
 	bool read_next_frame();	 

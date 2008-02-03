@@ -360,8 +360,12 @@ class video_datasource : virtual public lib::ref_counted_obj {
   	
 	/// Return the current video frame.
 	/// Should only be called from the callback routine.
-	/// The timestamp of the frame and the size of the data are also returned.
-  	virtual char* get_frame(timestamp_t now, timestamp_t *timestamp, int *size) = 0; 
+	/// The timestamp of the frame and the size of the data returned.
+	/// If the receiver wants to take ownership of the buffer it should call
+	/// frame_acquired().
+	/// When the receiver is done with this frame (and any preceding frames)
+	/// it should call frame_processed.
+  	virtual char * get_frame(timestamp_t now, timestamp_t *ts, int *size) = 0; 
 
 	/// Returns the width of the image returned by get_frame.
 	virtual int width() = 0;
@@ -370,10 +374,13 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	virtual int height() = 0;
 	
 	virtual timestamp_t frameduration() = 0;
-	/// Called by the client to indicate all frames up to timestamp are consumed.
-	/// If keepdata is set the actual storage for a frame with an exact
-	/// timestamp match is not freed.
-  	virtual void frame_done(timestamp_t timestamp, bool keepdata) = 0;
+	
+	/// Called by the client to indicate it wants to take ownership of this buffer.
+	/// Must only be called with most recent results from get_frame().
+  	virtual void frame_acquired(timestamp_t timestamp, char *data) = 0;
+	
+	/// Called by the client to indicate all frames up to and including timestamp are consumed.
+  	virtual void frame_processed(timestamp_t timestamp) = 0;
 	
 	/// Tells the datasource to start reading data starting from time t.
 	virtual void read_ahead(timestamp_t time) = 0;

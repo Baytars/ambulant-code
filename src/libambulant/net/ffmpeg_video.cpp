@@ -331,24 +331,33 @@ ffmpeg_video_decoder_datasource::_pop_top_frame() {
 }
 
 void 
-ffmpeg_video_decoder_datasource::frame_done(timestamp_t now, bool keepdata)
+ffmpeg_video_decoder_datasource::frame_acquired(timestamp_t now, char *buf)
+{
+	m_lock.enter();
+	assert(m_old_frame.first == now);
+	assert(m_old_frame.second == buf);
+	m_old_frame.second = NULL;
+	m_lock.leave();
+}
+
+void 
+ffmpeg_video_decoder_datasource::frame_processed(timestamp_t now)
 {
 	m_lock.enter();
 	if (m_frames.size() == 0) {
+		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: frame queue empty (programmer error)");
 		m_lock.leave();
 		return;
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.frame_done(%d)", (int)now);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.frame_processed(%d)", (int)now);
 
 	while ( m_frames.size() && m_old_frame.first <= now) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_done: discarding m_old_frame timestamp=%d, now=%d, data ptr = 0x%x",(int)m_old_frame.first,(int)now, m_old_frame.second);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: discarding m_old_frame timestamp=%d, now=%d, data ptr = 0x%x",(int)m_old_frame.first,(int)now, m_old_frame.second);
 		_pop_top_frame();
 	}
-	if (!keepdata) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_done(%d): free(0x%x)", (int)now, m_old_frame.second);
-		free(m_old_frame.second);
-		m_old_frame.second = NULL;
-	}
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed(%d): free(0x%x)", (int)now, m_old_frame.second);
+	free(m_old_frame.second);
+	m_old_frame.second = NULL;
 	m_lock.leave();
 }
 
@@ -588,7 +597,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 		} // End of while loop
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
   	}
-	m_src->frame_done(0, false);
+	m_src->frame_processed(0); // XXXJACK: Should pass ipts, for sanity check
 	if (frame) av_free(frame);
   out_of_memory:
 	// Now tell our client, if we have data available or are at end of file.

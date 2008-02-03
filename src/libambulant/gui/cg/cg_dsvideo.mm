@@ -60,33 +60,27 @@ cg_dsvideo_renderer::~cg_dsvideo_renderer()
 	m_lock.leave();
 }
 
-void
-cg_dsvideo_renderer::stop_show_frame()
+static void
+my_free_frame(void *ptr, const void *ptr2, size_t size)
 {
-	m_lock.enter();
-	if (m_image) {
-		AM_DBG lib::logger::get_logger()->trace("0x%x: stop_show_frame(0x%x)", this, m_image);
-		CGImageRelease(m_image);
-		m_image = NULL;
-	}
-	m_lock.leave();
+	free(ptr);
 }
 
 void
-cg_dsvideo_renderer::show_frame(const char* frame, int size)
+cg_dsvideo_renderer::push_frame(char* frame, int size)
 {
 	m_lock.enter();
 	if (m_image) {
 		CGImageRelease(m_image);
 		m_image = NULL;
 	}
-	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::show_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
+	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::push_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
 	assert(size == (int)(m_size.w * m_size.h * 4));
 	// XXXX Who keeps reference to frame?
 	CGSize nssize = CGSizeMake(m_size.w, m_size.h);
 	m_image = NULL; // [[NSImage alloc] initWithSize: nssize];
 #if 1
-	CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, frame, size, NULL);
+	CGDataProviderRef provider = CGDataProviderCreateWithData(frame, frame, size, my_free_frame);
 	assert(provider);
 #else
 	CFDataRef cfdata = CFDataCreate(NULL, (const UInt8 *)frame, size);
@@ -107,15 +101,15 @@ cg_dsvideo_renderer::show_frame(const char* frame, int size)
 	// - If you also set shouldInterpolate=true you get an additional factor of 2 slowdown.
 	CGBitmapInfo bitmapInfo = 0; 
 	m_image = CGImageCreate( m_size.w, m_size.h, 8, 32, m_size.w*4, genericColorSpace, bitmapInfo, provider, NULL, false, kCGRenderingIntentDefault);
-	AM_DBG lib::logger::get_logger()->trace("0x%x: show_frame(0x%x, %d) -> 0x%x -> 0x%x", this, frame, size, provider, m_image);
+	AM_DBG lib::logger::get_logger()->trace("0x%x: push_frame(0x%x, %d) -> 0x%x -> 0x%x", this, frame, size, provider, m_image);
 	CGDataProviderRelease(provider);
 	CGColorSpaceRelease(genericColorSpace);
 	if (!m_image) {
-		logger::get_logger()->trace("cg_dsvideo_renderer::show_frame: cannot create CGImage");
+		logger::get_logger()->trace("cg_dsvideo_renderer::push_frame: cannot create CGImage");
 		m_lock.leave();
 		return;
 	}
-	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::show_frame: created CGImage 0x%x", m_image);
+	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::push_frame: created CGImage 0x%x", m_image);
 //	if (m_dest) m_dest->need_redraw();
 	m_lock.leave();
 }
