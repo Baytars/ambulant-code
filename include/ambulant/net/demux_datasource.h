@@ -135,6 +135,7 @@ class demux_video_datasource:
   		int stream_index);
   
     ~demux_video_datasource();
+	void set_pixel_layout(pixel_order l) { assert(l == pixel_unknown); }
 	void read_ahead(timestamp_t clip_begin);
 	void seek(timestamp_t time);
     void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);

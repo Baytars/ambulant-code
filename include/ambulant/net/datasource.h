@@ -107,6 +107,15 @@ struct audio_format {
 		bits(0) {};
 };
 
+/// Pixel layout in memory.
+enum pixel_order {
+	pixel_unknown,	///< Compressed formats and such
+	pixel_rgba,		///< (msb)R G B A(lsb), in host order
+	pixel_argb,		///< (msb)A R G B(lsb), in host order
+	pixel_bgra,		///< (msb)B G R A(lsb), in host order
+	pixel_abgr		///< (msb)A B G R(lsb), in host order
+};
+
 /// This struct completely describes a video format.
 /// If name is "" the format is a sequence of uncompressed images.
 /// Parameters may be 0 if the values are not known.
@@ -116,8 +125,8 @@ struct video_format {
 	std::string name;			///< Name of the format
 	const void *parameters;		///< For a named format, pointer to parameters
 	timestamp_t frameduration;	///< For linear samples: the samplerate
-	int width;					/// The width of the video
-	int height;					///	The height of the video
+	int width;					///< The width of the video
+	int height;					///< The height of the video
 	
 	/// Default constructor: creates unknown video_format.
 	video_format()
@@ -337,6 +346,9 @@ class video_datasource : virtual public lib::ref_counted_obj {
   public:
   	virtual ~video_datasource() {};
 
+	/// Signals the type of pixels the receiver wants.
+	virtual void set_pixel_layout(pixel_order l) = 0;
+	
 	/// Return the duration of the video data, if known.
 	virtual common::duration get_dur() = 0;
 

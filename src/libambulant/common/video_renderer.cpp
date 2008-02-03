@@ -68,6 +68,9 @@ video_renderer::video_renderer(
 		m_lock.leave();
 		return;
 	}
+	// Tell the datasource how we like our pixels.
+	m_src->set_pixel_layout(pixel_layout());
+	
 	if (m_src->has_audio()) {
 		m_audio_ds = m_src->get_audio_datasource();
 	

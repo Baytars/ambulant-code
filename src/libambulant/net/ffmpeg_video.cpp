@@ -171,7 +171,8 @@ ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasourc
 	m_frame_count(0),
 	m_dropped_count(0),
 	m_elapsed(0),
-	m_start_input(true)
+	m_start_input(true),
+	m_pixel_layout(pixel_unknown)
 {	
 	
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource() (this = 0x%x)", (void*)this);
@@ -576,20 +577,27 @@ ffmpeg_video_decoder_datasource::data_avail()
 				sz = 0;
 				goto out_of_memory;
 			}
+			switch(m_pixel_layout) {
+			case pixel_rgba:
+				dst_pic_fmt = PIX_FMT_RGB32_1;
+				break;
+			case pixel_argb:
+				dst_pic_fmt = PIX_FMT_RGB32;
+				break;
+			case pixel_bgra:
+				dst_pic_fmt = PIX_FMT_BGR32_1;
+				break;
+			case pixel_abgr:
+				dst_pic_fmt = PIX_FMT_BGR32;
+				break;
+			default:
+				assert(0);
+			}
 			dst_pic_fmt = PIX_FMT_RGBA32;
 			dummy2 = avpicture_fill(&picture, (uint8_t*) framedata, dst_pic_fmt, w, h);
 			// The format we have is already in frame. Convert.
 			pic_fmt = m_con->pix_fmt;
 			img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, w, h);
-#if defined(AMBULANT_PLATFORM_MACOS) && defined(__LITTLE_ENDIAN__)
-			// The format is now RGBARGBA, but on the Intel mac we need BGRABGRA
-			char *p, c;
-			for (p=framedata; p<framedata+m_size; p+=4) {
-				c = p[0];
-				p[0] = p[2];
-				p[2] = c;
-			}
-#endif
 			// Finally send the frame upstream.
 			std::pair<timestamp_t, char*> element(pts, framedata);
 			m_frames.push(element);
