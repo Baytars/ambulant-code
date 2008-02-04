@@ -113,7 +113,9 @@ enum pixel_order {
 	pixel_rgba,		///< (msb)R G B A(lsb), in host order
 	pixel_argb,		///< (msb)A R G B(lsb), in host order
 	pixel_bgra,		///< (msb)B G R A(lsb), in host order
-	pixel_abgr		///< (msb)A B G R(lsb), in host order
+	pixel_abgr,		///< (msb)A B G R(lsb), in host order
+	pixel_rgb,		///< R G B (in byte order).
+	pixel_bgr		///< B G R (in byte order).
 };
 
 /// This struct completely describes a video format.
