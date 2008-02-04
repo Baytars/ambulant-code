@@ -106,7 +106,7 @@ class ffmpeg_video_decoder_datasource:
 
     bool end_of_file();
 	char* get_frame(timestamp_t now, timestamp_t *timestamp, int *size);
-	void frame_acquired(timestamp_t timestamp, char *data);
+	void frame_processed_keepdata(timestamp_t timestamp, char *data);
 	void frame_processed(timestamp_t timestamp);
 	void read_ahead(timestamp_t clip_begin);
 	void seek(timestamp_t time);
@@ -135,7 +135,6 @@ class ffmpeg_video_decoder_datasource:
 // 	bool m_src_end_of_file;
  	lib::event_processor *m_event_processor;
 	sorted_frames  m_frames;
-	ts_pointer_pair m_old_frame;
 	int m_size;		// NOTE: this assumes all decoded frames are the same size!
 //	databuffer m_buffer;
 //	detail::ffmpeg_demux *m_thread;
