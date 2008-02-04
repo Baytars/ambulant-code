@@ -546,9 +546,40 @@ ffmpeg_video_decoder_datasource::data_avail()
 			}
 			
 			// Next step: deocde the frame to the image format we want.
+			int bpp = 0;
+			switch(m_pixel_layout) {
+#if 0	// I think this isn't implemented
+			case pixel_rgba:
+				dst_pic_fmt = PIX_FMT_RGB32_1;
+				bpp = 4;
+				break;
+			case pixel_bgra:
+				dst_pic_fmt = PIX_FMT_BGR32_1;
+				bpp = 4;
+				break;
+#endif
+			case pixel_argb:
+				dst_pic_fmt = PIX_FMT_RGB32;
+				bpp = 4;
+				break;
+			case pixel_abgr:
+				dst_pic_fmt = PIX_FMT_BGR32;
+				bpp = 4;
+				break;
+			case pixel_rgb:
+				dst_pic_fmt = PIX_FMT_RGB24;
+				bpp = 3;
+				break;
+			case pixel_bgr:
+				dst_pic_fmt = PIX_FMT_BGR24;
+				bpp = 3;
+				break;
+			default:
+				assert(0);
+			}
 			w = m_fmt.width;
 			h = m_fmt.height;
-			m_size = w * h * 4;
+			m_size = w * h * bpp;
 			assert(m_size);
 			char *framedata = (char*) malloc(m_size);
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:framedata=0x%x", framedata);
@@ -559,24 +590,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 				sz = 0;
 				goto out_of_memory;
 			}
-			switch(m_pixel_layout) {
-			case pixel_rgba:
-				dst_pic_fmt = PIX_FMT_RGB32_1;
-				break;
-			case pixel_argb:
-				dst_pic_fmt = PIX_FMT_RGB32;
-				break;
-			case pixel_bgra:
-				dst_pic_fmt = PIX_FMT_BGR32_1;
-				break;
-			case pixel_abgr:
-				dst_pic_fmt = PIX_FMT_BGR32;
-				break;
-			default:
-				assert(0);
-			}
-			dst_pic_fmt = PIX_FMT_RGBA32;
-			dummy2 = avpicture_fill(&picture, (uint8_t*) framedata, dst_pic_fmt, w, h);
+			int datasize = avpicture_fill(&picture, (uint8_t*) framedata, dst_pic_fmt, w, h);
+			assert(datasize == m_size);
 			// The format we have is already in frame. Convert.
 			pic_fmt = m_con->pix_fmt;
 			img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, w, h);
