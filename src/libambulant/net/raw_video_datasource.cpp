@@ -91,7 +91,7 @@ raw_video_datasource::get_frame(double *timestamp, int *size)
 }
 
 void
-raw_video_datasource::frame_acquired(double timestamp, char *buf)
+raw_video_datasource::frame_processed_keepdata(double timestamp, char *buf)
 {
 	assert(m_buffer == buf);
 	m_buffer = NULL;

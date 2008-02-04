@@ -182,7 +182,6 @@ ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasourc
 	if (!_select_decoder(fmt))
 		lib::logger::get_logger()->error(gettext("ffmpeg_video_decoder_datasource: could not select %s(0x%x) decoder"), fmt.name.c_str(), fmt.parameters);
 	m_fmt = fmt;
-	m_old_frame = ts_pointer_pair(0, NULL);
 }
 
 ffmpeg_video_decoder_datasource::~ffmpeg_video_decoder_datasource()
@@ -214,11 +213,6 @@ ffmpeg_video_decoder_datasource::stop()
 	// And delete any frames left
 	while ( ! m_frames.empty() ) {
 		_pop_top_frame();
-	}
-	if (m_old_frame.second) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::stop(): free(0x%x)", m_old_frame.second);
-		free(m_old_frame.second);
-		m_old_frame.second = NULL;
 	}
 	m_lock.leave();
 }	
@@ -310,34 +304,25 @@ print_frames(sorted_frames frames) {
 
 void 
 ffmpeg_video_decoder_datasource::_pop_top_frame() {
-	// pop a frame, return the new top frame
-	// the old top frame is remembered in m_old_frame
-	// old data in m_old_frame is freed.
-  
-	if (m_old_frame.second) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_pop_top_frame(): free(0x%x)", m_old_frame.second);
-		free (m_old_frame.second);
-		m_old_frame.second = NULL;
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource._pop_top_frame(): free'n m_old_frame.second");
-
-	}
-	
 	if (m_frames.empty()) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource._pop_top_frame():no more frames left returning m_old_frame");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource._pop_top_frame(): no frames? (programmer error)");
 		return;
 	}
 
-	m_old_frame = m_frames.top();
+	char *data = m_frames.top().second;
+	assert(data);
+	if (data) free(data);
 	m_frames.pop();
 }
 
 void 
-ffmpeg_video_decoder_datasource::frame_acquired(timestamp_t now, char *buf)
+ffmpeg_video_decoder_datasource::frame_processed_keepdata(timestamp_t now, char *buf)
 {
 	m_lock.enter();
-	assert(m_old_frame.first == now);
-	assert(m_old_frame.second == buf);
-	m_old_frame.second = NULL;
+	assert(m_frames.size() > 0);
+	assert(m_frames.top().first == now);
+	assert(m_frames.top().second == buf);
+	m_frames.pop();
 	m_lock.leave();
 }
 
@@ -352,13 +337,10 @@ ffmpeg_video_decoder_datasource::frame_processed(timestamp_t now)
 	}
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.frame_processed(%d)", (int)now);
 
-	while ( m_frames.size() && m_old_frame.first <= now) {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: discarding m_old_frame timestamp=%d, now=%d, data ptr = 0x%x",(int)m_old_frame.first,(int)now, m_old_frame.second);
+	while ( m_frames.size() > 0 && m_frames.top().first <= now) {
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: discarding first frame timestamp=%d, now=%d, data ptr = 0x%x",(int)m_frames.top().first,(int)now, m_frames.top().second);
 		_pop_top_frame();
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed(%d): free(0x%x)", (int)now, m_old_frame.second);
-	free(m_old_frame.second);
-	m_old_frame.second = NULL;
 	m_lock.leave();
 }
 
@@ -548,13 +530,13 @@ ffmpeg_video_decoder_datasource::data_avail()
 			if (m_con->has_b_frames && frame->pict_type == FF_B_TYPE && pts < m_src->get_clip_begin()) {
 #endif
 				// A non-essential frame while skipping forward.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld", m_frame_count, pts);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld", m_frame_count, pts);
 				drop_this_frame = true;
 			}
-			if (pts < m_old_frame.first) {
+			if (m_frames.size() > 0 && pts < m_frames.top().first) {
 				// A frame that came after this frame has already been consumed.
 				// We should drop this frame.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, earlier frame (ts=%lld) already displayed", m_frame_count, pts, m_old_frame.first);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, earlier frame (ts=%lld) already displayed", m_frame_count, pts, m_frames.top().first);
 				drop_this_frame = true;
 			}
 			m_elapsed = pts;
@@ -696,18 +678,16 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	
 	timestamp_t frame_duration = frameduration(); 
 	assert (frame_duration > 0);
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame:  timestamp=%lld, now=%lld, frameduration = %lld",m_old_frame.first,now, frame_duration);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame:  timestamp=%lld, now=%lld, frameduration = %lld",m_frames.top().first, now, frame_duration);
 
 
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame(now=%lld): %lld (m_old_frame.first) <  %lld (now - frame_duration)",  now, m_old_frame.first, now - frame_duration );
-
-#if 1
+#if 0
 	// XXX Jack thinks it may be better not to do any framedropping here, and in stead do it only in the
 	// renderer (where we can gather statistics)
 	int curdropcount = 0;
-	while ( m_frames.size() > 1 && m_old_frame.first < now - (2*frame_duration)) { //HACK:Due to jitter, the previous condition of dropping frames older than one frameduration was too strict!
+	while ( m_frames.size() > 1 && m_frames.top().first < now - (2*frame_duration)) { //HACK:Due to jitter, the previous condition of dropping frames older than one frameduration was too strict!
 		//A better method to tolerate jitter required ??? This hack may still fail for high fps videos
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding m_old_frame timestamp=%lld, now=%lld, data ptr = 0x%x", m_old_frame.first,now, m_old_frame.second);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding first frame timestamp=%lld, now=%lld, data ptr = 0x%x", m_frames.top().first,now, m_frames.top().second);
 		_pop_top_frame();
 		curdropcount++;
 	}
@@ -725,7 +705,6 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	if (!(m_frames.size() == 0 || m_frames.top().first >= now-frame_duration)) {
 		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: top frame before now!");
 		lib::logger::get_logger()->debug("now-frameduration = %lld-%lld = %lld", now, frame_duration, now-frame_duration);
-		lib::logger::get_logger()->debug("m_old_frame.first = %lld", m_old_frame.first);
 		lib::logger::get_logger()->debug("m_frames.top().first = %lld", m_frames.top().first);
 		lib::logger::get_logger()->debug("go figure...");
 	}
@@ -734,9 +713,12 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	assert(m_frames.size() == 0 || m_frames.top().first >= now-(2*frame_duration));
 #endif
 	 
-	if (timestamp_p) *timestamp_p = m_old_frame.first;
+	if (timestamp_p) *timestamp_p = m_frames.top().first;
 	if (size_p) *size_p = m_size;
-	char *rv = m_old_frame.second;
+	char *rv = m_frames.top().second;
+	if (rv == NULL) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame(now=%lld): about to return NULL frame (ts=%lld), should not happen", now, *timestamp_p);
+	}
 	m_lock.leave();
 	return rv;
 }

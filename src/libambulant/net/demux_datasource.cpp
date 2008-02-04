@@ -442,7 +442,7 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 
 
 void 
-demux_video_datasource::frame_acquired(timestamp_t pts, char *data)
+demux_video_datasource::frame_processed_keepdata(timestamp_t pts, char *data)
 {
 	m_lock.enter();
 	assert(pts == 0);
