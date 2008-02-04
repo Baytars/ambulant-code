@@ -51,7 +51,7 @@ class cg_dsvideo_renderer :
     	common::factories *factory);
 	~cg_dsvideo_renderer();
 
-	
+	net::pixel_order pixel_layout();
     void push_frame(char* frame, int size);
 	void redraw(const rect &dirty, gui_window *window);
 	void set_intransition(const lib::transition_info *info) {};

@@ -31,6 +31,15 @@
 #define AM_DBG if(0)
 #endif
 
+// These two constants should match. Moreover, the optimal setting may depend on the
+// specific hardware.
+#define MY_PIXEL_LAYOUT net::pixel_argb
+#define MY_BITMAP_INFO (kCGImageAlphaNoneSkipFirst|kCGBitmapByteOrder32Host)
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_rgba
+#define MY_BITMAP_INFO (kCGImageAlphaNoneSkipLast|kCGBitmapByteOrder32Host)
+#endif
+
 namespace ambulant {
 
 using namespace lib;
@@ -58,6 +67,12 @@ cg_dsvideo_renderer::~cg_dsvideo_renderer()
 	if (m_image) CGImageRelease(m_image);
 	m_image = NULL;
 	m_lock.leave();
+}
+
+net::pixel_order
+cg_dsvideo_renderer::pixel_layout()
+{
+	return MY_PIXEL_LAYOUT;
 }
 
 static void
@@ -99,7 +114,7 @@ cg_dsvideo_renderer::push_frame(char* frame, int size)
 	// - If the image does need scaling things slow down by a factor of 4.
 	//   0 seems to be as good a value for bitmapInfo as any other value.
 	// - If you also set shouldInterpolate=true you get an additional factor of 2 slowdown.
-	CGBitmapInfo bitmapInfo = 0; 
+	CGBitmapInfo bitmapInfo = MY_BITMAP_INFO; 
 	m_image = CGImageCreate( m_size.w, m_size.h, 8, 32, m_size.w*4, genericColorSpace, bitmapInfo, provider, NULL, false, kCGRenderingIntentDefault);
 	AM_DBG lib::logger::get_logger()->trace("0x%x: push_frame(0x%x, %d) -> 0x%x -> 0x%x", this, frame, size, provider, m_image);
 	CGDataProviderRelease(provider);
