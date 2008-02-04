@@ -329,7 +329,7 @@ video_renderer::data_avail()
 		net::timestamp_t diff_ts = now_micros - frame_ts_micros;
 		m_epoch += (diff_ts / 1000);
 		m_frame_late++;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: resync clock by %lld us", diff_ts);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: resync clock by %lld us", diff_ts);
 		push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 		m_dest->need_redraw();
@@ -337,25 +337,25 @@ video_renderer::data_avail()
 		m_frame_displayed++;
 #else
 		// Frame is too late. Skip it. Schedule another callback asap.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
 		m_frame_late++;
 		m_src->frame_processed(frame_ts_micros);
 #endif
 	} else
 	if (frame_ts_micros > now_micros + frame_duration) {
 		// Frame is too early. Do nothing, just schedule a new event at the correct time and we will get this same frame again.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
 		m_frame_early++;
 	} else
 	if (frame_ts_micros <= m_last_frame_timestamp) {
 		// This frame, or a later one, has been displayed already. Skip.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: skip frame (ts=%lld), aleready displayed earlier (ts=%lld)", frame_ts_micros, m_last_frame_timestamp);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: skip frame (ts=%lld), aleready displayed earlier (ts=%lld)", frame_ts_micros, m_last_frame_timestamp);
 		m_frame_duplicate++;
 		m_src->frame_processed(frame_ts_micros);
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 		m_dest->need_redraw();
@@ -367,7 +367,7 @@ video_renderer::data_avail()
 //		XXXJACK?? if(frame_ts_micros <  now_micros)//if the current frames time was older than one frameduration don't increment the time to callback
 		frame_ts_micros += frame_duration;						
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
 	// Grmpf. frame_ts_micros is on the movie timescale, but start_frame() expects a time relative to
 	// the m_event_processor clock (even though it is in microseconds, not milliseconds). Very bad design,
