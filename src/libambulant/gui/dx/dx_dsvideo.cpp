@@ -107,14 +107,15 @@ dx_dsvideo_renderer::~dx_dsvideo_renderer()
 }
 	
 void
-dx_dsvideo_renderer::show_frame(const char* frame, int size)
+dx_dsvideo_renderer::push_frame(char* frame, int size)
 {
 	if (m_bitmap == NULL) _init_bitmap();
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame: size=%d", size);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame(0x%x, %d)", frame, size);
 	assert(size == (int)(m_size.w * m_size.h * 4));
 	memcpy(m_bitmap_dataptr, frame, size);
-	if (m_dest) m_dest->need_redraw();
+	free(frame);
+	//if (m_dest) m_dest->need_redraw();
 	m_lock.leave();
 }
 
