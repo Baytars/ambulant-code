@@ -77,7 +77,7 @@ class video_renderer : public common::renderer_playable {
 	
 	/// Display video data. Subclass providing this method is responsible for
 	/// eventually free()ing frame.
-	virtual void push_frame(char* frame, int size) { free(frame); };
+	virtual void push_frame(char* frame, int size) = 0;
 	
     virtual void redraw(const lib::rect &dirty, common::gui_window *window);
 	
