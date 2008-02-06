@@ -74,8 +74,10 @@ class dx_dsvideo_renderer :
     void _init_bitmap();
 	void _init_ddsurf(gui_window *window);
 	void _copy_to_ddsurf();
-	HBITMAP m_bitmap;			// Bitmap to hold the image
-	char *m_bitmap_dataptr;		// Pointer to actual data inside bitmap
+	char *m_frame;				// Current frame
+	int m_frame_size;			// Size of current frame
+	HBITMAP m_bitmap;			// Bitmap to hold the image (if needed)
+	char *m_bitmap_dataptr;		// Pointer to actual data inside bitmap (if needed)
 	IDirectDrawSurface *m_ddsurf;	// DD surface, for scaling and such
 	critical_section m_lock;
 };

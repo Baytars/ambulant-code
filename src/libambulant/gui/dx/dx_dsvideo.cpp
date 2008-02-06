@@ -34,6 +34,11 @@ using ambulant::lib::win32::win_report_error;
 #define AM_DBG if(0)
 #endif
 
+// ?? Cannot pick up IID_IDirectDrawSurface7. Redefine self.
+const GUID myIID_IDirectDrawSurface7 = {
+	0x06675a80,0x3b9b,0x11d2, {0xb9,0x2f,0x00,0x60,0x97,0x97,0xea,0x5b}
+};
+
 namespace ambulant {
 
 using namespace lib;
@@ -54,6 +59,7 @@ dx_dsvideo_renderer::dx_dsvideo_renderer(
 	event_processor *evp,
 	common::factories *factory)
 :	common::video_renderer(context, cookie, node, evp, factory),
+	m_frame(NULL),
 	m_bitmap(NULL),
 	m_bitmap_dataptr(NULL),
 	m_ddsurf(NULL)
@@ -100,22 +106,31 @@ dx_dsvideo_renderer::~dx_dsvideo_renderer()
 		m_ddsurf->Release();
 	m_ddsurf = NULL;
 	if (m_bitmap)
-			DeleteObject(m_bitmap);
+		DeleteObject(m_bitmap);
 	m_bitmap = NULL;
 	m_bitmap_dataptr = NULL;
+	if (m_frame)
+		free(m_frame);
+	m_frame = NULL;
 	m_lock.leave();
 }
 	
 void
 dx_dsvideo_renderer::push_frame(char* frame, int size)
 {
+#if 0
 	if (m_bitmap == NULL) _init_bitmap();
+#endif
 	m_lock.enter();
+	m_frame = frame;
+	m_frame_size = size;
 	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame(0x%x, %d)", frame, size);
 	assert(size == (int)(m_size.w * m_size.h * 4));
+#if 0
 	memcpy(m_bitmap_dataptr, frame, size);
 	free(frame);
 	//if (m_dest) m_dest->need_redraw();
+#endif
 	m_lock.leave();
 }
 
@@ -157,11 +172,74 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		m_lock.leave();
 		return;
 	}
-	// XXXX Should do this only when needed:
-	_copy_to_ddsurf();
+	// First thing we try is to change the DD surface memory pointer in-place.
+	// If that fails we copy.
+	static bool warned = false;	// Give the warning message only once per run.
+	LPVOID oldDataPointer = NULL;
+	DDSURFACEDESC2 desc;
+	HRESULT hr;
+	IDirectDrawSurface7 *dds7 = NULL;
+	hr = m_ddsurf->QueryInterface(myIID_IDirectDrawSurface7, (void**)&dds7);
+	if (FAILED(hr)) {
+		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: QueryInterface(DirectDrawSurface7) failed");
+		warned = true;
+	}
+	if (dds7) {
+		memset(&desc, 0, sizeof desc);
+		desc.dwSize = sizeof desc;
+		hr = dds7->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
+	}
+	if (dds7 == NULL) {
+		// pass, error message given earlier.
+	} else
+	if (FAILED(hr)) {
+		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: GetSurfaceDesc failed, error 0x%x", hr);
+		warned = true;
+	} else
+//	if ((desc.dwFlags & (DDSD_PIXELFORMAT|DDSD_LPSURFACE)) != (DDSD_PIXELFORMAT|DDSD_LPSURFACE)) {
+	if ((desc.dwFlags & DDSD_PIXELFORMAT) != DDSD_PIXELFORMAT) {
+		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: GetSurfaceDesc: incomplete information (dwFlags 0x%x)", desc.dwFlags);
+		warned = true;
+		(void)dds7->Unlock(NULL);
+	} else
+	if ( (desc.ddpfPixelFormat.dwFlags&DDPF_RGB) == 0
+			|| desc.ddpfPixelFormat.dwRGBBitCount != 32
+			|| desc.lpSurface == NULL
+			/*|| desc.dwSurfaceSize != m_frame_size*/) {
+		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: Surface incompatible with fast video (dwFlags 0x%x, dwRGBBitCount %d, lpSurface 0x%x)",
+			desc.ddpfPixelFormat.dwFlags, desc.ddpfPixelFormat.dwRGBBitCount, desc.lpSurface);
+		warned = true;
+		(void)dds7->Unlock(NULL);
+	} else {
+		// All is fine. Remember memory buffer (so we can set it back later, and as flag).
+		oldDataPointer = desc.lpSurface;
+	}
+	if (oldDataPointer) {
+		// Replace memory buffer pointer inside surface.
+		memset(&desc, 0, sizeof desc);
+		desc.dwSize = sizeof desc;
+		desc.dwFlags = DDSD_LPSURFACE;
+		desc.lpSurface = m_frame;
+		hr = dds7->SetSurfaceDesc(&desc, 0);
+		if (FAILED(hr)) {
+			if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: Cannot set lpSurface, no fast video (error 0x%x)", hr);
+			warned = true;
+			oldDataPointer = NULL;
+		}
+		hr = dds7->Unlock(NULL);
+		if (FAILED(hr)) {
+			lib::logger::get_logger()->trace("dx_dsvideo: Unlock: error 0x%x", hr);
+		}
+	}
+	if (!oldDataPointer) {
+		// Could not replace data pointer. Use bitblit to copy data.
+		if (m_bitmap == NULL) _init_bitmap();
+		memcpy(m_bitmap_dataptr, m_frame, m_frame_size);
+		_copy_to_ddsurf();
+	}
+
 	//const rect &r = m_dest->get_rect();
 	//AM_DBG logger::get_logger()->debug("dx_dsvideo_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
-#if 1
 	lib::rect img_rect1;
 	lib::rect img_reg_rc;
 	// lib::size srcsize = m_image->get_size();
@@ -241,65 +319,21 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	} else {
 		v->draw(m_ddsurf, img_rect_dirty, img_reg_rc_dirty, FALSE, tr);
 	}
-#endif // 1
-#if 0	
-	dx_window *cwindow = (dx_window *)window;
-	AmbulantView *view = (AmbulantView *)cwindow->view();
-#if 0
-	// See whether we're in a transition
-	NSImage *surf = NULL;
-	if (m_trans_engine && m_trans_engine->is_done()) {
-		delete m_trans_engine;
-		m_trans_engine = NULL;
-	}
-	if (m_trans_engine) {
-		surf = [view getTransitionSurface];
-		if ([surf isValid]) {
-			[surf lockFocus];
-			AM_DBG logger::get_logger()->debug("dx_dsvideo_renderer.redraw: drawing to transition surface");
-		} else {
-			lib::logger::get_logger()->trace("dx_dsvideo_renderer.redraw: cannot lockFocus for transition");
-			surf = NULL;
+	if (oldDataPointer) {
+		// Replace memory buffer pointer inside surface.
+		assert(dds7);
+		memset(&desc, 0, sizeof desc);
+		desc.dwSize = sizeof desc;
+		desc.dwFlags = DDSD_LPSURFACE;
+		desc.lpSurface = oldDataPointer;
+		hr = dds7->SetSurfaceDesc(&desc, 0);
+		if (FAILED(hr)) {
+			lib::logger::get_logger()->trace("dx_dsvideo: Cannot reset lpSurface??");
 		}
 	}
-#endif
-
-	if (m_image) {
-
-		// Now find both source and destination area for the bitblit.
-		NSSize cocoa_srcsize = [m_image size];
-		size srcsize = size((int)cocoa_srcsize.width, (int)cocoa_srcsize.height);
-		rect srcrect = rect(size(0, 0));
-		rect dstrect = m_dest->get_fit_rect(srcsize, &srcrect, m_alignment);
-		dstrect.translate(m_dest->get_global_topleft());
-		
-		NSRect cocoa_srcrect = NSMakeRect(0, 0, srcrect.width(), srcrect.height()); // XXXX 0, 0 is wrong
-		NSRect cocoa_dstrect = [view NSRectForAmbulantRect: &dstrect];
-		AM_DBG logger::get_logger()->debug("cocoa_dsvideo_renderer.redraw: draw image %f %f -> (%f, %f, %f, %f)", cocoa_srcsize.width, cocoa_srcsize.height, NSMinX(cocoa_dstrect), NSMinY(cocoa_dstrect), NSMaxX(cocoa_dstrect), NSMaxY(cocoa_dstrect));
-#ifdef WITH_SMIL30
-		double alfa = 1.0;
-		const common::region_info *ri = m_dest->get_info();
-		if (ri) alfa = ri->get_mediaopacity();
-		[m_image drawInRect: cocoa_dstrect fromRect: cocoa_srcrect operation: NSCompositeSourceAtop fraction: alfa];
-#else
-		[m_image drawInRect: cocoa_dstrect fromRect: cocoa_srcrect operation: NSCompositeSourceAtop fraction: 1.0];
-#endif
-	} else {
+	if (dds7) {
+		dds7->Release();
 	}
-#if 0
-	if (surf) [surf unlockFocus];
-	if (m_trans_engine && surf) {
-		AM_DBG logger::get_logger()->debug("cocoa_dsvideo_renderer.redraw: drawing to view");
-		m_trans_engine->step(m_event_processor->get_timer()->elapsed());
-		typedef lib::no_arg_callback<cocoa_dsvideo_renderer> transition_callback;
-		lib::event *ev = new transition_callback(this, &cocoa_dsvideo_renderer::transition_step);
-		lib::transition_info::time_type delay = m_trans_engine->next_step_delay();
-		if (delay < 33) delay = 33; // XXX band-aid
-		AM_DBG lib::logger::get_logger()->debug("cocoa_dsvideo_renderer.redraw: now=%d, schedule step for %d", m_event_processor->get_timer()->elapsed(), m_event_processor->get_timer()->elapsed()+delay);
-		m_event_processor->add_event(ev, delay);
-	}
-#endif
-#endif
 	m_lock.leave();
 }
 

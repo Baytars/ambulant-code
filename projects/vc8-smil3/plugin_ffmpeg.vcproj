@@ -144,7 +144,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib"
+				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib ddraw.lib"
 				OutputFile="../../bin/win32/libamplugin_ffmpeg.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\win32"
