@@ -34,10 +34,18 @@ using ambulant::lib::win32::win_report_error;
 #define AM_DBG if(0)
 #endif
 
+// Enabling this define will attempt to speed up video by stuffing the
+// pointer to "our" buffer with the video frame directly into the DD surface
+// and using that. This saves two memory copies (one memcpy from our
+// memory to an intermediate HBITMAP, then a BitBlt to the DD surface).
+#define ENABLE_FAST_DDVIDEO
+
+#ifdef ENABLE_FAST_DDVIDEO
 // ?? Cannot pick up IID_IDirectDrawSurface7. Redefine self.
 const GUID myIID_IDirectDrawSurface7 = {
 	0x06675a80,0x3b9b,0x11d2, {0xb9,0x2f,0x00,0x60,0x97,0x97,0xea,0x5b}
 };
+#endif
 
 namespace ambulant {
 
@@ -95,7 +103,10 @@ dx_dsvideo_renderer::_init_ddsurf(gui_window *window)
 	viewport *v = dxwindow->get_viewport();
 	assert(v);
 	m_ddsurf = v->create_surface(m_size);
-;
+#ifdef ENABLE_FAST_DDVIDEO
+	// Error message will be given later, if needed
+	(void)m_ddsurf->QueryInterface(myIID_IDirectDrawSurface7, (void**)&m_ddsurf7);
+#endif
 }
 
 dx_dsvideo_renderer::~dx_dsvideo_renderer()
@@ -118,19 +129,11 @@ dx_dsvideo_renderer::~dx_dsvideo_renderer()
 void
 dx_dsvideo_renderer::push_frame(char* frame, int size)
 {
-#if 0
-	if (m_bitmap == NULL) _init_bitmap();
-#endif
 	m_lock.enter();
 	m_frame = frame;
 	m_frame_size = size;
 	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame(0x%x, %d)", frame, size);
 	assert(size == (int)(m_size.w * m_size.h * 4));
-#if 0
-	memcpy(m_bitmap_dataptr, frame, size);
-	free(frame);
-	//if (m_dest) m_dest->need_redraw();
-#endif
 	m_lock.leave();
 }
 
@@ -166,7 +169,6 @@ void
 dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
-	// XXXX Should do this only when needed (skip extra bitblit)
 	if (m_ddsurf == NULL ) _init_ddsurf(window);
 	if (m_ddsurf == NULL) {
 		m_lock.leave();
@@ -174,63 +176,57 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	}
 	// First thing we try is to change the DD surface memory pointer in-place.
 	// If that fails we copy.
-	static bool warned = false;	// Give the warning message only once per run.
 	LPVOID oldDataPointer = NULL;
+#ifdef ENABLE_FAST_DDVIDEO
+	static bool warned = false;	// Give the warning message only once per run.
 	DDSURFACEDESC2 desc;
 	HRESULT hr;
-	IDirectDrawSurface7 *dds7 = NULL;
-	hr = m_ddsurf->QueryInterface(myIID_IDirectDrawSurface7, (void**)&dds7);
-	if (FAILED(hr)) {
-		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: QueryInterface(DirectDrawSurface7) failed");
+	if (m_ddsurf7 == NULL) {
+		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: DirectDrawSurface7 not available");
 		warned = true;
-	}
-	if (dds7) {
+	} else {
 		memset(&desc, 0, sizeof desc);
 		desc.dwSize = sizeof desc;
-		hr = dds7->Lock(NULL, &desc, DDLOCK_WAIT, NULL);
+		hr = m_ddsurf7->GetSurfaceDesc(&desc);
 	}
-	if (dds7 == NULL) {
+	if (m_ddsurf7 == NULL) {
 		// pass, error message given earlier.
 	} else
 	if (FAILED(hr)) {
 		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: GetSurfaceDesc failed, error 0x%x", hr);
 		warned = true;
 	} else
-//	if ((desc.dwFlags & (DDSD_PIXELFORMAT|DDSD_LPSURFACE)) != (DDSD_PIXELFORMAT|DDSD_LPSURFACE)) {
 	if ((desc.dwFlags & DDSD_PIXELFORMAT) != DDSD_PIXELFORMAT) {
 		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: No fast video: GetSurfaceDesc: incomplete information (dwFlags 0x%x)", desc.dwFlags);
 		warned = true;
-		(void)dds7->Unlock(NULL);
 	} else
 	if ( (desc.ddpfPixelFormat.dwFlags&DDPF_RGB) == 0
-			|| desc.ddpfPixelFormat.dwRGBBitCount != 32
-			|| desc.lpSurface == NULL
-			/*|| desc.dwSurfaceSize != m_frame_size*/) {
+			|| desc.ddpfPixelFormat.dwRGBBitCount != 32) {
 		if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: Surface incompatible with fast video (dwFlags 0x%x, dwRGBBitCount %d, lpSurface 0x%x)",
 			desc.ddpfPixelFormat.dwFlags, desc.ddpfPixelFormat.dwRGBBitCount, desc.lpSurface);
 		warned = true;
-		(void)dds7->Unlock(NULL);
 	} else {
 		// All is fine. Remember memory buffer (so we can set it back later, and as flag).
 		oldDataPointer = desc.lpSurface;
 	}
 	if (oldDataPointer) {
 		// Replace memory buffer pointer inside surface.
+		assert(m_ddsurf7);
 		memset(&desc, 0, sizeof desc);
 		desc.dwSize = sizeof desc;
 		desc.dwFlags = DDSD_LPSURFACE;
 		desc.lpSurface = m_frame;
-		hr = dds7->SetSurfaceDesc(&desc, 0);
+		hr = m_ddsurf7->SetSurfaceDesc(&desc, 0);
 		if (FAILED(hr)) {
 			if (!warned) lib::logger::get_logger()->trace("dx_dsvideo: Cannot set lpSurface, no fast video (error 0x%x)", hr);
 			warned = true;
 			oldDataPointer = NULL;
 		}
-		hr = dds7->Unlock(NULL);
 		if (FAILED(hr)) {
 			lib::logger::get_logger()->trace("dx_dsvideo: Unlock: error 0x%x", hr);
 		}
 	}
+#endif // ENABLE_FAST_DXVIDEO
 	if (!oldDataPointer) {
 		// Could not replace data pointer. Use bitblit to copy data.
 		if (m_bitmap == NULL) _init_bitmap();
@@ -319,21 +315,20 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	} else {
 		v->draw(m_ddsurf, img_rect_dirty, img_reg_rc_dirty, FALSE, tr);
 	}
+#ifdef ENABLE_FAST_DDVIDEO
 	if (oldDataPointer) {
 		// Replace memory buffer pointer inside surface.
-		assert(dds7);
+		assert(m_ddsurf7);
 		memset(&desc, 0, sizeof desc);
 		desc.dwSize = sizeof desc;
 		desc.dwFlags = DDSD_LPSURFACE;
 		desc.lpSurface = oldDataPointer;
-		hr = dds7->SetSurfaceDesc(&desc, 0);
+		hr = m_ddsurf7->SetSurfaceDesc(&desc, 0);
 		if (FAILED(hr)) {
 			lib::logger::get_logger()->trace("dx_dsvideo: Cannot reset lpSurface??");
 		}
 	}
-	if (dds7) {
-		dds7->Release();
-	}
+#endif
 	m_lock.leave();
 }
 
