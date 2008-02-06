@@ -79,6 +79,7 @@ class dx_dsvideo_renderer :
 	HBITMAP m_bitmap;			// Bitmap to hold the image (if needed)
 	char *m_bitmap_dataptr;		// Pointer to actual data inside bitmap (if needed)
 	IDirectDrawSurface *m_ddsurf;	// DD surface, for scaling and such
+	IDirectDrawSurface7 *m_ddsurf7;	// Same, for replacing the underlying storage
 	critical_section m_lock;
 };
 
