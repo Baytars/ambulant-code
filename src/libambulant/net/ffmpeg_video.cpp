@@ -334,7 +334,7 @@ ffmpeg_video_decoder_datasource::frame_processed(timestamp_t now)
 	m_lock.enter();
 	m_oldest_timestamp_wanted = now+1;
 	if (m_frames.size() == 0) {
-		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: frame queue empty (programmer error)");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: frame queue empty");
 		m_lock.leave();
 		return;
 	}

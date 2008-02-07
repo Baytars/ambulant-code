@@ -654,10 +654,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\libambulant\common\state.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\libambulant\common\smil_alignment.cpp"
 					>
 				</File>
@@ -666,7 +662,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\libambulant\common\video_renderer.cpp"
+					RelativePath="..\..\src\libambulant\common\state.cpp"
 					>
 				</File>
 			</Filter>
@@ -1221,10 +1217,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\ambulant\common\state.h"
-						>
-					</File>
-					<File
 						RelativePath="..\..\include\ambulant\common\smil_alignment.h"
 						>
 					</File>
@@ -1233,11 +1225,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\ambulant\common\trace_playable.h"
+						RelativePath="..\..\include\ambulant\common\state.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\include\ambulant\common\video_renderer.h"
+						RelativePath="..\..\include\ambulant\common\trace_playable.h"
 						>
 					</File>
 				</Filter>
