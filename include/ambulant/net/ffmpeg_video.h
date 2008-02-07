@@ -140,7 +140,7 @@ class ffmpeg_video_decoder_datasource:
 //	detail::ffmpeg_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
   	timestamp_t m_pts_last_frame;
-  	timestamp_t m_last_p_pts;
+  	timestamp_t m_oldest_timestamp_wanted;
 	timestamp_t m_video_clock;
   	int m_frame_count;
 	int m_dropped_count;
