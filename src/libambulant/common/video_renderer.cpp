@@ -339,9 +339,10 @@ video_renderer::data_avail()
 		m_last_frame_timestamp = frame_ts_micros;
 		m_frame_displayed++;
 #else
-		// Frame is too late. Skip it. Schedule another callback asap.
+		// Frame is too late. Skip forward to now. Schedule another callback asap.
 		AM_DBG lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
 		m_frame_late++;
+		frame_ts_micros = now_micros;
 		m_src->frame_processed(frame_ts_micros);
 #endif
 	} else
