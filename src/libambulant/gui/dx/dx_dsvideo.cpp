@@ -34,12 +34,6 @@ using ambulant::lib::win32::win_report_error;
 #define AM_DBG if(0)
 #endif
 
-// Enabling this define will attempt to speed up video by stuffing the
-// pointer to "our" buffer with the video frame directly into the DD surface
-// and using that. This saves two memory copies (one memcpy from our
-// memory to an intermediate HBITMAP, then a BitBlt to the DD surface).
-#define ENABLE_FAST_DDVIDEO
-
 #ifdef ENABLE_FAST_DDVIDEO
 // ?? Cannot pick up IID_IDirectDrawSurface7. Redefine self.
 const GUID myIID_IDirectDrawSurface7 = {
@@ -130,9 +124,10 @@ void
 dx_dsvideo_renderer::push_frame(char* frame, int size)
 {
 	m_lock.enter();
+	if (m_frame) free(m_frame);
 	m_frame = frame;
 	m_frame_size = size;
-	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_dsvideo_renderer::show_frame(0x%x, %d)", frame, size);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("dx_dsvideo_renderer::push_frame(0x%x, %d)", frame, size);
 	assert(size == (int)(m_size.w * m_size.h * 4));
 	m_lock.leave();
 }
@@ -227,13 +222,14 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		}
 	}
 #endif // ENABLE_FAST_DXVIDEO
+#ifndef JACK_DISABLE_HACK_PERFTEST
 	if (!oldDataPointer) {
 		// Could not replace data pointer. Use bitblit to copy data.
 		if (m_bitmap == NULL) _init_bitmap();
 		memcpy(m_bitmap_dataptr, m_frame, m_frame_size);
 		_copy_to_ddsurf();
 	}
-
+#endif
 	//const rect &r = m_dest->get_rect();
 	//AM_DBG logger::get_logger()->debug("dx_dsvideo_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	lib::rect img_rect1;
