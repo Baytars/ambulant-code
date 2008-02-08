@@ -35,6 +35,7 @@
 #include <uuids.h>
 #include <windows.h>
 #include <mmsystem.h>
+#include <d3dmtypes.h>
 
 #include "ambulant/gui/dx/dx_viewport.h"
 #include "ambulant/gui/dx/dx_audio_player.h" // Only to define the TPB GUID
@@ -466,7 +467,64 @@ gui::dx::viewport::create_surface(DWORD w, DWORD h) {
 	if (FAILED(hr)){
 		seterror("DirectDraw::CreateSurface()", hr);
 		return 0;
-	}	
+	}
+	return surface;
+}
+
+// Creates a DD surface with a pre-allocated buffer.
+IDirectDrawSurface* 
+gui::dx::viewport::create_surface_for(lib::size s, net::pixel_order fmt, void *buf) {
+	
+	DWORD h = s.h;
+	DWORD w = s.w;
+	IDirectDrawSurface* surface = 0;
+	DDSURFACEDESC sd;
+	memset(&sd, 0, sizeof(DDSURFACEDESC));
+	sd.dwSize = sizeof(DDSURFACEDESC);
+	sd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS /*| DDSD_PIXELFORMAT | DDSD_LPSURFACE*/;
+#ifdef DDSCAPS_OFFSCREENPLAIN
+	sd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+#else
+	sd.ddsCaps.dwCaps = DDSCAPS_SYSTEMMEMORY;
+#endif
+	sd.dwWidth = w;
+	sd.dwHeight = h;
+	/*
+	sd.ddpfPixelFormat.dwSize = sizeof sd.ddpfPixelFormat;
+	sd.ddpfPixelFormat.dwFlags = DDPF_FOURCC | DDPF_RGB;
+	switch (fmt) {
+	case net::pixel_argb:
+		sd.ddpfPixelFormat.dwFourCC = D3DMFMT_X8R8G8B8;
+		sd.ddpfPixelFormat.dwRGBBitCount = 32;
+		sd.ddpfPixelFormat.dwRBitMask = 0xff0000;
+		sd.ddpfPixelFormat.dwGBitMask = 0x00ff00;
+		sd.ddpfPixelFormat.dwBBitMask = 0x0000ff;
+		// XXXJACK: enough, or also the masks?
+		break;
+#ifdef D3DMFMT_X8R8G8B8
+	case net::pixel_abgr:
+		sd.ddpfPixelFormat.dwFourCC = D3DMFMT_X8B8G8R8;
+		sd.ddpfPixelFormat.dwRGBBitCount = 32;
+		// XXXJACK: enough, or also the masks?
+		break;
+#endif
+	case net::pixel_rgb:
+		sd.ddpfPixelFormat.dwFourCC = D3DMFMT_R8G8B8;
+		sd.ddpfPixelFormat.dwRGBBitCount = 24;
+		// XXXJACK: enough, or also the masks?
+		break;
+	default:
+		lib::logger::get_logger()->debug("viewport::create_surface_for: unsupported pixel format (programmmer error?)");
+		return NULL;
+	}
+	sd.lpSurface = buf;
+	*/
+	HRESULT hr = m_direct_draw->CreateSurface(&sd, &surface, NULL);
+	if (FAILED(hr)){
+		seterror("DirectDraw::CreateSurface()", hr);
+		return 0;
+	}
+	/*AM_DBG*/ lib::logger::get_logger()->debug("create_surface_for: returning 0x%x", surface);
 	return surface;
 }
 

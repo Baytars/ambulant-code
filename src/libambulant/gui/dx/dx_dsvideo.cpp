@@ -34,6 +34,8 @@ using ambulant::lib::win32::win_report_error;
 #define AM_DBG if(0)
 #endif
 
+#define MY_PIXEL_LAYOUT net::pixel_argb
+
 #ifdef ENABLE_FAST_DDVIDEO
 // ?? Cannot pick up IID_IDirectDrawSurface7. Redefine self.
 const GUID myIID_IDirectDrawSurface7 = {
@@ -69,6 +71,12 @@ dx_dsvideo_renderer::dx_dsvideo_renderer(
 	AM_DBG lib::logger::get_logger()->debug("dx_dsvideo_renderer(): 0x%x created", (void*)this);
 }
 
+net::pixel_order
+dx_dsvideo_renderer::pixel_layout()
+{
+	return MY_PIXEL_LAYOUT;
+}
+
 void
 dx_dsvideo_renderer::_init_bitmap()
 {
@@ -102,6 +110,7 @@ dx_dsvideo_renderer::_init_ddsurf(gui_window *window)
 	(void)m_ddsurf->QueryInterface(myIID_IDirectDrawSurface7, (void**)&m_ddsurf7);
 #endif
 }
+
 
 dx_dsvideo_renderer::~dx_dsvideo_renderer()
 {
@@ -164,7 +173,21 @@ void
 dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
+	// Get the top-level surface
+	dx_window *dxwindow = static_cast<dx_window*>(window);
+	viewport *v = dxwindow->get_viewport();
+	if(!v) {
+		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer::redraw NOT: no viewport %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
+		return;
+	}
+#if 1
+	if (m_ddsurf) {
+		m_ddsurf->Release();
+	}
+	m_ddsurf = v->create_surface_for(m_size, MY_PIXEL_LAYOUT, m_frame);
+#else
 	if (m_ddsurf == NULL ) _init_ddsurf(window);
+#endif
 	if (m_ddsurf == NULL) {
 		m_lock.leave();
 		return;
@@ -172,7 +195,7 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	// First thing we try is to change the DD surface memory pointer in-place.
 	// If that fails we copy.
 	LPVOID oldDataPointer = NULL;
-#ifdef ENABLE_FAST_DDVIDEO
+#ifdef old_ENABLE_FAST_DDVIDEO
 	static bool warned = false;	// Give the warning message only once per run.
 	DDSURFACEDESC2 desc;
 	HRESULT hr;
@@ -271,14 +294,6 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	// Finally blit img_rect_dirty to img_reg_rc_dirty
 	AM_DBG lib::logger::get_logger()->debug("dx_img_renderer::redraw %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
 	
-	// Get the top-level surface
-	dx_window *dxwindow = static_cast<dx_window*>(window);
-	viewport *v = dxwindow->get_viewport();
-	if(!v) {
-		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer::redraw NOT: no viewport %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
-		return;
-	}
-
 	dx_transition *tr = get_transition();
 	if (tr && tr->is_fullscreen()) {
 		v->set_fullscreen_transition(tr);
