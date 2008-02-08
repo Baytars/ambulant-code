@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="libambulant_wince"
 	ProjectGUID="{B2643C6C-B5BE-40FB-B127-320E15D9D09E}"
 	RootNamespace="libambulant_wince"
@@ -665,6 +665,10 @@
 					RelativePath="..\..\src\libambulant\common\state.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\..\src\libambulant\common\video_renderer.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="smil2"
@@ -1230,6 +1234,10 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\common\trace_playable.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\common\video_renderer.h"
 						>
 					</File>
 				</Filter>
