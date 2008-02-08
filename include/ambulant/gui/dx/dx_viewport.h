@@ -20,11 +20,7 @@
  */
 
 /* 
-<<<<<<< dx_viewport.h
  * @$Id$ 
-=======
- * @$Id$ 
->>>>>>> 1.38.2.1
  */
 
 #ifndef AMBULANT_GUI_DX_VIEWPORT_H
@@ -43,6 +39,7 @@
 #include "ambulant/lib/gtypes.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/preferences.h"
+#include "ambulant/net/datasource.h"
 
 struct IDirectDraw;
 struct IDirectDrawSurface;
@@ -81,6 +78,7 @@ class AMBULANTAPI viewport {
 	IDirectDrawSurface* create_surface(lib::size s) {
 		return create_surface(s.w, s.h);
 	}
+	IDirectDrawSurface* create_surface_for(lib::size s, net::pixel_order fmt, void *buf);
 	
 	// Surfaces cashe
 	IDirectDrawSurface* create_surface();

@@ -69,7 +69,7 @@ class dx_dsvideo_renderer :
 
 	
 //	void user_event(const point &where, int what = 0);
-	net::pixel_order pixel_layout() { return net::pixel_argb; }
+	net::pixel_order pixel_layout();
     void push_frame(char* frame, int size);
 	void redraw(const rect &dirty, gui_window *window);
 	void set_intransition(const lib::transition_info *info) {};
