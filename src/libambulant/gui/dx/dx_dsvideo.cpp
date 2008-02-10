@@ -245,7 +245,7 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		}
 	}
 #endif // ENABLE_FAST_DXVIDEO
-#ifndef JACK_DISABLE_HACK_PERFTEST
+#if 0
 	if (!oldDataPointer) {
 		// Could not replace data pointer. Use bitblit to copy data.
 		if (m_bitmap == NULL) _init_bitmap();

@@ -35,7 +35,11 @@
 #include <uuids.h>
 #include <windows.h>
 #include <mmsystem.h>
+#ifdef AMBULANT_PLATFORM_WIN32_WCE
 #include <d3dmtypes.h>
+#else
+#include <d3d8types.h>
+#endif
 
 #include "ambulant/gui/dx/dx_viewport.h"
 #include "ambulant/gui/dx/dx_audio_player.h" // Only to define the TPB GUID
@@ -481,7 +485,7 @@ gui::dx::viewport::create_surface_for(lib::size s, net::pixel_order fmt, void *b
 	DDSURFACEDESC sd;
 	memset(&sd, 0, sizeof(DDSURFACEDESC));
 	sd.dwSize = sizeof(DDSURFACEDESC);
-	sd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS /*| DDSD_PIXELFORMAT | DDSD_LPSURFACE*/;
+	sd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS | DDSD_PITCH | DDSD_PIXELFORMAT | DDSD_LPSURFACE /*| DDSD_SURFACESIZE */;
 #ifdef DDSCAPS_OFFSCREENPLAIN
 	sd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
 #else
@@ -489,16 +493,21 @@ gui::dx::viewport::create_surface_for(lib::size s, net::pixel_order fmt, void *b
 #endif
 	sd.dwWidth = w;
 	sd.dwHeight = h;
-	/*
+
 	sd.ddpfPixelFormat.dwSize = sizeof sd.ddpfPixelFormat;
-	sd.ddpfPixelFormat.dwFlags = DDPF_FOURCC | DDPF_RGB;
+	sd.ddpfPixelFormat.dwFlags = /*DDPF_FOURCC |*/ DDPF_RGB;
 	switch (fmt) {
 	case net::pixel_argb:
+#ifdef D3DMFMT_X8R8G8B8
 		sd.ddpfPixelFormat.dwFourCC = D3DMFMT_X8R8G8B8;
+#else
+		sd.ddpfPixelFormat.dwFourCC = D3DFMT_X8R8G8B8;
+#endif
 		sd.ddpfPixelFormat.dwRGBBitCount = 32;
 		sd.ddpfPixelFormat.dwRBitMask = 0xff0000;
 		sd.ddpfPixelFormat.dwGBitMask = 0x00ff00;
 		sd.ddpfPixelFormat.dwBBitMask = 0x0000ff;
+		sd.lPitch = 4*w;
 		// XXXJACK: enough, or also the masks?
 		break;
 #ifdef D3DMFMT_X8R8G8B8
@@ -509,8 +518,16 @@ gui::dx::viewport::create_surface_for(lib::size s, net::pixel_order fmt, void *b
 		break;
 #endif
 	case net::pixel_rgb:
+#ifdef D3DMFMT_R8G8B8
 		sd.ddpfPixelFormat.dwFourCC = D3DMFMT_R8G8B8;
+#else
+		sd.ddpfPixelFormat.dwFourCC = D3DFMT_R8G8B8;
+#endif
 		sd.ddpfPixelFormat.dwRGBBitCount = 24;
+		sd.ddpfPixelFormat.dwRBitMask = 0xff0000;
+		sd.ddpfPixelFormat.dwGBitMask = 0x00ff00;
+		sd.ddpfPixelFormat.dwBBitMask = 0x0000ff;
+		sd.lPitch = 3*w;
 		// XXXJACK: enough, or also the masks?
 		break;
 	default:
@@ -518,7 +535,9 @@ gui::dx::viewport::create_surface_for(lib::size s, net::pixel_order fmt, void *b
 		return NULL;
 	}
 	sd.lpSurface = buf;
-	*/
+#ifdef AMBULANT_PLATFORM_WIN32_WCE
+	sd.dwSurfaceSize = h*sd.lPitch;
+#endif
 	HRESULT hr = m_direct_draw->CreateSurface(&sd, &surface, NULL);
 	if (FAILED(hr)){
 		seterror("DirectDraw::CreateSurface()", hr);
