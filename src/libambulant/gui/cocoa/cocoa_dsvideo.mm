@@ -31,6 +31,29 @@
 #define AM_DBG if(0)
 #endif
 
+// These two constants should match. Moreover, the optimal setting may depend on the
+// specific hardware.
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_rgba
+#define MY_BITMAP_FORMAT 0 // NSAlphaFirstBitmapFormat
+#define MY_BPP 4
+#endif
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_argb
+#define MY_BITMAP_FORMAT 0 // NSAlphaFirstBitmapFormat
+#define MY_BPP 4
+#endif
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_bgr
+#define MY_BITMAP_FORMAT 0
+#define MY_BPP 3
+#endif
+#if 1
+#define MY_PIXEL_LAYOUT net::pixel_rgb
+#define MY_BITMAP_FORMAT 0
+#define MY_BPP 3
+#endif
+
 namespace ambulant {
 
 using namespace lib;
@@ -60,6 +83,12 @@ cocoa_dsvideo_renderer::~cocoa_dsvideo_renderer()
 	m_image = NULL;
 	m_lock.leave();
 }
+
+net::pixel_order
+cocoa_dsvideo_renderer::pixel_layout()
+{
+	return MY_PIXEL_LAYOUT;
+}
 	
 void
 cocoa_dsvideo_renderer::push_frame(char* frame, int size)
@@ -70,7 +99,7 @@ cocoa_dsvideo_renderer::push_frame(char* frame, int size)
 		m_image = NULL;
 	}
 	AM_DBG lib::logger::get_logger()->debug("cocoa_dsvideo_renderer::push_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
-	assert(size == (int)(m_size.w * m_size.h * 4));
+	assert(size == (int)(m_size.w * m_size.h * MY_BPP));
 	// XXXX Who keeps reference to frame?
 	NSSize nssize = NSMakeSize(m_size.w, m_size.h);
 	m_image = [[NSImage alloc] initWithSize: nssize];
@@ -89,24 +118,16 @@ cocoa_dsvideo_renderer::push_frame(char* frame, int size)
 		hasAlpha: NO
 		isPlanar: NO
 		colorSpaceName: NSDeviceRGBColorSpace
-#ifdef __BIG_ENDIAN__
-		bitmapFormat: NSAlphaFirstBitmapFormat
-#else
-		bitmapFormat: (NSBitmapFormat)0
-#endif
-		bytesPerRow: m_size.w * 4
-		bitsPerPixel: 32];
+		bitmapFormat: MY_BITMAP_FORMAT
+		bytesPerRow: m_size.w * MY_BPP
+		bitsPerPixel: MY_BPP*8];
 	if (!bitmaprep) {
 		logger::get_logger()->trace("cocoa_dsvideo_renderer::push_frame: cannot allocate NSBitmapImageRep");
 		logger::get_logger()->error(gettext("Out of memory while showing video"));
 		m_lock.leave();
 		return;
 	}
-#if 1
 	memcpy([bitmaprep bitmapData], frame, size);
-#else
-	swab(frame, [bitmaprep bitmapData], size);
-#endif
 	free(frame);
 	[m_image addRepresentation: bitmaprep];
 	[m_image setFlipped: true];
