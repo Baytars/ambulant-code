@@ -33,6 +33,17 @@
 #define AM_DBG if(0)
 #endif
 
+#if 1
+#define MY_PIXEL_LAYOUT net::pixel_rgba
+#define MY_HASALPHA TRUE
+#define MY_BPP 4
+#endif
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_rgb
+#define MY_HASALPHA FALSE
+#define MY_BPP 3
+#endif
+
 using namespace ambulant;
 using namespace gui::gtk;
 
@@ -69,6 +80,12 @@ gtk_video_renderer::~gtk_video_renderer()
 	if(m_image)
 		g_object_unref (G_OBJECT (m_image));
 	m_lock.leave();
+}
+
+net::pixel_order
+gtk_video_renderer::pixel_layout()
+{
+	return MY_PIXEL_LAYOUT;
 }
 
 void 
@@ -145,7 +162,7 @@ gtk_video_renderer::redraw_body(const lib::rect &dirty, common::gui_window* w)
 		int width = m_size.w;
 		int height = m_size.h;
 		AM_DBG lib::logger::get_logger()->debug("gtk_video_renderer.redraw_body(0x%x): width = %d, height = %d",(void *)this, width, height);
-		m_image =  gdk_pixbuf_new_from_data ((const guchar*) m_data, GDK_COLORSPACE_RGB, TRUE, 8, width, height, (width*4), NULL, NULL);
+		m_image =  gdk_pixbuf_new_from_data ((const guchar*) m_data, GDK_COLORSPACE_RGB, MY_HASALPHA, 8, width, height, (width*MY_BPP), NULL, NULL);
 
 		if (m_image) {
 			int width = gdk_pixbuf_get_width(m_image);
