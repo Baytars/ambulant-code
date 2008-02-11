@@ -78,7 +78,6 @@ class AMBULANTAPI viewport {
 	IDirectDrawSurface* create_surface(lib::size s) {
 		return create_surface(s.w, s.h);
 	}
-	IDirectDrawSurface* create_surface_for(lib::size s, net::pixel_order fmt, void *buf);
 	
 	// Surfaces cashe
 	IDirectDrawSurface* create_surface();

@@ -42,7 +42,9 @@
 // pointer to "our" buffer with the video frame directly into the DD surface
 // and using that. This saves two memory copies (one memcpy from our
 // memory to an intermediate HBITMAP, then a BitBlt to the DD surface).
-#undef ENABLE_FAST_DDVIDEO
+#ifndef AMBULANT_PLATFORM_WIN32_WCE
+#define ENABLE_FAST_DDVIDEO
+#endif
 
 namespace ambulant {
 

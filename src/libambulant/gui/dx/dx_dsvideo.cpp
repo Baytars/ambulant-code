@@ -180,14 +180,7 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		AM_DBG lib::logger::get_logger()->debug("dx_img_renderer::redraw NOT: no viewport %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
 		return;
 	}
-#if 1
-	if (m_ddsurf) {
-		m_ddsurf->Release();
-	}
-	m_ddsurf = v->create_surface_for(m_size, MY_PIXEL_LAYOUT, m_frame);
-#else
 	if (m_ddsurf == NULL ) _init_ddsurf(window);
-#endif
 	if (m_ddsurf == NULL) {
 		m_lock.leave();
 		return;
@@ -195,7 +188,7 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 	// First thing we try is to change the DD surface memory pointer in-place.
 	// If that fails we copy.
 	LPVOID oldDataPointer = NULL;
-#ifdef old_ENABLE_FAST_DDVIDEO
+#ifdef ENABLE_FAST_DDVIDEO
 	static bool warned = false;	// Give the warning message only once per run.
 	DDSURFACEDESC2 desc;
 	HRESULT hr;
@@ -245,14 +238,12 @@ dx_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 		}
 	}
 #endif // ENABLE_FAST_DXVIDEO
-#if 0
 	if (!oldDataPointer) {
 		// Could not replace data pointer. Use bitblit to copy data.
 		if (m_bitmap == NULL) _init_bitmap();
 		memcpy(m_bitmap_dataptr, m_frame, m_frame_size);
 		_copy_to_ddsurf();
 	}
-#endif
 	//const rect &r = m_dest->get_rect();
 	//AM_DBG logger::get_logger()->debug("dx_dsvideo_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	lib::rect img_rect1;
