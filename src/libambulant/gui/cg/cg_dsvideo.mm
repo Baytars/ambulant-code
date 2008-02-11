@@ -99,19 +99,10 @@ cg_dsvideo_renderer::push_frame(char* frame, int size)
 	}
 	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::push_frame: size=%d, w*h*3=%d", size, m_size.w * m_size.h * 4);
 	assert(size == (int)(m_size.w * m_size.h * MY_BPP));
-	// XXXX Who keeps reference to frame?
-	CGSize nssize = CGSizeMake(m_size.w, m_size.h);
-	m_image = NULL; // [[NSImage alloc] initWithSize: nssize];
-#if 1
+	// Step 1 - setup a data provider that reads our in-core image data
 	CGDataProviderRef provider = CGDataProviderCreateWithData(frame, frame, size, my_free_frame);
 	assert(provider);
-#else
-	CFDataRef cfdata = CFDataCreate(NULL, (const UInt8 *)frame, size);
-	assert(cfdata);
-	CGDataProviderRef provider = CGDataProviderCreateWithCFData(cfdata);
-	assert(provider);
-	CFRelease(cfdata);
-#endif
+	// Step 2 - create a CGImage that uses that data provider to initialize itself
 	CGColorSpaceRef genericColorSpace = CGColorSpaceCreateDeviceRGB();
 	assert(genericColorSpace);
 	// There may be room for improvement here, but I cannot find it. Did some experiments (on 4-core Intel Mac Pro)
