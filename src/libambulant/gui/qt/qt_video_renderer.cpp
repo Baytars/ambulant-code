@@ -71,36 +71,13 @@ qt_video_renderer::push_frame(char* frame, int size)
 	assert(frame);
 	assert(size == (int)(m_size.w*m_size.h*4));
 
-#if 1
-	// XXXJACK: untested code. Please remove this comment when it has been tested that video works
-	// on qt.
+    if (m_image) delete m_image;
 	if (m_data) free(m_data);
 	m_data = frame;
-#else
-    // First copy the data (XXXX Not needed, to be removed later)
-	// NOTE: data given to QImage should remain valid during the life of the image
-	if (size > m_datasize) {
-		m_data = (uchar*) realloc((void*) m_data, size);
-		if (!m_data) {
-        lib::logger::get_logger()->trace("qt_video_renderer.push_frame: out of memory");
-        return;
-		}
-		m_datasize = size;
-	}
-    memcpy(m_data, frame, size);
-	free(frame);
-#endif
-    
-    if (m_image) delete m_image;
     m_image = new QImage(m_data,  m_size.w, m_size.h, 32, NULL, 0, QImage::IgnoreEndian);
 
 	AM_DBG lib::logger::get_logger()->debug("qt_video_renderer.push_frame(0x%x): frame=0x%x, size=%d, m_image=0x%x", (void*) this, (void*)frame, size, m_image);
-    assert(m_dest);
-#if 0
-	// XXXJACK: not needed, done by video_renderer
-	m_dest->need_redraw();
-#endif
-
+ 
 	m_lock.leave();
 }
 

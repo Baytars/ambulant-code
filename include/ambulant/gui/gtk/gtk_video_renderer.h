@@ -52,6 +52,7 @@ class gtk_video_renderer :  public gtk_renderer<common::video_renderer>  {
 				 common::factories *factory);
 	
 	~gtk_video_renderer();
+	net::pixel_order pixel_layout();
    	void push_frame(char* frame, int size);
 	void redraw_body(const lib::rect &r, common::gui_window* w);
 private:
