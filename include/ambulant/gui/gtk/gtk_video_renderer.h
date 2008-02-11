@@ -30,7 +30,6 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/common/layout.h"
-#include "ambulant/net/raw_video_datasource.h"
 #include "ambulant/common/playable.h"
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
