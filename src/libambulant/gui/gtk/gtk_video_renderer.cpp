@@ -33,13 +33,13 @@
 #define AM_DBG if(0)
 #endif
 
-#if 0
+#if 1
 #define MY_PIXEL_LAYOUT net::pixel_rgba
 #define MY_HASALPHA TRUE
 #define MY_BPP 4
 #endif
-#if 1
-#define MY_PIXEL_LAYOUT net::pixel_bgr
+#if 0
+#define MY_PIXEL_LAYOUT net::pixel_rgb
 #define MY_HASALPHA FALSE
 #define MY_BPP 3
 #endif

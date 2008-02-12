@@ -555,17 +555,28 @@ ffmpeg_video_decoder_datasource::data_avail()
 			
 			// Next step: deocde the frame to the image format we want.
 			int bpp = 0;
+#ifndef FFMPEG_SUPPORTS_ALPHA_LAST
+			bool must_swab = false;
+#endif
 			switch(m_pixel_layout) {
-#ifdef WITH_FFMPEG_LIBSWSCALE
 			case pixel_rgba:
+#ifdef FFMPEG_SUPPORTS_ALPHA_LAST
 				dst_pic_fmt = PIX_FMT_RGB32_1;
+#else
+				dst_pic_fmt = PIX_FMT_BGR32;
+				must_swab = true;
+#endif
 				bpp = 4;
 				break;
 			case pixel_bgra:
+#ifdef FFMPEG_SUPPORTS_ALPHA_LAST
 				dst_pic_fmt = PIX_FMT_BGR32_1;
+#else
+				dst_pic_fmt = PIX_FMT_RGB32;
+				must_swab = true;
+#endif
 				bpp = 4;
 				break;
-#endif
 			case pixel_argb:
 				dst_pic_fmt = PIX_FMT_RGB32;
 				bpp = 4;
@@ -583,8 +594,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 				bpp = 3;
 				break;
 			default:
-				lib::logger::get_logger()->error("ffmpeg_video: programmer error: libswcale used but not included");
-				goto out_of_memory;
+				assert(0);
 			}
 			w = m_fmt.width;
 			h = m_fmt.height;
@@ -612,6 +622,21 @@ ffmpeg_video_decoder_datasource::data_avail()
 #else
 			img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, w, h);
 #endif
+#ifndef FFMPEG_SUPPORTS_ALPHA_LAST
+			if (must_swab) {
+				int lcount = w*h;
+				unsigned long *ptr = (unsigned long *)framedata;
+				while (lcount--) {
+					long oval = *ptr;
+					long nval =
+						(oval << 24) |
+						((oval & 0xff00) << 8) |
+						((oval >> 8) & 0xff00) |
+						((oval >> 24) & 0xff);
+					*ptr++ = nval;
+				}
+			}
+#endif // FFMPEG_SUPPORTS_ALPHA_LAST
 			// Finally send the frame upstream.
 			std::pair<timestamp_t, char*> element(pts, framedata);
 			m_frames.push(element);
