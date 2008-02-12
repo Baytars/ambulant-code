@@ -460,20 +460,24 @@ ffmpeg_video_decoder_datasource::data_avail()
 	}
 	
 	// No easy error conditions, so let's allocate our frame.
-	AVFrame *frame = avcodec_alloc_frame();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail called (0x%x) ", (void*) this);
-	while(inbuf && sz && m_con) {	
+	if (inbuf && m_con) {	
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:start decoding (0x%x) ", m_con);
-		assert(&m_con != NULL);
-		assert(inbuf);
 		assert(sz < 1000000); // XXXX This is soft, and probably incorrect. Remove when it fails.
+		AVFrame *frame = avcodec_alloc_frame();
+		if (frame == NULL) {
+			lib::logger::get_logger()->debug("ffmpeg_video_decoder: avcodec_alloc_frame() failed");
+			lib::logger::get_logger()->error("Out of memory playing video");
+			m_src->stop();
+			goto out_of_memory;
+		}
 		ptr = inbuf;
 		
 		while (sz > 0) {
 			bool drop_this_frame = false;
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: decoding picture(s),  %d byteas of data ", sz);
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: m_con: 0x%x, gotpic = %d, sz = %d ", m_con, got_pic, sz);
-			// XXXJACK: setting hurry_up should make the decoder run faster in case we
+			// We use skip_frame to make the decoder run faster in case we
 			// are not interested in the data (still seeking forward).
 			if (ipts != AV_NOPTS_VALUE && ipts < m_oldest_timestamp_wanted) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: setting hurry_up: ipts=%lld, m_oldest_timestamp_wanted=%lld",ipts, m_oldest_timestamp_wanted);
@@ -488,15 +492,9 @@ ffmpeg_video_decoder_datasource::data_avail()
 				len = sz;
 #endif
 			m_con->skip_frame = AVDISCARD_DEFAULT;
-#if 0
-            // XXX Dirac hack, to be removed.
-            // Some codecs (notably Dirac) always gobble up all bytes,
-            // and only return len==sz if got_pic is true.
-            len = sz;
-#endif
 			if (len < 0) {
 				lib::logger::get_logger()->trace(gettext("error decoding video frame (timestamp=%lld)"), ipts);
-				sz = 0;
+				sz = 0; // Throw away the rest of the packet, there's little else we can do.
 				break;
 			}
 			assert(len <= sz);
@@ -530,12 +528,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 			AM_DBG lib::logger::get_logger()->debug("videoclock: ipts=%lld pts=%lld video_clock=%lld, frame_delay=%lld", ipts, pts, m_video_clock, frame_delay);
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: storing frame with pts = %lld",pts );
 			m_frame_count++;
-#if 1
-			// XXXJACK No need to test for B frames and such, simply drop things with old ts
 			if (pts < m_oldest_timestamp_wanted) {
-#else
-			if (m_con->has_b_frames && frame->pict_type == FF_B_TYPE && pts < m_src->get_clip_begin()) {
-#endif
 				// A non-essential frame while skipping forward.
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld", m_frame_count, pts);
 				drop_this_frame = true;
@@ -608,13 +601,13 @@ ffmpeg_video_decoder_datasource::data_avail()
 			did_generate_frame = true;
 		} // End of while loop
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
+		av_free(frame);
+		m_src->frame_processed(0); // XXXJACK: Should pass ipts, for sanity check
   	}
-	m_src->frame_processed(0); // XXXJACK: Should pass ipts, for sanity check
-	if (frame) av_free(frame);
   out_of_memory:
 	// Now tell our client, if we have data available or are at end of file.
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): m_frames.size() returns %d, (eof=%d)", m_frames.size(), m_src->end_of_file());
-	if ( m_frames.size() > MIN_VIDEO_FRAMES || m_src->end_of_file()) {
+	if (m_frames.size() > MIN_VIDEO_FRAMES || m_src->end_of_file()) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): there is some data for the renderer ! (eof=%d)", m_src->end_of_file());
 		if ( m_client_callback ) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): calling client callback (eof=%d)", m_src->end_of_file());
