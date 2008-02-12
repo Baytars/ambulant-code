@@ -812,7 +812,7 @@ if test "x$test_ffmpeg" = "xmanual"; then
 			dnl
 			dnl Also check for swscale
 			dnl
-			if test -f ${withvalabs}/libswscale/swscale.h; then
+			if test -f ${withvalabs}/libswscale/libswscale.a; then
 			    FFMPEG_CFLAGS="-DWITH_FFMPEG_LIBSWSCALE ${FFMPEG_CFLAGS} -I${withvalabs}/libswscale"
 			    FFMPEG_LIBS="${FFMPEG_LIBS} -L${withvalabs}/libswscale -lswscale"
 			fi
