@@ -34,7 +34,7 @@
 #endif
 
 #if 1
-#define MY_PIXEL_LAYOUT net::pixel_rgba
+#define MY_PIXEL_LAYOUT net::pixel_argb
 #define MY_HASALPHA TRUE
 #define MY_BPP 4
 #endif
