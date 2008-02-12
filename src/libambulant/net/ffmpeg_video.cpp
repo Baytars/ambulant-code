@@ -52,6 +52,11 @@
 #define MAX_VIDEO_FRAMES 100
 #endif
 
+#ifdef WITH_FFMPEG_LIBSWSCALE
+// How scaling of images is done. As we don't scale here we pick the cheapest (assuming 0 is indeed the cheapest)
+#define SWSCALE_FLAGS 0
+#endif
+
 #define am_get_codec_var(codec,var) codec->var
 #define am_get_codec(codec) codec
 
@@ -162,6 +167,9 @@ ffmpeg_video_decoder_datasource::supported(const video_format& fmt)
 ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasource* src, video_format fmt)
 :	m_src(src),
 	m_con(NULL),
+#ifdef WITH_FFMPEG_LIBSWSCALE
+	m_img_convert_ctx(NULL),
+#endif
 	m_con_owned(false),
 	m_event_processor(NULL),
 	m_client_callback(NULL),
@@ -429,7 +437,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 	m_lock.enter();
 	int got_pic;
 	AVPicture picture;
-	int len, dummy2;
+	int len;
 	int pic_fmt, dst_pic_fmt;
 	int w,h;
 	unsigned char* ptr;
@@ -548,7 +556,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 			// Next step: deocde the frame to the image format we want.
 			int bpp = 0;
 			switch(m_pixel_layout) {
-#if 0	// I think this isn't implemented
+#ifdef WITH_FFMPEG_LIBSWSCALE
 			case pixel_rgba:
 				dst_pic_fmt = PIX_FMT_RGB32_1;
 				bpp = 4;
@@ -575,7 +583,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 				bpp = 3;
 				break;
 			default:
-				assert(0);
+				lib::logger::get_logger()->error("ffmpeg_video: programmer error: libswcale used but not included");
+				goto out_of_memory;
 			}
 			w = m_fmt.width;
 			h = m_fmt.height;
@@ -594,7 +603,15 @@ ffmpeg_video_decoder_datasource::data_avail()
 			assert(datasize == m_size);
 			// The format we have is already in frame. Convert.
 			pic_fmt = m_con->pix_fmt;
+#ifdef WITH_FFMPEG_LIBSWSCALE
+			m_img_convert_ctx = sws_getCachedContext(m_img_convert_ctx,
+				w, h, pic_fmt,
+				w, h, dst_pic_fmt,
+				SWSCALE_FLAGS, NULL, NULL, NULL);
+			sws_scale(m_img_convert_ctx, frame->data, frame->linesize, 0, h, picture.data, picture.linesize);
+#else
 			img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, w, h);
+#endif
 			// Finally send the frame upstream.
 			std::pair<timestamp_t, char*> element(pts, framedata);
 			m_frames.push(element);
