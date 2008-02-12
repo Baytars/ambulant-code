@@ -556,15 +556,17 @@ ffmpeg_video_decoder_datasource::data_avail()
 			// Next step: deocde the frame to the image format we want.
 			int bpp = 0;
 #ifndef FFMPEG_SUPPORTS_ALPHA_LAST
-			bool must_swab = false;
+			bool must_swab_2341 = false;
+			bool must_swab_4321 = false;
+			bool must_swab_1432 = false;
 #endif
 			switch(m_pixel_layout) {
 			case pixel_rgba:
 #ifdef FFMPEG_SUPPORTS_ALPHA_LAST
 				dst_pic_fmt = PIX_FMT_RGB32_1;
 #else
-				dst_pic_fmt = PIX_FMT_BGR32;
-				must_swab = true;
+				dst_pic_fmt = PIX_FMT_RGB32;
+				must_swab_2341 = true; /* Have (msb)ARGB(lsb) want RGBA */
 #endif
 				bpp = 4;
 				break;
@@ -573,7 +575,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 				dst_pic_fmt = PIX_FMT_BGR32_1;
 #else
 				dst_pic_fmt = PIX_FMT_RGB32;
-				must_swab = true;
+				must_swab_4321 = true; /* Have (msb)ARGB(lsb) want BGRA */
 #endif
 				bpp = 4;
 				break;
@@ -582,7 +584,12 @@ ffmpeg_video_decoder_datasource::data_avail()
 				bpp = 4;
 				break;
 			case pixel_abgr:
+#ifdef FFMPEG_SUPPORTS_ALPHA_LAST
 				dst_pic_fmt = PIX_FMT_BGR32;
+#else
+				dst_pic_fmt = PIX_FMT_RGB32;
+				must_swab_1432 = true; /* Have (msb)ARGB(lsb) want ABGR */
+#endif
 				bpp = 4;
 				break;
 			case pixel_rgb:
@@ -623,7 +630,18 @@ ffmpeg_video_decoder_datasource::data_avail()
 			img_convert(&picture, dst_pic_fmt, (AVPicture*) frame, pic_fmt, w, h);
 #endif
 #ifndef FFMPEG_SUPPORTS_ALPHA_LAST
-			if (must_swab) {
+			if (must_swab_2341) {
+				int lcount = w*h;
+				unsigned long *ptr = (unsigned long *)framedata;
+				while (lcount--) {
+					long oval = *ptr;
+					long nval =
+						((oval & 0xffffff) << 8) |
+						((oval >> 24) & 0xff);
+					*ptr++ = nval;
+				}
+			}
+			if (must_swab_4321) {
 				int lcount = w*h;
 				unsigned long *ptr = (unsigned long *)framedata;
 				while (lcount--) {
@@ -633,6 +651,19 @@ ffmpeg_video_decoder_datasource::data_avail()
 						((oval & 0xff00) << 8) |
 						((oval >> 8) & 0xff00) |
 						((oval >> 24) & 0xff);
+					*ptr++ = nval;
+				}
+			}
+			if (must_swab_1432) {
+				int lcount = w*h;
+				unsigned long *ptr = (unsigned long *)framedata;
+				while (lcount--) {
+					long oval = *ptr;
+					long nval =
+						(oval & 0xff000000) |
+						((oval & 0xff) << 16) |
+						(oval & 0xff00) |
+						((oval >> 16) & 0xff);
 					*ptr++ = nval;
 				}
 			}
