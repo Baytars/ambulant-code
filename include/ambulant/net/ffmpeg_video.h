@@ -22,30 +22,16 @@
 #ifndef AMBULANT_NET_FFMPEG_VIDEO_H
 #define AMBULANT_NET_FFMPEG_VIDEO_H
 
-
-//#include <vector>
-//#include <queue>
-
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <fcntl.h>
-
-
 #include "ambulant/config/config.h"
-//#include "ambulant/lib/callback.h"
-//#include "ambulant/lib/refcount.h"
-//#include "ambulant/lib/event_processor.h"
-//#include "ambulant/lib/mtsync.h"
-//#include "ambulant/lib/event_processor.h"
-//#include "ambulant/lib/unix/unix_thread.h"
-//#include "ambulant/net/databuffer.h"
-//#include "ambulant/net/posix_datasource.h"
 #include "ambulant/net/datasource.h"
 
 extern "C" {
 #include "avcodec.h"
 #include "avformat.h"
-//#include "common.h"
+#ifdef WITH_FFMPEG_LIBSWSCALE
+#include "swscale.h"
+#endif
+
 }
 
 // temporary debug messages
@@ -129,6 +115,10 @@ class ffmpeg_video_decoder_datasource:
 	
 	video_datasource* m_src;
 	AVCodecContext *m_con;
+#ifdef WITH_FFMPEG_LIBSWSCALE
+	struct SwsContext *m_img_convert_ctx;
+#endif
+
 	bool m_con_owned;	// True if we have to close/free m_con
 //	int m_stream_index;
   	video_format m_fmt;
