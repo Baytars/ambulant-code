@@ -80,9 +80,9 @@ class dx_window : public common::gui_window {
     viewport* m_viewport;
     
     // lock/unlock redraw
-	bool m_locked;
+	int m_locked;
 	lib::rect m_redraw_rect;
-	bool m_isnew_redraw_rect;
+	bool m_redraw_rect_valid;
 };
 
 } // namespace dx
