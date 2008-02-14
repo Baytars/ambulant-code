@@ -59,7 +59,7 @@ void gui::dx::dx_window::need_redraw(const lib::rect &r) {
 	rc &= m_viewrc;
 	if(!m_locked) {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("dx_window::need_redraw(%d,%d,%d,%d): drawing", rc.left(), rc.top(), rc.width(), rc.height());
-		assert(!m_redraw_rect_valid);
+		//assert(!m_redraw_rect_valid);
 		m_viewport->set_fullscreen_transition(NULL);
 		m_viewport->clear(rc, GetSysColor(COLOR_WINDOW), 1.0);
 		m_rgn->redraw(rc, this);
