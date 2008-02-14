@@ -61,7 +61,7 @@ class dx_window : public common::gui_window {
 	void need_redraw(const lib::rect& r);
 	void redraw(const lib::rect& r);
 	void need_redraw();
-	void redraw_now() { /* Redraws are synchronous on Windows */ }
+	void redraw_now();
 	void need_events(bool onoff) { /* Always get them on windows */ }
 	const std::string& get_name() const { return m_name;}
 	region *get_region() { return m_rgn;}

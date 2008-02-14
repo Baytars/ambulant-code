@@ -40,7 +40,7 @@ event_processor_impl::event_processor_impl(timer *t)
 		m_high_delta_timer(t), 
 		m_med_delta_timer(t), 
 		m_low_delta_timer(t)
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	, m_observer(NULL)
 #endif
 
@@ -110,7 +110,7 @@ event_processor_impl::serve_events()
 // serve all events in the high-med-low prioritity run queues
 // in the right order, after checking with their delta timers
 {
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	if (m_observer) m_observer->lock_redraw();
 #endif
 
@@ -135,7 +135,7 @@ event_processor_impl::serve_events()
 		// it must be a low priority event
 		(void) serve_event(m_low_delta_timer, &m_low_q);
 	}
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	if (m_observer) m_observer->unlock_redraw();
 #endif
 }
