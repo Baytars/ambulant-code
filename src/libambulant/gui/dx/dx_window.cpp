@@ -43,7 +43,7 @@ gui::dx::dx_window::dx_window(const std::string& name,
 	m_name(name),
 	m_viewrc(lib::point(0, 0), lib::size(bounds.w, bounds.h)),
 	m_wf(wf),
-	m_viewport(v), m_locked(false), m_isnew_redraw_rect(true) {
+	m_viewport(v), m_locked(0), m_redraw_rect_valid(false) {
 	//AM_DBG lib::logger::get_logger()->trace_stream() 
 	//	<< "dx_window(" << name << ", " << bounds << ")" << lib::endl;
 }
@@ -63,9 +63,9 @@ void gui::dx::dx_window::need_redraw(const lib::rect &r) {
 	if(!m_locked)
 		m_viewport->schedule_redraw(rc);
 	else {
-		if(m_isnew_redraw_rect) {
+		if(!m_redraw_rect_valid) {
 			m_redraw_rect = rc;
-			m_isnew_redraw_rect = false;
+			m_redraw_rect_valid = true;
 		} else m_redraw_rect |= rc;
 	}
 }
@@ -76,11 +76,14 @@ void gui::dx::dx_window::need_redraw() {
 }
 
 void gui::dx::dx_window::lock_redraw() {
-	m_locked = true;
-	m_isnew_redraw_rect = true;
+	m_locked++;
 }
 
 void gui::dx::dx_window::unlock_redraw() {
-	m_locked = false;
-	m_viewport->schedule_redraw(m_redraw_rect);
+	assert(m_locked > 0);
+	m_locked--;
+	if (m_locked == 0 && m_redraw_rect_valid) {
+		m_viewport->schedule_redraw(m_redraw_rect);
+		m_redraw_rect_valid = false;
+	}
 }

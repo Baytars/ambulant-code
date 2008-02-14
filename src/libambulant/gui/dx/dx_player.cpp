@@ -148,6 +148,11 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 
 	if (feedback) m_player->set_feedback(feedback);
 	m_player->initialize();
+#ifdef WITH_DELAYED_REDRAW
+	lib::event_processor *evp = m_player->get_evp();
+	assert(evp);
+	evp->set_observer(this);
+#endif
 	
 	// Create a worker processor instance
 }
