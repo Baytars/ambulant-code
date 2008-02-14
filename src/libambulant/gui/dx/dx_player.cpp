@@ -148,7 +148,7 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 
 	if (feedback) m_player->set_feedback(feedback);
 	m_player->initialize();
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	lib::event_processor *evp = m_player->get_evp();
 	assert(evp);
 	evp->set_observer(this);
@@ -159,6 +159,10 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 
 gui::dx::dx_player::~dx_player() {
 	if(m_player) stop();
+#ifndef WITHOUT_DELAYED_REDRAW
+	lib::event_processor *evp = m_player->get_evp();
+	if (evp) evp->set_observer(NULL);
+#endif
 	delete m_player;
 	while(!m_frames.empty()) {
 		frame *pf = m_frames.top();
@@ -168,6 +172,10 @@ gui::dx::dx_player::~dx_player() {
 		m_doc = pf->doc;
 		delete pf;
 		stop();
+#ifndef WITHOUT_DELAYED_REDRAW
+		evp = m_player->get_evp();
+		if (evp) evp->set_observer(NULL);
+#endif
 		delete m_player;
 		delete m_doc;
 	}
@@ -249,15 +257,14 @@ gui::dx::dx_player::init_parser_factory()
 
 void gui::dx::dx_player::play() {
 	if(m_player) {
-		common::gui_player::play();
-#if 0
-		// XXXJACK: I think this one isn't needed.
+		lock_redraw();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
 			dx_window *dxwin = (dx_window *)(*it).second->w;
 			dxwin->need_redraw();
 		}
-#endif
+		common::gui_player::play();
+		unlock_redraw();
 	}
 }
 
@@ -278,12 +285,20 @@ void gui::dx::dx_player::pause() {
 void gui::dx::dx_player::restart(bool reparse) {
 	bool playing = is_play_active();
 	stop();
+#ifndef WITHOUT_DELAYED_REDRAW
+	lib::event_processor *evp = m_player->get_evp();
+	if (evp) evp->set_observer(NULL);
+#endif
 	
 	delete m_player;
 	while(!m_frames.empty()) {
 		frame *pf = m_frames.top();
 		m_frames.pop();
 		m_windows = pf->windows;
+#ifndef WITHOUT_DELAYED_REDRAW
+		evp = m_player->get_evp();
+		if (evp) evp->set_observer(NULL);
+#endif
 		m_player = pf->player;
 		m_doc = pf->doc;
 		delete pf;
@@ -301,6 +316,10 @@ void gui::dx::dx_player::restart(bool reparse) {
 	AM_DBG m_logger->debug("Creating player instance for: %s", m_url.get_url().c_str());	
 	m_player = new smil2::smil_player(m_doc, this, m_embedder);	
 	m_player->initialize();
+#ifndef WITHOUT_DELAYED_REDRAW
+	evp = m_player->get_evp();
+	if (evp) evp->set_observer(this);
+#endif
 	if(playing) play();	
 }
 
@@ -800,6 +819,12 @@ void gui::dx::dx_player::open(net::url newdoc, bool startnewdoc, common::player 
 	// Create a player instance
 	AM_DBG m_logger->debug("Creating player instance for: %s", newdoc.get_url().c_str());
 	m_player = new smil2::smil_player(m_doc, this, m_embedder);
+	m_player->initialize();
+#ifndef WITHOUT_DELAYED_REDRAW
+	lib::event_processor *evp = m_player->get_evp();
+	assert(evp);
+	evp->set_observer(this);
+#endif
 	if(startnewdoc) play();
 }
 

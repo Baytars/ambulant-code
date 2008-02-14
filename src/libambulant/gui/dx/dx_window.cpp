@@ -57,12 +57,14 @@ void gui::dx::dx_window::need_redraw(const lib::rect &r) {
 	// clip rect to this window since the layout does not do this
 	lib::rect rc = r;
 	rc &= m_viewrc;
-	m_viewport->set_fullscreen_transition(NULL);
-	m_viewport->clear(rc, GetSysColor(COLOR_WINDOW), 1.0);
-	m_rgn->redraw(rc, this);
-	if(!m_locked)
+	if(!m_locked) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("dx_window::need_redraw(%d,%d,%d,%d): drawing", rc.left(), rc.top(), rc.width(), rc.height());
+		assert(!m_redraw_rect_valid);
+		m_viewport->set_fullscreen_transition(NULL);
+		m_viewport->clear(rc, GetSysColor(COLOR_WINDOW), 1.0);
+		m_rgn->redraw(rc, this);
 		m_viewport->schedule_redraw(rc);
-	else {
+	} else {
 		if(!m_redraw_rect_valid) {
 			m_redraw_rect = rc;
 			m_redraw_rect_valid = true;
@@ -70,9 +72,21 @@ void gui::dx::dx_window::need_redraw(const lib::rect &r) {
 	}
 }
 
+void gui::dx::dx_window::redraw_now() {
+	int keep_lock = m_locked;
+	m_locked = 0;
+	m_redraw_rect_valid = false;
+	need_redraw();
+	m_locked = keep_lock;
+}
+
 void gui::dx::dx_window::need_redraw() {
+#if 1
+	need_redraw(m_viewrc);
+#else
 	m_rgn->redraw(m_viewrc, this);
 	m_viewport->schedule_redraw();
+#endif
 }
 
 void gui::dx::dx_window::lock_redraw() {
@@ -83,7 +97,8 @@ void gui::dx::dx_window::unlock_redraw() {
 	assert(m_locked > 0);
 	m_locked--;
 	if (m_locked == 0 && m_redraw_rect_valid) {
-		m_viewport->schedule_redraw(m_redraw_rect);
+		lib::rect to_redraw = m_redraw_rect;
 		m_redraw_rect_valid = false;
+		need_redraw(to_redraw);
 	}
 }

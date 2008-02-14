@@ -35,7 +35,7 @@ namespace ambulant {
 
 namespace lib {
 
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 class event_processor_observer {
   public:
 	virtual void lock_redraw() = 0;
@@ -68,7 +68,7 @@ class event_processor {
 	// Stop this event processor (stops the underlying thread).
 	virtual void stop_processor_thread() = 0;
 
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	// Set the observer.
 	virtual void set_observer(event_processor_observer *obs) = 0;
 #endif
@@ -116,7 +116,7 @@ class event_processor_impl : public event_processor {
 	void cancel_all_events();
 	void serve_events();
 	void stop_processor_thread() {};
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	void set_observer(event_processor_observer *obs) {m_observer = obs; };
 #endif
 #ifndef NDEBUG
@@ -132,7 +132,7 @@ class event_processor_impl : public event_processor {
 
 	// the timer for this processor
 	timer *m_timer;
-#ifdef WITH_DELAYED_REDRAW
+#ifndef WITHOUT_DELAYED_REDRAW
 	event_processor_observer *m_observer;
 #endif
  private:
