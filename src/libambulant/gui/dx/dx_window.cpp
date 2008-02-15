@@ -54,6 +54,12 @@ gui::dx::dx_window::~dx_window() {
 }
   		
 void gui::dx::dx_window::need_redraw(const lib::rect &r) {
+	m_redraw_rect_lock.enter();
+	_need_redraw(r);
+	m_redraw_rect_lock.leave();
+}
+
+void gui::dx::dx_window::_need_redraw(const lib::rect &r) {
 	// clip rect to this window since the layout does not do this
 	lib::rect rc = r;
 	rc &= m_viewrc;
@@ -73,32 +79,34 @@ void gui::dx::dx_window::need_redraw(const lib::rect &r) {
 }
 
 void gui::dx::dx_window::redraw_now() {
+	m_redraw_rect_lock.enter();
 	int keep_lock = m_locked;
 	m_locked = 0;
 	m_redraw_rect_valid = false;
-	need_redraw();
+	_need_redraw(m_viewrc);
+	m_redraw_rect_valid = false;
 	m_locked = keep_lock;
+	m_redraw_rect_lock.leave();
 }
 
 void gui::dx::dx_window::need_redraw() {
-#if 1
 	need_redraw(m_viewrc);
-#else
-	m_rgn->redraw(m_viewrc, this);
-	m_viewport->schedule_redraw();
-#endif
 }
 
 void gui::dx::dx_window::lock_redraw() {
+	m_redraw_rect_lock.enter();
 	m_locked++;
+	m_redraw_rect_lock.leave();
 }
 
 void gui::dx::dx_window::unlock_redraw() {
+	m_redraw_rect_lock.enter();
 	assert(m_locked > 0);
 	m_locked--;
 	if (m_locked == 0 && m_redraw_rect_valid) {
 		lib::rect to_redraw = m_redraw_rect;
 		m_redraw_rect_valid = false;
-		need_redraw(to_redraw);
+		_need_redraw(to_redraw);
 	}
+	m_redraw_rect_lock.leave();
 }

@@ -70,6 +70,7 @@ class dx_window : public common::gui_window {
 	
 	viewport *get_viewport() { return m_viewport;}
   private:
+	void _need_redraw(const lib::rect& r);
 
 	// gui_window:
 	// passive_region *m_region;
@@ -80,6 +81,7 @@ class dx_window : public common::gui_window {
     viewport* m_viewport;
     
     // lock/unlock redraw
+	lib::critical_section m_redraw_rect_lock; 
 	int m_locked;
 	lib::rect m_redraw_rect;
 	bool m_redraw_rect_valid;
