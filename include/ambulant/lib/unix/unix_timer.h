@@ -37,13 +37,11 @@ namespace unix {
 // XXX: time() returns secs. This timer should be msec based. 
 
 // simple unix os timer
-class unix_timer : public ambulant::lib::timer  {
+class unix_timer : public ambulant::lib::realtime_timer  {
   public:
 	unix_timer() {};
 	
 	time_type elapsed() const;
-	void set_speed(double speed);
-	double get_realtime_speed() const { return 1.0; }
   private:
 	static time_type os_millitime();
 };

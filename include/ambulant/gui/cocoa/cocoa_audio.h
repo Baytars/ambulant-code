@@ -54,7 +54,6 @@ class cocoa_audio_playable :
 	void seek(double where);
 	void pause(pause_display d=display_show);
 	void resume();
-//	void speed_changed();
   private:
 	void cocoa_audio_playable::check_still_playing();
 	net::url m_url;

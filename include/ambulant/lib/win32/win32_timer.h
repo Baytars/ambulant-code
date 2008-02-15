@@ -65,9 +65,6 @@ class win32_timer : public ambulant::lib::timer  {
 	// Gets the speed of this timer
 	double get_speed() const { return 1.0;}
 	
-	// Gets the realtime speed of this 
-	// timer as modulated by its parent
-	double get_realtime_speed() const { return 1.0;}
   private:		
 	ULONGLONG m_epoch;
 	

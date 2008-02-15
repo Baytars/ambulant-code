@@ -31,7 +31,23 @@ using namespace ambulant;
 
 lib::unix::critical_section::critical_section()
 {
-	if (pthread_mutex_init(&m_cs, NULL) < 0) {
+#define MUTEX_DEBUG
+#ifdef MUTEX_DEBUG
+	static bool inited = false;
+	static pthread_mutexattr_t mutex_attr;
+	if (!inited) {
+		inited = true;
+		int rv = pthread_mutexattr_init(&mutex_attr);
+		assert(rv == 0);
+		rv = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_ERRORCHECK);
+		assert(rv == 0);
+	}
+#define mutex_attr_arg &mutex_attr
+#else
+#define mutex_attr_arg NULL
+#endif
+	
+	if (pthread_mutex_init(&m_cs, mutex_attr_arg) < 0) {
 		lib::logger::get_logger()->fatal("unix_critical_section: pthread_mutex_init failed: %s", strerror(errno));
 	}
 }
