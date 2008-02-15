@@ -33,12 +33,6 @@ lib::unix::unix_timer::elapsed() const
 	return os_millitime();
 }
 
-void
-lib::unix::unix_timer::set_speed(double speed)
-{
-	lib::logger::get_logger()->fatal("unix_timer: cannot set speed of realtime timer");
-}
-
 lib::unix::unix_timer::time_type
 lib::unix::unix_timer::os_millitime()
 {

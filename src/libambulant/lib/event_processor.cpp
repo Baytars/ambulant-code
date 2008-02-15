@@ -113,7 +113,7 @@ event_processor_impl::serve_events()
 #ifndef WITHOUT_DELAYED_REDRAW
 	if (m_observer) m_observer->lock_redraw();
 #endif
-
+	AM_DBG lib::logger::get_logger()->debug("serve_events: running loop");
 	// check all delta_timer queues, in the right order
 	while (events_available(m_high_delta_timer, &m_high_q)
 		|| events_available(m_med_delta_timer, &m_med_q)
@@ -135,6 +135,7 @@ event_processor_impl::serve_events()
 		// it must be a low priority event
 		(void) serve_event(m_low_delta_timer, &m_low_q);
 	}
+	AM_DBG lib::logger::get_logger()->debug("serve_events: end running loop");
 #ifndef WITHOUT_DELAYED_REDRAW
 	if (m_observer) m_observer->unlock_redraw();
 #endif

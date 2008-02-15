@@ -1184,7 +1184,11 @@ void time_node::on_eosd(qtime_type timestamp) {
 // Currently this notification is not used.
 // Could be used to define the slip sync offset.
 void time_node::on_bom(qtime_type timestamp) {
-	m_eom_flag = false;
+	AM_DBG m_logger->debug("%s[%s].on_bom()", m_attrs.get_tag().c_str(), 
+		m_attrs.get_id().c_str());
+// XXXJACK: setting the clocks isn't perfect yet, so on_bom() can happen after
+// on_eom(). That needs to be fixed, eventually.
+//	assert(!m_eom_flag);
 	if(!is_discrete()) {
 		qtime_type pt = timestamp.as_qtime_down_to(sync_node());
 		qtime_type st = pt.as_qtime_down_to(this);

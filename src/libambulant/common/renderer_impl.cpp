@@ -260,7 +260,7 @@ renderer_playable_dsall::readdone()
 		m_data_size = m_partial_data_size;
 		m_data = m_partial_data;
 		m_partial_data = NULL;
-		AM_DBG lib::logger::get_logger()->debug("renderer_playable_dsall.readdone(0x%x):  all done, calling need_redraw() and stopped_callback", (void *)this);
+		AM_DBG lib::logger::get_logger()->debug("renderer_playable_dsall.readdone(0x%x, %s):  all done, calling need_redraw() and stopped_callback", (void *)this, m_node->get_sig().c_str());
 		if (m_dest)
 			m_dest->need_redraw();
 		m_src->stop();

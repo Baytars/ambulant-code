@@ -81,7 +81,6 @@ class gstreamer_audio_renderer : public common::renderer_playable {
 	void pause();
 	void resume();
 //	void freeze() {};
-//	void speed_changed() {};
 
 //	void set_surface(common::surface *dest) { abort(); }
 //	common::surface *get_surface() { abort(); }

@@ -88,7 +88,6 @@ class sdl_audio_renderer : public common::renderer_playable {
 	void pause(common::pause_display d=common::display_show);
 	void resume();
 //	void freeze() {};
-//	void speed_changed() {};
 
 //	void set_surface(common::surface *dest) { abort(); }
 //	common::surface *get_surface() { abort(); }

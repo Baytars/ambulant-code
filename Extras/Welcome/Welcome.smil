@@ -20,15 +20,15 @@
   </head>
   <body>
     <par dur="16s">
-      <img src="data/background.png" region="background"/>
+      <img id="img_bg" src="data/background.png" region="background"/>
       <audio src="data/AmbulantTune.mp3" dur="7.9" region="audio"/>
       <par>
-      	<img src="data/ambulant.png" begin="0s" region="title"/>
-      	<img src="data/extensible.png" begin="2s" region="subtitle"/>
-      	<img src="data/fast.png" begin="2.5s" region="line1"/>
-      	<img src="data/portable.png" begin="3s" region="line2"/>
-      	<img src="data/opensource.png" begin="3.5s" region="line3"/>
-      	<img src="data/visit.png" begin="4s" region="info">
+      	<img id="img_ambulant" src="data/ambulant.png" begin="0s" region="title"/>
+      	<img id="img_extensible" src="data/extensible.png" begin="2s" region="subtitle"/>
+      	<img id="img_fast" src="data/fast.png" begin="2.5s" region="line1"/>
+      	<img id="img_portable" src="data/portable.png" begin="3s" region="line2"/>
+      	<img id="iumg_opensource" src="data/opensource.png" begin="3.5s" region="line3"/>
+      	<img id="img_visit" src="data/visit.png" begin="4s" region="info">
       	  <area href="http://www.ambulantplayer.org" show="new" external="true"/>
       	</img>
       </par>
