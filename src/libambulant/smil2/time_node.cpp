@@ -728,7 +728,9 @@ void time_node::activate(qtime_type timestamp) {
 		}
 #endif // WITH_SMIL30
 		else start_playable(sd_offset);
+#ifdef KKSYNC
 		if(m_timer) m_timer->resume();
+#endif
 	}
 }
 
@@ -1199,17 +1201,23 @@ void time_node::on_bom(qtime_type timestamp) {
 			pt.second(),
 			timestamp.second()); 
 	}
+#ifdef KKSYNC
 	if(m_timer) m_timer->resume();
+#endif
 }
 
 // Notification from the playable that has paused for fetching bits
 void time_node::on_pom(qtime_type timestamp) {
+#ifdef KKSYNC
 	if(m_timer) m_timer->pause();
+#endif
 }
 
 // Notification from the playable that has resumed playback
 void time_node::on_rom(qtime_type timestamp) {
+#ifdef KKSYNC
 	if(m_timer) m_timer->resume();
+#endif
 }
 
 // End of nedia notification

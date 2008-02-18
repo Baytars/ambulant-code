@@ -114,6 +114,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 	const lib::transition_info* m_intransition;
 	const lib::transition_info* m_outtransition;
 	smil2::audio_transition_engine* m_transition_engine;
+	lib::timer::time_type m_expected_callback_time;
 	// class methods and attributes:
 	static int init();
  	static void register_renderer(sdl_audio_renderer *rnd);

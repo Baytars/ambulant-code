@@ -51,7 +51,7 @@ lib::timer_control_impl::timer_control_impl(lib::timer* parent, double speed /* 
 	m_period(infinite),
 	m_priority(tp_default)
 {	
-	AM_DBG lib::logger::get_logger()->debug("lib::timer_control_impl(0x%x), parent=0x%x", this, parent);
+	AM_DBG lib::logger::get_logger()->debug("lib::timer_control_impl(0x%x), parent=0x%x, owned %d", this, parent, (int)owned);
 }
 
 lib::timer_control_impl::~timer_control_impl()
@@ -91,6 +91,8 @@ lib::timer_control_impl::elapsed(time_type pe) const
 #endif
 
 void lib::timer_control_impl::start(time_type t /* = 0 */) {
+	/*AM_DBG*/ lib::logger::get_logger()->debug("timer(0x%x).start(%d)", this, t);
+	assert(!m_running);
 	m_parent_epoch = m_parent->elapsed();
 	m_local_epoch = t;
 	m_running = true;
@@ -107,6 +109,7 @@ lib::timer_control_impl::apply_speed_manip(lib::timer::time_type dt) const
 void
 lib::timer_control_impl::stop()
 {
+	/*AM_DBG*/ lib::logger::get_logger()->debug("timer(0x%x).stop()", this);
 	m_local_epoch = 0;
 	m_running = false;
 }
@@ -114,6 +117,8 @@ lib::timer_control_impl::stop()
 void
 lib::timer_control_impl::pause()
 {
+	/*AM_DBG*/ lib::logger::get_logger()->debug("timer(0x%x).pause()", this);
+	//assert(m_running);
 	if(m_running) {
 		m_local_epoch += apply_speed_manip(m_parent->elapsed() - m_parent_epoch);
 		m_running = false;
@@ -123,6 +128,8 @@ lib::timer_control_impl::pause()
 void
 lib::timer_control_impl::resume()
 {
+	/*AM_DBG*/ lib::logger::get_logger()->debug("timer(0x%x).resume()", this);
+	assert(!m_running);
 	if(!m_running) {
 		m_parent_epoch = m_parent->elapsed();
 		m_running = true;
@@ -132,7 +139,7 @@ lib::timer_control_impl::resume()
 lib::timer_control_impl::time_type
 lib::timer_control_impl::set_time(time_type t, timer_priority prio)
 {
-	AM_DBG lib::logger::get_logger()->debug("0x%x.set_time(%d->%d, %d)", this, elapsed(), t, prio); 
+	/*AM_DBG*/ lib::logger::get_logger()->debug("timer(0x%x).set_time(%d->%d, %d)", this, elapsed(), t, prio); 
 	// If the priority of this request is lower than our priority: ignore it.
 	if (prio < m_priority || m_priority == tp_free) return t-elapsed();
 	if (prio == tp_default && m_priority == tp_default) {
