@@ -32,7 +32,10 @@
 
 using namespace ambulant;
 //using namespace gui::sdl;
-
+#define OUR_SAMPLERATE 44100
+#define OUR_NCHANNELS 2
+#define OUR_SAMPLESIZE 2
+#define OUR_BUFFERSIZE 1024
 extern "C" {
 
 void sdl_C_callback(void *userdata, Uint8 *stream, int len)
@@ -66,9 +69,9 @@ typedef lib::no_arg_callback<gui::sdl::sdl_audio_renderer> readdone_callback;
 
 bool gui::sdl::sdl_audio_renderer::s_sdl_init = false;
 Uint16 gui::sdl::sdl_audio_renderer::s_sdl_format = AUDIO_S16SYS;
-net::audio_format gui::sdl::sdl_audio_renderer::s_ambulant_format = net::audio_format(44100, 2, 16);
-int gui::sdl::sdl_audio_renderer::s_buffer_size = 4096;
-int gui::sdl::sdl_audio_renderer::s_min_buffer_size_bytes = 2 * 4096 * 2 * 2;  
+net::audio_format gui::sdl::sdl_audio_renderer::s_ambulant_format = net::audio_format(OUR_SAMPLERATE, OUR_NCHANNELS, OUR_SAMPLESIZE*8);
+int gui::sdl::sdl_audio_renderer::s_buffer_size = OUR_BUFFERSIZE;
+int gui::sdl::sdl_audio_renderer::s_min_buffer_size_bytes = 2 * OUR_BUFFERSIZE * OUR_NCHANNELS * OUR_SAMPLESIZE;  
 lib::critical_section gui::sdl::sdl_audio_renderer::s_static_lock;    
 std::list<gui::sdl::sdl_audio_renderer *> gui::sdl::sdl_audio_renderer::s_renderers;
 
@@ -335,7 +338,14 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 	if (m_is_paused||!m_audio_src) { 
 		rv = 0;
 		m_read_ptr_called = false;
+		// XXXX Need to adjust m_expected_callback_time
 	} else {
+		lib::timer *t = m_event_processor->get_timer();
+		lib::timer::time_type now = t->elapsed();
+		lib::timer::time_type delta = now - m_expected_callback_time;
+		lib::timer::time_type data_dur = (1000 * (bytes_wanted / (OUR_SAMPLESIZE*OUR_NCHANNELS))) / OUR_SAMPLERATE;
+		m_expected_callback_time += data_dur;
+		/*AM*DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: callback is %dms late (timer(0x%x)=%d)", delta, (void*)t, now);
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: m_audio_src->get_read_ptr(), m_audio_src=0x%x, this=0x%x", (void*) m_audio_src, (void*) this);
 		m_read_ptr_called = true;
 		rv = m_audio_src->size();
@@ -542,6 +552,9 @@ gui::sdl::sdl_audio_renderer::start(double where)
 		m_audio_src->start(m_event_processor, e);
 		m_is_playing = true;
 		m_is_paused = false;
+		lib::timer *t = m_event_processor->get_timer();
+		// t->set_priority(lib::tp_audio); but only if not higher already
+		m_expected_callback_time = t->elapsed();
 		m_lock.leave();
 		register_renderer(this);
 		if (m_intransition && ! m_transition_engine) {
