@@ -49,7 +49,9 @@ using namespace smil2;
 
 animate_node::animate_node(context_type *ctx, const node *n, animate_attrs *aattrs)
 :	time_node(ctx, n, tc_none, false), 
-	m_aattrs(aattrs) {
+	m_aattrs(aattrs),
+	m_last_timer(0)
+{
 }
 
 animate_node::~animate_node() {
@@ -57,6 +59,13 @@ animate_node::~animate_node() {
 }
 
 void animate_node::prepare_interval() {
+	assert(m_timer);
+#if 1
+	/*AM_DBG*/ lib::logger::get_logger()->debug("animate_node::prepare_interval(%s): detaching clock", get_sig().c_str());
+	// We detach animation nodes from the time graph, in the hope that this
+	// makes them more smooth.
+	m_timer->set_priority(lib::tp_free);
+#endif
 }
 
 void animate_node::read_dom_value(common::animation_destination *dst, animate_registers& regs) const {
@@ -110,6 +119,7 @@ linear_values_animation<F, T>::~linear_values_animation() {
 
 template <class F, class T>
 void linear_values_animation<F, T>::prepare_interval() {
+	animate_node::prepare_interval();
 	time_type dur = calc_dur();
 	time_type sfdur = dur;
 	const time_attrs* ta = get_time_attrs();
@@ -204,6 +214,7 @@ underlying_to_animation<T>::~underlying_to_animation() {
 
 template <class T>
 void underlying_to_animation<T>::prepare_interval() {
+	animate_node::prepare_interval();
 	time_type dur = calc_dur();
 	time_type sfdur = dur;
 	const time_attrs* ta = get_time_attrs();
@@ -249,6 +260,7 @@ class regdim_animation : public linear_values_animation<F, common::region_dim> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!this->m_animate_f) return;
 		lib::timer::time_type t = this->m_timer->elapsed();
+		this->_sanity_check_timer();
 		common::region_dim rd = this->m_animate_f->at(t);
 		if(this->m_aattrs->is_additive())
 			regs.rd += rd; // add
@@ -284,6 +296,7 @@ class underlying_to_regdim_animation : public underlying_to_animation<common::re
 	void apply_self_effect(animate_registers& regs) const {
 		if(!m_animate_f) return;
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		common::region_dim rd = m_animate_f->at(t, regs.rd);
 		regs.rd = rd; // override
 	}
@@ -324,6 +337,7 @@ class color_animation : public linear_values_animation<F, lib::color_t> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!this->m_animate_f) return;
 		lib::timer::time_type t = this->m_timer->elapsed();
+		this->_sanity_check_timer();
 		lib::color_t cl = this->m_animate_f->at(t);
 		if(this->m_aattrs->is_additive())
 			regs.cl += cl; // add
@@ -358,6 +372,7 @@ class underlying_to_color_animation : public underlying_to_animation<lib::color_
 	void apply_self_effect(animate_registers& regs) const {
 		if(!m_animate_f) return;
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		regs.cl = m_animate_f->at(t, regs.cl); // override
 	}
 };
@@ -391,6 +406,8 @@ class zindex_animation : public linear_values_animation<F, common::zindex_t> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!this->m_animate_f) return;
 		lib::timer::time_type t = this->m_timer->elapsed();
+		this->_sanity_check_timer();
+
 		common::zindex_t zi = this->m_animate_f->at(t);
 		if(this->m_aattrs->is_additive())
 			regs.zi += zi; // add
@@ -425,6 +442,7 @@ class underlying_to_zindex_animation : public underlying_to_animation<common::zi
 	void apply_self_effect(animate_registers& regs) const {
 		if(!m_animate_f) return;
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		common::zindex_t zi = m_animate_f->at(t, regs.zi);
 		regs.zi = zi; // override
 	}
@@ -470,6 +488,8 @@ class values_motion_animation : public linear_values_animation<F, lib::point> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!this->m_animate_f) return;
 		lib::timer::time_type t = this->m_timer->elapsed();
+		this->_sanity_check_timer();
+
 		lib::point pt = this->m_animate_f->at(t);
 		if(this->m_aattrs->is_additive())
 			regs.pt += pt; // add
@@ -510,6 +530,7 @@ class underlying_to_motion_animation : public underlying_to_animation<lib::point
 	void apply_self_effect(animate_registers& regs) const {
 		if(!m_animate_f) return;
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		lib::point pt = m_animate_f->at(t, regs.pt);
 		regs.pt = pt; // override
 	}
@@ -623,6 +644,7 @@ class underlying_to_panzoom_animation : public underlying_to_animation<common::r
 			return;
 		}
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		common::region_dim_spec panzoom = m_animate_f->at(t, regs.panzoom);
 		AM_DBG lib::logger::get_logger()->debug("panzoom_anim: timer=0x%x t=%d", (void*)m_timer, t);
 		regs.panzoom = panzoom; // override
@@ -658,6 +680,8 @@ class opacity_animation : public linear_values_animation<F, double> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!this->m_animate_f) return;
 		lib::timer::time_type t = this->m_timer->elapsed();
+		this->_sanity_check_timer();
+
 		double dv = this->m_animate_f->at(t);
 		if(this->m_aattrs->is_additive())
 			regs.dv += dv; // add
@@ -692,6 +716,7 @@ class underlying_to_opacity_animation : public underlying_to_animation<double> {
 	void apply_self_effect(animate_registers& regs) const {
 		if(!m_animate_f) return;
 		lib::timer::time_type t = m_timer->elapsed();
+		this->_sanity_check_timer();
 		double dv = m_animate_f->at(t, regs.dv);
 		regs.dv = dv; // override
 	}

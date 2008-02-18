@@ -92,6 +92,15 @@ class animate_node : public time_node {
 	// The set of animation related attributes of this node.
 	// Attributes parsing helper
 	animate_attrs *m_aattrs;
+#if 1
+	// For debugging: assert that time doesn't move backwards.
+	inline void _sanity_check_timer() const {
+		lib::timer::time_type t = m_timer->elapsed();
+		assert(t >= m_last_timer);
+		const_cast<animate_node*>(this)->m_last_timer = t;
+	}
+	lib::timer::time_type m_last_timer;
+#endif
 };
 
 } // namespace smil2

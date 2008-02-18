@@ -134,7 +134,7 @@ lib::timer_control_impl::set_time(time_type t, timer_priority prio)
 {
 	AM_DBG lib::logger::get_logger()->debug("0x%x.set_time(%d->%d, %d)", this, elapsed(), t, prio); 
 	// If the priority of this request is lower than our priority: ignore it.
-	if (prio < m_priority) return t-elapsed();
+	if (prio < m_priority || m_priority == tp_free) return t-elapsed();
 	if (prio == tp_default && m_priority == tp_default) {
 		// Default can be either hard sync (in which case we set our clock) or soft sync
 		// (in which case we ignore).
