@@ -164,7 +164,6 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
 {
 #ifdef DEBUG
     char *id = "nsPluginInstance::init";
-    NPSetWindowCallbackStruct *ws_info;
     fprintf(stderr, "%s(%x): %s=0x%x.\n",id,this,"aWindow",aWindow);
 #endif//DEBUG
     mNPWindow = aWindow;
@@ -172,7 +171,8 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
 #ifdef	XP_UNIX
 #ifdef	MOZ_X11
     this->window = (Window) aWindow->window;
-    ws_info = (NPSetWindowCallbackStruct *)aWindow->ws_info;
+    NPSetWindowCallbackStruct *ws_info =
+    	(NPSetWindowCallbackStruct *)aWindow->ws_info;
     this->display = ws_info->display;
     width = aWindow->width;
     height = aWindow->height;
