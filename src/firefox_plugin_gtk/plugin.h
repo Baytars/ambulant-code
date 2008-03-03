@@ -52,6 +52,9 @@
 #include "ambulant/common/player.h"
 #include "ambulant/net/url.h"
 #include "ambulant/lib/logger.h"
+#ifdef WITH_GTK
+class gtk_mainloop;
+#endif
 
 class nsScriptablePeer;
 

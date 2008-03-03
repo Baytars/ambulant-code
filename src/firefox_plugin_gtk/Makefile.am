@@ -17,7 +17,7 @@ EXTRA_DIST=plugin.h plugin.cpp \
 if WITH_GTK
 gtkincludes=-I$(GTK_CFLAGS)
 extra_gtk_cflags=-DWITH_GTK -DMOZ_X11
-extra_gtk_ldflags=../player_gtk/gtk_mainloop.o $(GTK_LIBS)
+extra_gtk_ldflags=../player_gtk/gtk_mainloop.o -lambulant_gtk $(GTK_LIBS)
 #-lambulant_gtk -lgtk -lpango
 else
 gtkincludes=
@@ -42,8 +42,8 @@ extra_live_ldflags=
 endif # WITH_LIVE
 #------------------------------------------------------
 if WITH_SDL
-sdl_config=`sdl-config --staticlibs`
-#extra_sdl_ldflags=-lambulant_sdl $(sdl_config)
+sdl_config=`sdl-config --libs`
+extra_sdl_ldflags=-lambulant_sdl $(sdl_config)
 #extra_sdl_ldflags=-lambulant_sdl $(sdl_config) \
 #	-Wl,-framework,Carbon \
 #	-Wl,-framework,IOKit \
@@ -64,10 +64,10 @@ endif # WITH_XERCES_BUILTIN
 #KB hack
 extra_hack1_ldflags=../player_gtk/gtk_mainloop.o
 
-EXTRA_CFLAGS=$(extra_gtk_cflags)
+#EXTRA_CFLAGS=$(extra_gtk_cflags)
 # KB temp MOZ_X11
-AM_CXXFLAGS = -DXP_UNIX
-#EXTRA_CXXFLAGS=-DXP_UNIX -DMOZ_X11
+AM_CXXFLAGS=$(extra_gtk_cflags)
+#EXTRA_CXXFLAGS=$(extra_gtk_cflags)
 #EXTRA_LDFLAGS=$(extra_gtk_ldflags)
 INCLUDES = \
 	-I$(top_builddir)/include \
