@@ -20,6 +20,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
 	<key>WebPluginDescription</key>
 	<string>Play SMIL multimedia documents with the Ambulant engine</string>
 	<key>WebPluginMIMETypes</key>
@@ -44,8 +46,18 @@
 			<key>WebPluginTypeDescription</key>
 			<string>SMIL Presentation</string>
 		</dict>
+		<key>application/x-ambulant-smil</key>
+		<dict>
+			<key>WebPluginExtensions</key>
+			<array>
+				<string>smi</string>
+				<string>smil</string>
+			</array>
+			<key>WebPluginTypeDescription</key>
+			<string>SMIL Presentation</string>
+		</dict>
 	</dict>
 	<key>WebPluginName</key>
-	<string>Ambulant Firefox SMIL Plug-In</string>
+	<string>AmbulantFirefoxPlugin.plugin</string>
 </dict>
 </plist>
