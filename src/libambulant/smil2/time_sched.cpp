@@ -239,7 +239,7 @@ void scheduler::restart(time_node *tn) {
 	const time_node::interval_type& i = tn->get_current_interval();
 	time_node::time_type bt = i.begin;
 	q_smil_time b(tn->sync_node(), bt);
-	AM_DBG lib::logger::get_logger()->debug("scheduler::restart: horizon %d -> %d", m_horizon, b.as_doc_time()());
+	/*AM_DBG*/ lib::logger::get_logger()->debug("scheduler::restart: horizon %d -> %d", m_horizon, b.as_doc_time()());
 	m_horizon = b.as_doc_time()();
 	m_timer->set_time(m_horizon);
 	tn->get_timer()->set_time(0);
@@ -302,7 +302,7 @@ scheduler::time_type scheduler::_exec(time_type now) {
 			time_node *nitp = *nit;
 			nitp->exec(timestamp);
 		}
-		AM_DBG lib::logger::get_logger()->debug("scheduler::_exec: horizon %d -> %d", m_horizon, next);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("scheduler::_exec: horizon %d -> %d", m_horizon, next);
 		m_horizon = next;
 		if(m_timer) m_timer->set_time(next);
 		eit++;
