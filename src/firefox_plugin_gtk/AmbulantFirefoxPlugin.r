@@ -1,3 +1,4 @@
+#include <Carbon/Carbon.r>
 resource 'STR#' (126, "description", purgeable) {
 	{	/* array StringArray: 2 elements */
 		/* [1] */

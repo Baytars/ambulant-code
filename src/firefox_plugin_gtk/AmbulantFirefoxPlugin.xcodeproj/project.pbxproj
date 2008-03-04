@@ -34,6 +34,7 @@
 		04C26AED0CBE0E3700CB8EFE /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AEC0CBE0E3700CB8EFE /* Carbon.framework */; };
 		04C26AF00CBE0E5500CB8EFE /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AEF0CBE0E5500CB8EFE /* IOKit.framework */; };
 		04C26AF30CBE0E8700CB8EFE /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C26AF20CBE0E8700CB8EFE /* OpenGL.framework */; };
+		04EA87490D7E06AE004DF0C2 /* AmbulantFirefoxPlugin.r in Rez */ = {isa = PBXBuildFile; fileRef = 041D49F40D7DAB09008874CD /* AmbulantFirefoxPlugin.r */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -51,7 +52,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		041D49F40D7DAB09008874CD /* AmbulantFirefoxPlugin.r */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = AmbulantFirefoxPlugin.r; sourceTree = "<group>"; };
+		041D49F40D7DAB09008874CD /* AmbulantFirefoxPlugin.r */ = {isa = PBXFileReference; explicitFileType = sourcecode.rez; fileEncoding = 4; path = AmbulantFirefoxPlugin.r; sourceTree = "<group>"; };
 		045D0B210958C14700C194EE /* libambulant.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant.a; path = src/libambulant/.libs/libambulant.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
 		045D0B290958C23900C194EE /* libambulant_sdl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_sdl.a; path = src/libambulant/.libs/libambulant_sdl.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
 		045D0B2A0958C23900C194EE /* libambulant_live.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_live.a; path = src/libambulant/.libs/libambulant_live.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
@@ -260,6 +261,7 @@
 			buildPhases = (
 				041DF9F00CD5E14700E30854 /* rename dylibs */,
 				04797EA20D7D5E9800B4EE4C /* run xpidl */,
+				04EA874B0D7E06CC004DF0C2 /* Rez */,
 				8D5B49AF048680CD000E48DA /* Resources */,
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
@@ -307,6 +309,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		04EA874B0D7E06CC004DF0C2 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04EA87490D7E06AE004DF0C2 /* AmbulantFirefoxPlugin.r in Rez */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		041DF9F00CD5E14700E30854 /* rename dylibs */ = {
