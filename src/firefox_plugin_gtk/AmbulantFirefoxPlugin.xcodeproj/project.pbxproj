@@ -51,6 +51,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		041D49F40D7DAB09008874CD /* AmbulantFirefoxPlugin.r */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.rez; path = AmbulantFirefoxPlugin.r; sourceTree = "<group>"; };
 		045D0B210958C14700C194EE /* libambulant.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant.a; path = src/libambulant/.libs/libambulant.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
 		045D0B290958C23900C194EE /* libambulant_sdl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_sdl.a; path = src/libambulant/.libs/libambulant_sdl.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
 		045D0B2A0958C23900C194EE /* libambulant_live.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libambulant_live.a; path = src/libambulant/.libs/libambulant_live.a; sourceTree = PREBUILT_AMBULANT_ROOT; };
@@ -245,6 +246,7 @@
 				045D0B7E0958C53F00C194EE /* mainloop.cpp */,
 				045D0B7F0958C53F00C194EE /* mainloop.h */,
 				32DBCF630370AF2F00C91783 /* AmbulantFirefoxPlugin_Prefix.pch */,
+				041D49F40D7DAB09008874CD /* AmbulantFirefoxPlugin.r */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -418,6 +420,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantFirefoxPlugin_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"XP_MACOSX=1",
 					"AM_PREFER_FFMPEG=1",
 					"WITH_LTDL_PLUGINS=1",
 					"WITH_EXTERNAL_DOM=1",
@@ -426,9 +429,12 @@
 					"WITH_EXPAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_FFMPEG_AVFORMAT=1",
-					"WITH_SMIL30=1",
+					"WITH_SMIL30=1\nAM_PREFER_FFMPEG=1\nWITH_LTDL_PLUGINS=1\nWITH_EXTERNAL_DOM=1\nWITH_SDL=1\nWITH_FFMPEG=1\nWITH_EXPAT=1\nWITH_OVERLAY_WINDOW=1\nWITH_FFMPEG_AVFORMAT=1\nWITH_SMIL30=1",
 				);
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = (
+					/Developer/Headers/FlatCarbon,
+					../../include,
+				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Internet Plug-Ins";
 				LIBRARY_SEARCH_PATHS = (
@@ -460,6 +466,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantFirefoxPlugin_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"XP_MACOSX=1",
 					"AM_PREFER_FFMPEG=1",
 					"WITH_LTDL_PLUGINS=1",
 					"WITH_EXTERNAL_DOM=1",
@@ -468,9 +475,12 @@
 					"WITH_EXPAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_FFMPEG_AVFORMAT=1",
-					"WITH_SMIL30=1",
+					"WITH_SMIL30=1\nAM_PREFER_FFMPEG=1\nWITH_LTDL_PLUGINS=1\nWITH_EXTERNAL_DOM=1\nWITH_SDL=1\nWITH_FFMPEG=1\nWITH_EXPAT=1\nWITH_OVERLAY_WINDOW=1\nWITH_FFMPEG_AVFORMAT=1\nWITH_SMIL30=1",
 				);
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = (
+					/Developer/Headers/FlatCarbon,
+					../../include,
+				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Internet Plug-Ins";
 				LIBRARY_SEARCH_PATHS = (
@@ -499,6 +509,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantFirefoxPlugin_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"XP_MACOSX=1",
 					"AM_PREFER_FFMPEG=1",
 					"WITH_LTDL_PLUGINS=1",
 					"WITH_EXTERNAL_DOM=1",
@@ -507,9 +518,12 @@
 					"WITH_EXPAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_FFMPEG_AVFORMAT=1",
-					"WITH_SMIL30=1",
+					"WITH_SMIL30=1\nAM_PREFER_FFMPEG=1\nWITH_LTDL_PLUGINS=1\nWITH_EXTERNAL_DOM=1\nWITH_SDL=1\nWITH_FFMPEG=1\nWITH_EXPAT=1\nWITH_OVERLAY_WINDOW=1\nWITH_FFMPEG_AVFORMAT=1\nWITH_SMIL30=1",
 				);
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = (
+					/Developer/Headers/FlatCarbon,
+					../../include,
+				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Library/Internet Plug-Ins";
 				LIBRARY_SEARCH_PATHS = (
