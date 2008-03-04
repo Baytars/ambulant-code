@@ -157,7 +157,7 @@ lib::timer_control_impl::set_time(time_type t, timer_priority prio)
 	bool was_running = m_running;
 	pause();
 	time_type delta = t - m_local_epoch;
-//	delta = m_parent->set_time(m_parent->elapsed() + delta, m_priority);
+	delta = m_parent->set_time(m_parent->elapsed() + delta, m_priority);
 	m_local_epoch += delta;
 	if (was_running) resume();
 	return 0;

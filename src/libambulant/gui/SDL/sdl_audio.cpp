@@ -344,8 +344,22 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		lib::timer::time_type now = t->elapsed();
 		lib::timer::time_type delta = now - m_expected_callback_time;
 		lib::timer::time_type data_dur = (1000 * (bytes_wanted / (OUR_SAMPLESIZE*OUR_NCHANNELS))) / OUR_SAMPLERATE;
-		m_expected_callback_time += data_dur;
-		/*AM*DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: callback is %dms late (timer(0x%x)=%d)", delta, (void*)t, now);
+		if (delta != 0) {
+			/*AM*DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: callback is %dms late (timer(0x%x)=%d)", delta, (void*)t, now);
+			t->set_time(m_expected_callback_time); 
+			now = t->elapsed();
+			delta = now - m_expected_callback_time;
+			if (delta > 0) {
+				/*AM*DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: after resync %dms late (timer=%d)", delta, now);
+				// XXXX slobber up some bytes
+			} else
+			if (delta < 0) {
+				/*AM*DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: after resync %dms early (timer=%d)", delta, now);
+				// XXXX Insert enough nulls, up p, lower bytes_wanted
+			}
+		}
+		m_expected_callback_time = now + data_dur;
+		data_dur = (1000 * (bytes_wanted / (OUR_SAMPLESIZE*OUR_NCHANNELS))) / OUR_SAMPLERATE;
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: m_audio_src->get_read_ptr(), m_audio_src=0x%x, this=0x%x", (void*) m_audio_src, (void*) this);
 		m_read_ptr_called = true;
 		rv = m_audio_src->size();
@@ -553,7 +567,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 		m_is_playing = true;
 		m_is_paused = false;
 		lib::timer *t = m_event_processor->get_timer();
-		// t->set_priority(lib::tp_audio); but only if not higher already
+		t->set_priority(lib::tp_audio); // XXXJACK but only if not higher already
 		m_expected_callback_time = t->elapsed();
 		m_lock.leave();
 		register_renderer(this);

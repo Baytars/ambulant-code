@@ -42,6 +42,7 @@
 		043902D40BD7955000E13028 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 043902C80BD7955000E13028 /* data */; };
 		043903070BD7956400E13028 /* DTDCache in Resources */ = {isa = PBXBuildFile; fileRef = 043902D50BD7956400E13028 /* DTDCache */; };
 		043903080BD7956400E13028 /* DTDCache in Resources */ = {isa = PBXBuildFile; fileRef = 043902D50BD7956400E13028 /* DTDCache */; };
+		044C3DA60D6AFCE0004244E4 /* libfaad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0480CCFF0CDD1D5C0025344B /* libfaad.a */; };
 		0480CD000CDD1D5C0025344B /* libfaad.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0480CCFF0CDD1D5C0025344B /* libfaad.a */; };
 		049650620BCADE2B002C00DF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 049650610BCADE2B002C00DF /* main.m */; };
 		0496506D0BCADE62002C00DF /* LogController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 049650640BCADE62002C00DF /* LogController.mm */; };
@@ -745,6 +746,7 @@
 				049656A70BCAEA7D002C00DF /* libSDL.a in Frameworks */,
 				049656A80BCAEA7D002C00DF /* libz.dylib in Frameworks */,
 				049656B30BCAEC13002C00DF /* Carbon.framework in Frameworks */,
+				044C3DA60D6AFCE0004244E4 /* libfaad.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
