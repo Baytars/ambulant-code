@@ -83,7 +83,7 @@ NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
             *((PRBool *)aValue) = PR_TRUE;
             break;
         default:
-            err = NPERR_GENERIC_ERROR;
+            err = NPERR_INVALID_PARAM;
     }
     return err;
 }
@@ -230,7 +230,8 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
 	gtk_widget_realize(gtkwidget);
 #endif // WITH_GTK
 #endif/*XP_UNIX*/
-    return mInitialized = true;
+	mInitialized = true;
+    return true;
 }
 
 void nsPluginInstance::shut()
@@ -392,7 +393,13 @@ NPError	nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
   NPError rv = NPERR_NO_ERROR;
 
 
-  if (aVariable == NPPVpluginScriptableInstance) {
+  if (aVariable == NPPVpluginScriptableInstance
+#if 1
+		// Jack added this one: it's what Safari seems to use. No idea
+		// whether that's really correct, though...
+		|| aVariable == NPPVpluginScriptableNPObject
+#endif
+		) {
     // addref happens in getter, so we don't addref here
     nsScriptablePeer * scriptablePeer = getScriptablePeer();
     if (scriptablePeer) {
@@ -413,7 +420,10 @@ NPError	nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
   else if (aVariable ==  NPPVpluginNeedsXEmbed) {
 	    *(PRBool *) aValue = PR_TRUE;
 	    rv = NPERR_NO_ERROR;
-  } else  *(void**) aValue = NULL;
+  } else  {
+	*(void**) aValue = NULL;
+	rv = NPERR_INVALID_PARAM;
+  }
   return rv;
 }
 
