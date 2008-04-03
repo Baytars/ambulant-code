@@ -73,17 +73,17 @@ class basic_atomic_count {
 	/// Increment the counter.
 	long operator++() {
 		m_cs.enter();
-		++m_value;
+		long rv = ++m_value;
 		m_cs.leave();
-		return m_value;
+		return rv;;
 	}
 	
 	/// Decrement the counter.
 	long operator--() {
 		m_cs.enter();
-		--m_value;
+		long rv = --m_value;
 		m_cs.leave();
-		return m_value;
+		return rv;
 	}
 	
 	/// Return the current value of the counter.
