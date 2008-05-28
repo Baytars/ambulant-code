@@ -510,6 +510,14 @@
    fun:_ZNSt15_Deque_iteratorIN8ambulant3net11ts_packet_tERS2_PS2_EC1ERKS5_
    obj:*
 }
+# {
+# Fixed by adding locking in smil_player rev.1.117
+#    Ambulant-TBD-19
+#    Helgrind:Race
+#    fun:_ZN8ambulant5smil211smil_player4stopEv
+#    obj:*
+# }
+
 {
    Ambulant-TBD-20
    Helgrind:Race
@@ -658,6 +666,15 @@
    fun:g_cclosure_marshal_VOID__VOID
    fun:g_closure_invoke
    obj:/lib/libgobject-2.0.so.0.1200.9
+}
+{
+   Ambulant-TBD-35
+   Helgrind:Race
+   fun:_ZN8ambulant3gui4none18none_area_renderer4stopEv
+   fun:_ZN8ambulant5smil211smil_player17_destroy_playableEPNS_6common8playableEPKNS_3lib14node_interfaceE
+   fun:_ZN8ambulant5smil211smil_player13stop_playableEPKNS_3lib14node_interfaceE
+   fun:_ZN8ambulant5smil29time_node13stop_playableEv
+   obj:*
 }
 {
    Ambulant-exit-main

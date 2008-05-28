@@ -597,7 +597,7 @@ class demux_datasink {
     
 	/// Data push call: consume data with given size and timestamp. Must copy data
 	/// before returning.
-	virtual void data_avail(timestamp_t pts, const uint8_t *data, int size) = 0;
+	virtual bool packet_avail(timestamp_t pts, const uint8_t *data, int size) = 0;
 
 	/// Return true if no more data should be pushed right now.
 	virtual bool buffer_full() = 0;
