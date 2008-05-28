@@ -333,15 +333,17 @@ ffmpeg_demux::seek(timestamp_t time)
 void
 ffmpeg_demux::remove_datasink(int stream_index)
 {
+	demux_datasink* ds;
 	m_lock.enter();
 	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
 	assert(m_sinks[stream_index] != 0);
-	if (m_sinks[stream_index])
-		// signal EOF
-		m_sinks[stream_index]->data_avail(0, 0, 0);
+	ds = m_sinks[stream_index];
 	m_sinks[stream_index] = 0;
 	m_nstream--;
 	m_lock.leave();
+	if (ds)
+		// signal EOF
+		ds->packet_avail(0, 0, 0);
 	if (m_nstream <= 0) cancel();
 }
 
@@ -429,22 +431,23 @@ ffmpeg_demux::run()
 				if (pts != AV_NOPTS_VALUE)
 					pts = av_rescale_q(pts, m_con->streams[pkt->stream_index]->time_base, AMBULANT_TIMEBASE);
 				
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.data_avail(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.packet_avail(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				
-				sink->data_avail(pts, pkt->data, pkt->size);
-
+				m_lock.leave();
+				sink->packet_avail(pts, pkt->data, pkt->size);
+				m_lock.enter();
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final data_avail(0, 0)");
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final packet_avail(0, 0)");
 	int i;
+	m_lock.leave();
 	for (i=0; i<MAX_STREAMS; i++)
 		if (m_sinks[i])
-			m_sinks[i]->data_avail(0, 0, 0);
+			m_sinks[i]->packet_avail(0, 0, 0);
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: returning");
-	m_lock.leave();
 	return 0;
 }
 
