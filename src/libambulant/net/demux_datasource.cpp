@@ -189,15 +189,15 @@ demux_audio_datasource::packet_avail(timestamp_t pts, const uint8_t *inbuf, int 
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.packet_avail: %d bytes available (ts = %lld)", sz, pts);
-	void* data = malloc(sz);
-	assert(data);
-	memcpy(data, inbuf, sz);
-	ts_packet_t tsp(pts,data,sz);
-	m_queue.push(tsp);
-	size_t new_queue_size = m_queue.size();
-	if (new_queue_size > MAX_AUDIO_PACKETS) {
-		AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.packet_avail: m_queue.size()(=%d) exceeds desired maximum(=%d)", new_queue_size, MAX_AUDIO_PACKETS);
-	}
+	if (_buffer_full()) {
+		rv = false;
+	} else {
+		void* data = malloc(sz);
+		assert(data);
+		memcpy(data, inbuf, sz);
+		ts_packet_t tsp(pts,data,sz);
+		m_queue.push(tsp);
+	     }
 	m_lock.leave();
 	return rv;
 }
@@ -220,12 +220,9 @@ demux_audio_datasource::_end_of_file()
 }
 
 bool 
-demux_audio_datasource::buffer_full()
+demux_audio_datasource::_buffer_full()
 {
-	m_lock.enter();
-	bool rv = m_queue.size() >= MAX_AUDIO_PACKETS;
-	m_lock.leave();
-	return rv;
+	return m_queue.size() >= MAX_AUDIO_PACKETS;
 }	
 
 ts_packet_t
@@ -495,15 +492,18 @@ write_data(long long int frame_nr, char* data, int sz)
 bool 
 demux_video_datasource::packet_avail(timestamp_t pts, const uint8_t *inbuf, int sz)
 {
-	bool rv = true;
 	m_lock.enter();
 
 	if ( ! m_thread) {
 		// video stopped
 		m_lock.leave();
-		return rv;
+		return true;;
 	}
-
+	if ( _buffer_full()) {
+		// video stopped
+		m_lock.leave();
+		return false;
+	}
 	m_src_end_of_file = (sz == 0);
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::packet_avail(): receiving data sz=%d ,pts=%lld", sz, pts);
 	if(sz > 0) {
@@ -535,7 +535,7 @@ demux_video_datasource::packet_avail(timestamp_t pts, const uint8_t *inbuf, int 
 		}
 	}		
 	m_lock.leave();
-	return rv;
+	return true;;
 }
 
 
@@ -561,13 +561,11 @@ demux_video_datasource::_end_of_file()
 }
 
 bool 
-demux_video_datasource::buffer_full()
+demux_video_datasource::_buffer_full()
 {
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size(), MAX_VIDEO_FRAMES);
-	bool rv = (m_frames.size() > MAX_VIDEO_FRAMES);
-	m_lock.leave();
-	return rv;
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::_buffer_full() (this=0x%x, count=%d)", (void*) this, m_frames.size(), MAX_VIDEO_FRAMES);
+	return (m_frames.size() > MAX_VIDEO_FRAMES);
+
 }	
 
 timestamp_t

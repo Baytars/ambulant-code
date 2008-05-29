@@ -95,7 +95,6 @@ class demux_audio_datasource:
   	void seek(timestamp_t time);
 	bool packet_avail(timestamp_t pts, const uint8_t *data, int size);
 	bool end_of_file();
-	bool buffer_full();
   	timestamp_t get_clip_end();
 	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_thread->get_start_time(); };
@@ -106,6 +105,7 @@ class demux_audio_datasource:
 
   private:
 	bool _end_of_file();
+	bool _buffer_full();
 	const net::url m_url;
 	//AVFormatContext *m_con;
 	int m_stream_index;
@@ -145,7 +145,6 @@ class demux_video_datasource:
 	void frame_processed(timestamp_t timestamp);
 	bool packet_avail(timestamp_t pts, const uint8_t *data, int size);
 	bool end_of_file();
-	bool buffer_full();
   	timestamp_t get_clip_end();
 	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_thread->get_start_time(); };
@@ -165,6 +164,7 @@ class demux_video_datasource:
 
   private:
 	bool _end_of_file();
+	bool _buffer_full();
 	const net::url m_url;
 	//AVFormatContext *m_con;
 	int m_stream_index;
