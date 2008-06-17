@@ -728,7 +728,6 @@ AC_MSG_RESULT(live555.com library found - $test_live)
 
 dnl Testing for ffmpeg
 dnl ======================================================================
-set -x #KB JNK
 ##
 # Find ffmpeg audio/video codec library
 #
@@ -750,18 +749,24 @@ AC_ARG_WITH(ffmpeg,
           ;;
     esac
 ])
-dnl test for slurped version first
+dnl test for downloaded version
 dnl
+FFMPEG_DEFAULT_DIR=`pwd`/third_party_packages/ffmpeg
 m4_pattern_allow(PKG_CONFIG_PATH_ORIG)
 PKG_CONFIG_PATH_ORIG=$PKG_CONFIG_PATH
-echo "test_ffmpeg=" $test_ffmpeg '$FFMPEG_PREFIX=' $FFMPEG_PREFIX
-ffmpeg_inst_style="not found"
+ffmpeg_inst_style=
 if test "x$test_ffmpeg" = "xtrue"; then
 	if test "x$FFMPEG_PREFIX" = "x";	
 	then
-          FFMPEG_PREFIX=`pwd`/third_party_packages/ffmpeg-cvs
+          FFMPEG_PREFIX=$FFMPEG_DEFAULT_DIR
 	fi
 	export PKG_CONFIG_PATH=$FFMPEG_PREFIX:$PKG_CONFIG_PATH
+	if ! test -e $FFMPEG_PREFIX/libavcodec-uninstalled.pc
+	then 
+  	    # currently (June 2008) ffmpeg people are shifting their pkg-config files back and forth
+
+	    PKG_CONFIG_PATH=$FFMPEG_PREFIX/libavcodec:$FFMPEG_PREFIX/libavformat:$FFMPEG_PREFIX/libavutil:$PKG_CONFIG_PATH
+	fi
         PKG_CHECK_MODULES(LIBAVUTIL,[libavutil >= 49.7.0], test_ffmpeg=true, test_ffmpeg=manual)
         PKG_CHECK_MODULES(LIBAVCODEC,[libavcodec >= 51.57.2], test_ffmpeg=true, test_ffmpeg=manual)
         PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], test_ffmpeg=true, test_ffmpeg=manual)
@@ -782,7 +787,12 @@ AC_MSG_RESULT($test_ffmpeg)
 AC_MSG_RESULT(Discovered FFMPEG version to use - $inst_style)
 
 PKG_CONFIG_PATH=$PKG_CONFIG_PATH_ORIG
-set +x #KB JNK
+
+if test "x$test_ffmpeg" = "xfalse"; then
+    AC_MSG_WARN([ffmpeg support not enabled])
+    ffmpeg_warning="
+ffmpeg not found or disabled. Building without ffmpeg (which means limited media support)"
+fi
 
 dnl Testing for Python
 dnl ======================================================================
