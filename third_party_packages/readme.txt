@@ -143,43 +143,29 @@ xerces-unix:
 	the directory containing libxerces-c.so.
 	
 ffmpeg:
-    XXXX This section is heavily outdated.
-    
-    The best option is to use the the fairly recent frozen cvs-ffmpeg
-    that was created especially for Ambulant. You find this on the
-    Ambulant SF download pages as ffmpeg-cvs-20051121.tgz. Unpack this
-    into this directory (third_party_packages) as ffmpeg-cvs, and configure
-    and build it. No need to install, if you have kept all pathnames as
-    stated here the Ambulant configure script will pick it up.
-    
-	Alternatively, use ffmpeg 0.4.8 or 0.4.9pre, but some functionality
-	will not work in this case. Download from
-	<http://ffmpeg.sourceforge.net/> and unpack into ffmpeg-0.4.8 in
-	this directory (.../ambulant/third_party_packages).
+	As ffmpeg does not provide versioned distributions, we use it from
+	the deveopers source tree.
+	In addition, for AAC audio decoding, libfaad2 is needs to be installed.
+	See: http://www.audiocoding.com/faad2.html 
+	(AAC decoding is used by AmbulantPlayer for audio streaming via RTSP.)
 
-	After downloading and unpacking, for MacOSX you must apply the patch
-	from ffmpeg (it should do no harm applying the patch for other Unix
-	systems bt I don't think it is needed). Then build ffmpeg (there is
-	no need to install):
-		$ cd ffmpeg-0.4.8
-		$ patch -p0 < ../ffmpeg-macosx-patch    # For Mac OS X only
-		$ ./configure       (*)
-		$ make
-		
-	(*) Use configure --disable-opts if you get a lot of linker errors
+	Then download ffmpeg from source in the directory 
+	.../ambulant/third_party_packages/ffmpeg using svn:
 
-	Note that there is no reason to install ffmpeg (and it may actually
-	fail to install cleanly on some systems): Ambulant Player links
-	against the static libraries in the build directory.
-
-	Also note that as of this writing you cannot use an ffmpeg
-	installation as comes pre-installed with some RedHat distributions:
-	not all libraries and include files seem to be installed.
+	$ cd .../ambulant/third_party_packages
+	$ svn checkout svn://svn.mplayerhq.hu/ffmpeg/trunk ffmpeg
+	$ cd ffmpeg
+	$ ./configure --enable-libfaad --enable-gpl
+	$ make
 
 	In principle the ffmpeg package is optional, but failing to supply
 	it will result in an ambulant player that can play no audio (Mac OS
 	X) or no audio and video (Linux).
-	
+
+	Note: currently (June 17, 2008) ffmpeg's lib*.pc files contain a bug,
+	work around: in .../ambulant/third_party_packages/ffmpeg (after configure):
+	$ mv lib*/lib*.pc .
+
 sdl:
 	Ambulant has been tested with sdl 1.2.5 thru 1.2.11. You find this at
 	<http://www.libsdl.org>. Build and install normally, and make sure
