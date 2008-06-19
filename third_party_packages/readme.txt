@@ -139,35 +139,44 @@ xerces-unix:
 	--with-xerces option on the main ambulant configure: it will
 	normally only look in third_party_packages/xerces-unix.
 
-	To run Ambulantplayer make sure that you have set LD_LIBRARY_PATH to
+	To run AmbulantPlayer make sure that you have set LD_LIBRARY_PATH to
 	the directory containing libxerces-c.so.
 	
 ffmpeg:
-	As ffmpeg does not provide versioned distributions, we use it from
-	the deveopers source tree.
-	In addition, for AAC audio decoding, libfaad2 is needs to be installed.
-	See: http://www.audiocoding.com/faad2.html 
-	(AAC decoding is used by AmbulantPlayer for audio streaming via RTSP.)
+	In principle the ffmpeg package is optional, but failing to supply
+	it will result in an AmbulantPlayer that can play no audio (Mac OS
+	X) or no audio and video (Linux).
 
-	Then download ffmpeg from source in the directory 
+	As ffmpeg does not provide versioned distributions, and on all Linux
+	distributions we have seen, system installed versions of ffmpeg have
+	too little functionality to be useable for AmbulantPlayer, we need to
+	extract it from	the developers source tree.
+
+	In addition, for AAC audio decoding, libfaad2 is needs to be installed.
+	See: http://www.audiocoding.com/faad2.html how to download and install.
+
+	Warning: while AmbulantPlayer by itself is licensed LGPL, by including
+	libfaad2 the licensing scheme falls back to GPL	(AAC decoding is currently
+	only needed by AmbulantPlayer for audio streaming via RTSP).
+
+	Download ffmpeg from source in the directory 
 	.../ambulant/third_party_packages/ffmpeg using svn:
 
 	$ cd .../ambulant/third_party_packages
 	$ svn checkout svn://svn.mplayerhq.hu/ffmpeg/trunk ffmpeg
 	$ cd ffmpeg
-	$ ./configure --enable-libfaad --enable-gpl
+	$ if [ `arch` = x86_64 ] then extracflags=--extra-cflags=-fPIC ; fi
+	$ ./configure --enable-libfaad --enable-gpl $extracflags
 	$ make
 
-	In principle the ffmpeg package is optional, but failing to supply
-	it will result in an ambulant player that can play no audio (Mac OS
-	X) or no audio and video (Linux).
-
+	("--extra-cflags=-fPIC" is needed a.o. on Fedora-8 64 bit installations).
 	Note: currently (June 17, 2008) ffmpeg's lib*.pc files contain a bug,
-	work around: in .../ambulant/third_party_packages/ffmpeg (after configure):
+	work around: type in .../ambulant/third_party_packages/ffmpeg
+	(after the configure command):
 	$ mv lib*/lib*.pc .
 
 sdl:
-	Ambulant has been tested with sdl 1.2.5 thru 1.2.11. You find this at
+	Ambulant has been tested with sdl 1.2.5 thru 1.2.13. You find this at
 	<http://www.libsdl.org>. Build and install normally, and make sure
 	the sdl-config utility is on your $PATH when running the configure
 	for Ambulant.
