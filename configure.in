@@ -760,6 +760,8 @@ if test "x$test_ffmpeg" = "xtrue"; then
 	then
           FFMPEG_PREFIX=$FFMPEG_DEFAULT_DIR
 	fi
+	# Turn into absolute path
+	FFMPEG_PREFIX=`cd $FFMPEG_PREFIX ; pwd`
 	export PKG_CONFIG_PATH=$FFMPEG_PREFIX:$PKG_CONFIG_PATH
 	if ! test -e $FFMPEG_PREFIX/libavcodec-uninstalled.pc
 	then 
@@ -767,9 +769,10 @@ if test "x$test_ffmpeg" = "xtrue"; then
 
 	    PKG_CONFIG_PATH=$FFMPEG_PREFIX/libavcodec:$FFMPEG_PREFIX/libavformat:$FFMPEG_PREFIX/libavutil:$PKG_CONFIG_PATH
 	fi
-        PKG_CHECK_MODULES(LIBAVUTIL,[libavutil >= 49.7.0], test_ffmpeg=true, test_ffmpeg=manual)
-        PKG_CHECK_MODULES(LIBAVCODEC,[libavcodec >= 51.57.2], test_ffmpeg=true, test_ffmpeg=manual)
-        PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], test_ffmpeg=true, test_ffmpeg=manual)
+	# test_ffmpeg is currently true. Set to false if any required piece is missing.
+    PKG_CHECK_MODULES(LIBAVUTIL,[libavutil >= 49.7.0], , test_ffmpeg=false)
+    PKG_CHECK_MODULES(LIBAVCODEC,[libavcodec >= 51.57.2], , test_ffmpeg=false)
+    PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], , test_ffmpeg=false)
 	FFMPEG_CFLAGS="${LIBAVFORMAT_CFLAGS} ${LIBAVCODEC_CFLAGS} ${LIBAVUTIL_CFLAGS}"
 	FFMPEG_LIBS="${LIBAVFORMAT_LIBS} ${LIBAVCODEC_LIBS} ${LIBAVUTIL_LIBS}"
 	if test "x$test_ffmpeg" = "xtrue"; then
