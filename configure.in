@@ -751,6 +751,7 @@ AC_ARG_WITH(ffmpeg,
 ])
 dnl test for downloaded version
 dnl
+set -x
 FFMPEG_DEFAULT_DIR=`pwd`/third_party_packages/ffmpeg
 m4_pattern_allow(PKG_CONFIG_PATH_ORIG)
 PKG_CONFIG_PATH_ORIG=$PKG_CONFIG_PATH
@@ -770,9 +771,9 @@ if test "x$test_ffmpeg" = "xtrue"; then
 	    PKG_CONFIG_PATH=$FFMPEG_PREFIX/libavcodec:$FFMPEG_PREFIX/libavformat:$FFMPEG_PREFIX/libavutil:$PKG_CONFIG_PATH
 	fi
 	# test_ffmpeg is currently true. Set to false if any required piece is missing.
-    PKG_CHECK_MODULES(LIBAVUTIL,[libavutil >= 49.7.0], , test_ffmpeg=false)
-    PKG_CHECK_MODULES(LIBAVCODEC,[libavcodec >= 51.57.2], , test_ffmpeg=false)
-    PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], , test_ffmpeg=false)
+	PKG_CHECK_MODULES(LIBAVUTIL,[libavutil >= 49.7.0], , test_ffmpeg=false)
+	PKG_CHECK_MODULES(LIBAVCODEC,[libavcodec >= 51.57.2], , test_ffmpeg=false)
+	PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], , test_ffmpeg=false)
 	FFMPEG_CFLAGS="${LIBAVFORMAT_CFLAGS} ${LIBAVCODEC_CFLAGS} ${LIBAVUTIL_CFLAGS}"
 	FFMPEG_LIBS="${LIBAVFORMAT_LIBS} ${LIBAVCODEC_LIBS} ${LIBAVUTIL_LIBS}"
 	if test "x$test_ffmpeg" = "xtrue"; then
@@ -797,6 +798,7 @@ if test "x$test_ffmpeg" = "xfalse"; then
 ffmpeg not found or disabled. Building without ffmpeg (which means limited media support)"
 fi
 
+set +x
 dnl Testing for Python
 dnl ======================================================================
 AC_MSG_CHECKING(whether to build Python interface)
