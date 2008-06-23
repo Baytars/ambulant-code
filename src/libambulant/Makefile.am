@@ -150,7 +150,10 @@ endif
 if WITH_FFMPEG
 toolkit_ffmpeg_libraries = libambulant_ffmpeg.la
 
-libambulant_ffmpeg_la_LDFLAGS = $(FFMPEG_LIBS)
+# XXXJACK was: libambulant_ffmpeg_la_LDFLAGS = $(FFMPEG_LIBS)
+# XXXJACK but this fails on OSX
+libambulant_ffmpeg_la_LDFLAGS = 
+
 ffmpegincludes = -DWITH_FFMPEG -DWITH_FFMPEG_AVFORMAT $(FFMPEG_CFLAGS)
 
 libambulant_ffmpeg_la_SOURCES = 	\
