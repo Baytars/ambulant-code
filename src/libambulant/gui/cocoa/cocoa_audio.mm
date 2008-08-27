@@ -40,8 +40,10 @@ cocoa_audio_playable::cocoa_audio_playable(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor *evp)
-:	playable_imp(context, cookie, node, evp),
+	lib::event_processor *evp,
+	common::factories *fp,
+	common::playable_factory_machdep *mdp)
+:	playable_imp(context, cookie, node, evp, fp, mdp),
 	m_url(node->get_url("src")),
 	m_sound(NULL)
 {

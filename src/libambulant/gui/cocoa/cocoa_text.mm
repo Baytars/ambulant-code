@@ -45,8 +45,9 @@ cocoa_text_renderer::cocoa_text_renderer(
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		event_processor *evp,
-		common::factories *factory)
-:	cocoa_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+		common::factories *factory,
+		common::playable_factory_machdep *mdp)
+:	cocoa_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory, mdp),
 	m_text_storage(NULL),
 	m_text_color(0),
 	m_font_name(NULL),

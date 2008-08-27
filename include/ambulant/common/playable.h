@@ -45,6 +45,7 @@ class audio_datasource;
 namespace common {
 
 class renderer;
+class factories;
 
 /// Display mode when the playable is paused.
 enum pause_display {
@@ -208,6 +209,12 @@ class playable_notification {
 
 	/// Playable corresponding to cookie n has seen a marker. 
 	virtual void marker_seen(cookie_type n, const char *name, double t = 0) = 0;
+};
+
+/// Machine-dependent auxiliary object to be passed to renderer factories.
+class playable_factory_machdep {
+  public:
+	virtual ~playable_factory_machdep() {}
 };
 
 /// Factory for playable objects.
