@@ -28,6 +28,7 @@
 #include "ambulant/gui/SDL/sdl_factory.h"
 #include "ambulant/gui/SDL/sdl_gui.h"
 #include "ambulant/gui/SDL/sdl_audio.h"
+#include "ambulant/smil2/test_attrs.h"
 
 using namespace ambulant;
 using namespace gui::sdl;
@@ -40,6 +41,17 @@ ambulant::gui::sdl::create_sdl_playable_factory(common::factories *factory)
 
 sdl_renderer_factory::~sdl_renderer_factory()
 {
+}
+
+bool 
+sdl_renderer_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+{
+	if (tag != "" && tag != "audio") return false;
+	if (renderer_uri != NULL && 
+		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererSdl")) != 0 &&
+		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0)
+		return false;
+	return true;
 }
 
 common::playable *

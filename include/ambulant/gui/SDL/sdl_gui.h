@@ -40,6 +40,8 @@ class sdl_renderer_factory : public common::playable_factory {
 	:   m_factory(factory) {}
 	~sdl_renderer_factory();
 		
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const;
+
 	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,

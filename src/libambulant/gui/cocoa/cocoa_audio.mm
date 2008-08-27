@@ -22,6 +22,7 @@
  */
 
 #include "ambulant/gui/cocoa/cocoa_audio.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -35,6 +36,16 @@ using namespace common;
 namespace gui {
 
 namespace cocoa {
+
+
+extern const char cocoa_audio_playable_tag[] = "audio";
+extern const char cocoa_audio_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoaAudio");
+
+common::playable_factory *
+get_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<cocoa_audio_playable, cocoa_audio_playable_tag, cocoa_audio_playable_renderer_uri >(factory, mdp);
+}
 
 cocoa_audio_playable::cocoa_audio_playable(
 	playable_notification *context,

@@ -141,6 +141,21 @@ cocoa_window::need_events(bool want)
 	[pool release];
 }
 
+bool cocoa_renderer_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+{
+	if (tag != "" &&
+		tag != "img" &&
+		tag != "text" &&
+		tag != "brush" &&
+		tag != "audio" &&
+		tag != "video" &&
+		tag != "smilText")
+			return false;
+	if (renderer_uri != NULL && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererCocoa")) != 0)
+			return false;
+	return true;
+}
+
 playable *
 cocoa_renderer_factory::new_playable(
 	playable_notification *context,
