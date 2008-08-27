@@ -28,6 +28,7 @@
 #include "ambulant/gui/none/none_gui.h"
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/parselets.h"
+#include "ambulant/smil2/params.h"
 
 
 //#define AM_DBG
@@ -308,10 +309,17 @@ global_playable_factory_impl::new_playable(
 {
     std::vector<playable_factory *>::iterator i;
     playable *rv;
+	const lib::xml_string& tag = node->get_local_name();
+	smil2::params *params = smil2::params::for_node(node);
+	const char *rname = NULL;
+	if (params)
+		rname = params->get_str("renderer");
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {
-        rv = (*i)->new_playable(context, cookie, node, evp);
-        if (rv) return rv;
+		if ((*i)->supports(tag, rname)) {
+			rv = (*i)->new_playable(context, cookie, node, evp);
+			if (rv) return rv;
+		}
     }
     return m_default_factory->new_playable(context, cookie, node, evp);
 }

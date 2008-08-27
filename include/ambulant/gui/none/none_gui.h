@@ -97,6 +97,11 @@ class none_playable_factory : public common::playable_factory {
   public:
   	none_playable_factory() {}
   	
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	{
+		return true;
+	}
+	
 	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,

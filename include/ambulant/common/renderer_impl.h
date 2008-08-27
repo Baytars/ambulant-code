@@ -199,6 +199,12 @@ class global_playable_factory_impl : public global_playable_factory {
 	/// Add a factory.
     void add_factory(playable_factory *rf);
     
+	/// The global factory supports everything (it says:-)
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	{
+		return true;
+	}
+
 	/// Create a new playable.
     playable *new_playable(
 		playable_notification *context,

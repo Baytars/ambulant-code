@@ -222,6 +222,10 @@ class playable_factory {
   public:
 	virtual ~playable_factory() {};
 	
+	/// Return true if this factory supports nodes of the given element type,
+	/// and param-based name. NULL/empty parameters are ignored.
+	virtual bool supports(const lib::xml_string& tag, const char* renderer_uri) const = 0;
+	
 	/// Create a playable for a given node.
 	virtual playable *new_playable(
 		playable_notification *context,
@@ -253,6 +257,47 @@ class global_playable_factory : public playable_factory {
 /// Factory function to get a (singleton?) global_playable_factory object.
 AMBULANTAPI global_playable_factory *get_global_playable_factory();
 
+/// Template factory for one implementation class
+template<class PlayableClass, const char *Tag, const char *Renderer_uri>
+class single_playable_factory : public playable_factory {
+  public:
+	single_playable_factory(
+		common::factories *factory,
+		common::playable_factory_machdep *mdp)
+	:	m_factory(factory),
+		m_mdp(mdp)
+	{}
+	
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	{
+		if (tag != "" && tag != Tag) return false;
+		if (renderer_uri != NULL && strcmp(renderer_uri, Renderer_uri) != 0) return false;
+		return true;
+	}
+		
+	playable *new_playable(
+		playable_notification *context,
+		playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp)
+	{
+		return new PlayableClass(context, cookie, node, evp, m_factory, m_mdp);
+	}
+	
+	playable *new_aux_audio_playable(
+		playable_notification *context,
+		playable_notification::cookie_type cookie,
+		const lib::node *node,
+		lib::event_processor *evp,
+		net::audio_datasource *src)
+	{
+		return NULL;
+	}
+	
+  private:
+	common::factories *m_factory;
+	common::playable_factory_machdep *m_mdp;
+};
 
 } // namespace common
  
