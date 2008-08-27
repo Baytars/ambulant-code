@@ -44,8 +44,10 @@ renderer_playable::renderer_playable(
 	playable_notification *context,
 	cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor* evp) 
-:	playable_imp(context, cookie, node, evp),
+	lib::event_processor* evp,
+	common::factories *factories,
+	common::playable_factory_machdep *mdp) 
+:	playable_imp(context, cookie, node, evp, factories, mdp),
 	m_dest(0),
 	m_alignment(0),
 	m_activated(false),
@@ -166,8 +168,9 @@ renderer_playable_ds::renderer_playable_ds(
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor *evp,
-	common::factories *factory)
-:	renderer_playable(context, cookie, node, evp),
+	common::factories *factory,
+	common::playable_factory_machdep *mdp)
+:	renderer_playable(context, cookie, node, evp, factory, mdp),
 	m_src(NULL)
 {
 	// XXXX m_src = passive_datasource(node->get_url("src"))->activate()
@@ -329,7 +332,7 @@ global_playable_factory_impl::new_aux_audio_playable(
         if (rv) return rv;
     }
 	
-    return m_default_factory->new_playable(context, cookie, node, evp);
+    return NULL;
 }
 
 global_playable_factory *

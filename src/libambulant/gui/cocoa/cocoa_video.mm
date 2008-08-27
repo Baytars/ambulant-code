@@ -126,8 +126,10 @@ cocoa_video_renderer::cocoa_video_renderer(
 	playable_notification *context,
 	playable_notification::cookie_type cookie,
 	const lib::node *node,
-	event_processor *evp)
-:	renderer_playable(context, cookie, node, evp),
+	event_processor *evp,
+	common::factories *fp,
+	common::playable_factory_machdep *mdp)
+:	renderer_playable(context, cookie, node, evp, fp, mdp),
 	m_url(node->get_url("src")),
 	m_movie(NULL),
 	m_movie_view(NULL),

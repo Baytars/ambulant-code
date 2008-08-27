@@ -56,7 +56,9 @@ class AMBULANTAPI playable_imp : public playable {
 		playable_notification *context,
 		cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor* evp) 
+		lib::event_processor* evp,
+		common::factories *fp,
+		common::playable_factory_machdep *mdp) 
 	:	m_context(context), 
 		m_cookie(cookie),
 		m_node(node),
@@ -89,7 +91,9 @@ class AMBULANTAPI renderer_playable : public playable_imp, public renderer {
 		playable_notification *context,
 		cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor* evp);
+		lib::event_processor* evp,
+		common::factories *fp,
+		common::playable_factory_machdep *mdp);
 			
 	// common::renderer interface
 	void set_surface(common::surface *dest) { m_dest = dest;}
@@ -126,7 +130,8 @@ class AMBULANTAPI renderer_playable_ds : public renderer_playable {
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *evp,
-		common::factories* factory);
+		common::factories* factory,
+		common::playable_factory_machdep *mdp);
 		
 	virtual ~renderer_playable_ds();
 	
@@ -162,8 +167,9 @@ class AMBULANTAPI renderer_playable_dsall : public renderer_playable_ds {
 		playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *evp,
-		common::factories *factory)
-	:	renderer_playable_ds(context, cookie, node, evp, factory),
+		common::factories *factory,
+		common::playable_factory_machdep *mdp)
+	:	renderer_playable_ds(context, cookie, node, evp, factory, mdp),
 		m_data(NULL),
 		m_data_size(0),
 		m_partial_data(NULL),
