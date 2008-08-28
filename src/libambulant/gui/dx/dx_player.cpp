@@ -511,7 +511,7 @@ gui::dx::dx_player::get_main_window() {
 ////////////////////
 // common::playable_factory implementation
 bool
-gui::dx::dx_playable_factory::supports(renderer_select *rs)
+gui::dx::dx_playable_factory::supports(common::renderer_select *rs)
 {
 	const lib::xml_string& tag = rs->get_tag();
 	if (tag != "" &&
