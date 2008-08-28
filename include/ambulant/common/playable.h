@@ -212,7 +212,7 @@ class playable_notification {
 };
 
 /// Machine-dependent auxiliary object to be passed to renderer factories.
-class playable_factory_machdep {
+class AMBULANTAPI playable_factory_machdep {
   public:
 	virtual ~playable_factory_machdep() {}
 };
