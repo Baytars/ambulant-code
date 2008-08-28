@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "AmbulantPlayer.h"
 #include "LogWindow.h"
+#include "ambulant/gui/dx/dx_wmuser.h"
 
 // logwindow_ostream implementation
 
@@ -53,7 +54,10 @@ BEGIN_MESSAGE_MAP(CLogWindow, CDialog)
 //	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
 //	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
 //	ON_BN_CLICKED(IDOK, OnBnClickedOK)
-ON_EN_CHANGE(IDC_RICHEDIT21, OnEnChangeRichedit21)
+	ON_EN_CHANGE(IDC_RICHEDIT21, OnEnChangeRichedit21)
+#ifdef ON_THREADSAFE_LOG
+	ON_MESSAGE(WM_AMBULANT_MESSAGE, OnAmbulantMessage)
+#endif
 END_MESSAGE_MAP()
 
 
@@ -62,10 +66,29 @@ END_MESSAGE_MAP()
 void
 CLogWindow::AppendText(const char *data)
 {
+#ifdef THREAD_SAFE_LOG
+	char *data_copy = strdup(data);
+	PostMessage(WM_AMBULANT_MESSAGE, 0, (LPARAM)data_copy);
+#else
 	USES_CONVERSION;
 	m_richedit.SetSel(-1, -1);
 	m_richedit.ReplaceSel(A2CT(data));
+#endif // THREAD_SAFE_LOG
 }
+
+#ifdef THREAD_SAFE_LOG
+LPARAM
+CLogWindow::OnAmbulantMessage(WPARAM wParam, LPARAM lParam)
+{
+	USES_CONVERSION;
+	char *data = (char *)lParam;
+	m_richedit.SetSel(-1, -1);
+	m_richedit.ReplaceSel(A2CT(data));
+	free(data);
+	return 0;
+}
+#endif // THREAD_SAFE_LOG
+
 void CLogWindow::OnEnChangeRichedit21()
 {
 	// TODO:  If this is a RICHEDIT control, the control will not
