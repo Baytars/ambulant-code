@@ -25,7 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_html.h"
 //#include "ambulant/gui/cocoa/cocoa_transition.h"
 #include "ambulant/common/region_info.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 #include "ambulant/lib/callback.h"
 #include <WebKit/WebKit.h>
 

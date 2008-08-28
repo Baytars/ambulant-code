@@ -25,7 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_dsvideo.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/smil_alignment.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 
 //#define AM_DBG
 #ifndef AM_DBG

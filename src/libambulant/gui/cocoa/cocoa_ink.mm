@@ -26,7 +26,7 @@
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
 #include "ambulant/lib/tree_builder.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 
 #include <Cocoa/Cocoa.h>
 

@@ -36,6 +36,7 @@
 #include "ambulant/common/factory.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
+#include "ambulant/common/renderer_select.h"
 
 namespace ambulant {
 
@@ -200,7 +201,7 @@ class global_playable_factory_impl : public global_playable_factory {
     void add_factory(playable_factory *rf);
     
 	/// The global factory supports everything (it says:-)
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	bool supports(renderer_select *rs)
 	{
 		return true;
 	}
@@ -222,6 +223,7 @@ class global_playable_factory_impl : public global_playable_factory {
   private:
     std::vector<playable_factory *> m_factories;
     playable_factory *m_default_factory;
+	std::map<int, renderer_select*> m_renderer_select;
 };
 
 /// Convience class: a playable_notification that does nothing.

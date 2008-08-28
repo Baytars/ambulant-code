@@ -48,9 +48,6 @@ namespace smil2 {
 using lib::custom_test;
 class state_test_methods_impl;
 
-// Macro for creating an Ambulant systemComponent URI
-#define AM_SYSTEM_COMPONENT(s) "http://www.ambulantplayer.org/component/" s
-
 class AMBULANTAPI test_attrs {
   public:
 	test_attrs(const lib::node *n);

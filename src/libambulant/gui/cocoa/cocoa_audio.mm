@@ -22,7 +22,7 @@
  */
 
 #include "ambulant/gui/cocoa/cocoa_audio.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
