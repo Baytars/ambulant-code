@@ -285,13 +285,17 @@ global_playable_factory_impl::global_playable_factory_impl()
 
 global_playable_factory_impl::~global_playable_factory_impl()
 {
-    // XXXX Should I delete the factories in m_factories? I think
-    // so, but I'm not sure...
-    std::vector<playable_factory*>::iterator i;
-    for(i=m_factories.begin(); i != m_factories.end(); i++)
-		delete (*i);
+	// Clear the renderer selection cache
+	std::map<int, renderer_select*>::iterator ri;
+	for (ri=m_renderer_select.begin(); ri!=m_renderer_select.end(); ri++)
+		delete (*ri).second;
+	m_renderer_select.clear();
+	// Clear the factories
+	delete m_default_factory;
+    std::vector<playable_factory*>::iterator fi;
+    for(fi=m_factories.begin(); fi != m_factories.end(); fi++)
+		delete (*fi);
 	m_factories.clear();
-    delete m_default_factory;
 }
     
 void
@@ -308,20 +312,36 @@ global_playable_factory_impl::new_playable(
 	lib::event_processor *evp)
 {
     std::vector<playable_factory *>::iterator i;
-    playable *rv;
-	const lib::xml_string& tag = node->get_local_name();
-	smil2::params *params = smil2::params::for_node(node);
-	const char *rname = NULL;
-	if (params)
-		rname = params->get_str("renderer");
-    
-    for(i=m_factories.begin(); i != m_factories.end(); i++) {
-		if ((*i)->supports(tag, rname)) {
-			rv = (*i)->new_playable(context, cookie, node, evp);
-			if (rv) return rv;
+	
+	// First make sure we have the node in our renderer selection cache
+	int nid = node->get_numid();
+	if (m_renderer_select.count(nid) == 0) {
+		m_renderer_select[nid] = new renderer_select(node);
+	}
+	renderer_select *rs = m_renderer_select[nid];
+	
+	// If we don't have a renderer selected yet select one
+	playable *rv = NULL;
+    playable_factory *pf = rs->get_playable_factory();
+	if (pf == NULL) {
+		for(i=m_factories.begin(); i != m_factories.end(); i++) {
+			if ((*i)->supports(rs)) {
+				rv = (*i)->new_playable(context, cookie, node, evp);
+				if (rv) {
+					// This one works! Let's remember it for next time.
+					pf = (*i);
+					break;
+				}
+			}
 		}
-    }
-    return m_default_factory->new_playable(context, cookie, node, evp);
+		if (rv == NULL) {
+			// We have no factories that can render this node...
+			rv = m_default_factory->new_playable(context, cookie, node, evp);
+			pf = m_default_factory;
+		}
+		rs->set_playable_factory(pf);
+	}
+	return rv;    
 }
 
 playable *

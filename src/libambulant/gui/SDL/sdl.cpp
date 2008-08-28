@@ -28,7 +28,7 @@
 #include "ambulant/gui/SDL/sdl_factory.h"
 #include "ambulant/gui/SDL/sdl_gui.h"
 #include "ambulant/gui/SDL/sdl_audio.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 
 using namespace ambulant;
 using namespace gui::sdl;
@@ -44,9 +44,11 @@ sdl_renderer_factory::~sdl_renderer_factory()
 }
 
 bool 
-sdl_renderer_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+sdl_renderer_factory::supports(common::renderer_select *rs)
 {
+	const lib::xml_string& tag = rs->get_tag();
 	if (tag != "" && tag != "ref" && tag != "audio") return false;
+	const char *renderer_uri = rs->get_renderer_uri();
 	if (renderer_uri != NULL && 
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererSdl")) != 0 &&
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0)

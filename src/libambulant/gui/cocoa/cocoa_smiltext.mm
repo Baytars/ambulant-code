@@ -25,7 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 #include <Cocoa/Cocoa.h>
 
 #ifndef AM_DBG

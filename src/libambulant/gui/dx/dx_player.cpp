@@ -511,8 +511,9 @@ gui::dx::dx_player::get_main_window() {
 ////////////////////
 // common::playable_factory implementation
 bool
-gui::dx::dx_playable_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+gui::dx::dx_playable_factory::supports(renderer_select *rs)
 {
+	const lib::xml_string& tag = rs->get_tag();
 	if (tag != "" &&
         tag != "ref" &&
 		tag != "img" &&
@@ -522,6 +523,7 @@ gui::dx::dx_playable_factory::supports(const lib::xml_string& tag, const char* r
 		tag != "video" &&
 		tag != "smilText")
 			return false;
+	const char *renderer_uri = rs->get_renderer_uri();
 	if (renderer_uri != NULL && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererDirectX")) != 0)
 			return false;
 	return true;

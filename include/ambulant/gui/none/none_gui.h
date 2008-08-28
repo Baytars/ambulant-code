@@ -97,7 +97,7 @@ class none_playable_factory : public common::playable_factory {
   public:
   	none_playable_factory() {}
   	
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	bool supports(common::renderer_select *)
 	{
 		return true;
 	}

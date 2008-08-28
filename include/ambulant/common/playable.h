@@ -30,6 +30,7 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/refcount.h"
 #include "ambulant/lib/node.h"
+#include "ambulant/common/renderer_select.h"
 
 namespace ambulant {
 
@@ -46,6 +47,7 @@ namespace common {
 
 class renderer;
 class factories;
+class renderer_select;
 
 /// Display mode when the playable is paused.
 enum pause_display {
@@ -222,9 +224,8 @@ class playable_factory {
   public:
 	virtual ~playable_factory() {};
 	
-	/// Return true if this factory supports nodes of the given element type,
-	/// and param-based name. NULL/empty parameters are ignored.
-	virtual bool supports(const lib::xml_string& tag, const char* renderer_uri) const = 0;
+	/// Return true if this factory supports this node.
+	virtual bool supports(renderer_select *) = 0;
 	
 	/// Create a playable for a given node.
 	virtual playable *new_playable(
@@ -268,9 +269,11 @@ class single_playable_factory : public playable_factory {
 		m_mdp(mdp)
 	{}
 	
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	bool supports(renderer_select *rs)
 	{
+		const lib::xml_string& tag = rs->get_tag();
 		if (tag != "" && tag != "ref" && tag != Tag) return false;
+		const char *renderer_uri = rs->get_renderer_uri();
 		if (renderer_uri != NULL && 
             strcmp(renderer_uri, "") != 0 &&
             strcmp(renderer_uri, Renderer_uri) != 0 &&

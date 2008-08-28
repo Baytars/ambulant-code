@@ -25,7 +25,7 @@
 #include "ambulant/config/config.h"
 #include "ambulant/gui/none/none_factory.h"
 #include "ambulant/gui/none/none_video_renderer.h"
-#include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/renderer_select.h"
 
 
 using namespace ambulant;
@@ -42,9 +42,11 @@ none_video_factory::~none_video_factory()
 }
 
 bool 
-none_video_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+none_video_factory::supports(common::renderer_select *rs)
 {
+	const lib::xml_string& tag = rs->get_tag();
 	if (tag != "" && tag != "ref" && tag != "video") return false;
+	const char *renderer_uri = rs->get_renderer_uri();
 	if (renderer_uri && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererNone")) == 0)
 		return true;
 	return false;
