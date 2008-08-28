@@ -51,9 +51,11 @@ class dsvideo_renderer_factory : public common::playable_factory {
 	:   m_factory(factory) {}
 	~dsvideo_renderer_factory() {}
 		
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
+	bool supports(common::renderer_select *rs)
 	{
+		const lib::xml_string& tag = rs->get_tag();
 		if (tag != "" && tag != "video") return false;
+		const char *renderer_uri = rs->get_renderer_uri();
 		if (renderer_uri != NULL && 
 			strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0)
 			return false;

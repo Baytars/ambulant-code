@@ -90,7 +90,7 @@ class dx_playable_factory : public common::playable_factory {
 	////////////////////
 	// common::playable_factory implementation
 
-	bool supports(renderer_select *);
+	  bool supports(common::renderer_select *);
 
 	common::playable *new_playable(
 		common::playable_notification *context,

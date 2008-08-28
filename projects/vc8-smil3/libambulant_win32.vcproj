@@ -905,6 +905,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\libambulant\common\renderer_select.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\libambulant\common\schema.cpp"
 					>
 				</File>
@@ -1453,6 +1457,10 @@
 					</File>
 					<File
 						RelativePath="..\..\include\ambulant\common\renderer_impl.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\ambulant\common\renderer_select.h"
 						>
 					</File>
 					<File

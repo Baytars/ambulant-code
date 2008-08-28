@@ -38,7 +38,7 @@ namespace common {
 
 class playable_factory;
 
-class renderer_select {
+class AMBULANTAPI renderer_select {
   public:
 	renderer_select(const lib::node *n)
 	:	m_node(n),
@@ -69,12 +69,13 @@ class renderer_select {
 	playable_factory *m_pf;
 };
 
+#if 0
 struct renderer_select_template {
 	lib::xml_string tags[];
 	std::string mimetypes[];
 	char *renderer_uris[];
 };
-	
+#endif
 
 } // namespace common
  

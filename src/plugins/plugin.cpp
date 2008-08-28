@@ -40,7 +40,7 @@ class basic_plugin_factory : public common::playable_factory {
 	{}
 	~basic_plugin_factory() {};
 		
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const;
+	bool supports(common::renderer_select *rs);
 
 	common::playable *new_playable(
 		common::playable_notification *context,
@@ -82,8 +82,9 @@ class basic_plugin : public common::playable_imp
 
 
 bool 
-basic_plugin_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
+basic_plugin_factory::supports(common::renderer_select *rs)
 {
+	const char *renderer_uri = rs->get_renderer_uri();
 	// Only use this plugin if explicitly requested. The tag does not matter.
 	if (renderer_uri != NULL && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererDummyPlugin")) == 0)
 		return true;
