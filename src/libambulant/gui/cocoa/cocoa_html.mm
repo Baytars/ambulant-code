@@ -25,6 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_html.h"
 //#include "ambulant/gui/cocoa/cocoa_transition.h"
 #include "ambulant/common/region_info.h"
+#include "ambulant/smil2/test_attrs.h"
 #include "ambulant/lib/callback.h"
 #include <WebKit/WebKit.h>
 
@@ -136,6 +137,22 @@ _get_html_view(common::surface *surf)
 	surf->set_renderer_private_data(my_renderer_id, (common::renderer_private_data *)wvc);
 	return wvc;
 }
+
+
+extern const char cocoa_html_playable_tag[] = "text";
+extern const char cocoa_html_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+extern const char cocoa_html_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererHtml");
+
+common::playable_factory *
+create_cocoa_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<
+        cocoa_html_renderer, 
+        cocoa_html_playable_tag, 
+        cocoa_html_playable_renderer_uri,
+        cocoa_html_playable_renderer_uri2>(factory, mdp);
+}
+
 
 void
 cocoa_html_renderer::start(double where) {

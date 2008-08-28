@@ -64,11 +64,13 @@ create_cocoa_window_factory(void *view)
     return new cocoa_window_factory(view);
 }
 
+#if 0
 common::playable_factory *
 create_cocoa_renderer_factory(common::factories *factory)
 {
     return new cocoa_renderer_factory(factory);
 }
+#endif
 
 cocoa_window::~cocoa_window()
 {
@@ -141,9 +143,11 @@ cocoa_window::need_events(bool want)
 	[pool release];
 }
 
+#if 0
 bool cocoa_renderer_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
 {
 	if (tag != "" &&
+        tag != "ref" &&
 		tag != "img" &&
 		tag != "text" &&
 		tag != "brush" &&
@@ -235,6 +239,7 @@ cocoa_renderer_factory::new_aux_audio_playable(
 {
 	return NULL;
 }
+#endif
 
 lib::size
 cocoa_window_factory::get_default_size()

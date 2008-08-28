@@ -25,6 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_dsvideo.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/smil_alignment.h"
+#include "ambulant/smil2/test_attrs.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -87,6 +88,21 @@ using namespace lib;
 namespace gui {
 
 namespace cocoa {
+
+extern const char cocoa_dsvideo_playable_tag[] = "video";
+extern const char cocoa_dsvideo_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererOpen");
+extern const char cocoa_dsvideo_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+
+common::playable_factory *
+create_cocoa_dsvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<
+        cocoa_dsvideo_renderer, 
+        cocoa_dsvideo_playable_tag, 
+        cocoa_dsvideo_playable_renderer_uri,
+        cocoa_dsvideo_playable_renderer_uri2>(factory, mdp);
+}
+
 
 cocoa_dsvideo_renderer::cocoa_dsvideo_renderer(
 	playable_notification *context,

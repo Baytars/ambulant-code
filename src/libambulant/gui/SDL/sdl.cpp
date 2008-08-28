@@ -46,7 +46,7 @@ sdl_renderer_factory::~sdl_renderer_factory()
 bool 
 sdl_renderer_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
 {
-	if (tag != "" && tag != "audio") return false;
+	if (tag != "" && tag != "ref" && tag != "audio") return false;
 	if (renderer_uri != NULL && 
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererSdl")) != 0 &&
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0)

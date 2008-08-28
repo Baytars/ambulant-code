@@ -24,6 +24,7 @@
 #include "ambulant/gui/cocoa/cocoa_video.h"
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/common/region_info.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #include <Cocoa/Cocoa.h>
 #include <QuickTime/QuickTime.h>
@@ -121,6 +122,20 @@ movieDidDrawFrame(Movie theMovie, long refCon)
 	return 0;
 }
 #endif
+
+extern const char cocoa_video_playable_tag[] = "video";
+extern const char cocoa_video_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+extern const char cocoa_video_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererQuickTime");
+
+common::playable_factory *
+create_cocoa_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<
+        cocoa_video_renderer, 
+        cocoa_video_playable_tag, 
+        cocoa_video_playable_renderer_uri,
+        cocoa_video_playable_renderer_uri2>(factory, mdp);
+}
 
 cocoa_video_renderer::cocoa_video_renderer(
 	playable_notification *context,

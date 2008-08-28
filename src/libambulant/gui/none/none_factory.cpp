@@ -44,10 +44,10 @@ none_video_factory::~none_video_factory()
 bool 
 none_video_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
 {
-	if (tag != "" && tag != "video") return false;
-	if (renderer_uri != NULL && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererNone")) != 0)
-		return false;
-	return true;
+	if (tag != "" && tag != "ref" && tag != "video") return false;
+	if (renderer_uri && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererNone")) == 0)
+		return true;
+	return false;
 }
 
 common::playable *

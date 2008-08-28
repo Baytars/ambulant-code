@@ -102,7 +102,15 @@ mainloop::init_playable_factory()
 #ifdef WITH_CG
 	pf->add_factory(gui::cg::create_cg_renderer_factory(this));
 #else
-	pf->add_factory(gui::cocoa::create_cocoa_renderer_factory(this));
+	pf->add_factory(gui::cocoa::create_cocoa_audio_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_dsvideo_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_fill_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_html_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_image_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_ink_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_smiltext_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_text_playable_factory(this, NULL));
+	pf->add_factory(gui::cocoa::create_cocoa_video_playable_factory(this, NULL));
 #endif
 #ifdef WITH_SDL
     AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop: add factory for SDL");

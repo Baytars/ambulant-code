@@ -42,9 +42,9 @@ extern const char cocoa_audio_playable_tag[] = "audio";
 extern const char cocoa_audio_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoaAudio");
 
 common::playable_factory *
-get_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+create_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
-	return new common::single_playable_factory<cocoa_audio_playable, cocoa_audio_playable_tag, cocoa_audio_playable_renderer_uri >(factory, mdp);
+	return new common::single_playable_factory<cocoa_audio_playable, cocoa_audio_playable_tag, cocoa_audio_playable_renderer_uri, cocoa_audio_playable_renderer_uri >(factory, mdp);
 }
 
 cocoa_audio_playable::cocoa_audio_playable(

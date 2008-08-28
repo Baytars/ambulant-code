@@ -514,6 +514,7 @@ bool
 gui::dx::dx_playable_factory::supports(const lib::xml_string& tag, const char* renderer_uri) const
 {
 	if (tag != "" &&
+        tag != "ref" &&
 		tag != "img" &&
 		tag != "text" &&
 		tag != "brush" &&
