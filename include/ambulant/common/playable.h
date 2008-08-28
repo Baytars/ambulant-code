@@ -258,7 +258,7 @@ class global_playable_factory : public playable_factory {
 AMBULANTAPI global_playable_factory *get_global_playable_factory();
 
 /// Template factory for one implementation class
-template<class PlayableClass, const char *Tag, const char *Renderer_uri>
+template<class PlayableClass, const char *Tag, const char *Renderer_uri, const char *Renderer_uri2>
 class single_playable_factory : public playable_factory {
   public:
 	single_playable_factory(
@@ -270,8 +270,11 @@ class single_playable_factory : public playable_factory {
 	
 	bool supports(const lib::xml_string& tag, const char* renderer_uri) const
 	{
-		if (tag != "" && tag != Tag) return false;
-		if (renderer_uri != NULL && strcmp(renderer_uri, Renderer_uri) != 0) return false;
+		if (tag != "" && tag != "ref" && tag != Tag) return false;
+		if (renderer_uri != NULL && 
+            strcmp(renderer_uri, "") != 0 &&
+            strcmp(renderer_uri, Renderer_uri) != 0 &&
+            strcmp(renderer_uri, Renderer_uri2) != 0) return false;
 		return true;
 	}
 		

@@ -25,7 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
-
+#include "ambulant/smil2/test_attrs.h"
 #include <Cocoa/Cocoa.h>
 
 #ifndef AM_DBG
@@ -89,6 +89,20 @@ _select_font(const char *family, smil2::smiltext_font_style style, smil2::smilte
 	font = [fm convertFont: font toHaveTrait: mask];
 	return font;
 }
+
+extern const char cocoa_smiltext_playable_tag[] = "text";
+extern const char cocoa_smiltext_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+
+common::playable_factory *
+create_cocoa_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<
+        cocoa_smiltext_renderer, 
+        cocoa_smiltext_playable_tag, 
+        cocoa_smiltext_playable_renderer_uri,
+        cocoa_smiltext_playable_renderer_uri>(factory, mdp);
+}
+
 
 cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 		playable_notification *context,

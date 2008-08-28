@@ -25,6 +25,7 @@
 #include "ambulant/gui/cocoa/cocoa_gui.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #include <Cocoa/Cocoa.h>
 
@@ -39,6 +40,21 @@ using namespace lib;
 namespace gui {
 
 namespace cocoa {
+
+extern const char cocoa_text_playable_tag[] = "text";
+extern const char cocoa_text_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+extern const char cocoa_text_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererText");
+
+common::playable_factory *
+create_cocoa_text_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+	return new common::single_playable_factory<
+        cocoa_text_renderer, 
+        cocoa_text_playable_tag, 
+        cocoa_text_playable_renderer_uri,
+        cocoa_text_playable_renderer_uri2>(factory, mdp);
+}
+
 
 cocoa_text_renderer::cocoa_text_renderer(
 		playable_notification *context,
