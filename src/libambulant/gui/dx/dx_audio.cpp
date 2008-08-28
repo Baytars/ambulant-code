@@ -45,8 +45,10 @@ gui::dx::dx_audio_renderer::dx_audio_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor* evp)
-:   common::renderer_playable(context, cookie, node, evp), 
+	lib::event_processor* evp,
+	common::factories *fp,
+	common::playable_factory_machdep *dxplayer)
+:   common::renderer_playable(context, cookie, node, evp, fp, dxplayer), 
 	m_player(0), 
 	m_update_event(0), 
 	m_level(1.0),

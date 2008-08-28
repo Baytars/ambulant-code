@@ -89,7 +89,9 @@ class dx_playable_factory : public common::playable_factory {
 		m_dxplayer(ctx) {}
 	////////////////////
 	// common::playable_factory implementation
-	
+
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const;
+
 	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
