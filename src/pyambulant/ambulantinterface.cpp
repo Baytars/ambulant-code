@@ -5166,6 +5166,7 @@ playable_factory::playable_factory(PyObject *itself)
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	if (itself)
 	{
+		if (!PyObject_HasAttrString(itself, "supports")) PyErr_Warn(PyExc_Warning, "playable_factory: missing attribute: supports");
 		if (!PyObject_HasAttrString(itself, "new_playable")) PyErr_Warn(PyExc_Warning, "playable_factory: missing attribute: new_playable");
 		if (!PyObject_HasAttrString(itself, "new_aux_audio_playable")) PyErr_Warn(PyExc_Warning, "playable_factory: missing attribute: new_aux_audio_playable");
 	}
@@ -5184,6 +5185,34 @@ playable_factory::~playable_factory()
 	PyGILState_Release(_GILState);
 }
 
+
+bool playable_factory::supports(const ambulant::lib::xml_string& tag, const char* renderer_uri) const
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	bool _rv;
+	PyObject *py_tag = Py_BuildValue("s", tag.c_str());
+	PyObject *py_renderer_uri = Py_BuildValue("s", renderer_uri);
+
+	PyObject *py_rv = PyObject_CallMethod(py_playable_factory, "supports", "(OO)", py_tag, py_renderer_uri);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during playable_factory::supports() callback:\n");
+		PyErr_Print();
+	}
+
+	if (py_rv && !PyArg_Parse(py_rv, "O&", bool_Convert, &_rv))
+	{
+		PySys_WriteStderr("Python exception during playable_factory::supports() return:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_tag);
+	Py_XDECREF(py_renderer_uri);
+
+	PyGILState_Release(_GILState);
+	return _rv;
+}
 
 ambulant::common::playable* playable_factory::new_playable(ambulant::common::playable_notification* context, ambulant::common::playable::cookie_type cookie, const ambulant::lib::node* node, ambulant::lib::event_processor* evp)
 {

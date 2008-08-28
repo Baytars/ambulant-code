@@ -9113,6 +9113,26 @@ static void playable_factoryObj_dealloc(playable_factoryObject *self)
 	pycppbridge_Type.tp_dealloc((PyObject *)self);
 }
 
+static PyObject *playable_factoryObj_supports(playable_factoryObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	ambulant::lib::xml_string tag;
+	char* renderer_uri;
+	char *tag_cstr="";
+	if (!PyArg_ParseTuple(_args, "ss",
+	                      &tag_cstr,
+	                      &renderer_uri))
+		return NULL;
+	tag = tag_cstr;
+	PyThreadState *_save = PyEval_SaveThread();
+	bool _rv = _self->ob_itself->supports(tag,
+	                                      renderer_uri);
+	PyEval_RestoreThread(_save);
+	_res = Py_BuildValue("O&",
+	                     bool_New, _rv);
+	return _res;
+}
+
 static PyObject *playable_factoryObj_new_playable(playable_factoryObject *_self, PyObject *_args)
 {
 	PyObject *_res = NULL;
@@ -9165,6 +9185,8 @@ static PyObject *playable_factoryObj_new_aux_audio_playable(playable_factoryObje
 }
 
 static PyMethodDef playable_factoryObj_methods[] = {
+	{"supports", (PyCFunction)playable_factoryObj_supports, 1,
+	 PyDoc_STR("(ambulant::lib::xml_string tag, char* renderer_uri) -> (bool _rv)")},
 	{"new_playable", (PyCFunction)playable_factoryObj_new_playable, 1,
 	 PyDoc_STR("(ambulant::common::playable_notification* context, ambulant::common::playable::cookie_type cookie, ambulant::lib::node* node, ambulant::lib::event_processor* evp) -> (ambulant::common::playable* _rv)")},
 	{"new_aux_audio_playable", (PyCFunction)playable_factoryObj_new_aux_audio_playable, 1,

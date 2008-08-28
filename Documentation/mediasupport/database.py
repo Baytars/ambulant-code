@@ -9,9 +9,9 @@ LINUX=OS("Linux")
 
 # Renderer objects
 
-QT=Renderer("QuickTime")
-DX=Renderer("DirectX")
-FFMPEG=Renderer("ffmpeg")
+QT=Renderer("QuickTime", "http://www.ambulantplayer.org/component/RendererQuickTime")
+DX=Renderer("DirectX", "http://www.ambulantplayer.org/component/RendererDirectX")
+FFMPEG=Renderer("ffmpeg", "http://www.ambulantplayer.org/component/RendererOpen")
 
 # Protocol objects
 FILE=Protocol("file")
