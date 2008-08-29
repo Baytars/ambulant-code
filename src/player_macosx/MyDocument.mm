@@ -730,4 +730,10 @@ document_embedder::aux_open(const ambulant::net::url& auxdoc)
 #endif	
 }
 #endif // WITH_OVERLAY_WINDOW
+
+- (void)windowDidChangeScreen: (NSNotification *)notification
+{
+    [view updateScreenSize];
+}
+
 @end
