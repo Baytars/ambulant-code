@@ -50,12 +50,13 @@ using namespace gui::gtk;
 
 
 gtk_video_renderer::gtk_video_renderer(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *const evp,
-    	common::factories *factory)
-:	gtk_renderer<common::video_renderer>(context, cookie, node, evp, factory),
+	common::playable_notification *context,
+	common::playable_notification::cookie_type cookie,
+	const lib::node *node,
+	lib::event_processor *const evp,
+	common::factories *factory,
+	common::playable_factory_machdep *mdp)
+:	gtk_renderer<common::video_renderer>(context, cookie, node, evp, factory, mdp),
  	m_image(NULL),
   	m_data(NULL),
 	m_img_displayed(0)
