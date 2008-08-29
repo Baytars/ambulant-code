@@ -100,7 +100,11 @@ class wvc_container : public lib::ref_counted_obj {
 	}
 	void hide_generation(int gen) {
 		if (m_generation == gen) {
+#if 0
 			[[m_wvc view] removeFromSuperviewWithoutNeedingDisplay];
+#else
+            [[m_wvc view] performSelectorOnMainThread: @selector(removeFromSuperviewWithoutNeedingDisplay) withObject: nil waitUntilDone: NO];
+#endif
 			m_generation++;
 			AM_DBG lib::logger::get_logger()->debug("wvc_container: %d: hiding HTML view", gen);
 		} else {
