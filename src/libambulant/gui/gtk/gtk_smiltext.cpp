@@ -45,11 +45,13 @@ namespace gui {
 namespace gtk {
 
 gtk_smiltext_renderer::gtk_smiltext_renderer(
-		playable_notification *context,
-		playable_notification::cookie_type cookie,
-		const lib::node *node,
-		event_processor *evp)
-:	gtk_renderer<renderer_playable>(context, cookie, node, evp),
+	playable_notification *context,
+	playable_notification::cookie_type cookie,
+	const lib::node *node,
+	event_processor *evp,
+	common::factories *fp,
+	common::playable_factory_machdep *mdp)
+:	gtk_renderer<renderer_playable>(context, cookie, node, evp, fp, mdp),
 	m_engine(smil2::smiltext_engine(node, evp, this, false)),
 	m_params(m_engine.get_params()),
 	m_motion_done(false),
