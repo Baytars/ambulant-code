@@ -179,6 +179,7 @@ common::playable_factory *create_cocoa_video_playable_factory(common::factories 
 - (bool)isAmbulantWindowInUse;
 - (bool)ignoreResize;
 - (BOOL)isFlipped;
+- (void)updateScreenSize;
 
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::rect *)arect;
 - (ambulant::lib::rect) ambulantRectForNSRect: (const NSRect *)nsrect;

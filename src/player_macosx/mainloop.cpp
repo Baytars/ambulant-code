@@ -70,6 +70,7 @@ mainloop::mainloop(const char *urlstr, void *view, ambulant::common::embedder *a
 	set_embedder(app);
 	AM_DBG lib::logger::get_logger()->debug("mainloop::mainloop(0x%x): created", (void*)this);
     // Set systemComponent values that are relevant
+    smil2::test_attrs::set_default_tests_attrs();
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Standalone"), true);
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version1.9"), true);
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version1.9Exact"), true);

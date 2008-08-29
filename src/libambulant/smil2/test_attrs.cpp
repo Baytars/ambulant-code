@@ -450,8 +450,11 @@ test_attrs::get_state_test_methods()
 {
 	static smil2::state_test_methods_impl *singleton;
 	
-	if (singleton == NULL)
+	if (singleton == NULL) {
+        if(active_tests_attrs_map.empty())
+            set_default_tests_attrs();
 		singleton = new smil2::state_test_methods_impl();
+    }
 	return singleton;
 }
 #endif // WITH_SMIL30

@@ -34,6 +34,7 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/preferences.h"
 #include "ambulant/common/renderer_select.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #include <Cocoa/Cocoa.h>
 
@@ -416,6 +417,7 @@ bad:
 	overlay_window_needs_reparent = NO;
 	overlay_window_needs_flush = NO;
 	overlay_window_needs_clear = NO;
+    [self updateScreenSize];
 	return self;
 }
 
@@ -579,6 +581,21 @@ bad:
 #else
 	return true;
 #endif
+}
+
+- (void)updateScreenSize
+{
+    // XXX Should be called for NSApplicationDidChangeScreenParametersNotification as well
+    NSScreen *screen = [[self window] screen];
+    if (screen) {
+        NSRect rect = [screen frame];
+        ambulant::smil2::test_attrs::set_current_screen_size(int(NSHeight(rect)), int(NSWidth(rect)));
+    }
+}
+
+-(void)viewDidMoveToWindow
+{
+    [self updateScreenSize];
 }
 
 - (void)mouseDown: (NSEvent *)theEvent
@@ -932,6 +949,7 @@ bad:
 // both seem to work.
 - (void) viewDidMoveToSuperview
 {
+    [self updateScreenSize];
 #ifdef WITH_QUICKTIME_OVERLAY
 	if (overlay_window == nil) return;
 	AM_DBG NSLog(@"viewDidMoveToWindow");
