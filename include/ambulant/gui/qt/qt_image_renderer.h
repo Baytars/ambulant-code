@@ -57,7 +57,8 @@ class qt_image_renderer : public qt_renderer<renderer_playable_dsall> {
 		playable_notification::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
-		common::factories *factory)
+		common::factories *fp,
+		common::playable_factory_machdep *mdp)
 	:	qt_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
 	 	m_image(NULL),
 		m_image_loaded(false)

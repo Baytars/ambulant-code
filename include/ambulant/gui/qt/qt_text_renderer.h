@@ -52,7 +52,8 @@ class qt_text_renderer : public qt_renderer<renderer_playable_dsall> {
 				common::playable_notification::cookie_type cookie,
 				const lib::node *node,
 				lib::event_processor *const evp,
-				common::factories *factory);
+				common::factories *factory,
+				common::playable_factory_machdep *mdp);
 	~qt_text_renderer();
 
  	void redraw_body(const lib::rect &r,

@@ -40,8 +40,9 @@ qt_text_renderer::qt_text_renderer(
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
     	lib::event_processor *const evp,
-    	common::factories *factory)
-:	qt_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+    	common::factories *factory,
+		common::playable_factory_machdep *mdp)
+:	qt_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory, mdp),
  	m_text_storage(NULL),
  	m_text_color(0),
  	m_text_font(NULL),
