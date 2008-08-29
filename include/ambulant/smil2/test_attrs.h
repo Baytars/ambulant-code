@@ -82,6 +82,8 @@ class AMBULANTAPI test_attrs {
 	static bool get_current_system_component_value(std::string name);
 	/// Set the value for a systemComponent by name
 	static void set_current_system_component_value(std::string name, bool enabled);
+    /// Set the screen size.  Note the order of the parameters!
+    static void set_current_screen_size(int height, int width);
 #ifdef WITH_SMIL30
 	/// Clear the list of user-preferred languages
 	static void clear_languages();
