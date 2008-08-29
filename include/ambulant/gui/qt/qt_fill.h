@@ -45,7 +45,8 @@ class qt_fill_renderer : public  renderer_playable {
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-		common::factories *factory)
+		common::factories *fp,
+		common::playable_factory_machdep *mdp)
  	:	renderer_playable(context, cookie, node, evp),
 	  	m_is_showing(false),
 		m_intransition(NULL),
