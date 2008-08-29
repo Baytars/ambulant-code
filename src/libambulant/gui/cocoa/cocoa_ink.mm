@@ -27,6 +27,7 @@
 #include "ambulant/smil2/params.h"
 #include "ambulant/lib/tree_builder.h"
 #include "ambulant/common/renderer_select.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #include <Cocoa/Cocoa.h>
 
@@ -50,6 +51,8 @@ extern const char cocoa_ink_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("Rend
 common::playable_factory *
 create_cocoa_ink_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererInk"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererCocoa"), true);
 	return new common::single_playable_factory<
         cocoa_ink_renderer, 
         cocoa_ink_playable_tag, 

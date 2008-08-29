@@ -27,6 +27,7 @@
 #include "ambulant/common/region_info.h"
 #include "ambulant/common/renderer_select.h"
 #include "ambulant/lib/callback.h"
+#include "ambulant/smil2/test_attrs.h"
 #include <WebKit/WebKit.h>
 
 #ifndef AM_DBG
@@ -146,6 +147,8 @@ extern const char cocoa_html_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("Ren
 common::playable_factory *
 create_cocoa_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererCocoa"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererHtml"), true);
 	return new common::single_playable_factory<
         cocoa_html_renderer, 
         cocoa_html_playable_tag, 
