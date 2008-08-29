@@ -5186,14 +5186,13 @@ playable_factory::~playable_factory()
 }
 
 
-bool playable_factory::supports(const ambulant::lib::xml_string& tag, const char* renderer_uri) const
+bool playable_factory::supports(ambulant::common::renderer_select* rs)
 {
 	PyGILState_STATE _GILState = PyGILState_Ensure();
 	bool _rv;
-	PyObject *py_tag = Py_BuildValue("s", tag.c_str());
-	PyObject *py_renderer_uri = Py_BuildValue("s", renderer_uri);
+	PyObject *py_rs = Py_BuildValue("O&", renderer_selectObj_New, rs);
 
-	PyObject *py_rv = PyObject_CallMethod(py_playable_factory, "supports", "(OO)", py_tag, py_renderer_uri);
+	PyObject *py_rv = PyObject_CallMethod(py_playable_factory, "supports", "(O)", py_rs);
 	if (PyErr_Occurred())
 	{
 		PySys_WriteStderr("Python exception during playable_factory::supports() callback:\n");
@@ -5207,8 +5206,7 @@ bool playable_factory::supports(const ambulant::lib::xml_string& tag, const char
 	}
 
 	Py_XDECREF(py_rv);
-	Py_XDECREF(py_tag);
-	Py_XDECREF(py_renderer_uri);
+	Py_XDECREF(py_rs);
 
 	PyGILState_Release(_GILState);
 	return _rv;

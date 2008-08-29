@@ -225,7 +225,7 @@ class playable_factory {
 	virtual ~playable_factory() {};
 	
 	/// Return true if this factory supports this node.
-	virtual bool supports(renderer_select *) = 0;
+	virtual bool supports(renderer_select *rs) = 0;
 	
 	/// Create a playable for a given node.
 	virtual playable *new_playable(

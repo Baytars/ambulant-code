@@ -19,6 +19,7 @@
 #include "ambulant/common/gui_player.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/common/playable.h"
+#include "ambulant/common/renderer_select.h"
 #include "ambulant/common/player.h"
 #include "ambulant/common/region_dim.h"
 #include "ambulant/common/region_info.h"
@@ -834,7 +835,7 @@ public:
 	playable_factory(PyObject *itself);
 	virtual ~playable_factory();
 
-	bool supports(const ambulant::lib::xml_string& tag, const char* renderer_uri) const;
+	bool supports(ambulant::common::renderer_select* rs);
 	ambulant::common::playable* new_playable(ambulant::common::playable_notification* context, ambulant::common::playable::cookie_type cookie, const ambulant::lib::node* node, ambulant::lib::event_processor* evp);
 	ambulant::common::playable* new_aux_audio_playable(ambulant::common::playable_notification* context, ambulant::common::playable::cookie_type cookie, const ambulant::lib::node* node, ambulant::lib::event_processor* evp, ambulant::net::audio_datasource* src);
   private:
@@ -858,7 +859,7 @@ public:
 	virtual ~global_playable_factory();
 
 	void add_factory(ambulant::common::playable_factory* rf);
-	bool supports(const ambulant::lib::xml_string&, const char*) const { abort(); }
+	bool supports(ambulant::common::renderer_select*) { abort(); }
 	ambulant::common::playable* new_playable(ambulant::common::playable_notification*, int, const ambulant::lib::node*, ambulant::lib::event_processor*) { abort(); }
 	ambulant::common::playable* new_aux_audio_playable(ambulant::common::playable_notification *context, int, const ambulant::lib::node *node, ambulant::lib::event_processor *evp, ambulant::net::audio_datasource *src) { abort(); }
   private:
