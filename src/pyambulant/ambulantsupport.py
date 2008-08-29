@@ -605,7 +605,7 @@ animation_destination_object.othermethods = [
 #    "void set_region_dim(const std::string&, const ambulant::common::region_dim&) { abort(); }",
 ]
 global_playable_factory_object.othermethods = [
-    "bool supports(const ambulant::lib::xml_string&, const char*) const { abort(); }",
+    "bool supports(ambulant::common::renderer_select*) { abort(); }",
     "ambulant::common::playable* new_playable(ambulant::common::playable_notification*, int, const ambulant::lib::node*, ambulant::lib::event_processor*) { abort(); }", # XXX
     "ambulant::common::playable* new_aux_audio_playable(ambulant::common::playable_notification *context, int, const ambulant::lib::node *node, ambulant::lib::event_processor *evp, ambulant::net::audio_datasource *src) { abort(); }", # XXX
 ]

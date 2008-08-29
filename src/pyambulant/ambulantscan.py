@@ -76,6 +76,7 @@ class MyScanner(CxxScanner):
             "create_from_tree", # Ifdeffed out, for the time being
             "gdk_pixmap_bitblt",
             "create_gtk_window_factory",
+            "single_playable_factory",
            
         ]
 
