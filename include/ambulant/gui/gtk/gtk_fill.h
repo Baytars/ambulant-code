@@ -48,7 +48,7 @@ class gtk_fill_renderer : public  renderer_playable {
 		lib::event_processor *const evp,
 		common::factories *factory,
 		common::playable_factory_machdep *mdp)
- 	:	renderer_playable(context, cookie, node, evp),
+	  :	renderer_playable(context, cookie, node, evp, factory, mdp),
 	  	m_is_showing(false),
 		m_intransition(NULL),
 		m_outtransition(NULL),
