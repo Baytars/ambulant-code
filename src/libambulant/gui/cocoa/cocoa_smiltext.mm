@@ -91,7 +91,7 @@ _select_font(const char *family, smil2::smiltext_font_style style, smil2::smilte
 	return font;
 }
 
-extern const char cocoa_smiltext_playable_tag[] = "text";
+extern const char cocoa_smiltext_playable_tag[] = "smilText";
 extern const char cocoa_smiltext_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
 
 common::playable_factory *
