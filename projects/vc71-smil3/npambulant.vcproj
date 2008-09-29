@@ -46,7 +46,7 @@
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreDefaultLibraryNames=""
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
+				ModuleDefinitionFile="..\..\src\npambulant\npambulant.def"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/npambulant.pdb"
 				MapExports="FALSE"
@@ -120,7 +120,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="libcpmt.lib"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
+				ModuleDefinitionFile="..\..\src\npambulant\npambulant.def"
 				ProgramDatabaseFile=".\Release/npambulant.pdb"
 				ImportLibrary=".\Release/npambulant.lib"
 				TargetMachine="1"/>
@@ -193,7 +193,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;..\..\\third_party_packages\xulrunner-sdk\sdk\lib&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\lib&quot;;..\..\lib\win32"
 				IgnoreDefaultLibraryNames="LIBCMT;LIBCMTD.lib;libcpmtd.lib"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
+				ModuleDefinitionFile="..\..\src\npambulant\npambulant.def"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/npambulant.pdb"
 				MapExports="FALSE"
@@ -272,7 +272,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				AdditionalLibraryDirectories="&quot;..\..\\third_party_packages\xulrunner-sdk\sdk\lib&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\lib&quot;;..\..\lib\win32"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="LIBCMT"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
+				ModuleDefinitionFile="..\..\src\npambulant\npambulant.def"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Release/npambulant.pdb"
 				SubSystem="0"
@@ -318,10 +318,10 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\npambulant.def">
+				RelativePath="..\..\src\npambulant\npambulant.def">
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\np_entry.cpp">
+				RelativePath="..\..\src\npambulant\np_entry.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -341,7 +341,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\npn_gate.cpp">
+				RelativePath="..\..\src\npambulant\npn_gate.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -361,7 +361,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\npp_gate.cpp">
+				RelativePath="..\..\src\npambulant\npp_gate.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -381,7 +381,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\nsScriptablePeer.cpp">
+				RelativePath="..\..\src\npambulant\nsScriptablePeer.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -401,7 +401,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\plugin.cpp">
+				RelativePath="..\..\src\npambulant\plugin.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -425,7 +425,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\npambulant.idl">
+				RelativePath="..\..\src\npambulant\npambulant.idl">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -472,20 +472,20 @@ c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\nsScriptablePeer.h">
+				RelativePath="..\..\src\npambulant\nsScriptablePeer.h">
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\plugin.h">
+				RelativePath="..\..\src\npambulant\plugin.h">
 			</File>
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\resource.h">
+				RelativePath="..\..\src\npambulant\resource.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\npambulant.rc">
+				RelativePath="..\..\src\npambulant\npambulant.rc">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
