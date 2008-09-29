@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="AmbulantFFplugin"
+	Name="npambulant"
 	ProjectGUID="{4DCBBF00-3086-40AA-B1B7-4FD350835E95}"
-	RootNamespace="AmbulantFFplugin"
+	RootNamespace="npambulant"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>
@@ -28,7 +28,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Debug/AmbulantFFplugin.pch"
+				PrecompiledHeaderFile=".\Debug/npambulant.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -46,11 +46,11 @@
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreDefaultLibraryNames=""
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\AmbulantFFplugin.def"
+				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Debug/AmbulantFFplugin.pdb"
+				ProgramDatabaseFile=".\Debug/npambulant.pdb"
 				MapExports="FALSE"
-				ImportLibrary=".\Debug/AmbulantFFplugin.lib"
+				ImportLibrary=".\Debug/npambulant.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -58,12 +58,12 @@
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/AmbulantFFplugin.tlb"
+				TypeLibraryName=".\Debug/npambulant.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
-copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\AmbulantFFplugin.xpt&quot;
+				CommandLine="copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
+copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -102,7 +102,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\Release/AmbulantFFplugin.pch"
+				PrecompiledHeaderFile=".\Release/npambulant.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -114,15 +114,15 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib"
-				OutputFile=".\Release/AmbulantFFplugin.dll"
+				OutputFile=".\Release/npambulant.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="libcpmt.lib"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\AmbulantFFplugin.def"
-				ProgramDatabaseFile=".\Release/AmbulantFFplugin.pdb"
-				ImportLibrary=".\Release/AmbulantFFplugin.lib"
+				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
+				ProgramDatabaseFile=".\Release/npambulant.pdb"
+				ImportLibrary=".\Release/npambulant.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -130,12 +130,12 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/AmbulantFFplugin.tlb"
+				TypeLibraryName=".\Release/npambulant.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\Release\AmbulantFFplugin.dll  &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
-copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\AmbulantFFplugin.xpt&quot;
+				CommandLine="copy /y .\Release\npambulant.dll  &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
+copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -174,7 +174,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Debug/AmbulantFFplugin.pch"
+				PrecompiledHeaderFile=".\Debug/npambulant.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -193,12 +193,12 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;..\..\\third_party_packages\xulrunner-sdk\sdk\lib&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\lib&quot;;..\..\lib\win32"
 				IgnoreDefaultLibraryNames="LIBCMT;LIBCMTD.lib;libcpmtd.lib"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\AmbulantFFplugin.def"
+				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Debug/AmbulantFFplugin.pdb"
+				ProgramDatabaseFile=".\Debug/npambulant.pdb"
 				MapExports="FALSE"
 				SubSystem="0"
-				ImportLibrary=".\Debug/AmbulantFFplugin.lib"
+				ImportLibrary=".\Debug/npambulant.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -206,12 +206,12 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\Ambu
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/AmbulantFFplugin.tlb"
+				TypeLibraryName=".\Debug/npambulant.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\AmbulantFFplugin.dll &quot;\Program Files\Mozilla Firefox\plugins\npAmbulantFFplugin.dll&quot;
-copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAmbulantFFplugin.xpt&quot;
+				CommandLine="copy /y .\npambulant.dll &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
+copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -252,7 +252,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 				EnableFunctionLevelLinking="TRUE"
 				TreatWChar_tAsBuiltInType="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/AmbulantFFplugin.pch"
+				PrecompiledHeaderFile=".\Release/npambulant.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -272,11 +272,11 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 				AdditionalLibraryDirectories="&quot;..\..\\third_party_packages\xulrunner-sdk\sdk\lib&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\lib&quot;;..\..\lib\win32"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames="LIBCMT"
-				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\AmbulantFFplugin.def"
+				ModuleDefinitionFile="..\..\src\firefox_plugin_win32\npambulant.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\Release/AmbulantFFplugin.pdb"
+				ProgramDatabaseFile=".\Release/npambulant.pdb"
 				SubSystem="0"
-				ImportLibrary=".\Release/AmbulantFFplugin.lib"
+				ImportLibrary=".\Release/npambulant.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -284,12 +284,12 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/AmbulantFFplugin.tlb"
+				TypeLibraryName=".\Release/npambulant.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\AmbulantFFplugin.dll &quot;\Program Files\Mozilla Firefox\plugins\npAmbulantFFplugin.dll&quot;
-copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAmbulantFFplugin.xpt&quot;
+				CommandLine="copy /y .\npambulant.dll &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dll&quot;
+copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -318,7 +318,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\AmbulantFFplugin.def">
+				RelativePath="..\..\src\firefox_plugin_win32\npambulant.def">
 			</File>
 			<File
 				RelativePath="..\..\src\firefox_plugin_win32\np_entry.cpp">
@@ -425,7 +425,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\AmbulantFFplugin.idl">
+				RelativePath="..\..\src\firefox_plugin_win32\npambulant.idl">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
@@ -435,7 +435,7 @@ copy /y .\AmbulantFFplugin.xpt &quot;\Program Files\Mozilla Firefox\plugins\npAm
 c:\moztools\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
 c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
 "
-						Outputs="AmbulantFFplugin.h;AmbulantFFplugin.xpt"/>
+						Outputs="npambulant.h;npambulant.xpt"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32">
@@ -446,7 +446,7 @@ c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\
 c:\moztools\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
 c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
 "
-						Outputs="AmbulantFFplugin.h;AmbulantFFplugin.xpt"/>
+						Outputs="npambulant.h;npambulant.xpt"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="DebugNoShLibNoXerces|Win32">
@@ -457,7 +457,7 @@ c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\
 ..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
 ..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
 "
-						Outputs="AmbulantFFplugin.h;AmbulantFFplugin.xpt"/>
+						Outputs="npambulant.h;npambulant.xpt"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="ReleaseNoShLibNoXerces|Win32">
@@ -468,7 +468,7 @@ c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\
 ..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
 ..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
 "
-						Outputs="AmbulantFFplugin.h;AmbulantFFplugin.xpt"/>
+						Outputs="npambulant.h;npambulant.xpt"/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -485,7 +485,7 @@ c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 			<File
-				RelativePath="..\..\src\firefox_plugin_win32\AmbulantFFplugin.rc">
+				RelativePath="..\..\src\firefox_plugin_win32\npambulant.rc">
 				<FileConfiguration
 					Name="Debug|Win32">
 					<Tool
