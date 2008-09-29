@@ -312,7 +312,7 @@ char* nsPluginInstance::get_document_location()
 
 /* glue code */
 // this macro implements AddRef(), Release() and QueryInterface() members
-NS_IMPL_ISUPPORTS1(nsPluginInstance, nsIAmbulantPlugin)
+NS_IMPL_ISUPPORTS1(nsPluginInstance, npambulant)
 
 // this will start AmbulantPlayer
 NS_IMETHODIMP nsPluginInstance::StartPlayer()
@@ -401,7 +401,7 @@ NPError	nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
   }
   else if (aVariable == NPPVpluginScriptableIID
            || aVariable ==  NPPVpluginScriptableInstance) {
-    static nsIID scriptableIID = AMBULANTFFPLUGIN_IID;
+    static nsIID scriptableIID = NPAMBULANT_IID;
     nsIID* ptr = (nsIID *)NPN_MemAlloc(sizeof(nsIID));
     if (ptr) {
         *ptr = scriptableIID;
