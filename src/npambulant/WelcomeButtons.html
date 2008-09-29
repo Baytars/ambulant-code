@@ -15,17 +15,15 @@ Example for Mozilla Test Case</h1>
 This demo shows the AmbulantPlayer Mozilla plugin.
 You should see the AmbulantPlayer plugin window
 playing the Welcome document.
-The plugin has currently 6 controls (Start,Stop,Restart,Resume,Pause,WatchDone).
-
-Pressing 'WatchDone' while Ambulant is playing will produce a Javascript Alert box,
-when the smil presentation is finished.
+The plugin has currently 5 controls (Start,Stop,Restart,Resume,Pause).
+Also, SMIL 2.1 interaction is supported.
 </p>
 
 </div>
 <h1 align="center">
 
 <embed align="middle" type="application/x-ambulant-smil" 
- src="./Ambulant/Extras/Welcome/Welcome.smil"
+ src="../../Extras/Welcome/Welcome.smil"
  width="241" height="271">
 
 <script>
@@ -55,21 +53,6 @@ function PausePlayer()
 {
   embed.pausePlayer();
 }
-
-function IsDone()
-{
-  var done = embed.isDone();
-  if (done == true) {
-	alert("isDone() returns done="+done);
-  } else {
-	StartTimer (this.timeout)
-  }
-}
-function StartTimer(timeout)
-{
-  this.timeout = timeout
-  this.timer   = setTimeout('IsDone()', timeout);
-}
 </script>
 <form name="formname">
 <input type=button value="Start" onclick='StartPlayer()'>
@@ -77,7 +60,6 @@ function StartTimer(timeout)
 <input type=button value="Restart" onclick='RestartPlayer()'>
 <input type=button value="Resume" onclick='ResumePlayer()'>
 <input type=button value="Pause" onclick='PausePlayer()'>
-<input type=button value="WatchDone" onclick='StartTimer(500)'>
 </form>
 </h1>
 </body>
