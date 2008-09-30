@@ -38,6 +38,8 @@
 #ifdef	XP_WIN32
 #include <cstddef> //XXXX Hack for ptrdiff_t  
 #define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
+#include <windows.h>
+#include <windowsx.h>
 #endif//XP_WIN32
 
 #include "plugin.h"
@@ -177,7 +179,7 @@ nsPluginInstance::~nsPluginInstance()
 	}
 }
 
-#ifdef XP_IN32
+#ifdef XP_WIN32
 int
 strcasecmp(const char* s1, const char* s2) {
 	if (s1 == NULL && s2 == NULL)
@@ -203,7 +205,7 @@ strcasecmp(const char* s1, const char* s2) {
 
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 static WNDPROC lpOldProc = NULL;
-#endif//XP_IN32
+#endif//XP_WIN32
 
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
@@ -568,21 +570,69 @@ nsScriptablePeer* nsPluginInstance::getScriptablePeer()
   return mScriptablePeer;
 }
 
-#if 0
-// XXXJACK: I think (but am not sure) this is cruft leftover from the sample
-// code we started with. If things work this can be ripped out
+#ifdef XP_WIN32
 
-#ifndef XP_UNIX
-static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static ambulant_player_callbacks s_ambulant_player_callbacks;
+
+static LRESULT CALLBACK
+PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  switch (msg) {
-    default:
-      break;
+	nsPluginInstance *plugin = (nsPluginInstance *)GetWindowLong(hWnd, GWL_USERDATA);
+	if (plugin)
+		switch (msg) {
+		case WM_PAINT:
+			{
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint(hWnd, &ps);
+				RECT rc;
+				GetClientRect(hWnd, &rc);
+				FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
+				EndPaint(hWnd, &ps);
+				if (plugin->m_ambulant_player)
+					plugin->m_ambulant_player->redraw(hWnd, hdc);
+				NPRegion invalid_region = CreateRectRgn(rc.left,rc.top,rc.right,rc.bottom);
+				NPN_InvalidateRegion(plugin->getNPP(), invalid_region);
+				break;
+			}
+			break;
+		case WM_LBUTTONDOWN:
+		case WM_MOUSEMOVE:
+			{
+				POINT point;
+				point.x=GET_X_LPARAM(lParam);
+				point.y=GET_Y_LPARAM(lParam);
+
+				if (plugin->m_ambulant_player) {
+					if (msg == WM_MOUSEMOVE) {
+						// code copied from MmView.cpp
+						int new_cursor_id = plugin->m_ambulant_player->get_cursor(point.x, point.y, hWnd);
+//XX					if (new_cursor_id>0) EnableToolTips(TRUE);
+//XX					else CancelToolTips();
+						if(new_cursor_id != plugin->m_cursor_id) {
+							HINSTANCE hIns = 0;
+							HCURSOR new_cursor = 0;
+							if(new_cursor_id == 0) {
+								new_cursor = LoadCursor(hIns, IDC_ARROW); 
+							} else {
+								new_cursor = LoadCursor(hIns, IDC_HAND); 
+							}
+							SetClassLongPtr(hWnd, GCLP_HCURSOR, HandleToLong(new_cursor));
+							plugin->m_cursor_id = new_cursor_id;
+						}
+					} else {
+						plugin->m_ambulant_player->on_click(point.x, point.y, hWnd);
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
   }
 
-  return NULL;
+  return DefWindowProc(hWnd, msg, wParam, lParam);
 }
-#endif // XP_UNIX
+#endif//XP_WIN32
 
 const char* 
 nsPluginInstance::getValue(const char* name)
