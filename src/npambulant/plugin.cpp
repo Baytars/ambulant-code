@@ -41,6 +41,7 @@
 #endif//XP_WIN32
 
 #include "plugin.h"
+#include "nsScriptablePeer.h"
 #include "nsIServiceManager.h"
 #include "nsISupportsUtils.h" // some usefule macros are defined here
 #ifdef WITH_GTK
@@ -79,16 +80,20 @@ extern "C" {
 //
 // general initialization and shutdown
 //
-NPError NS_PluginInitialize()
+NPError
+NS_PluginInitialize()
 {
     return NPERR_NO_ERROR;
 }
 
-void NS_PluginShutdown()
+void
+NS_PluginShutdown()
 {
 }
 
-NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
+NPError
+NS_PluginGetValue(NPPVariable aVariable, void *aValue)
+// 	Retrieve values from the plugin for the Browser. 
 {
     NPError err = NPERR_NO_ERROR;
 	AM_DBG fprintf(stderr, "NS_PluginGetValue(%d)\n", (int)aVariable);
@@ -113,24 +118,26 @@ NPError NS_PluginGetValue(NPPVariable aVariable, void *aValue)
 //
 // construction and destruction of our plugin instance object
 //
-nsPluginInstanceBase * NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
+nsPluginInstanceBase*
+NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
 {
-  AM_DBG fprintf(stderr, "NS_NewPluginInstance(0x%x)\n", aCreateDataStruct);
-  if(!aCreateDataStruct)
-    return NULL;
+	AM_DBG fprintf(stderr, "NS_NewPluginInstance(0x%x)\n", aCreateDataStruct);
+    if(!aCreateDataStruct)
+        return NULL;
 
-  nsPluginInstance * plugin = new nsPluginInstance(aCreateDataStruct->instance);
-  if (plugin)
-	 plugin->mCreateData = *aCreateDataStruct;
-  AM_DBG fprintf(stderr, "NS_NewPluginInstance: created 0x%x.\n",plugin);
-  return plugin;
+    nsPluginInstance * plugin = new nsPluginInstance(aCreateDataStruct->instance);
+    if (plugin)
+        plugin->mCreateData = *aCreateDataStruct;
+    AM_DBG fprintf(stderr, "NS_NewPluginInstance: created 0x%x.\n",plugin);
+    return plugin;
 }
 
-void NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
+void 
+NS_DestroyPluginInstance(nsPluginInstanceBase * aPlugin)
 {
-  AM_DBG fprintf(stderr, "NS_DestroyPluginInstance(0x%x)\n", aPlugin);
-  if(aPlugin)
-    delete (nsPluginInstance *)aPlugin;
+	AM_DBG fprintf(stderr, "NS_DestroyPluginInstance(0x%x)\n", aPlugin);
+    if(aPlugin)
+        delete (nsPluginInstance *)aPlugin;
 }
 } /* extern "C" */
 
@@ -163,13 +170,51 @@ nsPluginInstance::~nsPluginInstance()
 		mScriptablePeer->SetInstance(NULL);
 		NS_IF_RELEASE(mScriptablePeer);
 	}
+	if (m_ambulant_player) {
+		m_ambulant_player->stop();
+		delete m_ambulant_player;
+		m_ambulant_player = NULL;
+	}
 }
 
-NPBool nsPluginInstance::init(NPWindow* aWindow)
+#ifdef XP_IN32
+int
+strcasecmp(const char* s1, const char* s2) {
+	if (s1 == NULL && s2 == NULL)
+		return 0;
+	else if (s1 == NULL)
+		return -1;
+	else if (s2 == NULL)
+		return 1;
+
+	while (*s1 != 0 && *s2 != 0) {
+		if (toupper(*s1) != toupper(*s2))
+			return (toupper(*s1) < toupper(*s2)) ? -1 : 1;
+		s1++;
+		s2++;
+	}
+	if (*s1 == 0 && *s2 == 0)
+		return 0;
+	else if (*s1 == 0)
+		return -1;
+	else
+		return 1;
+}
+
+static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+static WNDPROC lpOldProc = NULL;
+#endif//XP_IN32
+
+NPBool
+nsPluginInstance::init(NPWindow* aWindow)
 {
 	AM_DBG fprintf(stderr, "nsPluginInstance::init(0x%x)\n", aWindow);
-    mNPWindow = aWindow;
+    if(aWindow == NULL)
+		return FALSE;
+	    mNPWindow = aWindow;
     NPError nperr = NPN_GetValue(mInstance, NPNVWindowNPObject, &mNPWindow);
+	if (nperr != NPERR_NO_ERROR)
+		return FALSE;
     // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
 	ambulant::common::plugin_engine *pe = ambulant::common::plugin_engine::get_plugin_engine();
 	void *edptr = pe->get_extra_data("npapi_extra_data");
@@ -179,7 +224,6 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
 	} else {
 		AM_DBG fprintf(stderr, "AmbulantWebKitPlugin: Cannot find npapi_extra_data, cannot communicate NPWindow\n");
 	}
-#ifdef	XP_UNIX
 #ifdef	MOZ_X11
     this->window = (Window) aWindow->window;
     NPSetWindowCallbackStruct *ws_info =
@@ -197,6 +241,23 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
   	gtk_widget_set_size_request(gtkwidget, width, height);
 //  	gtk_widget_set_uposition(gtkwidget, 240, 320);
 #endif // WITH_GTK
+#ifdef	XP_WIN32
+	m_hwnd = (HWND)aWindow->window;
+	if(m_hwnd == NULL)
+		return FALSE;
+	// subclass window so we can intercept window messages and
+	// do our drawing to it
+	lpOldProc = SubclassWindow(m_hwnd, (WNDPROC)PluginWinProc);
+
+	// associate window with our nsPluginInstance object so we can access 
+	// it in the window procedure
+	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
+
+	assert ( ! m_ambulant_player);
+	ambulant::lib::logger::get_logger()->set_show_message(nsPluginInstance::display_message);
+	ambulant::lib::logger::get_logger()->show("Ambulant plugin loaded");
+#endif//XP_WIN32
+
     const char* arg_str = NULL;
     if (mCreateData.argc > 1)
     for (int i =0; i < mCreateData.argc; i++) {
@@ -227,6 +288,7 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
         }
         file_str = strdup(file_url.get_file().c_str());
     }
+	m_url = file_url;
 #ifdef WITH_GTK
     gtk_gui* m_gui = new gtk_gui((char*) gtkwidget, file_str);
     m_mainloop = new gtk_mainloop(m_gui);
@@ -249,18 +311,34 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
         return false;
     m_ambulant_player->start();
 #endif // WITH_CG
-#endif/*XP_UNIX*/
+#ifdef	XP_WIN32
+	m_player_callbacks.set_os_window(m_hwnd);
+	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
+	if (m_ambulant_player)
+		m_ambulant_player->play();
+	mInitialized = TRUE;
+    return TRUE;
+#else //XP_WIN32
 	mInitialized = true;
     return true;
+#endif//XP_WIN32
 }
 
 void nsPluginInstance::shut()
 {
 	AM_DBG fprintf(stderr, "nsPluginInstance::shut()\n");
+#ifdef	XP_WIN32
+    // subclass it back
+    SubclassWindow(m_hwnd, lpOldProc);
+    m_hwnd = NULL;
+    mInitialized = FALSE;
+#else //XP_WIN32
     if (m_mainloop)
         delete m_mainloop;
     m_mainloop = NULL;
     m_ambulant_player = NULL; // deleted by mainloop
+#endif//XP_WIN32
+    mInitialized = FALSE;
 }
 
 NPBool nsPluginInstance::isInitialized()
@@ -318,6 +396,47 @@ char* nsPluginInstance::get_document_location()
     NPN_ReleaseVariantValue(&npvHref);
     return rv;
 }
+#ifdef	XP_WIN32
+
+const char *
+nsPluginInstance::getVersion()
+{
+	return ambulant::get_version();
+}
+
+ambulant_player_callbacks::ambulant_player_callbacks()
+:	m_hwnd(NULL)
+{
+}
+
+void
+ambulant_player_callbacks::set_os_window(HWND hwnd)
+{
+	m_hwnd = hwnd;
+}
+
+
+HWND 
+ambulant_player_callbacks::new_os_window()
+{
+	return m_hwnd;
+}
+
+SIZE
+ambulant_player_callbacks::get_default_size()
+{
+	SIZE size;
+	size.cx = ambulant::common::default_layout_width;
+	size.cy = ambulant::common::default_layout_height;
+	return size;
+}
+
+void
+ambulant_player_callbacks::destroy_os_window(HWND hwnd)
+{
+	m_hwnd = NULL;
+}
+#endif//XP_WIN32
 
 /* glue code */
 // this macro implements AddRef(), Release() and QueryInterface() members
@@ -328,7 +447,7 @@ NS_IMETHODIMP nsPluginInstance::StartPlayer()
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance::StartPlayer()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	m_ambulant_player->start();
+	get_player()->start();
 	return NS_OK;
 }
 
@@ -337,7 +456,7 @@ NS_IMETHODIMP nsPluginInstance::StopPlayer()
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance::StopPlayer()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	m_ambulant_player->stop();
+	get_player()->stop();
 	return NS_OK;
 }
 
@@ -346,8 +465,8 @@ NS_IMETHODIMP nsPluginInstance::RestartPlayer()
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance::RestartPlayer()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	m_ambulant_player->stop();
-	m_ambulant_player->start();
+	get_player()->stop();
+	get_player()->start();
 	return NS_OK;
 }
 
@@ -356,7 +475,7 @@ NS_IMETHODIMP nsPluginInstance::ResumePlayer()
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance::ResumePlayer()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	m_ambulant_player->resume();
+	get_player()->resume();
 	return NS_OK;
 }
 
@@ -365,7 +484,7 @@ NS_IMETHODIMP nsPluginInstance::PausePlayer()
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance::PausePlayer()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	m_ambulant_player->pause();
+	get_player()->pause();
 	return NS_OK;
 }
 
@@ -374,7 +493,7 @@ NS_IMETHODIMP nsPluginInstance::IsDone(PRBool *isdone)
 {
 	AM_DBG lib::logger::get_logger()->debug("nsPluginInstance:IsDone()\n");
 	if (m_ambulant_player == NULL) return NS_ERROR_NOT_AVAILABLE;
-	*isdone = m_ambulant_player->is_done();
+	*isdone = get_player()->is_done();
 	return NS_OK;
 }
 
