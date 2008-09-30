@@ -438,6 +438,13 @@ ambulant_player_callbacks::destroy_os_window(HWND hwnd)
 {
 	m_hwnd = NULL;
 }
+
+
+html_browser*
+ambulant_player_callbacks::new_html_browser(int left, int top, int width, int height)
+{
+	return NULL; // not implemented, but needs to be declared
+}
 #endif//XP_WIN32
 
 /* glue code */
