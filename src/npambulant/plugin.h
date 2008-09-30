@@ -38,6 +38,10 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
+#ifdef	XP_WIN32
+#include "npapi.h"
+#include "npupp.h"
+#endif//XP_WIN32
 #include "pluginbase.h"
 #include "nsScriptablePeer.h"
 #ifdef	XP_UNIX
@@ -59,6 +63,21 @@ class gtk_mainloop;
 class cg_mainloop;
 #endif
 
+#ifdef	XP_WIN32
+#include <ambulant/gui/dx/dx_player.h>
+#include <ambulant/net/url.h>
+class ambulant_player_callbacks : public ambulant::gui::dx::dx_player_callbacks {
+
+public:
+	ambulant_player_callbacks();
+	void set_os_window(HWND hwnd);
+	HWND new_os_window();
+	SIZE get_default_size();
+	void destroy_os_window(HWND);
+	html_browser *new_html_browser(int left, int top, int width, int height);
+	HWND m_hwnd;
+};
+#endif//XP_WIN32
 
 class nsScriptablePeer;
 
@@ -77,23 +96,33 @@ public:
 
   // we need to provide implementation of this method as it will be
   // used by Mozilla to retrive the scriptable peer
-  NPError	GetValue(NPPVariable variable, void *value);
+  NPError GetValue(NPPVariable variable, void *value);
 
   nsScriptablePeer* getScriptablePeer();
 
 private:
+#ifdef	XP_WIN32
+  static NPP s_lastInstance;
+  static void display_message(int level, const char *message);	
+#endif//XP_WIN32
   NPWindow* mNPWindow;
   NPP mInstance;
   NPBool mInitialized;
   nsScriptablePeer * mScriptablePeer;
-
+  ambulant::common::player* get_player() {
+#ifdef	XP_WIN32
+      return m_ambulant_player->get_player();
+#else // XP_WIN
+      return m_ambulant_player;
+#endif//XP_WIN32
+  }
   char* get_document_location();
 
 public:
   char mString[128];
 #ifdef	MOZ_X11
   Window window;
-  Display* display;
+    Display* display;
   int width, height;
 #endif // MOZ_X11
     nsPluginCreateData mCreateData;
@@ -105,19 +134,19 @@ public:
 	void *m_mainloop;
 #endif
     ambulant::lib::logger* m_logger;
-    ambulant::common::player* m_ambulant_player;
-#if 0
-// XXXJACK: I think (but am not sure) this is cruft leftover from the sample
-// code we started with. If things work this can be ripped out
 #ifdef	XP_WIN
+  ambulant::gui::dx::dx_player* m_ambulant_player;
+  ambulant_player_callbacks m_player_callbacks;
   HWND m_hwnd;
-#endif // XP_WIN
+#else // XP_WIN
+    ambulant::common::player* m_ambulant_player;
+#endif// XP_WIN
+  ambulant::net::url m_url;
 
   int m_cursor_id;
 
   NPP getNPP();
   const char* getValue(const char *name);
   const char * getVersion();
-#endif
 };
 #endif // __PLUGIN_H__
