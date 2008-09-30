@@ -35,6 +35,10 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#ifdef	XP_WIN32
+#include <cstddef> //XXXX Hack for ptrdiff_t  
+#define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
+#endif//XP_WIN32
 
 #include "plugin.h"
 #include "nsIServiceManager.h"
@@ -55,7 +59,6 @@
 
 using namespace ambulant;
 
-extern "C" {
 
 //////////////////////////////////////
 //
@@ -64,7 +67,13 @@ extern "C" {
 
 #define PLUGIN_NAME "ambulant plugin"
 #define PLUGIN_DESCRIPTION "W3C Smil 3.0 multimedia player"
+#ifndef	XP_WIN32
+extern "C" {
+#endif//XP_WIN32
 char* mimetypes = "application/smil:.smi:W3C Smil 3.0 Playable Multimedia file;application/smil+xml:.smil:W3C Smil 3.0 Playable Multimedia file;application/x-ambulant-smil:.smil:W3C Smil 3.0 Ambulant Player compatible file;";
+#ifdef	XP_WIN32
+extern "C" {
+#endif//XP_WIN32
 
 //////////////////////////////////////
 //

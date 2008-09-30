@@ -45,6 +45,10 @@
 // The native methods of this class are supposed to
 // be callable from JavaScript
 //
+#ifdef	XP_WIN32
+#include <cstddef> //XXXX Hack for ptrdiff_t  
+#define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
+#endif//XP_WIN32
 #include "nsScriptablePeer.h"
 #ifdef	MOZILLA_TRUNK
 #include "xpconnect/nsIXPConnect.h"
@@ -130,7 +134,8 @@ NS_IMETHODIMP nsScriptablePeer::QueryInterface(const nsIID& aIID, void** aInstan
   // Interfaces we've seen queries for:
   // bed52030-bca6-11d2-ba79-00805f8a5dd7 (nsIXPConnectWrappedJS)
   // 9cc0c2e0-f769-4f14-8cd6-2d2d40466f6c (nsIXPCScriptable)
-  AM_DBG fprintf(stderr, "nsScriptablePeer::QueryInterface: return NS_NOINTERFACE error for IID %s\n", aIID.ToString());
+ // AM_DBG fprintf(stderr, "nsScriptablePeer::QueryInterface: return NS_NOINTERFACE error for IID %s\n", aIID.ToString());
+  AM_DBG fprintf(stderr, "nsScriptablePeer::QueryInterface: return NS_NOINTERFACE error for IID\n");
   return NS_NOINTERFACE; 
 }
 
