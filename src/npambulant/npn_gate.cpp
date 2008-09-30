@@ -39,9 +39,10 @@
 //
 // Implementation of Netscape entry points (NPN_*)
 //
-#ifdef	WIN_32
+#ifdef	XP_WIN32
+#include <cstddef> //XXXX Hack for ptrdiff_t  
 #define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
-#endif//WIN_32
+#endif//XP_WIN32
 #include "npapi.h"
 #include "npupp.h"
 

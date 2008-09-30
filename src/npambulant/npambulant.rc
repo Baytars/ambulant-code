@@ -49,7 +49,7 @@ BEGIN
             VALUE "FileExtents", "smi,smil|smi,smil|smi,smil"
             VALUE "FileOpenName", "SMIL presentation (*.smi,*.smil)|SMIL presentation (*.smi,*.smil)|SMIL presentation (*.smi,*.smil)"
             VALUE "FileVersion", "1.9"
-            VALUE "InternalName", "npscriptable"
+            VALUE "InternalName", "npambulant"
             VALUE "LegalCopyright", "8"
             VALUE "MIMEType", "application/smil|application/smil+xml|application/x-ambulant-smil"
             VALUE "OriginalFilename", "npambulant.dll"
