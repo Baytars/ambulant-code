@@ -639,6 +639,15 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
   return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
+NPP nsPluginInstance::s_lastInstance = NULL;
+
+void
+nsPluginInstance::display_message(int level, const char *message) {
+	if (s_lastInstance)
+		NPN_Status(s_lastInstance, message);
+	// NPN_Status (mInstance, message);
+}
 #endif//XP_WIN32
 
 const char* 
@@ -664,9 +673,6 @@ nsPluginInstance::getNPP()
 
 
 const char* ambulant::get_version() { return "0";}
-#endif
-
-
 
 #ifdef WITH_GTK
 // some fake gtk_gui functions needed by gtk_mainloop
