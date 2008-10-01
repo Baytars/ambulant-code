@@ -84,48 +84,53 @@ class nsScriptablePeer;
 class nsPluginInstance : public nsPluginInstanceBase, npambulant
 {
 public:
-  NS_DECL_ISUPPORTS
-  NS_DECL_NPAMBULANT
 
-  nsPluginInstance(NPP aInstance);
-  ~nsPluginInstance();
-
-  NPBool init(NPWindow* aWindow);
-  void shut();
-  NPBool isInitialized();
-
-  // we need to provide implementation of this method as it will be
-  // used by Mozilla to retrive the scriptable peer
-  NPError GetValue(NPPVariable variable, void *value);
-
-  nsScriptablePeer* getScriptablePeer();
+    nsPluginCreateData mCreateData;
+protected:
 
 private:
-#ifdef	XP_WIN32
-  static NPP s_lastInstance;
-  static void display_message(int level, const char *message);	
-#endif//XP_WIN32
-  NPWindow* mNPWindow;
-  NPP mInstance;
-  NPBool mInitialized;
-  nsScriptablePeer * mScriptablePeer;
-  ambulant::common::player* get_player() {
-#ifdef	XP_WIN32
-      return m_ambulant_player->get_player();
-#else // XP_WIN
-      return m_ambulant_player;
-#endif//XP_WIN32
-  }
-  char* get_document_location();
+    NS_DECL_ISUPPORTS
+    NS_DECL_NPAMBULANT
 
-public:
-  char mString[128];
+    nsPluginInstance(NPP aInstance);
+    ~nsPluginInstance();
+
+    NPBool init(NPWindow* aWindow);
+    void shut();
+    NPBool isInitialized();
+    NPP getNPP();
+    const char* getValue(const char *name);
+    const char * getVersion();
+
+    // we need to provide implementation of this method as it will be
+    // used by Mozilla to retrive the scriptable peer
+    NPError GetValue(NPPVariable variable, void *value);
+
+    nsScriptablePeer* getScriptablePeer();
+
+#ifdef	XP_WIN32
+    static NPP s_lastInstance;
+    static void display_message(int level, const char *message);	
+#endif//XP_WIN32
+    NPWindow* mNPWindow;
+    NPP mInstance;
+    NPBool mInitialized;
+    nsScriptablePeer * mScriptablePeer;
+    ambulant::common::player* get_player() {
+#ifdef	XP_WIN32
+        return m_ambulant_player->get_player();
+#else//!XP_WIN32
+        return m_ambulant_player;
+#endif//XP_WIN32
+    }
+    char* get_document_location();
+    
+    char mString[128];
 #ifdef	MOZ_X11
-  Window window;
+    Window window;
     Display* display;
-  int width, height;
+    int width, height;
 #endif // MOZ_X11
-    nsPluginCreateData mCreateData;
 #ifdef WITH_GTK
     gtk_mainloop* m_mainloop;
 #elif WITH_CG
@@ -134,19 +139,15 @@ public:
 	void *m_mainloop;
 #endif
     ambulant::lib::logger* m_logger;
-#ifdef	XP_WIN
-  ambulant::gui::dx::dx_player* m_ambulant_player;
-  ambulant_player_callbacks m_player_callbacks;
-  HWND m_hwnd;
-#else // XP_WIN
+#ifdef	XP_WIN32
+    ambulant::gui::dx::dx_player* m_ambulant_player;
+    ambulant_player_callbacks m_player_callbacks;
+    HWND m_hwnd;
+#else //!XP_WIN32
     ambulant::common::player* m_ambulant_player;
-#endif// XP_WIN
-  ambulant::net::url m_url;
+#endif// XP_WIN32
+    ambulant::net::url m_url;
 
-  int m_cursor_id;
-
-  NPP getNPP();
-  const char* getValue(const char *name);
-  const char * getVersion();
+    int m_cursor_id;
 };
 #endif // __PLUGIN_H__
