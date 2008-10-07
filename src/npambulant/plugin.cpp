@@ -178,6 +178,32 @@ nsPluginInstance::~nsPluginInstance()
 		m_ambulant_player = NULL;
 	}
 }
+#ifdef	XP_WIN32
+int
+strcasecmp(const char* s1, const char* s2) {
+	if (s1 == NULL && s2 == NULL)
+		return 0;
+	else if (s1 == NULL)
+		return -1;
+	else if (s2 == NULL)
+		return 1;
+
+	while (*s1 != 0 && *s2 != 0) {
+		if (toupper(*s1) != toupper(*s2))
+			return (toupper(*s1) < toupper(*s2)) ? -1 : 1;
+		s1++;
+		s2++;
+	}
+	if (*s1 == 0 && *s2 == 0)
+		return 0;
+	else if (*s1 == 0)
+		return -1;
+	else
+		return 1;
+}
+static  LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+static  WNDPROC lpOldProc = NULL;
+#endif//XP_WIN32
 
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
@@ -512,8 +538,6 @@ nsPluginInstance::getNPP()
 // platform/toolkit specifixc functions
 
 #ifdef XP_WIN32
-///XXXX static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
-static WNDPROC lpOldProc = NULL;
 
 static ambulant_player_callbacks s_ambulant_player_callbacks;
 
@@ -627,29 +651,6 @@ html_browser*
 ambulant_player_callbacks::new_html_browser(int left, int top, int width, int height)
 {
 	return NULL; // not implemented, but needs to be declared
-}
-
-int
-strcasecmp(const char* s1, const char* s2) {
-	if (s1 == NULL && s2 == NULL)
-		return 0;
-	else if (s1 == NULL)
-		return -1;
-	else if (s2 == NULL)
-		return 1;
-
-	while (*s1 != 0 && *s2 != 0) {
-		if (toupper(*s1) != toupper(*s2))
-			return (toupper(*s1) < toupper(*s2)) ? -1 : 1;
-		s1++;
-		s2++;
-	}
-	if (*s1 == 0 && *s2 == 0)
-		return 0;
-	else if (*s1 == 0)
-		return -1;
-	else
-		return 1;
 }
 #endif//XP_WIN32
 
