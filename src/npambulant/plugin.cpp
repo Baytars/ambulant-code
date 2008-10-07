@@ -36,8 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 #ifdef	XP_WIN32
-#include <cstddef> //XXXX Hack for ptrdiff_t  
-#define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
+#include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
+#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #include <windows.h>
 #include <windowsx.h>
 #endif//XP_WIN32
@@ -179,34 +179,6 @@ nsPluginInstance::~nsPluginInstance()
 	}
 }
 
-#ifdef XP_WIN32
-int
-strcasecmp(const char* s1, const char* s2) {
-	if (s1 == NULL && s2 == NULL)
-		return 0;
-	else if (s1 == NULL)
-		return -1;
-	else if (s2 == NULL)
-		return 1;
-
-	while (*s1 != 0 && *s2 != 0) {
-		if (toupper(*s1) != toupper(*s2))
-			return (toupper(*s1) < toupper(*s2)) ? -1 : 1;
-		s1++;
-		s2++;
-	}
-	if (*s1 == 0 && *s2 == 0)
-		return 0;
-	else if (*s1 == 0)
-		return -1;
-	else
-		return 1;
-}
-
-static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
-static WNDPROC lpOldProc = NULL;
-#endif//XP_WIN32
-
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
@@ -265,9 +237,9 @@ nsPluginInstance::init(NPWindow* aWindow)
     for (int i =0; i < mCreateData.argc; i++) {
 // Uncomment next line to see the <EMBED/> attr values	
 //          fprintf(stderr, "arg[%i]:%s=%s\n",i,mCreateData.argn[i],mCreateData.argv[i]);
-            if (strcasecmp(mCreateData.argn[i],"data") == 0)
-                if (arg_str == NULL)
-                    arg_str = mCreateData.argv[i];
+        if (strcasecmp(mCreateData.argn[i],"data") == 0)
+            if (arg_str == NULL)
+                arg_str = mCreateData.argv[i];
             if (strcasecmp(mCreateData.argn[i],"src") == 0)
                 if (arg_str == NULL)
                     arg_str = mCreateData.argv[i];
@@ -334,18 +306,18 @@ void nsPluginInstance::shut()
     SubclassWindow(m_hwnd, lpOldProc);
     m_hwnd = NULL;
     mInitialized = FALSE;
-#else //XP_WIN32
+#else // ! XP_WIN32
     if (m_mainloop)
         delete m_mainloop;
     m_mainloop = NULL;
     m_ambulant_player = NULL; // deleted by mainloop
-#endif//XP_WIN32
-    mInitialized = FALSE;
+#endif// ! XP_WIN32
+    mInitialized = false;
 }
 
 NPBool nsPluginInstance::isInitialized()
 {
-  return mInitialized;
+	return mInitialized;
 }
 
 /// Get the location of the html document.
@@ -398,54 +370,6 @@ char* nsPluginInstance::get_document_location()
     NPN_ReleaseVariantValue(&npvHref);
     return rv;
 }
-#ifdef	XP_WIN32
-
-const char *
-nsPluginInstance::getVersion()
-{
-	return ambulant::get_version();
-}
-
-ambulant_player_callbacks::ambulant_player_callbacks()
-:	m_hwnd(NULL)
-{
-}
-
-void
-ambulant_player_callbacks::set_os_window(HWND hwnd)
-{
-	m_hwnd = hwnd;
-}
-
-
-HWND 
-ambulant_player_callbacks::new_os_window()
-{
-	return m_hwnd;
-}
-
-SIZE
-ambulant_player_callbacks::get_default_size()
-{
-	SIZE size;
-	size.cx = ambulant::common::default_layout_width;
-	size.cy = ambulant::common::default_layout_height;
-	return size;
-}
-
-void
-ambulant_player_callbacks::destroy_os_window(HWND hwnd)
-{
-	m_hwnd = NULL;
-}
-
-
-html_browser*
-ambulant_player_callbacks::new_html_browser(int left, int top, int width, int height)
-{
-	return NULL; // not implemented, but needs to be declared
-}
-#endif//XP_WIN32
 
 /* glue code */
 // this macro implements AddRef(), Release() and QueryInterface() members
@@ -517,67 +441,79 @@ NS_IMETHODIMP nsPluginInstance::IsDone(PRBool *isdone)
 // in the bin/components folder
 NPError	nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 {
-  AM_DBG fprintf(stderr, "nsPluginInstance::GetValue(%d)\n", (int)aVariable);
-  NPError rv = NPERR_NO_ERROR;
+	AM_DBG fprintf(stderr, "nsPluginInstance::GetValue(%d)\n", (int)aVariable);
+    NPError rv = NPERR_NO_ERROR;
 
 
-  if (aVariable == NPPVpluginScriptableInstance
-#if 0
-		// Jack added this one: it's what Safari seems to use. No idea
-		// whether that's really correct, though...
-		// ... And it seems it isn't: Safari wants another type of object.
-		|| aVariable == NPPVpluginScriptableNPObject
-#endif
-		) {
-    // addref happens in getter, so we don't addref here
-    nsScriptablePeer * scriptablePeer = getScriptablePeer();
-    if (scriptablePeer) {
-        *(void**)aValue = (void*)scriptablePeer;
-    } else
-      rv = NPERR_OUT_OF_MEMORY_ERROR;
-  }
-  else if (aVariable == NPPVpluginScriptableIID
-           || aVariable ==  NPPVpluginScriptableInstance) {
-    static nsIID scriptableIID = NPAMBULANT_IID;
-    nsIID* ptr = (nsIID *)NPN_MemAlloc(sizeof(nsIID));
-    if (ptr) {
-        *ptr = scriptableIID;
+    if (aVariable == NPPVpluginScriptableInstance) {
+        // addref happens in getter, so we don't addref here
+        nsScriptablePeer * scriptablePeer = getScriptablePeer();
+        if (scriptablePeer) {
+            *(void**)aValue = (void*)scriptablePeer;
+        } else
+            rv = NPERR_OUT_OF_MEMORY_ERROR;
+    }
+    else if (aVariable == NPPVpluginScriptableIID
+             || aVariable ==  NPPVpluginScriptableInstance) {
+        static nsIID scriptableIID = NPAMBULANT_IID;
+        nsIID* ptr = (nsIID *)NPN_MemAlloc(sizeof(nsIID));
+        if (ptr) {
+            *ptr = scriptableIID;
         *(nsIID **)aValue = ptr;
-    } else
-      rv = NPERR_OUT_OF_MEMORY_ERROR;
-  }
-  else if (aVariable ==  NPPVpluginNeedsXEmbed) {
+        } else
+            rv = NPERR_OUT_OF_MEMORY_ERROR;
+    }
+    else if (aVariable ==  NPPVpluginNeedsXEmbed) {
 	    *(PRBool *) aValue = PR_TRUE;
 	    rv = NPERR_NO_ERROR;
-  } else  {
-	*(void**) aValue = NULL;
-	rv = NPERR_INVALID_PARAM;
-  }
-  return rv;
+    } else  {
+        *(void**) aValue = NULL;
+        rv = NPERR_INVALID_PARAM;
+    }
+    return rv;
 }
 
-// ==============================
-// ! Scriptability related code !
-// ==============================
-//
 // this method will return the scriptable object (and create it if necessary)
 nsScriptablePeer* nsPluginInstance::getScriptablePeer()
 {
-  AM_DBG fprintf(stderr, "nsPluginInstance::getScriptablePeer()\n");
-  if (!mScriptablePeer) {
-    mScriptablePeer = new nsScriptablePeer(this);
-    if(!mScriptablePeer)
-      return NULL;
-
+    AM_DBG fprintf(stderr, "nsPluginInstance::getScriptablePeer()\n");
+    if (!mScriptablePeer) {
+        mScriptablePeer = new nsScriptablePeer(this);
+        if(!mScriptablePeer)
+            return NULL;
+    }
+    // add reference for the caller requesting the object
     NS_ADDREF(mScriptablePeer);
-  }
-
-  // add reference for the caller requesting the object
-  NS_ADDREF(mScriptablePeer);
-  return mScriptablePeer;
+    return mScriptablePeer;
 }
 
+
+const char* 
+nsPluginInstance::getValue(const char* name)
+{
+	std::string wanted(name);
+	int i;
+	char** np = mCreateData.argn; 
+	char** vp = mCreateData.argv;
+	for (i = 0; i < mCreateData.argc; i++) {
+		const std::string current((const char*)np[i]);
+		if (current == wanted)
+			return (const char*) vp[i];
+	}
+	return NULL;
+}
+
+NPP
+nsPluginInstance::getNPP()
+{
+	return mCreateData.instance;
+}
+
+// platform/toolkit specifixc functions
+
 #ifdef XP_WIN32
+///XXXX static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+static WNDPROC lpOldProc = NULL;
 
 static ambulant_player_callbacks s_ambulant_player_callbacks;
 
@@ -628,16 +564,15 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						}
 					} else {
 						plugin->m_ambulant_player->on_click(point.x, point.y, hWnd);
-				}
-			}
-			break;
-
-		default:
-			break;
-		}
-  }
-
-  return DefWindowProc(hWnd, msg, wParam, lParam);
+                    }
+                }
+                break;
+                
+            default:
+                break;
+            }
+        }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 NPP nsPluginInstance::s_lastInstance = NULL;
@@ -646,31 +581,77 @@ void
 nsPluginInstance::display_message(int level, const char *message) {
 	if (s_lastInstance)
 		NPN_Status(s_lastInstance, message);
-	// NPN_Status (mInstance, message);
+}
+
+const char *
+nsPluginInstance::getVersion()
+{
+	return ambulant::get_version();
+}
+
+ambulant_player_callbacks::ambulant_player_callbacks()
+:	m_hwnd(NULL)
+{
+}
+
+void
+ambulant_player_callbacks::set_os_window(HWND hwnd)
+{
+	m_hwnd = hwnd;
+}
+
+
+HWND 
+ambulant_player_callbacks::new_os_window()
+{
+	return m_hwnd;
+}
+
+SIZE
+ambulant_player_callbacks::get_default_size()
+{
+	SIZE size;
+	size.cx = ambulant::common::default_layout_width;
+	size.cy = ambulant::common::default_layout_height;
+	return size;
+}
+
+void
+ambulant_player_callbacks::destroy_os_window(HWND hwnd)
+{
+	m_hwnd = NULL;
+}
+
+
+html_browser*
+ambulant_player_callbacks::new_html_browser(int left, int top, int width, int height)
+{
+	return NULL; // not implemented, but needs to be declared
+}
+
+int
+strcasecmp(const char* s1, const char* s2) {
+	if (s1 == NULL && s2 == NULL)
+		return 0;
+	else if (s1 == NULL)
+		return -1;
+	else if (s2 == NULL)
+		return 1;
+
+	while (*s1 != 0 && *s2 != 0) {
+		if (toupper(*s1) != toupper(*s2))
+			return (toupper(*s1) < toupper(*s2)) ? -1 : 1;
+		s1++;
+		s2++;
+	}
+	if (*s1 == 0 && *s2 == 0)
+		return 0;
+	else if (*s1 == 0)
+		return -1;
+	else
+		return 1;
 }
 #endif//XP_WIN32
-
-const char* 
-nsPluginInstance::getValue(const char* name)
-{
-	std::string wanted(name);
-	int i;
-	char** np = mCreateData.argn; 
-	char** vp = mCreateData.argv;
-	for (i = 0; i < mCreateData.argc; i++) {
-		const std::string current((const char*)np[i]);
-		if (current == wanted)
-			return (const char*) vp[i];
-	}
-	return NULL;
-}
-
-NPP
-nsPluginInstance::getNPP()
-{
-	return mCreateData.instance;
-}
-
 
 const char* ambulant::get_version() { return "0";}
 
@@ -682,16 +663,16 @@ GtkWidget* gtk_gui::get_document_container() { return m_documentcontainer; }
 gtk_gui::gtk_gui(const char* s, const char* s2) {
     memset (this, 0, sizeof(gtk_gui));
     m_toplevelcontainer = (GtkWindow*) s;
-	m_documentcontainer = gtk_drawing_area_new();
-	gtk_widget_hide(m_documentcontainer);
+    m_documentcontainer = gtk_drawing_area_new();
+    gtk_widget_hide(m_documentcontainer);
 //XXXX FIXME vbox only needed to give	m_documentcontainer a parent widget at *draw() callback time
-	m_guicontainer = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));
-	gtk_box_pack_start (GTK_BOX(m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
+    m_guicontainer = gtk_vbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(m_toplevelcontainer), GTK_WIDGET (m_guicontainer));
+    gtk_box_pack_start (GTK_BOX(m_guicontainer), m_documentcontainer, TRUE, TRUE, 0);
 //XXXX not used:  m_guicontainer = menubar = NULL;
 //XXXX FIXME <EMBED src="xxx" ../> attr value is 2nd contructor arg.
     m_smilfilename = s2;
-	main_loop = g_main_loop_new(NULL, FALSE);
+    main_loop = g_main_loop_new(NULL, FALSE);
 }
 
 gtk_gui::~gtk_gui() {

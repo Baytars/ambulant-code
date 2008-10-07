@@ -38,32 +38,31 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
+// mozilla includes
 #ifdef	XP_WIN32
 #include "npapi.h"
 #include "npupp.h"
 #endif//XP_WIN32
 #include "pluginbase.h"
 #include "nsScriptablePeer.h"
-#ifdef	XP_UNIX
+
+// ambulant player includes
+#include "ambulant/version.h"
+#include "ambulant/common/player.h"
+#include "ambulant/net/url.h"
+#include "ambulant/lib/logger.h"
+
+// graphic toolkit includes
 #ifdef	MOZ_X11
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #endif // MOZ_X11
-#endif // XP_UNIX
-
-#include "ambulant/version.h"
-#include "ambulant/common/player.h"
-#include "ambulant/net/url.h"
-#include "ambulant/lib/logger.h"
-#ifdef WITH_GTK
+#ifdef	WITH_GTK
 class gtk_mainloop;
-#endif
-#ifdef WITH_CG
+#elif	WITH_CG
 class cg_mainloop;
-#endif
-
-#ifdef	XP_WIN32
+#elif	XP_WIN32
 #include <ambulant/gui/dx/dx_player.h>
 #include <ambulant/net/url.h>
 class ambulant_player_callbacks : public ambulant::gui::dx::dx_player_callbacks {
@@ -77,8 +76,11 @@ public:
 	html_browser *new_html_browser(int left, int top, int width, int height);
 	HWND m_hwnd;
 };
-#endif//XP_WIN32
+#else
+#error None of WITH_GTK/WITH_CG/XP_WIN32 defined: no graphic toolkit available
+#endif//WITH_GTK/WITH_CG/XP_WIN32
 
+// class definition
 class nsScriptablePeer;
 
 class nsPluginInstance : public nsPluginInstanceBase, npambulant
@@ -103,34 +105,27 @@ private:
     const char * getVersion();
 
     // we need to provide implementation of this method as it will be
-    // used by Mozilla to retrive the scriptable peer
+    // used by Mozilla to retrieve the scriptable peer
     NPError GetValue(NPPVariable variable, void *value);
-
     nsScriptablePeer* getScriptablePeer();
+    char* get_document_location();
 
-#ifdef	XP_WIN32
-    static NPP s_lastInstance;
-    static void display_message(int level, const char *message);	
-#endif//XP_WIN32
     NPWindow* mNPWindow;
     NPP mInstance;
     NPBool mInitialized;
     nsScriptablePeer * mScriptablePeer;
-    ambulant::common::player* get_player() {
-#ifdef	XP_WIN32
-        return m_ambulant_player->get_player();
-#else//!XP_WIN32
-        return m_ambulant_player;
-#endif//XP_WIN32
-    }
-    char* get_document_location();
     
     char mString[128];
+    ambulant::lib::logger* m_logger;
+    ambulant::net::url m_url;
+    int m_cursor_id;
+
 #ifdef	MOZ_X11
     Window window;
     Display* display;
     int width, height;
 #endif // MOZ_X11
+
 #ifdef WITH_GTK
     gtk_mainloop* m_mainloop;
 #elif WITH_CG
@@ -138,16 +133,21 @@ private:
 #else
 	void *m_mainloop;
 #endif
-    ambulant::lib::logger* m_logger;
+
 #ifdef	XP_WIN32
-    ambulant::gui::dx::dx_player* m_ambulant_player;
     ambulant_player_callbacks m_player_callbacks;
     HWND m_hwnd;
+    ambulant::gui::dx::dx_player* m_ambulant_player;
+    ambulant::common::player* get_player() {
+        return m_ambulant_player->get_player();
+    }
+    static NPP s_lastInstance;
+    static void display_message(int level, const char *message);	
 #else //!XP_WIN32
     ambulant::common::player* m_ambulant_player;
+    ambulant::common::player* get_player() {
+        return m_ambulant_player;
+    }
 #endif// XP_WIN32
-    ambulant::net::url m_url;
-
-    int m_cursor_id;
 };
 #endif // __PLUGIN_H__
