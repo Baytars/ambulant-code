@@ -42,13 +42,12 @@
 //
 //
 #ifdef	XP_WIN32
-#include <cstddef> //XXXX Hack for ptrdiff_t  
-#define ptrdiff_t long int // for ptrdiff_t in xulrunner-sdk (GeckoSDK 1.9 and Vc7)
+#include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
+#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//XP_WIN32
+
 #include "pluginbase.h"
 
-//#include "plugin.h"
-//#include "nsScriptablePeer.h"
 #ifndef	XP_WIN32
 extern "C" {
 #endif// ! XP_WIN32
