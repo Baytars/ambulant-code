@@ -60,7 +60,7 @@ NPNetscapeFuncs NPNFuncs;
 
 extern "C" {
 NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* pFuncs);
-}
+}; // extern "C"
 
 NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 {
@@ -212,3 +212,4 @@ NPError OSCALL NP_Shutdown()
 {
   return NPERR_NO_ERROR;
 }
+

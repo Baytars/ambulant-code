@@ -494,7 +494,7 @@ NPError	nsPluginInstance::GetValue(NPPVariable aVariable, void *aValue)
 	    rv = NPERR_NO_ERROR;
     } else  {
         *(void**) aValue = NULL;
-        rv = NPERR_INVALID_PARAM;
+//        rv = NPERR_INVALID_PARAM;
     }
     return rv;
 }

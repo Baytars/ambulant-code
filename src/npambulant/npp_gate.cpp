@@ -42,6 +42,7 @@
 //
 //
 #ifdef	XP_WIN32
+//#undef _GLOBAL_USING
 #include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//XP_WIN32
