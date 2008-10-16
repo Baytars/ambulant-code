@@ -24,7 +24,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;..\..\third_party_packages\xulrunner-sdk&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\sdk\include&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\plugin&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\nspr&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\java&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\js&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\xpcom&quot;;..\..\include;&quot;..\..\projects\vc71-smil3&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;XML_STATIC;AMBULANT_BUILD_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_EXTERNAL_DOM;WITH_SMIL30;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;_X86_;NPSIMPLE_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;XP_WIN32;AMBULANT_USE_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_EXTERNAL_DOM;WITH_SMIL30;XPCOM_GLUE;MOZILLA_STRICT_API;$(NOINHERIT)"
+				GeneratePreprocessedFile="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				BufferSecurityCheck="FALSE"
@@ -36,6 +37,7 @@
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
+				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
 				CompileAs="2"/>
 			<Tool
@@ -44,7 +46,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="TRUE"
 				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32_D.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcom.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcomglue_s.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib ..\..\lib\win32\xerces-depdom_2.lib"
-				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
+				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName)_D.dll"
 				LinkIncremental="0"
 				SuppressStartupBanner="FALSE"
 				AdditionalLibraryDirectories="..\..\lib\win32"
@@ -66,8 +68,7 @@
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\npambulant.dll &quot;\Program Files\Mozilla Firefox\plugins\npambulant.dllxpt&quot;
-copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
+				CommandLine="copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -329,7 +330,6 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="_DEBUG;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -352,7 +352,6 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="_DEBUG;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -372,7 +371,6 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="_DEBUG;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -392,7 +390,6 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="_DEBUG;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -412,7 +409,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="_DEBUG;XP_WIN32;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="XP_WIN"
 						BasicRuntimeChecks="3"/>
 				</FileConfiguration>
 				<FileConfiguration
