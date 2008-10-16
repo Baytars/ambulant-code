@@ -314,6 +314,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 #ifdef	XP_WIN32
 	m_player_callbacks.set_os_window(m_hwnd);
 	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
+	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
 	if (m_ambulant_player)
 		m_ambulant_player->play();
 	mInitialized = TRUE;
@@ -654,7 +655,7 @@ ambulant_player_callbacks::new_html_browser(int left, int top, int width, int he
 }
 #endif//XP_WIN32
 
-const char* ambulant::get_version() { return "0";}
+//const char* ambulant::get_version() { return "0";}
 
 #ifdef WITH_GTK
 // some fake gtk_gui functions needed by gtk_mainloop

@@ -104,7 +104,6 @@ NS_IMETHODIMP_(nsrefcnt) nsScriptablePeer::Release()
   } 
   return mRefCnt; 
 } 
-
 // here nsScriptablePeer should return three interfaces it can be asked for by their iid's
 // static casts are necessary to ensure that correct pointer is returned
 NS_IMETHODIMP nsScriptablePeer::QueryInterface(const nsIID& aIID, void** aInstancePtr) 

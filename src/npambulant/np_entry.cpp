@@ -76,8 +76,9 @@ NPError OSCALL NP_GetEntryPoints(NPPluginFuncs* pFuncs)
 // As yet, out plugin does not use any of the new functions in Firefox 3.0
 //  if(pFuncs->size < sizeof(NPPluginFuncs))
 //    return NPERR_INVALID_FUNCTABLE_ERROR;
-  memset(pFuncs, 0, sizeof(NPPluginFuncs));
-  pFuncs->size = sizeof(NPPluginFuncs);
+//  memset(pFuncs, 0, sizeof(NPPluginFuncs));
+//  pFuncs->size = sizeof(NPPluginFuncs);
+  memset(pFuncs, 0, pFuncs->size);	
   pFuncs->version       = (NP_VERSION_MAJOR << 8) | NP_VERSION_MINOR;
   pFuncs->newp          = NPP_New;
   pFuncs->destroy       = NPP_Destroy;
