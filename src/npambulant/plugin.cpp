@@ -38,6 +38,7 @@
 #ifdef	XP_WIN32
 #include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+#define _PTRDIFF_T_DEFINED
 #include <windows.h>
 #include <windowsx.h>
 #endif//XP_WIN32
@@ -159,6 +160,7 @@ nsPluginInstance::nsPluginInstance(NPP aInstance)
   mScriptablePeer(NULL)
 {
 	AM_DBG fprintf(stderr, "nsPluginInstance::nsPluginInstance(0x%x)\n", aInstance);
+	s_last_instance = aInstance;
 }
 
 nsPluginInstance::~nsPluginInstance()
@@ -314,7 +316,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 #ifdef	XP_WIN32
 	m_player_callbacks.set_os_window(m_hwnd);
 	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
-	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
+//X	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
 	if (m_ambulant_player)
 		m_ambulant_player->play();
 	mInitialized = TRUE;
@@ -510,6 +512,8 @@ nsScriptablePeer* nsPluginInstance::getScriptablePeer()
             return NULL;
     }
     // add reference for the caller requesting the object
+	// and for ourself
+    NS_ADDREF(mScriptablePeer);
     NS_ADDREF(mScriptablePeer);
     return mScriptablePeer;
 }
@@ -600,12 +604,12 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-NPP nsPluginInstance::s_lastInstance = NULL;
+NPP nsPluginInstance::s_last_instance = NULL;
 
 void
 nsPluginInstance::display_message(int level, const char *message) {
-	if (s_lastInstance)
-		NPN_Status(s_lastInstance, message);
+	if (s_last_instance)
+		NPN_Status(s_last_instance, message);
 }
 
 const char *
