@@ -41,6 +41,7 @@
 // Implementation of plugin entry points (NPP_*)
 //
 //
+//#define DEBUG
 #ifdef	XP_WIN32
 //#undef _GLOBAL_USING
 #include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
@@ -84,8 +85,11 @@ NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn
 {   
 #ifdef DEBUG
 	  char *id = "NPP_New";
-	  fprintf(stderr, "%s: %s=0x%x.\n",id,"instance",instance);
+	  fprintf(stderr, "%s: %s=0x%x type=%s argc= %dargs=:\n",id,"instance",instance,pluginType,argc);
+	  for (int i=0;i<argc;i++)
+		  fprintf(stderr, "\t%s\n",argv[i]);
 #endif
+
 	if(instance == NULL)
 		return NPERR_INVALID_INSTANCE_ERROR;
 
@@ -102,6 +106,8 @@ NPP_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn
 	ds.argn     = argn; 
 	ds.argv     = argv; 
 	ds.saved    = saved;
+
+	assert(instance->pdata == NULL);
 
 	nsPluginInstanceBase * plugin = NS_NewPluginInstance(&ds);
 	if(plugin == NULL)

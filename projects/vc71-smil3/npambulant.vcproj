@@ -39,6 +39,7 @@
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
+				CallingConvention="0"
 				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -118,14 +119,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-
 				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcom.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcomglue_s.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib ..\..\lib\win32\xerces-depdom_2.lib"
 				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
-				LinkIncremental="1"
+				LinkIncremental="0"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreAllDefaultLibraries="FALSE"
-				IgnoreDefaultLibraryNames="libcpmt.lib"
+				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile="..\..\src\npambulant\npambulant.def"
 				ProgramDatabaseFile=".\Release/npambulant.pdb"
 				ImportLibrary=".\Release/npambulant.lib"
@@ -337,8 +337,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;XP_WIN32;_DEBUG;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -359,8 +358,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;XP_WIN32;_DEBUG;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -378,8 +376,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;XP_WIN32;_DEBUG;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -397,8 +394,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="NDEBUG;XP_WIN32;_DEBUG;MOZILLA_STRICT_API;XPCOM_GLUE;XP_WIN;_X86_;WIN32;_WINDOWS;_MBCS;_USRDLL;NPSIMPLE_EXPORTS;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 			</File>
 			<File
@@ -417,7 +413,7 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 			</File>
 		</Filter>
@@ -443,8 +439,8 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 						Name="VCCustomBuildTool"
 						Description="Running the XPIDL compiler and linker for $(InputName)"
 						CommandLine="echo %cd%
-c:\moztools\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
-c:\moztools\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\xpcom\idl &quot;$(InputPath)&quot;
+..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
+..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
 "
 						Outputs="npambulant.h;npambulant.xpt"/>
 				</FileConfiguration>

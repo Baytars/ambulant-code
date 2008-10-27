@@ -97,7 +97,8 @@ NS_IMETHODIMP_(nsrefcnt) nsScriptablePeer::Release()
   --mRefCnt; 
   if (mRefCnt == 0) { 
 #ifdef	AMBULANT_PLATFORM_WIN32
-	  // XXXJACK: I do not trust this. delete this smells like a hack...
+	  if (mPlugin)
+		  mPlugin->mScriptablePeer = NULL;
       delete this;
 #endif//AMBULANT_PLATFORM_WIN32
       return 0; 
