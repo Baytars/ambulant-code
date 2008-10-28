@@ -120,6 +120,8 @@ private:
     ambulant::net::url m_url;
     int m_cursor_id;
 
+    static NPP s_last_instance;
+    static void display_message(int level, const char *message);	
 #ifdef	MOZ_X11
     Window window;
     Display* display;
@@ -141,8 +143,6 @@ private:
     ambulant::common::player* get_player() {
         return m_ambulant_player->get_player();
     }
-    static NPP s_last_instance;
-    static void display_message(int level, const char *message);	
 #else //!XP_WIN32
     ambulant::common::player* m_ambulant_player;
     ambulant::common::player* get_player() {

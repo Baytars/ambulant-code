@@ -260,6 +260,10 @@ nsPluginInstance::init(NPWindow* aWindow)
 	ambulant::lib::logger::get_logger()->show("Ambulant plugin loaded");
 #endif//XP_WIN32
 
+	assert ( ! m_ambulant_player);
+	ambulant::lib::logger::get_logger()->set_show_message(nsPluginInstance::display_message);
+	ambulant::lib::logger::get_logger()->show("Ambulant plugin loaded");
+
     const char* arg_str = NULL;
     if (mCreateData.argc > 1)
     for (int i =0; i < mCreateData.argc; i++) {
@@ -538,6 +542,15 @@ NPP
 nsPluginInstance::getNPP()
 {
 	return mCreateData.instance;
+}
+
+
+NPP nsPluginInstance::s_last_instance = NULL;
+
+void
+nsPluginInstance::display_message(int level, const char *message) {
+	if (s_last_instance)
+		NPN_Status(s_last_instance, message);
 }
 
 // platform/toolkit specifixc functions
