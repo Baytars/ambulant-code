@@ -487,4 +487,3 @@ void gui::dx::audio_player::set_balance(long val) {
 	long cdb = val*100;
 	m_basic_audio->put_Balance(cdb);
 }
-

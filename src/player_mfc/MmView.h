@@ -58,7 +58,7 @@ virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
 
 // Implementation
-public:
+public:	
 	virtual ~MmView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;

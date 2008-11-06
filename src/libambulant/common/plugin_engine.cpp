@@ -82,7 +82,7 @@ plugin_engine::plugin_engine()
 	bool use_plugins = common::preferences::get_preferences()->m_use_plugins;
     collect_plugin_directories();
 #ifdef WITH_LTDL_PLUGINS
-	lib::logger::get_logger()->trace("plugin_engine: using LTDL plugin loader");
+	lib::logger::get_logger()->trace("plugin_engine: using LTDL plugin loader");F
 	int errors = lt_dlinit();
 	if (errors) {
 		lib::logger::get_logger()->trace("LTDL plugin loader: Cannot initialize: %d error(s)", errors);
