@@ -908,19 +908,16 @@ void smil_player::show_link(const lib::node *n, const net::url& href,
 
 bool smil_player::goto_node(const lib::node *target)
 {
-	lib::logger::get_logger()->debug("goto_node(%s)", target->get_sig().c_str());
+	AM_DBG lib::logger::get_logger()->debug("goto_node(%s)", target->get_sig().c_str());
 
 	std::map<int, time_node*>::iterator it = m_dom2tn->find(target->get_numid());
-	lib::logger::get_logger()->trace("goto_node: found target");
-
+	
 	if(it != m_dom2tn->end()) {
 		bool already_running = m_root->is_active();
 		if (!already_running) {
 			if (m_system) m_system->starting(this);
 		}
-		lib::logger::get_logger()->trace("goto_node: about to start scheduler");
 		m_scheduler->start((*it).second);
-		lib::logger::get_logger()->trace("goto_node: scheduler started");
 		if (!already_running) {
 
 			_update();
@@ -972,14 +969,11 @@ void smil_player::update() {
 }
 
 void smil_player::_update() {
-	lib::logger::get_logger()->trace("smil_player::_update, starting");
 	if(m_scheduler && m_root && m_root->is_active()) {
 		lib::timer::time_type dt = m_scheduler->exec();
 		if(m_root->is_active()) {
-			lib::logger::get_logger()->trace("smil_player::_update, root is active");
 			lib::event *update_event = new lib::no_arg_callback_event<smil_player>(this, 
 				&smil_player::update);
-			lib::logger::get_logger()->trace("smil_player::_update, going to call add_event");
 			m_event_processor->add_event(update_event, dt, lib::ep_high);
 		}
 	}
