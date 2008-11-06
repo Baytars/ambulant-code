@@ -150,6 +150,7 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 		m_video_fmt.parameters = NULL;
 	}
 	memset(m_sinks, 0, sizeof m_sinks);
+	m_current_sink = NULL;
 }
 
 ffmpeg_demux::~ffmpeg_demux()
@@ -347,10 +348,16 @@ ffmpeg_demux::remove_datasink(int stream_index)
 	m_sinks[stream_index] = 0;
 	if (ds) m_nstream--;
 	m_lock.leave();
-	if (ds) {
-		// signal EOF
-		ds->push_data(0, 0, 0);
-		ds->release();
+	if (ds)
+	{
+		if (ds == m_current_sink){
+			m_current_sink = NULL;
+		}
+		else{
+			// signal EOF
+			ds->push_data(0, 0, 0);
+			ds->release();
+		}
 	}
 	if (m_nstream <= 0) cancel();
 }
@@ -450,6 +457,7 @@ ffmpeg_demux::run()
 			bool accepted = false;
 			while ( ! accepted && sink && !exit_requested()) { 
 				sink = m_sinks[pkt->stream_index];
+				m_current_sink = sink;
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
 				accepted = sink->push_data(pts, pkt->data, pkt->size);
@@ -465,6 +473,12 @@ ffmpeg_demux::run()
 //					sleep(1);   // This is overdoing it
 				}
 				m_lock.enter();
+				if (m_current_sink == NULL)
+				{
+					sink->push_data(0,0,0); 
+					sink->release();
+				}
+
 			}
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
