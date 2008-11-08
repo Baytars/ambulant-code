@@ -316,8 +316,8 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 	if (m_buffer.buffer_not_empty() || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
-		if (callbackk) {
-			assert(evp);
+		if (callbackk && evp) {
+			//assert(evp);
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start: trigger client callback");
 			evp->add_event(callbackk, 0, ambulant::lib::ep_med);
 		} else {
@@ -477,8 +477,8 @@ ffmpeg_decoder_datasource::data_avail()
 		
 		if ( m_client_callback && (m_buffer.buffer_not_empty() ||  _end_of_file() || _clip_end()  ) ) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
-			assert(m_event_processor);
-			if (m_elapsed >= m_src->get_clip_begin()) {
+			//assert(m_event_processor);
+			if (m_elapsed >= m_src->get_clip_begin() && m_event_processor) {
 				m_event_processor->add_event(m_client_callback, 0, ambulant::lib::ep_med);
 				m_client_callback = NULL;
 			}
@@ -885,11 +885,14 @@ ffmpeg_resample_datasource::data_avail()
 		// If the client is currently interested tell them about data being available
 		if (m_client_callback && (m_buffer.buffer_not_empty() || _end_of_file() )) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
-			assert(m_event_processor);
-			lib::event *clientcallback = m_client_callback;
-			m_client_callback = NULL;
-			m_event_processor->add_event(clientcallback, 0, ambulant::lib::ep_med);
-			m_event_processor = NULL;
+			//assert(m_event_processor);
+			if (m_event_processor)
+			{
+				lib::event *clientcallback = m_client_callback;
+				m_client_callback = NULL;
+				m_event_processor->add_event(clientcallback, 0, ambulant::lib::ep_med);
+				m_event_processor = NULL;
+			}
 		} else {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource::data_avail(): No client callback!");
 		}
@@ -1036,8 +1039,8 @@ ffmpeg_resample_datasource::start(ambulant::lib::event_processor *evp, ambulant:
 		// immedeately signal our client again
 		restart_input = false;
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource::start(): no restart EOF (or clipend reached) but no data available");
-		if (callbackk) {
-			assert(evp);
+		if (callbackk && evp) {
+			//assert(evp);
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource::start: trigger client callback");
 			evp->add_event(callbackk, 0, ambulant::lib::ep_med);
 		} else {
