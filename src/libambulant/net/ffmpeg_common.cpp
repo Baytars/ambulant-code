@@ -456,7 +456,6 @@ ffmpeg_demux::run()
 			}
 			bool accepted = false;
 			while ( ! accepted && sink && !exit_requested()) { 
-				sink = m_sinks[pkt->stream_index];
 				m_current_sink = sink;
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
@@ -483,6 +482,7 @@ ffmpeg_demux::run()
 		}
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
+		sink = m_sinks[pkt->stream_index];
 	}
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final push_data(0, 0)");
 	int i;
