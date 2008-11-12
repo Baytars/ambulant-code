@@ -62,8 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libambulant_shwin32_D.lib"
 				OutputFile="../../bin/win32/libampluginD_plugin.dll"
 				LinkIncremental="0"
+				AdditionalLibraryDirectories="../../lib/win32"
 				IgnoreDefaultLibraryNames="LIBC.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/plugin.pdb"
@@ -142,8 +144,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libambulant_shwin32.lib"
 				OutputFile="../../bin/win32/libamplugin_plugin.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="../../lib/win32"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
