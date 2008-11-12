@@ -651,7 +651,8 @@ std::string net::url::get_url() const
 	std::string rv = repr(*this);
 	if (!m_absolute)
 		lib::logger::get_logger()->trace("url::get_url(): URL not absolute: \"%s\"", rv.c_str());
-	rv = string2uri(rv);
+	if (!this->is_local_file())
+		rv = string2uri(rv);
 	return rv;
 }
 
