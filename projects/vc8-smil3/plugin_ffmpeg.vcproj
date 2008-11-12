@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib"
+				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib libambulant_shwin32_D.lib"
 				OutputFile="../../bin/win32/libampluginD_ffmpeg.dll"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories="..\..\lib\win32"
@@ -125,6 +125,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
 				AdditionalIncludeDirectories="..\..\include;&quot;..\..\third_party_packages\SDL-1.2.12\include&quot;;..\..\third_party_packages\ffmpeg\libavformat;..\..\third_party_packages\ffmpeg\libavcodec;..\..\third_party_packages\ffmpeg;..\..\third_party_packages\ffmpeg\libavutil;&quot;..\..\third_party_packages\ffmpeg-windows-compat&quot;;..\..\third_party_packages\live\UsageEnvironment\include;..\..\third_party_packages\live\liveMedia\include;..\..\third_party_packages\live\groupsock\include;..\..\third_party_packages\live\BasicUsageEnvironment\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;WITH_SMIL30;WITH_FFMPEG;WITH_LIVE;WITH_SDL;WITH_DSVIDEO"
 				RuntimeLibrary="2"
@@ -146,7 +147,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib ddraw.lib"
+				AdditionalDependencies="SDL.lib avformat.lib avcodec.lib avutil.lib liveMedia.lib BasicUsageEnvironment.lib UsageEnvironment.lib groupsock.lib ws2_32.lib ddraw.lib libambulant_shwin32.lib"
 				OutputFile="../../bin/win32/libamplugin_ffmpeg.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\lib\win32"
