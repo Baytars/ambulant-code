@@ -84,6 +84,7 @@ class textptr {
 		if (m_length < 0) m_length = strlen(m_pcb);
 		int n = (int)m_length + 1;
 		m_pw = new wchar_t[n];
+		
 #ifdef AMBULANT_PLATFORM_WIN32
 		MultiByteToWideChar(CP_ACP, 0, m_pcb, n, m_pw, n);
 #else
@@ -97,12 +98,29 @@ class textptr {
 		if(m_pcb != NULL) return const_cast<char_ptr>(m_pcb);
 		if(m_pb != NULL) return m_pb;
 		if(m_pcw == NULL) return NULL;
+#ifdef AMBULANT_PLATFORM_WIN32
+		//marisa added this code 11/11/08 
+		//for double-byte characters the value of wcslen was not correct
+		//the fix is to call WideCharToMultiByte twice -- once to get the length, once to convert
+		BSTR unicodestr = 0;
+		char *ansistr;
+		unicodestr = ::SysAllocString(m_pcw);
+		int lenW = ::SysStringLen(unicodestr);
+		int lenA = ::WideCharToMultiByte(CP_ACP, 0, unicodestr, lenW, 0, 0, NULL, NULL);
+		if (lenA > 0){
+			ansistr = new char[lenA + 1]; // allocate a final null terminator as well
+			::WideCharToMultiByte(CP_ACP, 0, unicodestr, lenW, ansistr, lenA, NULL, NULL);
+			ansistr[lenA] = 0; // Set the null terminator yourself
+		}
+		else {
+			// handle the error
+		}
+		m_pb = ansistr;
+		::SysFreeString(unicodestr);
+#else
 		if (m_length < 0) m_length = wcslen(m_pcw);
 		int n = (int)m_length + 1;
 		m_pb = new char[n];
-#ifdef AMBULANT_PLATFORM_WIN32
-		WideCharToMultiByte(CP_ACP, 0, m_pcw, n, m_pb, n, NULL, NULL);
-#else
 		wcstombs(m_pb, m_pcw, n);
 
 #endif
