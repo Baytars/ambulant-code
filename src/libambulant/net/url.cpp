@@ -58,17 +58,7 @@ const std::string file_url_escape_frag = file_url_escape + "#";
 static std::string
 filepath2urlpath(const std::string& fparg, bool handle_frag=false)
 {
-	/*marisa remove*/
-	std::string msg;
-	/*end*/
-
 	std::string filepath = fparg;
-	/*marisa remove*/
-	msg = "filepath2urlpath beginning argument " + filepath;
-	ambulant::lib::logger::get_logger()->trace(msg);
-	msg.clear();
-	/*end*/
-	
 	size_t urlbufsize = filepath.size()*3+7; // Worst case: all characters escaped
 	LPTSTR urlbuf = (LPTSTR)malloc(urlbufsize*sizeof(TCHAR));
 	DWORD urlbufsizearg = (DWORD)urlbufsize;
@@ -112,11 +102,6 @@ filepath2urlpath(const std::string& fparg, bool handle_frag=false)
 	}
 	
 	rv = lib::textptr(wrv.c_str());  
-	/*marisa remove*/
-	msg = "filepath2urlpath after backslash and lower " + rv;
-	ambulant::lib::logger::get_logger()->trace(msg);
-	msg.clear();
-	/*end*/
 	
 #ifdef AMBULANT_PLATFORM_WIN32_WCE
 	// On WinCE InternetCanonicalizeUrl also turns backslash into %5c (sigh).
@@ -131,11 +116,6 @@ filepath2urlpath(const std::string& fparg, bool handle_frag=false)
 	if (fragment != "") {
 		rv = rv + fragment;
 	}
-	/*marisa remove*/
-	msg = "filepath2urlpath end result " + rv;
-	ambulant::lib::logger::get_logger()->trace(msg);
-	msg.clear();
-	/*end*/
 	return rv;
 }
 
