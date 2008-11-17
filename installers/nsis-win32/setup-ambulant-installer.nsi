@@ -16,7 +16,7 @@
 ; - VC8_DISTDIR: where to pick up these files.
 ;
 !define PRODUCT_NAME "Ambulant Player"
-!define PRODUCT_VERSION "1.9"
+!define PRODUCT_VERSION "2.0"
 !define DISTRIBUTE_DLL_BUILD
 ; !define DISTRIBUTE_PYTHON_PLUGIN
 !define PRODUCT_PUBLISHER "Centrum voor Wiskunde en Informatica"
@@ -27,11 +27,11 @@
 
 ; Where the system directory is on the machine where we are building the installer
 
-; !define DISTRIBUTE_VC7_RT
-; !define BUILD_SYSDIR "C:\WINDOWS\system32"  ; Most machines
+!define DISTRIBUTE_VC7_RT
+!define BUILD_SYSDIR "C:\WINDOWS\system32"  ; Most machines
 
-!define DISTRIBUTE_VC8_RT
-!define VC8_DISTDIR "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86"
+; !define DISTRIBUTE_VC8_RT
+; !define VC8_DISTDIR "C:\Program Files\Microsoft Visual Studio 8\VC\redist\x86"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
