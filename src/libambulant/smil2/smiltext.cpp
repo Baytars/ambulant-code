@@ -976,6 +976,7 @@ AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): s
 		double now = elapsed - m_epoch;
 		if ( ! m_finished)
 			m_shifted_origin.y = (int) now * m_params.m_rate / 1000 * y_dir;
+//*KB*/	lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: now=%lf m_shifted_origin(%d,%d)", now, m_shifted_origin.x, m_shifted_origin.y);
 	}
 AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_shifted_origin(%d,%d)", m_shifted_origin.x, m_shifted_origin.y);
 
@@ -1120,6 +1121,7 @@ AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_shift
 			unsigned int rate = _compute_rate(m_words.begin()->m_run, smiltext_rect.size(), rect, dur);
 			m_engine.set_rate(rate);
 			m_params = m_engine.get_params();
+//*KB*/	lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: dur=%d rate%d", dur, rate);
 		}
 	}
 	// layout done, render the run
@@ -1141,6 +1143,7 @@ AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_shift
 				// inside the viewing rectangle
 				m_finished = true;
 				m_provider->smiltext_stopped();
+//*KB*/	lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_finished rate%d", m_finished);
 			}
 		}
 	}
