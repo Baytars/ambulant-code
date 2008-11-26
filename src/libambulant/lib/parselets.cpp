@@ -261,7 +261,7 @@ lib::full_clock_value_p::parse(const_iterator& it, const const_iterator& end) {
 	d = fraction.parse(tit, end);
 	if(d == -1) return -1;
 	sd += d;
-	m_result.fraction = fraction.m_result;
+	m_result.fraction = (int)fraction.m_result;
 	it = tit;
 	return sd;
 }
@@ -343,12 +343,10 @@ lib::timecount_value_p::parse(const_iterator& it, const const_iterator& end) {
 // clock_value_p and converter to ms
 
 inline int fraction_to_ms(int f) {
-	//commented out old code -- see comments below
-	//return (f<=0)?0:int(::floor(1000.0*f + 0.5));
-	
-	//marisa@dinf.ne.jp (7 july 2008).  after a full clock value parse for the string "0:00:02.440",
-	//the value of "f" was 440.  a ridiculously large value was being returned...
-	return (f<=0)?0:f;
+	if (f > 1000) 
+		return f/1000;
+	else
+		return (f<=0)?0:f;
 }
 
 std::ptrdiff_t 
