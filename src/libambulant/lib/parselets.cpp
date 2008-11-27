@@ -261,7 +261,7 @@ lib::full_clock_value_p::parse(const_iterator& it, const const_iterator& end) {
 	d = fraction.parse(tit, end);
 	if(d == -1) return -1;
 	sd += d;
-	m_result.fraction = (int)fraction.m_result;
+	m_result.fraction = fraction.m_result;
 	it = tit;
 	return sd;
 }
@@ -343,8 +343,17 @@ lib::timecount_value_p::parse(const_iterator& it, const const_iterator& end) {
 // clock_value_p and converter to ms
 
 inline int fraction_to_ms(int f) {
-	if (f > 1000) 
-		return f/1000;
+	if (f >= 1000) 
+	{
+		//grab the first three digits
+		char chin[20] = "";
+		char chout[3] = "";
+		itoa(f, chin, 10);
+		chout[0] = chin[0];
+		chout[1] = chin[1];
+		chout[2] = chin[2];
+		return atoi(chout);
+	}
 	else
 		return (f<=0)?0:f;
 }
