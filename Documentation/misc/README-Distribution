@@ -230,6 +230,9 @@ Creating the MacOSX installer
 	--with-webkit-dom --with-webkit-plugin
 
 - Install the player, "sudo make install" in src/player_macos.
+  IMPORTANT: at the end of make install, a few calls to "testdependencies"
+  are made. These check that you don't link to non-standard libraries.
+  Make sure these calls produce no output.
 - To create the installer, run the script in installers/sh-macos.
   Getting the background picture correct is a bit of a trick:
   - After the disk is mounted, cd to it (terminal window)
