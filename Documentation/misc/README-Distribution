@@ -226,8 +226,7 @@ Creating the MacOSX installer
 	--with-smil30 --with-universalsdk=$SYSROOT --with-live555 \
 	-disable-dependency-tracking --with-libfaad \
 	--with-xerces --with-xerces-plugin \
-	--with-python=/usr/bin/python  --with-python-plugin \
-	--with-webkit-dom --with-webkit-plugin
+	--without-external-dom
 
 - Install the player, "sudo make install" in src/player_macos.
   IMPORTANT: at the end of make install, a few calls to "testdependencies"
@@ -247,7 +246,16 @@ Creating the WebKit/Safari plugin
 =================================
 - Make sure the prerequisites are built, as above.
 - Build a slightly different configuration from above, with
-  <to be supplied>
+
+  export SYSROOT=/Developer/SDKs/MacOSX10.4u.sdk
+  export MACOSX_DEPLOYMENT_TARGET=10.4
+  ../configure -C --with-ffmpeg=third_party_packages/ffmpeg-universal \
+	--with-smil30 --with-universalsdk=$SYSROOT --with-live555 \
+	-disable-dependency-tracking --with-libfaad \
+	--with-xerces --with-xerces-plugin \
+	--with-python=/usr/bin/python  --with-python-plugin \
+	--with-webkit-dom --with-webkit-plugin
+	
 - Build the plugin, with <to be supplied>
   
 Creating the Windows desktop installer
