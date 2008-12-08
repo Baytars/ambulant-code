@@ -394,7 +394,7 @@ smiltext_engine::_update() {
 		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
 		unsigned int delay = m_auto_rate ? 40 : 1000 / m_params.m_rate;
 		if (delay < 40) delay = 40;
-		AM_DBG lib::logger::get_logger()->debug("delay=%d: next_update_needed=%d", delay, next_update_needed);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("delay=%d: next_update_needed=%d", delay, next_update_needed);
 		if (next_update_needed > delay || next_update_needed == 0) {
 			next_update_needed = delay;
 		}
@@ -950,6 +950,7 @@ AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x) r=
 	if (m_crawling) {
 		long int elapsed = m_event_processor->get_timer()->elapsed();
 		double now = elapsed - m_epoch;
+		m_shifted_origin.x = (int) now * m_params.m_rate / 1000 * x_dir;
 		if (m_shifted_origin.x < 0)
 AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): strange: shifted_x=%d, m_epoch=%ld, elpased=%ld !", this, m_shifted_origin.x, m_epoch, elapsed);
 		switch (align) {
@@ -988,7 +989,8 @@ AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw(0x%x): s
 		}
 		long int elapsed = m_event_processor->get_timer()->elapsed();
 		double now = elapsed - m_epoch;
-		AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_rate=%d y_dir=%d now=%lf m_shifted_origin(%d,%d)", 
+		m_shifted_origin.y = (int) now * m_params.m_rate / 1000 * y_dir;
+AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_rate=%d y_dir=%d now=%lf m_shifted_origin(%d,%d)", 
 									   m_params.m_rate, y_dir, now, m_shifted_origin.x, m_shifted_origin.y);
 	}
 	AM_DBG lib::logger::get_logger()->debug("smiltext_layout_engine::redraw: m_shifted_origin(%d,%d)", m_shifted_origin.x, m_shifted_origin.y);
