@@ -29,7 +29,7 @@
 // Somehow, the time stamps produced by live555 are incorrect.
 // Enable the next define to try and re-create correct
 // timestamps.
-#undef ENABLE_LIVE555_PTS_CORRECTION
+#define ENABLE_LIVE555_PTS_CORRECTION
 
 #ifdef AMBULANT_PLATFORM_MACOS
 // Both MacHeaders.h and Live typedef Boolean, but to imcompatible
