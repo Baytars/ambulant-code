@@ -286,7 +286,7 @@ void
 ffmpeg_decoder_datasource::stop()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::stop(0x%x)", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::stop(0x%x)", (void*)this);
 	if (m_con && m_con_owned) {
 		avcodec_close(m_con);
 		av_free(m_con);
@@ -321,7 +321,7 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start: trigger client callback");
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start: trigger client callback");
 			evp->add_event(callbackk, 0, ambulant::lib::ep_med);
 		} else {
 			lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): no client callback!");
@@ -333,7 +333,7 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 		restart_input = true;
 		m_client_callback = callbackk;
 		m_event_processor = evp;
-        /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: storing callback");
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: storing callback");
 	}
 	
 	// Also restart our source if we still have room and there is
@@ -342,10 +342,10 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 	
 	if (restart_input) {
 		lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): calling m_src->start(0x%x, 0x%x)", m_event_processor, e);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): calling m_src->start(0x%x, 0x%x)", m_event_processor, e);
 		m_src->start(evp,  e);
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): not restarting, eof=%d, buffer_full=%d", (int)_end_of_file(), (int)m_buffer.buffer_full());
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): not restarting, eof=%d, buffer_full=%d", (int)_end_of_file(), (int)m_buffer.buffer_full());
 	}
 	m_lock.leave();
 }
@@ -368,7 +368,7 @@ void
 ffmpeg_decoder_datasource::data_avail()
 {
 	m_lock.enter();		    
-	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: called : m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);		
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: called : m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);		
 	int sz;
 	if (m_con) {
 		if (m_src == NULL) {
@@ -480,7 +480,7 @@ ffmpeg_decoder_datasource::data_avail()
 		}
 		
 		if ( m_client_callback && (m_buffer.buffer_not_empty() ||  _end_of_file() || _clip_end()  ) ) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
 			assert(m_event_processor);
 			if (m_elapsed >= m_src->get_clip_begin()) {
 				m_event_processor->add_event(m_client_callback, 0, ambulant::lib::ep_med);
@@ -488,10 +488,10 @@ ffmpeg_decoder_datasource::data_avail()
 				m_event_processor = NULL;
 			}
 		} else {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
 		}
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No decoder, flushing available data");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No decoder, flushing available data");
 	}
 	m_lock.leave();
 }
