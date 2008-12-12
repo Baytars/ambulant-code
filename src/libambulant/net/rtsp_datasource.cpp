@@ -170,16 +170,21 @@ ambulant::net::rtsp_demux::remove_datasink(int stream_index)
 {
 	m_critical_section.enter();
 	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
-	assert(m_context && m_context->sinks && m_context->sinks[stream_index] != 0);
-	if (m_context->sinks[stream_index]) {
-		// signal EOF
-		_push_data_to_sink (stream_index, 0, 0, 0);
-		m_context->sinks[stream_index]->release();
-	}
+	assert(m_context && m_context->sinks);
+    demux_datasink *ds = m_context->sinks[stream_index];
 	m_context->sinks[stream_index] = 0;
-	m_context->nsinks--;
-	if (m_context->nsinks <= 0) _cancel();
+	if (ds) m_context->nsinks--;
 	m_critical_section.leave();
+    // XXXJACK This code suffers from the same problem as the ffmpeg_demux
+    // code: if may get into a deadlock if we hold the lock
+    // and it may deallocate ds while it's being used in run() otherwise.
+    // But: it doesn't seem to occur just yet, so we live dangerously:-)
+	if (ds) {
+ 		// signal EOF
+		ds->push_data(0, 0, 0);
+		ds->release();
+	}
+	if (m_context->nsinks <= 0) _cancel();
 }
 
 rtsp_context_t*
@@ -725,7 +730,7 @@ done:
 		m_context->initialPacketDataLen = 0;
 	}
 
-#ifdef JACK_IS_NOT_CONVINCED_YET
+#if 1 // def JACK_IS_NOT_CONVINCED_YET
 	// xxxbo In the case that m_context->time_left is a negative from the beginning for some reason,
 	// Ambulant should render the video other than stop at the beginning.
 	if (m_context->time_left >= 0 && m_context->last_pts >= m_context->time_left) {
