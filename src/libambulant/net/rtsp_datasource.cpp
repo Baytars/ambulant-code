@@ -628,97 +628,93 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 		}
 	}
 	timestamp_t rpts =  (timestamp_t)(pts.tv_sec - m_context->first_sync_time.tv_sec) * 1000000LL  +  (timestamp_t) (pts.tv_usec - m_context->first_sync_time.tv_usec);
-	// XXXJACK: Some code downstream expects timestamps to be file-based, i.e. when playing with clipBegin=10s it expects the first frame to have
-	// timestamp=10s. Not sure this is correct, but for now we fix up the timestamp. I'm also not sure how this interacts with seeking.
-	// Please remove this comment once it has been checked that the current behaviour is correct.
 	AM_DBG lib::logger::get_logger()->debug("after_reading_video: called timestamp 0x%08.8x%08.8x, sec = %d, usec =  %d", (long)(rpts>>32), (long)(rpts&0xffffffff), pts.tv_sec, pts.tv_usec);
-	
-	
-	demux_datasink *sink = m_context->sinks[m_context->video_stream];
-again:
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+    // Guess frame duration. This assumes that the lowest difference between wto adjacent frames is the duration.
+    // If we ever get a stream where the duration increases (i.e. frame rate decreases) we're hosed.
+    timestamp_t delta_pts = abs(rpts-m_context->last_pts);
+    if (m_context->frame_duration == 0 || (delta_pts != 0 && delta_pts < m_context->frame_duration)) {
+        m_context->frame_duration = delta_pts;
+        m_context->last_emit_pts = rpts - m_context->frame_duration;
+    }
+#endif
+    // We may beed to insert a few bytes at the front of the packet. run() has made sure
+    // there's room for that.
+    if (m_context->extraPacketHeaderSize) {
+        // This magic was gleamed from mplayer, file demux_rtp.cpp and vlc, file live555.cpp.
+        // The space in video_packet was already left free in run().
+        memcpy(m_context->video_packet, m_context->extraPacketHeaderData, m_context->extraPacketHeaderSize);
+    }
 	if (m_context->notPacketized) {
 		// We have to re-packetize ourselves. We do this by combining all data with the same timestamp.
-		if (rpts == 0 || rpts == m_context->last_pts) {
-			// Still the same packet. Combine the data and return.
-			if (m_context->vbuffer == NULL) {
-				// There is no old data. We may need to insert the extra header at the beginning.
-				assert(m_context->vbufferlen == 0);
-			}
-			// See if we can steal the packet in stead of copying it
-			if (m_context->vbuffer == NULL) {
-				assert(m_context->vbufferlen == 0);
-				m_context->vbuffer = m_context->video_packet;
-				m_context->vbufferlen = sz+m_context->extraPacketHeaderSize;
-				m_context->video_packet = NULL;
-			} else {
-				// We cannot reuse the video_packet because there is already data in vbuffer.
-				// Realloc and copy.
-				m_context->vbuffer = (unsigned char *)realloc(m_context->vbuffer, m_context->vbufferlen+sz+m_context->extraPacketHeaderSize);
-				if (m_context->vbuffer == NULL) {
-					lib::logger::get_logger()->trace("rtsp: out of memory rebuffering. Dropping packet.");
-					m_context->vbufferlen = 0;
-					goto done;
-				}
-				if (m_context->extraPacketHeaderSize) {
-					// This magic was gleamed from mplayer, file demux_rtp.cpp and vlc, file live555.cpp.
-					// The space in video_packet was already left free in run().
-					memcpy(m_context->video_packet, m_context->extraPacketHeaderData, m_context->extraPacketHeaderSize);
-				}
-				memcpy(m_context->vbuffer+m_context->vbufferlen, m_context->video_packet, sz+m_context->extraPacketHeaderSize);
-				m_context->vbufferlen += sz+m_context->extraPacketHeaderSize;
-			}
+        if (rpts != 0 && rpts != m_context->last_pts && m_context->vbuffer) {
+            // The new fragment has a different timestamp from what we have buffered. We first emit the buffered data.
+            timestamp_t out_pts = m_context->last_pts;
 #ifdef ENABLE_LIVE555_PTS_CORRECTION
-            // Guess frame duration. This assumes that the lowest difference between to adjacent frames is the duration.
-            // If we ever get a stream where the duration increases (i.e. frame rate decreases) we're hosed.
-            timestamp_t delta_pts = abs(rpts-m_context->last_pts);
-            if (m_context->frame_duration == 0 || (delta_pts != 0 && delta_pts < m_context->frame_duration)) {
-                m_context->frame_duration = delta_pts;
-                m_context->last_emit_pts = rpts - m_context->frame_duration;
+            // Determine the pts we want to send to upper layers. The pts live555 gives us seems to be incorrect:
+            // the data we get in the packets is in strictly increasing order, but the timestamps are not.
+            // We re-invent the timestamp.
+            // Because we also have to cater for seeking and packect loss we use a heuristic here: if we received
+            // a pts that is more than 1 second off we re-synchronise.
+            if (m_context->last_emit_pts) {
+                if (out_pts < m_context->last_emit_pts-1000000 || out_pts > m_context->last_emit_pts+1000000)
+                    m_context->last_emit_pts = 0;
+                else
+                    out_pts = m_context->last_emit_pts + m_context->frame_duration;
             }
+            m_context->last_emit_pts = out_pts;
 #endif
-            m_context->last_pts = rpts;
-			goto done;
-		}
-	}
-    timestamp_t out_pts = rpts;
-#ifdef ENABLE_LIVE555_PTS_CORRECTION
-    // Determine the pts we want to send to upper layers. The pts live555 gives us seems to be incorrect:
-    // the data we get in the packets is in strictly increasing order, but the timestamps are not.
-    // We re-invent the timestamp.
-    // Because we also have to cater for seeking and packect loss we use a heuristic here: if we received
-    // a pts that is more than 1 second off we re-synchronise.
-    if (m_context->last_emit_pts) {
-        if (rpts < m_context->last_emit_pts-1000000 || rpts > m_context->last_emit_pts+1000000)
-            m_context->last_emit_pts = 0;
-        else
-            rpts = m_context->last_emit_pts + m_context->frame_duration;
-    }
-    m_context->last_emit_pts = rpts;
-#endif
-	// Send the data to our sink, which is responsible for copying/saving it before returning.
-	if (m_context->notPacketized) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length (buffered)=%d, timestamp=%lld, rpts=%lld synced=%d", m_context->vbufferlen, m_context->last_pts+m_clip_begin, rpts+m_clip_begin, m_context->video_subsession->rtpSource()->hasBeenSynchronizedUsingRTCP());
-#if 0
-        out_pts = m_context->last_pts;
-#endif
-		_push_data_to_sink(m_context->video_stream, out_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
-		free(m_context->vbuffer);
-		m_context->vbuffer = NULL;
-		m_context->vbufferlen = 0;
-		m_context->last_pts=rpts;
-		goto again;
+           /*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length (buffered)=%d, timestamp=%lld, rpts=%lld synced=%d", m_context->vbufferlen, out_pts+m_clip_begin, rpts+m_clip_begin, m_context->video_subsession->rtpSource()->hasBeenSynchronizedUsingRTCP());
+            _push_data_to_sink(m_context->video_stream, out_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
+            free(m_context->vbuffer);
+            m_context->vbuffer = NULL;
+            m_context->vbufferlen = 0;
+            m_context->last_pts=rpts;
+        }
+        // We store the new data but don't process it yet (the next fragment may belong to the same packet).
+        if (m_context->vbuffer == NULL) {
+            // If it's the first fragment, steal it.
+            assert(m_context->vbufferlen == 0);
+            m_context->vbuffer = m_context->video_packet;
+            m_context->vbufferlen = sz+m_context->extraPacketHeaderSize;
+            m_context->video_packet = NULL;
+        } else {
+            // We cannot reuse the video_packet because there is already data in vbuffer.
+            // Realloc and copy.
+            m_context->vbuffer = (unsigned char *)realloc(m_context->vbuffer, m_context->vbufferlen+sz+m_context->extraPacketHeaderSize);
+            if (m_context->vbuffer == NULL) {
+                lib::logger::get_logger()->trace("rtsp: out of memory rebuffering. Dropping packet.");
+                m_context->vbufferlen = 0;
+                goto done;
+            }
+            memcpy(m_context->vbuffer+m_context->vbufferlen, m_context->video_packet, sz+m_context->extraPacketHeaderSize);
+            m_context->vbufferlen += sz+m_context->extraPacketHeaderSize;
+        }
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length %d+%d=%d, timestamp=%lld", sz, m_context->extraPacketHeaderSize, sz+m_context->extraPacketHeaderSize, rpts+m_clip_begin);
-		if (m_context->extraPacketHeaderSize) {
-			// This magic was gleamed from mplayer, file demux_rtp.cpp and vlc, file live555.cpp.
-			// The space in video_packet was already left free in run().
-			memcpy(m_context->video_packet, m_context->extraPacketHeaderData, m_context->extraPacketHeaderSize);
-		}
+        // The data is correctly packetized. Simply send it upstream.
+        timestamp_t out_pts = rpts;
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+        // Determine the pts we want to send to upper layers. The pts live555 gives us seems to be incorrect:
+        // the data we get in the packets is in strictly increasing order, but the timestamps are not.
+        // We re-invent the timestamp.
+        // Because we also have to cater for seeking and packect loss we use a heuristic here: if we received
+        // a pts that is more than 1 second off we re-synchronise.
+        if (m_context->last_emit_pts) {
+            if (out_pts < m_context->last_emit_pts-1000000 || out_pts > m_context->last_emit_pts+1000000)
+                m_context->last_emit_pts = 0;
+            else
+                out_pts = m_context->last_emit_pts + m_context->frame_duration;
+        }
+        m_context->last_emit_pts = out_pts;
+#endif
+		/*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length %d+%d=%d, timestamp=%lld, rpts=%lld", sz, m_context->extraPacketHeaderSize, sz+m_context->extraPacketHeaderSize, out_pts+m_clip_begin, rpts+m_clip_begin);
 		_push_data_to_sink(m_context->video_stream, out_pts, (uint8_t*) m_context->video_packet, sz+m_context->extraPacketHeaderSize);
 	}
-	m_context->last_pts=rpts;
 	
 done:
+    // Record the pts of the last packet processed (not necessarily sent upstream, yet).
+	m_context->last_pts=rpts;
+
 // Tell the main demux loop that we're ready for another packet.
 	m_context->need_video = true;
 	if (m_context->video_packet) free(m_context->video_packet);

@@ -456,7 +456,7 @@ ffmpeg_demux::run()
 			bool accepted = false;
 			while ( ! accepted && sink && !exit_requested()) { 
 				m_current_sink = sink;
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
 				accepted = sink->push_data(pts, pkt->data, pkt->size);
 				if ( ! accepted) {
