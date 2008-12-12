@@ -113,7 +113,9 @@ struct rtsp_context_t {
 		eof(false),
 		clip_end(-1),
 		duration(-1),
-		time_left(-1),
+		last_expected_pts(-1),
+        highest_pts_seen(-1),
+        idle_time(0),
 		audio_codec_name("none"),
 		video_codec_name("none"),
 		first_sync_time_set(false),
@@ -178,7 +180,9 @@ struct rtsp_context_t {
 	bool eof;				// True when we reach end-of-file on any stream (XXXJACK: correct behaviour?)
 	timestamp_t clip_end;	// Where we want to stop (microseconds)
 	float duration;			// How long the stream will take in total (XXXJACK: needed?)
-	timestamp_t time_left;	// The same, but different (XXXJACK: needed?)
+	timestamp_t last_expected_pts;	// The same, but different
+    timestamp_t highest_pts_seen;   // Highest pts seen in any stream
+    timestamp_t idle_time;      // Amount of time we have not seen any packets
 	const char* audio_codec_name;
 	const char* video_codec_name;
 	timeval first_sync_time;	// timestamp of first synchronized packet
