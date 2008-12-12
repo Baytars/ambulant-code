@@ -261,6 +261,7 @@ cocoa_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 #else
 		[m_image drawInRect: cocoa_dstrect fromRect: cocoa_srcrect operation: NSCompositeSourceAtop fraction: 1.0];
 #endif
+        /*AM_DBG*/ [view dump: m_image toImageID: "video"];
 	} else {
 	}
 #if 0

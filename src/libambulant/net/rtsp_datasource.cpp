@@ -319,6 +319,7 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
 				continue;
 			}
 			context->audio_stream = stream_index;
+            context->audio_subsession = subsession;
 			context->audio_codec_name = subsession->codecName();
 			context->audio_fmt = audio_format("live", context->audio_codec_name);
 			AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url), audio codecname :%s ",context->audio_codec_name);
@@ -352,6 +353,7 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
 				continue;
 			}
 			context->video_stream = stream_index;
+            context->video_subsession = subsession;
 			context->video_codec_name = subsession->codecName();
 			context->video_fmt = video_format("live", context->video_codec_name);
 			AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url), video codecname :%s ",context->video_codec_name);
@@ -364,7 +366,8 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
 #endif
 			int rtp_sock_num = subsession->rtpSource()->RTPgs()->socketNum();
 			increaseReceiveBufferTo(*context->env, rtp_sock_num, DESIRED_VIDEO_BUF_SIZE);
-
+            // Try by Jack: disable waiting for packets, hope this fixes reorder problem.
+            subsession->rtpSource()->setPacketReorderingThresholdTime(0);
 			//For MP4V-ES video format we need to insert a packet into the RTSP stream
 			//which should be present in the 'config' MIME parameter which should be present hopefully in the SDP description
 			//this idea was copied from mplayer libmpdemux/demux_rtp.cpp
@@ -471,7 +474,7 @@ ambulant::net::rtsp_demux::run()
 		MediaSubsession* subsession;
 		MediaSubsessionIterator iter(*m_context->media_session);
 		while ((subsession = iter.next()) != NULL) {
-			if (strcmp(subsession->mediumName(), "audio") == 0) {
+			if (subsession == m_context->audio_subsession) {
 				if(m_context->need_audio) {
 					// XXXJACK We don't actually need to malloc every time, we could probably reuse the old one if it was copied.
 					assert(!m_context->audio_packet);
@@ -482,7 +485,7 @@ ambulant::net::rtsp_demux::run()
 					subsession->readSource()->getNextFrame(m_context->audio_packet, MAX_RTP_FRAME_SIZE, after_reading_audio_stub, this,  on_source_close ,m_context);
 					m_critical_section.enter();
 				}
-			} else if (strcmp(subsession->mediumName(), "video") == 0) {
+			} else if (subsession == m_context->video_subsession) {
 				if (m_context->need_video) {
 					// XXXJACK We don't actually need to malloc every time, we could probably reuse the old one if it was copied.
 					assert(!m_context->video_packet);
@@ -493,6 +496,7 @@ ambulant::net::rtsp_demux::run()
 					AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() video_packet 0x%x", m_context->video_packet);
 					m_critical_section.leave();
 					subsession->readSource()->getNextFrame(&m_context->video_packet[m_context->extraPacketHeaderSize], MAX_RTP_FRAME_SIZE-m_context->extraPacketHeaderSize, after_reading_video_stub, this, on_source_close, m_context);
+       
 					m_critical_section.enter();
 					
 				}
@@ -550,6 +554,8 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 {
 	m_critical_section.enter();
 	AM_DBG lib::logger::get_logger()->debug("after_reading_audio: called sz = %d, truncated = %d", sz, truncated);
+    if (truncated)
+        lib::logger::get_logger()->trace("rtsp_demux: truncated audio packet");
 	assert(m_context);
 	assert(m_context->audio_packet);
 	assert(m_context->audio_stream >= 0);
@@ -574,6 +580,8 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 	m_critical_section.enter();
 	assert(m_context);
 	AM_DBG lib::logger::get_logger()->debug("after_reading_video: called sz = %d, truncated = %d pts=(%d s, %d us), dur=%d", sz, truncated, pts.tv_sec, pts.tv_usec, duration);
+    if (truncated)
+        lib::logger::get_logger()->trace("rtsp_demux: truncated video packet");
 	assert(m_context->video_packet);
 	assert(m_context->video_stream >= 0);
 	
@@ -603,19 +611,15 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 	if (!m_context->first_sync_time_set) {
 		// We have not been synced yet. If the video stream has been synced for this packet
 		// we can set the epoch of the timing info. 
-		MediaSubsession* subsession;
-		MediaSubsessionIterator iter(*m_context->media_session);
-		while ((subsession = iter.next()) != NULL) {
-			if (strcmp(subsession->mediumName(), "video") == 0)
-				break;
-		}
+		MediaSubsession* subsession = m_context->video_subsession;
+		
 		if (subsession) {
 			// Set the packet's presentation time stamp, depending on whether or
 			// not our RTP source's timestamps have been synchronized yet: 
 			// This idea is borrowed from mplayer at demux_rtp.cpp::after_reading
 			Boolean hasBeenSynchronized = subsession->rtpSource()->hasBeenSynchronizedUsingRTCP();
 			if (hasBeenSynchronized) {
-				AM_DBG lib::logger::get_logger()->debug("after_reading_video: resync video, from %ds %dus to %ds %dus", m_context->first_sync_time.tv_sec, m_context->first_sync_time.tv_usec, pts.tv_sec, pts.tv_usec);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("after_reading_video: resync video, from %ds %dus to %ds %dus", m_context->first_sync_time.tv_sec, m_context->first_sync_time.tv_usec, pts.tv_sec, pts.tv_usec);
 				m_context->first_sync_time.tv_sec = pts.tv_sec;
 				m_context->first_sync_time.tv_usec = pts.tv_usec;
 				m_context->last_pts = 0;
@@ -663,26 +667,54 @@ again:
 				memcpy(m_context->vbuffer+m_context->vbufferlen, m_context->video_packet, sz+m_context->extraPacketHeaderSize);
 				m_context->vbufferlen += sz+m_context->extraPacketHeaderSize;
 			}
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+            // Guess frame duration. This assumes that the lowest difference between to adjacent frames is the duration.
+            // If we ever get a stream where the duration increases (i.e. frame rate decreases) we're hosed.
+            timestamp_t delta_pts = abs(rpts-m_context->last_pts);
+            if (m_context->frame_duration == 0 || (delta_pts != 0 && delta_pts < m_context->frame_duration)) {
+                m_context->frame_duration = delta_pts;
+                m_context->last_emit_pts = rpts - m_context->frame_duration;
+            }
+#endif
+            m_context->last_pts = rpts;
 			goto done;
 		}
 	}
+    timestamp_t out_pts = rpts;
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+    // Determine the pts we want to send to upper layers. The pts live555 gives us seems to be incorrect:
+    // the data we get in the packets is in strictly increasing order, but the timestamps are not.
+    // We re-invent the timestamp.
+    // Because we also have to cater for seeking and packect loss we use a heuristic here: if we received
+    // a pts that is more than 1 second off we re-synchronise.
+    if (m_context->last_emit_pts) {
+        if (rpts < m_context->last_emit_pts-1000000 || rpts > m_context->last_emit_pts+1000000)
+            m_context->last_emit_pts = 0;
+        else
+            rpts = m_context->last_emit_pts + m_context->frame_duration;
+    }
+    m_context->last_emit_pts = rpts;
+#endif
 	// Send the data to our sink, which is responsible for copying/saving it before returning.
 	if (m_context->notPacketized) {
-		AM_DBG lib::logger::get_logger()->debug("Video packet length (buffered)=%d, timestamp=%lld", m_context->vbufferlen, m_context->last_pts+m_clip_begin);
-		_push_data_to_sink(m_context->video_stream, m_context->last_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length (buffered)=%d, timestamp=%lld, rpts=%lld synced=%d", m_context->vbufferlen, m_context->last_pts+m_clip_begin, rpts+m_clip_begin, m_context->video_subsession->rtpSource()->hasBeenSynchronizedUsingRTCP());
+#if 0
+        out_pts = m_context->last_pts;
+#endif
+		_push_data_to_sink(m_context->video_stream, out_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
 		free(m_context->vbuffer);
 		m_context->vbuffer = NULL;
 		m_context->vbufferlen = 0;
 		m_context->last_pts=rpts;
 		goto again;
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("Video packet length %d+%d=%d, timestamp=%lld", sz, m_context->extraPacketHeaderSize, sz+m_context->extraPacketHeaderSize, rpts+m_clip_begin);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("Video packet length %d+%d=%d, timestamp=%lld", sz, m_context->extraPacketHeaderSize, sz+m_context->extraPacketHeaderSize, rpts+m_clip_begin);
 		if (m_context->extraPacketHeaderSize) {
 			// This magic was gleamed from mplayer, file demux_rtp.cpp and vlc, file live555.cpp.
 			// The space in video_packet was already left free in run().
 			memcpy(m_context->video_packet, m_context->extraPacketHeaderData, m_context->extraPacketHeaderSize);
 		}
-		_push_data_to_sink(m_context->video_stream, rpts+m_clip_begin, (uint8_t*) m_context->video_packet, sz+m_context->extraPacketHeaderSize);
+		_push_data_to_sink(m_context->video_stream, out_pts, (uint8_t*) m_context->video_packet, sz+m_context->extraPacketHeaderSize);
 	}
 	m_context->last_pts=rpts;
 	

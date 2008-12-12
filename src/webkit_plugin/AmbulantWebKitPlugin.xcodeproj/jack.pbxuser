@@ -136,11 +136,6 @@
 		name = libffi_support.m;
 		path = /Users/jack/src/pyobjc/Modules/objc/libffi_support.m;
 		sourceTree = "<group>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 20286}}";
-			sepNavSelRange = "{16161, 0}";
-			sepNavVisRange = "{9874, 396}";
-		};
 	};
 	0470F9B40E9F9E8A00AC7A51 /* libffi_support.m:653 */ = {
 		isa = PBXFileBreakpoint;
@@ -530,8 +525,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 245320501;
-			PBXWorkspaceStateSaveDate = 245320501;
+			PBXPerProjectTemplateStateSaveDate = 250518298;
+			PBXWorkspaceStateSaveDate = 250518298;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
