@@ -26,6 +26,11 @@
 
 #define MAX_RTP_FRAME_SIZE 50000
 
+// Somehow, the time stamps produced by live555 are incorrect.
+// Enable the next define to try and re-create correct
+// timestamps.
+#undef ENABLE_LIVE555_PTS_CORRECTION
+
 #ifdef AMBULANT_PLATFORM_MACOS
 // Both MacHeaders.h and Live typedef Boolean, but to imcompatible
 // types.
@@ -83,7 +88,9 @@ struct rtsp_context_t {
 		sdp(NULL),
 		nstream(0),
 		audio_stream(-1),
+        audio_subsession(NULL),
 		video_stream(-1),
+        video_subsession(NULL),
 		configData(NULL),
 		configDataLen(0),
 		initialPacketData(NULL),
@@ -94,6 +101,10 @@ struct rtsp_context_t {
 		vbuffer(NULL),
 		vbufferlen(0),
 		last_pts(0),
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+        last_emit_pts(0),
+        frame_duration(0),
+#endif
 		need_audio(true),
 		need_video(true),
 		audio_packet(NULL),
@@ -141,8 +152,10 @@ struct rtsp_context_t {
 	char* sdp;
 	int nstream;		// Total number of streams
 	int audio_stream;	// Index of the audio subsession
+    MediaSubsession *audio_subsession;
 	int video_stream;	// Index of the video subsession
-	
+	MediaSubsession *video_subsession;
+    
 	unsigned char* configData; // For H264 (and maybe other formats): Extra configuration data, to be passed to ffmpeg
 	int configDataLen;
 	unsigned char *initialPacketData;	// For MP4V (and maybe other formats): a synthetic initial packet
@@ -153,6 +166,10 @@ struct rtsp_context_t {
 	unsigned char* vbuffer;		// Buffer for re-packetizing
 	int vbufferlen;
 	timestamp_t last_pts;		// Timestamp of packet data being accumulated in vbuffer
+#ifdef ENABLE_LIVE555_PTS_CORRECTION
+    timestamp_t last_emit_pts;  // Last timestamp emitted to higher layers
+    timestamp_t frame_duration; // Current guess at frame duration
+#endif
 	bool need_audio;			// True if we're interested in an audio packet
 	bool need_video;			// True if we're interested in a video packet
 	unsigned char* audio_packet;	// The current audio packet data (size is a parameter to after_reading_audio)
@@ -170,6 +187,7 @@ struct rtsp_context_t {
 	video_format video_fmt;
 	demux_datasink *sinks[MAX_STREAMS];
 	int nsinks;
+    
 };
 	
 class rtsp_demux : public abstract_demux {
