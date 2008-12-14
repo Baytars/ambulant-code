@@ -94,6 +94,7 @@ Before creating the distribution
   - src/player_wince/AmbulantPlayer.rc
   - src/player_mfc/AmbulantPlayer.rc (Dialog IDD_ABOUTBOX)
   - src/player_gtk/AmbulantPlayer.desktop
+  - src/webkit_plugin/README
   - installers/nokia770/AmbulantPlayer.desktop
   - installers/nokia770/AmbulantPlayerCHINOOK.desktop
   - installers/nokia770/debian/create_installer
