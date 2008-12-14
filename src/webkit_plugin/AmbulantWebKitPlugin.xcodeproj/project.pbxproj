@@ -20,6 +20,7 @@
 		0499E89C0959B25F00A7FDF8 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0499E89B0959B25F00A7FDF8 /* libavutil.a */; };
 		0499E89F0959B29100A7FDF8 /* libSDL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0499E89E0959B29100A7FDF8 /* libSDL.a */; };
 		0499E8A50959B2E100A7FDF8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0499E8A40959B2E100A7FDF8 /* libz.dylib */; };
+		04A6164D0EF5BED3008B2A1A /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04A6164C0EF5BED3008B2A1A /* libiconv.dylib */; };
 		04C0A45F0CD2942F00CEDCA9 /* libambulant_ffmpeg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45B0CD2942F00CEDCA9 /* libambulant_ffmpeg.dylib */; };
 		04C0A4600CD2942F00CEDCA9 /* libambulant_cocoa.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45C0CD2942F00CEDCA9 /* libambulant_cocoa.dylib */; };
 		04C0A4610CD2942F00CEDCA9 /* libambulant.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 04C0A45D0CD2942F00CEDCA9 /* libambulant.dylib */; };
@@ -72,6 +73,7 @@
 		0499E89B0959B25F00A7FDF8 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = "third_party_packages/ffmpeg-universal/libavutil/libavutil.a"; sourceTree = PREBUILT_AMBULANT_ROOT; };
 		0499E89E0959B29100A7FDF8 /* libSDL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL.a; path = /usr/local/lib/libSDL.a; sourceTree = "<absolute>"; };
 		0499E8A40959B2E100A7FDF8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		04A6164C0EF5BED3008B2A1A /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		04C0A45B0CD2942F00CEDCA9 /* libambulant_ffmpeg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libambulant_ffmpeg.dylib; path = "../../build-webkitplugin/src/libambulant/.libs/libambulant_ffmpeg.dylib"; sourceTree = SOURCE_ROOT; };
 		04C0A45C0CD2942F00CEDCA9 /* libambulant_cocoa.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libambulant_cocoa.dylib; path = "../../build-webkitplugin/src/libambulant/.libs/libambulant_cocoa.dylib"; sourceTree = SOURCE_ROOT; };
 		04C0A45D0CD2942F00CEDCA9 /* libambulant.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libambulant.dylib; path = "../../build-webkitplugin/src/libambulant/.libs/libambulant.dylib"; sourceTree = SOURCE_ROOT; };
@@ -117,6 +119,7 @@
 				04C0A4620CD2942F00CEDCA9 /* libambulant_live.dylib in Frameworks */,
 				040DE08F0CD533A300A68D91 /* libambulant_sdl.a in Frameworks */,
 				0471CC4C0EF5B60C00DBDE51 /* libintl.a in Frameworks */,
+				04A6164D0EF5BED3008B2A1A /* libiconv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +173,7 @@
 			children = (
 				045D0B570958C26F00C194EE /* Ambulant */,
 				045D0B5B0958C36B00C194EE /* libintl.a */,
+				04A6164C0EF5BED3008B2A1A /* libiconv.dylib */,
 				045D0B920958C71E00C194EE /* libexpat.a */,
 				0499E8960959B22200A7FDF8 /* libavcodec.a */,
 				0499E8980959B24100A7FDF8 /* libavformat.a */,
@@ -319,7 +323,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bindir=${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS\nbinary=${bindir}/AmbulantWebKitPlugin\namlibdir=../../build-webkitplugin/src/libambulant/.libs\ncp ${amlibdir}/libambulant.0 ${bindir}/libambulant.dylib\ninstall_name_tool -id @loader_path/libambulant.dylib ${bindir}/libambulant.dylib\ninstall_name_tool -change /usr/local/lib/libambulant.0 @loader_path/libambulant.dylib ${binary}\ncp ${amlibdir}/libambulant_ffmpeg.0 ${bindir}/libambulant_ffmpeg.dylib\ninstall_name_tool -id @loader_path/libambulant_ffmpeg.dylib ${bindir}/libambulant_ffmpeg.dylib\ninstall_name_tool -change /usr/local/lib/libambulant_ffmpeg.0 @loader_path/libambulant_ffmpeg.dylib ${binary}\ncp ${amlibdir}/libambulant_live.0 ${bindir}/libambulant_live.dylib\ninstall_name_tool -id @loader_path/libambulant_live.dylib ${bindir}/libambulant_live.dylib\ninstall_name_tool -change /usr/local/lib/libambulant_live.0 @loader_path/libambulant_live.dylib ${binary}\n";
+			shellScript = "bindir=${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/Contents/MacOS\nbinary=${bindir}/AmbulantWebKitPlugin\namlibdir=../../build-webkitplugin/src/libambulant/.libs\ncp ${amlibdir}/libambulant.0 ${bindir}/libambulant.dylib\ninstall_name_tool -id @loader_path/libambulant.dylib ${bindir}/libambulant.dylib\ninstall_name_tool -change /usr/local/lib/libambulant.0 @loader_path/libambulant.dylib ${binary}\ncp ${amlibdir}/libambulant_cocoa.0 ${bindir}/libambulant_cocoa.dylib\ninstall_name_tool -id @loader_path/libambulant_cocoa.dylib ${bindir}/libambulant_cocoa.dylib\ninstall_name_tool -change /usr/local/lib/libambulant_cocoa.0 @loader_path/libambulant_cocoa.dylib ${binary}\ncp ${amlibdir}/libambulant_ffmpeg.0 ${bindir}/libambulant_ffmpeg.dylib\ninstall_name_tool -id @loader_path/libambulant_ffmpeg.dylib ${bindir}/libambulant_ffmpeg.dylib\ninstall_name_tool -change /usr/local/lib/libambulant_ffmpeg.0 @loader_path/libambulant_ffmpeg.dylib ${binary}\ncp ${amlibdir}/libambulant_live.0 ${bindir}/libambulant_live.dylib\ninstall_name_tool -id @loader_path/libambulant_live.dylib ${bindir}/libambulant_live.dylib\ninstall_name_tool -change /usr/local/lib/libambulant_live.0 @loader_path/libambulant_live.dylib ${binary}\n";
 		};
 		04C26E450CBE22E300CB8EFE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
