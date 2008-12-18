@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AmbulantPlayer 1.8\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2008-12-15 17:30+0100\n"
+"POT-Creation-Date: 2008-12-17 11:57+0100\n"
 "PO-Revision-Date: 2004-09-12 15:09+0200\n"
 "Last-Translator: Jack Jansen <Jack.Jansen@cwi.nl>\n"
 "Language-Team: English <Jack.Jansen@cwi.nl>\n"
@@ -622,47 +622,47 @@ msgstr "DOM-tree kan niet gebouwd worden: %s"
 msgid "Preferences"
 msgstr "Voorkeuren"
 
-#: src/player_gtk/gtk_settings.cpp:93 src/player_unix/qt_settings.cpp:76
+#: src/player_gtk/gtk_settings.cpp:97 src/player_unix/qt_settings.cpp:76
 msgid "Log level:"
 msgstr "Logboek detail:"
 
-#: src/player_gtk/gtk_settings.cpp:110 src/player_unix/qt_settings.cpp:86
+#: src/player_gtk/gtk_settings.cpp:114 src/player_unix/qt_settings.cpp:86
 msgid "XML parser:"
 msgstr "XML parser:"
 
-#: src/player_gtk/gtk_settings.cpp:126
+#: src/player_gtk/gtk_settings.cpp:130
 msgid "Xerces Options:"
 msgstr "Xerces opties:"
 
-#: src/player_gtk/gtk_settings.cpp:134 src/player_unix/qt_settings.cpp:97
+#: src/player_gtk/gtk_settings.cpp:139 src/player_unix/qt_settings.cpp:97
 msgid "Enable XML namespace support"
 msgstr "Gebruik XML namespace ondersteuning"
 
-#: src/player_gtk/gtk_settings.cpp:142
+#: src/player_gtk/gtk_settings.cpp:147
 msgid "Enable XML Validation:"
 msgstr "Gebruik XML validering"
 
-#: src/player_gtk/gtk_settings.cpp:160 src/player_unix/qt_settings.cpp:112
+#: src/player_gtk/gtk_settings.cpp:165 src/player_unix/qt_settings.cpp:112
 msgid "Using Schema"
 msgstr "Met Schema"
 
-#: src/player_gtk/gtk_settings.cpp:161 src/player_unix/qt_settings.cpp:115
+#: src/player_gtk/gtk_settings.cpp:166 src/player_unix/qt_settings.cpp:115
 msgid "Using DTD"
 msgstr "Met DTD"
 
-#: src/player_gtk/gtk_settings.cpp:168 src/player_unix/qt_settings.cpp:120
+#: src/player_gtk/gtk_settings.cpp:173 src/player_unix/qt_settings.cpp:120
 msgid "Validation Schema full checking"
 msgstr "Volledige controle Schema"
 
-#: src/player_gtk/gtk_settings.cpp:173
+#: src/player_gtk/gtk_settings.cpp:178
 msgid "Plugin Options:"
 msgstr "Opties voor insteekmodules:"
 
-#: src/player_gtk/gtk_settings.cpp:181 src/player_unix/qt_settings.cpp:127
+#: src/player_gtk/gtk_settings.cpp:187 src/player_unix/qt_settings.cpp:127
 msgid "Use plugins"
 msgstr "Gebruik insteekmodules"
 
-#: src/player_gtk/gtk_settings.cpp:186
+#: src/player_gtk/gtk_settings.cpp:192
 msgid "Plugin Directory:"
 msgstr "Map voor insteekmodules:"
 
