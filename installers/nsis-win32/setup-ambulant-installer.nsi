@@ -16,7 +16,7 @@
 ; - VC8_DISTDIR: where to pick up these files.
 ;
 !define PRODUCT_NAME "Ambulant Player"
-!define PRODUCT_VERSION "2.0.1"
+!define PRODUCT_VERSION "2.0.2"
 !define PRODUCT_VERSION_BASE "2.0"
 !define DISTRIBUTE_DLL_BUILD
 ; !define DISTRIBUTE_PYTHON_PLUGIN
