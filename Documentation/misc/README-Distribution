@@ -58,9 +58,13 @@ trunk later (which would apply it twice) by doing
 
 After the release you need to merge the changes again, but only the ones
 you didn't merge previously. Set working copy to the trunk, and
-"cvs up -jrelease-ambulant-16-merge -jrelease-ambulant-16-branch". (NOTE:
-this has not been tested yet so please take care and modify this sentence if
-it turns out to be wrong:-). Finally we need to move the "-merge" tag to
+"cvs up -jrelease-ambulant-16-merge -jrelease-ambulant-16-branch".
+Now, check in, and record the fact that you've merged to the trunk up to this point:
+"cvs tag -F remease-ambulant-16-merge-trunk".
+
+Next, switch back to the release branch. It's best to update version numbers at
+this point (will forestall conflicts later, when merging to the trunk).
+Finally we need to move the "-merge" tag to
 show up to which point the branch has been merged: set your working
 copy to the branch, and "cvs tag -F release-ambulant-16-merge" to move
 the tag.
