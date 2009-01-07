@@ -71,6 +71,16 @@ class viewport;
 class dx_window;
 class dx_transition;
 
+common::playable_factory *create_dx_area_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_basicvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_brush_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_image_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_text_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_dx_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class dx_player_callbacks : public html_browser_factory {
   public:
 	virtual HWND new_os_window() = 0;
@@ -78,15 +88,18 @@ class dx_player_callbacks : public html_browser_factory {
 	virtual SIZE get_default_size() = 0;
 };
 
+#if 0
 class dx_playable_factory : public common::playable_factory {
   public:
 	  dx_playable_factory(
 			common::factories *factory,
-			lib::logger *logger,
 			dx_playables_context *ctx)
 	:	m_factory(factory),
-		m_logger(logger),
-		m_dxplayer(ctx) {}
+		m_logger(NULL),
+		m_dxplayer(ctx)
+	{
+		m_logger = lib::logger::get_logger();
+	}
 	////////////////////
 	// common::playable_factory implementation
 
@@ -109,6 +122,7 @@ class dx_playable_factory : public common::playable_factory {
 	lib::logger *m_logger;
 	dx_playables_context *m_dxplayer;
 };
+#endif
 
 class AMBULANTAPI dx_player : 
 	public common::gui_player, 

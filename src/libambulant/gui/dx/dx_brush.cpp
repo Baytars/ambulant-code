@@ -25,11 +25,10 @@
 #include "ambulant/gui/dx/dx_viewport.h"
 #include "ambulant/gui/dx/dx_window.h"
 #include "ambulant/gui/dx/dx_transition.h"
-
 #include "ambulant/common/region_info.h"
-
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/logger.h"
+#include "ambulant/smil2/test_attrs.h"
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
