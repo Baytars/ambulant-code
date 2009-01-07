@@ -28,6 +28,7 @@
 #include "ambulant/lib/tree_builder.h"
 #include "ambulant/lib/document.h"
 #include "ambulant/lib/logger.h"
+#include "ambulant/version.h"
 
 //#define AM_DBG
 
@@ -387,6 +388,9 @@ void test_attrs::set_default_tests_attrs() {
 	active_tests_attrs_map["systemScreenSize"] = "1024X1280";
 	active_tests_attrs_map["systemScreenDepth"] = "32";
     set_current_system_component_value(AM_SYSTEM_COMPONENT("Ambulant"), true);
+    set_current_system_component_value(AM_SYSTEM_COMPONENT("Version2.0"), true);
+    set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION), true);
+    set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION "Exact"), true);
 }
 
 #ifdef WITH_SMIL30
