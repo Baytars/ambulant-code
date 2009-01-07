@@ -40,6 +40,8 @@ namespace dx {
 
 class basicvideo_player;
 
+common::playable_factory *create_dx_basicvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class dx_basicvideo_renderer : public dx_renderer_playable {
   public:
 	dx_basicvideo_renderer(

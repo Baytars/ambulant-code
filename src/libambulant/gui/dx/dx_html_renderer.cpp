@@ -45,6 +45,25 @@
 
 using namespace ambulant;
 
+extern const char dx_html_playable_tag[] = "text";
+extern const char dx_html_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectX");
+extern const char dx_html_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererDirectXHTML");
+extern const char dx_html_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererHTML");
+
+common::playable_factory *
+gui::dx::create_dx_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectX"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectXHTML"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererHTML"), true);
+	return new common::single_playable_factory<
+		gui::dx::dx_html_renderer, 
+        dx_html_playable_tag, 
+        dx_html_playable_renderer_uri, 
+        dx_html_playable_renderer_uri2, 
+        dx_html_playable_renderer_uri3 >(factory, mdp);
+}
+
 // Unique key used to access our renderer_private data
 static common::renderer_private_id my_renderer_id = (common::renderer_private_id)"dx_html_renderer";
 

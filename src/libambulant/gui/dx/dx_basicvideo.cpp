@@ -41,6 +41,20 @@
 #endif
 
 using namespace ambulant;
+extern const char dx_basicvideo_playable_tag[] = "video";
+extern const char dx_basicvideo_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectXBasicVideo");
+
+common::playable_factory *
+gui::dx::create_dx_basicvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectXBasicVideo"), true);
+	return new common::single_playable_factory<
+		gui::dx::dx_basicvideo_renderer, 
+        dx_basicvideo_playable_tag, 
+        dx_basicvideo_playable_renderer_uri, 
+        dx_basicvideo_playable_renderer_uri, 
+        dx_basicvideo_playable_renderer_uri >(factory, mdp);
+}
 
 gui::dx::dx_basicvideo_renderer::dx_basicvideo_renderer(
 	common::playable_notification *context,

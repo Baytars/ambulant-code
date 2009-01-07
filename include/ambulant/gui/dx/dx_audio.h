@@ -40,6 +40,8 @@ namespace dx {
 
 class audio_player;
 
+common::playable_factory *create_dx_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class dx_audio_renderer : public common::renderer_playable {
   public:
 	dx_audio_renderer(

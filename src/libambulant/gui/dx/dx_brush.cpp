@@ -35,6 +35,22 @@
 #endif
 
 using namespace ambulant;
+extern const char dx_brush_playable_tag[] = "brush";
+extern const char dx_brush_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectX");
+extern const char dx_brush_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererDirectXBrush");
+
+common::playable_factory *
+gui::dx::create_dx_brush_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectX"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectXBrush"), true);
+	return new common::single_playable_factory<
+		gui::dx::dx_brush, 
+        dx_brush_playable_tag, 
+        dx_brush_playable_renderer_uri, 
+        dx_brush_playable_renderer_uri, 
+        dx_brush_playable_renderer_uri >(factory, mdp);
+}
 
 gui::dx::dx_brush::dx_brush(
 	common::playable_notification *context,
