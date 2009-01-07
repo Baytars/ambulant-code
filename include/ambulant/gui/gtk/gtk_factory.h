@@ -53,6 +53,10 @@ class gtk_renderer_factory : public common::playable_factory {
   public:
 	gtk_renderer_factory(common::factories *factory);
 	
+	bool supports(common::renderer_select *rs) {
+	  return true;
+	}
+
 	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
@@ -98,6 +102,8 @@ class gtk_video_factory : public common::playable_factory {
 	gtk_video_factory(common::factories *factory)
 	:   m_factory(factory) {}
 	~gtk_video_factory();
+
+	bool supports(common::renderer_select *rs);
 
 	common::playable *new_playable(
 		common::playable_notification *context,

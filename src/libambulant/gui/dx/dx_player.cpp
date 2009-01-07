@@ -510,6 +510,25 @@ gui::dx::dx_player::get_main_window() {
 
 ////////////////////
 // common::playable_factory implementation
+bool
+gui::dx::dx_playable_factory::supports(common::renderer_select *rs)
+{
+	const lib::xml_string& tag = rs->get_tag();
+	if (tag != "" &&
+        tag != "ref" &&
+		tag != "img" &&
+		tag != "text" &&
+		tag != "brush" &&
+		tag != "audio" &&
+		tag != "video" &&
+		tag != "smilText")
+			return false;
+	const char *renderer_uri = rs->get_renderer_uri();
+	if (renderer_uri != NULL && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererDirectX")) != 0)
+			return false;
+	return true;
+}
+
 
 common::playable *
 gui::dx::dx_playable_factory::new_playable(
@@ -540,33 +559,33 @@ gui::dx::dx_playable_factory::new_playable(
 		p = new dx_img_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 	} else if(tag == "audio") {
 #ifdef WITH_FFMPEG
-		p = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory);
+		p = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 #else
 		if (use_ffmpeg)
 			lib::logger::get_logger()->debug("dx_player: DirectShow audio renderer disabled by preference");
 		else
-			p = new dx_audio_renderer(context, cookie, node, evp);
+			p = new dx_audio_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 #endif/*WITH_FFMPEG*/
 	} else if(tag == "video") {
 #if defined(USE_DS_VIDEO)
-		p = new dx_dsvideo_renderer(context, cookie, node, evp, m_factory);
+		p = new dx_dsvideo_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 #elif defined(USE_BASIC_VIDEO)
 		if (use_ffmpeg)
 			lib::logger::get_logger()->debug("dx_player: DirectShow video renderer disabled by preference");
 		else
-			p = new dx_basicvideo_renderer(context, cookie, node, evp, m_dxplayer);
+			p = new dx_basicvideo_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 #else
 		if (use_ffmpeg)
 			lib::logger::get_logger()->debug("dx_player: DirectShow video renderer disabled by preference");
 		else
-			p = new dx_video_renderer(context, cookie, node, evp, m_dxplayer);
+			p = new dx_video_renderer(context, cookie, node, evp, m_factory, m_dxplayer);
 #endif
 	} else if(tag == "area") {
-		p = new dx_area(context, cookie, node, evp);
+		p = new dx_area(context, cookie, node, evp, m_factory, m_dxplayer);
 	} else if(tag == "brush") {
-		p = new dx_brush(context, cookie, node, evp, m_dxplayer);
+		p = new dx_brush(context, cookie, node, evp, m_factory, m_dxplayer);
 	} else {
-		p = new dx_area(context, cookie, node, evp);
+		p = new dx_area(context, cookie, node, evp, m_factory, m_dxplayer);
 	}
 	return p;
 }

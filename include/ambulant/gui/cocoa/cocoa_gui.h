@@ -82,11 +82,14 @@ class cocoa_window_factory : public common::window_factory {
     void *m_defaultwindow_view;
 };
 
+#if 0
 class cocoa_renderer_factory : public common::playable_factory {
   public:
   	cocoa_renderer_factory(common::factories *factory)
 	:   m_factory(factory) {}
   	
+	bool supports(const lib::xml_string& tag, const char* renderer_uri) const;
+
 	common::playable *new_playable(
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
@@ -102,6 +105,7 @@ class cocoa_renderer_factory : public common::playable_factory {
   private:
     common::factories *m_factory;
 };
+#endif
 
 class cocoa_gui_screen : public common::gui_screen {
   public:
@@ -115,7 +119,20 @@ class cocoa_gui_screen : public common::gui_screen {
 };
 
 AMBULANTAPI common::window_factory *create_cocoa_window_factory(void *view);
+#if 0
 AMBULANTAPI common::playable_factory *create_cocoa_renderer_factory(common::factories *factory);
+#endif
+
+common::playable_factory *create_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_dsvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_fill_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_image_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_ink_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_text_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+common::playable_factory *create_cocoa_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 
 } // namespace cocoa
 
@@ -162,6 +179,7 @@ AMBULANTAPI common::playable_factory *create_cocoa_renderer_factory(common::fact
 - (bool)isAmbulantWindowInUse;
 - (bool)ignoreResize;
 - (BOOL)isFlipped;
+- (void)updateScreenSize;
 
 - (NSRect) NSRectForAmbulantRect: (const ambulant::lib::rect *)arect;
 - (ambulant::lib::rect) ambulantRectForNSRect: (const NSRect *)nsrect;

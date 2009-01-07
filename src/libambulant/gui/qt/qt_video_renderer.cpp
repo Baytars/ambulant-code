@@ -46,8 +46,9 @@ qt_video_renderer::qt_video_renderer(
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor *const evp,
-    	common::factories *factory)
-:	qt_renderer<common::video_renderer>(context, cookie, node, evp, factory),
+    	common::factories *factory,
+		common::playable_factory_machdep *mdp)
+:	qt_renderer<common::video_renderer>(context, cookie, node, evp, factory, mdp),
 	m_image(NULL),
 	m_datasize(1)
 {

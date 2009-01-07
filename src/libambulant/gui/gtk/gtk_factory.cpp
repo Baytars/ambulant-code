@@ -190,28 +190,28 @@ gtk_renderer_factory::new_playable(
 	common::playable* rv;
 	if (tag == "img") {
  		rv = new gtk_image_renderer(context, cookie, node,
-						  evp, m_factory);
+					    evp, m_factory, NULL);
 		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_image_renderer 0x%x", 
 			(void*) node, (void*) rv);
 	} else if (tag == "brush") {
  		rv = new gtk_fill_renderer(context, cookie, node,
-					  evp, m_factory);
+					   evp, m_factory, NULL);
 		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_fill_renderer 0x%x", 
 			(void*) node, (void*) rv);
 #ifdef WITH_SMIL30
 	} else if(tag == "smilText") {
-	  rv = new gtk_smiltext_renderer(context, cookie, node, evp);//, m_factory);
+	  rv = new gtk_smiltext_renderer(context, cookie, node, evp, m_factory, NULL);//, m_factory);
 #endif/*WITH_SMIL30*/
 	} else if ( tag == "text") {
 #ifdef	WITH_GTK_HTML_WIDGET
 		net::url url = net::url(node->get_url("src"));
 		if (url.guesstype() == "text/html") {
-			rv = new gtk_html_renderer(context, cookie, node, evp, m_factory);
+		  rv = new gtk_html_renderer(context, cookie, node, evp, m_factory, NULL);
 			AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_html_renderer 0x%x", (void*) node, (void*) rv);
 		} else {
 #endif   /*WITH_GTK_HTML_WIDGET*/
 		rv = new gtk_text_renderer(context, cookie, node,
-						 evp, m_factory);
+					   evp, m_factory, NULL);
 		AM_DBG lib::logger::get_logger()->debug("gtk_renderer_factory: node 0x%x: returning gtk_text_renderer 0x%x",
 			(void*) node, (void*) rv);
 
@@ -307,6 +307,14 @@ gtk_video_factory::~gtk_video_factory()
 {
 }
 
+
+bool
+gtk_video_factory::supports(common::renderer_select *rs)
+{
+  const xml_string& tag = rs->get_tag();
+  if (tag != "" && tag != "video" && tag != "ref") return false;
+}
+
 common::playable *
 gtk_video_factory::new_playable(
 		common::playable_notification *context,
@@ -319,7 +327,7 @@ gtk_video_factory::new_playable(
 	lib::xml_string tag = node->get_qname().second;
     AM_DBG lib::logger::get_logger()->debug("gtk_video_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "video") {
-		rv = new gtk_video_renderer(context, cookie, node, evp, m_factory);
+	  rv = new gtk_video_renderer(context, cookie, node, evp, m_factory, NULL);
 		AM_DBG lib::logger::get_logger()->debug("gtk_video_factory: node 0x%x:  returning gtk_video_renderer 0x%x", (void *)node, (void *)rv);
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("gtk_video_factory: no renderer for tag \"%s\"", tag.c_str());
