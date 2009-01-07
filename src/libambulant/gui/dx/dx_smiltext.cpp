@@ -25,15 +25,13 @@
 #include "ambulant/gui/dx/dx_window.h"
 #include "ambulant/gui/dx/dx_smiltext.h"
 #include "ambulant/gui/dx/dx_transition.h"
-
 #include "ambulant/common/region_info.h"
-
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/memfile.h"
 #include "ambulant/lib/string_util.h"
 #include "ambulant/smil2/params.h"
+#include "ambulant/smil2/test_attrs.h"
 #include "ambulant/common/factory.h"
-
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/win32/win32_error.h"
 #include "ambulant/lib/textptr.h"

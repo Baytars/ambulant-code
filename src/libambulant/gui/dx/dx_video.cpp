@@ -26,14 +26,13 @@
 #include "ambulant/gui/dx/dx_window.h"
 #include "ambulant/gui/dx/dx_video_player.h"
 #include "ambulant/gui/dx/dx_transition.h"
-
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/win32/win32_asb.h"
 #include "ambulant/lib/textptr.h"
-
 #include "ambulant/common/region_info.h"
+#include "ambulant/smil2/test_attrs.h"
 
 //#define AM_DBG if(1)
 

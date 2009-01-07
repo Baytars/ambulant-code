@@ -23,13 +23,12 @@
 
 #include "ambulant/gui/dx/dx_audio.h"
 #include "ambulant/gui/dx/dx_audio_player.h"
-
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/win32/win32_asb.h"
-
 #include "ambulant/common/region.h"
+#include "ambulant/smil2/test_attrs.h"
 
 
 //#define AM_DBG
@@ -40,6 +39,25 @@
 using namespace ambulant;
 
 double s_global_level = 1.0;
+
+extern const char dx_audio_playable_tag[] = "audio";
+extern const char dx_audio_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectX");
+extern const char dx_audio_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererDirectXAudio");
+extern const char dx_audio_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererAudio");
+
+common::playable_factory *
+gui::dx::create_dx_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectX"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectXAudio"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererAudio"), true);
+	return new common::single_playable_factory<
+		gui::dx::dx_audio_renderer, 
+        dx_audio_playable_tag, 
+        dx_audio_playable_renderer_uri, 
+        dx_audio_playable_renderer_uri2, 
+        dx_audio_playable_renderer_uri3 >(factory, mdp);
+}
 
 gui::dx::dx_audio_renderer::dx_audio_renderer(
 	common::playable_notification *context,

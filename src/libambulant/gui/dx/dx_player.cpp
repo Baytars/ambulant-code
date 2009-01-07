@@ -213,7 +213,16 @@ gui::dx::dx_player::init_playable_factory()
 	common::global_playable_factory *pf = common::get_global_playable_factory();
 	set_playable_factory(pf);
 	// Add the playable factory
-	pf->add_factory(new dx_playable_factory(this, m_logger, this));
+	pf->add_factory(create_dx_area_playable_factory(this, this));
+	pf->add_factory(create_dx_audio_playable_factory(this, this));
+	pf->add_factory(create_dx_basicvideo_playable_factory(this, this));
+	pf->add_factory(create_dx_brush_playable_factory(this, this));
+	pf->add_factory(create_dx_html_playable_factory(this, this));
+	pf->add_factory(create_dx_image_playable_factory(this, this));
+	pf->add_factory(create_dx_smiltext_playable_factory(this, this));
+	pf->add_factory(create_dx_text_playable_factory(this, this));
+	pf->add_factory(create_dx_video_playable_factory(this, this));
+	
 }
 
 void
@@ -508,6 +517,7 @@ gui::dx::dx_player::get_main_window() {
 	return (*it).second->h;
 }
 
+#if 0
 ////////////////////
 // common::playable_factory implementation
 bool
@@ -600,6 +610,7 @@ gui::dx::dx_playable_factory::new_aux_audio_playable(
 {
 	return NULL;
 }
+#endif
 
 void gui::dx::dx_player::set_intransition(common::playable *p, const lib::transition_info *info) { 
 	AM_DBG lib::logger::get_logger()->debug("set_intransition : %s", repr(info->m_type).c_str());
