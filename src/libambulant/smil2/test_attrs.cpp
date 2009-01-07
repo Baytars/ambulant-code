@@ -518,7 +518,11 @@ void
 test_attrs::set_current_screen_size(int height, int width)
 {
     char buf[32];
-    snprintf(buf, sizeof buf, "%dx%d", height, width);
+#ifdef AMBULANT_PLATFORM_WIN32
+	sprintf_s(buf, sizeof buf, "%dx%d", height, width);
+#else
+	snprintf(buf, sizeof buf, "%dx%d", height, width);
+#endif
     active_tests_attrs_map["systemScreenSize"] = std::string(buf);
     // XXX should raise contentControlChange
 }

@@ -48,8 +48,9 @@ gui::dx::dx_video_renderer::dx_video_renderer(
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor* evp,
+	common::factories *fp,
 	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, dxplayer),
+:   dx_renderer_playable(context, cookie, node, evp, fp, dxplayer),
 	m_player(0), 
 	m_update_event(0),
 	m_frametime(50)

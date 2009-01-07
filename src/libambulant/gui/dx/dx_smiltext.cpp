@@ -73,7 +73,7 @@ gui::dx::dx_smiltext_renderer::dx_smiltext_renderer(
 	lib::event_processor* evp,
 	common::factories* factory,
 	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, dxplayer),
+:   dx_renderer_playable(context, cookie, node, evp, factory, dxplayer),
 	m_context(context),
 	m_size(0,0),
 	m_hdc(NULL),
