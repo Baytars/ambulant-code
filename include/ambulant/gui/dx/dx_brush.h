@@ -37,6 +37,8 @@ namespace gui {
 
 namespace dx {
 
+common::playable_factory *create_dx_brush_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class dx_brush : public dx_renderer_playable {
   public:
 	dx_brush(

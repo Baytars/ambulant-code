@@ -37,6 +37,8 @@ namespace dx {
 
 class dx_gui_region;
 
+common::playable_factory *create_dx_area_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class dx_area : public common::renderer_playable {
   public:
 	dx_area (

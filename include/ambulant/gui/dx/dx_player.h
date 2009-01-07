@@ -71,15 +71,6 @@ class viewport;
 class dx_window;
 class dx_transition;
 
-common::playable_factory *create_dx_area_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_basicvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_brush_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_image_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_text_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
-common::playable_factory *create_dx_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
 
 class dx_player_callbacks : public html_browser_factory {
   public:
