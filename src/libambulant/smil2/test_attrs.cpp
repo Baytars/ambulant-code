@@ -386,6 +386,7 @@ void test_attrs::set_default_tests_attrs() {
 #endif
 	active_tests_attrs_map["systemScreenSize"] = "1024X1280";
 	active_tests_attrs_map["systemScreenDepth"] = "32";
+    set_current_system_component_value(AM_SYSTEM_COMPONENT("Ambulant"), true);
 }
 
 #ifdef WITH_SMIL30

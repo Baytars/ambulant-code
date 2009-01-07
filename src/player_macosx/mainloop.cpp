@@ -72,9 +72,10 @@ mainloop::mainloop(const char *urlstr, void *view, ambulant::common::embedder *a
     // Set systemComponent values that are relevant
     smil2::test_attrs::set_default_tests_attrs();
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Standalone"), true);
-    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version1.9"), true);
-    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version1.9Exact"), true);
-	init_factories();
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version2.0"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION "Exact"), true);
+ 	init_factories();
 	
 	init_plugins();
 	
