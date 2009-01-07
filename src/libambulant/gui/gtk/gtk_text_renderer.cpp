@@ -38,12 +38,13 @@ using namespace ambulant;
 using namespace gui::gtk;
 
 gtk_text_renderer::gtk_text_renderer(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-    	lib::event_processor *const evp,
-    	common::factories *factory)
-:	gtk_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+	common::playable_notification *context,
+	common::playable_notification::cookie_type cookie,
+	const lib::node *node,
+	lib::event_processor *const evp,
+	common::factories *factory,
+	common::playable_factory_machdep *mdp)
+:	gtk_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory, mdp),
  	m_text_storage(NULL),
  	m_text_color(0),
  	m_text_font(NULL),

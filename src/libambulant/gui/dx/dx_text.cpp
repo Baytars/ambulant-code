@@ -50,7 +50,7 @@ gui::dx::dx_text_renderer::dx_text_renderer(
 	lib::event_processor* evp,
 	common::factories* factory,
 	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, dxplayer),
+:   dx_renderer_playable(context, cookie, node, evp, factory, dxplayer),
 	m_text(0),
 	m_df(factory->get_datasource_factory())
 {

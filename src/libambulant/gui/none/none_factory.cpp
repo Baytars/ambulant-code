@@ -25,6 +25,7 @@
 #include "ambulant/config/config.h"
 #include "ambulant/gui/none/none_factory.h"
 #include "ambulant/gui/none/none_video_renderer.h"
+#include "ambulant/common/renderer_select.h"
 
 
 using namespace ambulant;
@@ -40,6 +41,17 @@ none_video_factory::~none_video_factory()
 {
 }
 
+bool 
+none_video_factory::supports(common::renderer_select *rs)
+{
+	const lib::xml_string& tag = rs->get_tag();
+	if (tag != "" && tag != "ref" && tag != "video") return false;
+	const char *renderer_uri = rs->get_renderer_uri();
+	if (renderer_uri && strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererNone")) == 0)
+		return true;
+	return false;
+}
+
 common::playable *
 none_video_factory::new_playable(
 		common::playable_notification *context,
@@ -51,7 +63,7 @@ none_video_factory::new_playable(
 	lib::xml_string tag = node->get_local_name();
     AM_DBG lib::logger::get_logger()->debug("none_video_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
 	if ( tag == "video") {
-		rv = new gui::none::none_video_renderer(context, cookie, node, evp, m_factory);
+		rv = new gui::none::none_video_renderer(context, cookie, node, evp, m_factory, NULL);
 		AM_DBG lib::logger::get_logger()->debug("none_video_factory: node 0x%x: returning none_video_renderer 0x%x", (void *)node, (void *)rv);
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("none_video_factory: no renderer for tag \"%s\"", tag.c_str());

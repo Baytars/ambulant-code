@@ -66,7 +66,8 @@ class qt_html_renderer : public renderer_playable {
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
 		lib::event_processor* evp,
-		common::factories *factory);
+		common::factories *fp,
+		common::playable_factory_machdep *mdp);
 	~qt_html_renderer();
 	void start(double t);
 	void stop();

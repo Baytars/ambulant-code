@@ -58,8 +58,9 @@ class gtk_image_renderer : public gtk_renderer<renderer_playable_dsall> {
 		playable_notification::cookie_type cookie,
 		const node *node,
 		event_processor *const evp,
-		common::factories *factory)
-	:	gtk_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory),
+		common::factories *factory,
+		common::playable_factory_machdep *mdp)
+	  :	gtk_renderer<renderer_playable_dsall>(context, cookie, node, evp, factory, mdp),
 	 	m_image(NULL),
 		m_image_loaded(false)
 	 	{};

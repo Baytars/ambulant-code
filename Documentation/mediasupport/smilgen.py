@@ -50,7 +50,7 @@ def smil_document():
     doc.init()
     return doc
     
-def gen_smil(mediatype, basename, mediafilename):
+def gen_smil(mediatype, basename, mediafilename, renderer_uri):
     if basename:
         mediafilename = urllib.basejoin(basename, mediafilename)
     s = smil_document()
@@ -64,19 +64,25 @@ def gen_smil(mediatype, basename, mediafilename):
     
     s.body()
     if mediatype == 'video':
-        s.video('', src=mediafilename)
+        s.video(src=mediafilename)
+        if renderer_uri:
+            s.param('', name="renderer", value=renderer_uri)
+        s.video.close()
     elif mediatype == 'audio':
-        s.audio('', src=mediafilename)
+        s.audio(src=mediafilename)
+        if renderer_uri:
+            s.param('', name="renderer", value=renderer_uri)
+        s.audio.close()
     else:
         raise RuntimeError('Unknown media type ' + mediatype)
     s.body.close()
     s.smil.close()
     return s
     
-def gen_smilfile(prefix, basename, e):
+def gen_smilfile(prefix, basename, e, renderer_uri):
     if not e.sample: return None
     if not e.smil.get(prefix):
-        smildata = gen_smil(e.tag, basename, e.sample)
+        smildata = gen_smil(e.tag, basename, e.sample, renderer_uri)
         mediafilename = e.sample.split('/')[-1]
         smilfilename = prefix + mediafilename.split('.')[0] + '.smil'
         fp = open(smilfilename, 'w')

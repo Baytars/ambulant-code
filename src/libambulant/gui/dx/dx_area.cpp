@@ -39,8 +39,10 @@ gui::dx::dx_area::dx_area(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor* evp) 
-:	common::renderer_playable(context, cookie, node, evp), 
+	lib::event_processor* evp,
+	common::factories *fp,
+	common::playable_factory_machdep *dxplayer) 
+:	common::renderer_playable(context, cookie, node, evp, fp, dxplayer), 
 	m_rgn(0) {
 	AM_DBG lib::logger::get_logger()->debug("dx_area::ctr(0x%x)", this);
 }

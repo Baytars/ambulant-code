@@ -46,7 +46,9 @@ class dx_audio_renderer : public common::renderer_playable {
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor* evp);
+		lib::event_processor* evp,
+		common::factories *fp,
+		common::playable_factory_machdep *dxplayer);
 	~dx_audio_renderer();
 	void start(double t);
 	void stop();

@@ -53,7 +53,9 @@ class qt_smiltext_renderer :
 		common::playable_notification *context,
 		common::playable_notification::cookie_type cookie,
 		const lib::node *node,
-		lib::event_processor* evp);
+		lib::event_processor* evp,
+		common::factories *fp,
+		common::playable_factory_machdep *mdp);
 	~qt_smiltext_renderer();
 	void start(double t);
 	void stop();
