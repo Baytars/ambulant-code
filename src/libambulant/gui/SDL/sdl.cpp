@@ -29,6 +29,7 @@
 #include "ambulant/gui/SDL/sdl_gui.h"
 #include "ambulant/gui/SDL/sdl_audio.h"
 #include "ambulant/common/renderer_select.h"
+#include "ambulant/smil2/test_attrs.h"
 
 using namespace ambulant;
 using namespace gui::sdl;
@@ -36,6 +37,9 @@ using namespace gui::sdl;
 common::playable_factory *
 ambulant::gui::sdl::create_sdl_playable_factory(common::factories *factory)
 {
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererSdl"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererOpen"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererAudio"), true);
     return new sdl_renderer_factory(factory);
 }
 
@@ -51,7 +55,8 @@ sdl_renderer_factory::supports(common::renderer_select *rs)
 	const char *renderer_uri = rs->get_renderer_uri();
 	if (renderer_uri != NULL && 
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererSdl")) != 0 &&
-		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0)
+		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0 &&
+        strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererAudio")) != 0 )
 		return false;
 	return true;
 }

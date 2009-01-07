@@ -259,7 +259,7 @@ class global_playable_factory : public playable_factory {
 AMBULANTAPI global_playable_factory *get_global_playable_factory();
 
 /// Template factory for one implementation class
-template<class PlayableClass, const char *Tag, const char *Renderer_uri, const char *Renderer_uri2>
+template<class PlayableClass, const char *Tag, const char *Renderer_uri, const char *Renderer_uri2, const char *Renderer_uri3>
 class single_playable_factory : public playable_factory {
   public:
 	single_playable_factory(

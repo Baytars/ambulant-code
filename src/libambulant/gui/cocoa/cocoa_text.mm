@@ -55,6 +55,7 @@ create_cocoa_text_playable_factory(common::factories *factory, common::playable_
         cocoa_text_renderer, 
         cocoa_text_playable_tag, 
         cocoa_text_playable_renderer_uri,
+        cocoa_text_playable_renderer_uri2,
         cocoa_text_playable_renderer_uri2>(factory, mdp);
 }
 

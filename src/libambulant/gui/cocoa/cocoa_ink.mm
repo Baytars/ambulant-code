@@ -57,6 +57,7 @@ create_cocoa_ink_playable_factory(common::factories *factory, common::playable_f
         cocoa_ink_renderer, 
         cocoa_ink_playable_tag, 
         cocoa_ink_playable_renderer_uri,
+        cocoa_ink_playable_renderer_uri2,
         cocoa_ink_playable_renderer_uri2>(factory, mdp);
 }
 

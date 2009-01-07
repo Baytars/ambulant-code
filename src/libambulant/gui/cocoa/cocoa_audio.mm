@@ -41,13 +41,19 @@ namespace cocoa {
 
 extern const char cocoa_audio_playable_tag[] = "audio";
 extern const char cocoa_audio_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoaAudio");
+extern const char cocoa_audio_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererAudio");
 
 common::playable_factory *
 create_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererCocoaAudio"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererAudio"), true);
 	return new common::single_playable_factory<
-        cocoa_audio_playable, cocoa_audio_playable_tag, cocoa_audio_playable_renderer_uri, cocoa_audio_playable_renderer_uri >(factory, mdp);
+        cocoa_audio_playable, 
+        cocoa_audio_playable_tag, 
+        cocoa_audio_playable_renderer_uri, 
+        cocoa_audio_playable_renderer_uri2, 
+        cocoa_audio_playable_renderer_uri2 >(factory, mdp);
 }
 
 cocoa_audio_playable::cocoa_audio_playable(
