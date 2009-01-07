@@ -42,16 +42,19 @@ namespace cocoa {
 
 extern const char cocoa_fill_playable_tag[] = "brush";
 extern const char cocoa_fill_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
+extern const char cocoa_fill_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererFill");
 
 common::playable_factory *
 create_cocoa_fill_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
     smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererCocoa"), true);
+   smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererFill"), true);
 	return new common::single_playable_factory<
         cocoa_fill_renderer, 
         cocoa_fill_playable_tag, 
         cocoa_fill_playable_renderer_uri,
-        cocoa_fill_playable_renderer_uri>(factory, mdp);
+        cocoa_fill_playable_renderer_uri2,
+        cocoa_fill_playable_renderer_uri2>(factory, mdp);
 }
 
 

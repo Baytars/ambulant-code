@@ -26,6 +26,7 @@
 #include "ambulant/gui/none/none_factory.h"
 #include "ambulant/gui/none/none_video_renderer.h"
 #include "ambulant/common/renderer_select.h"
+#include "ambulant/smil2/test_attrs.h"
 
 
 using namespace ambulant;
@@ -34,6 +35,7 @@ using namespace gui::none;
 common::playable_factory *
 ambulant::gui::none::create_none_video_factory(common::factories *factory)
 {
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererNone"), true);
     return new none_video_factory(factory);
 }
 

@@ -157,6 +157,7 @@ create_cocoa_html_playable_factory(common::factories *factory, common::playable_
         cocoa_html_renderer, 
         cocoa_html_playable_tag, 
         cocoa_html_playable_renderer_uri,
+        cocoa_html_playable_renderer_uri2,
         cocoa_html_playable_renderer_uri2>(factory, mdp);
 }
 
