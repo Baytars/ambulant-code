@@ -49,12 +49,14 @@ gui::qt::qt_smiltext_renderer::qt_smiltext_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
-	lib::event_processor* evp)
+	lib::event_processor* evp,
+		common::factories *fp,
+		common::playable_factory_machdep *mdp)
   :     m_qt_transparent(redc(QT_TRANSPARENT_COLOR),greenc(QT_TRANSPARENT_COLOR),bluec( QT_TRANSPARENT_COLOR)),
         m_qt_alternative(redc(QT_ALTERNATIVE_COLOR),greenc(QT_ALTERNATIVE_COLOR),bluec( QT_ALTERNATIVE_COLOR)),
 	m_bgopacity(1.0),
 	m_blending(false),
-	qt_renderer<renderer_playable>(context, cookie, node, evp),
+	qt_renderer<renderer_playable>(context, cookie, node, evp, fp, mdp),
 	m_layout_engine(smil2::smiltext_layout_engine(node, evp, this, this, true))
 {
 	AM_DBG lib::logger::get_logger()->debug("qt_smiltext_renderer(0x%x)", this);
