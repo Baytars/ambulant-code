@@ -59,6 +59,8 @@ namespace qt {
 
 class browser_container;
 
+common::playable_factory *create_qt_html_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class qt_html_renderer : public renderer_playable {
   public:
 	qt_html_renderer(

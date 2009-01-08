@@ -47,7 +47,7 @@ namespace gtk {
 	void gdk_pixmap_bitblt(GdkPixmap* dst, int dst_x, int dst_y, GdkPixmap* src, int src_x, int src_y, int width, int height);
 
 class gtk_ambulant_widget;
-
+#if 0
 /// GTK implementation of playable_factory
 class gtk_renderer_factory : public common::playable_factory {
   public:
@@ -73,6 +73,7 @@ class gtk_renderer_factory : public common::playable_factory {
   	common::factories *m_factory;
 
 };  // class gtk_renderer_factory
+#endif
 
 /// GTK implementation of window_factory
 class gtk_window_factory : public common::window_factory {
@@ -94,7 +95,7 @@ class gtk_window_factory : public common::window_factory {
 	GdkCursor* m_hand2_cursor;
 };  // class gtk_window_factory
 
-
+#if 0
 /// GTK implementation of another playable_factory that handles video.
 class gtk_video_factory : public common::playable_factory {
   public:
@@ -120,6 +121,7 @@ class gtk_video_factory : public common::playable_factory {
  private:
         common::factories *m_factory;
 }; // class gtk_video_factory 
+#endif
 
 /// ambulant_gtk_window is the GTK implementation of gui_window, it is the
 /// class that corresponds to a SMIL topLayout element.
@@ -257,12 +259,16 @@ class gtk_ambulant_widget : public GtkWidget, public ambulant::common::gui_scree
 
 };  // class gtk_ambulant_widget
 
+#if 0
 AMBULANTAPI common::playable_factory *create_gtk_renderer_factory(common::factories *factory);
+#endif
 AMBULANTAPI common::window_factory *create_gtk_window_factory(gtk_ambulant_widget* gtk_widget, common::gui_player* gpl);
 // XXXX Needs to be implemented:
 // Create gtk_ambulant_widget inside gtk_parent_widget, call create_gtk_window_factory.
 AMBULANTAPI common::window_factory *create_gtk_window_factory_unsafe(void* gtk_parent_widget, common::gui_player* gpl);
+#if 0
 AMBULANTAPI common::playable_factory *create_gtk_video_factory(common::factories *factory);
+#endif
 
 } // namespace gtk
 

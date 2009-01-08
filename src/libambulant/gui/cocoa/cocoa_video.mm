@@ -18,11 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /* 
-<<<<<<< cocoa_video.mm
  * @$Id$ 
-=======
- * @$Id$ 
->>>>>>> 1.39.2.4
  */
 
 #include "ambulant/gui/cocoa/cocoa_video.h"
@@ -126,7 +122,7 @@ movieDidDrawFrame(Movie theMovie, long refCon)
 extern const char cocoa_video_playable_tag[] = "video";
 extern const char cocoa_video_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
 extern const char cocoa_video_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererQuickTime");
-// XXXJACK RendererVideo
+extern const char cocoa_video_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererVideo");
 
 common::playable_factory *
 create_cocoa_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
@@ -139,7 +135,7 @@ create_cocoa_video_playable_factory(common::factories *factory, common::playable
         cocoa_video_playable_tag, 
         cocoa_video_playable_renderer_uri,
         cocoa_video_playable_renderer_uri2,
-        cocoa_video_playable_renderer_uri2>(factory, mdp);
+        cocoa_video_playable_renderer_uri3>(factory, mdp);
 }
 
 cocoa_video_renderer::cocoa_video_renderer(

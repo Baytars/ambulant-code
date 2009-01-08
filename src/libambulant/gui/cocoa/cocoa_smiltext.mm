@@ -18,11 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /* 
-<<<<<<< cocoa_smiltext.mm
  * @$Id$ 
-=======
- * @$Id$ 
->>>>>>> 1.30.6.5
  */
 
 #include "ambulant/gui/cocoa/cocoa_smiltext.h"
@@ -113,7 +109,6 @@ create_cocoa_smiltext_playable_factory(common::factories *factory, common::playa
         cocoa_smiltext_playable_renderer_uri2,
         cocoa_smiltext_playable_renderer_uri2>(factory, mdp);
 }
-
 
 cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 		playable_notification *context,

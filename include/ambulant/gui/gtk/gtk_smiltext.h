@@ -41,6 +41,8 @@ namespace gui {
 
 namespace gtk {
 
+common::playable_factory *create_gtk_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
+
 class gtk_smiltext_renderer : 
 	public gtk_renderer<renderer_playable>,
 	public smil2::smiltext_notification

@@ -35,6 +35,7 @@
 
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/textptr.h"
+#include "ambulant/smil2/test_attrs.h"
 
 // #define AM_DBG if(1)
 
@@ -44,6 +45,23 @@
 
 using namespace ambulant;
 using ambulant::lib::logger;
+
+extern const char qt_smiltext_playable_tag[] = "smilText";
+extern const char qt_smiltext_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererQt");
+extern const char qt_smiltext_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererSmilText");
+
+common::playable_factory *
+gui::qt::create_qt_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererQt"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererSmilText"), true);
+	return new common::single_playable_factory<
+        gui::qt::qt_smiltext_renderer, 
+        qt_smiltext_playable_tag, 
+        qt_smiltext_playable_renderer_uri,
+        qt_smiltext_playable_renderer_uri2,
+        qt_smiltext_playable_renderer_uri2>(factory, mdp);
+}
 
 gui::qt::qt_smiltext_renderer::qt_smiltext_renderer(
 	common::playable_notification *context,

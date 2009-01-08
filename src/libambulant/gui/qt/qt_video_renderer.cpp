@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 #include "ambulant/common/playable.h"
-
+#include "ambulant/smil2/test_attrs.h"
 
 // WARNING: turning on AM_DBG globally in this file seems to trigger
 // a condition that makes the whole player hang or collapse. So you probably
@@ -39,7 +39,24 @@
 using namespace ambulant;
 using namespace gui::qt;
 
+extern const char qt_video_playable_tag[] = "video";
+extern const char qt_video_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererQt");
+extern const char qt_video_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererVideo");
+extern const char qt_video_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererOpen");
 
+common::playable_factory *
+gui::qt::create_qt_video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererQt"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererVideo"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererOpen"), true);
+	return new common::single_playable_factory<
+        qt_video_renderer, 
+        qt_video_playable_tag, 
+        qt_video_playable_renderer_uri,
+        qt_video_playable_renderer_uri2,
+        qt_video_playable_renderer_uri3>(factory, mdp);
+}
 
 qt_video_renderer::qt_video_renderer(
 		common::playable_notification *context,
