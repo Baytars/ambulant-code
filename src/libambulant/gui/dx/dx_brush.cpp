@@ -48,8 +48,8 @@ gui::dx::create_dx_brush_playable_factory(common::factories *factory, common::pl
 		gui::dx::dx_brush, 
         dx_brush_playable_tag, 
         dx_brush_playable_renderer_uri, 
-        dx_brush_playable_renderer_uri, 
-        dx_brush_playable_renderer_uri >(factory, mdp);
+        dx_brush_playable_renderer_uri2, 
+        dx_brush_playable_renderer_uri2 >(factory, mdp);
 }
 
 gui::dx::dx_brush::dx_brush(
@@ -58,8 +58,8 @@ gui::dx::dx_brush::dx_brush(
 	const lib::node *node,
 	lib::event_processor* evp,
 	common::factories *fp,
-	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, fp, dxplayer),
+	common::playable_factory_machdep *dxplayer)
+:   dx_renderer_playable(context, cookie, node, evp, fp, dynamic_cast<dx_playables_context*>(dxplayer)),
 	m_color(0) {
 	AM_DBG lib::logger::get_logger()->debug("dx_brush::dx_brush(0x%x)", this);
 }

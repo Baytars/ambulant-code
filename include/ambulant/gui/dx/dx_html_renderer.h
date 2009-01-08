@@ -55,7 +55,7 @@ class dx_html_renderer : public dx_renderer_playable {
 		const lib::node *node,
 		lib::event_processor* evp,
 		common::factories* factories,
-		dx_playables_context *dxplayer);
+		common::playable_factory_machdep *mdp);
 	~dx_html_renderer();
 	void start(double t);
 	void stop();
