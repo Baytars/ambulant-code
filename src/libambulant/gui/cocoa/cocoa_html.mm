@@ -143,7 +143,6 @@ _get_html_view(common::surface *surf)
 	return wvc;
 }
 
-
 extern const char cocoa_html_playable_tag[] = "text";
 extern const char cocoa_html_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
 extern const char cocoa_html_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererHtml");
@@ -160,7 +159,6 @@ create_cocoa_html_playable_factory(common::factories *factory, common::playable_
         cocoa_html_playable_renderer_uri2,
         cocoa_html_playable_renderer_uri2>(factory, mdp);
 }
-
 
 void
 cocoa_html_renderer::start(double where) {

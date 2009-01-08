@@ -26,6 +26,7 @@
 #include "ambulant/gui/gtk/gtk_renderer.h"
 #include "ambulant/gui/gtk/gtk_text_renderer.h"
 #include "ambulant/smil2/params.h"
+#include "ambulant/smil2/test_attrs.h"
 
 //#define AM_DBG
 #ifndef AM_DBG
@@ -36,6 +37,23 @@
 
 using namespace ambulant;
 using namespace gui::gtk;
+
+extern const char gtk_text_playable_tag[] = "text";
+extern const char gtk_text_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererGtk");
+extern const char gtk_text_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererText");
+
+common::playable_factory *
+gui::gtk::create_gtk_text_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererGtk"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererText"), true);
+	return new common::single_playable_factory<
+        gtk_text_renderer, 
+        gtk_text_playable_tag, 
+        gtk_text_playable_renderer_uri,
+        gtk_text_playable_renderer_uri2,
+        gtk_text_playable_renderer_uri2>(factory, mdp);
+}
 
 gtk_text_renderer::gtk_text_renderer(
 	common::playable_notification *context,

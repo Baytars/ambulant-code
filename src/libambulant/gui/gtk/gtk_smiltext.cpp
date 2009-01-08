@@ -28,6 +28,7 @@
 #include "ambulant/gui/gtk/gtk_util.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/params.h"
+#include "ambulant/smil2/test_attrs.h"
 
 //#define AM_DBG if(1)
 #ifndef AM_DBG
@@ -43,6 +44,23 @@ using namespace lib;
 namespace gui {
 
 namespace gtk {
+
+extern const char gtk_smiltext_playable_tag[] = "smilText";
+extern const char gtk_smiltext_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererGtk");
+extern const char gtk_smiltext_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererSmilText");
+
+common::playable_factory *
+create_gtk_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererGtk"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererSmilText"), true);
+	return new common::single_playable_factory<
+        gtk_smiltext_renderer, 
+        gtk_smiltext_playable_tag, 
+        gtk_smiltext_playable_renderer_uri,
+        gtk_smiltext_playable_renderer_uri2,
+        gtk_smiltext_playable_renderer_uri2>(factory, mdp);
+}
 
 gtk_smiltext_renderer::gtk_smiltext_renderer(
 		playable_notification *context,

@@ -45,7 +45,6 @@ namespace gui {
 
 namespace cocoa {
 
-
 extern const char cocoa_image_playable_tag[] = "img";
 extern const char cocoa_image_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
 extern const char cocoa_image_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererImg");
@@ -62,7 +61,6 @@ create_cocoa_image_playable_factory(common::factories *factory, common::playable
         cocoa_image_playable_renderer_uri2,
         cocoa_image_playable_renderer_uri2>(factory, mdp);
 }
-
 
 cocoa_image_renderer::~cocoa_image_renderer()
 {

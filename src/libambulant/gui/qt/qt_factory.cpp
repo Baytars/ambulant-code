@@ -60,6 +60,7 @@ ambulant::gui::qt::create_qt_window_factory_unsafe(void *parent_widget, int top_
     return new qt_window_factory(qw, top_offset, gpl);
 }
 
+#if 0
 common::playable_factory *
 ambulant::gui::qt::create_qt_playable_factory(common::factories *factory)
 {
@@ -71,6 +72,7 @@ ambulant::gui::qt::create_qt_video_factory(common::factories *factory)
 {
     return new qt_video_factory(factory);
 }
+
 //
 // qt_renderer_factory
 //
@@ -134,6 +136,7 @@ qt_renderer_factory::new_aux_audio_playable(
 {
 	return NULL;
 }
+#endif
   
 //
 // qt_window_factory
