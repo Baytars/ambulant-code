@@ -111,8 +111,8 @@ gui::dx::dx_html_renderer::dx_html_renderer(
 	const lib::node *node,
 	lib::event_processor* evp,
 	common::factories* factory, 
-	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, factory, dxplayer),
+	common::playable_factory_machdep *dxplayer)
+:   dx_renderer_playable(context, cookie, node, evp, factory, dynamic_cast<dx_playables_context*>(dxplayer)),
 	m_html_browser(NULL),
 	m_df(factory->get_datasource_factory())
 {

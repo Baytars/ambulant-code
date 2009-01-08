@@ -47,7 +47,7 @@ class dx_brush : public dx_renderer_playable {
 		const lib::node *node,
 		lib::event_processor* evp,
 		common::factories *fp,
-		dx_playables_context *dxplayer);
+		common::playable_factory_machdep *dxplayer);
 	~dx_brush();
 	void start(double t);
 	void stop();

@@ -64,14 +64,34 @@ using ambulant::lib::win32::win_report_error;
 using ambulant::lib::win32::win_report_last_error;
 using ambulant::lib::logger;
 
+using namespace ambulant;
+extern const char dx_smiltext_playable_tag[] = "smilText";
+extern const char dx_smiltext_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectX");
+extern const char dx_smiltext_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererDirectXSmilText");
+extern const char dx_smiltext_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererSmilText");
+
+common::playable_factory *
+gui::dx::create_dx_smiltext_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
+{
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectX"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectXSmilText"), true);
+    smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererSmilText"), true);
+	return new common::single_playable_factory<
+		gui::dx::dx_smiltext_renderer, 
+        dx_smiltext_playable_tag, 
+        dx_smiltext_playable_renderer_uri, 
+        dx_smiltext_playable_renderer_uri2, 
+        dx_smiltext_playable_renderer_uri3 >(factory, mdp);
+}
+
 gui::dx::dx_smiltext_renderer::dx_smiltext_renderer(
 	common::playable_notification *context,
 	common::playable_notification::cookie_type cookie,
 	const lib::node *node,
 	lib::event_processor* evp,
 	common::factories* factory,
-	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, factory, dxplayer),
+	common::playable_factory_machdep *dxplayer)
+:   dx_renderer_playable(context, cookie, node, evp, factory, dynamic_cast<dx_playables_context*>(dxplayer)),
 	m_context(context),
 	m_size(0,0),
 	m_hdc(NULL),

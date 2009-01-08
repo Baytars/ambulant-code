@@ -62,8 +62,8 @@ gui::dx::dx_basicvideo_renderer::dx_basicvideo_renderer(
 	const lib::node *node,
 	lib::event_processor* evp,
 	common::factories *fp,
-	dx_playables_context *dxplayer)
-:   dx_renderer_playable(context, cookie, node, evp, fp, dxplayer),
+	common::playable_factory_machdep *dxplayer)
+:   dx_renderer_playable(context, cookie, node, evp, fp, dynamic_cast<dx_playables_context*>(dxplayer)),
 	m_player(0), 
 	m_update_event(0) {
 	AM_DBG lib::logger::get_logger()->debug("dx_basicvideo_renderer(0x%x)", this);
