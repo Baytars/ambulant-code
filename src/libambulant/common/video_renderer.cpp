@@ -317,7 +317,8 @@ video_renderer::data_avail()
 	} else
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
-		m_src->frame_processed(frame_ts_micros);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
+        m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES
 	if (frame_ts_micros <= now_micros - frame_duration && !m_prev_frame_dropped) {
