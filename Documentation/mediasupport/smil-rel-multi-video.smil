@@ -11,7 +11,7 @@
 <body>
  <seq>
  <par>
-  <video region="video" src="media/video-mpeg-mp3-mpeg-640x480.mpg" clipBegin="0s" clipEnd="4s">
+  <video region="video" src="media/video-quicktime-pcm-animation-176x144.mov" clipBegin="0s" clipEnd="4s">
   </video>
   <smilText region="caption" dur="1s" fill="freeze">
     This is the default video renderer
@@ -19,7 +19,7 @@
  </par>
  <switch>
  <par systemComponent="http://www.ambulantplayer.org/component/RendererQuickTime">
-  <video region="video" src="media/video-mpeg-mp3-mpeg-640x480.mpg" clipBegin="4s" clipEnd="8s">
+  <video region="video" src="media/video-quicktime-pcm-animation-176x144.mov" clipBegin="4s" clipEnd="8s">
    <param name="renderer" value="http://www.ambulantplayer.org/component/RendererQuickTime"/>
   </video>
   <smilText region="caption" dur="1s" fill="freeze">
@@ -32,7 +32,7 @@
  </switch>
  <switch>
  <par systemComponent="http://www.ambulantplayer.org/component/RendererDirectX">
-  <video region="video" src="media/video-mpeg-mp3-mpeg-640x480.mpg" clipBegin="8s" clipEnd="12s">
+  <video region="video" src="media/video-quicktime-pcm-animation-176x144.mov" clipBegin="8s" clipEnd="12s">
    <param name="renderer" value="http://www.ambulantplayer.org/component/RendererDirectX"/>
   </video>
   <smilText region="caption" dur="1s" fill="freeze">
@@ -45,7 +45,7 @@
  </switch>
  <switch>
  <par systemComponent="http://www.ambulantplayer.org/component/RendererOpen">
-  <video region="video" src="media/video-mpeg-mp3-mpeg-640x480.mpg" clipBegin="12s" clipEnd="16s">
+  <video region="video" src="media/video-quicktime-pcm-animation-176x144.mov" clipBegin="12s" clipEnd="16s">
    <param name="renderer" value="http://www.ambulantplayer.org/component/RendererOpen"/>
   </video>
   <smilText region="caption" dur="1s" fill="freeze">
