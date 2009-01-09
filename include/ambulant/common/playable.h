@@ -277,7 +277,8 @@ class single_playable_factory : public playable_factory {
 		if (renderer_uri != NULL && 
             strcmp(renderer_uri, "") != 0 &&
             strcmp(renderer_uri, Renderer_uri) != 0 &&
-            strcmp(renderer_uri, Renderer_uri2) != 0) return false;
+            strcmp(renderer_uri, Renderer_uri2) != 0&&
+            strcmp(renderer_uri, Renderer_uri3) != 0) return false;
 		return true;
 	}
 		
