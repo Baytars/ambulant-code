@@ -311,23 +311,20 @@ void
 global_playable_factory_impl::preferred_renderer(const char* name)
 {
     renderer_select rs(name);
-    std::list<playable_factory *>::reverse_iterator i;
-    playable_factory *cur_first = m_factories.front();
-    bool done;
-    
-    i = m_factories.rbegin();
-    do {
-        done = (*i) == cur_first;
-        if ((*i)->supports(&rs)) {
-            /*AM_DBG*/ lib::logger::get_logger()->debug("preferred_renderer: moving 0x%x to front", *i);
-            m_factories.push_front(*i);
-            // We need an iterator here, not a reverse iterator. Tricky code, gleamed
-            // from <http://www.ddj.com/cpp/184401406>.
-            m_factories.erase((++i).base());
-        } else {
-            ++i;
-        }
-    } while(!done);
+    std::list<playable_factory *>::iterator i;
+	std::list<playable_factory *> new_list;
+
+	for (i=m_factories.begin(); i!=m_factories.end(); i++) {
+		if ((*i)->supports(&rs)) {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("preferred_renderer: moving 0x%x to front", *i);
+			new_list.push_back(*i);
+		}
+	}
+	for (i=m_factories.begin(); i!=m_factories.end(); i++) {
+		if (!(*i)->supports(&rs))
+			new_list.push_back(*i);
+	}
+	m_factories = new_list;
 }
 
 playable *

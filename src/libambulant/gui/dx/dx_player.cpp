@@ -121,6 +121,13 @@ gui::dx::dx_player::dx_player(dx_player_callbacks &hoster, common::player_feedba
 	init_factories();
 	init_plugins();
 
+	// Order the factories according to the preferences
+	common::preferences *prefs = common::preferences::get_preferences();
+	if (prefs->m_prefer_ffmpeg)
+		get_playable_factory()->preferred_renderer(AM_SYSTEM_COMPONENT("RendererOpen"));
+	else
+		get_playable_factory()->preferred_renderer(AM_SYSTEM_COMPONENT("RendererDirectX"));   
+
 	// Parse the provided URL. 
 	AM_DBG m_logger->debug("Parsing: %s", u.get_url().c_str());	
 	m_doc = create_document(u);
