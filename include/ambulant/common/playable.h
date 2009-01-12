@@ -253,6 +253,8 @@ class global_playable_factory : public playable_factory {
     
 	/// Add a factory.
     virtual void add_factory(playable_factory *rf) = 0;
+    /// Signal preference for a certain category of renderers
+    virtual void preferred_renderer(const char* name) = 0;
 };
 
 /// Factory function to get a (singleton?) global_playable_factory object.

@@ -295,7 +295,7 @@ global_playable_factory_impl::~global_playable_factory_impl()
 	m_renderer_select.clear();
 	// Clear the factories
 	delete m_default_factory;
-    std::vector<playable_factory*>::iterator fi;
+    std::list<playable_factory*>::iterator fi;
     for(fi=m_factories.begin(); fi != m_factories.end(); fi++)
 		delete (*fi);
 	m_factories.clear();
@@ -306,7 +306,30 @@ global_playable_factory_impl::add_factory(playable_factory *rf)
 {
     m_factories.push_back(rf);
 }
+
+void
+global_playable_factory_impl::preferred_renderer(const char* name)
+{
+    renderer_select rs(name);
+    std::list<playable_factory *>::reverse_iterator i;
+    playable_factory *cur_first = m_factories.front();
+    bool done;
     
+    i = m_factories.rbegin();
+    do {
+        done = (*i) == cur_first;
+        if ((*i)->supports(&rs)) {
+            /*AM_DBG*/ lib::logger::get_logger()->debug("preferred_renderer: moving 0x%x to front", *i);
+            m_factories.push_front(*i);
+            // We need an iterator here, not a reverse iterator. Tricky code, gleamed
+            // from <http://www.ddj.com/cpp/184401406>.
+            m_factories.erase((++i).base());
+        } else {
+            ++i;
+        }
+    } while(!done);
+}
+
 playable *
 global_playable_factory_impl::new_playable(
 	playable_notification *context,
@@ -314,7 +337,7 @@ global_playable_factory_impl::new_playable(
 	const lib::node *node,
 	lib::event_processor *evp)
 {
-    std::vector<playable_factory *>::iterator i;
+    std::list<playable_factory *>::iterator i;
 	
 	// First make sure we have the node in our renderer selection cache
 	int nid = node->get_numid();
@@ -355,7 +378,7 @@ global_playable_factory_impl::new_aux_audio_playable(
 	lib::event_processor *evp,
 	net::audio_datasource *src)
 {
-    std::vector<playable_factory *>::iterator i;
+    std::list<playable_factory *>::iterator i;
     playable *rv;
     
     for(i=m_factories.begin(); i != m_factories.end(); i++) {

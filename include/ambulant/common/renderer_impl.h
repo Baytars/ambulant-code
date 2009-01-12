@@ -200,6 +200,9 @@ class global_playable_factory_impl : public global_playable_factory {
 	/// Add a factory.
     void add_factory(playable_factory *rf);
     
+    /// Signal preference for a certain renderer (or category of renderers)
+    void preferred_renderer(const char* name);
+    
 	/// The global factory supports everything (it says:-)
 	bool supports(renderer_select *rs)
 	{
@@ -221,7 +224,7 @@ class global_playable_factory_impl : public global_playable_factory {
   		net::audio_datasource *src);
 
   private:
-    std::vector<playable_factory *> m_factories;
+    std::list<playable_factory *> m_factories;
     playable_factory *m_default_factory;
 	std::map<int, renderer_select*> m_renderer_select;
 };
