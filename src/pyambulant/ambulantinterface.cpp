@@ -5257,6 +5257,7 @@ global_playable_factory::global_playable_factory(PyObject *itself)
 	if (itself)
 	{
 		if (!PyObject_HasAttrString(itself, "add_factory")) PyErr_Warn(PyExc_Warning, "global_playable_factory: missing attribute: add_factory");
+		if (!PyObject_HasAttrString(itself, "preferred_renderer")) PyErr_Warn(PyExc_Warning, "global_playable_factory: missing attribute: preferred_renderer");
 	}
 	if (itself == NULL) itself = Py_None;
 
@@ -5288,6 +5289,24 @@ void global_playable_factory::add_factory(ambulant::common::playable_factory* rf
 
 	Py_XDECREF(py_rv);
 	Py_XDECREF(py_rf);
+
+	PyGILState_Release(_GILState);
+}
+
+void global_playable_factory::preferred_renderer(const char* name)
+{
+	PyGILState_STATE _GILState = PyGILState_Ensure();
+	PyObject *py_name = Py_BuildValue("s", name);
+
+	PyObject *py_rv = PyObject_CallMethod(py_global_playable_factory, "preferred_renderer", "(O)", py_name);
+	if (PyErr_Occurred())
+	{
+		PySys_WriteStderr("Python exception during global_playable_factory::preferred_renderer() callback:\n");
+		PyErr_Print();
+	}
+
+	Py_XDECREF(py_rv);
+	Py_XDECREF(py_name);
 
 	PyGILState_Release(_GILState);
 }

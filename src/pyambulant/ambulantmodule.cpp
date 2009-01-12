@@ -9357,9 +9357,26 @@ static PyObject *global_playable_factoryObj_add_factory(global_playable_factoryO
 	return _res;
 }
 
+static PyObject *global_playable_factoryObj_preferred_renderer(global_playable_factoryObject *_self, PyObject *_args)
+{
+	PyObject *_res = NULL;
+	char* name;
+	if (!PyArg_ParseTuple(_args, "s",
+	                      &name))
+		return NULL;
+	PyThreadState *_save = PyEval_SaveThread();
+	_self->ob_itself->preferred_renderer(name);
+	PyEval_RestoreThread(_save);
+	Py_INCREF(Py_None);
+	_res = Py_None;
+	return _res;
+}
+
 static PyMethodDef global_playable_factoryObj_methods[] = {
 	{"add_factory", (PyCFunction)global_playable_factoryObj_add_factory, 1,
 	 PyDoc_STR("(ambulant::common::playable_factory* rf) -> None")},
+	{"preferred_renderer", (PyCFunction)global_playable_factoryObj_preferred_renderer, 1,
+	 PyDoc_STR("(char* name) -> None")},
 	{NULL, NULL, 0}
 };
 
