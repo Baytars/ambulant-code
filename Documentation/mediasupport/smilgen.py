@@ -50,11 +50,14 @@ def smil_document():
     doc.init()
     return doc
     
-def gen_smil(mediatype, basename, mediafilename, renderer_uri):
+def gen_smil(mediatype, basename, mediafilename, renderer_uri=""):
     if basename:
         mediafilename = urllib.basejoin(basename, mediafilename)
     s = smil_document()
-    s.smil()
+    if renderer_uri:
+        s.smil(systemComponent=renderer_uri)
+    else:
+        s.smil()
     s.head()
     s.layout()
     s.topLayout(width="640", height="480")
@@ -65,13 +68,9 @@ def gen_smil(mediatype, basename, mediafilename, renderer_uri):
     s.body()
     if mediatype == 'video':
         s.video(src=mediafilename)
-        if renderer_uri:
-            s.param('', name="renderer", value=renderer_uri)
         s.video.close()
     elif mediatype == 'audio':
         s.audio(src=mediafilename)
-        if renderer_uri:
-            s.param('', name="renderer", value=renderer_uri)
         s.audio.close()
     else:
         raise RuntimeError('Unknown media type ' + mediatype)
