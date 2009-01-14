@@ -37,10 +37,6 @@ namespace qt {
 AMBULANTAPI common::window_factory *create_qt_window_factory(QWidget *parent_widget, int top_offset, common::gui_player *gpl);
 #endif
 AMBULANTAPI common::window_factory *create_qt_window_factory_unsafe(void *parent_widget, int top_offset, common::gui_player *gpl);
-#if 0
-AMBULANTAPI common::playable_factory *create_qt_playable_factory(common::factories *factory);
-AMBULANTAPI common::playable_factory *create_qt_video_factory(common::factories *factory);
-#endif
 } // namespace qt
 
 } // namespace gui

@@ -79,42 +79,6 @@ class dx_player_callbacks : public html_browser_factory {
 	virtual SIZE get_default_size() = 0;
 };
 
-#if 0
-class dx_playable_factory : public common::playable_factory {
-  public:
-	  dx_playable_factory(
-			common::factories *factory,
-			dx_playables_context *ctx)
-	:	m_factory(factory),
-		m_logger(NULL),
-		m_dxplayer(ctx)
-	{
-		m_logger = lib::logger::get_logger();
-	}
-	////////////////////
-	// common::playable_factory implementation
-
-	  bool supports(common::renderer_select *);
-
-	common::playable *new_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const ambulant::lib::node *node,
-		lib::event_processor * evp);
-
-	common::playable *new_aux_audio_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp,
-		net::audio_datasource *src);
-  private:
-	common::factories *m_factory;
-	lib::logger *m_logger;
-	dx_playables_context *m_dxplayer;
-};
-#endif
-
 class AMBULANTAPI dx_player : 
 	public common::gui_player, 
 	public common::window_factory, 
