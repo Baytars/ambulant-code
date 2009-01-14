@@ -82,31 +82,6 @@ class cocoa_window_factory : public common::window_factory {
     void *m_defaultwindow_view;
 };
 
-#if 0
-class cocoa_renderer_factory : public common::playable_factory {
-  public:
-  	cocoa_renderer_factory(common::factories *factory)
-	:   m_factory(factory) {}
-  	
-	bool supports(const lib::xml_string& tag, const char* renderer_uri) const;
-
-	common::playable *new_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp);
-		
-	common::playable *new_aux_audio_playable(
-		common::playable_notification *context,
-		common::playable_notification::cookie_type cookie,
-		const lib::node *node,
-		lib::event_processor *evp,
-		net::audio_datasource *src);
-  private:
-    common::factories *m_factory;
-};
-#endif
-
 class cocoa_gui_screen : public common::gui_screen {
   public:
 	cocoa_gui_screen(void *view)
@@ -119,9 +94,6 @@ class cocoa_gui_screen : public common::gui_screen {
 };
 
 AMBULANTAPI common::window_factory *create_cocoa_window_factory(void *view);
-#if 0
-AMBULANTAPI common::playable_factory *create_cocoa_renderer_factory(common::factories *factory);
-#endif
 
 common::playable_factory *create_cocoa_audio_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
 common::playable_factory *create_cocoa_dsvideo_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
