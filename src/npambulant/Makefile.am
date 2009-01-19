@@ -27,7 +27,27 @@ extra_ffmpeg_ldflags=
 endif
 #------------------------------------------------------
 if WITH_LIVE
-extra_live_ldflags= -L$(LIVE_ROOT)/liveMedia/ -lliveMedia \
+extra_live_LDADD=$(top_builddir)/src/libambulant/.libs/libambulant_live.a
+liveincludes = -I$(LIVE_ROOT)/BasicUsageEnvironment/include \
+			   -I$(LIVE_ROOT)/groupsock/include \
+			   -I$(LIVE_ROOT)/liveMedia/include \
+			   -I$(LIVE_ROOT)/UsageEnvironment/include
+
+livelibs = -L$(LIVE_ROOT)/liveMedia/ -lliveMedia \
+			  -L$(LIVE_ROOT)/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
+			  -L$(LIVE_ROOT)/groupsock/ -lgroupsock  \
+			  -L$(LIVE_ROOT)/UsageEnvironment/ -lUsageEnvironment
+extra_live_DEFINES=-DWITH_LIVE
+else
+extra_live_DEFINES=
+extra_live_LDADD =
+liveincludes =
+livelibs =
+endif # WITH_LIVE
+#------------------------------------------------------
+if WITH_LIVE
+extra_live_ldflags=$(top_builddir)/src/libambulant/.libs/libambulant_live.a\
+			  -L$(LIVE_ROOT)/liveMedia/ -lliveMedia \
 			  -L$(LIVE_ROOT)/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
 			  -L$(LIVE_ROOT)/groupsock/ -lgroupsock  \
 			  -L$(LIVE_ROOT)/UsageEnvironment/ -lUsageEnvironment
