@@ -103,7 +103,7 @@ class textptr {
 		//for double-byte characters the value of wcslen was not correct
 		//the fix is to call WideCharToMultiByte twice -- once to get the length, once to convert
 		BSTR unicodestr = 0;
-		char *ansistr;
+		char *ansistr = 0;
 		unicodestr = ::SysAllocString(m_pcw);
 		int lenW = ::SysStringLen(unicodestr);
 		int lenA = ::WideCharToMultiByte(CP_ACP, 0, unicodestr, lenW, 0, 0, NULL, NULL);
