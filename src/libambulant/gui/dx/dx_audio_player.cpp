@@ -30,7 +30,7 @@
 // CLSID_FilterGraph
 #include <uuids.h>
 
-#define AM_DBG
+//#define AM_DBG if(1)
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -65,12 +65,15 @@ gui::dx::audio_player::~audio_player() {
 }
 		
 void gui::dx::audio_player::start(double t) {
+	AM_DBG lib::logger::get_logger()->debug("dx_audio_player: start %f", t);
 	if(is_playing()) pause();
 	seek(t);
 	resume();
 }
 
 void gui::dx::audio_player::stop() {
+	AM_DBG lib::logger::get_logger()->debug("dx_audio_player: stop");
+	
 	if(m_media_control == 0) return;
 	HRESULT hr = m_media_control->Stop();
 	if(FAILED(hr)) {
@@ -99,6 +102,7 @@ void gui::dx::audio_player::resume() {
 }
 
 void gui::dx::audio_player::seek(double t) {
+	AM_DBG lib::logger::get_logger()->debug("dx_audio_player: seek %f", t);
 	if(m_media_position == 0) return;
 	HRESULT hr = m_media_position->put_CurrentPosition(REFTIME(t));
 	if(FAILED(hr))
@@ -437,6 +441,11 @@ void gui::dx::audio_player::unregister_player(audio_player *cur) {
 
 void gui::dx::audio_player::set_rate(double rate) {
 	if (m_audio_speedup) {
+		
+		char ch_rate[25];
+		sprintf(ch_rate, "Amb Rate = %.3f", rate);
+		AM_DBG lib::logger::get_logger()->trace(ch_rate);
+
 		m_audio_speedup->setCycleSpeed((short)(rate*100));
 	}
 }

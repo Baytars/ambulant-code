@@ -257,7 +257,7 @@ lib::full_clock_value_p::parse(const_iterator& it, const const_iterator& end) {
 	sd += d;
 	
 	// fraction
-	int_p fraction;
+	fraction_p fraction;
 	d = fraction.parse(tit, end);
 	if(d == -1) return -1;
 	sd += d;
@@ -306,7 +306,7 @@ lib::partial_clock_value_p::parse(const_iterator& it, const const_iterator& end)
 	sd += d;
 	
 	// fraction
-	int_p fraction;
+	fraction_p fraction;
 	d = fraction.parse(tit, end);
 	if(d == -1) return -1;
 	m_result.fraction = fraction.m_result;
@@ -343,10 +343,8 @@ lib::timecount_value_p::parse(const_iterator& it, const const_iterator& end) {
 // clock_value_p and converter to ms
 
 inline int fraction_to_ms(int f) {
-	int num = f;
-	while (num >= 1000)
-		num = num/10;
-	return (num<=0)?0:num;
+    // There is now a fraction_p parser, that always ensures fractions are in milliseconds.
+	return (f<=0)?0:f;
 }
 
 std::ptrdiff_t 
