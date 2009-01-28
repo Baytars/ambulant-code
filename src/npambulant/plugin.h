@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: NPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -38,116 +38,46 @@
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
 
-// mozilla includes
-#ifdef	XP_WIN32
 #include "npapi.h"
-#include "npupp.h"
-#endif//XP_WIN32
-#include "pluginbase.h"
-#include "nsScriptablePeer.h"
+#include "npruntime.h"
+#include <string>
 
-// ambulant player includes
-#include "ambulant/version.h"
-#include "ambulant/common/player.h"
-#include "ambulant/net/url.h"
-#include "ambulant/lib/logger.h"
-
-// graphic toolkit includes
-#ifdef	MOZ_X11
-#include <X11/Xlib.h>
-#include <X11/Intrinsic.h>
-#include <X11/cursorfont.h>
-#endif // MOZ_X11
-#ifdef	WITH_GTK
-class gtk_mainloop;
-#elif	WITH_CG
-class cg_mainloop;
-#elif	XP_WIN32
-#include <ambulant/gui/dx/dx_player.h>
-#include <ambulant/net/url.h>
-class ambulant_player_callbacks : public ambulant::gui::dx::dx_player_callbacks {
-
-public:
-	ambulant_player_callbacks();
-	void set_os_window(HWND hwnd);
-	HWND new_os_window();
-	SIZE get_default_size();
-	void destroy_os_window(HWND);
-	html_browser *new_html_browser(int left, int top, int width, int height);
-	HWND m_hwnd;
-};
-#else
-#error None of WITH_GTK/WITH_CG/XP_WIN32 defined: no graphic toolkit available
-#endif//WITH_GTK/WITH_CG/XP_WIN32
-
-// class definition
-class nsScriptablePeer;
-
-class nsPluginInstance : public nsPluginInstanceBase, npambulant
+#ifdef JNK
+class CPlugin
 {
-public:
-
-    nsPluginCreateData mCreateData;
-protected:
-
 private:
-    NS_DECL_ISUPPORTS
-    NS_DECL_NPAMBULANT
+  NPP m_pNPInstance;
 
-    nsPluginInstance(NPP aInstance);
-    ~nsPluginInstance();
-
-    NPBool init(NPWindow* aWindow);
-    void shut();
-    NPBool isInitialized();
-    NPP getNPP();
-    const char* getValue(const char *name);
-    const char * getVersion();
-
-    // we need to provide implementation of this method as it will be
-    // used by Mozilla to retrieve the scriptable peer
-    NPError GetValue(NPPVariable variable, void *value);
-    nsScriptablePeer* getScriptablePeer();
-    char* get_document_location();
-
-    NPWindow* mNPWindow;
-    NPP mInstance;
-    NPBool mInitialized;
-    nsScriptablePeer * mScriptablePeer;
-    
-    char mString[128];
-    ambulant::lib::logger* m_logger;
-    ambulant::net::url m_url;
-    int m_cursor_id;
-
-    static NPP s_last_instance;
-    static void display_message(int level, const char *message);	
-#ifdef	MOZ_X11
-    Window window;
-    Display* display;
-    int width, height;
-#endif // MOZ_X11
-
-#ifdef WITH_GTK
-    gtk_mainloop* m_mainloop;
-#elif WITH_CG
-	cg_mainloop *m_mainloop;
-#else
-	void *m_mainloop;
+#ifdef XP_WIN
+  HWND m_hWnd; 
 #endif
 
-#ifdef	XP_WIN32
-    ambulant_player_callbacks m_player_callbacks;
-    HWND m_hwnd;
-    ambulant::gui::dx::dx_player* m_ambulant_player;
-    ambulant::common::player* get_player() {
-        return m_ambulant_player->get_player();
-    }
-#else //!XP_WIN32
-    ambulant::common::player* m_ambulant_player;
-    ambulant::common::player* get_player() {
-        return m_ambulant_player;
-    }
-#endif// XP_WIN32
+  NPWindow * m_Window;
+  
+  NPStream * m_pNPStream;
+  NPBool m_bInitialized;
+
+  NPObject *m_pScriptableObject;
+
+public:
+  char m_String[128];
+
+public:
+  CPlugin(NPP pNPInstance);
+  ~CPlugin();
+
+  NPBool init(NPWindow* pNPWindow);
+  void shut();
+  NPBool isInitialized();
+  
+  int16 handleEvent(void* event);
+
+  void showVersion();
+  void clear();
+  void getVersion(char* *aVersion);
+
+  NPObject *GetScriptableObject();
 };
+#endif//JNK
+
 #endif // __PLUGIN_H__

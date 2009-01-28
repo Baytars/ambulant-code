@@ -27,7 +27,7 @@ extra_ffmpeg_ldflags=
 endif
 #------------------------------------------------------
 if WITH_LIVE
-extra_live_ldflags=$(top_builddir)/src/libambulant/.libs/libambulant_live.a\
+extra_live_ldflags=$(top_builddir)/src/libambulant/.libs/libambulant_live.a \
 			  -L$(LIVE_ROOT)/liveMedia/ -lliveMedia \
 			  -L$(LIVE_ROOT)/BasicUsageEnvironment/ -lBasicUsageEnvironment  \
 			  -L$(LIVE_ROOT)/groupsock/ -lgroupsock  \
@@ -97,7 +97,7 @@ FIREFOXENV=
 
 BUILDLIBDIR=
 lib_LTLIBRARIES = libnpambulant.la
-libnpambulant_la_SOURCES=np_entry.cpp npn_gate.cpp npp_gate.cpp plugin.cpp nsScriptablePeer.cpp
+libnpambulant_la_SOURCES=np_entry.cpp npn_gate.cpp npp_gate.cpp ScriptablePluginObjectBase.cpp ScriptablePluginObject.cpp CPlugin.cpp plugin.cpp
 nodist_libnpambulant_la_INCLUDES=npambulant.h
 
 libnpambulant_la_LDFLAGS=	\
