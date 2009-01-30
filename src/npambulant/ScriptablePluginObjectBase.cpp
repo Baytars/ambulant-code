@@ -40,13 +40,6 @@ bool
 ScriptablePluginObjectBase::SetProperty(NPIdentifier name,
                                         const NPVariant *value)
 {
-  extern void* sBar_id; // KB HAK
-  if (name == sBar_id) {
-    printf ("bar set\n");
-
-    return true;
-  }
-
   return false;
 }
 

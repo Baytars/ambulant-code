@@ -76,7 +76,7 @@ NPError NPP_New(NPMIMEType pluginType,
 
   NPError rv = NPERR_NO_ERROR;
 
-  CPlugin * pPlugin = new CPlugin(instance);
+  CPlugin * pPlugin = new CPlugin(pluginType,instance,mode,argc,argn,argv,saved);
   if(pPlugin == NULL)
     return NPERR_OUT_OF_MEMORY_ERROR;
 

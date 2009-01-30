@@ -93,7 +93,13 @@ AllocateScriptablePluginObject(NPP npp, NPClass *aClass); //KB
 class CPlugin
 {
 private:
+  NPMIMEType m_mimetype;
   NPP m_pNPInstance;
+  uint16 m_mode;
+  int m_argc;  
+  char** m_argn;
+  char** m_argv;
+  NPSavedData* m_data;
 
 #ifdef XP_WIN
   HWND m_hWnd; 
@@ -110,7 +116,8 @@ public:
   char m_String[128];
 
 public:
-  CPlugin(NPP pNPInstance);
+  CPlugin(NPMIMEType mimetype, NPP pNPInstance, uint16 mode,
+          int argc, char* argn[], char* argv[], NPSavedData* data);
   ~CPlugin();
 
   NPBool init(NPWindow* pNPWindow);
@@ -122,11 +129,13 @@ public:
   void showVersion();
   void clear();
   void getVersion(char* *aVersion);
+
   void startPlayer();
   void stopPlayer();
+  void restartPlayer();
   void pausePlayer();
   void resumePlayer();
-  void restartPlayer();
+  bool isDone();
 
   NPObject *GetScriptableObject();
 

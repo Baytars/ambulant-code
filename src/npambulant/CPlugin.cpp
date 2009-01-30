@@ -26,8 +26,15 @@
 
 using namespace ambulant;
 
-CPlugin::CPlugin(NPP pNPInstance) :
-  m_pNPInstance(pNPInstance),
+CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
+				 int argc, char* argn[], char* argv[], NPSavedData* data) :
+  m_mimetype(mimetype),
+  m_pNPInstance(pNPInstance ),
+  m_mode(mode),
+  m_argc(argc),  
+  m_argn(argn),
+  m_argv(argv),
+  m_data(data),
   m_pNPStream(NULL),
   m_bInitialized(FALSE),
   m_pScriptableObject(NULL),
@@ -41,8 +48,14 @@ CPlugin::CPlugin(NPP pNPInstance) :
 
   NPIdentifier n = NPN_GetStringIdentifier("foof");
 
+  sStartPlayer_id = NPN_GetStringIdentifier("startPlayer");
+  sStopPlayer_id = NPN_GetStringIdentifier("stopPlayer");
+  sRestartPlayer_id = NPN_GetStringIdentifier("restartPlayer");
+  sPausePlayer_id = NPN_GetStringIdentifier("pausePlayer");
+  sResumePlayer_id = NPN_GetStringIdentifier("resumePlayer");
+  sIsDone_id = NPN_GetStringIdentifier("isDone");
+
   sFoo_id = NPN_GetStringIdentifier("foo");
-  sBar_id = NPN_GetStringIdentifier("bar");
   sDocument_id = NPN_GetStringIdentifier("document");
   sBody_id = NPN_GetStringIdentifier("body");
   sCreateElement_id = NPN_GetStringIdentifier("createElement");
@@ -51,17 +64,7 @@ CPlugin::CPlugin(NPP pNPInstance) :
   sPluginType_id = NPN_GetStringIdentifier("PluginType");
 
   NPVariant v;
-  INT32_TO_NPVARIANT(46, v);
-
-  NPN_SetProperty(m_pNPInstance, sWindowObj, n, &v);
-
   NPVariant rval;
-  NPN_GetProperty(m_pNPInstance, sWindowObj, n, &rval);
-
-  if (NPVARIANT_IS_INT32(rval)) {
-    printf("rval = %d\n", NPVARIANT_TO_INT32(rval));
-  }
-
   n = NPN_GetStringIdentifier("document");
 
   if (!NPN_IdentifierIsString(n)) {
@@ -71,11 +74,8 @@ CPlugin::CPlugin(NPP pNPInstance) :
 
     NPN_Evaluate(m_pNPInstance, sWindowObj, &str, NULL);
   }
-
   NPObject *doc;
-
   NPN_GetProperty(m_pNPInstance, sWindowObj, n, &rval);
-
   if (NPVARIANT_IS_OBJECT(rval) && (doc = NPVARIANT_TO_OBJECT(rval))) {
     n = NPN_GetStringIdentifier("title");
 
@@ -93,30 +93,13 @@ CPlugin::CPlugin(NPP pNPInstance) :
     NPN_SetProperty(m_pNPInstance, sWindowObj, n, &v);
 
     NPString str;
-    str.utf8characters = "document.getElementById('result').innerHTML += '<p>' + 'NPN_Evaluate() test, document = ' + this + '</p>';";
+    str.utf8characters = "document.getElementById('embed').innerHTML += '<p>' + 'NPN_Evaluate() test, document = ' + this + '</p>';";
     str.utf8length = strlen(str.utf8characters);
 
     NPN_Evaluate(m_pNPInstance, doc, &str, NULL);
 
     NPN_ReleaseObject(doc);
   }
-
-  NPVariant barval;
-  NPN_GetProperty(m_pNPInstance, sWindowObj, sBar_id, &barval);
-
-  NPVariant arg;
-  OBJECT_TO_NPVARIANT(sWindowObj, arg);
-
-  NPN_InvokeDefault(m_pNPInstance, NPVARIANT_TO_OBJECT(barval), &arg, 1,
-                    &rval);
-
-  if (NPVARIANT_IS_INT32(rval) && NPVARIANT_TO_INT32(rval) == 4) {
-    printf ("Default function call SUCCEEDED!\n");
-  } else {
-    printf ("Default function call FAILED!\n");
-  }
-
-  NPN_ReleaseVariantValue(&barval);
   NPN_ReleaseVariantValue(&rval);
 
 
@@ -201,22 +184,17 @@ bool CPlugin::init_ambulant(NPP npp, NPWindow* aWindow)
 	ambulant::lib::logger::get_logger()->show("Ambulant plugin loaded");
 
     const char* arg_str = NULL;
-	/* KB TBD *
-    if (mCreateData.argc > 1)
-    for (int i =0; i < mCreateData.argc; i++) {
-//	Uncomment next line to see the <EMBED/> attr values	
-//  fprintf(stderr, "arg[%i]:%s=%s\n",i,mCreateData.argn[i],mCreateData.argv[i]);
-        if (strcasecmp(mCreateData.argn[i],"data") == 0)
+    if (m_argc > 1)
+    for (int i =0; i < m_argc; i++) {
+//		Uncomment next line to see the <EMBED/> attr values	
+//  	fprintf(stderr, "arg[%i]:%s=%s\n",i,m_argn[i],m_argv[i]);
+        if (strcasecmp(m_argn[i],"data") == 0)
             if (arg_str == NULL)
-                arg_str = mCreateData.argv[i];
-            if (strcasecmp(mCreateData.argn[i],"src") == 0)
+                arg_str = m_argv[i];
+            if (strcasecmp(m_argn[i],"src") == 0)
                 if (arg_str == NULL)
-                    arg_str = mCreateData.argv[i];
+                    arg_str = m_argv[i];
     }
-    /* KB TBD *
-	arg_str = get_document_location();
-	TBD */
-	arg_str = "file:///export/scratch1/Ambulant/ambulant/Extras/Welcome/Welcome.smil";
     if (arg_str == NULL)
         return false;
     net::url file_url;
@@ -289,7 +267,7 @@ char* CPlugin::get_document_location()
 
 	// Get document
 	NPVariant npvDocument;
-	bool ok = NPN_GetProperty( m_pNPInstance, (NPObject*)m_Window, NPN_GetStringIdentifier("document"), &npvDocument);
+	bool ok = NPN_GetProperty( m_pNPInstance, sWindowObj, NPN_GetStringIdentifier("document"), &npvDocument);
 	AM_DBG fprintf(stderr, "NPN_GetProperty(..., document, ...) -> %d, 0x%d\n", ok, npvDocument);
 	if (!ok) return NULL;
 	assert(NPVARIANT_IS_OBJECT(npvDocument));
@@ -399,6 +377,15 @@ void CPlugin::stopPlayer()
 	if (m_ambulant_player != NULL)
 	  get_player()->stop();
 }
+// this will restart AmbulantPlayer
+void CPlugin::restartPlayer()
+{
+	AM_DBG lib::logger::get_logger()->debug("CPlugin::restartPlayer()\n");
+	if (m_ambulant_player != NULL) {
+	  get_player()->stop();
+	  get_player()->start();
+	}
+}
 // this will pause AmbulantPlayer
 void CPlugin::pausePlayer()
 {
@@ -414,14 +401,15 @@ void CPlugin::resumePlayer()
 	  get_player()->resume();
 }
 // this will restart AmbulantPlayer
-void CPlugin::restartPlayer()
+bool CPlugin::isDone()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::restartPlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("CPlugin::isDone()\n");
 	if (m_ambulant_player != NULL) {
-	  get_player()->stop();
-	  get_player()->start();
+	  return get_player()->is_done();
 	}
+	return false;
 }
+
 // this will force to draw a version string in the plugin window
 void CPlugin::showVersion()
 {
