@@ -90,7 +90,7 @@ public:
 extern NPObject *
 AllocateScriptablePluginObject(NPP npp, NPClass *aClass); //KB
 
-class CPlugin
+class npambulant
 {
 private:
   NPMIMEType m_mimetype;
@@ -116,9 +116,9 @@ public:
   char m_String[128];
 
 public:
-  CPlugin(NPMIMEType mimetype, NPP pNPInstance, uint16 mode,
+  npambulant(NPMIMEType mimetype, NPP pNPInstance, uint16 mode,
           int argc, char* argn[], char* argv[], NPSavedData* data);
-  ~CPlugin();
+  ~npambulant();
 
   NPBool init(NPWindow* pNPWindow);
   void shut();

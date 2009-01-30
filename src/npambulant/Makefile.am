@@ -97,7 +97,7 @@ FIREFOXENV=
 
 BUILDLIBDIR=
 lib_LTLIBRARIES = libnpambulant.la
-libnpambulant_la_SOURCES=np_entry.cpp npn_gate.cpp npp_gate.cpp ScriptablePluginObjectBase.cpp ScriptablePluginObject.cpp CPlugin.cpp plugin.cpp
+libnpambulant_la_SOURCES=np_entry.cpp npn_gate.cpp npp_gate.cpp ScriptablePluginObjectBase.cpp ScriptablePluginObject.cpp npambulant.cpp
 nodist_libnpambulant_la_INCLUDES=npambulant.h
 
 libnpambulant_la_LDFLAGS=	\
@@ -111,15 +111,8 @@ libnpambulant_la_LDFLAGS=	\
 	$(ambulant_ldflags)	\
 	-o $(NPAMBULANT)
 
-$(libnpambulant_la_OBJECTS): npambulant.h	npambulant.xpt
-build-npambulant: $(PLUGIN_FILES) plugin.h npambulant.h
+build-npambulant: $(PLUGIN_FILES)
 	AM_LDFLAGS="-o libnpambulant.so"
-
-npambulant.h: $(srcdir)/npambulant.idl
-	$(XPIDL) -m header  -w -I$(XULRUNNER_ROOT)/idl $(srcdir)/npambulant.idl
-
-npambulant.xpt: $(srcdir)/npambulant.idl
-	$(XPIDL) -m typelib -w -I$(XULRUNNER_ROOT)/idl $(srcdir)/npambulant.idl
 
 check-npambulant:
 	( a=`cd $(ambulantlibdir); pwd` ; \
@@ -127,23 +120,20 @@ check-npambulant:
 	  LD_LIBRARY_PATH=-L"$$a" $(FIREFOXENV) FIREFOXPATH=$(BUILDLIBDIR) $(DEBUGGER) $(FIREFOX) $(FIREFOXARGS) test/test_npambulant.html ; \
 	)
 
-install-npambulant: npambulant.xpt .libs/$(NPAMBULANT)
+install-npambulant:  .libs/$(NPAMBULANT)
 	if [ `id -u` == "0" ]; then MOZILLA_PLUGINS=/usr/lib/$(MOZILLA_PLUGINS); else MOZILLA_PLUGINS=~/.$(MOZILLA_PLUGINS);fi; \
 	$(INSTALL) -d $(MOZILLA_PLUGINS);	\
 	$(INSTALL_PROGRAM) .libs/$(NPAMBULANT) $$MOZILLA_PLUGINS/npambulant.so;	\
-	$(INSTALL_DATA) npambulant.xpt $$MOZILLA_PLUGINS/npambulant.xpt;		\
 	./selinux_patch.sh $$MOZILLA_PLUGINS/npambulant.so
 # when selinux is enabled, identify the installed shared library
 
 
 clean-npambulant:
 	if [ `id -u` == "0" ]; then MOZILLA_PLUGINS=/usr/lib/$(MOZILLA_PLUGINS); else MOZILLA_PLUGINS=~/.$(MOZILLA_PLUGINS);fi; \
-	rm -fr $$MOZILLA_PLUGINS/npambulant.so; \
-	rm -fr $$MOZILLA_PLUGINS/npambulant.xpt
+	rm -fr $$MOZILLA_PLUGINS/npambulant.so;
 
 mostlyclean-local:
 	rm -fr .libs *o $(NPAMBULANT)
-	rm -fr npambulant.h npambulant.xpt
 
 # Debug target
 

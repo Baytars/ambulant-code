@@ -1,5 +1,5 @@
 #include "ScriptablePluginObject.h"
-#include "CPlugin.h"
+#include "npambulant.h"
 
 /* ambulant player includes */
 #ifdef	XP_WIN32
@@ -10,7 +10,6 @@
 #include <windowsx.h>
 #endif//XP_WIN32
 
-#include "plugin.h"
 #ifdef WITH_GTK
 #include "gtk_mainloop.h"
 #endif
@@ -26,7 +25,23 @@
 
 using namespace ambulant;
 
-CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
+NPIdentifier sStartPlayer_id;
+NPIdentifier sStopPlayer_id;
+NPIdentifier sPausePlayer_id;
+NPIdentifier sResumePlayer_id;
+NPIdentifier sRestartPlayer_id;
+NPIdentifier sIsDone_id;
+
+NPIdentifier sDocument_id;
+NPIdentifier sBody_id;
+NPIdentifier sCreateElement_id;
+NPIdentifier sCreateTextNode_id;
+NPIdentifier sAppendChild_id;
+NPIdentifier sPluginType_id;
+NPObject *sWindowObj;
+
+
+npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 				 int argc, char* argn[], char* argv[], NPSavedData* data) :
   m_mimetype(mimetype),
   m_pNPInstance(pNPInstance ),
@@ -46,8 +61,6 @@ CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 
   NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
 
-  NPIdentifier n = NPN_GetStringIdentifier("foof");
-
   sStartPlayer_id = NPN_GetStringIdentifier("startPlayer");
   sStopPlayer_id = NPN_GetStringIdentifier("stopPlayer");
   sRestartPlayer_id = NPN_GetStringIdentifier("restartPlayer");
@@ -55,7 +68,6 @@ CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
   sResumePlayer_id = NPN_GetStringIdentifier("resumePlayer");
   sIsDone_id = NPN_GetStringIdentifier("isDone");
 
-  sFoo_id = NPN_GetStringIdentifier("foo");
   sDocument_id = NPN_GetStringIdentifier("document");
   sBody_id = NPN_GetStringIdentifier("body");
   sCreateElement_id = NPN_GetStringIdentifier("createElement");
@@ -63,70 +75,8 @@ CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
   sAppendChild_id = NPN_GetStringIdentifier("appendChild");
   sPluginType_id = NPN_GetStringIdentifier("PluginType");
 
-  NPVariant v;
-  NPVariant rval;
-  n = NPN_GetStringIdentifier("document");
-
-  if (!NPN_IdentifierIsString(n)) {
-    NPString str;
-    str.utf8characters = "alert('NPN_IdentifierIsString() test failed!');";
-    str.utf8length = strlen(str.utf8characters);
-
-    NPN_Evaluate(m_pNPInstance, sWindowObj, &str, NULL);
-  }
-  NPObject *doc;
-  NPN_GetProperty(m_pNPInstance, sWindowObj, n, &rval);
-  if (NPVARIANT_IS_OBJECT(rval) && (doc = NPVARIANT_TO_OBJECT(rval))) {
-    n = NPN_GetStringIdentifier("title");
-
-    NPN_GetProperty(m_pNPInstance, doc, n, &rval);
-
-    if (NPVARIANT_IS_STRING(rval)) {
-      printf ("title = %s\n", NPVARIANT_TO_STRING(rval).utf8characters);
-
-      NPN_ReleaseVariantValue(&rval);
-    }
-
-    n = NPN_GetStringIdentifier("plugindoc");
-
-    OBJECT_TO_NPVARIANT(doc, v);
-    NPN_SetProperty(m_pNPInstance, sWindowObj, n, &v);
-
-    NPString str;
-    str.utf8characters = "document.getElementById('embed').innerHTML += '<p>' + 'NPN_Evaluate() test, document = ' + this + '</p>';";
-    str.utf8length = strlen(str.utf8characters);
-
-    NPN_Evaluate(m_pNPInstance, doc, &str, NULL);
-
-    NPN_ReleaseObject(doc);
-  }
-  NPN_ReleaseVariantValue(&rval);
-
-
   DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObject,
 								   AllocateScriptablePluginObject);//KB
-
-  NPObject *myobj =
-    NPN_CreateObject(m_pNPInstance,
-                     GET_NPOBJECT_CLASS(ScriptablePluginObject));
-
-  n = NPN_GetStringIdentifier("pluginobj");
-
-  OBJECT_TO_NPVARIANT(myobj, v);
-  NPN_SetProperty(m_pNPInstance, sWindowObj, n, &v);
-
-  NPN_GetProperty(m_pNPInstance, sWindowObj, n, &rval);
-
-  printf ("Object set/get test ");
-
-  if (NPVARIANT_IS_OBJECT(rval) && NPVARIANT_TO_OBJECT(rval) == myobj) {
-    printf ("succeeded!\n");
-  } else {
-    printf ("FAILED!\n");
-  }
-
-  NPN_ReleaseVariantValue(&rval);
-  NPN_ReleaseObject(myobj);
 
   const char *ua = NPN_UserAgent(m_pNPInstance);
   strcpy(m_String, ua);
@@ -134,7 +84,7 @@ CPlugin::CPlugin(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
   s_npambulant_last_instance = pNPInstance;
 }
 
-CPlugin::~CPlugin()
+npambulant::~npambulant()
 {
   if (sWindowObj)
     NPN_ReleaseObject(sWindowObj);
@@ -144,7 +94,7 @@ CPlugin::~CPlugin()
   sWindowObj = 0;
 }
 
-bool CPlugin::init_ambulant(NPP npp, NPWindow* aWindow)
+bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 {
 	AM_DBG fprintf(stderr, "nsPluginInstance::init(0x%x)\n", aWindow);
     if(aWindow == NULL)
@@ -259,7 +209,7 @@ bool CPlugin::init_ambulant(NPP npp, NPWindow* aWindow)
 /// Get the location of the html document.
 /// In javascript this is simply document.location.href. In C it's the
 /// same, but slightly more convoluted:-)
-char* CPlugin::get_document_location()
+char* npambulant::get_document_location()
 {
     char *id = "ambulant::nsPluginInstance::getLocation";
 	AM_DBG fprintf(stderr, "nsPluginInstance::get_document_location()\n");
@@ -307,7 +257,7 @@ char* CPlugin::get_document_location()
     return rv;
 }
 
-NPBool CPlugin::init(NPWindow* pNPWindow)
+NPBool npambulant::init(NPWindow* pNPWindow)
 {
   if(pNPWindow == NULL)
     return FALSE;
@@ -321,7 +271,7 @@ NPBool CPlugin::init(NPWindow* pNPWindow)
   // do our drawing to it
   lpOldProc = SubclassWindow(m_hWnd, (WNDPROC)PluginWinProc);
 
-  // associate window with our CPlugin object so we can access 
+  // associate window with our npambulant object so we can access 
   // it in the window procedure
   SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
 #endif
@@ -332,7 +282,7 @@ NPBool CPlugin::init(NPWindow* pNPWindow)
   return init_ambulant(m_pNPInstance, m_Window);
 }
 
-void CPlugin::shut()
+void npambulant::shut()
 {
 #ifdef XP_WIN
   // subclass it back
@@ -343,12 +293,12 @@ void CPlugin::shut()
   m_bInitialized = FALSE;
 }
 
-NPBool CPlugin::isInitialized()
+NPBool npambulant::isInitialized()
 {
   return m_bInitialized;
 }
 
-int16 CPlugin::handleEvent(void* event)
+int16 npambulant::handleEvent(void* event)
 {
 #ifdef XP_MAC
   NPEvent* ev = (NPEvent*)event;
@@ -364,46 +314,46 @@ int16 CPlugin::handleEvent(void* event)
 }
 
 // this will start AmbulantPlayer
-void CPlugin::startPlayer()
+void npambulant::startPlayer()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::startPlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::startPlayer()\n");
 	if (m_ambulant_player != NULL)
 	  get_player()->start();
 }
 // this will stop AmbulantPlayer
-void CPlugin::stopPlayer()
+void npambulant::stopPlayer()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::stopPlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::stopPlayer()\n");
 	if (m_ambulant_player != NULL)
 	  get_player()->stop();
 }
 // this will restart AmbulantPlayer
-void CPlugin::restartPlayer()
+void npambulant::restartPlayer()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::restartPlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::restartPlayer()\n");
 	if (m_ambulant_player != NULL) {
 	  get_player()->stop();
 	  get_player()->start();
 	}
 }
 // this will pause AmbulantPlayer
-void CPlugin::pausePlayer()
+void npambulant::pausePlayer()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::pausePlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::pausePlayer()\n");
 	if (m_ambulant_player != NULL)
 	  get_player()->pause();
 }
 // this will resume AmbulantPlayer
-void CPlugin::resumePlayer()
+void npambulant::resumePlayer()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::resumePlayer()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::resumePlayer()\n");
 	if (m_ambulant_player != NULL)
 	  get_player()->resume();
 }
 // this will restart AmbulantPlayer
-bool CPlugin::isDone()
+bool npambulant::isDone()
 {
-	AM_DBG lib::logger::get_logger()->debug("CPlugin::isDone()\n");
+	AM_DBG lib::logger::get_logger()->debug("npambulant::isDone()\n");
 	if (m_ambulant_player != NULL) {
 	  return get_player()->is_done();
 	}
@@ -411,7 +361,7 @@ bool CPlugin::isDone()
 }
 
 // this will force to draw a version string in the plugin window
-void CPlugin::showVersion()
+void npambulant::showVersion()
 {
   const char *ua = NPN_UserAgent(m_pNPInstance);
   strcpy(m_String, ua);
@@ -437,7 +387,7 @@ void CPlugin::showVersion()
 }
 
 // this will clean the plugin window
-void CPlugin::clear()
+void npambulant::clear()
 {
   strcpy(m_String, "");
 
@@ -447,7 +397,7 @@ void CPlugin::clear()
 #endif
 }
 
-void CPlugin::getVersion(char* *aVersion)
+void npambulant::getVersion(char* *aVersion)
 {
   const char *ua = NPN_UserAgent(m_pNPInstance);
   char*& version = *aVersion;
@@ -457,7 +407,7 @@ void CPlugin::getVersion(char* *aVersion)
 }
 
 NPObject *
-CPlugin::GetScriptableObject()
+npambulant::GetScriptableObject()
 {
 
 
@@ -477,6 +427,7 @@ DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObject,
 }
 
 extern "C" {
+  /* status line */
   NPP s_npambulant_last_instance = NULL;
   
   void
@@ -484,6 +435,41 @@ extern "C" {
 	if (s_npambulant_last_instance)
 	  NPN_Status(s_npambulant_last_instance, message);
   }
+  //KB JNK??
+#ifdef XP_WIN
+static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+static WNDPROC lpOldProc = NULL;
+static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  switch (msg) {
+    case WM_PAINT:
+      {
+        // draw a frame and display the string
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        RECT rc;
+        GetClientRect(hWnd, &rc);
+        FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
+        npambulant * p = (npambulant *)GetWindowLong(hWnd, GWL_USERDATA);
+        if(p) {
+          if (p->m_String[0] == 0) {
+            strcpy("npambulant", p->m_String);
+          }
+
+          DrawText(hdc, p->m_String, strlen(p->m_String), &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+        }
+
+        EndPaint(hWnd, &ps);
+      }
+      break;
+    default:
+      break;
+  }
+
+  return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+#endif//XP_WIN
+
 } // extern "C"
 
 #ifdef WITH_GTK

@@ -1,6 +1,6 @@
 #include "ScriptablePluginObject.h"
 #include "ConstructablePluginObject.h"
-#include "CPlugin.h"
+#include "npambulant.h"
 
 static NPObject *
 AllocateConstructablePluginObject(NPP npp, NPClass *aClass)
@@ -38,8 +38,8 @@ DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObject,
 bool
 ScriptablePluginObject::HasMethod(NPIdentifier name)
 {
-  return name == sFoo_id
-	|| name == sStartPlayer_id
+  return false
+    || name == sStartPlayer_id
 	|| name == sStopPlayer_id
 	|| name == sRestartPlayer_id
 	|| name == sPausePlayer_id
@@ -78,97 +78,29 @@ bool
 ScriptablePluginObject::Invoke(NPIdentifier name, const NPVariant *args,
                                uint32_t argCount, NPVariant *result)
 {
-  if (name == sFoo_id) {
-    printf ("foo called!\n");
-
-    NPVariant docv;
-    NPN_GetProperty(mNpp, sWindowObj, sDocument_id, &docv);
-
-    NPObject *doc = NPVARIANT_TO_OBJECT(docv);
-
-    NPVariant strv;
-    STRINGZ_TO_NPVARIANT("div", strv);
-
-    NPVariant divv;
-    NPN_Invoke(mNpp, doc, sCreateElement_id, &strv, 1, &divv);
-
-    STRINGZ_TO_NPVARIANT("I'm created by a plugin!", strv);
-
-    NPVariant textv;
-    NPN_Invoke(mNpp, doc, sCreateTextNode_id, &strv, 1, &textv);
-
-    NPVariant v;
-    NPN_Invoke(mNpp, NPVARIANT_TO_OBJECT(divv), sAppendChild_id, &textv, 1,
-               &v);
-    NPN_ReleaseVariantValue(&v);
-
-    NPN_ReleaseVariantValue(&textv);
-
-    NPVariant bodyv;
-    NPN_GetProperty(mNpp, doc, sBody_id, &bodyv);
-
-    NPN_Invoke(mNpp, NPVARIANT_TO_OBJECT(bodyv), sAppendChild_id, &divv, 1,
-               &v);
-    NPN_ReleaseVariantValue(&v);
-
-    NPN_ReleaseVariantValue(&divv);
-    NPN_ReleaseVariantValue(&bodyv);
-
-    NPN_ReleaseVariantValue(&docv);
-
-    STRINGZ_TO_NPVARIANT(strdup("foo return val"), *result);
-
-    return PR_TRUE;
-  }
+  if ( ! mNpp)
+	return PR_FALSE; 
   if (name == sStartPlayer_id) {
-    printf ("startPlayer called !\n");
-	if (mNpp)
-	  ((CPlugin*)mNpp->pdata)->startPlayer();
-    STRINGZ_TO_NPVARIANT(strdup("startPlayer return val"), *result);
-
-    return PR_TRUE;
-
+	printf ("startPlayer called !\n");
+	((npambulant*)mNpp->pdata)->startPlayer();
   } else  if (name == sStopPlayer_id) {
-    printf ("stopPlayer called !\n");
-	if (mNpp)
-	  ((CPlugin*)mNpp->pdata)->stopPlayer();
-    STRINGZ_TO_NPVARIANT(strdup("stopPlayer return val"), *result);
-
-    return PR_TRUE;
-
+	printf ("stopPlayer called !\n");
+	((npambulant*)mNpp->pdata)->stopPlayer();
   } else  if (name == sRestartPlayer_id) {
-    printf ("restartPlayer called !\n");
-	if (mNpp)
-	  ((CPlugin*)mNpp->pdata)->restartPlayer();
-    STRINGZ_TO_NPVARIANT(strdup("restartPlayer return val"), *result);
-
-    return PR_TRUE;
-
+	printf ("restartPlayer called !\n");
+	((npambulant*)mNpp->pdata)->restartPlayer();
   } else  if (name == sPausePlayer_id) {
-    printf ("pausePlayer called !\n");
-	if (mNpp)
-	  ((CPlugin*)mNpp->pdata)->pausePlayer();
-    STRINGZ_TO_NPVARIANT(strdup("pausePlayer return val"), *result);
-
-    return PR_TRUE;
-
+	printf ("pausePlayer called !\n");
+	((npambulant*)mNpp->pdata)->pausePlayer();
   } else  if (name == sResumePlayer_id) {
-    printf ("resumePlayer called !\n");
-	if (mNpp)
-	  ((CPlugin*)mNpp->pdata)->resumePlayer();
-    STRINGZ_TO_NPVARIANT(strdup("resumePlayer return val"), *result);
-
-    return PR_TRUE;
-
+	printf ("resumePlayer called !\n");
+	((npambulant*)mNpp->pdata)->resumePlayer();
   } else  if (name == sIsDone_id) {
-    printf ("isDone called !\n");
-	if (mNpp) {
-	  bool rv = ((CPlugin*)mNpp->pdata)->isDone();
-	  BOOLEAN_TO_NPVARIANT(rv, *result);
-	  return PR_TRUE;
-	}
-  }
-  return PR_FALSE;
+	printf ("isDone called !\n");
+	bool rv = ((npambulant*)mNpp->pdata)->isDone();
+	BOOLEAN_TO_NPVARIANT(rv, *result);
+  } else return PR_FALSE;
+  return PR_TRUE;
 }
 
 bool

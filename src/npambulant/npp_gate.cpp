@@ -40,7 +40,7 @@
 // Implementation of plugin entry points (NPP_*)
 // most are just empty stubs for this particular plugin 
 //
-#include "CPlugin.h"
+#include "npambulant.h"
 
 char*
 NPP_GetMIMEDescription(void)
@@ -60,7 +60,7 @@ void NPP_Shutdown(void)
 {
 }
 
-// here the plugin creates an instance of our CPlugin object which 
+// here the plugin creates an instance of our npambulant object which 
 // will be associated with this newly created plugin instance and 
 // will do all the neccessary job
 NPError NPP_New(NPMIMEType pluginType,
@@ -76,7 +76,7 @@ NPError NPP_New(NPMIMEType pluginType,
 
   NPError rv = NPERR_NO_ERROR;
 
-  CPlugin * pPlugin = new CPlugin(pluginType,instance,mode,argc,argn,argv,saved);
+  npambulant * pPlugin = new npambulant(pluginType,instance,mode,argc,argn,argv,saved);
   if(pPlugin == NULL)
     return NPERR_OUT_OF_MEMORY_ERROR;
 
@@ -84,7 +84,7 @@ NPError NPP_New(NPMIMEType pluginType,
   return rv;
 }
 
-// here is the place to clean up and destroy the CPlugin object
+// here is the place to clean up and destroy the npambulant object
 NPError NPP_Destroy (NPP instance, NPSavedData** save)
 {
   if(instance == NULL)
@@ -92,7 +92,7 @@ NPError NPP_Destroy (NPP instance, NPSavedData** save)
 
   NPError rv = NPERR_NO_ERROR;
 
-  CPlugin * pPlugin = (CPlugin *)instance->pdata;
+  npambulant * pPlugin = (npambulant *)instance->pdata;
   if(pPlugin != NULL) {
     pPlugin->shut();
     delete pPlugin;
@@ -113,7 +113,7 @@ NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
   if(pNPWindow == NULL)
     return NPERR_GENERIC_ERROR;
 
-  CPlugin * pPlugin = (CPlugin *)instance->pdata;
+  npambulant * pPlugin = (npambulant *)instance->pdata;
 
   if(pPlugin == NULL) 
     return NPERR_GENERIC_ERROR;
@@ -161,7 +161,7 @@ NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
   if(instance == NULL)
     return NPERR_GENERIC_ERROR;
 
-  CPlugin * plugin = (CPlugin *)instance->pdata;
+  npambulant * plugin = (npambulant *)instance->pdata;
   if(plugin == NULL)
     return NPERR_GENERIC_ERROR;
 
@@ -258,7 +258,7 @@ int16	NPP_HandleEvent(NPP instance, void* event)
     return 0;
 
   int16 rv = 0;
-  CPlugin * pPlugin = (CPlugin *)instance->pdata;
+  npambulant * pPlugin = (npambulant *)instance->pdata;
   if (pPlugin)
     rv = pPlugin->handleEvent(event);
 
@@ -278,7 +278,7 @@ NPObject *NPP_GetScriptableInstance(NPP instance)
     return 0;
 
   NPObject *npobj = 0;
-  CPlugin * pPlugin = (CPlugin *)instance->pdata;
+  npambulant * pPlugin = (npambulant *)instance->pdata;
   if (!pPlugin)
     npobj = pPlugin->GetScriptableObject();
 
