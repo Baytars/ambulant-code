@@ -26,7 +26,6 @@ extern NPIdentifier sPausePlayer_id;
 extern NPIdentifier sResumePlayer_id;
 extern NPIdentifier sIsDone_id;
 
-extern NPIdentifier sFoo_id;
 extern NPIdentifier sPluginType_id;
 extern NPIdentifier sDocument_id;
 extern NPIdentifier sCreateElement_id;
