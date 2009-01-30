@@ -41,7 +41,12 @@ function StopPlayer()
 
 function RestartPlayer()
 {
-  embed.restartPlayer();
+	try {
+	embed.restartPlayer();
+	} 
+	catch(err) {
+  		alert(err);
+	}
 }
 
 function ResumePlayer()

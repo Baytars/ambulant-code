@@ -55,6 +55,14 @@
 #include "plugin.h"
 #include "npupp.h"
 
+
+NPIdentifier sStartPlayer_id;
+NPIdentifier sStopPlayer_id;
+NPIdentifier sPausePlayer_id;
+NPIdentifier sResumePlayer_id;
+NPIdentifier sRestartPlayer_id;
+NPIdentifier sIsDone_id;
+
 NPIdentifier sFoo_id;
 NPIdentifier sBar_id;
 NPIdentifier sDocument_id;
