@@ -123,6 +123,8 @@ public:
   NPBool init(NPWindow* pNPWindow);
   void shut();
   NPBool isInitialized();
+  NPP getNPP();
+  const char* getValue(const char *name);
   
   int16 handleEvent(void* event);
 
