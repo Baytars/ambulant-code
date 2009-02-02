@@ -1,15 +1,15 @@
 #ifdef	XP_WIN32
 #include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+
+#include <windows.h>
+#include <windowsx.h>
 #endif//XP_WIN32
 #include "ScriptablePluginObject.h"
 #include "npambulant.h"
 
-/* ambulant player includes */
-#include <windows.h>
-#include <windowsx.h>
-
   //KB JNK??
+/* ambulant player includes */
 #ifdef	XP_WIN32
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 static WNDPROC lpOldProc = NULL;
@@ -331,6 +331,14 @@ void npambulant::shut()
 NPBool npambulant::isInitialized()
 {
   return m_bInitialized;
+}
+
+NPP npambulant::getNPP() {
+  return m_pNPInstance;
+}
+
+const char* npambulant::getValue(const char *name) {
+  return NULL; //TBD
 }
 
 int16 npambulant::handleEvent(void* event)
