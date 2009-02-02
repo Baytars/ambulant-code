@@ -476,6 +476,117 @@ extern "C" {
 } // extern "C"
 #endif//WIN32
 
+// some platform/toolkit specific hacks and functions
+
+#ifdef XP_WIN32
+
+static ambulant_player_callbacks s_ambulant_player_callbacks;
+
+static LRESULT CALLBACK
+PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	nsPluginInstance *plugin = (nsPluginInstance *)GetWindowLong(hWnd, GWL_USERDATA);
+	if (plugin)
+		switch (msg) {
+		case WM_PAINT:
+			{
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint(hWnd, &ps);
+				RECT rc;
+				GetClientRect(hWnd, &rc);
+				FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
+				EndPaint(hWnd, &ps);
+				if (plugin->m_ambulant_player)
+					plugin->m_ambulant_player->redraw(hWnd, hdc);
+				NPRegion invalid_region = CreateRectRgn(rc.left,rc.top,rc.right,rc.bottom);
+				NPN_InvalidateRegion(plugin->getNPP(), invalid_region);
+				break;
+			}
+			break;
+		case WM_LBUTTONDOWN:
+		case WM_MOUSEMOVE:
+			{
+				POINT point;
+				point.x=GET_X_LPARAM(lParam);
+				point.y=GET_Y_LPARAM(lParam);
+
+				if (plugin->m_ambulant_player) {
+					if (msg == WM_MOUSEMOVE) {
+						// code copied from MmView.cpp
+						int new_cursor_id = plugin->m_ambulant_player->get_cursor(point.x, point.y, hWnd);
+//XX					if (new_cursor_id>0) EnableToolTips(TRUE);
+//XX					else CancelToolTips();
+						if(new_cursor_id != plugin->m_cursor_id) {
+							HINSTANCE hIns = 0;
+							HCURSOR new_cursor = 0;
+							if(new_cursor_id == 0) {
+								new_cursor = LoadCursor(hIns, IDC_ARROW); 
+							} else {
+								new_cursor = LoadCursor(hIns, IDC_HAND); 
+							}
+							SetClassLongPtr(hWnd, GCLP_HCURSOR, HandleToLong(new_cursor));
+							plugin->m_cursor_id = new_cursor_id;
+						}
+					} else {
+						plugin->m_ambulant_player->on_click(point.x, point.y, hWnd);
+                    }
+                }
+                break;
+                
+            default:
+                break;
+            }
+        }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+const char *
+nsPluginInstance::getVersion()
+{
+	return ambulant::get_version();
+}
+
+ambulant_player_callbacks::ambulant_player_callbacks()
+:	m_hwnd(NULL)
+{
+}
+
+void
+ambulant_player_callbacks::set_os_window(HWND hwnd)
+{
+	m_hwnd = hwnd;
+}
+
+
+HWND 
+ambulant_player_callbacks::new_os_window()
+{
+	return m_hwnd;
+}
+
+SIZE
+ambulant_player_callbacks::get_default_size()
+{
+	SIZE size;
+	size.cx = ambulant::common::default_layout_width;
+	size.cy = ambulant::common::default_layout_height;
+	return size;
+}
+
+void
+ambulant_player_callbacks::destroy_os_window(HWND hwnd)
+{
+	m_hwnd = NULL;
+}
+
+
+html_browser*
+ambulant_player_callbacks::new_html_browser(int left, int top, int width, int height)
+{
+	return NULL; // not implemented, but needs to be declared
+}
+#endif//XP_WIN32
+
 #ifdef WITH_GTK
 // some fake gtk_gui functions needed by gtk_mainloop
 void gtk_gui::internal_message(int, char*) {}
