@@ -344,6 +344,9 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\npambulant\npambulant.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\npambulant\npambulant.def">
 			</File>
 			<File
@@ -385,102 +388,35 @@ copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\npambulant\nsScriptablePeer.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""/>
-				</FileConfiguration>
+				RelativePath="..\..\src\npambulant\ScriptablePluginObject.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\npambulant\plugin.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""/>
-				</FileConfiguration>
+				RelativePath="..\..\src\npambulant\ScriptablePluginObjectBase.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\..\src\npambulant\npambulant.idl">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Running the XPIDL compiler and linker for $(InputName)"
-						CommandLine="echo %cd%
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-"
-						Outputs="npambulant.h;npambulant.xpt"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Running the XPIDL compiler and linker for $(InputName)"
-						CommandLine="echo %cd%
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-"
-						Outputs="npambulant.h;npambulant.xpt"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="DebugNoShLibNoXerces|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Running the XPIDL compiler and linker for $(InputName)"
-						CommandLine="echo %cd%
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-"
-						Outputs="npambulant.h;npambulant.xpt"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseNoShLibNoXerces|Win32">
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Running the XPIDL compiler and linker for $(InputName)"
-						CommandLine="echo %cd%
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m header -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-..\..\third_party_packages\xulrunner-sdk\bin\xpidl.exe -m typelib -I..\..\third_party_packages\xulrunner-sdk\idl &quot;$(InputPath)&quot;
-"
-						Outputs="npambulant.h;npambulant.xpt"/>
-				</FileConfiguration>
+				RelativePath="..\..\src\npambulant\ConstructablePluginObject.h">
 			</File>
 			<File
-				RelativePath="..\..\src\npambulant\nsScriptablePeer.h">
+				RelativePath="..\..\src\npambulant\npambulant.h">
 			</File>
 			<File
-				RelativePath="..\..\src\npambulant\plugin.h">
+				RelativePath="..\..\src\npambulant\npplat.h">
+			</File>
+			<File
+				RelativePath="..\..\src\npambulant\pluginbase.h">
 			</File>
 			<File
 				RelativePath="..\..\src\npambulant\resource.h">
+			</File>
+			<File
+				RelativePath="..\..\src\npambulant\ScriptablePluginObject.h">
+			</File>
+			<File
+				RelativePath="..\..\src\npambulant\ScriptablePluginObjectBase.h">
 			</File>
 		</Filter>
 		<Filter

@@ -1,13 +1,47 @@
+#ifdef	XP_WIN32
+#include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
+#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+#endif//XP_WIN32
 #include "ScriptablePluginObject.h"
 #include "npambulant.h"
 
 /* ambulant player includes */
-#ifdef	XP_WIN32
-#include <cstddef>		   // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
-#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
-#define _PTRDIFF_T_DEFINED
 #include <windows.h>
 #include <windowsx.h>
+
+  //KB JNK??
+#ifdef	XP_WIN32
+static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
+static WNDPROC lpOldProc = NULL;
+static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  switch (msg) {
+    case WM_PAINT:
+      {
+        // draw a frame and display the string
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        RECT rc;
+        GetClientRect(hWnd, &rc);
+        FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
+        npambulant * p = (npambulant *)GetWindowLong(hWnd, GWL_USERDATA);
+        if(p) {
+          if (p->m_String[0] == 0) {
+            strcpy("npambulant", p->m_String);
+          }
+
+          DrawText(hdc, p->m_String, strlen(p->m_String), &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+        }
+
+        EndPaint(hWnd, &ps);
+      }
+      break;
+    default:
+      break;
+  }
+
+  return DefWindowProc(hWnd, msg, wParam, lParam);
+}
 #endif//XP_WIN32
 
 #ifdef WITH_GTK
@@ -16,6 +50,7 @@
 #ifdef WITH_CG
 #include "cg_mainloop.h"
 #endif
+
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/preferences.h"
 //#define AM_DBG
@@ -197,7 +232,7 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 		} else 
 			m_ambulant_player->play();
 	}
-	mInitialized = TRUE;
+	m_bInitialized = TRUE;
     return TRUE;
 #else // ! XP_WIN32
 	m_bInitialized = true;
@@ -426,8 +461,10 @@ DECLARE_NPOBJECT_CLASS_WITH_BASE(ScriptablePluginObject,
   return m_pScriptableObject;
 }
 
+/* status line */	
+#ifndef WIN32
 extern "C" {
-  /* status line */
+#endif//WIN32
   NPP s_npambulant_last_instance = NULL;
   
   void
@@ -435,42 +472,9 @@ extern "C" {
 	if (s_npambulant_last_instance)
 	  NPN_Status(s_npambulant_last_instance, message);
   }
-  //KB JNK??
-#ifdef XP_WIN
-static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
-static WNDPROC lpOldProc = NULL;
-static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  switch (msg) {
-    case WM_PAINT:
-      {
-        // draw a frame and display the string
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        RECT rc;
-        GetClientRect(hWnd, &rc);
-        FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
-        npambulant * p = (npambulant *)GetWindowLong(hWnd, GWL_USERDATA);
-        if(p) {
-          if (p->m_String[0] == 0) {
-            strcpy("npambulant", p->m_String);
-          }
-
-          DrawText(hdc, p->m_String, strlen(p->m_String), &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        }
-
-        EndPaint(hWnd, &ps);
-      }
-      break;
-    default:
-      break;
-  }
-
-  return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-#endif//XP_WIN
-
+#ifndef WIN32
 } // extern "C"
+#endif//WIN32
 
 #ifdef WITH_GTK
 // some fake gtk_gui functions needed by gtk_mainloop
