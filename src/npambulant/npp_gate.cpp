@@ -40,6 +40,11 @@
 // Implementation of plugin entry points (NPP_*)
 // most are just empty stubs for this particular plugin 
 //
+#ifdef	XP_WIN32
+#include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
+#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+#endif//XP_WIN32
+
 #include "npambulant.h"
 
 char*
