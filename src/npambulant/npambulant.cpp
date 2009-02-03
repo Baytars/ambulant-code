@@ -67,7 +67,7 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
   m_hWnd = NULL;
 #endif
 
-  NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
+NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
 
   sStartPlayer_id = NPN_GetStringIdentifier("startPlayer");
   sStopPlayer_id = NPN_GetStringIdentifier("stopPlayer");
