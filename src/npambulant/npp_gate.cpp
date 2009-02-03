@@ -42,7 +42,7 @@
 //
 #ifdef	XP_WIN32
 #include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
-#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+//#define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//XP_WIN32
 
 #include "npambulant.h"
@@ -158,13 +158,12 @@ NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
 // in the bin/components folder
 NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
 {
-  if(instance == NULL)
+  if(instance == NULL || value == NULL)
     return NPERR_INVALID_INSTANCE_ERROR;
 
   NPError rv = NPERR_NO_ERROR;
 
-  if(instance == NULL)
-    return NPERR_GENERIC_ERROR;
+  *(NPObject **)value = NULL;
 
   npambulant * plugin = (npambulant *)instance->pdata;
   if(plugin == NULL)
@@ -184,7 +183,8 @@ NPError	NPP_GetValue(NPP instance, NPPVariable variable, void *value)
     *(PRBool *) value = PR_TRUE;
     break;        
   default:
-    rv = NPERR_GENERIC_ERROR;
+//    rv = NPERR_GENERIC_ERROR;
+	break; 
   }
 
   return rv;

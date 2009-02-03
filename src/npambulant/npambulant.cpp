@@ -1,6 +1,8 @@
 #ifdef	XP_WIN32
 #include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
+#ifdef _DEBUG
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
+#endif//_DEBUG
 
 #include <windows.h>
 #include <windowsx.h>
@@ -13,35 +15,6 @@
 #ifdef	XP_WIN32
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 static WNDPROC lpOldProc = NULL;
-static LRESULT CALLBACK PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  switch (msg) {
-    case WM_PAINT:
-      {
-        // draw a frame and display the string
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        RECT rc;
-        GetClientRect(hWnd, &rc);
-        FrameRect(hdc, &rc, GetStockBrush(BLACK_BRUSH));
-        npambulant * p = (npambulant *)GetWindowLong(hWnd, GWL_USERDATA);
-        if(p) {
-          if (p->m_String[0] == 0) {
-            strcpy("npambulant", p->m_String);
-          }
-
-          DrawText(hdc, p->m_String, strlen(p->m_String), &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-        }
-
-        EndPaint(hWnd, &ps);
-      }
-      break;
-    default:
-      break;
-  }
-
-  return DefWindowProc(hWnd, msg, wParam, lParam);
-}
 #endif//XP_WIN32
 
 #ifdef WITH_GTK
@@ -131,7 +104,7 @@ npambulant::~npambulant()
 
 bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 {
-	AM_DBG fprintf(stderr, "nsPluginInstance::init(0x%x)\n", aWindow);
+	AM_DBG fprintf(stderr, "npambulant::init(0x%x)\n", aWindow);
     if(aWindow == NULL)
 		return FALSE;
     // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
@@ -139,7 +112,7 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 	void *edptr = pe->get_extra_data("npapi_extra_data");
 	if (edptr) {
 		*(NPWindow**)edptr = aWindow;
-		AM_DBG fprintf(stderr, "nsPluginInstance::init: setting npapi_extra_data(0x%x) to NPWindow 0x%x\n", edptr, aWindow);
+		AM_DBG fprintf(stderr, "npambulant::init: setting npapi_extra_data(0x%x) to NPWindow 0x%x\n", edptr, aWindow);
 	} else {
 		AM_DBG fprintf(stderr, "AmbulantWebKitPlugin: Cannot find npapi_extra_data, cannot communicate NPWindow\n");
 	}
@@ -160,7 +133,7 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 	// do our drawing to it
 	lpOldProc = SubclassWindow(m_hwnd, (WNDPROC)PluginWinProc);
 
-	// associate window with our nsPluginInstance object so we can access 
+	// associate window with our npambulant object so we can access 
 	// it in the window procedure
 	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 #endif//XP_WIN32
@@ -246,8 +219,8 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 /// same, but slightly more convoluted:-)
 char* npambulant::get_document_location()
 {
-    char *id = "ambulant::nsPluginInstance::getLocation";
-	AM_DBG fprintf(stderr, "nsPluginInstance::get_document_location()\n");
+    char *id = "ambulant::npambulant::getLocation";
+	AM_DBG fprintf(stderr, "npambulant::get_document_location()\n");
     char *rv = NULL;
 
 	// Get document
@@ -493,7 +466,7 @@ static ambulant_player_callbacks s_ambulant_player_callbacks;
 static LRESULT CALLBACK
 PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	nsPluginInstance *plugin = (nsPluginInstance *)GetWindowLong(hWnd, GWL_USERDATA);
+	npambulant *plugin = (npambulant *)GetWindowLong(hWnd, GWL_USERDATA);
 	if (plugin)
 		switch (msg) {
 		case WM_PAINT:
@@ -546,12 +519,6 @@ PluginWinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
         }
     return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-const char *
-nsPluginInstance::getVersion()
-{
-	return ambulant::get_version();
 }
 
 ambulant_player_callbacks::ambulant_player_callbacks()

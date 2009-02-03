@@ -70,7 +70,7 @@
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
+				CommandLine="
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -121,7 +121,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcom.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcomglue_s.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib ..\..\lib\win32\xerces-depdom_2.lib"
+				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib ..\..\lib\win32\xerces-depdom_2.lib"
 				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName).dll"
 				LinkIncremental="0"
 				SuppressStartupBanner="TRUE"
@@ -142,7 +142,7 @@
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\npambulant.xpt &quot;\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;
+				CommandLine="
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>

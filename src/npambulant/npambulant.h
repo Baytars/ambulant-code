@@ -72,6 +72,7 @@ class cg_mainloop;
 #elif	XP_WIN32
 #include <ambulant/gui/dx/dx_player.h>
 #include <ambulant/net/url.h>
+typedef ambulant::gui::dx::dx_player_callbacks gui_callbacks; //XX from MmView.cpp
 class ambulant_player_callbacks : public ambulant::gui::dx::dx_player_callbacks {
 
 public:
