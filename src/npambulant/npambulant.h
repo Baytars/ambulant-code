@@ -165,7 +165,7 @@ public:
 #endif
 
 #ifdef	XP_WIN32
-#define strcasecmp(s1,s2) _stricmp(s2,s2)
+#define strcasecmp(s1,s2) _stricmp(s1,s2)
     ambulant_player_callbacks m_player_callbacks;
     HWND m_hwnd;
     ambulant::gui::dx::dx_player* m_ambulant_player;

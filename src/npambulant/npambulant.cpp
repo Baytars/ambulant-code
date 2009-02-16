@@ -67,7 +67,7 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
   m_hWnd = NULL;
 #endif
 
-NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
+  NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
 
   sStartPlayer_id = NPN_GetStringIdentifier("startPlayer");
   sStopPlayer_id = NPN_GetStringIdentifier("stopPlayer");
@@ -94,8 +94,8 @@ NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
 
 npambulant::~npambulant()
 {
-  if (sWindowObj)
-    NPN_ReleaseObject(sWindowObj);
+ // if (sWindowObj)
+ //   NPN_ReleaseObject(sWindowObj);
   if (m_pScriptableObject)
     NPN_ReleaseObject(m_pScriptableObject);
 
@@ -146,12 +146,14 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
     for (int i =0; i < m_argc; i++) {
 //		Uncomment next line to see the <EMBED/> attr values	
 //  	fprintf(stderr, "arg[%i]:%s=%s\n",i,m_argn[i],m_argv[i]);
-        if (strcasecmp(m_argn[i],"data") == 0)
+		const char* name = m_argn[i];
+		const char* value = m_argv[i];
+        if (strcasecmp(name, "data") == 0)
             if (arg_str == NULL)
-                arg_str = m_argv[i];
-            if (strcasecmp(m_argn[i],"src") == 0)
+                arg_str = value;
+            if (strcasecmp(name,"src") == 0)
                 if (arg_str == NULL)
-                    arg_str = m_argv[i];
+                    arg_str = value;
     }
     if (arg_str == NULL)
         return false;
@@ -292,12 +294,20 @@ NPBool npambulant::init(NPWindow* pNPWindow)
 
 void npambulant::shut()
 {
+	if (m_ambulant_player) {
 #ifdef XP_WIN
+	  m_ambulant_player->get_player()->stop();
+//	  delete m_ambulant_player->get_player();
+	  delete m_ambulant_player;
+	}
   // subclass it back
   SubclassWindow(m_hWnd, lpOldProc);
   m_hWnd = NULL;
+#else
+	m_ambulant_player->stop();
+	delete m_ambulant->player;
 #endif
-
+  m_ambulant_player = NULL;
   m_bInitialized = FALSE;
 }
 
