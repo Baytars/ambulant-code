@@ -171,7 +171,7 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
         } else {
             file_url = arg_url;
         }
-        file_str = strdup(file_url.get_file().c_str());
+        file_str = strdup(file_url.get_url().c_str());
     }
 	m_url = file_url;
 #ifdef WITH_GTK
@@ -296,19 +296,20 @@ void npambulant::shut()
 {
 	if (m_ambulant_player) {
 #ifdef XP_WIN
-	  m_ambulant_player->get_player()->stop();
-//	  delete m_ambulant_player->get_player();
-	  delete m_ambulant_player;
+		m_ambulant_player->get_player()->stop();
+//	  	delete m_ambulant_player->get_player();
+	  	delete m_ambulant_player;
 	}
-  // subclass it back
-  SubclassWindow(m_hWnd, lpOldProc);
-  m_hWnd = NULL;
+	// subclass it back
+	SubclassWindow(m_hWnd, lpOldProc);
+	m_hWnd = NULL;
 #else
-	m_ambulant_player->stop();
-	delete m_ambulant->player;
+		m_ambulant_player->stop();
+		delete m_ambulant_player;
+	}
 #endif
-  m_ambulant_player = NULL;
-  m_bInitialized = FALSE;
+	m_ambulant_player = NULL;
+	m_bInitialized = FALSE;
 }
 
 NPBool npambulant::isInitialized()
