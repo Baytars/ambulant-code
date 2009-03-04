@@ -332,9 +332,9 @@ time_node::sync_playable_clock()
 	qtime_type timestamp(this, get_simple_time());
 	time_type ad_offset = timestamp.second - m_interval.begin;
 	// XXXJACK: does this work correctly for repeating nodes??
-	//marisa: added - 1 because all my offsets for moving backwards in a file were 1 second too big
-	//this seems to work; however, maybe the ambulant developers have a better idea?
-	m_context->seek_playable(n, time_type_to_secs(ad_offset()) - 1);
+  // marisa: ad_offset sometimes causes the start time of a node to be 1 second
+  // too large
+  m_context->seek_playable(n, time_type_to_secs(ad_offset()));
 }
 
 // This function calculates the simple duration of this node.
