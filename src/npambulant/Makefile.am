@@ -71,6 +71,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include/ambulant/gui \
 	-I$(top_srcdir)/src/player_gtk \
 	$(gtkincludes) \
+	-I$(XULRUNNER_ROOT)/include/xulrunner-sdk-1.9/plugin \
+	-I$(XULRUNNER_ROOT)/include/xulrunner-sdk-1.9/system_wrappers \
+	-I$(XULRUNNER_ROOT)/include/nspr4 \
+	-I$(XULRUNNER_ROOT)/include/xulrunner-sdk-1.9/java  \
+	-I$(XULRUNNER_ROOT)/include/xulrunner-sdk-1.9/xpcom \
 	-I$(XULRUNNER_ROOT)/include/plugin \
 	-I$(XULRUNNER_ROOT)/include/system_wrappers \
 	-I$(XULRUNNER_ROOT)/include/nspr  \

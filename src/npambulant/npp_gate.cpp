@@ -54,7 +54,7 @@ NPP_GetMIMEDescription(void)
   return mimetypes;
 }
 
-
+npambulant * s_npambulant = NULL;
 
 NPError NPP_Initialize(void)
 {
@@ -84,7 +84,7 @@ NPError NPP_New(NPMIMEType pluginType,
   npambulant * pPlugin = new npambulant(pluginType,instance,mode,argc,argn,argv,saved);
   if(pPlugin == NULL)
     return NPERR_OUT_OF_MEMORY_ERROR;
-
+  s_npambulant = pPlugin;
   instance->pdata = (void *)pPlugin;
   return rv;
 }
@@ -98,9 +98,10 @@ NPError NPP_Destroy (NPP instance, NPSavedData** save)
   NPError rv = NPERR_NO_ERROR;
 
   npambulant * pPlugin = (npambulant *)instance->pdata;
-  if(pPlugin != NULL) {
+  if(pPlugin != NULL && s_npambulant != NULL) {
     pPlugin->shut();
     delete pPlugin;
+    s_npambulant = NULL;
   }
   return rv;
 }
@@ -126,8 +127,6 @@ NPError NPP_SetWindow (NPP instance, NPWindow* pNPWindow)
   // window just created
   if(!pPlugin->isInitialized() && (pNPWindow->window != NULL)) { 
     if(!pPlugin->init(pNPWindow)) {
-      delete pPlugin;
-      pPlugin = NULL;
       return NPERR_MODULE_LOAD_FAILED_ERROR;
     }
   }

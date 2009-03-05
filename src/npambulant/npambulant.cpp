@@ -305,10 +305,12 @@ void npambulant::shut()
 	m_hWnd = NULL;
 #else
 		m_ambulant_player->stop();
-		delete m_ambulant_player;
+		while ( ! m_ambulant_player->is_done())
+		  sleep(10000);
+		delete m_mainloop;
 	}
 #endif
-	m_ambulant_player = NULL;
+m_ambulant_player = NULL; // deleted by mainloop
 	m_bInitialized = FALSE;
 }
 
