@@ -191,6 +191,7 @@ class gtk_ambulant_widget : public GtkWidget, public ambulant::common::gui_scree
 	   is executed by the main thread */
 	static lib::critical_section s_lock;
 	static int s_widgets;
+	static std::set<guint> s_draw_area_tags;
   private:
 	ambulant_gtk_window* m_gtk_window;
 	GtkWidget *m_widget;

@@ -84,7 +84,8 @@ ambulant::gui::gtk::create_gtk_video_factory(common::factories *factory)
 // structure to keep track of the dirty area
 struct dirty_area_widget {
 	lib::rect area;
-	GtkWidget* widget;	
+	GtkWidget* widget;
+	guint tag;
 };
 
 // Callbacks used to keep synchronization of the different threads
@@ -98,6 +99,10 @@ bool gtk_C_callback_helper_queue_draw_area(void *arg)
 	gtk_ambulant_widget::s_lock.enter();
 	if (gtk_ambulant_widget::s_widgets > 0)
 		gtk_widget_queue_draw_area(r->widget, r->area.left(), r->area.top(), r->area.width(), r->area.height());
+	
+	/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("gtk_C_callback_helper_queue_draw_area with left: %d, top: %d, width: %d, height: %d tag=%d", r->area.left(), r->area.top(), r->area.width(), r->area.height(),r->tag);
+
+	gtk_ambulant_widget::s_draw_area_tags.erase(r->tag);
 	gtk_ambulant_widget::s_lock.leave();
 //	gtk_widget_queue_draw(r->widget);
 	delete r;
@@ -452,7 +457,12 @@ ambulant_gtk_window::need_redraw(const lib::rect &r)
 		AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_redraw(0x%x): gtk_widget_translate_coordinates failed.", (void *)this);
 	}
 	AM_DBG lib::logger::get_logger()->debug("ambulant_gtk_window::need_redraw: parent ltrb=(%d,%d,%d,%d)", dirty->area.left(), dirty->area.top(), dirty->area.width(), dirty->area.height());
-	g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc) gtk_C_callback_helper_queue_draw_area, (void *)dirty, NULL);
+	gtk_ambulant_widget::s_lock.enter();
+	guint draw_area_tag = g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc) gtk_C_callback_helper_queue_draw_area, (void *)dirty, NULL);
+	dirty->tag = draw_area_tag;
+	gtk_ambulant_widget::s_draw_area_tags.insert(draw_area_tag);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ambulant_gtk_window::need_redraw: parent ltrb=(%d,%d,%d,%d), tag=%d fun=0x%x", dirty->area.left(), dirty->area.top(), dirty->area.width(), dirty->area.height(), draw_area_tag, gtk_C_callback_helper_queue_draw_area);
+	gtk_ambulant_widget::s_lock.leave();
 }
 
 void
@@ -782,12 +792,18 @@ vJUNK
 // gtk_ambulant_widget::s_widgets is a counter to check for the liveliness of gtk_widget during
 // execution of gtk*draw() functions by a callback function in the main thread
 // gtk_ambulant_widget::s_lock is for the protection of the counter
+// gtk_ambulant_widget::s_draw_area_tags contains the set of tags returned by 
+// g_idle_queue_add() that are not yet processed. This set is maintained because 
+// in the npambulant plugin, when the plugin is unloaded all unprocessed queue entries
+// must be removed from the main event loop, otherwise the callback will be done on 
+// removed code and the browser may crash.
 // TBD: a better approach would be to have s static protected std::vector<dirty_widget> 
 // to be updated when callbacks are scheduled and executed
 // and use these entries to remove any scheduled callbacks with
 // gboolean g_idle_remove_by_data (gpointer data); when the gtk_widget is destroyed
 // then the ugly dependence on the parent widget couls also be removed
 int gtk_ambulant_widget::s_widgets = 0;
+std::set<guint> gtk_ambulant_widget::s_draw_area_tags;
 lib::critical_section gtk_ambulant_widget::s_lock;
 
 gtk_ambulant_widget::gtk_ambulant_widget(GtkWidget* parent_widget)
@@ -814,6 +830,14 @@ gtk_ambulant_widget::~gtk_ambulant_widget()
 {
 	gtk_ambulant_widget::s_lock.enter();
 	gtk_ambulant_widget::s_widgets--;
+	if ( ! gtk_ambulant_widget::s_draw_area_tags.empty()) {
+		for (std::set<guint>::iterator it = s_draw_area_tags.begin(); it != s_draw_area_tags.end(); it++) {
+		  /*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("gtk_ambulant_widget::~gtk_ambulant_widget removing tag %d", (*it));
+		  g_source_remove((*it));
+
+		}
+		s_draw_area_tags.clear();
+	}
 	gtk_ambulant_widget::s_lock.leave();
 	AM_DBG lib::logger::get_logger()->debug("gtk_ambulant_widget::~gtk_ambulant_widget(0x%x): m_gtk_window=0x%x s_widgets=%d", (void*)this, m_gtk_window, gtk_ambulant_widget::s_widgets);
 	GObject* toplevel_widget = G_OBJECT (GTK_WIDGET (gtk_widget_get_toplevel(m_widget)));
