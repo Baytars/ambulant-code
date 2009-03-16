@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="npambulant"
 	ProjectGUID="{4DCBBF00-3086-40AA-B1B7-4FD350835E95}"
 	RootNamespace="npambulant"
@@ -83,7 +83,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="false"
 				AdditionalDependencies="..\..\lib\win32\libambulant_shwin32_D.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2D.lib ..\..\lib\win32\xerces-depdom_2D.lib"
-				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName)_D.dll"
+				OutputFile="C:\mozilla-central\ff-opt-static\dist\bin\plugins\$(ProjectName)_D.dll"
 				LinkIncremental="0"
 				SuppressStartupBanner="false"
 				AdditionalLibraryDirectories="..\..\lib\win32"

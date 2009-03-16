@@ -38,7 +38,7 @@
 #ifdef AMBULANT_PLATFORM_WIN32_WCE
 #include <d3dmtypes.h>
 #else
-#include <d3d8types.h>
+#include <d3d9types.h>
 #endif
 
 #include "ambulant/gui/dx/dx_viewport.h"
