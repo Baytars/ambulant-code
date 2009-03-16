@@ -1,6 +1,7 @@
 #ifdef	XP_WIN32
 #include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
 #ifdef _DEBUG
+#include <vld.h> // Visual Leak Detector
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//_DEBUG
 
@@ -12,6 +13,7 @@
 
   //KB JNK??
 /* ambulant player includes */
+
 #ifdef	XP_WIN32
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 static WNDPROC lpOldProc = NULL;
@@ -94,8 +96,8 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 
 npambulant::~npambulant()
 {
- // if (sWindowObj)
- //   NPN_ReleaseObject(sWindowObj);
+  if (sWindowObj)
+    NPN_ReleaseObject(sWindowObj);
   if (m_pScriptableObject)
     NPN_ReleaseObject(m_pScriptableObject);
 
@@ -221,7 +223,6 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 /// same, but slightly more convoluted:-)
 char* npambulant::get_document_location()
 {
-    char *id = "ambulant::npambulant::getLocation";
 	AM_DBG fprintf(stderr, "npambulant::get_document_location()\n");
     char *rv = NULL;
 
@@ -269,40 +270,45 @@ char* npambulant::get_document_location()
 
 NPBool npambulant::init(NPWindow* pNPWindow)
 {
-  if(pNPWindow == NULL)
-    return FALSE;
+	if(pNPWindow == NULL)
+		return FALSE;
 
 #ifdef XP_WIN
-  m_hWnd = (HWND)pNPWindow->window;
-  if(m_hWnd == NULL)
-    return FALSE;
+#ifdef	_DEBUG
+//	VLDEnable();
+#endif//_DEBUG
+	m_hWnd = (HWND)pNPWindow->window;
+	if(m_hWnd == NULL)
+		return FALSE;
+	// subclass window so we can intercept window messages and
+	// do our drawing to it
+	lpOldProc = SubclassWindow(m_hWnd, (WNDPROC)PluginWinProc);
 
-  // subclass window so we can intercept window messages and
-  // do our drawing to it
-  lpOldProc = SubclassWindow(m_hWnd, (WNDPROC)PluginWinProc);
-
-  // associate window with our npambulant object so we can access 
-  // it in the window procedure
-  SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+	// associate window with our npambulant object so we can access 
+	// it in the window procedure
+	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
 #endif
 
-  m_Window = pNPWindow;
+	m_Window = pNPWindow;
 
-  m_bInitialized = TRUE;
-  return init_ambulant(m_pNPInstance, m_Window);
+	m_bInitialized = TRUE;
+	return init_ambulant(m_pNPInstance, m_Window);
 }
 
 void npambulant::shut()
 {
+	// subclass it back
+	assert(m_hWnd);
+	SubclassWindow(m_hWnd, lpOldProc);
+	m_hWnd = NULL;
 	if (m_ambulant_player) {
 #ifdef XP_WIN
 		m_ambulant_player->get_player()->stop();
-//	  	delete m_ambulant_player->get_player();
 	  	delete m_ambulant_player;
 	}
-	// subclass it back
-	SubclassWindow(m_hWnd, lpOldProc);
-	m_hWnd = NULL;
+#ifdef	_DEBUG
+//	VLDDisable();
+#endif//_DEBUG
 #else
 		m_ambulant_player->stop();
 		while ( ! m_ambulant_player->is_done())
@@ -310,7 +316,7 @@ void npambulant::shut()
 		delete m_mainloop;
 	}
 #endif
-m_ambulant_player = NULL; // deleted by mainloop
+	m_ambulant_player = NULL; // deleted by mainloop
 	m_bInitialized = FALSE;
 }
 
