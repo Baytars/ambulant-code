@@ -1,7 +1,6 @@
 #ifdef	XP_WIN32
 #include <cstddef>		   	 // Needed for ptrdiff_t. Is used in GeckoSDK 1.9,
 #ifdef _DEBUG
-#include <vld.h> // Visual Leak Detector
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//_DEBUG
 
@@ -11,12 +10,10 @@
 #include "ScriptablePluginObject.h"
 #include "npambulant.h"
 
-  //KB JNK??
 /* ambulant player includes */
 
 #ifdef	XP_WIN32
 static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
-static WNDPROC lpOldProc = NULL;
 #endif//XP_WIN32
 
 #ifdef WITH_GTK
@@ -67,6 +64,8 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 {
 #ifdef XP_WIN
   m_hWnd = NULL;
+  m_lpOldProc = NULL;
+  m_OldWindow = NULL;
 #endif
 
   NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &sWindowObj);
@@ -102,6 +101,8 @@ npambulant::~npambulant()
     NPN_ReleaseObject(m_pScriptableObject);
 
   sWindowObj = 0;
+  extern NPP s_npambulant_last_instance;
+  s_npambulant_last_instance = NULL;
 }
 
 bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
@@ -109,7 +110,7 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 	AM_DBG fprintf(stderr, "npambulant::init(0x%x)\n", aWindow);
     if(aWindow == NULL)
 		return FALSE;
-    // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
+   // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
 	ambulant::common::plugin_engine *pe = ambulant::common::plugin_engine::get_plugin_engine();
 	void *edptr = pe->get_extra_data("npapi_extra_data");
 	if (edptr) {
@@ -131,13 +132,6 @@ bool npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 	m_hwnd = (HWND)aWindow->window;
 	if(m_hwnd == NULL)
 		return FALSE;
-	// subclass window so we can intercept window messages and
-	// do our drawing to it
-	lpOldProc = SubclassWindow(m_hwnd, (WNDPROC)PluginWinProc);
-
-	// associate window with our npambulant object so we can access 
-	// it in the window procedure
-	SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 #endif//XP_WIN32
 	assert ( ! m_ambulant_player);
 	ambulant::lib::logger::get_logger()->set_show_message(npambulant_display_message);
@@ -272,21 +266,17 @@ NPBool npambulant::init(NPWindow* pNPWindow)
 {
 	if(pNPWindow == NULL)
 		return FALSE;
-
 #ifdef XP_WIN
-#ifdef	_DEBUG
-//	VLDEnable();
-#endif//_DEBUG
 	m_hWnd = (HWND)pNPWindow->window;
 	if(m_hWnd == NULL)
 		return FALSE;
 	// subclass window so we can intercept window messages and
 	// do our drawing to it
-	lpOldProc = SubclassWindow(m_hWnd, (WNDPROC)PluginWinProc);
+	m_lpOldProc = SubclassWindow(m_hWnd, (WNDPROC)PluginWinProc);
 
 	// associate window with our npambulant object so we can access 
 	// it in the window procedure
-	SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
+	m_OldWindow = SetWindowLong(m_hWnd, GWL_USERDATA, (LONG)this);
 #endif
 
 	m_Window = pNPWindow;
@@ -297,18 +287,25 @@ NPBool npambulant::init(NPWindow* pNPWindow)
 
 void npambulant::shut()
 {
-	// subclass it back
-	assert(m_hWnd);
-	SubclassWindow(m_hWnd, lpOldProc);
+#ifdef XP_WIN
+	if (m_hWnd) {
+		// reset the userdata association
+		if (m_OldWindow)
+			SetWindowLong(m_hWnd, GWL_USERDATA, m_OldWindow);
+		// subclass it back
+		if (m_lpOldProc);
+		SubclassWindow(m_hWnd, m_lpOldProc);
+	}
+	m_OldWindow = NULL;
 	m_hWnd = NULL;
+	m_lpOldProc = NULL;
+#endif//XP_WIN
+
 	if (m_ambulant_player) {
 #ifdef XP_WIN
 		m_ambulant_player->get_player()->stop();
 	  	delete m_ambulant_player;
 	}
-#ifdef	_DEBUG
-//	VLDDisable();
-#endif//_DEBUG
 #else
 		m_ambulant_player->stop();
 		while ( ! m_ambulant_player->is_done())

@@ -80,7 +80,6 @@ NPError NPP_New(NPMIMEType pluginType,
     return NPERR_INVALID_INSTANCE_ERROR;
 
   NPError rv = NPERR_NO_ERROR;
-
   npambulant * pPlugin = new npambulant(pluginType,instance,mode,argc,argn,argv,saved);
   if(pPlugin == NULL)
     return NPERR_OUT_OF_MEMORY_ERROR;

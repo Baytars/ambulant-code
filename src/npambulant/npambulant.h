@@ -104,6 +104,8 @@ private:
 
 #ifdef XP_WIN
   HWND m_hWnd; 
+  WNDPROC m_lpOldProc;
+  LONG m_OldWindow;
 #endif
 
   NPWindow * m_Window;
