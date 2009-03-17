@@ -49,7 +49,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;..\..\third_party_packages\xulrunner-sdk&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\sdk\include&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\plugin&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\nspr&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\java&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\js&quot;;..\..\include;&quot;..\..\projects\vc71-smil3&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;XP_WIN32;AMBULANT_BUILD_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITHOUT_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_SMIL30;MOZILLA_STRICT_API;_X86_;_WINDOWS;_USRDLL;NPSIMPLE_EXPORTS;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;_XP_WIN32;XP_WIN32;XPCOM_GLUE;AMBULANT_BUILD_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITHOUT_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_SMIL30;MOZILLA_STRICT_API;_X86_;_WINDOWS;_USRDLL;NPSIMPLE_EXPORTS;NPAMBULANT_EXPORTS;$(NOINHERIT)"
 				GeneratePreprocessedFile="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -63,8 +63,8 @@
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="0"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
 				CallingConvention="0"
 				CompileAs="2"
 			/>
@@ -468,6 +468,14 @@
 			<File
 				RelativePath="..\..\src\npambulant\npambulant.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Detect64BitPortabilityProblems="false"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\..\src\npambulant\npambulant.def"
