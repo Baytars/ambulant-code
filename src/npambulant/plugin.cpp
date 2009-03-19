@@ -277,7 +277,7 @@ nsPluginInstance::init(NPWindow* aWindow)
     net::url arg_url = net::url::from_url (arg_str);
     char* file_str = NULL;
     if (arg_url.is_absolute()) {
-        file_str = strdup(arg_url.get_file().c_str());
+        file_str = strdup(arg_url.get_url().c_str());
     } else {
         char* loc_str = get_document_location();
         if (loc_str != NULL) {
@@ -287,7 +287,7 @@ nsPluginInstance::init(NPWindow* aWindow)
         } else {
             file_url = arg_url;
         }
-        file_str = strdup(file_url.get_file().c_str());
+        file_str = strdup(file_url.get_url().c_str());
     }
 	m_url = file_url;
 #ifdef WITH_GTK
