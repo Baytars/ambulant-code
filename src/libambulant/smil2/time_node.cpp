@@ -910,6 +910,7 @@ void time_node::repeat_playable() {
 	if(!is_playable() || m_ffwd_mode) return;
 	AM_DBG m_logger->debug("%s[%s].repeat()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
+    stop_playable();
 	m_context->start_playable(m_node, 0);
 }
 
