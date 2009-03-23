@@ -394,7 +394,7 @@ smiltext_engine::_update() {
 		// In principle we do a callback per pixel scrolled, but clamp at 25 per second.
 		unsigned int delay = m_auto_rate ? 40 : 1000 / m_params.m_rate;
 		if (delay < 40) delay = 40;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("delay=%d: next_update_needed=%d", delay, next_update_needed);
+		AM_DBG lib::logger::get_logger()->debug("delay=%d: next_update_needed=%d", delay, next_update_needed);
 		if (next_update_needed > delay || next_update_needed == 0) {
 			next_update_needed = delay;
 		}

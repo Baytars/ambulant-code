@@ -1068,6 +1068,10 @@ void time_node::exec(qtime_type timestamp) {
             set_state_ex(ts_postactive, qt);
 		return;
 	}
+#if 1
+    if (!m_last_cdur.is_definite() && m_eom_flag)
+        m_last_cdur = timestamp.as_time_down_to(this);
+#endif
 	
 	// Check for the EOSD event
 	AM_DBG if (has_debug()) m_logger->debug("%s[%s] checking for end-of-sd (cdur=%ld)", m_attrs.get_tag().c_str(), 
