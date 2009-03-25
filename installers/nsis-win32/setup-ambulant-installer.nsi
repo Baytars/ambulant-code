@@ -88,7 +88,7 @@ Section "Core Components" CoreSection
   File "..\..\bin\win32\avcodec-51.dll"
   File "..\..\bin\win32\avformat-52.dll"
   File "..\..\bin\win32\avutil-49.dll"
-  File "..\..\bin\win32\SDL.dll"
+;  File "..\..\bin\win32\SDL.dll"
 !else
   File "..\..\bin\win32\AmbulantPlayer.exe"
 !endif
