@@ -1,0 +1,41 @@
+The following test sequences are mandatory before release, to check
+that at least everything we make public available works properly.
+
+A. Build Ambulant as if it would be a distributed version: enable as
+   much supported features as possible (--with-live, --with-xerces,
+   --with-plugins, --with-python, --with-xerces-plugin,
+   --with-python-plugin), etc., depending on platform.
+   Clear any preferences file in .ambulant  and start AmbulantPlayer.
+   You should see the initial Welcome demo.
+
+B. Make sure all local test work (and player controls as well):
+   1. Welcome.smil
+   2. NYC-SMIL2.smil (use File->Load Settings...)
+   3. NYC-SmilText.smil (at least until "In Memoriam")
+   4. NYC-StateTest.smil
+   5. Audiotests (mp3,ogg,seektest,wav)
+   6. Birthday (all versions, test click on picture)
+   7. Bridge
+   8. Euros
+   9. Flashlight
+  10. Imagetests
+  11. News (test click on exclusive)
+  12. Video tests
+
+C. Make sure that the zipp'd versions of the tests work properly, these
+   are available at http://ambulantplayer.org/Demos.shtml:
+   1. smilText
+   2. PanZoom
+   3. Videotest
+   4. Birthday
+   5. Euros
+   6. Flashlight
+   7. News
+ 
+D. Make sure that the http versions of the tests at C. work properly.
+
+E. Make sure that the rtsp versions of the tests at C. work properly.
+
+F. Build and install Firefox plugin and verify that all tests at C.
+   for plugin work properly.
+
