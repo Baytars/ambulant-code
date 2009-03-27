@@ -1,0 +1,10 @@
+Installation instructions for installing the AmbulantPlayer Firefox plugin
+version 2.0.2 (xpcom version, works only in Firefox) on Linux (32 bit):
+Move or copy the following files from this .zip file to:
+$HOME/.mozilla/plugins
+(or as root for system-wide installation to: /usr/lib/mozilla/plugins)
+
+npambulant.so
+npambulant.xpt
+
+For uninstall, remove above files.
