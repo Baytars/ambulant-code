@@ -30,6 +30,7 @@
 #ifndef AMBULANT_LIB_AMSTREAM_H
 #define AMBULANT_LIB_AMSTREAM_H
 
+#include <string.h> // needed for strlen()
 #include "ambulant/config/config.h"
 #include "ambulant/lib/byte_buffer.h"
 
