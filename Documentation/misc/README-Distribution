@@ -219,6 +219,7 @@ Creating the MacOSX installer
   third_party_packages/readme.txt has (terse) instructions on
   how to do this.
   SDL needs to be installed, the others are used in-place.
+- Create a directory to build in, for example "build-dist".
 - Build the whole source tree, don't forget options for
   enabling xerces, etc. You want to build with Xerces in a plugin,
   live support, no Python support, only fast internal DOM acces,
@@ -250,6 +251,8 @@ Creating the MacOSX installer
 Creating the WebKit/Safari plugin
 =================================
 - Make sure the prerequisites are built, as above.
+- Create the directory to build in. this must be called "build-webkitplugin",
+  if it's different you have to fix the xcode project, below.
 - Build a slightly different configuration from above, with
 
   export SYSROOT=/Developer/SDKs/MacOSX10.4u.sdk
@@ -261,7 +264,13 @@ Creating the WebKit/Safari plugin
 	--with-python=/usr/bin/python  --with-python-plugin \
 	--with-webkit-dom --with-webkit-plugin
 	
-- Build the plugin, with <to be supplied>
+- Build the libraries ("make" in the build directory), *BUT DON'T INSTALL*.
+  You may have to build pyamplugin separately, without the MACOSX_DEPLOYMENT_TARGET
+  variable set.
+- In XCode, open src/webkit_plugin/AmbulantWebKitPlugin.xcodeproj and build the
+  Release target.
+- You will find the plugin in "~/Library/Internet Plugins".
+- Put into a z
   
 Creating the Windows desktop installer
 ======================================
@@ -350,6 +359,9 @@ bugfix release later (which will cost everyone another 2 days or so of work).
 - We can use vin.cst.cwi.nl to test it on newer distributions then our desktop.
   (at this moment fedora core 3)
 
+IMPORTANT: for each distribution, compare the size with the previous distribution
+for that platform. If the new one is any smaller, or much bigger, think why
+this could be the case. If you cannot think of a very good reason: investigate!
   
 Uploading the distributions
 ===========================
