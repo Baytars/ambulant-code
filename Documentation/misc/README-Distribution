@@ -271,6 +271,17 @@ Creating the WebKit/Safari plugin
   Release target.
 - You will find the plugin in "~/Library/Internet Plugins".
 - Put into a z
+
+Creating the Firefox plugin on Linux
+====================================
+
+- download xulrunner-sdk from mozilla.org into third-party-packages
+- as above, configure --with-npambulant [other options]; make;make install
+- TEMP FIX: cd src/npambulant;./link-patch;cp npambulant.so <install-dir, see below>
+- Pack the installed files npambulant.so and npambulant.xpt with
+  src/npambulant/README.linux into npambulant.zip
+  For root installs, files go into /usr/lib/mozilla/plugins, otherwise
+  into ~/.mozilla/plugins
   
 Creating the Windows desktop installer
 ======================================
