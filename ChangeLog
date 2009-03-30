@@ -1,3 +1,79 @@
+2009-03-30 12:11  jackjansen
+
+	* Added more notes on Mac building.
+
+2009-03-30 09:54  jackjansen
+
+	* Shallow bug (that turned out to be non-essential anyway)
+
+2009-03-27 16:35  keesblom
+
+	* separated the README for npambulant into one for win32 and one
+	  for linux32
+
+2009-03-27 16:07  keesblom
+
+	* 1.--with-python works; 2.unix FF plugin interaction now works; 3.
+	  plugin doesn´t crash in ~scheduler() anymoe
+
+2009-03-25 17:15  keesblom
+
+	* Created 1st 2.0.2 release candidate
+
+2009-03-25 17:09  keesblom
+
+	* Refined the text to largely omit stuff in ambulant-documents
+
+2009-03-25 16:11  keesblom
+
+	* Added a README how to (un)install Firefox plugin on Windows
+
+2009-03-25 15:18  keesblom
+
+	* Added an initial list of test sequences to make sure everything
+	  we make available to general public really works before release.
+
+2009-03-23 16:49  keesblom
+
+	* Revised use of flags m_running and m_exit_requested. Should fix
+	  #2654569
+
+2009-03-23 16:44  jackjansen
+
+	* Fixed #2663294: repeatCount and repeatDur not working.
+
+	  The core of the problem was that repeat only resulted in a
+	  start_playable(), but as playables currently aren't restartable
+	  we also need a stop_playable() before the start.
+
+2009-03-23 16:30  jackjansen
+
+	* Partial fix for #2663294: on_eosd() callback comes very late.
+
+	  This issue was that, although time_node::exec() was called, there
+	  was no provision for calling on_eosd() for the special case of a
+	  continuous media item that had finished its simple duration.
+
+2009-03-19 14:32  keesblom
+
+	* Backported old bug, could not load non-local url
+
+2009-01-15 14:44  jackjansen
+
+	* Backport of 1.64.6.1: Seeking on video file which also has audio
+	  no longer worked, because of the A/V resyncing fix for #2046564.
+	  Fixed.
+
+2009-01-15 14:41  jackjansen
+
+	* Backport of 1.25: Bug (and fix) spotted by Daniel Weck:
+	  change_global_rate() argument is an increment, not a factor.
+
+2009-01-06 17:24  keesblom
+
+	* Small last minute changes in rules (--without-gstreamer) and
+	  control (3.0 for 800/810)
+
 2008-11-30 22:59  jackjansen
 
 	* smilText on Windows (and probably gtk or qt too) was unhappy with
