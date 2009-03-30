@@ -145,7 +145,7 @@ Before creating the distribution
   (the perl script is on http://www.red-bean.com/cvs2cl/cvs2cl.pl).
   
   Note that if we're preparing for a micro-release you should replace the '-b'
-  with -rrelease-ambulant-xxx and merge the output into ChangeLog.
+  with -rrelease-ambulant-xxx-branch and merge the output into ChangeLog.
 
 - Update the API documentation in Documentation/API by running doxygen
   Read and check the documentation for consistency, errors and missing items.
