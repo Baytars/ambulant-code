@@ -127,8 +127,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 661;
-		modificationTime = 245343725.968472;
-		state = 1;
+		modificationTime = 260095375.905965;
+		state = 0;
 	};
 	0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */ = {
 		isa = PBXFileReference;
@@ -150,8 +150,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 653;
-		modificationTime = 245343725.968334;
-		state = 1;
+		modificationTime = 260095375.915769;
+		state = 0;
 	};
 	0470F9B60E9F9EA000AC7A51 /* libffi_support.m:619 */ = {
 		isa = PBXFileBreakpoint;
@@ -166,8 +166,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 619;
-		modificationTime = 245343725.968573;
-		state = 1;
+		modificationTime = 260095375.938176;
+		state = 0;
 	};
 	0470F9B80E9F9EA900AC7A51 /* libffi_support.m:592 */ = {
 		isa = PBXFileBreakpoint;
@@ -182,8 +182,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 592;
-		modificationTime = 245343725.968265;
-		state = 1;
+		modificationTime = 260095375.957214;
+		state = 0;
 	};
 	0470F9BA0E9F9EAF00AC7A51 /* libffi_support.m:581 */ = {
 		isa = PBXFileBreakpoint;
@@ -198,8 +198,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 581;
-		modificationTime = 245343725.968607;
-		state = 1;
+		modificationTime = 260095375.98476;
+		state = 0;
 	};
 	0470F9BC0E9F9EB400AC7A51 /* libffi_support.m:559 */ = {
 		isa = PBXFileBreakpoint;
@@ -214,8 +214,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 559;
-		modificationTime = 245343725.968403;
-		state = 1;
+		modificationTime = 260095375.99449;
+		state = 0;
 	};
 	0470F9BE0E9F9EBD00AC7A51 /* libffi_support.m:528 */ = {
 		isa = PBXFileBreakpoint;
@@ -230,8 +230,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 528;
-		modificationTime = 245343725.96854;
-		state = 1;
+		modificationTime = 260095376.015678;
+		state = 0;
 	};
 	0470F9C00E9F9EC300AC7A51 /* libffi_support.m:520 */ = {
 		isa = PBXFileBreakpoint;
@@ -246,8 +246,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 520;
-		modificationTime = 245343725.968299;
-		state = 1;
+		modificationTime = 260095376.025496;
+		state = 0;
 	};
 	0470F9C20E9F9ECC00AC7A51 /* libffi_support.m:492 */ = {
 		isa = PBXFileBreakpoint;
@@ -262,8 +262,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 492;
-		modificationTime = 245343725.968506;
-		state = 1;
+		modificationTime = 260095376.061082;
+		state = 0;
 	};
 	0470F9C40E9F9ED000AC7A51 /* libffi_support.m:478 */ = {
 		isa = PBXFileBreakpoint;
@@ -278,8 +278,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 478;
-		modificationTime = 245343725.968128;
-		state = 1;
+		modificationTime = 260095376.072259;
+		state = 0;
 	};
 	0470F9C60E9F9ED300AC7A51 /* libffi_support.m:469 */ = {
 		isa = PBXFileBreakpoint;
@@ -294,8 +294,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 469;
-		modificationTime = 245343725.96864;
-		state = 1;
+		modificationTime = 260095376.094131;
+		state = 0;
 	};
 	0470F9C80E9F9ED600AC7A51 /* libffi_support.m:464 */ = {
 		isa = PBXFileBreakpoint;
@@ -310,8 +310,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 464;
-		modificationTime = 245343725.968438;
-		state = 1;
+		modificationTime = 260095376.105335;
+		state = 0;
 	};
 	0470F9CA0E9F9EE200AC7A51 /* libffi_support.m:424 */ = {
 		isa = PBXFileBreakpoint;
@@ -326,8 +326,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 424;
-		modificationTime = 245343725.968369;
-		state = 1;
+		modificationTime = 260095376.127883;
+		state = 0;
 	};
 	0470F9CC0E9F9EE400AC7A51 /* libffi_support.m:421 */ = {
 		isa = PBXFileBreakpoint;
@@ -342,8 +342,8 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 421;
-		modificationTime = 245343725.968219;
-		state = 1;
+		modificationTime = 260095376.144622;
+		state = 0;
 	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
 		uiCtxt = {
@@ -373,7 +373,6 @@
 		indexTemplatePath = "";
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeArchitecture = i386;
 		activeBuildConfigurationName = Release;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
@@ -525,8 +524,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 250986416;
-			PBXWorkspaceStateSaveDate = 250986416;
+			PBXPerProjectTemplateStateSaveDate = 260094859;
+			PBXWorkspaceStateSaveDate = 260094859;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
