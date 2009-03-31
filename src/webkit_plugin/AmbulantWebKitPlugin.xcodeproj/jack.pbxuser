@@ -166,7 +166,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 619;
-		modificationTime = 260095375.938176;
+		modificationTime = 260095375.9381761;
 		state = 0;
 	};
 	0470F9B80E9F9EA900AC7A51 /* libffi_support.m:592 */ = {
@@ -342,7 +342,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 421;
-		modificationTime = 260095376.144622;
+		modificationTime = 260095376.1446219;
 		state = 0;
 	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
@@ -524,8 +524,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 260094859;
-			PBXWorkspaceStateSaveDate = 260094859;
+			PBXPerProjectTemplateStateSaveDate = 260190689;
+			PBXWorkspaceStateSaveDate = 260190689;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
@@ -533,8 +533,9 @@
 	};
 	089C167EFE841241C02AAC07 /* English */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {751, 649}}";
+			sepNavIntBoundsRect = "{{0, 0}, {939, 872}}";
 			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 0}";
 			sepNavVisRect = "{{0, 0}, {751, 649}}";
 		};
 	};
