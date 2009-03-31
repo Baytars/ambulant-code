@@ -104,11 +104,7 @@ Before creating the distribution
   - installers/nokia770/create_installer
   - installers/nokia770/debian/files
   - installers/nsis-win32/setup-ambulant-installer.nsi
-  - installers/winse-wince/AmbulantWinCEWiseInstaller.wse
-  	- Product Details->Default Directory
-  	- Add/Remove Programs -> Software Version
-  	- General Information->Installation Version
-  	- Build Settings -> Installation .exe name
+  - projects/vc8-wince5-smil3/ambulant-wince5-installer.vddproj
   - Documentation/user/developer.html (2 times)
   - Documentation/user-htmlhelp/developer.html (2 times, regenerate winHelp)
 - check the following files for being up-to-date:
