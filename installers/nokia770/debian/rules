@@ -33,7 +33,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	(cd $(SRC_DIR);$(MAKE))
+	(cd $(SRC_DIR);$(MAKE) -j4)
 
 	touch build-stamp
 
