@@ -101,6 +101,7 @@ Before creating the distribution
   - src/webkit_plugin/README
   - installers/nokia770/AmbulantPlayer.desktop
   - installers/nokia770/AmbulantPlayerCHINOOK.desktop
+  - installers/nokia770/changelog
   - installers/nokia770/create_installer
   - installers/nokia770/debian/files
   - installers/nsis-win32/setup-ambulant-installer.nsi
