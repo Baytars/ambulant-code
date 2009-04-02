@@ -317,6 +317,11 @@ nsPluginInstance::init(NPWindow* aWindow)
 	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
 //X	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
 	if (m_ambulant_player) {
+#if 0
+		ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+		prefs->m_prefer_ffmpeg = true;
+		prefs->m_use_plugins = false;
+#endif
 		if ( ! get_player()) {
 			delete m_ambulant_player;
 			m_ambulant_player = NULL;
