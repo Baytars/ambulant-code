@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="plugin_ffmpeg"
 	ProjectGUID="{EED7FDFC-068B-4035-BF6C-855E9CCC9A3A}"
 	Keyword="Win32Proj"
