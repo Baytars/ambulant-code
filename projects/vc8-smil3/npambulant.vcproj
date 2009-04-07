@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="npambulant"
 	ProjectGUID="{4DCBBF00-3086-40AA-B1B7-4FD350835E95}"
 	RootNamespace="npambulant"
@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(projectdir)&quot;;&quot;..\..\third_party_packages\xulrunner-sdk&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\sdk\include&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\plugin&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\nspr&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\java&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\js&quot;;&quot;..\..\third_party_packages\xulrunner-sdk\include\xpcom&quot;;..\..\include;..\..\src\npambulant"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;XP_WIN32;AMBULANT_USE_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_SMIL30;XPCOM_GLUE;MOZILLA_STRICT_API;_X86_;_WINDOWS;_USRDLL;NPSIMPLE_EXPORTS;$(NOINHERIT)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_AMBULANT;XP_WIN32;DEBUG;AMBULANT_USE_DLL;WITH_EXPAT;WITH_XERCES;WITH_XERCES_BUILTIN;WITH_HTML_WIDGET;WITH_WINDOWS_PLUGINS;WITH_SMIL30;XPCOM_GLUE;MOZILLA_STRICT_API;_X86_;_WINDOWS;_USRDLL;NPSIMPLE_EXPORTS;$(NOINHERIT)"
 				GeneratePreprocessedFile="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -81,7 +81,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalDependencies="..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcom.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\xpcomglue_s.lib ..\..\third_party_packages\xulrunner-sdk\sdk\lib\nspr4.lib ..\..\lib\win32\libexpat.lib ..\..\lib\win32\libjpeg.lib ..\..\lib\win32\libpng.lib ..\..\lib\win32\zlib.lib ..\..\lib\win32\xerces-c_2.lib"
-				OutputFile="C:\Program Files\Mozilla Firefox\plugins\$(ProjectName)_D.dll"
+				OutputFile="C:\mozilla-central\ff-opt-static\dist\bin\plugins\$(ProjectName)_D.dll"
 				LinkIncremental="0"
 				SuppressStartupBanner="false"
 				AdditionalLibraryDirectories="..\..\lib\win32"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy /y .\npambulant.xpt &quot;c:\Program Files\Mozilla Firefox\plugins\npambulant.xpt&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libambulant_shwin32_D.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libampluginD_state_xpath.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libampluginD_ffmpeg.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avcodec-51.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avformat-52.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avutil-49.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\SDL.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\xerces-c_2_8D.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;"
+				CommandLine="copy /y .\npambulant.xpt &quot;c:\mozilla-central\ff-opt-static\dist\bin\plugins\npambulant.xpt&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libambulant_shwin32_D.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libampluginD_state_xpath.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\libampluginD_ffmpeg.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avcodec-51.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avformat-52.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\avutil-49.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\SDL.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;copy /y ..\..\bin\win32\xerces-c_2_8D.dll &quot;c:\Program Files\Mozilla Firefox\plugins\&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

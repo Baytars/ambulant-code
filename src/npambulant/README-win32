@@ -16,5 +16,5 @@ xerces-c_2_8.dll
 
 For uninstall, remove above files.
 
-WARNING: this version of the AmbulantPlayer Firefox plugin is incompatible with
+WARNING: this version of the AmbulantPlayer Firefox plugin may be incompatible with
 some other plugins, e.g. Greasemonkey.

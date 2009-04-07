@@ -207,13 +207,30 @@ static  LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 static  WNDPROC lpOldProc = NULL;
 #endif//XP_WIN32
 
+NPError
+nsPluginInstance::SetWindow(NPWindow* pNPWindow)
+{
+	NPError rv = NPERR_NO_ERROR;
+
+	if (mNPWindow != NULL)
+		mNPWindow = pNPWindow;
+	return rv;
+}
+
+NPError
+nsPluginInstance::NewStream(NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype) 
+{
+	assert (mNPWindow);
+	init (mNPWindow);
+	return NPERR_NO_ERROR;
+}
+
 NPBool
 nsPluginInstance::init(NPWindow* aWindow)
 {
 	AM_DBG fprintf(stderr, "nsPluginInstance::init(0x%x)\n", aWindow);
     if(aWindow == NULL)
 		return FALSE;
-	    mNPWindow = aWindow;
     NPError nperr = NPN_GetValue(mInstance, NPNVWindowNPObject, &mNPWindow);
 	if (nperr != NPERR_NO_ERROR)
 		return FALSE;
@@ -313,15 +330,15 @@ nsPluginInstance::init(NPWindow* aWindow)
     m_ambulant_player->start();
 #endif // WITH_CG
 #ifdef	XP_WIN32
+#if 0
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_prefer_ffmpeg = true;
+	prefs->m_use_plugins = true;
+#endif
 	m_player_callbacks.set_os_window(m_hwnd);
 	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
 //X	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
 	if (m_ambulant_player) {
-#if 0
-		ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
-		prefs->m_prefer_ffmpeg = true;
-		prefs->m_use_plugins = false;
-#endif
 		if ( ! get_player()) {
 			delete m_ambulant_player;
 			m_ambulant_player = NULL;
