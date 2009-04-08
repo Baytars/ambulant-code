@@ -41,6 +41,7 @@
 #define _PTRDIFF_T_DEFINED
 #include <windows.h>
 #include <windowsx.h>
+#include "ambulant\lib\textptr.h"
 #endif//XP_WIN32
 
 #include "plugin.h"
@@ -235,6 +236,17 @@ nsPluginInstance::init(NPWindow* aWindow)
 	if (nperr != NPERR_NO_ERROR)
 		return FALSE;
     // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
+#if 1
+	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
+	prefs->m_prefer_ffmpeg = true;
+	prefs->m_use_plugins = true;
+#ifdef	XP_WIN32
+	prefs->m_plugin_dir = lib::win32::get_module_dir()+"\plugins\\";
+	ambulant::lib::textptr pn_conv(prefs->m_plugin_dir.c_str());
+	SetDllDirectory (pn_conv);
+//#elseif TBD
+#endif 	XP_WIN3
+#endif
 	ambulant::common::plugin_engine *pe = ambulant::common::plugin_engine::get_plugin_engine();
 	void *edptr = pe->get_extra_data("npapi_extra_data");
 	if (edptr) {
@@ -330,11 +342,6 @@ nsPluginInstance::init(NPWindow* aWindow)
     m_ambulant_player->start();
 #endif // WITH_CG
 #ifdef	XP_WIN32
-#if 0
-	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
-	prefs->m_prefer_ffmpeg = true;
-	prefs->m_use_plugins = true;
-#endif
 	m_player_callbacks.set_os_window(m_hwnd);
 	m_ambulant_player = new ambulant::gui::dx::dx_player(m_player_callbacks, NULL, m_url);
 //X	m_ambulant_player->set_state_component_factory(NULL); // XXXJACK DEBUG!!!!
