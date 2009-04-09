@@ -33,3 +33,5 @@ E. Make sure that the rtsp versions of the tests at C. work properly.
 F. Build and install Firefox plugin and verify that all tests at C.
    for plugin work properly.
 
+The script Run-tests.sh excutes the sequences B-E automatically.
+
