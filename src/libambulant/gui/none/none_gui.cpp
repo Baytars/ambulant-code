@@ -71,6 +71,7 @@ gui::none::none_playable::stop()
 	lib::logger::get_logger()->trace("none_playable.stop(0x%x)", (void *)this);
 }
 
+
 void
 gui::none::none_background_renderer::redraw(const rect &dirty, gui_window *window)
 {

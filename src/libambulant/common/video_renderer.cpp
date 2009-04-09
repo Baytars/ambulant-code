@@ -95,6 +95,15 @@ video_renderer::~video_renderer() {
 	m_lock.leave();
 }
 
+#ifdef EXP_KEEPING_RENDERER
+void 
+video_renderer::update_context_info(const lib::node *node)
+{
+	m_node = node;
+	_init_clip_begin_end();
+}
+#endif
+
 void
 video_renderer::start (double where)
 {
@@ -151,6 +160,18 @@ video_renderer::start (double where)
 
 	m_lock.leave();
 }
+
+#ifdef EXP_KEEPING_RENDERER
+void
+video_renderer::stop_but_keeping_renderer()
+{
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
+	//m_context->stopped(m_cookie, 0);
+	m_activated = false;
+	m_lock.leave();
+}
+#endif
 
 void
 video_renderer::stop()
@@ -292,9 +313,16 @@ video_renderer::data_avail()
 	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 		if (m_src) {
+			//xxxbo: 20-03-2009
+#ifndef EXP_KEEPING_RENDERER
 			m_src->stop();
 			m_src->release();
 			m_src = NULL;
+#else
+			m_lock.leave();
+			pause();
+			return;
+#endif
 		}
 		m_lock.leave();
 		m_context->stopped(m_cookie, 0);

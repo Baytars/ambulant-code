@@ -41,6 +41,7 @@
 
 #include <map>
 
+
 namespace ambulant {
 namespace lib {
 class document;
@@ -54,7 +55,7 @@ class playable_factory;
 } // namespace common
 
 namespace smil2 {
-
+ 
 class smil_layout_manager;
 class animation_engine;
 class scheduler;
@@ -208,6 +209,11 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
 	const time_node *m_pointed_node;
 	bool m_wait_for_eom_flag;
 	std::map<const lib::node*, common::playable *> m_playables;
+	//xxxbo: 
+#ifdef EXP_KEEPING_RENDERER
+	std::map<const std::string, common::playable *> m_playables_url_based;
+#endif
+	
 	critical_section m_playables_cs;
 	std::map<const node*, double> m_playables_dur;
 	lib::logger *m_logger;

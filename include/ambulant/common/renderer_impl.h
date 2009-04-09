@@ -106,6 +106,9 @@ class AMBULANTAPI renderer_playable : public playable_imp, public renderer {
 	void transition_freeze_end(lib::rect r) { m_context->transitioned(m_cookie); }
 	virtual void start(double t);
 	virtual void stop();
+#ifdef EXP_KEEPING_RENDERER
+	virtual void stop_keeping_renderer();
+#endif
   protected:
 	virtual void _init_clip_begin_end();	///< Fill m_clip_begin and m_clip_end
 	surface *m_dest;		///< The surface we should render to.
