@@ -4,6 +4,7 @@ Move or copy the following files from this .zip file to:
 C:\Program Files\Mozilla Firefox\plugins
 
 avcodec-51.dll
+avdevice-52.dll
 avformat-52.dll
 avutil-49.dll
 npambulant.dll
@@ -12,7 +13,9 @@ libambulant-shwin32.dll
 libamplugin_plugin.dll
 libamplugin_state_xpath.dll
 libamplugin_ffmpeg.dll
+libamplugin_plugin.dll
 xerces-c_2_8.dll
+SDL.dll
 
 For uninstall, remove above files.
 
