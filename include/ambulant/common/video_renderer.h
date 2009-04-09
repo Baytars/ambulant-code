@@ -80,6 +80,14 @@ class video_renderer : public common::renderer_playable {
 	
 	void start(double where);
     void stop();
+#ifdef EXP_KEEPING_RENDERER
+	void stop_but_keeping_renderer();
+	//xxxbo:
+	/// Update the context info.
+	/// According to the node to which this playable is associated, 
+	/// update the clipbegin and clipend info.
+	void update_context_info(const lib::node *node);
+#endif
 	void seek(double where);
     void pause(pause_display d=display_show);
     void resume();

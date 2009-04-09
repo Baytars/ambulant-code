@@ -160,6 +160,7 @@ cocoa_audio_playable::stop()
 	[pool release];
 }
 
+
 void
 cocoa_audio_playable::pause(pause_display d)
 {

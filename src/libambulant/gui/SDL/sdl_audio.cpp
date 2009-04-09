@@ -413,9 +413,11 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::stop);
 		m_event_processor->add_event(e, 0, ambulant::lib::ep_med);
 		if (m_audio_src) {
+#ifndef EXP_KEEPING_RENDERER
 			m_audio_src->stop();
 			m_audio_src->release();
 			m_audio_src = NULL;
+#endif
 		}
 		m_lock.leave();
 		if (m_context) {
@@ -507,9 +509,11 @@ gui::sdl::sdl_audio_renderer::stop()
 	}
 	m_is_playing = false;
 	if (m_audio_src) {
+#ifndef EXP_KEEPING_RENDERER
 		m_audio_src->stop();
 		m_audio_src->release();
 		m_audio_src = NULL;
+#endif
 	}
 	m_lock.leave();
 }

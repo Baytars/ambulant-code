@@ -250,6 +250,9 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	ambulant::lib::event *callbackk, timestamp_t timestamp)
 {
 	m_lock.enter();
+#ifdef EXP_KEEPING_RENDERER
+//	m_start_input = true;
+#endif
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: (this = 0x%x)", (void*) this);
 
 	if (m_client_callback != NULL) {
@@ -257,7 +260,8 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 		m_client_callback = NULL;
 		lib::logger::get_logger()->error("ffmpeg_video_decoder_datasource::start(): m_client_callback already set!");
 	}
-	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
+
+		if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {

@@ -114,6 +114,7 @@ smil_player::~smil_player() {
 		if (rem > 1) m_logger->trace("smil_player::~smil_player: playable 0x%x still has refcount of %d", (*it).second, rem);
 	}
 	
+	
 	delete m_focussed_nodes;
 	delete m_new_focussed_nodes;
 	delete m_scheduler;
@@ -236,6 +237,7 @@ void smil_player::pause() {
 			(*it).second->pause();
 		m_playables_cs.leave();
 	}
+
 	m_lock.leave();
 }
 
@@ -250,6 +252,7 @@ void smil_player::_resume() {
 	if(m_state == common::ps_pausing) {
 		m_state = common::ps_playing;
 		std::map<const lib::node*, common::playable *>::iterator it;
+
 		m_playables_cs.enter();
 		for(it = m_playables.begin();it!=m_playables.end();it++)
 			(*it).second->resume();
@@ -279,6 +282,7 @@ void smil_player::done_playback() {
 
 // Request to create a playable for the node.
 common::playable *smil_player::create_playable(const lib::node *n) {
+#ifndef EXP_KEEPING_RENDERER
 	std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.find(n);
 	common::playable *np = (it != m_playables.end())?(*it).second:0;
@@ -290,6 +294,38 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.en
 		m_playables_cs.leave();
 AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
 	}
+#else
+	std::map<const std::string, common::playable *>::iterator it_url_based = 
+	m_playables_url_based.find((n->get_url("src")).get_url().c_str());
+	common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
+	if( np == NULL ) { 
+		np = _new_playable(n);
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
+		m_playables_cs.enter();
+		m_playables_url_based[(n->get_url("src")).get_url().c_str()] = np;
+		m_playables_cs.leave();
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
+
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
+		m_playables_cs.enter();
+		m_playables[n] = np;
+		m_playables_cs.leave();
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
+	}
+	//xxxbo: update the context info of np, for example, clipbegin, clipend, according to the node
+	else {
+		std::map<const lib::node*, common::playable *>::iterator it = 
+		m_playables.find(n);
+		common::playable *np_gb = (it != m_playables.end())?(*it).second:0;
+		if(np_gb == NULL) {
+
+			m_playables_cs.enter();
+			m_playables[n] = np;
+			m_playables_cs.leave();
+		}
+		np->update_context_info(n);
+	}
+#endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
 	// value for a timing attribute) because these are global.
@@ -356,12 +392,11 @@ void smil_player::stop_playable(const lib::node *n) {
 	AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(%s)", n->get_sig().c_str());
 	if (n == m_focus) {
 		m_focus = NULL;
-		highlight(n, false);
+		highlight(n, false); 
 		node_focussed(NULL);
 	}
 	AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.enter", (void*)n);
 	m_playables_cs.enter();
-		
 	std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.find(n);
 	std::pair<const lib::node*, common::playable*> victim(NULL,NULL);
@@ -374,8 +409,15 @@ void smil_player::stop_playable(const lib::node *n) {
 		m_playables.erase(it);
 	}
 	m_playables_cs.leave();
-	if (victim.second)
+	if (victim.second) 
+		//xxxbo: 
+#ifdef EXP_KEEPING_RENDERER
+		//victim.second->stop_but_keeping_renderer(); 
+		victim.second->pause(); 
+		//pause();
+#else
 		_destroy_playable(victim.second, victim.first);
+#endif
 	AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.leave", (void*)n);
 }
 
@@ -772,6 +814,7 @@ void smil_player::on_focus_advance() {
 	m_playables_cs.enter();
 	std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.begin();
+
 	// First find the current focus
 	if (m_focus != NULL) {
 		while (it != m_playables.end() && (*it).first != m_focus) it++;

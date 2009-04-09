@@ -113,6 +113,14 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	
 	virtual ~playable() {}
 	
+	//xxxbo:
+#ifdef EXP_KEEPING_RENDERER
+	/// Update the context info.
+	/// According to the node to which this playable is associated, 
+	/// update the clipbegin and clipend info.
+	virtual void update_context_info(const lib::node *node) {}
+#endif
+	
 	/// Start playback.
 	/// Starts playing at media time t independent 
 	/// of the previous state (not playing, playing, paused). 
@@ -124,7 +132,9 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	/// The playable may be invoked again later
 	/// and therefore may keep its data cashed.
 	virtual void stop() = 0;
-	
+#ifdef EXP_KEEPING_RENDERER
+	virtual void stop_but_keeping_renderer() {}
+#endif
 	/// Pauses playback, keeping the last frame. 
 	/// On media end the playable should be in a state 
 	/// as if pause and then seek to end has been called.

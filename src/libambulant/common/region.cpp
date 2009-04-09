@@ -151,11 +151,13 @@ void
 surface_impl::show(gui_events *cur)
 {
 	m_children_cs.enter();
+#ifndef EXP_KEEPING_RENDERER
 #if 1
 	// Sanity check: it shouldn't be in here already
 	std::list<gui_events*>::iterator i;
 	for(i=m_renderers.begin(); i!=m_renderers.end(); i++)
 		assert((*i) != cur);
+#endif
 #endif
 	m_renderers.push_back(cur);
 	m_children_cs.leave();
