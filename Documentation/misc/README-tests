@@ -33,5 +33,13 @@ E. Make sure that the rtsp versions of the tests at C. work properly.
 F. Build and install Firefox plugin and verify that all tests at C.
    for plugin work properly.
 
-The script Run-tests.sh excutes the sequences B-E automatically.
+The script Run-tests.sh excutes the sequences B-E automatically on
+Linux or Windows (Cygwin only).
+
+On Linux: (cd ../..;./configure --prefix=$HOME;make;make install)
+LD_LIBRARY_PATH=$HOME/lib ./Run-tests.sh
+
+On Windows, download Cygwin and the optional packages unzip (in Archive) and
+wget (in Web). Install AmbulantPlayer, then in Cygwin command window type:
+./Run-tests.sh
 
