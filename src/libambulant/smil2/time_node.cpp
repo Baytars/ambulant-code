@@ -910,7 +910,7 @@ void time_node::repeat_playable() {
 	if(!is_playable() || m_ffwd_mode) return;
 	AM_DBG m_logger->debug("%s[%s].repeat()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
-    stop_playable();
+    stop_playable();//xyzzy
 	m_context->start_playable(m_node, 0);
 }
 
@@ -1070,8 +1070,18 @@ void time_node::exec(qtime_type timestamp) {
 		return;
 	}
 #if 1
-    if (!m_last_cdur.is_definite() && m_eom_flag)
-        m_last_cdur = timestamp.as_time_down_to(this);
+	// Note: the following code is probably a stop-gap.
+	// The original code (which didn't look at repeats) was added
+	// because repeating nodes with indefinite duration didn't
+	// repeat correctly. However, the fix of setting m_last_cdur
+	// broke hyperlinks (for example in Flashlight_desktop.smil).
+	// The solution of only setting m_last_cdur when in a repeating node
+	// feels more like a hack than a real fix...
+	bool repeats = m_attrs.specified_rdur() || m_attrs.specified_rcount();
+	if (repeats && !m_last_cdur.is_definite() && m_eom_flag) {
+		time_type cdur = timestamp.as_time_down_to(this);
+        m_last_cdur = cdur;
+	}
 #endif
 	
 	// Check for the EOSD event
