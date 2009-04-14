@@ -107,244 +107,6 @@
 			sepNavVisRange = "{0, 1923}";
 		};
 	};
-	0470F9AF0E9F9E8200AC7A51 /* libffi_support.m */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.objc;
-		name = libffi_support.m;
-		path = /Users/jack/src/pyobjc/Modules/objc/libffi_support.m;
-		sourceTree = "<absolute>";
-	};
-	0470F9B10E9F9E8200AC7A51 /* libffi_support.m:661 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9AF0E9F9E8200AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 661;
-		modificationTime = 260095375.905965;
-		state = 0;
-	};
-	0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.c.objc;
-		name = libffi_support.m;
-		path = /Users/jack/src/pyobjc/Modules/objc/libffi_support.m;
-		sourceTree = "<group>";
-	};
-	0470F9B40E9F9E8A00AC7A51 /* libffi_support.m:653 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 653;
-		modificationTime = 260095375.915769;
-		state = 0;
-	};
-	0470F9B60E9F9EA000AC7A51 /* libffi_support.m:619 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 619;
-		modificationTime = 260095375.9381761;
-		state = 0;
-	};
-	0470F9B80E9F9EA900AC7A51 /* libffi_support.m:592 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 592;
-		modificationTime = 260095375.957214;
-		state = 0;
-	};
-	0470F9BA0E9F9EAF00AC7A51 /* libffi_support.m:581 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 581;
-		modificationTime = 260095375.98476;
-		state = 0;
-	};
-	0470F9BC0E9F9EB400AC7A51 /* libffi_support.m:559 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 559;
-		modificationTime = 260095375.99449;
-		state = 0;
-	};
-	0470F9BE0E9F9EBD00AC7A51 /* libffi_support.m:528 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 528;
-		modificationTime = 260095376.015678;
-		state = 0;
-	};
-	0470F9C00E9F9EC300AC7A51 /* libffi_support.m:520 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 520;
-		modificationTime = 260095376.025496;
-		state = 0;
-	};
-	0470F9C20E9F9ECC00AC7A51 /* libffi_support.m:492 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 492;
-		modificationTime = 260095376.061082;
-		state = 0;
-	};
-	0470F9C40E9F9ED000AC7A51 /* libffi_support.m:478 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 478;
-		modificationTime = 260095376.072259;
-		state = 0;
-	};
-	0470F9C60E9F9ED300AC7A51 /* libffi_support.m:469 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 469;
-		modificationTime = 260095376.094131;
-		state = 0;
-	};
-	0470F9C80E9F9ED600AC7A51 /* libffi_support.m:464 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 464;
-		modificationTime = 260095376.105335;
-		state = 0;
-	};
-	0470F9CA0E9F9EE200AC7A51 /* libffi_support.m:424 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 424;
-		modificationTime = 260095376.127883;
-		state = 0;
-	};
-	0470F9CC0E9F9EE400AC7A51 /* libffi_support.m:421 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 0470F9B20E9F9E8A00AC7A51 /* libffi_support.m */;
-		functionName = "method_stub()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 421;
-		modificationTime = 260095376.1446219;
-		state = 0;
-	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1096, 665}}";
@@ -373,27 +135,13 @@
 		indexTemplatePath = "";
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
-		activeBuildConfigurationName = Release;
+		activeBuildConfigurationName = Debug;
 		activeExecutable = 04239D220CD2895A00152474 /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		addToTargets = (
 			8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */,
 		);
 		breakpoints = (
-			0470F9B10E9F9E8200AC7A51 /* libffi_support.m:661 */,
-			0470F9B40E9F9E8A00AC7A51 /* libffi_support.m:653 */,
-			0470F9B60E9F9EA000AC7A51 /* libffi_support.m:619 */,
-			0470F9B80E9F9EA900AC7A51 /* libffi_support.m:592 */,
-			0470F9BA0E9F9EAF00AC7A51 /* libffi_support.m:581 */,
-			0470F9BC0E9F9EB400AC7A51 /* libffi_support.m:559 */,
-			0470F9BE0E9F9EBD00AC7A51 /* libffi_support.m:528 */,
-			0470F9C00E9F9EC300AC7A51 /* libffi_support.m:520 */,
-			0470F9C20E9F9ECC00AC7A51 /* libffi_support.m:492 */,
-			0470F9C40E9F9ED000AC7A51 /* libffi_support.m:478 */,
-			0470F9C60E9F9ED300AC7A51 /* libffi_support.m:469 */,
-			0470F9C80E9F9ED600AC7A51 /* libffi_support.m:464 */,
-			0470F9CA0E9F9EE200AC7A51 /* libffi_support.m:424 */,
-			0470F9CC0E9F9EE400AC7A51 /* libffi_support.m:421 */,
 		);
 		codeSenseManager = 04EC0D320CBD8D22009B6B85 /* Code sense */;
 		executables = (
@@ -524,8 +272,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 260190689;
-			PBXWorkspaceStateSaveDate = 260190689;
+			PBXPerProjectTemplateStateSaveDate = 260358006;
+			PBXWorkspaceStateSaveDate = 260358006;
 		};
 		sourceControlManager = 04EC0D310CBD8D22009B6B85 /* Source Control */;
 		userBuildSettings = {
