@@ -435,7 +435,8 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 		m_client_callback = NULL;
 		lib::logger::get_logger()->error("demux_video_datasource::start(): m_client_callback already set!");
 	}
-	
+
+#ifndef EXP_KEEPING_RENDERER
 	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
@@ -454,6 +455,31 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 		m_client_callback = callbackk;
 		m_event_processor = evp;
 	}
+#else
+	if (m_frames.size() > 0 /* XXXX Check timestamp! */ && timestamp > 0 ) {
+		// We have data (or EOF) available. Don't bother starting up our source again, in stead
+		// immedeately signal our client again
+		if (callbackk) {
+			assert(evp);
+			AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::start: trigger client callback");
+			evp->add_event(callbackk, MIN_EVENT_DELAY, ambulant::lib::ep_med);
+		} else {
+			lib::logger::get_logger()->debug("Internal error: demux_video_datasource::start(): no client callback!");
+			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
+		}
+	} else if (m_frames.size() > 0) { 
+		while (m_frames.size() > 0) {
+		evp->add_event(callbackk, MIN_EVENT_DELAY, ambulant::lib::ep_med);
+		}
+	} else {
+		// We have no data available. Start our source, and in our data available callback we
+		// will signal the client.
+		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::start: remembering callback");
+		m_client_callback = callbackk;
+		m_event_processor = evp;
+	}
+	
+#endif
 	m_lock.leave();
 }
 

@@ -319,9 +319,9 @@ video_renderer::data_avail()
 			m_src->release();
 			m_src = NULL;
 #else
-			m_lock.leave();
-			pause();
-			return;
+		//	m_lock.leave();
+		//	pause();
+		//	return;
 #endif
 		}
 		m_lock.leave();
