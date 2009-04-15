@@ -238,11 +238,13 @@ nsPluginInstance::init(NPWindow* aWindow)
     // Start by saving the NPWindow for any Ambulant plugins (such as SMIL State)
 #if 1
 	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
-	prefs->m_prefer_ffmpeg = false;
+	prefs->m_prefer_ffmpeg = true;
+	prefs->m_use_plugins = false;
 #ifdef	XP_WIN32
+    // for Windows, ffmpeg is only available as plugin
+	prefs->m_use_plugins = true;
 	prefs->m_plugin_dir = lib::win32::get_module_dir()+"\plugins\\";
 	ambulant::lib::textptr pn_conv(prefs->m_plugin_dir.c_str());
-	prefs->m_use_plugins = true;
 	SetDllDirectory (pn_conv);
 //#elseif TBD
 #endif 	XP_WIN3
