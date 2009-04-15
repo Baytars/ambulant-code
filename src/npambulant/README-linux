@@ -20,4 +20,9 @@ Notes:
 3. For a 64-bit version, copy npambulant.so-64 in place of npambulant.so in one of the
    directories mentioned above.
 4. This version was build with the following options:
+   for ambulant:
    ./configure --prefix=$HOME CFLAGS=-fPIC CXXFLAGS=-fPIC --with-live --without-python --without-xerces --without-plugins --without-qt --with-npambulant LDFLAGS=-L$HOME/lib EXTRA_LIBS=-lfaad
+   for ffmpeg:
+   ./configure --enable-libfaad --enable-pthreads --enable-gpl --enable-x11grab --disable-swscale --enable-shared --extra-cflags=-fPIC -O0 -I/ufs/kees/include --extra-ldflags=-L/ufs/kees/lib --prefix=/ufs/kees --disable-mmx 
+   (fPIC and --disable-mmx only for 64 bit)
+   In addition, the 64-bit link was done by link-patch.
