@@ -219,7 +219,7 @@ nsPluginInstance::SetWindow(NPWindow* pNPWindow)
 }
 
 NPError
-nsPluginInstance::NewStream(NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype) 
+nsPluginInstance::NewStream(NPMIMEType type, NPStream* stream, NPBool seekable, ambulant::lib::uint16* stype) 
 {
 	assert (mNPWindow);
 	init (mNPWindow);

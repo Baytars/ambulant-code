@@ -7,4 +7,12 @@ $HOME/.mozilla/plugins
 npambulant.so
 npambulant.xpt
 
+Restart Firefox.
+
 For uninstall, remove above files.
+
+Notes: 
+1. the current version of npambulant is incompatible with nspluginwrapper.
+   For toot installations, you can disable nspluginwrapper by adding
+   ":npambulant*" to the variable IGNORE_WRAP in "/etc/sysconfig/nspluginwrapper"
+2. Aa 64-bit version is not yet available.
