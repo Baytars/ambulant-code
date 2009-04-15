@@ -412,7 +412,7 @@ void smil_player::stop_playable(const lib::node *n) {
 	if (victim.second) 
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
-		//victim.second->stop_but_keeping_renderer(); 
+		victim.second->stop_but_keeping_renderer(); 
 		victim.second->pause(); 
 		//pause();
 #else

@@ -35,7 +35,7 @@
 // WARNING: turning on AM_DBG globally for the ffmpeg code seems to trigger
 // a condition that makes the whole player hang or collapse. So you probably
 // shouldn't do it:-)
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif 
@@ -261,7 +261,8 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 		lib::logger::get_logger()->error("ffmpeg_video_decoder_datasource::start(): m_client_callback already set!");
 	}
 
-		if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
+#ifndef EXP_KEEPING_RENDERER
+	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
@@ -289,8 +290,46 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 		m_client_callback = callbackk;
 		m_event_processor = evp;
 	}
+	
+#else
+	if (m_frames.size() > 0 && timestamp > 0 /* XXXX Check timestamp! */ ) {
+		// We have data (or EOF) available. Don't bother starting up our source again, in stead
+		// immedeately signal our client again
+		if (callbackk) {
+			assert(evp);
+			if (timestamp < 0) timestamp = 0;
+			lib::timer::time_type timestamp_milli = (lib::timer::time_type)(timestamp/1000); // micro to milli
+			lib::timer::time_type now_milli = evp->get_timer()->elapsed();
+			lib::timer::time_type delta_milli = 0;
+			if (now_milli < timestamp_milli)
+				delta_milli = timestamp_milli - now_milli;
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start: trigger client callback timestamp_milli=%d delta_milli=%d, now_milli=%d", (int)timestamp_milli, (int)delta_milli, (int)now_milli);
+			// Sanity check: we don't want this to be more than a second into the future
+			if (delta_milli > 1000) {
+				lib::logger::get_logger()->trace("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
+				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
+			}
+			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
+		} else {
+			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource::start(): no client callback!");
+			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
+		}
+	} else if (m_frames.size() > 0) {
+		while (m_frames.size() > 0) {
+		evp->add_event(callbackk, 0, ambulant::lib::ep_high);
+		}
+	} else	{
+		// We have no data available. Start our source, and in our data available callback we
+		// will signal the client.
+		m_client_callback = callbackk;
+		m_event_processor = evp;
+	}
+	
+#endif
 	// Don't restart our source if we are at end of file.
+#ifndef EXP_KEEPING_RENDERER
 	if ( _end_of_file() ) m_start_input = false;
+#endif
 	
 	if (m_start_input) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame() Calling m_src->start_frame(..)");
