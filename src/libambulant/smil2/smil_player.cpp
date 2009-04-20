@@ -324,6 +324,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			m_playables_cs.leave();
 		}
 		np->update_context_info(n);
+		np->resume();
 	}
 #endif
 	
@@ -413,7 +414,7 @@ void smil_player::stop_playable(const lib::node *n) {
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
 		victim.second->stop_but_keeping_renderer(); 
-		victim.second->pause(); 
+		//victim.second->pause(); 
 		//pause();
 #else
 		_destroy_playable(victim.second, victim.first);

@@ -149,6 +149,7 @@ video_renderer::start (double where)
 	assert(m_clip_begin >= 0);
 	assert(where >= 0);
 	m_epoch = m_timer->elapsed() - (long)(m_clip_begin/1000) - (int)(where*1000);
+	m_is_paused = false;
 
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);

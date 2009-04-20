@@ -417,6 +417,11 @@ demux_video_datasource::seek(timestamp_t time)
 	m_lock.leave();
 	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
 	// thread trying to deliver new data to this demux_datasource.
+#if 1
+	// XXXJACK untested code, but Jack thinks it's needed; if we seek we must reset
+	// any previous end-of-file condition.
+	m_src_end_of_file = false;
+#endif
 	m_thread->seek(time);
 }
 
@@ -437,7 +442,6 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 	}
 
 #ifndef EXP_KEEPING_RENDERER
-	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
@@ -456,7 +460,7 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 		m_event_processor = evp;
 	}
 #else
-	if (m_frames.size() > 0 /* XXXX Check timestamp! */ && timestamp > 0 ) {
+	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {
@@ -467,10 +471,10 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 			lib::logger::get_logger()->debug("Internal error: demux_video_datasource::start(): no client callback!");
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
 		}
-	} else if (m_frames.size() > 0) { 
-		while (m_frames.size() > 0) {
-		evp->add_event(callbackk, MIN_EVENT_DELAY, ambulant::lib::ep_med);
-		}
+	//} else if (m_frames.size() > 0) { 
+	//	while (m_frames.size() > 0) {
+	//	evp->add_event(callbackk, MIN_EVENT_DELAY, ambulant::lib::ep_med);
+	//	}
 	} else {
 		// We have no data available. Start our source, and in our data available callback we
 		// will signal the client.
