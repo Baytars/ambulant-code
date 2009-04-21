@@ -324,7 +324,6 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			m_playables_cs.leave();
 		}
 		np->update_context_info(n);
-		//np->resume();
 	}
 #endif
 	
