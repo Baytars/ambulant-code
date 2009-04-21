@@ -299,31 +299,26 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 	m_playables_url_based.find((n->get_url("src")).get_url().c_str());
 	common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
 	if( np == NULL ) { 
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable", (void*)n);
 		np = _new_playable(n);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
-		m_playables_url_based[(n->get_url("src")).get_url().c_str()] = np;
+		m_playables[n] = np;
 		m_playables_cs.leave();
-		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
-
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
+	} else {
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playble is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
-		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
-	}
-	//xxxbo: update the context info of np, for example, clipbegin, clipend, according to the node
-	else {
-		AM_DBG lib::logger::get_logger()->debug("smil_player:create_playable(0x%x): reuse renderer 0x%x", (void*)n, (void*)np);
-		std::map<const lib::node*, common::playable *>::iterator it = 
-		m_playables.find(n);
-		common::playable *np_gb = (it != m_playables.end())?(*it).second:0;
-		assert(np_gb == NULL);
 		m_playables_cs.enter();
-		m_playables[n] = np;
+		m_playables_url_based.erase(it_url_based);
 		m_playables_cs.leave();
+		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
+		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->update_context_info(n, n->get_numid());
-	}
+	}	
 #endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
@@ -412,9 +407,16 @@ void smil_player::stop_playable(const lib::node *n) {
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
 		victim.second->stop_but_keeping_renderer();
-		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: keep alive renderer 0x%x", (void*)victim.second);
-		//victim.second->pause(); 
-		//pause();
+		std::map<const std::string, common::playable *>::iterator it_url_based = 
+		m_playables_url_based.find((victim.first->get_url("src")).get_url().c_str());
+		common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
+		if( np == NULL ) { 
+			AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
+			m_playables_cs.enter();
+			m_playables_url_based[(victim.first->get_url("src")).get_url().c_str()] = victim.second;
+			m_playables_cs.leave();
+			AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
+		}	
 #else
 		_destroy_playable(victim.second, victim.first);
 #endif
