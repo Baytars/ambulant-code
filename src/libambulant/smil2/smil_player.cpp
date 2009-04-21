@@ -37,7 +37,7 @@
 #include "ambulant/smil2/smil_layout.h"
 #include "ambulant/smil2/time_sched.h"
 #include "ambulant/smil2/animate_e.h"
-
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -314,16 +314,15 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 	}
 	//xxxbo: update the context info of np, for example, clipbegin, clipend, according to the node
 	else {
+		AM_DBG lib::logger::get_logger()->debug("smil_player:create_playable(0x%x): reuse renderer 0x%x", (void*)n, (void*)np);
 		std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.find(n);
 		common::playable *np_gb = (it != m_playables.end())?(*it).second:0;
-		if(np_gb == NULL) {
-
-			m_playables_cs.enter();
-			m_playables[n] = np;
-			m_playables_cs.leave();
-		}
-		np->update_context_info(n);
+		assert(np_gb == NULL);
+		m_playables_cs.enter();
+		m_playables[n] = np;
+		m_playables_cs.leave();
+		np->update_context_info(n, n->get_numid());
 	}
 #endif
 	
@@ -409,15 +408,17 @@ void smil_player::stop_playable(const lib::node *n) {
 		m_playables.erase(it);
 	}
 	m_playables_cs.leave();
-	if (victim.second) 
+	if (victim.second) {
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
-		victim.second->stop_but_keeping_renderer(); 
+		victim.second->stop_but_keeping_renderer();
+		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: keep alive renderer 0x%x", (void*)victim.second);
 		//victim.second->pause(); 
 		//pause();
 #else
 		_destroy_playable(victim.second, victim.first);
 #endif
+	}
 	AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.leave", (void*)n);
 }
 

@@ -97,9 +97,10 @@ video_renderer::~video_renderer() {
 
 #ifdef EXP_KEEPING_RENDERER
 void 
-video_renderer::update_context_info(const lib::node *node)
+video_renderer::update_context_info(const lib::node *node, int cookie)
 {
 	m_node = node;
+	m_cookie = cookie;
 	_init_clip_begin_end();
 }
 #endif
@@ -168,7 +169,7 @@ video_renderer::stop_but_keeping_renderer()
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-	//m_context->stopped(m_cookie, 0);
+	m_context->stopped(m_cookie, 0);
 	m_activated = false;
 	m_lock.leave();
 }
