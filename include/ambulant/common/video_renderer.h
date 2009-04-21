@@ -86,7 +86,7 @@ class video_renderer : public common::renderer_playable {
 	/// Update the context info.
 	/// According to the node to which this playable is associated, 
 	/// update the clipbegin and clipend info.
-	void update_context_info(const lib::node *node);
+	void update_context_info(const lib::node *node, int cookie);
 #endif
 	void seek(double where);
     void pause(pause_display d=display_show);

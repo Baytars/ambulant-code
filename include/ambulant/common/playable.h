@@ -118,7 +118,7 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	/// Update the context info.
 	/// According to the node to which this playable is associated, 
 	/// update the clipbegin and clipend info.
-	virtual void update_context_info(const lib::node *node) {}
+	virtual void update_context_info(const lib::node *node, int cookie) {}
 #endif
 	
 	/// Start playback.
