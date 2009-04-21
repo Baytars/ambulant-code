@@ -295,9 +295,18 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.en
 AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
 	}
 #else
-	std::map<const std::string, common::playable *>::iterator it_url_based = 
-	m_playables_url_based.find((n->get_url("src")).get_url().c_str());
-	common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
+	common::playable *np = NULL;
+	if (n->get_attribute("src")) {
+		// It may be in the URL-based playable cache. Let us look.
+		std::map<const std::string, common::playable *>::iterator it_url_based = 
+				m_playables_url_based.find(n->get_url("src").get_url());
+		if (it_url_based != m_playables_url_based.end()) {
+			np = (*it_url_based).second;
+			m_playables_cs.enter();
+			m_playables_url_based.erase(it_url_based);
+			m_playables_cs.leave();
+		}
+	}
 	if( np == NULL ) { 
 		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable", (void*)n);
 		np = _new_playable(n);
@@ -311,9 +320,6 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
-		m_playables_cs.leave();
-		m_playables_cs.enter();
-		m_playables_url_based.erase(it_url_based);
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
 		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
@@ -411,11 +417,11 @@ void smil_player::stop_playable(const lib::node *n) {
 		m_playables_url_based.find((victim.first->get_url("src")).get_url().c_str());
 		common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
 		if( np == NULL ) { 
-			AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
+			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.enter", (void*)n);
 			m_playables_cs.enter();
 			m_playables_url_based[(victim.first->get_url("src")).get_url().c_str()] = victim.second;
 			m_playables_cs.leave();
-			AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
+			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.leave", (void*)n);
 		}	
 #else
 		_destroy_playable(victim.second, victim.first);
