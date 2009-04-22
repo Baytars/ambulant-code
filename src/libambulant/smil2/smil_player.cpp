@@ -934,6 +934,7 @@ void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common:
 		AM_DBG lib::logger::get_logger()->debug("smil_player::_destroy_playble_in_cache: stop the playble in the cache");
 		victim.second->stop();
 		int rem = victim.second->release();
+		m_destroy_event = NULL;
 		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
 	}
 	
