@@ -117,6 +117,15 @@ smil_player::~smil_player() {
 		if (rem > 1) m_logger->trace("smil_player::~smil_player: playable 0x%x still has refcount of %d", (*it).second, rem);
 	}
 	
+#ifdef EXP_KEEPING_RENDERER
+	// clean up the playable cache as well
+	std::map<const std::string, common::playable *>::iterator it_url_based; 
+	for(it_url_based = m_playables_url_based.begin();it_url_based!=m_playables_url_based.end();it_url_based++) {
+		int rem = (*it_url_based).second->release();
+		if (rem > 1) m_logger->trace("smil_player::~smil_player: url_based_playable 0x%x still has refcount of %d", (*it_url_based).second, rem);
+	}
+#endif
+	
 	
 	delete m_focussed_nodes;
 	delete m_new_focussed_nodes;
@@ -217,6 +226,9 @@ void smil_player::start() {
 
 // Command to stop playback
 void smil_player::stop() {
+#ifdef EXP_KEEPING_RENDERER
+	assert(m_playables_url_based.empty());
+#endif
 	m_lock.enter();
 	if(m_state == common::ps_pausing || m_state == common::ps_playing) {
 		m_timer->pause();
@@ -307,6 +319,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			np = (*it_url_based).second;
 			m_playables_cs.enter();
 			m_playables_url_based.erase(it_url_based);
+			assert(m_playables_url_based.empty());
 			m_playables_cs.leave();
 		}
 	}
@@ -324,7 +337,6 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
-		//m_event_processor->cancel_event(m_destroy_event, lib::ep_high);
  
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
 		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
@@ -928,16 +940,22 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 #ifdef EXP_KEEPING_RENDERER
 void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim) {
 
-	if (!m_playables_url_based.empty()) {
-		assert(victim.first);
-		assert(victim.second);
+	assert(victim.first);
+	assert(victim.second);
+
+	std::map<const std::string, common::playable *>::iterator it_url_based = 
+	m_playables_url_based.find(victim.first->get_url("src").get_url());
+	if (it_url_based != m_playables_url_based.end()) {
+		m_playables_cs.enter();
+		m_playables_url_based.erase(it_url_based);
+		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::_destroy_playble_in_cache: stop the playble in the cache");
 		victim.second->stop();
 		int rem = victim.second->release();
 		m_destroy_event = NULL;
 		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
+		assert(m_playables_url_based.empty());
 	}
-	
 }
 #endif
 
