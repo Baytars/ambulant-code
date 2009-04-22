@@ -176,6 +176,9 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
  private:
 	common::playable* _new_playable(const lib::node *n); 
 	void _destroy_playable(common::playable *r, const lib::node *n); 
+#ifdef EXP_KEEPING_RENDERER
+	void _destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim);
+#endif
 	common::playable* _get_playable(const lib::node *n) {
 		std::map<const lib::node*, common::playable *>::iterator it = 
 			m_playables.find(n);
@@ -212,6 +215,8 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
 	//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
 	std::map<const std::string, common::playable *> m_playables_url_based;
+	lib::event *m_destroy_event;			// event_processor callback to _destroy_playable
+
 #endif
 	
 	critical_section m_playables_cs;
