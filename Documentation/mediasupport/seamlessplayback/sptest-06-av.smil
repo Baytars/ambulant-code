@@ -1,0 +1,31 @@
+<smil version="3.0">
+<head>
+<layout>
+<root-layout width="670" height="370" backgroundColor="black"/>
+<region xml:id="left" left="10" top="10" width="320" height="240" backgroundColor="gray"/>
+<region xml:id="right" left="340" top="10" width="320" height="240" backgroundColor="gray"/>
+<region xml:id="bottom" left="10" width="650" top="260" height="100" backgroundColor="white"/>
+</layout>
+</head>
+<body>
+<par>
+<smilText region="bottom">
+This presentation consists of 4 4-second parts. Only the media are in separate parts,
+the Karaoke continues for the whole duration.
+<br/>
+In the left region, you should see the animated score of Vader Jacob.
+<br/>
+In the right region, you should see the Karaoke-style words to it.
+<br/>
+On the speakers, you should hear the audio.
+<clear begin="16s"/>
+</smilText>
+<seq>
+<video id="media-01" src="media-av.mpg" region="left" clipEnd="4s"/>
+<video id="media-02" src="media-av.mpg" region="left" clipBegin="4s" clipEnd="8s"/>
+<video id="media-03" src="media-av.mpg" region="left" clipBegin="8s" clipEnd="12s"/>
+<video id="media-04" src="media-av.mpg" region="left" clipBegin="12s"/>
+</seq>
+</par>
+</body>
+</smil>
