@@ -76,7 +76,10 @@ smil_player::smil_player(lib::document *doc, common::factories *factory, common:
 	m_wait_for_eom_flag(true),
 	m_focus(0),
 	m_focussed_nodes(new std::set<int>()),
-	m_new_focussed_nodes(0)
+	m_new_focussed_nodes(0),
+#ifdef EXP_KEEPING_RENDERER
+	m_destroy_event(NULL)
+#endif
 {
 	m_logger = lib::logger::get_logger();
 	AM_DBG m_logger->debug("smil_player::smil_player(0x%x)", this);
@@ -321,6 +324,8 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
+		//m_event_processor->cancel_event(m_destroy_event, lib::ep_high);
+ 
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
 		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->update_context_info(n, n->get_numid());
@@ -412,17 +417,27 @@ void smil_player::stop_playable(const lib::node *n) {
 	if (victim.second) {
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
-		victim.second->stop_but_keeping_renderer();
-		std::map<const std::string, common::playable *>::iterator it_url_based = 
-		m_playables_url_based.find((victim.first->get_url("src")).get_url().c_str());
-		common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
-		if( np == NULL ) { 
-			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.enter", (void*)n);
-			m_playables_cs.enter();
-			m_playables_url_based[(victim.first->get_url("src")).get_url().c_str()] = victim.second;
-			m_playables_cs.leave();
-			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.leave", (void*)n);
-		}	
+		if (n->get_attribute("src")) {
+			victim.second->stop_but_keeping_renderer();
+			std::map<const std::string, common::playable *>::iterator it_url_based = 
+			m_playables_url_based.find((victim.first->get_url("src")).get_url());
+			common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
+			if( np == NULL ) { 
+				AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.enter", (void*)n);
+				m_playables_cs.enter();
+				m_playables_url_based[(victim.first->get_url("src")).get_url()] = victim.second;
+				m_playables_cs.leave();
+				AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.leave", (void*)n);
+				// Add a event to destroy this playable on next 1 microseconds, however, Jack thinks there is another option...
+				typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
+				lib::event *m_destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
+				m_event_processor->add_event(m_destroy_event, 1, lib::ep_high);
+				m_destroy_event = NULL;
+			}	
+		}
+		else {
+			_destroy_playable(victim.second, victim.first);
+		}
 #else
 		_destroy_playable(victim.second, victim.first);
 #endif
@@ -909,6 +924,21 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 	int rem = np->release();
 	if (rem > 1) m_logger->debug("smil_player::_destroy_playable: playable 0x%x still has refcount of %d", np, rem);
 }
+
+#ifdef EXP_KEEPING_RENDERER
+void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim) {
+
+	if (!m_playables_url_based.empty()) {
+		assert(victim.first);
+		assert(victim.second);
+		AM_DBG lib::logger::get_logger()->debug("smil_player::_destroy_playble_in_cache: stop the playble in the cache");
+		victim.second->stop();
+		int rem = victim.second->release();
+		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
+	}
+	
+}
+#endif
 
 void smil_player::show_link(const lib::node *n, const net::url& href, 
 	src_playstate srcstate, dst_playstate dststate, const char *target)
