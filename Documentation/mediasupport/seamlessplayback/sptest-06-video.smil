@@ -10,8 +10,8 @@
 <body>
 <par>
 <smilText region="bottom">
-This presentation consists of 4 4-second parts. Only the media are in separate parts,
-the Karaoke continues for the whole duration.
+This presentation consists of 4 4-second parts. Only the media is segmented,
+the Karaoke is a single smilText item that continues for the whole duration.
 <br/>
 In the left region, you should see the animated score of Vader Jacob.
 <br/>
