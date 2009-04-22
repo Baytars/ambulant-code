@@ -25,7 +25,9 @@ sptest-04
 	to a different region.
 	
 sptest-05
-	Loop: Play the first two bars twice. Then play bar 5 and 6 twice.
+	Loop: 4 4-second parts. Play the first two bars twice. Then play bar 5 and 6 twice.
 	Tests what happens if subsequent playback needs to reposition the media.
 	
-			
+sptest-06
+	Global time: Same as sptest-01, but now only the media are in 4 parts, the
+	Karaoke is global. Tests what happens to global synchronization.
