@@ -1214,7 +1214,7 @@ void time_node::on_eom(qtime_type timestamp) {
     if (m_saw_on_eom)
         m_logger->debug("time_node::on_eom: renderer emitted second stopped() callback for %s", get_sig().c_str());
     m_saw_on_eom = true;
-	if(is_playable() && !is_discrete()) {
+	if(is_playable() && !is_discrete()) {	
 		if(m_impldur == time_type::unresolved) {
 			time_type pt = timestamp.as_node_time(sync_node());
 			m_impldur = pt - m_interval.begin();

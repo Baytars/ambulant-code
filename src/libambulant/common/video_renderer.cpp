@@ -171,6 +171,16 @@ video_renderer::stop_but_keeping_renderer()
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 	m_context->stopped(m_cookie, 0);
 	m_activated = false;
+//	if (m_dest) {
+//		m_dest->renderer_done(this);
+//		m_dest = NULL;
+//	}
+	if (m_audio_renderer) {
+		m_audio_renderer->stop();
+		m_audio_renderer->release();
+		m_audio_renderer = NULL;
+	}
+	
 	m_lock.leave();
 }
 #endif
