@@ -180,13 +180,11 @@ video_renderer::stop()
 { 
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-#ifndef EXP_KEEPING_RENDERER
 	if (!m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.stop(0x%x): not started", (void*)this);
 		m_lock.leave();
 		return;
 	}
-#endif
 	m_context->stopped(m_cookie, 0);
 	m_activated = false;
 	if (m_dest) {
