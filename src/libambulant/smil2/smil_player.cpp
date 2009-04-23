@@ -339,6 +339,8 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		m_playables_cs.leave();
  
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
+		//xxxbo: stop the previous player
+		np->stop_but_keeping_renderer();
 		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->update_context_info(n, n->get_numid());
 	}	
@@ -430,9 +432,9 @@ void smil_player::stop_playable(const lib::node *n) {
 		//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
 		if (n->get_attribute("src")) {
-			victim.second->stop_but_keeping_renderer();
+			//victim.second->stop_but_keeping_renderer();
 			std::map<const std::string, common::playable *>::iterator it_url_based = 
-			m_playables_url_based.find((victim.first->get_url("src")).get_url());
+					m_playables_url_based.find((victim.first->get_url("src")).get_url());
 			common::playable *np = (it_url_based != m_playables_url_based.end())?(*it_url_based).second:0;
 			if( np == NULL ) { 
 				AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(0x%x)cs.enter", (void*)n);
