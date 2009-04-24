@@ -128,7 +128,11 @@ video_renderer::start (double where)
 	}
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
+#ifndef EXP_KEEPING_RENDERER
 	if (where) m_src->seek((net::timestamp_t)(where*1000000));
+#else
+	if (where) m_src->seek((net::timestamp_t)(where*1000000), m_clip_end);
+#endif
 	m_activated = true;
 
 #if 1
@@ -226,7 +230,11 @@ video_renderer::seek(double t)
 	long int delta = t_ms - m_timer->elapsed();  // Positive delta: move forward in time
 	m_epoch -= delta;	// Which means the epoch moves back in time
 #endif
+#ifndef EXP_KEEPING_RENDERER
 	if (m_src) m_src->seek(t_ms);
+#else
+	if (m_src) m_src->seek(t_ms, m_clip_end);
+#endif
 	if (m_audio_renderer) m_audio_renderer->seek(t);
 }
 

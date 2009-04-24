@@ -327,6 +327,7 @@ ffmpeg_demux::read_ahead(timestamp_t time)
 	m_lock.leave();
 }
 
+#ifndef EXP_KEEPING_RENDERER
 void
 ffmpeg_demux::seek(timestamp_t time)
 {
@@ -337,6 +338,20 @@ ffmpeg_demux::seek(timestamp_t time)
     }
 	m_lock.leave();
 }
+#else
+void
+ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
+{
+	m_lock.enter();
+    if (m_seektime != time) {
+        m_seektime = time;
+        m_seektime_changed = true;
+    }
+	m_clip_end = clip_end;
+
+	m_lock.leave();
+}
+#endif
 
 void
 ffmpeg_demux::remove_datasink(int stream_index)
@@ -488,7 +503,7 @@ ffmpeg_demux::run()
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final push_data(0, 0)");
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: final push_data(0, 0)");
 	int i;
 	m_lock.leave();
 	for (i=0; i<MAX_STREAMS; i++)

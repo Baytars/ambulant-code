@@ -457,6 +457,7 @@ ffmpeg_video_decoder_datasource::read_ahead(timestamp_t clip_begin)
 	m_src->read_ahead(clip_begin);
 }
 
+#ifndef EXP_KEEPING_RENDERER
 void
 ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 {
@@ -470,6 +471,21 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 	m_oldest_timestamp_wanted = time;
 	m_lock.leave();
 }
+#else
+void
+ffmpeg_video_decoder_datasource::seek(timestamp_t time, timestamp_t clip_end)
+{
+	m_lock.enter();
+	// We leave one frame in the queue: there could be a callback outstanding which
+	// will otherwise run into problems in get_frame().
+	while ( m_frames.size() > 1) {
+		_pop_top_frame();
+	}
+	if (m_src) m_src->seek(time, clip_end);
+	m_oldest_timestamp_wanted = time;
+	m_lock.leave();
+}
+#endif
 
 void 
 ffmpeg_video_decoder_datasource::data_avail()

@@ -499,8 +499,7 @@ void
 gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-#if 1
+	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
 		m_lock.leave();
 		unregister_renderer(this);
@@ -508,7 +507,7 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
 	}
-#endif
+
 	m_is_playing = false;
 	m_context->stopped(m_cookie, 0);
 
@@ -521,6 +520,9 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_node = node;
 	m_cookie = cookie;
 	_init_clip_begin_end();
+	if (m_audio_src) {
+		m_audio_src->seek(m_clip_begin, m_clip_end);	
+	}
 }
 #endif
 
@@ -576,7 +578,12 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
+#ifndef EXP_KEEPING_RENDERER
 		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000));
+#else
+		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);		
+		//m_audio_src->seek(m_clip_begin, m_clip_end);	
+#endif
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
 		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::start(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
 		m_audio_src->start(m_event_processor, e);
@@ -600,7 +607,11 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
+#ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000));
+#else
+	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+#endif
 	// XXXJACK: Should restart SDL
 	m_lock.leave();
 }

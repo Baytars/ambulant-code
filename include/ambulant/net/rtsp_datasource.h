@@ -208,7 +208,11 @@ class rtsp_demux : public abstract_demux {
 	double duration(){ return 0.0; };
 	audio_format& get_audio_format() { return m_context->audio_fmt; };
 	video_format& get_video_format() { return m_context->video_fmt; };
+#ifndef EXP_KEEPING_RENDERER
 	void seek(timestamp_t time);
+#else
+	void seek(timestamp_t time, timestamp_t clip_end);
+#endif
 	void read_ahead(timestamp_t time);
 	void cancel();
 	timestamp_t get_clip_end();
