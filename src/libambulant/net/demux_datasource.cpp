@@ -152,7 +152,8 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 	}
 	m_lock.leave();
 }
- 
+
+#ifndef EXP_KEEPING_RENDERER
 void 
 demux_audio_datasource::seek(timestamp_t time)
 {
@@ -167,6 +168,22 @@ demux_audio_datasource::seek(timestamp_t time)
 	// thread trying to deliver new data to this demux_datasource.
 	m_thread->seek(time);
 }
+#else
+void 
+demux_audio_datasource::seek(timestamp_t time, timestamp_t clip_end)
+{
+	m_lock.enter();
+	assert(m_thread);
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
+	while (m_queue.size() > 0) {
+		m_queue.pop();
+	}
+	m_lock.leave();
+	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
+	// thread trying to deliver new data to this demux_datasource.
+	m_thread->seek(time, clip_end);
+}
+#endif
 
 void 
 demux_audio_datasource::read_ahead(timestamp_t time)
@@ -188,7 +205,7 @@ demux_audio_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 	bool rv = true;
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.push_data: %d bytes available (ts = %lld)", sz, pts);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource.push_data: %d bytes available (ts = %lld)", sz, pts);
 	if ( ! m_src_end_of_file) {
 		if (_buffer_full()) {
 			rv = false;
@@ -261,7 +278,7 @@ demux_audio_datasource::get_clip_end()
 	m_lock.enter();
 	assert(m_thread);
 	timestamp_t clip_end = m_thread->get_clip_end();
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::get_clip_end: clip_end=%d", clip_end);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource::get_clip_end: clip_end=%d", clip_end);
 	m_lock.leave();
 	return  clip_end;
 }
@@ -397,6 +414,7 @@ demux_video_datasource::read_ahead(timestamp_t time)
 	m_lock.leave();
 }
 
+#ifndef EXP_KEEPING_RENDERER
 void 
 demux_video_datasource::seek(timestamp_t time)
 {
@@ -424,6 +442,35 @@ demux_video_datasource::seek(timestamp_t time)
 #endif
 	m_thread->seek(time);
 }
+#else
+void 
+demux_video_datasource::seek(timestamp_t time, timestamp_t clip_end)
+{
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::seek: (this = 0x%x), time=%d", (void*) this, time);
+	assert(m_thread);
+	
+	while (m_frames.size() > 0) {
+		// flush frame queue
+		ts_frame_pair element = m_frames.front();
+		if (element.second.data) {
+			free (element.second.data);
+			element.second.data = NULL;
+		}
+		m_frames.pop();
+	}
+	
+	m_lock.leave();
+	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
+	// thread trying to deliver new data to this demux_datasource.
+#if 1
+	// XXXJACK untested code, but Jack thinks it's needed; if we seek we must reset
+	// any previous end-of-file condition.
+	m_src_end_of_file = false;
+#endif
+	m_thread->seek(time, clip_end);
+}
+#endif
 
 void 
 demux_video_datasource::start_frame(ambulant::lib::event_processor *evp, 

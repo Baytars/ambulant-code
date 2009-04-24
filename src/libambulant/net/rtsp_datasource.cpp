@@ -239,6 +239,7 @@ ambulant::net::rtsp_demux::read_ahead(timestamp_t time)
 	m_critical_section.leave();
 }
 
+#ifndef EXP_KEEPING_RENDERER
 void
 ambulant::net::rtsp_demux::seek(timestamp_t time)
 {
@@ -247,6 +248,17 @@ ambulant::net::rtsp_demux::seek(timestamp_t time)
 	m_seektime_changed = true;
 	m_critical_section.leave();
 }
+#else
+void
+ambulant::net::rtsp_demux::seek(timestamp_t time, timestamp_t clip_end)
+{
+	m_critical_section.enter();
+	m_seektime = time;
+	m_seektime_changed = true;
+	m_clip_end = clip_end;
+	m_critical_section.leave();
+}
+#endif
 
 static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize );
