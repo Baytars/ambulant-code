@@ -456,12 +456,12 @@ gui::sdl::sdl_audio_renderer::data_avail()
 		m_lock.leave();
 		return;
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: %d bytes available", m_audio_src->size());
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: %d bytes available", m_audio_src->size());
 	
 	restart_audio_input();
 	
 	m_lock.leave();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: done");
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: done");
 }	
 
 bool

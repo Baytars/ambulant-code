@@ -205,7 +205,7 @@ demux_audio_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 	bool rv = true;
 	m_lock.enter();
 	m_src_end_of_file = (sz == 0);
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource.push_data: %d bytes available (ts = %lld)", sz, pts);
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource.push_data: %d bytes available (ts = %lld)", sz, pts);
 	if ( ! m_src_end_of_file) {
 		if (_buffer_full()) {
 			rv = false;
@@ -278,7 +278,7 @@ demux_audio_datasource::get_clip_end()
 	m_lock.enter();
 	assert(m_thread);
 	timestamp_t clip_end = m_thread->get_clip_end();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_audio_datasource::get_clip_end: clip_end=%d", clip_end);
+	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::get_clip_end: clip_end=%d", clip_end);
 	m_lock.leave();
 	return  clip_end;
 }
