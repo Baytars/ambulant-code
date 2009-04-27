@@ -102,6 +102,10 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 	m_node = node;
 	m_cookie = cookie;
 	_init_clip_begin_end();
+	if (m_audio_renderer) {
+		m_audio_renderer->update_context_info(node, cookie);
+		//m_audio_renderer->seek(m_clip_begin);
+	}
 }
 #endif
 
@@ -179,11 +183,11 @@ video_renderer::stop_but_keeping_renderer()
 //		m_dest->renderer_done(this);
 //		m_dest = NULL;
 //	}
-	if (m_audio_renderer) {
-		m_audio_renderer->stop();
-		m_audio_renderer->release();
-		m_audio_renderer = NULL;
-	}
+//	if (m_audio_renderer) {
+//		m_audio_renderer->stop();
+//		m_audio_renderer->release();
+//		m_audio_renderer = NULL;
+//	}
 	
 	m_lock.leave();
 }
