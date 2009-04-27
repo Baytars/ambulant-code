@@ -425,7 +425,9 @@ ffmpeg_demux::run()
 		int ret = av_read_frame(m_con, pkt);
 		m_lock.enter();
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size);
+#ifndef EXP_KEEPING_RENDERER
 		if (ret < 0) break;
+#endif
 		pkt_nr++;
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet number : %d",pkt_nr);
 		// Find out where to send it to
