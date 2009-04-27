@@ -390,7 +390,10 @@ ffmpeg_demux::run()
 #endif
 	pkt_nr = 0;
 	assert(m_con);
-	
+
+#ifdef EXP_KEEPING_RENDERER
+	bool eof_sent_to_clients = false;
+#endif
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: started");
 	while (!exit_requested()) {
 		AVPacket pkt1, *pkt = &pkt1;
@@ -399,6 +402,9 @@ ffmpeg_demux::run()
 		// Read a packet
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run:  started");
 		if (m_seektime_changed) {
+#ifdef EXP_KEEPING_RENDERER
+			eof_sent_to_clients = false;
+#endif
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
 			int64_t seektime = m_clip_begin+m_seektime;
             if (m_con->start_time != AV_NOPTS_VALUE) {
@@ -427,7 +433,31 @@ ffmpeg_demux::run()
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size);
 #ifndef EXP_KEEPING_RENDERER
 		if (ret < 0) break;
+#else
+		if (ret < 0) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: wait some time before continuing the while loop");
+			if (!eof_sent_to_clients) {
+				
+				for (int i=0; i<MAX_STREAMS; i++) {
+					if (m_sinks[i]) {
+						m_sinks[i]->push_data(0, 0, 0);
+					}
+				}
+				eof_sent_to_clients = true;
+			}
+			// wait some time before continuing the while loop to avoid consuming too much cpu resource
+			// sleep 10 millisec, hardly noticeable
+			m_lock.leave();
+#ifdef	AMBULANT_PLATFORM_WIN32
+			ambulant::lib::sleep_msec(10); 
+#else
+			usleep(10000);
+#endif//AMBULANT_PLATFORM_WIN32
+			m_lock.enter();
+			continue;
+		}
 #endif
+		
 		pkt_nr++;
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet number : %d",pkt_nr);
 		// Find out where to send it to
