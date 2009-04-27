@@ -102,6 +102,9 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 	m_node = node;
 	m_cookie = cookie;
 	_init_clip_begin_end();
+	seek(m_clip_begin);
+	//if (m_src) m_src->seek(m_clip_begin, m_clip_end);
+
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
 		//m_audio_renderer->seek(m_clip_begin);
@@ -238,6 +241,7 @@ video_renderer::seek(double t)
 	if (m_src) m_src->seek(t_ms);
 #else
 	if (m_src) m_src->seek(t_ms, m_clip_end);
+	m_last_frame_timestamp = -1;
 #endif
 	if (m_audio_renderer) m_audio_renderer->seek(t);
 }

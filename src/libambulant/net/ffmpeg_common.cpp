@@ -343,10 +343,10 @@ void
 ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 {
 	m_lock.enter();
-    if (m_seektime != time) {
+//    if (m_seektime != time) {
         m_seektime = time;
         m_seektime_changed = true;
-    }
+//    }
 	m_clip_end = clip_end;
 
 	m_lock.leave();
@@ -405,7 +405,7 @@ ffmpeg_demux::run()
 #ifdef EXP_KEEPING_RENDERER
 			eof_sent_to_clients = false;
 #endif
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
 			int64_t seektime = m_clip_begin+m_seektime;
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
