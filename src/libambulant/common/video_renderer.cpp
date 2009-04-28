@@ -107,7 +107,6 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
-		//m_audio_renderer->seek(m_clip_begin);
 	}
 }
 #endif
