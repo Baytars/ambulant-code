@@ -343,10 +343,15 @@ void
 ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 {
 	m_lock.enter();
-//    if (m_seektime != time) {
+#ifndef EXP_KEEPING_RENDERER
+    if (m_seektime != time) {
         m_seektime = time;
         m_seektime_changed = true;
-//    }
+    }
+#else
+	m_seektime = time;
+	m_seektime_changed = true;
+#endif
 	m_clip_end = clip_end;
 
 	m_lock.leave();
