@@ -181,9 +181,13 @@ video_renderer::start (double where)
 	if (m_audio_renderer) 
 		m_audio_renderer->start(where);
 
-	m_dest->show(this);
 
 	m_lock.leave();
+	
+	// Note by Jack: I'm not 100% sure that calling show() after releasing the lock is safe, but (a)
+	// calling it inside the lock leads to deadly embrace (this lock and the one in the destination region,
+	// during a redraw) and (b) other renderers also call m_dest->show() without holding the lock.
+	m_dest->show(this);
 }
 
 #ifdef EXP_KEEPING_RENDERER
@@ -221,8 +225,14 @@ video_renderer::stop()
 	m_context->stopped(m_cookie, 0);
 	m_activated = false;
 	if (m_dest) {
+#ifdef EXP_KEEPING_RENDERER
+		m_lock.leave();
+#endif
 		m_dest->renderer_done(this);
 		m_dest = NULL;
+#ifdef EXP_KEEPING_RENDERER
+		m_lock.enter();
+#endif
 	}
 	if (m_audio_renderer) {
 		m_audio_renderer->stop();
@@ -347,6 +357,13 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
+	if (buf == NULL) {
+		// This can only happen immedeately after a seek.
+		lib::logger::get_logger()->debug("video_renderer::data_avail: get_frame returned NULL");
+		assert(m_last_frame_timestamp < 0);
+		m_lock.leave();
+		return;
+	}
 	net::timestamp_t frame_duration = m_src->frameduration(); // XXX For now: assume 30fps
 	
 	// If we are at the end of the clip we stop and signal the scheduler..
