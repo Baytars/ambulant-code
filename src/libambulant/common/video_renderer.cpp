@@ -55,6 +55,9 @@ video_renderer::video_renderer(
 	m_frame_duplicate(0),
 	m_frame_early(0),
 	m_frame_late(0),
+#ifdef EXP_KEEPING_RENDERER
+	m_previous_clip_end(-1),
+#endif
 	m_frame_missing(0)
 {
 	m_lock.enter();
@@ -62,6 +65,10 @@ video_renderer::video_renderer(
 	net::url url = node->get_url("src");
 	
 	_init_clip_begin_end();
+	
+#ifdef EXP_KEEPING_RENDERER
+	m_previous_clip_end = m_clip_end;
+#endif
 
 	m_src = factory->get_datasource_factory()->new_video_datasource(url,m_clip_begin, m_clip_end);
 	if (m_src == NULL) {
@@ -101,8 +108,15 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 {
 	m_node = node;
 	m_cookie = cookie;
-	_init_clip_begin_end();
-	seek(m_clip_begin/1000);
+	_init_clip_begin_end();                                                                                                
+	//seek(m_clip_begin/1000);
+	//m_src->seek(m_clip_begin, m_clip_end);
+
+	if (m_clip_begin < m_previous_clip_end) {
+		seek(m_clip_begin/1000);
+	}
+	m_previous_clip_end = m_clip_end;
+
 
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);

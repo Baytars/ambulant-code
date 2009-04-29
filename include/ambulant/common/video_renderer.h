@@ -121,6 +121,9 @@ class video_renderer : public common::renderer_playable {
 	long int m_frame_early;
 	long int m_frame_late;
 	long int m_frame_missing;
+#ifdef EXP_KEEPING_RENDERER
+	net::timestamp_t m_previous_clip_end;       
+#endif
   protected:
 	lib::critical_section m_lock;
 };
