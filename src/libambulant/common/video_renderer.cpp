@@ -391,6 +391,7 @@ video_renderer::data_avail()
 //			m_src = NULL;
 //		}
 		m_lock.leave();
+		//xxxbo: don't stop the previous one 
 		m_context->stopped(m_cookie, 0);
 		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",

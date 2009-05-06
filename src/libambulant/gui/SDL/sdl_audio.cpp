@@ -507,9 +507,8 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
 	}
-
 	m_is_playing = false;
-	m_context->stopped(m_cookie, 0);
+	//m_context->stopped(m_cookie, 0);
 
 	m_lock.leave();
 }
