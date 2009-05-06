@@ -1204,11 +1204,11 @@ void time_node::on_rom(qtime_type timestamp) {
 	if(m_timer) m_timer->resume();
 }
 
-// End of nedia notification
+// End of media notification
 // This notification is taken into account when this node is still active
 // and the implicit duration is involved in timing calculations.
 void time_node::on_eom(qtime_type timestamp) {
-	AM_DBG m_logger->debug("%s[%s].on_eom()", m_attrs.get_tag().c_str(), 
+	/*AM_DBG*/ m_logger->debug("%s[%s].on_eom()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_eom_flag = true;
     if (m_saw_on_eom)
@@ -1444,7 +1444,16 @@ void time_node::fill(qtime_type timestamp) {
 			for(it = cl.begin(); it != cl.end(); it++)
 				(*it)->fill(qt);
 		} 
+#ifndef EXP_KEEPING_RENDERER
 		if(is_playable()) pause_playable();
+#else
+		if (m_node->get_attribute("src")) {
+			m_logger->debug("%s[%s].continue() ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
+						m_attrs.get_id().c_str(),  
+						timestamp.as_time_value_down_to(this), timestamp.second(), 
+						timestamp.as_doc_time_value());
+		}		
+#endif
 		if(m_timer) {
 			m_timer->pause();
 			m_timer->set_time(m_interval.end());

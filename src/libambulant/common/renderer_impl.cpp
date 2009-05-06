@@ -177,6 +177,9 @@ renderer_playable::_init_clip_begin_end()
 	AM_DBG lib::logger::get_logger()->debug("renderer_playable::init_clip_begin_end: cb=%lld, ce=%lld", cb,ce);
 	m_clip_begin = cb;
 	m_clip_end = ce;
+#ifdef EXP_KEEPING_RENDERER
+	if (m_clip_end > 0) m_clip_end += 20000;
+#endif
 }
 
 renderer_playable_ds::renderer_playable_ds(
