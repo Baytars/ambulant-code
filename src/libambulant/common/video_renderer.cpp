@@ -359,8 +359,10 @@ video_renderer::data_avail()
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
 	if (buf == NULL) {
 		// This can only happen immedeately after a seek.
+		//bo-note: Probably, the above claim is not true. Actually, this happens at the end of the last clip
 		lib::logger::get_logger()->debug("video_renderer::data_avail: get_frame returned NULL");
-		assert(m_last_frame_timestamp < 0);
+		//bo-note: In this case, this assert is not true any more. So I comment out it.
+		//assert(m_last_frame_timestamp < 0);
 		m_lock.leave();
 		return;
 	}

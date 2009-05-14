@@ -349,6 +349,7 @@ ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
         m_seektime_changed = true;
     }
 #else
+	// To support demo 5: repeate the previous clipbegin and clipend
 	m_seektime = time;
 	m_seektime_changed = true;
 #endif
