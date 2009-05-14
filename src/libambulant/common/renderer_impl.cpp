@@ -178,7 +178,7 @@ renderer_playable::_init_clip_begin_end()
 	m_clip_begin = cb;
 	m_clip_end = ce;
 #ifdef EXP_KEEPING_RENDERER
-	if (m_clip_end > 0) m_clip_end += 20000;
+	//if (m_clip_end > 0) m_clip_end += 16000000;
 #endif
 }
 
