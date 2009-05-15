@@ -37,7 +37,7 @@
 #include "ambulant/smil2/smil_layout.h"
 #include "ambulant/smil2/time_sched.h"
 #include "ambulant/smil2/animate_e.h"
-#define AM_DBG
+//#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
