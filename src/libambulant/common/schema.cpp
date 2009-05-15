@@ -56,6 +56,13 @@ static const char* statecommand_elements[] = {
 	"setvalue", "newvalue", "delvalue", "send"
 };
 #endif // WITH_SMIL30
+
+#ifdef EXP_KEEPING_RENDERER
+static const char* prefetch_elements[] = {
+	"prefetch"
+};
+#endif EXP_KEEPING_RENDERER
+
 // Create the smplest possible schema factory
 // Its sole purpose is to create privately the schema singleton.
 namespace ambulant {
@@ -143,6 +150,12 @@ bool schema::is_statecommand(const lib::xml_string& tag) const {
 	return m_statecommands.find(tag) != m_statecommands.end();
 }
 #endif // WITH_SMIL30
+
+#ifdef EXP_KEEPING_RENDERER
+bool schema::is_prefetch(const lib::xml_string& tag) const {
+	return m_prefetch.find(tag) != m_prefetch.end();
+}
+#endif //EXP_KEEPING_RENDERER
 
 const char* 
 ambulant::common::time_container_type_as_str(time_container_type t) {

@@ -726,6 +726,10 @@ void time_node::activate(qtime_type timestamp) {
 			sync_node()->raise_update_event(timestamp);
 		}
 #endif // WITH_SMIL30
+#ifdef EXP_KEEPING_RENDERER
+		//xxxbo: the entrence point for prefetch
+		else if (is_prefetch()) start_prefetch();
+#endif
 		else start_playable(sd_offset);
 		if(m_timer) m_timer->resume();
 	}
@@ -814,6 +818,11 @@ void time_node::start_statecommand(time_type offset) {
 }
 #endif // WITH_SMIL30
 
+#ifdef EXP_KEEPING_RENDERER
+void time_node::start_prefetch() {
+}
+#endif //EXP_KEEPING_RENDERER
+
 // Returns true when this node is associated with a playable
 bool time_node::is_playable() const {
 #ifdef WITH_SMIL30
@@ -842,6 +851,17 @@ bool time_node::is_statecommand() const {
 	return sch->is_statecommand(qn);
 }
 #endif // WITH_SMIL30
+
+#ifdef EXP_KEEPING_RENDERER
+// Returns true when this node is a prefetch 
+bool time_node::is_prefetch() const {
+	const common::schema *sch = common::schema::get_instance();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
+	const lib::xml_string& qn = m_node->get_local_name();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
+	return sch->is_prefetch(qn);
+}
+#endif // EXP_KEEPING_RENDERER
 //////////////////////////
 // Playables shell
 
