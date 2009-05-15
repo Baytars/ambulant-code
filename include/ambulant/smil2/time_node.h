@@ -203,7 +203,7 @@ class time_node : public schedulable {
 #endif // WITH_SMIL30
 #ifdef EXP_KEEPING_RENDERER
 	// Prefetch is special internal playables
-	void start_prefetch();
+	void start_prefetch(time_type offset = 0);
 #endif // EXP_KEEPING_RENDERER
 	
 	// Std xml tree navigation interface
