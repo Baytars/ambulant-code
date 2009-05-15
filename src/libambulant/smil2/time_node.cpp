@@ -819,7 +819,37 @@ void time_node::start_statecommand(time_type offset) {
 #endif // WITH_SMIL30
 
 #ifdef EXP_KEEPING_RENDERER
-void time_node::start_prefetch() {
+void time_node::start_prefetch(time_type offset) {
+	if(m_ffwd_mode) {
+		AM_DBG m_logger->debug("start_prefetch(%ld): ffwd skip %s", offset(), get_sig().c_str());
+		return;
+	}
+	if(!is_playable() ) {
+		return;
+	}
+	qtime_type timestamp(this, offset);
+	AM_DBG m_logger->debug("%s[%s].start_prefetch(%ld) DT:%ld", m_attrs.get_tag().c_str(), 
+						   m_attrs.get_id().c_str(), offset(), timestamp.as_doc_time_value());
+	m_eom_flag = false;
+    m_saw_on_bom = false;
+    m_saw_on_eom = false;
+	common::playable *np = create_playable();
+	if(np) np->wantclicks(m_want_activate_events);
+	const lib::transition_info *trans_in = m_attrs.get_trans_in();
+#if 0
+	if(np) {
+		if(trans_in) {
+			m_context->start_playable(m_node, time_type_to_secs(offset()), trans_in);
+		} else {
+			np->start(time_type_to_secs(offset()));
+		} 
+	}
+#endif
+	if (is_link()  && m_attrs.get_actuate() == actuate_onload) {
+		AM_DBG m_logger->debug("%s[%s].start_prefetch: actuate_onLoad", m_attrs.get_tag().c_str(), 
+							   m_attrs.get_id().c_str());
+		follow_link(timestamp);
+	}	
 }
 #endif //EXP_KEEPING_RENDERER
 
