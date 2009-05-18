@@ -445,7 +445,9 @@ void smil_player::stop_playable(const lib::node *n) {
 				// Add a event to destroy this playable on next 20000 microseconds, however, Jack thinks there is another option...
 				typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
 				lib::event *m_destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
-				m_event_processor->add_event(m_destroy_event, 20000, lib::ep_high);
+				//xxxbo: if this playable is created for prefetch, we don't destroy it.
+				if (!m_root->is_prefetch())
+					m_event_processor->add_event(m_destroy_event, 20000, lib::ep_high);
 				m_destroy_event = NULL;
 			}	
 		}
