@@ -95,9 +95,9 @@ renderer_playable::stop()
 void
 renderer_playable::stop_keeping_renderer()
 {
-	AM_DBG lib::logger::get_logger()->debug("renderer_playable.stop(0x%x)", (void *)this);
+	AM_DBG lib::logger::get_logger()->debug("renderer_playable.stop_keeping_renderer(0x%x)", (void *)this);
 	if (!m_activated) {
-		lib::logger::get_logger()->trace("renderer_playable.stop(0x%x): not started", (void*)this);
+		lib::logger::get_logger()->trace("renderer_playable.stop_keeping_renderer(0x%x): not started", (void*)this);
 	} else {
 		if (m_dest)
 			m_dest->renderer_done(this);

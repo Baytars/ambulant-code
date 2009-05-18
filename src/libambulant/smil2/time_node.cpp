@@ -836,7 +836,7 @@ void time_node::start_prefetch(time_type offset) {
 	common::playable *np = create_playable();
 	if(np) np->wantclicks(m_want_activate_events);
 	const lib::transition_info *trans_in = m_attrs.get_trans_in();
-#if 0
+#if 0 // don't start playable yet, 
 	if(np) {
 		if(trans_in) {
 			m_context->start_playable(m_node, time_type_to_secs(offset()), trans_in);
@@ -1497,6 +1497,9 @@ void time_node::fill(qtime_type timestamp) {
 #ifndef EXP_KEEPING_RENDERER
 		if(is_playable()) pause_playable();
 #else
+		//xxxbo: Instead of pausing the playable, we should continue it for some short period of time.
+		//       Here, I just print some message and actual action needed to be inserted later after I 
+		//		 figure out how to do it.	
 		if (m_node->get_attribute("src")) {
 			m_logger->debug("%s[%s].continue() ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
 						m_attrs.get_id().c_str(),  
