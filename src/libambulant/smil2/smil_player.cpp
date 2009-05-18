@@ -446,7 +446,9 @@ void smil_player::stop_playable(const lib::node *n) {
 				typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
 				lib::event *m_destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
 				//xxxbo: if this playable is created for prefetch, we don't destroy it.
-				if (!m_root->is_prefetch())
+				//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
+				std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
+				if(it != m_dom2tn->end() && !(*it).second->is_prefetch()) 
 					m_event_processor->add_event(m_destroy_event, 20000, lib::ep_high);
 				m_destroy_event = NULL;
 			}	
