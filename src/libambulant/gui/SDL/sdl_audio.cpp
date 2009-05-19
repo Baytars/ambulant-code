@@ -569,6 +569,14 @@ void
 gui::sdl::sdl_audio_renderer::start(double where)
 {
 	m_lock.enter();
+#ifdef EXP_KEEPING_RENDERER
+	if (m_is_playing) {
+		lib::logger::get_logger()->trace("sdl_audio_renderer.start(0x%x): already started", (void*)this);
+		m_lock.leave();
+		return;
+	}
+	
+#endif
     if (!m_node) abort();
 		
 	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x, %s, where=%f)", 
