@@ -340,9 +340,10 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
  
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
 		//xxxbo: stop the previous renderer
-		/////xxxbo: To support continuous playback, we don't stop the previous renderer. However, this approach 
-		//       break the demo sptest-05(Loop: 4 4-second parts. Play the first two bars twice).
-		/////np->stop_but_keeping_renderer();
+		//xxxbo: To support continuous playback, we don't stop the previous renderer.
+		const char * fb = n->get_attribute("fill");
+		if (fb == NULL || strcmp(fb, "continue"))
+			np->stop_but_keeping_renderer();
 		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->update_context_info(n, n->get_numid());
 	}	

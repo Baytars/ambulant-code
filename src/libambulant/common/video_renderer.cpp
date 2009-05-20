@@ -392,18 +392,19 @@ video_renderer::data_avail()
 //			m_src->release();
 //			m_src = NULL;
 //		}
-		/////xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-		//       we continue playback it other than return. However, this approach 
-		//       break the demo sptest-05(Loop: 4 4-second parts. Play the first two bars twice).
-		/////m_lock.leave();
+		///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
+		//        we continue playback it other than return. 
+		const char * fb = m_node->get_attribute("fill");
+		if (fb == NULL || strcmp(fb, "continue"))
+			m_lock.leave();
 		m_context->stopped(m_cookie, 0);
 		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 										 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
-		/////xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-		//       we continue playback it other than return. However, this approach 
-		//       break the demo sptest-05(Loop: 4 4-second parts. Play the first two bars twice).
-		/////return;
+		///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
+		//        we continue playback it other than return. 
+		if (fb == NULL || strcmp(fb, "continue"))
+			return;
 	}
 #endif
 
