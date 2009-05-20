@@ -1497,15 +1497,20 @@ void time_node::fill(qtime_type timestamp) {
 #ifndef EXP_KEEPING_RENDERER
 		if(is_playable()) pause_playable();
 #else
-		//xxxbo: Instead of pausing the playable, we should continue it for some short period of time.
-		//       Here, I just print some message and actual action needed to be inserted later after I 
-		//		 figure out how to do it.	
-		if (m_node->get_attribute("src")) {
-			m_logger->debug("%s[%s].continue() ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
-						m_attrs.get_id().c_str(),  
-						timestamp.as_time_value_down_to(this), timestamp.second(), 
-						timestamp.as_doc_time_value());
-		}		
+		if (fb != fill_continue) {
+			if(is_playable()) pause_playable();
+		}
+		else {
+			//xxxbo: Instead of pausing the playable, we should continue it for some short period of time.
+			//       Here, I just print some message and actual action needed to be inserted later after I 
+			//		 figure out how to do it.			
+			if (m_node->get_attribute("src")) {
+				m_logger->debug("%s[%s].continue() ST:%ld, PT:%ld, DT:%ld", m_attrs.get_tag().c_str(), 
+								m_attrs.get_id().c_str(),  
+								timestamp.as_time_value_down_to(this), timestamp.second(), 
+								timestamp.as_doc_time_value());
+			}
+		}
 #endif
 		if(m_timer) {
 			m_timer->pause();

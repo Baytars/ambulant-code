@@ -543,6 +543,9 @@ void time_attrs::parse_fill() {
 	if(fill == "remove") m_fill = fill_remove;
 	else if(fill == "freeze") m_fill = fill_freeze;
 	else if(fill == "hold") m_fill = fill_hold;
+#ifdef EXP_KEEPING_RENDERER
+	else if(fill == "continue") m_fill = fill_continue;
+#endif
 	else if(fill == "transition") m_fill = fill_transition;
 	else if(fill == "auto") m_fill = fill_auto;
 	// else default or invalid
