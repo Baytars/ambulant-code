@@ -576,6 +576,9 @@ fill_behavior time_attrs::get_default_fill() {
 			if(fill == "remove") {retfb = fill_remove; break;}
 			else if(fill == "freeze") {retfb = fill_freeze; break;}
 			else if(fill == "hold") {retfb = fill_hold; break;}
+#ifdef EXP_KEEPING_RENDERER
+			else if(fill == "continue") {retfb = fill_continue; break;}
+#endif
 			else if(fill == "transition") {retfb = fill_transition; break;}
 			else if(fill == "auto") {retfb = fill_auto; break;}
 			// else inherit or invalid e.g. continue
@@ -764,6 +767,9 @@ std::string smil2::repr(fill_behavior f) {
 		case fill_remove: return "remove";
 		case fill_freeze: return "freeze";
 		case fill_hold: return "hold";
+#ifdef EXP_KEEPING_RENDERER
+		case fill_continue: return "continue";
+#endif
 		case fill_transition: return "transition";
 		case fill_auto: return "auto";
 		case fill_default: return "default";

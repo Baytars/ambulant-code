@@ -343,21 +343,14 @@ void
 ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 {
 	m_lock.enter();
-#ifndef EXP_KEEPING_RENDERER
-    if (m_seektime != time) {
-        m_seektime = time;
-        m_seektime_changed = true;
-    }
-#else
 	// To support demo 5: repeate the previous clipbegin and clipend
 	m_seektime = time;
 	m_seektime_changed = true;
-#endif
 	m_clip_end = clip_end;
 
 	m_lock.leave();
 }
-#endif
+#endif//EXP_KEEPING_RENDERER
 
 void
 ffmpeg_demux::remove_datasink(int stream_index)

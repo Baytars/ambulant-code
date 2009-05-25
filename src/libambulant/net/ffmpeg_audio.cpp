@@ -470,6 +470,7 @@ ffmpeg_decoder_datasource::data_avail()
 		}
 		// Restart reading if we still have room to accomodate more data
 		// XXX The note regarding m_elapsed holds here as well.
+#ifndef EXP_KEEPING_RENDERER
 		if (!m_src->end_of_file() && m_event_processor && !m_buffer.buffer_full() && !_clip_end() ) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling m_src->start() again");
 			lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
@@ -490,6 +491,28 @@ ffmpeg_decoder_datasource::data_avail()
 		} else {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
 		}
+#else
+		if (!m_src->end_of_file() && m_event_processor && !m_buffer.buffer_full() ) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling m_src->start() again");
+			lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
+			m_src->start(m_event_processor, e);
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail: not calling start: eof=%d m_ep=0x%x buffull=%d", 
+													(int)m_src->end_of_file(), (void*)m_event_processor, (int)m_buffer.buffer_full());
+		}
+		
+		if ( m_client_callback && (m_buffer.buffer_not_empty() ||  _end_of_file()  ) ) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
+			assert(m_event_processor);
+			if (m_elapsed >= m_src->get_clip_begin()) {
+				m_event_processor->add_event(m_client_callback, 0, ambulant::lib::ep_med);
+				m_client_callback = NULL;
+				m_event_processor = NULL;
+			}
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
+		}		
+#endif//EXP_KEEPING_RENDERER
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No decoder, flushing available data");
 	}
@@ -503,9 +526,10 @@ ffmpeg_decoder_datasource::end_of_file()
 	m_lock.enter();
 	if (_clip_end()) {
 		m_lock.leave();
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::end_of_file(): clip_end reached");
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::end_of_file(): clip_end reached");
 		return true;
 	}
+
 	bool rv = _end_of_file();
 	m_lock.leave();
 	return rv;
