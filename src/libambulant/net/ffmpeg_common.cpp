@@ -345,7 +345,9 @@ ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 	m_lock.enter();
 	// To support demo 5: repeate the previous clipbegin and clipend
 	m_seektime = time;
+#if 0 //xxxbo note: a temporary hard hack for fill="continue", need rethink it later
 	m_seektime_changed = true;
+#endif
 	m_clip_end = clip_end;
 
 	m_lock.leave();

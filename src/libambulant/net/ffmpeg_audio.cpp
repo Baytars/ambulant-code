@@ -589,10 +589,12 @@ ffmpeg_decoder_datasource::seek(timestamp_t time, timestamp_t clip_end)
 	m_lock.enter();
 	int nbytes = m_buffer.size();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek(%d): flushing %d bytes\n", time, nbytes);
+#if 0 //xxxbo note: a temporary hard hack for fill="continue", need rethink it later
 	if (nbytes) {
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);
 	}
+#endif
 	m_src->seek(time, clip_end);
 	m_elapsed = time;
 	m_lock.leave();
