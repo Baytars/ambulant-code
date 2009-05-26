@@ -942,7 +942,7 @@ void time_node::pause_playable(common::pause_display d) {
 
 void time_node::resume_playable() {
 	if(!is_playable() || m_ffwd_mode) return;
-	AM_DBG m_logger->debug("%s[%s].resume()", m_attrs.get_tag().c_str(), 
+	/*AM_DBG*/ m_logger->debug("%s[%s].resume()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_context->resume_playable(m_node);
 }
@@ -1509,6 +1509,7 @@ void time_node::fill(qtime_type timestamp) {
 								m_attrs.get_id().c_str(),  
 								timestamp.as_time_value_down_to(this), timestamp.second(), 
 								timestamp.as_doc_time_value());
+				if(is_playable()) resume_playable();
 			}
 		}
 #endif
