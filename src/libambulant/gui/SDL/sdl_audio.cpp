@@ -426,6 +426,13 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 		}
 		return;
 	}
+#ifdef EXP_KEEPING_RENDERER
+	if (m_audio_src && m_clip_end >0 && m_audio_src->get_elapsed() > m_clip_end) {
+		if (m_context) {
+			m_context->stopped(m_cookie, 0);
+		}
+	}
+#endif
 	m_lock.leave();
 }
 
@@ -433,17 +440,11 @@ bool
 gui::sdl::sdl_audio_renderer::restart_audio_input()
 {
 	// private method - no need to lock.
-#ifndef EXP_KEEPING_RENDERER
 	if (!m_audio_src || m_audio_src->end_of_file() || !m_is_playing) {
 		// No more data.
 		return false;
 	}
-#else
-	if (!m_audio_src || m_audio_src->get_elapsed() > m_clip_end || !m_is_playing) {
-		// No more data.
-		return false;
-	}	
-#endif
+
 	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);

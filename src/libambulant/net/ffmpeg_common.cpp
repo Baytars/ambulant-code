@@ -353,8 +353,9 @@ ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 	m_seektime_changed = true;
 #endif 
 
+#if 0 // 28-05-2009
 	m_clip_end = clip_end;
-
+#endif
 	m_lock.leave();
 }
 #endif//EXP_KEEPING_RENDERER
