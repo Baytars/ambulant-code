@@ -31,3 +31,9 @@ sptest-05
 sptest-06
 	Global time: Same as sptest-01, but now only the media are in 4 parts, the
 	Karaoke is global. Tests what happens to global synchronization.
+
+sptest-07
+	prefetch: the same as sptest-02, but <prefetch> elements have been added.
+	This should allow back-to-back playback to be as good again as for sptest-01,
+	we hope.
+	
