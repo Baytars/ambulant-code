@@ -428,6 +428,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	}
 #ifdef EXP_KEEPING_RENDERER
 	if (m_audio_src && m_clip_end >0 && m_audio_src->get_elapsed() > m_clip_end) {
+		//assert(m_fill_continue);
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -526,8 +527,14 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_node = node;
 	m_cookie = cookie;
 	_init_clip_begin_end();
+	
 	if (m_audio_src) {
-		m_audio_src->seek(m_clip_begin, m_clip_end);	
+		const char * fb = node->get_attribute("fill");
+		//For "fill=continue", we pass -1 to the datasource classes. 
+		if (!strcmp(fb, "continue"))
+			m_audio_src->seek(m_clip_begin, -1);
+		else 
+			m_audio_src->seek(m_clip_begin, m_clip_end);	
 	}
 }
 #endif

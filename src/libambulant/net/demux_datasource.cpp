@@ -175,11 +175,10 @@ demux_audio_datasource::seek(timestamp_t time, timestamp_t clip_end)
 	m_lock.enter();
 	assert(m_thread);
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
-#if 0 //xxxbo note: a temporary hard hack for fill="continue", need rethink it later
-	while (m_queue.size() > 0) {
-		m_queue.pop();
-	}
-#endif
+	if (clip_end != -1)
+		while (m_queue.size() > 0) {
+			m_queue.pop();
+		}
 	m_lock.leave();
 	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
 	// thread trying to deliver new data to this demux_datasource.
