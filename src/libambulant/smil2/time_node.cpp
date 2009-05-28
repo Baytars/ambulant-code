@@ -1497,9 +1497,7 @@ void time_node::fill(qtime_type timestamp) {
 #ifndef EXP_KEEPING_RENDERER
 		if(is_playable()) pause_playable();
 #else
-		if (fb != fill_continue) {
-			if(is_playable()) pause_playable();
-		}
+		if (fb != fill_continue && is_playable()) pause_playable();
 		else {
 			//xxxbo: Instead of pausing the playable, we should continue it for some short period of time.
 			//       Here, I just print some message and actual action needed to be inserted later after I 
@@ -1509,6 +1507,7 @@ void time_node::fill(qtime_type timestamp) {
 								m_attrs.get_id().c_str(),  
 								timestamp.as_time_value_down_to(this), timestamp.second(), 
 								timestamp.as_doc_time_value());
+				//xxxbo: It seems that resume_playble doesn't make any difference
 				if(is_playable()) resume_playable();
 			}
 		}

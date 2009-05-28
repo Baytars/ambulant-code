@@ -124,6 +124,9 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	timestamp_t get_clip_end();
   	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_src->get_start_time(); };
+#ifdef EXP_KEEPING_RENDERER
+	timestamp_t get_elapsed() { return m_elapsed;};
+#endif
 
   protected:
 	bool _select_decoder(const char* file_ext);
