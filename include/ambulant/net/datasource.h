@@ -295,6 +295,9 @@ class audio_datasource_mixin {
 	virtual timestamp_t get_start_time() = 0;
 	/// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
+#ifdef EXP_KEEPING_RENDERER
+	virtual timestamp_t get_elapsed() {};
+#endif
 };
 
 class audio_datasource : public datasource, public audio_datasource_mixin {

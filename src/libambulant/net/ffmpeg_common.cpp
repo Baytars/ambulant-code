@@ -122,7 +122,11 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 :   m_con(con),
 	m_nstream(0),
 	m_clip_begin(clip_begin),
+#ifndef EXP_KEEPING_RENDERER
 	m_clip_end(clip_end),
+#else
+	m_clip_end(-1),
+#endif
 	m_seektime(0),
 	m_seektime_changed(false)
 {
@@ -347,7 +351,8 @@ ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
 	m_seektime = time;
 #if 0 //xxxbo note: a temporary hard hack for fill="continue", need rethink it later
 	m_seektime_changed = true;
-#endif
+#endif 
+
 	m_clip_end = clip_end;
 
 	m_lock.leave();
