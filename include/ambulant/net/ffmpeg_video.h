@@ -95,10 +95,9 @@ class ffmpeg_video_decoder_datasource:
 	void frame_processed_keepdata(timestamp_t timestamp, char *data);
 	void frame_processed(timestamp_t timestamp);
 	void read_ahead(timestamp_t clip_begin);
-#ifndef EXP_KEEPING_RENDERER
 	void seek(timestamp_t time);
-#else
-	void seek(timestamp_t time, timestamp_t clip_end);		
+#ifdef EXP_KEEPING_RENDERER
+	void set_clip_end(timestamp_t clip_end);		
 #endif
     void data_avail();
 	bool buffer_full();

@@ -327,7 +327,6 @@ ffmpeg_demux::read_ahead(timestamp_t time)
 	m_lock.leave();
 }
 
-#ifndef EXP_KEEPING_RENDERER
 void
 ffmpeg_demux::seek(timestamp_t time)
 {
@@ -338,16 +337,13 @@ ffmpeg_demux::seek(timestamp_t time)
     }
 	m_lock.leave();
 }
-#else
+
+#ifdef EXP_KEEPING_RENDERER
 void
-ffmpeg_demux::seek(timestamp_t time, timestamp_t clip_end)
+ffmpeg_demux::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
-	// To support demo 5: repeate the previous clipbegin and clipend
-	m_seektime = time;
-	if (clip_end != -1) {
-		m_seektime_changed = true;
-	}
+	m_seektime_changed = true;
 	m_clip_end = clip_end;
 	m_lock.leave();
 }

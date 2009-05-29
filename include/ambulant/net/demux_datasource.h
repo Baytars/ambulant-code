@@ -92,10 +92,9 @@ class demux_audio_datasource:
 	void start(lib::event_processor *evp, lib::event *callback);
 	void stop();  
 	void read_ahead(timestamp_t clip_begin);
-#ifndef EXP_KEEPING_RENDERER
   	void seek(timestamp_t time);
-#else
-  	void seek(timestamp_t time, timestamp_t clip_end);	
+#ifdef EXP_KEEPING_RENDERER
+  	void set_clip_end(timestamp_t clip_end);	
 #endif
 	bool push_data(timestamp_t pts, const uint8_t *data, int size);
 	bool end_of_file();
@@ -141,10 +140,9 @@ class demux_video_datasource:
     ~demux_video_datasource();
 	void set_pixel_layout(pixel_order l) { assert(l == pixel_unknown); }
 	void read_ahead(timestamp_t clip_begin);
-#ifndef EXP_KEEPING_RENDERER
 	void seek(timestamp_t time);
-#else
-	void seek(timestamp_t time, timestamp_t clip_end);
+#ifdef EXP_KEEPING_RENDERER
+	void set_clip_end(timestamp_t clip_end);
 #endif
 	void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
 	void stop();  

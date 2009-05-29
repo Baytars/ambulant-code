@@ -280,10 +280,11 @@ class audio_datasource_mixin {
 	virtual void read_ahead(timestamp_t time) = 0;
 	/// Tells the datasource to seek to a specific time. Not guaranteed
 	/// to work.
-#ifndef EXP_KEEPING_RENDERER
 	virtual void seek(timestamp_t time) = 0;
-#else
-	virtual void seek(timestamp_t time, timestamp_t clip_end) = 0;	
+
+#ifdef EXP_KEEPING_RENDERER
+    /// Set end-of-clip (which works like end of file), or -1 for real end of file.
+	virtual void set_clip_end(timestamp_t clip_end) = 0;	
 #endif
 	/// At what timestamp value should the audio playback stop?
 	virtual timestamp_t get_clip_end() = 0;
@@ -296,7 +297,7 @@ class audio_datasource_mixin {
 	/// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
 #ifdef EXP_KEEPING_RENDERER
-	virtual timestamp_t get_elapsed() {};
+	virtual timestamp_t get_elapsed() { assert(0); };
 #endif
 };
 
@@ -326,10 +327,9 @@ class raw_audio_datasource:
     void start(lib::event_processor *evp, lib::event *callback) { m_src->start(evp,callback); };
 	void stop() { m_src->stop(); };  
 	void read_ahead(timestamp_t time){};
-#ifndef EXP_KEEPING_RENDERER
   	void seek(timestamp_t time){};
-#else
-	void seek(timestamp_t time, timestamp_t clip_end){};
+#ifdef EXP_KEEPING_RENDERER
+	void set_clip_end(timestamp_t clip_end){};
 #endif
     void readdone(int len) { m_src->readdone(len); };
     bool end_of_file() { return m_src->end_of_file(); };
@@ -407,11 +407,13 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	
 	/// Tells the datasource to start reading data starting from time t.
 	virtual void read_ahead(timestamp_t time) = 0;
+
 	/// Fast forward (or reverse) to a specific place in time.
-#ifndef EXP_KEEPING_RENDERER
 	virtual void seek(timestamp_t time) = 0;
-#else
-	virtual void seek(timestamp_t time, timestamp_t clip_end) = 0;
+    
+#ifdef EXP_KEEPING_RENDERER
+    /// Set end-of-clip (which works like end of file), or -1 for real end of file.
+	virtual void set_clip_end(timestamp_t clip_end) = 0;
 #endif
 	/// At what timestamp value should the video playback stop?
 	virtual timestamp_t get_clip_end() = 0;
@@ -655,10 +657,11 @@ class abstract_demux : public BASE_THREAD, public lib::ref_counted_obj {
 	
 	/// Seek to the given location, if possible. As timestamps are
 	/// provided to the sinks this call may be implemented as no-op.
-#ifndef EXP_KEEPING_RENDERER
 	virtual void seek(timestamp_t time) = 0;
-#else
-	virtual void seek(timestamp_t time, timestamp_t clip_end) = 0;	
+
+#ifdef EXP_KEEPING_RENDERER
+    /// Set end-of-clip (which works like end of file), or -1 for real end of file.
+	virtual void set_clip_end(timestamp_t clip_end) = 0;	
 #endif
 
 	/// Seek to the given location, if possible. Only allowed before the

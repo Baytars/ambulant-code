@@ -39,6 +39,14 @@ lib::unix::unix_timer::set_speed(double speed)
 	lib::logger::get_logger()->fatal("unix_timer: cannot set speed of realtime timer");
 }
 
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+void
+lib::unix::unix_timer::skew(signed_time_type skew)
+{
+    assert(skew == 0);
+}
+#endif
+
 lib::unix::unix_timer::time_type
 lib::unix::unix_timer::os_millitime()
 {

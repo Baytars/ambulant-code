@@ -153,7 +153,6 @@ demux_audio_datasource::start(ambulant::lib::event_processor *evp, ambulant::lib
 	m_lock.leave();
 }
 
-#ifndef EXP_KEEPING_RENDERER
 void 
 demux_audio_datasource::seek(timestamp_t time)
 {
@@ -168,21 +167,15 @@ demux_audio_datasource::seek(timestamp_t time)
 	// thread trying to deliver new data to this demux_datasource.
 	m_thread->seek(time);
 }
-#else
+
+#ifdef EXP_KEEPING_RENDERER
 void 
-demux_audio_datasource::seek(timestamp_t time, timestamp_t clip_end)
+demux_audio_datasource::set_clip_end(timestamp_t clip_end)
 {
-	m_lock.enter();
 	assert(m_thread);
-	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
-	if (clip_end != -1)
-		while (m_queue.size() > 0) {
-			m_queue.pop();
-		}
-	m_lock.leave();
 	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
 	// thread trying to deliver new data to this demux_datasource.
-	m_thread->seek(time, clip_end);
+	m_thread->set_clip_end(clip_end);
 }
 #endif
 
@@ -415,7 +408,6 @@ demux_video_datasource::read_ahead(timestamp_t time)
 	m_lock.leave();
 }
 
-#ifndef EXP_KEEPING_RENDERER
 void 
 demux_video_datasource::seek(timestamp_t time)
 {
@@ -443,34 +435,13 @@ demux_video_datasource::seek(timestamp_t time)
 #endif
 	m_thread->seek(time);
 }
-#else
+
+#ifdef EXP_KEEPING_RENDERER
 void 
-demux_video_datasource::seek(timestamp_t time, timestamp_t clip_end)
+demux_video_datasource::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::seek: (this = 0x%x), time=%d", (void*) this, time);
-	assert(m_thread);
-	
-	if (clip_end != -1)
-		while (m_frames.size() > 0) {
-			// flush frame queue
-			ts_frame_pair element = m_frames.front();
-			if (element.second.data) {
-				free (element.second.data);
-				element.second.data = NULL;
-			}
-			m_frames.pop();
-		}
-	
-	m_lock.leave();
-	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the
-	// thread trying to deliver new data to this demux_datasource.
-#if 1
-	// XXXJACK untested code, but Jack thinks it's needed; if we seek we must reset
-	// any previous end-of-file condition.
-	m_src_end_of_file = false;
-#endif
-	m_thread->seek(time, clip_end);
+	m_thread->set_clip_end(clip_end);
 }
 #endif
 

@@ -567,7 +567,6 @@ ffmpeg_decoder_datasource::read_ahead(timestamp_t clip_begin)
 	m_lock.leave();
 } 
 
-#ifndef EXP_KEEPING_RENDERER
 void 
 ffmpeg_decoder_datasource::seek(timestamp_t time)
 {
@@ -579,24 +578,16 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 		m_buffer.readdone(nbytes);
 	}
 	m_src->seek(time);
+    /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek: set elapsed from %ld to %ld", m_elapsed, time);
 	m_elapsed = time;
 	m_lock.leave();
 } 
-#else
+
+#ifdef EXP_KEEPING_RENDERER
 void 
-ffmpeg_decoder_datasource::seek(timestamp_t time, timestamp_t clip_end)
+ffmpeg_decoder_datasource::set_clip_end(timestamp_t clip_end)
 {
-	m_lock.enter();
-	int nbytes = m_buffer.size();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek(%d): flushing %d bytes\n", time, nbytes);
-	if (clip_end != -1) 
-		if (nbytes) {
-			(void)m_buffer.get_read_ptr();
-			m_buffer.readdone(nbytes);
-		}
-	m_src->seek(time, clip_end);
-	m_elapsed = time;
-	m_lock.leave();
+	m_src->set_clip_end(clip_end);
 } 
 #endif
 
@@ -658,6 +649,15 @@ ffmpeg_decoder_datasource::get_clip_begin()
 	m_lock.leave();
 	return clip_begin;
 }
+
+#ifdef EXP_KEEPING_RENDERER
+timestamp_t
+ffmpeg_decoder_datasource::get_elapsed()
+{
+    long long buftime = 1000000LL * (m_buffer.size() * 8) / (m_fmt.samplerate* m_fmt.channels * m_fmt.bits);
+    return m_elapsed - (timestamp_t)buftime;
+}
+#endif
 
 bool 
 ffmpeg_decoder_datasource::_select_decoder(const char* file_ext)
@@ -1002,7 +1002,6 @@ ffmpeg_resample_datasource::read_ahead(timestamp_t clip_begin)
 	m_lock.leave();
 } 
 
-#ifndef EXP_KEEPING_RENDERER
 void 
 ffmpeg_resample_datasource::seek(timestamp_t time)
 {
@@ -1015,17 +1014,13 @@ ffmpeg_resample_datasource::seek(timestamp_t time)
 	m_src->seek(time);
 	m_lock.leave();
 } 
-#else
+
+#ifdef EXP_KEEPING_RENDERER
 void 
-ffmpeg_resample_datasource::seek(timestamp_t time, timestamp_t clip_end)
+ffmpeg_resample_datasource::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
-	int nbytes = m_buffer.size();
-	if (nbytes) {
-		(void)m_buffer.get_read_ptr();
-		m_buffer.readdone(nbytes);
-	}
-	m_src->seek(time, clip_end);
+	m_src->set_clip_end(clip_end);
 	m_lock.leave();
 } 
 #endif
