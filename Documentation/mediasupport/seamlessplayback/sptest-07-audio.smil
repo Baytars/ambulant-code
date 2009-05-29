@@ -55,7 +55,7 @@ Al<tev next="0.25s"/>le <tev next="0.25s"/>klok<tev next="0.25s"/>ken <tev next=
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom,<tev next="0.5s"/><tev next="0.5s"/>
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom!<tev next="0.5s"/><tev next="0.5s"/>
 </smilText>
-<audio xml:id="media-04" src="media-video-copy.mp3" region="left" clipBegin="12s"/>
+<audio xml:id="media-04" src="media-audio-copy.mp3" region="left" clipBegin="12s"/>
 </par>
 </seq>
 </par>
