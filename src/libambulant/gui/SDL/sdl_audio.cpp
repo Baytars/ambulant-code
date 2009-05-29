@@ -338,7 +338,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 	if (m_is_paused||!m_audio_src) { 
 		rv = 0;
 		m_read_ptr_called = false;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio source paused, or no audio source");
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio source paused, or no audio source");
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: m_audio_src->get_read_ptr(), m_audio_src=0x%x, this=0x%x", (void*) m_audio_src, (void*) this);
 		m_read_ptr_called = true;
@@ -347,7 +347,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (rv) assert(*ptr);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: time=%d, wanted %d bytes, returning %d bytes", m_event_processor->get_timer()->elapsed(), bytes_wanted, rv);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: time=%d, wanted %d bytes, returning %d bytes", m_event_processor->get_timer()->elapsed(), bytes_wanted, rv);
 		// Also set volume(s)
 		m_volcount = 0;
 		if (m_dest) {
@@ -430,7 +430,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	if (m_audio_src && m_clip_end >0 && m_audio_src->get_elapsed() > m_clip_end) {
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
-		assert(fb && !strcmp(fb, "continue"));
+		//assert(fb && !strcmp(fb, "continue"));
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -633,7 +633,15 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 #ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000));
 #else
-	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+	//if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+	if (m_audio_src) {
+		const char * fb = m_node->get_attribute("fill");
+		//For "fill=continue", we pass -1 to the datasource classes. 
+		if (fb != NULL && !strcmp(fb, "continue"))
+			m_audio_src->seek((net::timestamp_t)(where*1000000), -1);
+		else
+			m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+	}
 #endif
 	// XXXJACK: Should restart SDL
 	m_lock.leave();
