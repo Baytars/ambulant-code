@@ -430,7 +430,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	if (m_audio_src && m_clip_end >0 && m_audio_src->get_elapsed() > m_clip_end) {
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
-		assert(!strcmp(fb, "continue"));
+		assert(fb && !strcmp(fb, "continue"));
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
