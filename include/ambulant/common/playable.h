@@ -284,7 +284,11 @@ class single_playable_factory : public playable_factory {
 	bool supports(renderer_select *rs)
 	{
 		const lib::xml_string& tag = rs->get_tag();
+#ifndef EXP_KEEPING_RENDERER
 		if (tag != "" && tag != "ref" && tag != Tag) return false;
+#else
+		if (tag != "" && tag != "ref" && tag != Tag && tag != "prefetch") return false;
+#endif
 		const char *renderer_uri = rs->get_renderer_uri();
 		if (renderer_uri != NULL && 
             strcmp(renderer_uri, "") != 0 &&

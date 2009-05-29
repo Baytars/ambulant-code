@@ -51,7 +51,11 @@ bool
 sdl_renderer_factory::supports(common::renderer_select *rs)
 {
 	const lib::xml_string& tag = rs->get_tag();
+#ifndef EXP_KEEPING_RENDERER
 	if (tag != "" && tag != "ref" && tag != "audio") return false;
+#else
+	if (tag != "" && tag != "ref" && tag != "audio" && tag != "prefetch") return false;
+#endif
 	const char *renderer_uri = rs->get_renderer_uri();
 	if (renderer_uri != NULL && 
 		strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererSdl")) != 0 &&
