@@ -344,9 +344,9 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		const char * fb = n->get_attribute("fill");
 		if (fb == NULL || strcmp(fb, "continue"))
 			np->stop_but_keeping_renderer();
-		//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
-		np->update_context_info(n, n->get_numid());
 	}	
+	//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
+	np->update_context_info(n, n->get_numid());
 #endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
