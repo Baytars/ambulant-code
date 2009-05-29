@@ -533,7 +533,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	if (m_audio_src) {
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (!strcmp(fb, "continue"))
+		if (fb != NULL && !strcmp(fb, "continue"))
 			m_audio_src->seek(m_clip_begin, -1);
 		else 
 			m_audio_src->seek(m_clip_begin, m_clip_end);	
