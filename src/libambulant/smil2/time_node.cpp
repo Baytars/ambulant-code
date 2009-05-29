@@ -1508,7 +1508,7 @@ void time_node::fill(qtime_type timestamp) {
 								timestamp.as_time_value_down_to(this), timestamp.second(), 
 								timestamp.as_doc_time_value());
 				//xxxbo: It seems that resume_playble doesn't make any difference
-				if(is_playable()) resume_playable();
+				//if(is_playable()) resume_playable();
 			}
 		}
 #endif
