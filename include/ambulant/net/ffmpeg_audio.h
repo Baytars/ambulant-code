@@ -111,10 +111,9 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	bool end_of_file();
 	bool buffer_full();
 	void read_ahead(timestamp_t clip_begin);
-#ifndef EXP_KEEPING_RENDERER
 	void seek(timestamp_t time);
-#else
-	void seek(timestamp_t time, timestamp_t clip_end);	
+#ifdef EXP_KEEPING_RENDERER
+	void set_clip_end(timestamp_t clip_end);	
 #endif
 
 	char* get_read_ptr();
@@ -125,7 +124,7 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
   	timestamp_t get_clip_begin();
   	timestamp_t get_start_time() { return m_src->get_start_time(); };
 #ifdef EXP_KEEPING_RENDERER
-	timestamp_t get_elapsed() { return m_elapsed;};
+	timestamp_t get_elapsed();
 #endif
 
   protected:
@@ -160,10 +159,9 @@ class ffmpeg_resample_datasource: virtual public audio_datasource, virtual publi
 	void start(lib::event_processor *evp, lib::event *callback);  
 	void stop();  
 	void read_ahead(timestamp_t time);
-#ifndef EXP_KEEPING_RENDERER
 	void seek(timestamp_t time);
-#else
-	void seek(timestamp_t time, timestamp_t clip_end);	
+#ifdef EXP_KEEPING_RENDERER
+	void set_clip_end(timestamp_t clip_end);	
 #endif
 	void readdone(int len);
 	void data_avail();

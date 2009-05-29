@@ -108,7 +108,14 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 {
 	m_node = node;
 	m_cookie = cookie;
-	_init_clip_begin_end();                                                                                                
+    net::timestamp_t old_clip_end = m_clip_end;
+	_init_clip_begin_end();
+    
+#if 1
+    // XXXJACK: new, experimental code by jack.
+    if (m_clip_begin != old_clip_end)
+        seek(m_clip_begin/1000);
+#else
 	//seek(m_clip_begin/1000);
 	//m_src->seek(m_clip_begin, m_clip_end);
 
@@ -116,7 +123,7 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 		seek(m_clip_begin/1000);
 	}
 	m_previous_clip_end = m_clip_end;
-
+#endif
 
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
@@ -147,10 +154,13 @@ video_renderer::start (double where)
 	}
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
+#if 0
+    // XXXJACK: removed this code, I think it is not needed.
 #ifndef EXP_KEEPING_RENDERER
 	if (where) m_src->seek((net::timestamp_t)(where*1000000));
 #else
 	if (where) m_src->seek((net::timestamp_t)(where*1000000), m_clip_end);
+#endif
 #endif
 	m_activated = true;
 
@@ -259,19 +269,22 @@ video_renderer::seek(double t)
 	long int delta = t_ms - m_timer->elapsed();  // Positive delta: move forward in time
 	m_epoch -= delta;	// Which means the epoch moves back in time
 #endif
-#ifndef EXP_KEEPING_RENDERER
 	if (m_src) m_src->seek(t_ms);
-#else
+#if 0
+    // XXXJACK: removed this code, I think it is not needed.
+#ifndef EXP_KEEPING_RENDERER
 	//if (m_src) m_src->seek(t_ms, m_clip_end);
 	if (m_src) {
-		const char * fb = m_node->get_attribute("fill");
+        m_src->seek(t_ms, m_clip_begin); // xxxjack: wrong! Only if != prev clipend!!!
 		//For "fill=continue", we pass -1 to the datasource classes. 
+		const char * fb = m_node->get_attribute("fill");
 		if (fb != NULL && !strcmp(fb, "continue"))
-			m_src->seek(t_ms, -1);
+			m_src->set_clip_end(-1);
 		else
-			m_src->seek(t_ms, m_clip_end);
+			m_src->set_clip_end(m_clip_end);
 	}
 	m_last_frame_timestamp = -1;
+#endif
 #endif
 	if (m_audio_renderer) m_audio_renderer->seek(t);
 }

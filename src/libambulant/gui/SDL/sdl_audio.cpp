@@ -131,7 +131,7 @@ void
 gui::sdl::sdl_audio_renderer::register_renderer(sdl_audio_renderer *rnd)
 {
 	s_static_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::register_renderer(0x%x)", rnd);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::register_renderer(0x%x)", rnd);
 	std::list<sdl_audio_renderer *>::iterator i;
 	for( i=s_renderers.begin(); i != s_renderers.end(); i++) {
 		if ((*i) == rnd) {
@@ -150,7 +150,7 @@ void
 gui::sdl::sdl_audio_renderer::unregister_renderer(sdl_audio_renderer *rnd)
 {
 	s_static_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::unregister_renderer(0x%x)", rnd);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::unregister_renderer(0x%x)", rnd);
 	std::list<sdl_audio_renderer *>::iterator i;
 	for( i=s_renderers.begin(); i != s_renderers.end(); i++) {
 		if ((*i) == rnd) {
@@ -227,6 +227,9 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	m_intransition(NULL),
 	m_outtransition(NULL),
 	m_transition_engine(NULL)
+#ifdef AMBULANT_INSTRUMENT_AUDIO_DRIFT
+    , m_audio_clock(0)
+#endif
 {
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_audio_renderer() -> 0x%x",  this);
 	if (init() != 0)
@@ -237,7 +240,17 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	
 	_init_clip_begin_end();
 	
-	m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
+#ifndef EXP_KEEPING_RENDERER
+    m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
+#else
+    const char * fb = m_node->get_attribute("fill");
+    //For "fill=continue", we pass -1 to the datasource classes. 
+    if (fb != NULL && !strcmp(fb, "continue")) {
+        m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, -1);
+    } else {
+        m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
+    }
+#endif
 	if (!m_audio_src)
 		lib::logger::get_logger()->error(gettext("%s: cannot open audio file"), url.get_url().c_str());
 	else if (!supported.contains(m_audio_src->get_audio_format())) {
@@ -262,6 +275,9 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	m_intransition(NULL),
 	m_outtransition(NULL),
 	m_transition_engine(NULL)
+#ifdef AMBULANT_INSTRUMENT_AUDIO_DRIFT
+    , m_audio_clock(0)
+#endif
 {
 	net::audio_format_choices supported(s_ambulant_format);
 	net::url url = node->get_url("src");
@@ -340,6 +356,41 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		m_read_ptr_called = false;
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio source paused, or no audio source");
 	} else {
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+        if (m_audio_clock == 0) {
+            // Set the initial value for the audio clock
+            m_audio_clock = m_event_processor->get_timer()->elapsed();
+        }
+        // Check how far the audio and system clock are apart. Positive numbers mean the audio
+        // clock is ahead of the system clock.
+        lib::timer::signed_time_type clock_drift = m_audio_clock - m_event_processor->get_timer()->elapsed();
+        
+        // If the clocks are too far apart we assume something fishy is going on, and we resync the audio clock.
+        if (clock_drift < -10000 || clock_drift > 10000) {
+            lib::logger::get_logger()->trace("sdl_audio_renderer: audio clock %d ms ahead. Resync.", clock_drift);
+            m_audio_clock -= clock_drift;
+            clock_drift = 0;
+        }
+        
+        // If the audio clock is 1 tick behind we assume it's a result of the rounding error (below)
+        // and adjust.
+        if (clock_drift == -1) {
+            m_audio_clock += 1;
+            clock_drift = 0;
+        }
+        // Now communicate it to the clock.
+        { // if (clock_drift < -20 || clock_drift > 20) {
+            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            // We communicate the drift to the clock. The clock will return true if it will take
+            // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
+            lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
+            // XXX For now, assume residual_clock_drift always zero.
+        }
+        // Update the audio clock
+        lib::timer::time_type delta = (bytes_wanted * 1000) / (44100*2*2); // Warning: rounding error possible
+        m_audio_clock += delta;
+#endif
+
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: m_audio_src->get_read_ptr(), m_audio_src=0x%x, this=0x%x", (void*) m_audio_src, (void*) this);
 		m_read_ptr_called = true;
 		rv = m_audio_src->size();
@@ -427,10 +478,14 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 		return;
 	}
 #ifdef EXP_KEEPING_RENDERER
-	if (m_audio_src && m_clip_end >0 && m_audio_src->get_elapsed() > m_clip_end) {
+    static long xxxtotsize;
+    xxxtotsize += size;
+    net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
+	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
+        /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
-		//assert(fb && !strcmp(fb, "continue"));
+		assert(fb && !strcmp(fb, "continue"));
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -509,7 +564,7 @@ void
 gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
 		m_lock.leave();
 		unregister_renderer(this);
@@ -528,15 +583,17 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 {
 	m_node = node;
 	m_cookie = cookie;
+    net::timestamp_t old_clip_end = m_clip_end;
 	_init_clip_begin_end();
 	
 	if (m_audio_src) {
+        if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
-			m_audio_src->seek(m_clip_begin, -1);
+			m_audio_src->set_clip_end(-1);
 		else 
-			m_audio_src->seek(m_clip_begin, m_clip_end);	
+			m_audio_src->set_clip_end(m_clip_end);	
 	}
 }
 #endif
@@ -595,20 +652,23 @@ gui::sdl::sdl_audio_renderer::start(double where)
 #endif
     if (!m_node) abort();
 		
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x, %s, where=%f)", 
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x, %s, where=%f)", 
 		(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
 	
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
+#if 0
+        // XXXJACK: Removed this code, I think it is not needed.
 #ifndef EXP_KEEPING_RENDERER
 		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000));
 #else
 		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);		
 		//m_audio_src->seek(m_clip_begin, m_clip_end);	
 #endif
+#endif
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::start(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
 		m_audio_src->start(m_event_processor, e);
 		m_is_playing = true;
 		m_is_paused = false;
@@ -619,7 +679,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 			m_transition_engine->init(m_event_processor, false, m_intransition);
 		}
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer.start: no datasource");
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start: no datasource");
 		m_lock.leave();
 		m_context->stopped(m_cookie, 0);
 	}
@@ -630,9 +690,10 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
-#ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000));
-#else
+#if 0
+    // XXXJACK: Removed this code, I think it is not needed.
+#ifndef EXP_KEEPING_RENDERER
 	//if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
 	if (m_audio_src) {
 		const char * fb = m_node->get_attribute("fill");
@@ -644,6 +705,7 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 	}
 #endif
 	// XXXJACK: Should restart SDL
+#endif
 	m_lock.leave();
 }
 
