@@ -886,9 +886,9 @@ bool time_node::is_statecommand() const {
 // Returns true when this node is a prefetch 
 bool time_node::is_prefetch() const {
 	const common::schema *sch = common::schema::get_instance();
-	AM_DBG lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
+	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
 	const lib::xml_string& qn = m_node->get_local_name();
-	AM_DBG lib::logger::get_logger()->debug("is_prefetch: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
+	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
 	return sch->is_prefetch(qn);
 }
 #endif // EXP_KEEPING_RENDERER

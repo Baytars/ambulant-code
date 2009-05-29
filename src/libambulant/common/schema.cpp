@@ -116,6 +116,15 @@ schema::schema() {
 		m_statecommands.insert(statecommand_elements[i]);
 	}
 #endif // WITH_SMIL30
+	
+#ifdef EXP_KEEPING_RENDERER
+	n = sizeof(prefetch_elements)/sizeof(const char *);
+	for(i =0;i<n;i++) {
+		m_time_elements.insert(prefetch_elements[i]);
+		m_prefetch.insert(prefetch_elements[i]);
+	}
+	
+#endif // EXP_KEEPING_RENDERER
 		
 	n = sizeof(layout_elements)/sizeof(const char *);
 	for(i=0; i<n; i++) {

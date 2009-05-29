@@ -262,7 +262,15 @@ video_renderer::seek(double t)
 #ifndef EXP_KEEPING_RENDERER
 	if (m_src) m_src->seek(t_ms);
 #else
-	if (m_src) m_src->seek(t_ms, m_clip_end);
+	//if (m_src) m_src->seek(t_ms, m_clip_end);
+	if (m_src) {
+		const char * fb = m_node->get_attribute("fill");
+		//For "fill=continue", we pass -1 to the datasource classes. 
+		if (fb != NULL && !strcmp(fb, "continue"))
+			m_src->seek(t_ms, -1);
+		else
+			m_src->seek(t_ms, m_clip_end);
+	}
 	m_last_frame_timestamp = -1;
 #endif
 	if (m_audio_renderer) m_audio_renderer->seek(t);

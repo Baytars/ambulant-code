@@ -451,15 +451,16 @@ demux_video_datasource::seek(timestamp_t time, timestamp_t clip_end)
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::seek: (this = 0x%x), time=%d", (void*) this, time);
 	assert(m_thread);
 	
-	while (m_frames.size() > 0) {
-		// flush frame queue
-		ts_frame_pair element = m_frames.front();
-		if (element.second.data) {
-			free (element.second.data);
-			element.second.data = NULL;
+	if (clip_end != -1)
+		while (m_frames.size() > 0) {
+			// flush frame queue
+			ts_frame_pair element = m_frames.front();
+			if (element.second.data) {
+				free (element.second.data);
+				element.second.data = NULL;
+			}
+			m_frames.pop();
 		}
-		m_frames.pop();
-	}
 	
 	m_lock.leave();
 	// NOTE: the seek is outside the lock, otherwise there's a deadlock with the

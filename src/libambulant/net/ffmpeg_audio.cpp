@@ -526,7 +526,7 @@ ffmpeg_decoder_datasource::end_of_file()
 	m_lock.enter();
 	if (_clip_end()) {
 		m_lock.leave();
-		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::end_of_file(): clip_end reached");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::end_of_file(): clip_end reached");
 		return true;
 	}
 
