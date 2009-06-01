@@ -92,11 +92,18 @@ video_renderer::video_renderer(
 }
 
 video_renderer::~video_renderer() {
+#if 0
+    // Jack removed the call to stop(): things may be falling apart already. 
+    // And calling stop() serves no more purpose, really.
 	// m_audio_ds released by audio renderer
 	stop(); // releases m_src, m_audio_renderer (in most cases)
+#endif
 	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
+    if (m_dest) m_dest->renderer_done(this);
+    m_dest = NULL;
 	if (m_audio_renderer) m_audio_renderer->release();
+    m_audio_renderer = NULL;
 	if (m_src) m_src->release();
 	m_src = NULL;
 	m_lock.leave();
@@ -111,23 +118,20 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
     net::timestamp_t old_clip_end = m_clip_end;
 	_init_clip_begin_end();
     
-#if 1
-    // XXXJACK: new, experimental code by jack.
-    if (m_clip_begin != old_clip_end)
-        seek(m_clip_begin/1000);
-#else
-	//seek(m_clip_begin/1000);
-	//m_src->seek(m_clip_begin, m_clip_end);
-
-	if (m_clip_begin < m_previous_clip_end) {
-		seek(m_clip_begin/1000);
-	}
-	m_previous_clip_end = m_clip_end;
-#endif
+    // Assumption in the following code (by Jack): if we have an audio renderer
+    // then the streams are multiplexed, and we should seek only a single stream.
+    // We let the audio handler do the seeking, as the video handler can
+    // much more easily skip frames, etc.
 
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
-	}
+	} else {
+        if (m_clip_begin != old_clip_end) {
+            seek(m_clip_begin/1000);
+        }
+    }
+	m_previous_clip_end = m_clip_end;
+
 }
 #endif
 
@@ -208,6 +212,7 @@ video_renderer::stop_but_keeping_renderer()
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 	m_context->stopped(m_cookie, 0);
 	m_activated = false;
+    // XXXJACK: I don't trust this code. I am pretty sure that we should also call stop_but_keeping_renderer() in the audio renderer.
 //	if (m_dest) {
 //		m_dest->renderer_done(this);
 //		m_dest = NULL;
@@ -232,10 +237,12 @@ video_renderer::stop()
 		m_lock.leave();
 		return;
 	}
+    // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 	m_context->stopped(m_cookie, 0);
 	m_activated = false;
 	if (m_dest) {
 #ifdef EXP_KEEPING_RENDERER
+        // XXXJACK: I'm not happy with releasing the lock here. Is there a good reason for it??
 		m_lock.leave();
 #endif
 		m_dest->renderer_done(this);
@@ -399,6 +406,7 @@ video_renderer::data_avail()
 			m_src = NULL;
 		}
 		m_lock.leave();
+        // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 		m_context->stopped(m_cookie, 0);
 		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
@@ -418,6 +426,7 @@ video_renderer::data_avail()
 		const char * fb = m_node->get_attribute("fill");
 		if (fb == NULL || strcmp(fb, "continue"))
 			m_lock.leave();
+        // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 		m_context->stopped(m_cookie, 0);
 		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",

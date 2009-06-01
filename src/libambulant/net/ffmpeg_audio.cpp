@@ -572,13 +572,12 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	int nbytes = m_buffer.size();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek(%d): flushing %d bytes\n", time, nbytes);
+    AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
 	if (nbytes) {
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);
 	}
 	m_src->seek(time);
-    /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::seek: set elapsed from %ld to %ld", m_elapsed, time);
 	m_elapsed = time;
 	m_lock.leave();
 } 
@@ -1007,6 +1006,7 @@ ffmpeg_resample_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	int nbytes = m_buffer.size();
+    AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource(0x%x)::seek(%ld), discard %d bytes", (void*)this, (long)time, nbytes);
 	if (nbytes) {
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);

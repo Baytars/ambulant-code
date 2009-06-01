@@ -332,6 +332,7 @@ ffmpeg_demux::seek(timestamp_t time)
 {
 	m_lock.enter();
     if (m_seektime != time) {
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::seek(%ld): was %ld", time, m_seektime);
         m_seektime = time;
         m_seektime_changed = true;
     }
@@ -339,11 +340,12 @@ ffmpeg_demux::seek(timestamp_t time)
 }
 
 #ifdef EXP_KEEPING_RENDERER
+
 void
 ffmpeg_demux::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
-	m_seektime_changed = true;
+	// Note, we only set m_seektime changed if we change the *current* position, not the end position.
 	m_clip_end = clip_end;
 	m_lock.leave();
 }
@@ -401,11 +403,11 @@ ffmpeg_demux::run()
 #ifdef EXP_KEEPING_RENDERER
 			eof_sent_to_clients = false;
 #endif
-			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
 			int64_t seektime = m_clip_begin+m_seektime;
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
-                AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek", m_con->start_time);
+                AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek for ffmpeg start_time", m_con->start_time);
             }
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
 			int seek_streamnr = -1;
@@ -460,7 +462,7 @@ ffmpeg_demux::run()
 		assert(pkt->stream_index >= 0 && pkt->stream_index < MAX_STREAMS);
 		demux_datasink *sink = m_sinks[pkt->stream_index];
 		if (sink == NULL) {
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: Drop data for stream %d (%lld, %lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
 		} else {
 			AM_DBG lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink (stream %d) (%lld, %lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
 			if (sink && !exit_requested()) {
@@ -531,7 +533,7 @@ ffmpeg_demux::run()
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: freeing pkt (number %d)",pkt_nr);
 		av_free_packet(pkt);
 	}
-	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: final push_data(0, 0)");
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: final push_data(0, 0)");
 	int i;
 	m_lock.leave();
 	for (i=0; i<MAX_STREAMS; i++)

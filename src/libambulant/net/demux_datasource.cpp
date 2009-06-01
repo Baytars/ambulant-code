@@ -88,7 +88,8 @@ demux_audio_datasource::demux_audio_datasource(const net::url& url, abstract_dem
 	m_src_end_of_file(false),
 	m_event_processor(NULL),
 	m_thread(thread),
-	m_client_callback(NULL)
+	m_client_callback(NULL),
+    m_current_seek_position(0)
 {	
 	//AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::demux_audio_datasource: rate=%d, channels=%d", context->streams[m_stream_index]->codec.sample_rate, context->streams[m_stream_index]->codec.channels);
 	// XXX ignoring the codec for now but i'll have to look into this real soon
@@ -158,6 +159,10 @@ demux_audio_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	assert(m_thread);
+    if (time == m_current_seek_position) {
+        m_lock.leave();
+        return;
+    }
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
 	while (m_queue.size() > 0) {
 		m_queue.pop();
@@ -258,6 +263,7 @@ demux_audio_datasource::get_ts_packet_t()
 {
 	ts_packet_t tsp(0,NULL,0);
 	m_lock.enter();
+    m_current_seek_position = -1;   // We no longer know our seek position.
 	if (m_queue.size() > 0) {
 		tsp = m_queue.front();
 		m_queue.pop();
@@ -344,6 +350,7 @@ demux_video_datasource::demux_video_datasource(const net::url& url, abstract_dem
 	m_thread(thread),
 	m_client_callback(NULL),
 	m_audio_src(NULL),
+    m_current_seek_position(0),
 	m_frame_nr(0)
 {
 	assert(m_thread);
@@ -388,6 +395,7 @@ demux_video_datasource::stop()
 		}
 		m_frames.pop();
 	}
+    m_current_seek_position = -1;
 	m_src_end_of_file = true;
 	m_lock.leave();
 	
@@ -412,6 +420,10 @@ void
 demux_video_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    if (time == m_current_seek_position) {
+        m_lock.leave();
+        return;
+    }
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::seek: (this = 0x%x), time=%d", (void*) this, time);
 	assert(m_thread);
 
@@ -543,6 +555,7 @@ demux_video_datasource::frame_processed(timestamp_t pts)
 	m_lock.leave();
 }
 
+#if 0
 void
 write_data(long long int frame_nr, char* data, int sz)
 {
@@ -555,6 +568,7 @@ write_data(long long int frame_nr, char* data, int sz)
 		fclose(out);
 	}
 }
+#endif
 
 
 bool 
@@ -603,7 +617,7 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 		}
 	}		
 	m_lock.leave();
-	return true;;
+	return true;
 }
 
 
@@ -673,6 +687,7 @@ demux_video_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *
 		m_lock.leave();
 		return NULL;
 	}
+    m_current_seek_position = -1;   // We no longer know our position
 	ts_frame_pair frame = m_frames.front();
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_frame(): ts=%lld 0x%x %d", frame.first, frame.second.data, frame.second.size);
 	char *rv = (char*) frame.second.data;
