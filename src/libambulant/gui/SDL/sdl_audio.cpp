@@ -281,7 +281,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 {
 	net::audio_format_choices supported(s_ambulant_format);
 	net::url url = node->get_url("src");
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_audio_renderer() this=(x%x), ds = 0x%x",  (void*) this, (void*) ds);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_audio_renderer(%s) this=0x%x, ds = 0x%x", node->get_sig().c_str(), (void*) this, (void*) ds);
 	if (init() != 0)
 		return;
 		
@@ -357,6 +357,11 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio source paused, or no audio source");
 	} else {
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
+        // XXXJACK Note that the following code is incorrect: we assume that the time samples arrive here (from
+        // our audio datasource) they are immedeately played out. We should probably add a slight delay, because
+        // the samples will take some time to traverse SDL, and then the audio hardware. If ever we see a systematic
+        // error, with audio lagging behind video for a fixed amount of time, we need to adjust this.
+         
         if (m_audio_clock == 0) {
             // Set the initial value for the audio clock
             m_audio_clock = m_event_processor->get_timer()->elapsed();
@@ -366,7 +371,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         lib::timer::signed_time_type clock_drift = m_audio_clock - m_event_processor->get_timer()->elapsed();
         
         // If the clocks are too far apart we assume something fishy is going on, and we resync the audio clock.
-        if (clock_drift < -10000 || clock_drift > 10000) {
+        if (clock_drift < -100000 || clock_drift > 100000) {
             lib::logger::get_logger()->trace("sdl_audio_renderer: audio clock %d ms ahead. Resync.", clock_drift);
             m_audio_clock -= clock_drift;
             clock_drift = 0;
@@ -380,7 +385,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         }
         // Now communicate it to the clock.
         { // if (clock_drift < -20 || clock_drift > 20) {
-            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            AM_DBG if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
@@ -482,7 +487,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
     xxxtotsize += size;
     net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
-        /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
+        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
 		assert(fb && !strcmp(fb, "continue"));
@@ -581,6 +586,7 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 void 
 gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int cookie)
 {
+    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info(%s), this=0x%x, ds=0x%x", node->get_sig().c_str(), (void*)this, (void*)m_audio_src);
 	m_node = node;
 	m_cookie = cookie;
     net::timestamp_t old_clip_end = m_clip_end;
@@ -634,6 +640,7 @@ void
 gui::sdl::sdl_audio_renderer::resume()
 {
 	m_lock.enter();
+    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::resume(0x%x)", (void*)this);
 	m_is_paused = false;
 	m_lock.leave();
 }

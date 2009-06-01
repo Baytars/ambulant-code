@@ -117,7 +117,8 @@ class demux_audio_datasource:
 	lib::event_processor *m_event_processor;
 	std::queue<ts_packet_t> m_queue;
 	abstract_demux *m_thread;
-	lib::event *m_client_callback;  // This is our calllback to the client
+	lib::event *m_client_callback;  // This is our callback to the client
+    timestamp_t m_current_seek_position;       // Current position of our stream, or -1 if unknown.
 	lib::critical_section m_lock;
 };
 
@@ -182,6 +183,7 @@ class demux_video_datasource:
 	abstract_demux *m_thread;
 	lib::event *m_client_callback;  // This is our calllback to the client
   	pkt_audio_datasource* m_audio_src;
+    timestamp_t m_current_seek_position;       // Current position of our stream, or -1 if unknown.
 	lib::critical_section m_lock;
   	//FILE *m_file;
   	long long int m_frame_nr;

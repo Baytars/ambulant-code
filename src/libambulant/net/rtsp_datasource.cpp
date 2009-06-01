@@ -253,7 +253,6 @@ void
 ambulant::net::rtsp_demux::set_clip_end(timestamp_t clip_end)
 {
 	m_critical_section.enter();
-	m_seektime_changed = true; // XXXXJACK: is this correct? Or only for seektime?
 	m_clip_end = clip_end;
 	m_critical_section.leave();
 }
