@@ -256,7 +256,7 @@ plugin_engine::load_plugins(std::string dirname)
 					is_python_plugin = true;
                     lib::logger::get_logger()->trace("plugin_engine: recording Python plugin %s", pluginname);
 #else
-                    lib::logger::get_logger()->trace("plugin_engine: skipping Python plugin %s", pluginname);
+                    lib::logger::get_logger()->trace("plugin_engine: skipping Python plugin %s (disabled at build time)", pluginname);
 					continue;
 #endif // WITH_PYTHON_PLUGIN
                 } else
@@ -271,8 +271,8 @@ plugin_engine::load_plugins(std::string dirname)
 					is_python_engine = true;
                     lib::logger::get_logger()->trace("plugin_engine: recording Python engine %s", pluginname);
 #else
-                    lib::logger::get_logger()->trace("plugin_engine: skipping Python engine %s", pluginname);
-		    free(namelist[nr_of_files]);
+                    lib::logger::get_logger()->trace("plugin_engine: skipping Python engine %s (disabled at build time)", pluginname);
+                    free(namelist[nr_of_files]);
                     continue;
 #endif // WITH_PYTHON_PLUGIN
                 }
