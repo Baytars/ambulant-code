@@ -249,10 +249,10 @@ Creating the WebKit/Safari plugin
   export MACOSX_DEPLOYMENT_TARGET=10.4
   ../configure -C --with-ffmpeg=third_party_packages/ffmpeg-universal \
 	--with-smil30 --with-universalsdk=$SYSROOT --with-live555 \
-	-disable-dependency-tracking --with-libfaad \
+	--disable-dependency-tracking --with-libfaad \
 	--with-xerces --with-xerces-plugin \
 	--with-python=/usr/bin/python  --with-python-plugin \
-	--with-webkit-dom --with-webkit-plugin
+	--with-webkit-plugin
 	
 - Build the libraries ("make" in the build directory), *BUT DON'T INSTALL*.
   You may have to build pyamplugin separately, without the MACOSX_DEPLOYMENT_TARGET
