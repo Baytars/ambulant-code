@@ -357,17 +357,20 @@ ffmpeg_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp, a
 	m_lock.enter();
 	bool restart_input = false;
 	if (evp == NULL) {
-		lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): event_processor is null, clearing callback.");
+		lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch(): event_processor is null, clearing callback.");
 		callbackk = NULL;
 	}
-	if (m_buffer.buffer_not_empty() || _end_of_file() ) {
-		// We have data (or EOF) available. Don't bother starting up our source again, in stead
-		// immedeately signal our client again
+//	if (m_buffer.buffer_not_empty() || _end_of_file() ) {
+	
+	// We have data (or EOF) available. Don't bother starting up our source again, in stead
+	// immedeately signal our client again
+	
+	if (_end_of_file() ) {
 		if (callbackk) {
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start: trigger client callback");
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch: trigger client callback");
 			evp->add_event(callbackk, 0, ambulant::lib::ep_med);
 		} else {
-			lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): no client callback!");
+			lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch(): no client callback!");
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
 		}
 	} else {
@@ -376,7 +379,7 @@ ffmpeg_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp, a
 		restart_input = true;
 		m_client_callback = callbackk;
 		m_event_processor = evp;
-        AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: storing callback");
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch(): storing callback");
 	}
 	// Also restart our source if we still have room and there is
 	// data to read.
@@ -384,10 +387,10 @@ ffmpeg_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp, a
 	
 	if (restart_input) {
 		lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): calling m_src->start(0x%x, 0x%x)", m_event_processor, e);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch(): calling m_src->start(0x%x, 0x%x)", m_event_processor, e);
 		m_src->start(evp,  e);
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start(): not restarting, eof=%d, buffer_full=%d", (int)_end_of_file(), (int)m_buffer.buffer_full());
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::start_prefetch(): not restarting, eof=%d, buffer_full=%d", (int)_end_of_file(), (int)m_buffer.buffer_full());
 	}
 	m_lock.leave();
 }
@@ -615,7 +618,7 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
 	int nbytes = m_buffer.size();
-    AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
+    /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
 	if (nbytes) {
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);

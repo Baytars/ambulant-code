@@ -319,7 +319,9 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			np = (*it_url_based).second;
 			m_playables_cs.enter();
 			m_playables_url_based.erase(it_url_based);
-			assert(m_playables_url_based.empty());
+			// In case of prefetch, there are more than one playables( for example, one for audio, 
+			// the second one for prefetch) stored in the map, so this assert is not true any more.
+			//assert(m_playables_url_based.empty());
 			m_playables_cs.leave();
 		}
 	}
@@ -719,7 +721,7 @@ smil_player::stopped(int n, double t) {
 		// XXXJACK m_scheduler->update_horizon(root_time);
 		q_smil_time timestamp(m_root, root_time);
 		time_node* tn = (*it).second;
-		AM_DBG m_logger->debug("smil_player::stopped(%d), want_on_eom()=%d", n, tn->want_on_eom());
+		/*AM_DBG*/ m_logger->debug("smil_player::stopped(%d), want_on_eom()=%d", n, tn->want_on_eom());
 		if (tn->want_on_eom()) {
 			async_arg aa((*it).second, timestamp);
 			async_cb *cb = new async_cb(this, &smil_player::stopped_async, aa);
