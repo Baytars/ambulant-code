@@ -229,6 +229,9 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 	/// When the data is available (or end of file reached) exactly one
 	/// callback is scheduled through the event_processor.
 	virtual void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
+#ifdef EXP_KEEPING_RENDERER
+	virtual void start_prefetch(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
+#endif
 	
 	/// Called by the client to indicate it wants no more data.
 	virtual void stop() = 0;
@@ -285,6 +288,8 @@ class audio_datasource_mixin {
 #ifdef EXP_KEEPING_RENDERER
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;	
+	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
+	virtual void set_buffer_size(timestamp_t clip_duration) = 0;
 #endif
 	/// At what timestamp value should the audio playback stop?
 	virtual timestamp_t get_clip_end() = 0;
@@ -330,6 +335,8 @@ class raw_audio_datasource:
   	void seek(timestamp_t time){};
 #ifdef EXP_KEEPING_RENDERER
 	void set_clip_end(timestamp_t clip_end){};
+	void start_prefetch(lib::event_processor *evp, lib::event *callback) {};
+	void set_buffer_size(timestamp_t clip_duration){};
 #endif
     void readdone(int len) { m_src->readdone(len); };
     bool end_of_file() { return m_src->end_of_file(); };

@@ -78,6 +78,9 @@ class stdio_datasource : virtual public datasource, virtual public lib::ref_coun
   	~stdio_datasource();
   	
   	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback);
+#ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(ambulant::lib::event_processor *evp, ambulant::lib::event *callback){};
+#endif
 	void stop();
 	void readdone(int len);
 	bool end_of_file();

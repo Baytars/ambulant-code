@@ -126,6 +126,10 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	/// of the previous state (not playing, playing, paused). 
 	virtual void start(double t) = 0;
 	
+#ifdef EXP_KEEPING_RENDERER
+	virtual void start_prefetch(double t) {};
+#endif
+	
 	/// Stop playback.
 	/// Stops playing and removes any effects from the screen. 
 	/// Resets playable to its initial state.

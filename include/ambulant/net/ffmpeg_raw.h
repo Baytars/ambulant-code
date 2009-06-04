@@ -112,6 +112,9 @@ class ffmpeg_raw_datasource:
 	~ffmpeg_raw_datasource();
 
 	void start(lib::event_processor *evp, lib::event *callback);  
+#ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(lib::event_processor *evp, lib::event *callback){};  
+#endif
 	void stop();
 	
 	char* get_read_ptr();

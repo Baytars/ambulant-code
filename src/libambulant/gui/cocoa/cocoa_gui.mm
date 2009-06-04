@@ -196,7 +196,11 @@ cocoa_renderer_factory::new_playable(
 		rv = new cocoa_audio_playable(context, cookie, node, evp, m_factory, NULL);
 		AM_DBG logger::get_logger()->debug("cocoa_renderer_factory: node 0x%x: returning cocoa_audio_renderer 0x%x", (void *)node, (void *)rv);
 #endif
+#ifndef EXP_KEEPING_RENDERER
 	} else if ( tag == "video") {
+#else
+	} else if ( tag == "video" || tag == "prefetch") {	
+#endif
 		if (common::preferences::get_preferences()->m_prefer_ffmpeg ) {
 			rv = new cocoa_dsvideo_renderer(context, cookie, node, evp, m_factory, NULL);
 			if (rv) {
