@@ -519,7 +519,7 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 	if (tag == "prefetch") {
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-		m_audio_src->start(m_event_processor, e);		
+		m_audio_src->start_prefetch(m_event_processor, e);		
 	} else {
 		if (m_audio_src->size() < s_min_buffer_size_bytes ) {
 			// Start reading 
@@ -640,7 +640,13 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	_init_clip_begin_end();
 	
 	if (m_audio_src) {
-        if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
+#if 0 // for supporting prefetch, I comment out this line of code
+      // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
+	//	std::string tag = m_node->get_local_name();
+	//	if (tag == "prefetch") {
+			if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
+	//	}
+#endif
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
