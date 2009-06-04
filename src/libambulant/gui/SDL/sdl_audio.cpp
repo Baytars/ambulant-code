@@ -508,11 +508,28 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		return false;
 	}
 
+#ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
 		m_audio_src->start(m_event_processor, e);
 	}
+#else
+	std::string tag = m_node->get_local_name();
+	if (tag == "prefetch") {
+		// Start reading 
+		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
+		m_audio_src->start(m_event_processor, e);		
+	} else {
+		if (m_audio_src->size() < s_min_buffer_size_bytes ) {
+			// Start reading 
+			lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
+			m_audio_src->start(m_event_processor, e);
+		}
+	}
+	
+
+#endif
 	return true;
 }
 
@@ -528,7 +545,37 @@ gui::sdl::sdl_audio_renderer::data_avail()
 	}
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: %d bytes available", m_audio_src->size());
 	
+#ifndef EXP_KEEPING_RENDERER
 	restart_audio_input();
+#else
+	std::string tag = m_node->get_local_name();
+	if (tag == "prefetch") {
+		bool still_buzy = restart_audio_input();
+		if (!still_buzy) {
+			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::prefetch_done: calling m_context->stopped() this = (x%x)",this);
+			// We cannot call unregister_renderer from here, because we are called from the
+			// SDL callback and already holding the m_global_lock. So, in stead
+			// we use the event processor to unregister ourselves later.
+#ifndef EXP_KEEPING_RENDERER
+			lib::event *e = new readdone_callback(this, &sdl_audio_renderer::stop);
+			m_event_processor->add_event(e, 0, ambulant::lib::ep_med);
+			if (m_audio_src) {
+				m_audio_src->stop();
+				m_audio_src->release();
+				m_audio_src = NULL;
+			}
+#endif
+			m_lock.leave();
+			if (m_context) {
+				m_context->stopped(m_cookie, 0);
+			} else {
+				AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer(0x%x): m_context is  NULL", (void*)this);
+			}
+			return;		
+		}
+	}
+	else restart_audio_input();
+#endif
 	
 	m_lock.leave();
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: done");
@@ -691,6 +738,44 @@ gui::sdl::sdl_audio_renderer::start(double where)
 		m_context->stopped(m_cookie, 0);
 	}
 }
+
+#ifdef EXP_KEEPING_RENDERER
+void
+gui::sdl::sdl_audio_renderer::start_prefetch(double where)
+{
+	m_lock.enter();
+#ifdef EXP_KEEPING_RENDERER
+	if (m_is_playing) {
+		lib::logger::get_logger()->trace("sdl_audio_renderer.start_prefetch(0x%x): already started", (void*)this);
+		m_lock.leave();
+		return;
+	}
+	
+#endif
+    if (!m_node) abort();
+	
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start_prefetch(0x%x, %s, where=%f)", 
+											(void *)this, m_node->get_sig().c_str(), where);
+	if (m_audio_src) {
+		
+		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
+			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
+		
+		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
+		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin());
+		m_audio_src->start_prefetch(m_event_processor, e);
+		m_is_playing = true;
+		m_is_paused = false;
+		m_lock.leave();
+		//register_renderer(this);
+	} else {
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start_prefetch: no datasource");
+		m_lock.leave();
+		m_context->stopped(m_cookie, 0);
+	}
+}
+#endif
 
 void
 gui::sdl::sdl_audio_renderer::seek(double where)

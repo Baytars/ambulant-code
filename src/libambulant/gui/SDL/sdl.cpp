@@ -75,6 +75,7 @@ sdl_renderer_factory::new_playable(
 	common::playable *rv;
 	lib::xml_string tag = node->get_local_name();
     AM_DBG lib::logger::get_logger()->debug("sdl_renderer_factory: node 0x%x:   inspecting %s\n", (void *)node, tag.c_str());
+#ifndef EXP_KEEPING_RENDERER
 	if ( tag == "audio") {
 		rv = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory, (common::playable_factory_machdep*)NULL);
 		AM_DBG lib::logger::get_logger()->debug("sdl_renderer_factory: node 0x%x: returning sdl_audio_renderer 0x%x", (void *)node, (void *)rv);
@@ -82,6 +83,16 @@ sdl_renderer_factory::new_playable(
 		AM_DBG lib::logger::get_logger()->debug("sdl_renderer_factory: no SDL renderer for tag \"%s\"", tag.c_str());
         return NULL;
 	}
+#else
+	if ( tag == "audio" || tag == "prefetch") {
+		rv = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory, (common::playable_factory_machdep*)NULL);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory: node 0x%x: returning sdl_audio_renderer 0x%x", (void *)node, (void *)rv);
+	} else {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory: no SDL renderer for tag \"%s\"", tag.c_str());
+        return NULL;
+	}
+	
+#endif
 	return rv;
 }
 

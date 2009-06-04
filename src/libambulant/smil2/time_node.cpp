@@ -836,12 +836,14 @@ void time_node::start_prefetch(time_type offset) {
 	common::playable *np = create_playable();
 	if(np) np->wantclicks(m_want_activate_events);
 	const lib::transition_info *trans_in = m_attrs.get_trans_in();
-#if 0 // don't start playable yet, 
+#if 1 // don't start playable yet, 
 	if(np) {
 		if(trans_in) {
 			m_context->start_playable(m_node, time_type_to_secs(offset()), trans_in);
 		} else {
-			np->start(time_type_to_secs(offset()));
+			//np->start(time_type_to_secs(offset()));
+			//np->pause();
+			np->start_prefetch(time_type_to_secs(offset()));
 		} 
 	}
 #endif
@@ -886,9 +888,9 @@ bool time_node::is_statecommand() const {
 // Returns true when this node is a prefetch 
 bool time_node::is_prefetch() const {
 	const common::schema *sch = common::schema::get_instance();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
+	AM_DBG lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
 	const lib::xml_string& qn = m_node->get_local_name();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("is_prefetch: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
+	AM_DBG lib::logger::get_logger()->debug("is_prefetch: 0x%x %s ok\n", m_node, m_node->get_sig().c_str());
 	return sch->is_prefetch(qn);
 }
 #endif // EXP_KEEPING_RENDERER
