@@ -154,7 +154,7 @@ event_processor_impl::serve_events()
             drift = next_event_time-1;
     }
     /*AM_DBG*/ if (drift) lib::logger::get_logger()->debug("event_processor: adjust clock %d ms (positive is forward)", drift);
-//    m_timer->skew(drift);
+    //m_timer->skew(drift);
 #endif
         
             
