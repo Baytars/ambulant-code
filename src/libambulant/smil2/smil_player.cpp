@@ -328,13 +328,14 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 	if( np == NULL ) { 
 		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable", (void*)n);
 		np = _new_playable(n);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playble is found 0x%x", (void*)n, (void*)np);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playble is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;

@@ -581,6 +581,14 @@ ffmpeg_decoder_datasource::end_of_file()
 	return rv;
 }
 
+#ifdef EXP_KEEPING_RENDERER
+bool 
+ffmpeg_decoder_datasource::end_of_file_prefetch()
+{
+	return m_src->end_of_file();	
+}
+#endif
+
 bool 
 ffmpeg_decoder_datasource::_end_of_file()
 {

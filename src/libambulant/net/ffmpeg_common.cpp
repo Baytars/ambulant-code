@@ -403,8 +403,12 @@ ffmpeg_demux::run()
 #ifdef EXP_KEEPING_RENDERER
 			eof_sent_to_clients = false;
 #endif
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
+#ifndef EXP_KEEPING_RENDERER //xxxbo note: I don't understand why seektime = m_clip_begin+m_seektime;
 			int64_t seektime = m_clip_begin+m_seektime;
+#else
+			int64_t seektime = m_seektime;
+#endif
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
                 AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek for ffmpeg start_time", m_con->start_time);

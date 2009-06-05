@@ -385,7 +385,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         }
         // Now communicate it to the clock.
         { // if (clock_drift < -20 || clock_drift > 20) {
-            AM_DBG if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
@@ -503,11 +503,18 @@ bool
 gui::sdl::sdl_audio_renderer::restart_audio_input()
 {
 	// private method - no need to lock.
-	if (!m_audio_src || m_audio_src->end_of_file() || !m_is_playing) {
-		// No more data.
-		return false;
+	std::string tag = m_node->get_local_name();
+	if (tag != "prefetch") {
+		if (!m_audio_src || m_audio_src->end_of_file() || !m_is_playing) {
+			// No more data.
+			return false;
+		}
+	} else { //xxxbo: here, I use end_of_file_prefetch to detect if the end of the physical file is reached
+		if (!m_audio_src || m_audio_src->end_of_file_prefetch() || !m_is_playing) {
+			// No more data.
+			return false;
+		}		
 	}
-
 #ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
 		// Start reading 
@@ -515,7 +522,7 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		m_audio_src->start(m_event_processor, e);
 	}
 #else
-	std::string tag = m_node->get_local_name();
+	tag = m_node->get_local_name();
 	if (tag == "prefetch") {
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
@@ -619,7 +626,10 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
 		m_lock.leave();
-		unregister_renderer(this);
+		std::string tag = m_node->get_local_name();
+		if (tag != "prefetch") {
+			unregister_renderer(this);
+		}
 		// XXX Should we call stopped_callback?
 		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
@@ -640,13 +650,17 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	_init_clip_begin_end();
 	
 	if (m_audio_src) {
-#if 0 // for supporting prefetch, I comment out this line of code
+	  // for supporting prefetch, I comment out this line of code
       // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
-	//	std::string tag = m_node->get_local_name();
-	//	if (tag == "prefetch") {
-			if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
-	//	}
-#endif
+		
+		//if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
+		
+		std::string tag = m_node->get_local_name();
+		if (tag == "prefetch") {
+			m_audio_src->seek(m_clip_begin);
+		}
+		m_audio_clock = 0;
+		
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
