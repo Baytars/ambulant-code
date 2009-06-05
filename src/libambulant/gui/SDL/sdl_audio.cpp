@@ -658,6 +658,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 		std::string tag = m_node->get_local_name();
 		if (tag == "prefetch") {
 			m_audio_src->seek(m_clip_begin);
+			m_audio_clock = 0;
 		}
 		
 		const char * fb = node->get_attribute("fill");
