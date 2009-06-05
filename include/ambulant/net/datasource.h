@@ -309,6 +309,10 @@ class audio_datasource_mixin {
 class audio_datasource : public datasource, public audio_datasource_mixin {
   public:
 	virtual ~audio_datasource() {};
+#ifdef EXP_KEEPING_RENDERER
+	/// Return true if the end of the file is reached.
+	virtual bool end_of_file_prefetch() = 0;
+#endif
 };
 
 class pkt_audio_datasource : public pkt_datasource, public audio_datasource_mixin {
@@ -337,6 +341,7 @@ class raw_audio_datasource:
 	void set_clip_end(timestamp_t clip_end){};
 	void start_prefetch(lib::event_processor *evp, lib::event *callback) {};
 	void set_buffer_size(timestamp_t clip_duration){};
+	bool end_of_file_prefetch() { return m_src->end_of_file(); };
 #endif
     void readdone(int len) { m_src->readdone(len); };
     bool end_of_file() { return m_src->end_of_file(); };
