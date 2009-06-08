@@ -126,9 +126,17 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
 	} else {
+		//xxxbo: Note, for supporting prefetch, I comment out this line of code
+		// (it is here for the reason of demo 5-Loop: Play the first two bars twice).
+#if 0
         if (m_clip_begin != old_clip_end) {
             seek(m_clip_begin/1000);
         }
+#endif
+		std::string tag = m_node->get_local_name();
+		if (tag == "prefetch") {
+			seek(m_clip_begin/1000);
+		}		
     }
 	m_previous_clip_end = m_clip_end;
 
@@ -205,6 +213,68 @@ video_renderer::start (double where)
 }
 
 #ifdef EXP_KEEPING_RENDERER
+void
+video_renderer::start_prefetch (double where)
+{
+	m_lock.enter();
+	if (m_activated) {
+		lib::logger::get_logger()->trace("video_renderer.start(0x%x): already started", (void*)this);
+		m_lock.leave();
+		return;
+	}
+	if (!m_src) {
+		lib::logger::get_logger()->trace("video_renderer.start: no datasource, skipping media item");
+		m_context->stopped(m_cookie, 0);
+		m_lock.leave();
+		return;
+	}
+	if (!m_dest) {
+		lib::logger::get_logger()->trace("video_renderer.start: no destination surface, skipping media item");
+		m_context->stopped(m_cookie, 0);
+		m_lock.leave();
+		return;
+	}
+	// Tell the datasource how we like our pixels.
+	m_src->set_pixel_layout(pixel_layout());
+	m_activated = true;
+	
+#if 1
+	m_timer = m_event_processor->get_timer();
+#else
+	// XXX Note: comment below is possibly incorrect, but at  the very least the
+	// code does not work, because video_datasource::start_frame() assumes a shared clock.
+	//
+	// This is a workaround for a bug: the "normal" timer
+	// can be set back in time sometimes, and the video renderer
+	// does not like that. For now use a private timer, will
+	// have to be fixed eventually.
+	m_timer = lib::realtime_timer_factory();
+#endif
+	
+	// Now we need to define where we start playback. This depends on m_clip_begin (microseconds)
+	// and where (seconds). We use these to set m_epoch (milliseconds) to the time (m_timer-based)
+	// at which we would have played the frame with timestamp 0.
+	assert(m_clip_begin >= 0);
+	assert(where >= 0);
+	m_epoch = m_timer->elapsed() - (long)(m_clip_begin/1000) - (int)(where*1000);
+	m_is_paused = false;
+	
+	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
+	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
+	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
+	m_src->start_prefetch (m_event_processor, e, 0);
+	if (m_audio_renderer) 
+		m_audio_renderer->start_prefetch(where);
+	
+	
+	m_lock.leave();
+	
+	// Note by Jack: I'm not 100% sure that calling show() after releasing the lock is safe, but (a)
+	// calling it inside the lock leads to deadly embrace (this lock and the one in the destination region,
+	// during a redraw) and (b) other renderers also call m_dest->show() without holding the lock.
+	m_dest->show(this);
+}
+
 void
 video_renderer::stop_but_keeping_renderer()
 {
@@ -414,27 +484,49 @@ video_renderer::data_avail()
 		return;
 	}
 #else
-	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
-//		if (m_src) {
-//			m_src->stop();
-//			m_src->release();
-//			m_src = NULL;
-//		}
-		///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-		//        we continue playback it other than return. 
-		const char * fb = m_node->get_attribute("fill");
-		if (fb == NULL || strcmp(fb, "continue"))
+	std::string tag = m_node->get_local_name();
+	if (tag == "prefetch") {
+		if (m_src->end_of_file_prefetch() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
+			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 			m_lock.leave();
-        // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
-		m_context->stopped(m_cookie, 0);
-		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
-		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
-										 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
-		///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-		//        we continue playback it other than return. 
-		if (fb == NULL || strcmp(fb, "continue"))
+			m_context->stopped(m_cookie, 0);
+			//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
+			lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
+											 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 			return;
+		}	
+		//xxxbo: Note, for prefetch, we arrange the next callback and return otherthan show the frame on the screen. 
+		lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
+		// Grmpf. frame_ts_micros is on the movie timescale, but start_frame() expects a time relative to
+		// the m_event_processor clock (even though it is in microseconds, not milliseconds). Very bad design,
+		// for now we hack around it.
+		m_src->start_prefetch (m_event_processor, e, frame_ts_micros+(m_epoch*1000));
+		m_lock.leave();		
+		return;
+	} else {
+		if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
+			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+			//		if (m_src) {
+			//			m_src->stop();
+			//			m_src->release();
+			//			m_src = NULL;
+			//		}
+			///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
+			//        we continue playback it other than return. 
+			const char * fb = m_node->get_attribute("fill");
+			if (fb == NULL || strcmp(fb, "continue"))
+				m_lock.leave();
+			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
+			m_context->stopped(m_cookie, 0);
+			//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
+			lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
+											 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
+			///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
+			//        we continue playback it other than return. 
+			if (fb == NULL || strcmp(fb, "continue"))
+				return;
+		}		
 	}
 #endif
 
@@ -451,13 +543,13 @@ video_renderer::data_avail()
 	} else
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
         m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES
 	if (frame_ts_micros <= now_micros - frame_duration && !m_prev_frame_dropped) {
 		// Frame is too late. Skip forward to now. Schedule another callback asap.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
 		m_frame_late++;
 		frame_ts_micros = now_micros;
 		m_src->frame_processed(frame_ts_micros);
@@ -466,7 +558,7 @@ video_renderer::data_avail()
 #endif
 	if (frame_ts_micros > now_micros + frame_duration) {
 		// Frame is too early. Do nothing, just schedule a new event at the correct time and we will get this same frame again.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
 		m_frame_early++;
 	} else
 	if (frame_ts_micros <= m_last_frame_timestamp) {
@@ -479,7 +571,7 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES

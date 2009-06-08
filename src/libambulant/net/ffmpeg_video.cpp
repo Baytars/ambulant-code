@@ -338,6 +338,69 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	m_lock.leave();
 }
 
+#ifdef EXP_KEEPING_RENDERER
+void 
+ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp, 
+											 ambulant::lib::event *callbackk, timestamp_t timestamp)
+{
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_prefetch: (this = 0x%x)", (void*) this);
+	
+	if (m_client_callback != NULL) {
+		delete m_client_callback;
+		m_client_callback = NULL;
+		lib::logger::get_logger()->error("ffmpeg_video_decoder_datasource::start_frame(): m_client_callback already set!");
+	}
+	
+	if (m_frames.size() > 0 || _end_of_file() ) {
+		// We have data (or EOF) available. Don't bother starting up our source again, in stead
+		// immedeately signal our client again
+		if (callbackk) {
+			assert(evp);
+#if 0
+			if (timestamp < 0) timestamp = 0;
+			lib::timer::time_type timestamp_milli = (lib::timer::time_type)(timestamp/1000); // micro to milli
+			lib::timer::time_type now_milli = evp->get_timer()->elapsed();
+			lib::timer::time_type delta_milli = 0;
+			if (now_milli < timestamp_milli)
+				delta_milli = timestamp_milli - now_milli;
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: 0x%x: trigger client callback timestamp_milli=%d delta_milli=%d, now_milli=%d, %d frames in buffer", this, (int)timestamp_milli, (int)delta_milli, (int)now_milli, m_frames.size());
+			// Sanity check: we don't want this to be more than a second into the future
+			if (delta_milli > 1000) {
+				lib::logger::get_logger()->trace("ffmpeg_video::start_prefetch: frame is %f seconds in the future", delta_milli / 1000.0);
+				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
+			}
+			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
+#endif
+			evp->add_event(callbackk, 1, ambulant::lib::ep_high);
+		} else {
+			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource::start(): no client callback!");
+			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
+		}
+	} else	{
+		// We have no data available. Start our source, and in our data available callback we
+		// will signal the client.
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video: 0x%x: start_frame: record callback for later", this);
+		m_client_callback = callbackk;
+		m_event_processor = evp;
+	}
+	
+	// Don't restart our source if we are at end of file.
+#ifndef EXP_KEEPING_RENDERER
+	if ( _end_of_file() ) m_start_input = false;
+#endif
+	
+	if (m_start_input) {
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame() Calling m_src->start_frame(..)");
+		lib::event *e = new framedone_callback(this, &ffmpeg_video_decoder_datasource::data_avail);
+		assert(m_src);
+		m_src->start_frame(evp, e, 0);
+		m_start_input = false;
+	}
+	m_lock.leave();
+}
+#endif
+
 void
 print_frames(sorted_frames frames) {
   	sorted_frames f(frames);
@@ -479,6 +542,19 @@ ffmpeg_video_decoder_datasource::set_clip_end(timestamp_t clip_end)
 	if (m_src) m_src->set_clip_end(clip_end);
 	m_lock.leave();
 }
+
+void
+ffmpeg_video_decoder_datasource::set_buffer_size(timestamp_t clip_duration)
+{
+	m_lock.enter();
+	//xxxbo: here, the exact buffer size should be computed according to clip_duration, 
+	//       I just set the max size of buffer to 100,000 because I don't know how to calculate it yet, and will 
+	//       fix it later.
+#undef MAX_VIDEO_FRAMES 
+#define MAX_VIDEO_FRAMES 100000
+	m_lock.leave();
+}
+
 #endif
 
 void 
@@ -768,6 +844,15 @@ ffmpeg_video_decoder_datasource::end_of_file()
 	m_lock.leave();
 	return rv;
 }
+
+#ifdef EXP_KEEPING_RENDERER
+// xxxbo: Note, for prefetch, m_frames.size() > 0 is always true, so we should rely on downstream datasource to make decision  
+bool 
+ffmpeg_video_decoder_datasource::end_of_file_prefetch()
+{
+	return m_src == NULL || m_src->end_of_file();	
+}
+#endif
 
 bool 
 ffmpeg_video_decoder_datasource::_end_of_file()

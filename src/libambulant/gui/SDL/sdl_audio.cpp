@@ -650,7 +650,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	_init_clip_begin_end();
 	
 	if (m_audio_src) {
-	  // for supporting prefetch, I comment out this line of code
+	  //xxxbo: Note, for supporting prefetch, I comment out this line of code
       // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
 		
 		//if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);

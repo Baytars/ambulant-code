@@ -836,17 +836,14 @@ void time_node::start_prefetch(time_type offset) {
 	common::playable *np = create_playable();
 	if(np) np->wantclicks(m_want_activate_events);
 	const lib::transition_info *trans_in = m_attrs.get_trans_in();
-#if 1 // don't start playable yet, 
 	if(np) {
 		if(trans_in) {
 			m_context->start_playable(m_node, time_type_to_secs(offset()), trans_in);
 		} else {
 			//np->start(time_type_to_secs(offset()));
-			//np->pause();
 			np->start_prefetch(time_type_to_secs(offset()));
 		} 
 	}
-#endif
 	if (is_link()  && m_attrs.get_actuate() == actuate_onload) {
 		AM_DBG m_logger->debug("%s[%s].start_prefetch: actuate_onLoad", m_attrs.get_tag().c_str(), 
 							   m_attrs.get_id().c_str());
