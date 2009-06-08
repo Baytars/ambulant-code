@@ -426,6 +426,11 @@ class video_datasource : virtual public lib::ref_counted_obj {
 #ifdef EXP_KEEPING_RENDERER
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;
+	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
+	virtual void set_buffer_size(timestamp_t clip_duration) = 0;
+	virtual void start_prefetch(lib::event_processor *evp, lib::event *callback, timestamp_t pts) = 0;
+	/// Return true if all data has been consumed.
+  	virtual bool end_of_file_prefetch() = 0;
 #endif
 	/// At what timestamp value should the video playback stop?
 	virtual timestamp_t get_clip_end() = 0;

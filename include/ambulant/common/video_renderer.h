@@ -81,6 +81,7 @@ class video_renderer : public common::renderer_playable {
 	void start(double where);
     void stop();
 #ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(double where);
 	void stop_but_keeping_renderer();
 	//xxxbo:
 	/// Update the context info.
