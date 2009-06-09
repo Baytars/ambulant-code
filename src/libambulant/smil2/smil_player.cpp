@@ -470,7 +470,7 @@ void smil_player::stop_playable(const lib::node *n) {
 				//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
 				std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
 				if(it != m_dom2tn->end() && !(*it).second->is_prefetch()) 
-					//xxxbo: the unit of add_event is milisecond.
+					//xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
 					m_event_processor->add_event(m_destroy_event, 20, lib::ep_high);
 				m_destroy_event = NULL;
 			}	
