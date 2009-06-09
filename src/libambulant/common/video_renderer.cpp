@@ -259,6 +259,19 @@ video_renderer::start_prefetch (double where)
 	m_epoch = m_timer->elapsed() - (long)(m_clip_begin/1000) - (int)(where*1000);
 	m_is_paused = false;
 	
+	// We need to initial these variable over here
+	m_paused_epoch = 0;
+	m_last_frame_timestamp = -1;
+	m_frame_displayed = 0;
+	m_frame_duplicate = 0;
+	m_frame_early = 0;
+	m_frame_late = 0;
+#ifdef EXP_KEEPING_RENDERER
+	m_previous_clip_end = -1;
+#endif
+	m_frame_missing = 0;
+	
+	
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
 	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
@@ -281,6 +294,13 @@ video_renderer::stop_but_keeping_renderer()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 	m_context->stopped(m_cookie, 0);
+#if 1
+	if (m_node->get_local_name() != "prefetch") {
+		if (m_dest) m_dest->renderer_done(this);
+		m_dest = NULL;
+	}
+#endif
+
 	m_activated = false;
     // XXXJACK: I don't trust this code. I am pretty sure that we should also call stop_but_keeping_renderer() in the audio renderer.
 //	if (m_dest) {
@@ -487,12 +507,12 @@ video_renderer::data_avail()
 	std::string tag = m_node->get_local_name();
 	if (tag == "prefetch") {
 		if (m_src->end_of_file_prefetch() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+			/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail_prefetch: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 			m_lock.leave();
 			m_context->stopped(m_cookie, 0);
 			//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
-			lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
+			lib::logger::get_logger()->debug("video_renderer_prefetch: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 											 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 			return;
 		}	

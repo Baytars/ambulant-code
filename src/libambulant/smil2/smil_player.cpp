@@ -323,6 +323,20 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			// the second one for prefetch) stored in the map, so this assert is not true any more.
 			//assert(m_playables_url_based.empty());
 			m_playables_cs.leave();
+			// xxxx copy code from _new_playable to call set_surface()
+#if 1
+			assert(np);
+			surface *surf = m_layout_manager->get_surface(n);
+			assert(surf);	// XXXJACK: at least, I think it cannot be NULL....
+			common::renderer *rend = np->get_renderer();
+			assert(rend);	// This code should never be executed for non-rendering playables, Jack thinks.
+			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
+			if (n->get_local_name() == "prefetch") surf = NULL;
+			/*AM_DBG*/ lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, surf, rend);
+			if (rend && surf) {
+				rend->set_surface(surf);
+			}
+#endif
 		}
 	}
 	if( np == NULL ) { 
@@ -347,6 +361,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		const char * fb = n->get_attribute("fill");
 		if (fb == NULL || strcmp(fb, "continue"))
 			np->stop_but_keeping_renderer();
+			//np->stop();
 	}	
 	//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 	np->update_context_info(n, n->get_numid());
@@ -455,7 +470,8 @@ void smil_player::stop_playable(const lib::node *n) {
 				//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
 				std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
 				if(it != m_dom2tn->end() && !(*it).second->is_prefetch()) 
-					m_event_processor->add_event(m_destroy_event, 20000, lib::ep_high);
+					//xxxbo: the unit of add_event is milisecond.
+					m_event_processor->add_event(m_destroy_event, 20, lib::ep_high);
 				m_destroy_event = NULL;
 			}	
 		}
