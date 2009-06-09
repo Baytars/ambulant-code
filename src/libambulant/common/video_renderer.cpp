@@ -228,14 +228,17 @@ video_renderer::start_prefetch (double where)
 		m_lock.leave();
 		return;
 	}
+#if 0
 	if (!m_dest) {
-		lib::logger::get_logger()->trace("video_renderer.start: no destination surface, skipping media item");
+		lib::logger::get_logger()->trace("video_renderer.start_prefetch: no destination surface, skipping media item");
 		m_context->stopped(m_cookie, 0);
 		m_lock.leave();
 		return;
 	}
+#endif
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
+
 	m_activated = true;
 	
 #if 1
@@ -285,7 +288,9 @@ video_renderer::start_prefetch (double where)
 	// Note by Jack: I'm not 100% sure that calling show() after releasing the lock is safe, but (a)
 	// calling it inside the lock leads to deadly embrace (this lock and the one in the destination region,
 	// during a redraw) and (b) other renderers also call m_dest->show() without holding the lock.
+#if 0
 	m_dest->show(this);
+#endif
 }
 
 void
