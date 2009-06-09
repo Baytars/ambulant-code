@@ -411,7 +411,7 @@ ffmpeg_demux::run()
 #endif
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
-                AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek for ffmpeg start_time", m_con->start_time);
+                /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek for ffmpeg start_time", m_con->start_time);
             }
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
 			int seek_streamnr = -1;
