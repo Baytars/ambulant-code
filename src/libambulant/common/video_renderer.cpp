@@ -126,9 +126,8 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
 	} else {
-		//xxxbo: Note, for supporting prefetch, I comment out this line of code
-		// (it is here for the reason of demo 5-Loop: Play the first two bars twice).
-#if 0
+#if 0  //xxxbo: Note, for supporting prefetch, I comment out this line of code
+	   // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
         if (m_clip_begin != old_clip_end) {
             seek(m_clip_begin/1000);
         }
@@ -136,7 +135,7 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 		std::string tag = m_node->get_local_name();
 		if (tag == "prefetch") {
 			seek(m_clip_begin/1000);
-		}		
+		}	
     }
 	m_previous_clip_end = m_clip_end;
 
@@ -228,14 +227,6 @@ video_renderer::start_prefetch (double where)
 		m_lock.leave();
 		return;
 	}
-#if 0
-	if (!m_dest) {
-		lib::logger::get_logger()->trace("video_renderer.start_prefetch: no destination surface, skipping media item");
-		m_context->stopped(m_cookie, 0);
-		m_lock.leave();
-		return;
-	}
-#endif
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
 
@@ -262,18 +253,15 @@ video_renderer::start_prefetch (double where)
 	m_epoch = m_timer->elapsed() - (long)(m_clip_begin/1000) - (int)(where*1000);
 	m_is_paused = false;
 	
-	// We need to initial these variable over here
+	// We need to initial these variables over here
 	m_paused_epoch = 0;
 	m_last_frame_timestamp = -1;
 	m_frame_displayed = 0;
 	m_frame_duplicate = 0;
 	m_frame_early = 0;
 	m_frame_late = 0;
-#ifdef EXP_KEEPING_RENDERER
 	m_previous_clip_end = -1;
-#endif
 	m_frame_missing = 0;
-	
 	
 	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
 	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
@@ -282,15 +270,7 @@ video_renderer::start_prefetch (double where)
 	if (m_audio_renderer) 
 		m_audio_renderer->start_prefetch(where);
 	
-	
-	m_lock.leave();
-	
-	// Note by Jack: I'm not 100% sure that calling show() after releasing the lock is safe, but (a)
-	// calling it inside the lock leads to deadly embrace (this lock and the one in the destination region,
-	// during a redraw) and (b) other renderers also call m_dest->show() without holding the lock.
-#if 0
-	m_dest->show(this);
-#endif
+	m_lock.leave();	
 }
 
 void

@@ -149,7 +149,7 @@ class demux_video_datasource:
 	void set_buffer_size(timestamp_t clip_duration){};
 	void start_prefetch(lib::event_processor *evp, lib::event *callback, timestamp_t pts){};
 	/// Return true if all data has been consumed.
-  	bool end_of_file_prefetch(){};
+  	bool end_of_file_prefetch(){return false;};
 	
 #endif
 	void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
