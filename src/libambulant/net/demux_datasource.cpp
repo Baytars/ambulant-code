@@ -689,7 +689,7 @@ demux_video_datasource::get_frame(timestamp_t now, timestamp_t *timestamp, int *
 	}
     m_current_seek_position = -1;   // We no longer know our position
 	ts_frame_pair frame = m_frames.front();
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_frame(): ts=%lld 0x%x %d", frame.first, frame.second.data, frame.second.size);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("demux_video_datasource::get_frame(): ts=%lld 0x%x %d", frame.first, frame.second.data, frame.second.size);
 	char *rv = (char*) frame.second.data;
 	*sizep = frame.second.size;
 	*timestamp = frame.first;
