@@ -766,7 +766,7 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 	m_lock.enter();
 #ifdef EXP_KEEPING_RENDERER
 	if (m_is_playing) {
-		lib::logger::get_logger()->trace("sdl_audio_renderer.start_prefetch(0x%x): already started", (void*)this);
+		lib::logger::get_logger()->trace("sdl_audio_renderer::start_prefetch(0x%x): already started", (void*)this);
 		m_lock.leave();
 		return;
 	}
@@ -774,7 +774,7 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 #endif
     if (!m_node) abort();
 	
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start_prefetch(0x%x, %s, where=%f)", 
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
 		
@@ -790,7 +790,7 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 		m_lock.leave();
 		//register_renderer(this);
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start_prefetch: no datasource");
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch: no datasource");
 		m_lock.leave();
 		m_context->stopped(m_cookie, 0);
 	}
