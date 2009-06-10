@@ -298,6 +298,9 @@ video_renderer::stop_but_keeping_renderer()
 //		m_audio_renderer = NULL;
 //	}
 	
+	if (m_audio_renderer) {
+		m_audio_renderer->stop_but_keeping_renderer();
+	}
 	m_lock.leave();
 }
 #endif
@@ -548,13 +551,13 @@ video_renderer::data_avail()
 	} else
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
         m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES
 	if (frame_ts_micros <= now_micros - frame_duration && !m_prev_frame_dropped) {
 		// Frame is too late. Skip forward to now. Schedule another callback asap.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: skip late frame, ts=%lld, now-dur=%lld", frame_ts_micros, now_micros-frame_duration);
 		m_frame_late++;
 		frame_ts_micros = now_micros;
 		m_src->frame_processed(frame_ts_micros);
@@ -563,7 +566,7 @@ video_renderer::data_avail()
 #endif
 	if (frame_ts_micros > now_micros + frame_duration) {
 		// Frame is too early. Do nothing, just schedule a new event at the correct time and we will get this same frame again.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
 		m_frame_early++;
 	} else
 	if (frame_ts_micros <= m_last_frame_timestamp) {
@@ -576,7 +579,7 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES
