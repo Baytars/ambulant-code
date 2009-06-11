@@ -10,6 +10,9 @@ I assume the following interface for the renderer and playable (the important bi
 This is slightly different from what is currently implemented.
 All methods are from playable, unless otherwise indicated.
 
+playable and renderer API
+-------------------------
+
 create(event_processor *evp, playable_notification *context)	
 	/// Constructor function.
 	
@@ -45,10 +48,35 @@ I'm ignoring pause(), resume(), seek() and wantclicks() here, as they have no in
 on the grand scheme of things. I am assuming that these calls can only be issued
 between start() and stop(). We want to put assert()s in to check this.
 
-The notification interface is unchanged. started() and stopped() are the only ones that
-are interesting to us. All the other ones can only occur between those two. Every
+playable_notification interface
+-------------------------------
+
+The notification interface is unchanged:
+
+started(cookie)
+	/// Emitted when the node starts playback
+	
+stopped(cookie)
+	/// Emitted when the node stops playback
+	
+All the other ones can only occur between those two. Every
 start() will generate exactly one started(). Exactly one stopped() is always emitted,
 after started(). stopped() may be emitted before or after stop().
+
+internal events
+---------------
+
+There are a number of internal events (internal to the renderer) that also
+cause state changes:
+
+END_OF_FILE
+	/// The data source signals end-of-file
+	
+END_OF_CLIP
+	/// The data source position goes past clipEnd.
+
+API call sequences
+------------------
 
 For a normal node, that is not followed by a second node referring to the same URL,
 the order of calls will be:
