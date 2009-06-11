@@ -137,6 +137,7 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
 			seek(m_clip_begin/1000);
 		}	
     }
+	
 	m_previous_clip_end = m_clip_end;
 
 }
@@ -371,7 +372,9 @@ video_renderer::seek(double t)
 	m_last_frame_timestamp = -1;
 #endif
 #endif
+#ifndef EXP_KEEPING_RENDERER
 	if (m_audio_renderer) m_audio_renderer->seek(t);
+#endif
 }
 
 common::duration 
