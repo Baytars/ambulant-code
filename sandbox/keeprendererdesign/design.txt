@@ -18,7 +18,7 @@ create(event_processor *evp, playable_notification *context)
 	
 init_with_node(node *n)
 	/// Bind the renderer to a node, either prefetch or media.
-	/// Records node, URL, cookie, clip_begin/end, etc.
+	/// Records node, URL, clip_begin/end, etc.
 	
 renderer::set_surface(surface *dest)
 	/// Bind renderer output to a surface.
