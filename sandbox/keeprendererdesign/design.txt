@@ -30,6 +30,8 @@ preroll(double when, double where, double how_much)
 	/// start reading data.
 	/// Record where as old "official" position.
 	/// when and how_much are ignored.
+	/// Note: doing two prerolls with the same "where" parameter after each other
+	/// should have exactly the effect that the second one does nothing.
 	
 start(double t, playable_notification::cookie_type cookie)
 	/// preroll(0, t, 0)
@@ -46,7 +48,7 @@ post_stop()
 	
 I'm ignoring pause(), resume(), seek() and wantclicks() here, as they have no influence
 on the grand scheme of things. I am assuming that these calls can only be issued
-between start() and stop(). We want to put assert()s in to check this.
+between start() and stop(). NEW: We want to put assert()s in to check this.
 
 playable_notification interface
 -------------------------------
@@ -61,7 +63,8 @@ stopped(cookie)
 	
 All the other ones can only occur between those two. Every
 start() will generate exactly one started(). Exactly one stopped() is always emitted,
-after started(). stopped() may be emitted before or after stop().
+after started(). stopped() may be emitted before or after stop(). NEW: we want to
+put in asserts to check this.
 
 internal events
 ---------------
@@ -107,7 +110,9 @@ For two nodes back-to-back, the order will be:
 There is now the question of how to handle mismatching surfaces. Probably not difficult, but we need
 to be aware of it.
 
-For a prefetch, later followed by a normal node, the order will be:
+For a prefetch, later followed by a normal node, the order will be (this assumes prefetch is completely
+transparent to the scheduler, doesn't react to dur/begin/end, doesn't do other timing calculations, very
+similar to how state commands are implemented):
 
 	create()
 	init_with_node(prefetch_node)
@@ -119,6 +124,23 @@ For a prefetch, later followed by a normal node, the order will be:
 	stop()
 	post_stop()
 	
+Alternative for prefetch (assuming prefetch is very much like a normal video/audio/ref/etc):
+	create()
+	init_with_node(prefetch_node)
+	preroll(prefetch_node_parameters)
+	start()
+	stop()
+	init_with_node(normal_node)
+	set_surface(normal_node_surface)
+	preroll(normal_node_parameters)
+	start()
+	stop()
+	post_stop()
+	
+For the time being, we have decided to try the first solution: prefetch has a side-effect which
+triggers at the beginning of its duration and continues "forever" afterwards. The scheduler ignores
+it for its calculations.
+
 Changes, and rationale
 ----------------------
 
