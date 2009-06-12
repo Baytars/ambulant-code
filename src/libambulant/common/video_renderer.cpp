@@ -372,9 +372,7 @@ video_renderer::seek(double t)
 	m_last_frame_timestamp = -1;
 #endif
 #endif
-#ifndef EXP_KEEPING_RENDERER
 	if (m_audio_renderer) m_audio_renderer->seek(t);
-#endif
 }
 
 common::duration 
@@ -501,7 +499,7 @@ video_renderer::data_avail()
 			/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail_prefetch: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 			m_lock.leave();
-			m_context->stopped(m_cookie, 0);
+//xxxjack			m_context->stopped(m_cookie, 0);
 			//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 			lib::logger::get_logger()->debug("video_renderer_prefetch: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 											 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
