@@ -938,7 +938,7 @@ void time_node::resume_playable() {
 }
 
 void time_node::stop_playable() {
-	if(!is_playable()) return;
+	if(!is_playable() && !is_prefetch()) return;
 	if(!m_needs_remove) return;
 	m_eom_flag = true;
 	AM_DBG m_logger->debug("%s[%s].stop()", m_attrs.get_tag().c_str(), 
@@ -1537,6 +1537,7 @@ void time_node::remove(qtime_type timestamp) {
 	if(is_animation()) stop_animation();
 #ifdef WITH_SMIL30
 	/* else nothing to do for statecommands */
+	if (is_prefetch()) stop_playable();
 #endif
 	else if(is_playable()) stop_playable();
 	if(m_timer) m_timer->stop();

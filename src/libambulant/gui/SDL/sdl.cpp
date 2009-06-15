@@ -86,7 +86,7 @@ sdl_renderer_factory::new_playable(
 #else
 	if ( tag == "audio" || tag == "prefetch") {
 		rv = new gui::sdl::sdl_audio_renderer(context, cookie, node, evp, m_factory, (common::playable_factory_machdep*)NULL);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory: node 0x%x: returning sdl_audio_renderer 0x%x", (void *)node, (void *)rv);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory: node 0x%x: %s returning sdl_audio_renderer 0x%x", (void *)node, node->get_sig().c_str(), (void *)rv);
 	} else {
 		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory: no SDL renderer for tag \"%s\"", tag.c_str());
         return NULL;
