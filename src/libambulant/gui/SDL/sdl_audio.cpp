@@ -654,6 +654,11 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
       // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
 		
 		if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
+//		std::string tag = m_node->get_local_name();
+//		if (tag == "prefetch") {
+			m_audio_clock = 0;
+//		}
+
 		
 #if 0
 		std::string tag = m_node->get_local_name();
