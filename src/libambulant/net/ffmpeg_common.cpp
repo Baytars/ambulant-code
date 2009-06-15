@@ -331,11 +331,16 @@ void
 ffmpeg_demux::seek(timestamp_t time)
 {
 	m_lock.enter();
+#ifndef EXP_KEEPING_RENDERER
     if (m_seektime != time) {
         AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::seek(%ld): was %ld", time, m_seektime);
         m_seektime = time;
         m_seektime_changed = true;
     }
+#else
+	m_seektime = time;
+	m_seektime_changed = true;
+#endif
 	m_lock.leave();
 }
 
