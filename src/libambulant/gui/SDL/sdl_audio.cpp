@@ -490,7 +490,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
         AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
-		assert(fb && !strcmp(fb, "continue"));
+		//assert(fb && !strcmp(fb, "continue"));
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -574,7 +574,7 @@ gui::sdl::sdl_audio_renderer::data_avail()
 #endif
 			m_lock.leave();
 			if (m_context) {
-				m_context->stopped(m_cookie, 0);
+				//m_context->stopped(m_cookie, 0);
 			} else {
 				AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer(0x%x): m_context is  NULL", (void*)this);
 			}
@@ -653,14 +653,15 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	  //xxxbo: Note, for supporting prefetch, I comment out this line of code
       // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
 		
-		//if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
+		if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
 		
+#if 0
 		std::string tag = m_node->get_local_name();
 		if (tag == "prefetch") {
 			m_audio_src->seek(m_clip_begin);
 			m_audio_clock = 0;
 		}
-		
+#endif
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
@@ -774,7 +775,7 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 #endif
     if (!m_node) abort();
 	
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
+	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
 		
