@@ -122,22 +122,27 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
     // then the streams are multiplexed, and we should seek only a single stream.
     // We let the audio handler do the seeking, as the video handler can
     // much more easily skip frames, etc.
-
+#if 1
+	//pause(); //xxxbo: Note, we can only call pause after start_prefetch since m_timer which is needed by pause
+			   //       is created in start_prefetch
+	if (m_clip_begin != old_clip_end) {
+		seek(m_clip_begin/1000);
+	}
+#endif
 	if (m_audio_renderer) {
 		m_audio_renderer->update_context_info(node, cookie);
-	} else {
-#if 0  //xxxbo: Note, for supporting prefetch, I comment out this line of code
+	} 
+#if 0
+	else {
 	   // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
         if (m_clip_begin != old_clip_end) {
             seek(m_clip_begin/1000);
         }
-#endif
-		std::string tag = m_node->get_local_name();
-		if (tag == "prefetch") {
-			seek(m_clip_begin/1000);
-		}	
     }
-	
+#endif
+	//resume(); //xxxbo: Note, we can only call pause after start_prefetch since m_timer which is needed by pause
+			    //       is created in start_prefetch
+
 	m_previous_clip_end = m_clip_end;
 
 }
@@ -246,6 +251,16 @@ video_renderer::start_prefetch (double where)
 	m_timer = lib::realtime_timer_factory();
 #endif
 	
+	//xxxbo:
+#if 0
+	pause(); 
+	seek(m_clip_begin/1000);
+	if (m_audio_renderer) {
+		m_audio_renderer->seek(m_clip_begin/1000);
+	}
+	resume();
+#endif	
+	
 	// Now we need to define where we start playback. This depends on m_clip_begin (microseconds)
 	// and where (seconds). We use these to set m_epoch (milliseconds) to the time (m_timer-based)
 	// at which we would have played the frame with timestamp 0.
@@ -348,6 +363,7 @@ video_renderer::stop()
 void
 video_renderer::seek(double t)
 {
+	//assert(m_audio_renderer == NULL);
 	AM_DBG lib::logger::get_logger()->trace("video_renderer: seek(%f) curtime=%f", t, (double)m_timer->elapsed()/1000.0);
 	long int t_ms = (long int)(t*1000.0);
 #if 0
@@ -372,7 +388,7 @@ video_renderer::seek(double t)
 	m_last_frame_timestamp = -1;
 #endif
 #endif
-	if (m_audio_renderer) m_audio_renderer->seek(t);
+	//if (m_audio_renderer) m_audio_renderer->seek(t);
 }
 
 common::duration 
@@ -423,6 +439,7 @@ video_renderer::pause(pause_display d)
 		if (m_audio_renderer) 
 			m_audio_renderer->pause(d);
 		m_is_paused = true;
+		assert (m_timer);
 		m_paused_epoch = m_timer->elapsed();
 	}
 	m_lock.leave();
@@ -437,6 +454,7 @@ video_renderer::resume()
 		if (m_audio_renderer) 
 			m_audio_renderer->resume();
 		m_is_paused = false;
+		assert (m_timer);
 		unsigned long int pause_length = m_timer->elapsed() - m_paused_epoch;
 		m_epoch += pause_length;
 	}
@@ -464,6 +482,7 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
+
 	if (buf == NULL) {
 		// This can only happen immedeately after a seek.
 		//bo-note: Probably, the above claim is not true. Actually, this happens at the end of the last clip
@@ -552,7 +571,7 @@ video_renderer::data_avail()
 	} else
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
         m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES

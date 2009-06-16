@@ -652,13 +652,11 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	if (m_audio_src) {
 	  //xxxbo: Note, for supporting prefetch, I comment out this line of code
       // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
-		
 		if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
 //		std::string tag = m_node->get_local_name();
 //		if (tag == "prefetch") {
 			m_audio_clock = 0;
 //		}
-
 		
 #if 0
 		std::string tag = m_node->get_local_name();
@@ -783,6 +781,12 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
+
+		//xxxbo:
+#if 0
+		m_audio_src->seek(m_clip_begin);
+		m_audio_clock = 0;
+#endif
 		
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");

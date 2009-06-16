@@ -412,7 +412,12 @@ ffmpeg_demux::run()
 #ifndef EXP_KEEPING_RENDERER //xxxbo note: I don't understand why seektime = m_clip_begin+m_seektime;
 			int64_t seektime = m_clip_begin+m_seektime;
 #else
-			int64_t seektime = m_seektime;
+			int64_t seektime;
+			if (m_seektime == 0) 
+				seektime = m_clip_begin;
+			else
+				seektime = m_seektime;
+			//int64_t seektime = m_seektime;
 #endif
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
