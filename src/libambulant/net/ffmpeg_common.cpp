@@ -416,7 +416,10 @@ ffmpeg_demux::run()
 			if (m_seektime == 0) 
 				seektime = m_clip_begin;
 			else
+			{
+				m_clip_begin = 0;
 				seektime = m_seektime;
+			}
 			//int64_t seektime = m_seektime;
 #endif
             if (m_con->start_time != AV_NOPTS_VALUE) {
