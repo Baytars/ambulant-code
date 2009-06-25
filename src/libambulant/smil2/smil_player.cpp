@@ -297,6 +297,7 @@ void smil_player::done_playback() {
 
 // Request to create a playable for the node.
 common::playable *smil_player::create_playable(const lib::node *n) {
+    assert(n);
 #ifndef EXP_KEEPING_RENDERER
 	std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.find(n);
@@ -340,7 +341,6 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		}
 	}
 	if( np == NULL ) { 
-		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable", (void*)n);
 		np = _new_playable(n);
 		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
@@ -362,9 +362,11 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		if (fb == NULL || strcmp(fb, "continue"))
 			np->stop_but_keeping_renderer();
 			//np->stop();
-	}	
-	//xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
-	np->update_context_info(n, n->get_numid());
+	}
+    if (np) {
+        //xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
+        np->update_context_info(n, n->get_numid());
+    }
 #endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
@@ -923,6 +925,7 @@ void smil_player::on_focus_activate() {
 // Creates and returns a playable for the node.
 common::playable *
 smil_player::_new_playable(const lib::node *n) {
+    assert(n);
 	int nid = n->get_numid();
 	std::string tag = n->get_local_name();
 	const char *pid = n->get_attribute("id");
@@ -946,7 +949,9 @@ smil_player::_new_playable(const lib::node *n) {
 		} else {
 			AM_DBG m_logger->debug("smil_player::_new_playable: surface not set because rend == NULL");
 		}
-	}
+	} else {
+        lib::logger::get_logger()->trace("%s: could not create playable", n->get_sig().c_str());
+    }
 	return np;
 }
 

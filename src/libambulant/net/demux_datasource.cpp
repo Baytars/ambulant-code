@@ -164,6 +164,10 @@ demux_audio_datasource::seek(timestamp_t time)
         return;
     }
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
+    int nbuf = m_queue.size();
+    if ( nbuf > 0) {
+        lib::logger::get_logger()->debug("demux_audio_datasource: flush %d buffers due to seek", nbuf);
+    }
 	while (m_queue.size() > 0) {
 		m_queue.pop();
 	}
@@ -426,7 +430,10 @@ demux_video_datasource::seek(timestamp_t time)
     }
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::seek: (this = 0x%x), time=%d", (void*) this, time);
 	assert(m_thread);
-
+    int nbuf = m_frames.size();
+    if ( nbuf > 0) {
+        lib::logger::get_logger()->debug("demux_video_datasource: flush %d frames due to seek", nbuf);
+    }
 	while (m_frames.size() > 0) {
 		// flush frame queue
 		ts_frame_pair element = m_frames.front();
