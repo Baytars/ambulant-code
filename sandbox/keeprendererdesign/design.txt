@@ -10,6 +10,10 @@ I assume the following interface for the renderer and playable (the important bi
 This is slightly different from what is currently implemented.
 All methods are from playable, unless otherwise indicated.
 
+Note to self: many renderers have an "m_activated" member, but the meaning is unclear.
+In some places it is used to mean "the internal engine is running", in other places
+it means "the engine is running, and I'm connected to a surface". This needs fixing.
+
 playable and renderer API
 -------------------------
 
