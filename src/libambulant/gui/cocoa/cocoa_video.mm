@@ -270,6 +270,7 @@ cocoa_video_renderer::stop()
 	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	if (m_movie_view) {
 		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: removing m_movie_view 0x%x", (void *)m_movie_view);
 		[MovieCreator performSelectorOnMainThread: @selector(removeFromSuperview:) withObject: m_movie_view waitUntilDone: NO];

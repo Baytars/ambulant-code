@@ -97,7 +97,8 @@ void gui::dx::dx_area::start(double t) {
 }
 
 void gui::dx::dx_area::stop() {
-	m_dest->renderer_done(this);
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	m_activated = false;
 	if(m_rgn) {
 		delete m_rgn;

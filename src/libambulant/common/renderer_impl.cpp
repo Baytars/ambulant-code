@@ -63,6 +63,16 @@ renderer_playable::renderer_playable(
 }
 
 void
+renderer_playable::set_surface(common::surface *dest)
+{
+	if (m_dest && m_dest != dest) {
+		m_dest->renderer_done(this);
+	}
+	m_dest = dest;
+}
+
+
+void
 renderer_playable::start(double t)
 {
 	AM_DBG lib::logger::get_logger()->debug("renderer_playable.start(0x%x)", (void *)this);
@@ -85,8 +95,8 @@ renderer_playable::stop()
 	if (!m_activated) {
 		lib::logger::get_logger()->trace("renderer_playable.stop(0x%x): not started", (void*)this);
 	} else {
-		if (m_dest)
-			m_dest->renderer_done(this);
+		if (m_dest)	m_dest->renderer_done(this);
+		m_dest = NULL;
 	}
 	m_activated = false;
 }
@@ -99,8 +109,8 @@ renderer_playable::stop_keeping_renderer()
 	if (!m_activated) {
 		lib::logger::get_logger()->trace("renderer_playable.stop_keeping_renderer(0x%x): not started", (void*)this);
 	} else {
-		if (m_dest)
-			m_dest->renderer_done(this);
+		if (m_dest)	m_dest->renderer_done(this);
+		m_dest = NULL;
 	}
 	m_activated = false;
 	
