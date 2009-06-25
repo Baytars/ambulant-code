@@ -530,7 +530,11 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 	while ( m_frames.size() > 1) {
 		_pop_top_frame();
 	}
-#else //xxxbo: I just hack here to support prefetch for video, need think it carefully later. 
+#else //xxxbo: I just hack here to support prefetch for video, need think it carefully later.
+    int nframes = m_frames.size();
+    if (nframes > 0) {
+        lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes);
+    }
 	while ( m_frames.size() > 0) {
 		_pop_top_frame();
 	}	

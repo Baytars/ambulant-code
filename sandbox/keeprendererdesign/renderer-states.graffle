@@ -14,7 +14,9 @@
 	<key>CanvasOrigin</key>
 	<string>{0, 0}</string>
 	<key>CanvasScale</key>
-	<real>1</real>
+	<real>0.72000002861022949</real>
+	<key>CanvasSize</key>
+	<string>{794.486, 1137.01}</string>
 	<key>ColumnAlign</key>
 	<integer>1</integer>
 	<key>ColumnSpacing</key>
@@ -449,7 +451,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{510.555, 894.262}, {71, 14}}</string>
+			<string>{{510.39, 894.474}, {71, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -517,7 +519,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>74</integer>
 			<key>Points</key>
 			<array>
-				<string>{597, 835.842}</string>
+				<string>{596.693, 836.237}</string>
 				<string>{487, 977.098}</string>
 			</array>
 			<key>Style</key>
@@ -540,7 +542,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{231.802, 916.281}, {71, 14}}</string>
+			<string>{{232.021, 916.436}, {71, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -606,7 +608,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>72</integer>
 			<key>Points</key>
 			<array>
-				<string>{202, 876.854}</string>
+				<string>{202.408, 877.144}</string>
 				<string>{343, 977.098}</string>
 			</array>
 			<key>Style</key>
@@ -629,7 +631,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{379.5, 763.666}, {71, 14}}</string>
+			<string>{{379.5, 763.997}, {71, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -697,7 +699,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>70</integer>
 			<key>Points</key>
 			<array>
-				<string>{415, 676.756}</string>
+				<string>{415, 677.256}</string>
 				<string>{415, 955.098}</string>
 			</array>
 			<key>Style</key>
@@ -848,7 +850,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{576.5, 753.352}, {41, 14}}</string>
+			<string>{{576.5, 753.084}, {41, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -914,7 +916,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>65</integer>
 			<key>Points</key>
 			<array>
-				<string>{597, 733.188}</string>
+				<string>{597, 732.688}</string>
 				<string>{597, 791.842}</string>
 			</array>
 			<key>Style</key>
@@ -937,7 +939,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{181.5, 791.842}, {41, 14}}</string>
+			<string>{{181.5, 791.573}, {41, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -1003,7 +1005,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>63</integer>
 			<key>Points</key>
 			<array>
-				<string>{202, 769.5}</string>
+				<string>{202, 769}</string>
 				<string>{202, 832.854}</string>
 			</array>
 			<key>Style</key>
@@ -1687,7 +1689,7 @@ Yellow shadow: diagram is incorrect}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{364, 575.757}, {102, 14}}</string>
+			<string>{{364, 575.409}, {102, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -1753,7 +1755,7 @@ Yellow shadow: diagram is incorrect}</string>
 			<integer>47</integer>
 			<key>Points</key>
 			<array>
-				<string>{415, 560.784}</string>
+				<string>{415, 560.284}</string>
 				<string>{415, 632.756}</string>
 			</array>
 			<key>Style</key>
@@ -2195,7 +2197,7 @@ start data transfer.}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{222, 318.579}, {52, 14}}</string>
+			<string>{{222, 318.281}, {52, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -2263,7 +2265,7 @@ start data transfer.}</string>
 			<integer>35</integer>
 			<key>Points</key>
 			<array>
-				<string>{248, 281.5}</string>
+				<string>{248, 281}</string>
 				<string>{248, 391}</string>
 			</array>
 			<key>Style</key>
@@ -2342,7 +2344,7 @@ start data transfer.}</string>
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{389, 355.451}, {52, 14}}</string>
+			<string>{{389, 355.152}, {52, 14}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FitText</key>
@@ -2410,7 +2412,7 @@ start data transfer.}</string>
 			<integer>32</integer>
 			<key>Points</key>
 			<array>
-				<string>{415, 343.215}</string>
+				<string>{415, 342.715}</string>
 				<string>{415, 391}</string>
 			</array>
 			<key>Style</key>
@@ -2923,7 +2925,7 @@ surface = NULL}</string>
 	<key>GuidesVisible</key>
 	<string>YES</string>
 	<key>HPages</key>
-	<integer>2</integer>
+	<integer>1</integer>
 	<key>ImageCounter</key>
 	<integer>1</integer>
 	<key>IsPalette</key>
@@ -3015,7 +3017,7 @@ surface = NULL}</string>
 		</dict>
 	</array>
 	<key>ModificationDate</key>
-	<string>2009-06-12 00:09:51 +0200</string>
+	<string>2009-06-12 09:47:39 +0200</string>
 	<key>Modifier</key>
 	<string>Jack Jansen</string>
 	<key>NotesVisible</key>
@@ -3043,7 +3045,7 @@ surface = NULL}</string>
 		<key>NSPaperSize</key>
 		<array>
 			<string>size</string>
-			<string>{595.276, 841.89}</string>
+			<string>{595, 842}</string>
 		</array>
 		<key>NSRightMargin</key>
 		<array>
@@ -3073,7 +3075,7 @@ surface = NULL}</string>
 	<key>UseEntirePage</key>
 	<true/>
 	<key>VPages</key>
-	<integer>2</integer>
+	<integer>1</integer>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
@@ -3093,7 +3095,7 @@ surface = NULL}</string>
 		<key>ShowStatusBar</key>
 		<true/>
 		<key>VisibleRegion</key>
-		<string>{{0, 0}, {1107.7, 1051.57}}</string>
+		<string>{{-371, -161}, {1538.48, 1460.51}}</string>
 		<key>Zoom</key>
 		<string>0.7303395</string>
 	</dict>
