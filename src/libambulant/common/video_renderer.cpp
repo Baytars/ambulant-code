@@ -295,10 +295,10 @@ video_renderer::stop_but_keeping_renderer()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 	m_context->stopped(m_cookie, 0);
-#if 1
+#if 1 //xxxbo: this part of code is here for supporting prefetch (sptest-07-video/av.smil). 
 	if (m_node->get_local_name() != "prefetch") {
 		if (m_dest) m_dest->renderer_done(this);
-		m_dest = NULL;
+		//m_dest = NULL; //xxxbo: comment out this line, otherwise it will break other sptests, i.e. sptest-01, etc 
 	}
 #endif
 
