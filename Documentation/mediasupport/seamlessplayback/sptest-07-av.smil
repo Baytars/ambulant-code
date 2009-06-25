@@ -10,7 +10,8 @@
 <body>
 <par>
 <smilText region="bottom">
-This presentation consists of 4 4-second parts. Odd and even media come from different files.
+This presentation consists of 4 4-second parts. Odd and even media come from different files,
+using prefetch to arm them.
 <br/>
 In the left region, you should see the animated score of Vader Jacob.
 <br/>

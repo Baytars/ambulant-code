@@ -17,6 +17,8 @@ In the left region, you should see the animated score of Vader Jacob.
 In the right region, you should see the Karaoke-style words to it.
 <br/>
 There is no audio.
+<br/>
+This is line sptest-01, but using fill=continue.
 <clear begin="16s"/>
 </smilText>
 <seq>
