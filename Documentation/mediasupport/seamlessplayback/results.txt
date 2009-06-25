@@ -1,0 +1,63 @@
+Results of runnign the tests. Last update, 25-Jun-09, Jack.
+Items with [!] in margin are not what is expected, and need attention.
+
+problems with all (not always repeated again below):
+[!]	Playing a video-only media item causes the player not to stop at the end. (Jack, 25-Jun-09)
+[!]	Playing video-only along with karaoke does not sync the karaoke to the video. (Jack, 25-Jun-09)
+
+sptest-00:
+	25-Jun-09, Jack: Works.
+
+sptest-01
+	audio: Works with minimal (0.2s?) audio pause (Jack, 25-Jun-09)
+	video: Same, but does not stop at the end (Jack, 25-Jun-09)
+	av: Works with minimal (0.2s?) audio pause (Jack, 25-Jun-09)
+	
+sptest-02
+	audio: Audio pauses 0.25s (Jack, 25-Jun-09)
+	video: Video pauses without display for about 0.7s, sync is pretty bad, does not stop at the end (Jack, 25-Jun-09)
+	av: Audio pauses 0.25s, video pauses (without display) for about 0.7s (Jack, 25-Jun-09)
+	audio-modified: Same as audio, plays alternatives as it should (Jack, 25-Jun-09)
+	
+sptest-03
+[!]	audio: Works, but crashes on window close (Jack, 25-Jun-09)
+[!]	video: Works, but hangs at the end, then crashes (Jack, 25-Jun-09)
+	av:  Works (Jack, 25-Jun-09)
+	
+sptest-04
+	video: Works (Jack, 25-Jun-09)
+	av: Works (Jack, 25-Jun-09)
+	
+sptest-05
+	audio: Works (Jack, 25-Jun-09)
+[!]	video: Video does not repeat but pauses (Jack, 25-Jun-09)
+[!]	av: First repeat: pause in audio and video. Second part starts ugly. Then audio repeats, but not video. (Jack, 25-Jun-09)
+	
+sptest-06
+	audio: Works (Jack, 25-Jun-09)
+	video: Sync progressively worsens (Jack, 25-Jun-09)
+	av: Works (Jack, 25-Jun-09)
+
+sptest-07
+	audio: Is not better that sptest-02 (Jack, 25-Jun-09)
+	video: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
+	av: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
+	audio-modified: Same, also has ffmpeg error messages in output (Jack, 25-Jun-09)
+	
+sptest-08:
+	audio: Perfect! (Jack, 25-Jun-09)
+[!]	video: Video disappears during beats 3-4, 5-6 (Jack, 25-Jun-09)
+[!]	av: Video disappears during beats 3-4, 5-6 (Jack, 25-Jun-09)
+	
+sptest-09:
+	audio: Perfect! (Jack, 25-Jun-09)
+[!]	video: Video disappears during beats 3-4, 5-6 (Jack, 25-Jun-09)
+[!]	av: Video disappears during beats 3-4, 5-6 (Jack, 25-Jun-09)
+	
+sptest-10:
+	video: Works (Jack, 25-Jun-09)
+	av: Works (Jack, 25-Jun-09)
+	
+sptest-11:
+	video: Works (Jack, 25-Jun-09)
+	av: Works, with minimal (expected) audio hiss (Jack, 25-Jun-09)
