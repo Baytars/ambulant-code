@@ -155,6 +155,9 @@ video_renderer::start (double where)
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.start(0x%x): already started", (void*)this);
 		m_lock.leave();
+        // XXXJACK: stopgap for continuous renderering: call show().
+        // Interaction renderer/surface needs rethinking.
+        if (m_dest) m_dest->show(this);
 		return;
 	}
 	if (!m_src) {

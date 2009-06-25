@@ -151,14 +151,10 @@ void
 surface_impl::show(gui_events *cur)
 {
 	m_children_cs.enter();
-#ifndef EXP_KEEPING_RENDERER
-#if 1
 	// Sanity check: it shouldn't be in here already
 	std::list<gui_events*>::iterator i;
 	for(i=m_renderers.begin(); i!=m_renderers.end(); i++)
 		assert((*i) != cur);
-#endif
-#endif
 	m_renderers.push_back(cur);
 	m_children_cs.leave();
 	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].show(0x%x)", (void *)this, (void *)cur);
@@ -173,7 +169,7 @@ surface_impl::show(gui_events *cur)
 void
 surface_impl::renderer_done(gui_events *cur)
 {
-	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("surface_impl[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
 	
 	m_children_cs.enter();
 	std::list<gui_events*>::iterator i = m_renderers.end();
@@ -182,6 +178,11 @@ surface_impl::renderer_done(gui_events *cur)
 	if (i == m_renderers.end()) {
 		lib::logger::get_logger()->trace("surface_impl[0x%x].renderer_done(0x%x): not found in %d active renderers!",
 			(void *)this, (void*)cur, m_renderers.size());
+        // Note by Jack: this is not necessarily an error condition, with the current structure of the code.
+        // Renderers may or may not call surface_impl::show() (for example, if errors occur) and don't remember
+        // this fact. Hence, it is possible they call renderer_done() later without the corresponding show()
+        // call. We may want to revisit this pattern at some point.
+        //
 		//assert(0);
 	} else {
 		m_renderers.erase(i);
