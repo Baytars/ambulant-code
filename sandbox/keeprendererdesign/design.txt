@@ -41,10 +41,12 @@ start(double t, playable_notification::cookie_type cookie)
 	
 stop()
 	/// Scheduler-aspect of stop: emits stopped(), removes node/cookie binding.
-	/// Playback continues, though.
+	/// Returns a boolean, if it returns true the renderer is actually continuing
+	/// and it may be cached. For complete playback stop a later call to
+	/// post_stop() is required.
 
 post_stop()
-	/// Playback stops.
+	/// Playback stops. May only be called if stop() returned true.
 	
 I'm ignoring pause(), resume(), seek() and wantclicks() here, as they have no influence
 on the grand scheme of things. I am assuming that these calls can only be issued
@@ -154,4 +156,5 @@ I've removed start_prefetch(), because we already had an (unused, and forgotten)
 called preroll().
 
 Bo's call stop_but_keeping_renderer() is now called simply stop(). The "second half"
-of the old stop, which actually stops playback, is now called post_stop().
+of the old stop, which actually stops playback, is now called post_stop(). The return value
+of stop() is new too.
