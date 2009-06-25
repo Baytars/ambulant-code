@@ -37,3 +37,15 @@ sptest-07
 	This should allow back-to-back playback to be as good again as for sptest-01,
 	we hope.
 	
+sptest-08:
+	fill=continue. Identical to sptest-01, but all media items use fill=continue.
+	
+sptest-09:
+	fill=continue. Identical to sptest-06, but all media items use fill=continue.
+	
+sptest-10:
+	End in time. Play 4-second sections from different files in different regions,
+	to ensure that renderers actually end when they're not reused.
+	
+sptest-11:
+	End-in-time with fill=continue. Like sptest-10, but with fill=continue.
