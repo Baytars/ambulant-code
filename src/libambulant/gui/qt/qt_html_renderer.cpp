@@ -156,7 +156,8 @@ void
 gui::qt::qt_html_renderer::stop() {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::stop(0x%x)", this);
-	m_dest->renderer_done(this);
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	m_activated = false;
 	if (m_html_browser)
 	   m_html_browser->hide(m_event_processor);

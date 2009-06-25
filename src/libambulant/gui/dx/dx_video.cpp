@@ -171,7 +171,8 @@ void gui::dx::dx_video_renderer::stop() {
 	p->stop();
 	delete p;
 	m_cs.leave();
-	m_dest->renderer_done(this);
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	m_activated = false;
 	m_dxplayer->stopped(this);
 	m_context->stopped(m_cookie);

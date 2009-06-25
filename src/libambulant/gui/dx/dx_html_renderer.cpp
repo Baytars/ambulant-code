@@ -184,7 +184,8 @@ gui::dx::dx_html_renderer::stop() {
 	// m_html_browser->hide();
 	assert(m_html_browser);
 
-	m_dest->renderer_done(this);
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	m_activated = false;
 	m_dxplayer->stopped(this);
 	m_html_browser->hide(m_event_processor);

@@ -111,6 +111,7 @@ gtk_fill_renderer::stop()
 	} else {
 		m_is_showing = false;
 		if (m_dest) m_dest->renderer_done(this);
+		m_dest = NULL;
 	}
 	assert(m_context);
 	m_context->stopped(m_cookie);

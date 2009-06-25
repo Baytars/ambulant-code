@@ -182,6 +182,7 @@ surface_impl::renderer_done(gui_events *cur)
 	if (i == m_renderers.end()) {
 		lib::logger::get_logger()->trace("surface_impl[0x%x].renderer_done(0x%x): not found in %d active renderers!",
 			(void *)this, (void*)cur, m_renderers.size());
+		//assert(0);
 	} else {
 		m_renderers.erase(i);
 	}
