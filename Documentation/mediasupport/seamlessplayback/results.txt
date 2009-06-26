@@ -1,8 +1,7 @@
-Results of runnign the tests. Last update, 25-Jun-09, Jack.
+Results of runnign the tests. Last update, 26-Jun-09, Jack.
 Items with [!] in margin are not what is expected, and need attention.
 
 problems with all (not always repeated again below):
-[!]	Playing a video-only media item causes the player not to stop at the end. (Jack, 25-Jun-09)
 [!]	Playing video-only along with karaoke does not sync the karaoke to the video. (Jack, 25-Jun-09)
 
 sptest-00:
@@ -10,23 +9,23 @@ sptest-00:
 
 sptest-01
 	audio: Works with minimal (0.2s?) audio pause (Jack, 25-Jun-09)
-	video: Same, but does not stop at the end (Jack, 25-Jun-09)
-	av: Works with minimal (0.2s?) audio pause (Jack, 25-Jun-09)
+	video: Same, but does not stop at the end (Jack, 26-Jun-09)
+	av: Works with minimal (0.2s?) audio pause (Jack, 26-Jun-09)
 	
 sptest-02
 	audio: Audio pauses 0.25s (Jack, 25-Jun-09)
-	video: Video pauses without display for about 0.7s, sync is pretty bad, does not stop at the end (Jack, 25-Jun-09)
-	av: Audio pauses 0.25s, video pauses (without display) for about 0.7s (Jack, 25-Jun-09)
+	video: Video pauses without display for about 0.7s, sync is pretty bad (Jack, 26-Jun-09)
+	av: Audio pauses 0.25s, video pauses (without display) for about 0.7s (Jack, 26-Jun-09)
 	audio-modified: Same as audio, plays alternatives as it should (Jack, 25-Jun-09)
 	
 sptest-03
 [!]	audio: Works, but crashes on window close (Jack, 25-Jun-09)
-[!]	video: Works, but hangs at the end, then crashes (Jack, 25-Jun-09)
-	av:  Works (Jack, 25-Jun-09)
+	video: Works (Jack, 26-Jun-09)
+	av:  Works (Jack, 26-Jun-09)
 	
 sptest-04
-	video: Works (Jack, 25-Jun-09)
-	av: Works (Jack, 25-Jun-09)
+	video: Works (Jack, 26-Jun-09)
+	av: Works (Jack, 26-Jun-09)
 	
 sptest-05
 	audio: Works (Jack, 25-Jun-09)

@@ -487,11 +487,13 @@ video_renderer::data_avail()
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
 
 	if (buf == NULL) {
-		// This can only happen immedeately after a seek.
-		//bo-note: Probably, the above claim is not true. Actually, this happens at the end of the last clip
-		lib::logger::get_logger()->debug("video_renderer::data_avail: get_frame returned NULL");
-		//bo-note: In this case, this assert is not true any more. So I comment out it.
-		//assert(m_last_frame_timestamp < 0);
+		// This can only happen immedeately after a seek, or if we have read past end-of-file.
+ 		lib::logger::get_logger()->debug("video_renderer::data_avail: get_frame returned NULL");
+        if (m_src->end_of_file()) {
+            m_context->stopped(m_cookie, 0);
+        } else {
+            assert(m_last_frame_timestamp < 0);
+        }
 		m_lock.leave();
 		return;
 	}
@@ -538,25 +540,18 @@ video_renderer::data_avail()
 	} else {
 		if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
 			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
-			//		if (m_src) {
-			//			m_src->stop();
-			//			m_src->release();
-			//			m_src = NULL;
-			//		}
-			///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-			//        we continue playback it other than return. 
-			const char * fb = m_node->get_attribute("fill");
-			if (fb == NULL || strcmp(fb, "continue"))
-				m_lock.leave();
 			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 			m_context->stopped(m_cookie, 0);
-			//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 			lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 											 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
-			///xxxbo: To support continuous playback, when frame_ts_micros > m_clip_end, 
-			//        we continue playback it other than return. 
-			if (fb == NULL || strcmp(fb, "continue"))
+			
+            // To support continuous playback, when frame_ts_micros > m_clip_end, 
+			// we continue playback, unless we are prefetching.
+			const char * fb = m_node->get_attribute("fill");
+			if (m_src->end_of_file() || fb == NULL || strcmp(fb, "continue")) {
+				m_lock.leave();
 				return;
+            }
 		}		
 	}
 #endif
