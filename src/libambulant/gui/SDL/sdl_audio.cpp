@@ -385,7 +385,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         }
         // Now communicate it to the clock.
         { // if (clock_drift < -20 || clock_drift > 20) {
-            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            AM_DBG if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
@@ -503,18 +503,20 @@ bool
 gui::sdl::sdl_audio_renderer::restart_audio_input()
 {
 	// private method - no need to lock.
-	std::string tag = m_node->get_local_name();
-	if (tag != "prefetch") {
-		if (!m_audio_src || m_audio_src->end_of_file() || !m_is_playing) {
-			// No more data.
-			return false;
-		}
-	} else { //xxxbo: here, I use end_of_file_prefetch to detect if the end of the physical file is reached
-		if (!m_audio_src || m_audio_src->end_of_file_prefetch() || !m_is_playing) {
-			// No more data.
-			return false;
-		}		
-	}
+    
+    // end-of-data condition testing is a bit convoluted, because m_node may not always be
+    // available.
+    bool more_data = (m_audio_src != NULL && m_is_playing);
+    if (more_data && m_audio_src->end_of_file())
+        more_data = false;
+    if (more_data) {
+        std::string tag = m_node->get_local_name();
+        if (tag == "prefetch" && m_audio_src->end_of_file_prefetch())
+            more_data = false;
+    }
+    if (!more_data)
+        return false;
+        
 #ifndef EXP_KEEPING_RENDERER
 	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
 		// Start reading 
@@ -522,7 +524,7 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		m_audio_src->start(m_event_processor, e);
 	}
 #else
-	tag = m_node->get_local_name();
+	std::string tag = m_node->get_local_name();
 	if (tag == "prefetch") {
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
@@ -778,7 +780,7 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 #endif
     if (!m_node) abort();
 	
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {
 

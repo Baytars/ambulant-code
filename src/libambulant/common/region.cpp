@@ -169,7 +169,7 @@ surface_impl::show(gui_events *cur)
 void
 surface_impl::renderer_done(gui_events *cur)
 {
-	/*AM_DBG*/ lib::logger::get_logger()->debug("surface_impl[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
+	AM_DBG lib::logger::get_logger()->debug("surface_impl[0x%x].renderer_done(0x%x)", (void *)this, (void*)cur);
 	
 	m_children_cs.enter();
 	std::list<gui_events*>::iterator i = m_renderers.end();
