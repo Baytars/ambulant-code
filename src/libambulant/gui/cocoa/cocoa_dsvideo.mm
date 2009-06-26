@@ -18,11 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /* 
-<<<<<<< cocoa_dsvideo.mm
  * @$Id$ 
-=======
- * @$Id$ 
->>>>>>> 1.23.2.4
  */
 
 #include "ambulant/gui/cocoa/cocoa_gui.h"
@@ -284,6 +280,7 @@ void
 cocoa_dsvideo_renderer::redraw(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
+    assert(m_dest);
 	const rect &r = m_dest->get_rect();
 	AM_DBG logger::get_logger()->debug("cocoa_dsvideo_renderer.redraw(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 	
