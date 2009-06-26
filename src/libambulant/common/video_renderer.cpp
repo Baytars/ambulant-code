@@ -520,7 +520,7 @@ video_renderer::data_avail()
 	std::string tag = m_node->get_local_name();
 	if (tag == "prefetch") {
 		if (m_src->end_of_file_prefetch() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-			/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail_prefetch: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail_prefetch: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 			// XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
 			m_lock.leave();
 //xxxjack			m_context->stopped(m_cookie, 0);
@@ -569,7 +569,7 @@ video_renderer::data_avail()
 	} else
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
         m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES

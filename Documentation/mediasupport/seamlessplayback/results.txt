@@ -19,7 +19,7 @@ sptest-02
 	audio-modified: Same as audio, plays alternatives as it should (Jack, 25-Jun-09)
 	
 sptest-03
-[!]	audio: Works, but crashes on window close (Jack, 25-Jun-09)
+	audio: Works (Jack, 26-Jun-09)
 	video: Works (Jack, 26-Jun-09)
 	av:  Works (Jack, 26-Jun-09)
 	

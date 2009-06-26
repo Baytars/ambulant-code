@@ -932,7 +932,7 @@ void time_node::pause_playable(common::pause_display d) {
 
 void time_node::resume_playable() {
 	if(!is_playable() || m_ffwd_mode) return;
-	/*AM_DBG*/ m_logger->debug("%s[%s].resume()", m_attrs.get_tag().c_str(), 
+	AM_DBG m_logger->debug("%s[%s].resume()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_context->resume_playable(m_node);
 }
@@ -1249,7 +1249,7 @@ void time_node::on_rom(qtime_type timestamp) {
 // This notification is taken into account when this node is still active
 // and the implicit duration is involved in timing calculations.
 void time_node::on_eom(qtime_type timestamp) {
-	/*AM_DBG*/ m_logger->debug("%s[%s].on_eom()", m_attrs.get_tag().c_str(), 
+	AM_DBG m_logger->debug("%s[%s].on_eom()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_eom_flag = true;
     if (m_saw_on_eom)

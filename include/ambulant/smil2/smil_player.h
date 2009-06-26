@@ -215,7 +215,6 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
 	//xxxbo: 
 #ifdef EXP_KEEPING_RENDERER
 	std::map<const std::string, common::playable *> m_playables_url_based;
-	lib::event *m_destroy_event;			// event_processor callback to _destroy_playable
 
 #endif
 	
