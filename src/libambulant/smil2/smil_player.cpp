@@ -331,7 +331,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			assert(rend);	// This code should never be executed for non-rendering playables, Jack thinks.
 			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
 			if (n->get_local_name() == "prefetch") surf = NULL;
-			/*AM_DBG*/ lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
+			AM_DBG lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
 			if (rend && surf) {
 				rend->set_surface(surf);
 			}
@@ -340,14 +340,14 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 	}
 	if( np == NULL ) { 
 		np = _new_playable(n);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playble is found 0x%x", (void*)n, (void*)np);
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playble is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
@@ -740,7 +740,7 @@ smil_player::stopped(int n, double t) {
 		// XXXJACK m_scheduler->update_horizon(root_time);
 		q_smil_time timestamp(m_root, root_time);
 		time_node* tn = (*it).second;
-		/*AM_DBG*/ m_logger->debug("smil_player::stopped(%d), want_on_eom()=%d", n, tn->want_on_eom());
+		AM_DBG m_logger->debug("smil_player::stopped(%d), want_on_eom()=%d", n, tn->want_on_eom());
 		if (tn->want_on_eom()) {
 			async_arg aa((*it).second, timestamp);
 			async_cb *cb = new async_cb(this, &smil_player::stopped_async, aa);
@@ -986,7 +986,6 @@ void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common:
 		victim.second->stop();
 		int rem = victim.second->release();
 		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
-		assert(m_playables_url_based.empty());
 	}
 }
 #endif

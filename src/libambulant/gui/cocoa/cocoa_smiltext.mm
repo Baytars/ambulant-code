@@ -155,6 +155,7 @@ cocoa_smiltext_renderer::start(double t)
 void
 cocoa_smiltext_renderer::seek(double t)
 {
+    assert( t >= 0);
 	m_engine.seek(t);
 	//renderer_playable::seek(t);
 }

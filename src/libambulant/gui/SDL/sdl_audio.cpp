@@ -649,6 +649,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_cookie = cookie;
 	_init_clip_begin_end();
 	
+    /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_audio_src) {
 		m_audio_clock = 0;
 		
@@ -788,18 +789,19 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
-	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000));
+    assert( where >= 0);
+	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000));
 #if 0
     // XXXJACK: Removed this code, I think it is not needed.
 #ifndef EXP_KEEPING_RENDERER
-	//if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+	//if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000), m_clip_end);	
 	if (m_audio_src) {
 		const char * fb = m_node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
-			m_audio_src->seek((net::timestamp_t)(where*1000000), -1);
+			m_audio_src->seek((net::timestamp_t)(where*1000), -1);
 		else
-			m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);	
+			m_audio_src->seek((net::timestamp_t)(where*1000), m_clip_end);	
 	}
 #endif
 	// XXXJACK: Should restart SDL

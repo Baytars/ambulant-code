@@ -243,6 +243,7 @@ void
 ambulant::net::rtsp_demux::seek(timestamp_t time)
 {
 	m_critical_section.enter();
+    assert( time >= 0);
 	m_seektime = time;
 	m_seektime_changed = true;
 	m_critical_section.leave();

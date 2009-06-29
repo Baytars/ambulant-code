@@ -486,6 +486,7 @@ void
 ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
 	// We leave one frame in the queue: there could be a callback outstanding which
 	// will otherwise run into problems in get_frame().
 #ifndef EXP_KEEPING_RENDERER
@@ -493,6 +494,9 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 		_pop_top_frame();
 	}
 #else //xxxbo: I just hack here to support prefetch for video, need think it carefully later.
+
+    // XXXJACK We should cater for the frame corresponding to "time" being in our queue, i.e. for
+    // very small seek-forward calls, by just discarding a couple of frames.
     int nframes = m_frames.size();
     if (nframes > 0) {
         AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes);
@@ -586,7 +590,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 			// We use skip_frame to make the decoder run faster in case we
 			// are not interested in the data (still seeking forward).
 			if (ipts != AV_NOPTS_VALUE && ipts < m_oldest_timestamp_wanted) {
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: setting hurry_up: ipts=%lld, m_oldest_timestamp_wanted=%lld (%lld us late)",ipts, m_oldest_timestamp_wanted, m_oldest_timestamp_wanted-ipts);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: setting hurry_up: ipts=%lld, m_oldest_timestamp_wanted=%lld (%lld us late)",ipts, m_oldest_timestamp_wanted, m_oldest_timestamp_wanted-ipts);
 				m_con->skip_frame = AVDISCARD_NONREF;
 				m_dropped_count++; // This is not necessarily correct
 			} else {
@@ -638,13 +642,13 @@ ffmpeg_video_decoder_datasource::data_avail()
 			m_frame_count++;
 			if (pts < m_oldest_timestamp_wanted) {
 				// A non-essential frame while skipping forward.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld < oldest-wanted=%lld", m_frame_count, pts, m_oldest_timestamp_wanted);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld < oldest-wanted=%lld", m_frame_count, pts, m_oldest_timestamp_wanted);
 				drop_this_frame = true;
 			}
 			if (m_frames.size() > 0 && pts < m_frames.top().first) {
 				// A frame that came after this frame has already been consumed.
 				// We should drop this frame.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, later frame (ts=%lld) already displayed", m_frame_count, pts, m_frames.top().first);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, later frame (ts=%lld) already displayed", m_frame_count, pts, m_frames.top().first);
 				drop_this_frame = true;
 			}
 			m_elapsed = pts;
@@ -889,7 +893,7 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	int curdropcount = 0;
 	while ( m_frames.size() > 1 && m_frames.top().first < now - (2*frame_duration)) { //HACK:Due to jitter, the previous condition of dropping frames older than one frameduration was too strict!
 		//A better method to tolerate jitter required ??? This hack may still fail for high fps videos
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding first frame timestamp=%lld, now=%lld, data ptr = 0x%x", m_frames.top().first,now, m_frames.top().second);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame: discarding first frame timestamp=%lld, now=%lld, data ptr = 0x%x", m_frames.top().first,now, m_frames.top().second);
 		_pop_top_frame();
 		curdropcount++;
 	}
