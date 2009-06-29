@@ -68,6 +68,13 @@ lib::win32::win32_timer::elapsed() const {
 	return time_type(dt);
 }
 
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+void
+lib::win32::win32_timer::skew(signed_time_type skew)
+{
+	assert(skew==0);
+}
+#endif // AMBULANT_FIX_AUDIO_DRIFT
 
 // Factory routine for the machine-independent
 // timer class
@@ -75,6 +82,5 @@ lib::timer*
 lib::realtime_timer_factory() {
 	return new lib::win32::win32_timer();
 }
-
 
 

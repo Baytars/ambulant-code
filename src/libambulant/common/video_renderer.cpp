@@ -189,9 +189,10 @@ video_renderer::start (double where)
 	if (m_audio_renderer) 
 		m_audio_renderer->start(where);
 
+#ifdef EXP_KEEPING_RENDERER
     // We now no longer know where we are (until we get to end-of-clip).
     m_previous_clip_position = -1;
-
+#endif
 	m_lock.leave();
 	
 	// Note by Jack: I'm not 100% sure that calling show() after releasing the lock is safe, but (a)

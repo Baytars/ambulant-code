@@ -483,6 +483,7 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 	}
 
 #ifndef EXP_KEEPING_RENDERER
+	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
 		if (callbackk) {

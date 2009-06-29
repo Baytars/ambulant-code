@@ -222,7 +222,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_SMIL30"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_SMIL30;EXP_KEEPING_RENDERERS"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				TreatWChar_tAsBuiltInType="false"
@@ -309,7 +309,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_HTML_WIDGET;WITH_SMIL30"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_HTML_WIDGET;WITH_SMIL30;EXP_KEEPING_RENDERERS"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"

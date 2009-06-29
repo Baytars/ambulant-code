@@ -287,9 +287,7 @@ class time_node : public schedulable {
 #ifdef WITH_SMIL30
 	bool is_statecommand() const;
 #endif
-#ifdef EXP_KEEPING_RENDERER
 	bool is_prefetch() const;
-#endif
 	bool is_playable() const;
 
 	const time_attrs* get_time_attrs() const { return &m_attrs;}

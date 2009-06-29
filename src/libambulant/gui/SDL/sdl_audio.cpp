@@ -513,11 +513,13 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
     bool more_data = (m_audio_src != NULL && m_is_playing);
     if (more_data && m_audio_src->end_of_file())
         more_data = false;
+#ifdef EXP_KEEPING_RENDERER
     if (more_data) {
         std::string tag = m_node->get_local_name();
         if (tag == "prefetch" && m_audio_src->end_of_file_prefetch())
             more_data = false;
     }
+#endif
     if (!more_data)
         return false;
         
