@@ -147,7 +147,7 @@ class demux_video_datasource:
 	void set_clip_end(timestamp_t clip_end);
 	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
 	void set_buffer_size(timestamp_t clip_duration){};
-	void start_prefetch(lib::event_processor *evp, lib::event *callback, timestamp_t pts){};
+	void start_prefetch(lib::event_processor *evp){};
 	/// Return true if all data has been consumed.
   	bool end_of_file_prefetch(){return false;};
 	

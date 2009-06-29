@@ -166,7 +166,7 @@ demux_audio_datasource::seek(timestamp_t time)
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
     int nbuf = m_queue.size();
     if ( nbuf > 0) {
-        lib::logger::get_logger()->debug("demux_audio_datasource: flush %d buffers due to seek", nbuf);
+        AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource: flush %d buffers due to seek", nbuf);
     }
 	while (m_queue.size() > 0) {
 		m_queue.pop();
@@ -432,7 +432,7 @@ demux_video_datasource::seek(timestamp_t time)
 	assert(m_thread);
     int nbuf = m_frames.size();
     if ( nbuf > 0) {
-        lib::logger::get_logger()->debug("demux_video_datasource: flush %d frames due to seek", nbuf);
+        AM_DBG lib::logger::get_logger()->debug("demux_video_datasource: flush %d frames due to seek", nbuf);
     }
 	while (m_frames.size() > 0) {
 		// flush frame queue
@@ -477,7 +477,7 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 	if (m_client_callback != NULL) {
 		delete m_client_callback;
 		m_client_callback = NULL;
-		lib::logger::get_logger()->error("demux_video_datasource::start(): m_client_callback already set!");
+		lib::logger::get_logger()->debug("demux_video_datasource::start(): m_client_callback already set!");
 	}
 
 #ifndef EXP_KEEPING_RENDERER
