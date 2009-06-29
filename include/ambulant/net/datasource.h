@@ -230,7 +230,7 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 	/// callback is scheduled through the event_processor.
 	virtual void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
 #ifdef EXP_KEEPING_RENDERER
-	virtual void start_prefetch(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
+	virtual void start_prefetch(ambulant::lib::event_processor *evp) = 0;
 #endif
 	
 	/// Called by the client to indicate it wants no more data.
@@ -339,7 +339,7 @@ class raw_audio_datasource:
   	void seek(timestamp_t time){};
 #ifdef EXP_KEEPING_RENDERER
 	void set_clip_end(timestamp_t clip_end){};
-	void start_prefetch(lib::event_processor *evp, lib::event *callback) {};
+	void start_prefetch(lib::event_processor *evp) {};
 	void set_buffer_size(timestamp_t clip_duration){};
 	bool end_of_file_prefetch() { return m_src->end_of_file(); };
 #endif
@@ -428,7 +428,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	virtual void set_clip_end(timestamp_t clip_end) = 0;
 	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
 	virtual void set_buffer_size(timestamp_t clip_duration) = 0;
-	virtual void start_prefetch(lib::event_processor *evp, lib::event *callback, timestamp_t pts) = 0;
+	virtual void start_prefetch(lib::event_processor *evp) = 0;
 	/// Return true if all data has been consumed.
   	virtual bool end_of_file_prefetch() = 0;
 #endif

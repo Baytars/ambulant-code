@@ -258,7 +258,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	if (m_client_callback != NULL) {
 		delete m_client_callback;
 		m_client_callback = NULL;
-		lib::logger::get_logger()->error("ffmpeg_video_decoder_datasource::start_frame(): m_client_callback already set!");
+		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame(): m_client_callback already set!");
 	}
 
 #ifndef EXP_KEEPING_RENDERER
@@ -340,51 +340,13 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 
 #ifdef EXP_KEEPING_RENDERER
 void 
-ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp, 
-											 ambulant::lib::event *callbackk, timestamp_t timestamp)
+ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_prefetch: (this = 0x%x)", (void*) this);
 	
-	if (m_client_callback != NULL) {
-		delete m_client_callback;
-		m_client_callback = NULL;
-		lib::logger::get_logger()->error("ffmpeg_video_decoder_datasource::start_frame(): m_client_callback already set!");
-	}
-	
-	if (m_frames.size() > 0 || _end_of_file() ) {
-		// We have data (or EOF) available. Don't bother starting up our source again, in stead
-		// immedeately signal our client again
-		if (callbackk) {
-			assert(evp);
-#if 0
-			if (timestamp < 0) timestamp = 0;
-			lib::timer::time_type timestamp_milli = (lib::timer::time_type)(timestamp/1000); // micro to milli
-			lib::timer::time_type now_milli = evp->get_timer()->elapsed();
-			lib::timer::time_type delta_milli = 0;
-			if (now_milli < timestamp_milli)
-				delta_milli = timestamp_milli - now_milli;
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: 0x%x: trigger client callback timestamp_milli=%d delta_milli=%d, now_milli=%d, %d frames in buffer", this, (int)timestamp_milli, (int)delta_milli, (int)now_milli, m_frames.size());
-			// Sanity check: we don't want this to be more than a second into the future
-			if (delta_milli > 1000) {
-				lib::logger::get_logger()->trace("ffmpeg_video::start_prefetch: frame is %f seconds in the future", delta_milli / 1000.0);
-				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
-			}
-			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
-#endif
-			evp->add_event(callbackk, 1, ambulant::lib::ep_high);
-		} else {
-			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource::start(): no client callback!");
-			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
-		}
-	} else	{
-		// We have no data available. Start our source, and in our data available callback we
-		// will signal the client.
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video: 0x%x: start_frame: record callback for later", this);
-		m_client_callback = callbackk;
-		m_event_processor = evp;
-	}
-	
+    m_event_processor = evp;
+    
 	// Don't restart our source if we are at end of file.
 #ifndef EXP_KEEPING_RENDERER
 	if ( _end_of_file() ) m_start_input = false;
@@ -533,7 +495,7 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 #else //xxxbo: I just hack here to support prefetch for video, need think it carefully later.
     int nframes = m_frames.size();
     if (nframes > 0) {
-        lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes);
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes);
     }
 	while ( m_frames.size() > 0) {
 		_pop_top_frame();

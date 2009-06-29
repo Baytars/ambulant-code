@@ -226,7 +226,8 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	m_volcount(0),
 	m_intransition(NULL),
 	m_outtransition(NULL),
-	m_transition_engine(NULL)
+	m_transition_engine(NULL),
+    m_previous_clip_position(-1)
 #ifdef AMBULANT_INSTRUMENT_AUDIO_DRIFT
     , m_audio_clock(0)
 #endif
@@ -239,7 +240,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	net::url url = node->get_url("src");
 	
 	_init_clip_begin_end();
-	
+	m_previous_clip_position = m_clip_begin;
 #ifndef EXP_KEEPING_RENDERER
     m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
 #else
@@ -285,6 +286,9 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	if (init() != 0)
 		return;
 		
+	_init_clip_begin_end();
+	m_previous_clip_position = m_clip_begin;
+
 	if (!m_audio_src)
 		lib::logger::get_logger()->error(gettext("%s: cannot open"), url.get_url().c_str());
 	
@@ -524,20 +528,15 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		m_audio_src->start(m_event_processor, e);
 	}
 #else
-	std::string tag = m_node->get_local_name();
-	if (tag == "prefetch") {
-		// Start reading 
-		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-		m_audio_src->start_prefetch(m_event_processor, e);		
-	} else {
-		if (m_audio_src->size() < s_min_buffer_size_bytes ) {
-			// Start reading 
-			lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-			m_audio_src->start(m_event_processor, e);
-		}
-	}
-	
-
+	/*AM_DBG*/ {
+        std::string tag = m_node->get_local_name();
+        assert(tag != "prefetch");
+    }
+    if (m_audio_src->size() < s_min_buffer_size_bytes ) {
+        // Start reading 
+        lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
+        m_audio_src->start(m_event_processor, e);
+    }
 #endif
 	return true;
 }
@@ -648,25 +647,17 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
     AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info(%s), this=0x%x, ds=0x%x", node->get_sig().c_str(), (void*)this, (void*)m_audio_src);
 	m_node = node;
 	m_cookie = cookie;
-    net::timestamp_t old_clip_end = m_clip_end;
 	_init_clip_begin_end();
 	
 	if (m_audio_src) {
-	  //xxxbo: Note, for supporting prefetch, I comment out this line of code
-      // (it is here for the reason of demo 5-Loop: Play the first two bars twice).
-		if (m_clip_begin != old_clip_end) m_audio_src->seek(m_clip_begin);
-//		std::string tag = m_node->get_local_name();
-//		if (tag == "prefetch") {
-			m_audio_clock = 0;
-//		}
+		m_audio_clock = 0;
 		
-#if 0
-		std::string tag = m_node->get_local_name();
-		if (tag == "prefetch") {
-			m_audio_src->seek(m_clip_begin);
-			m_audio_clock = 0;
-		}
-#endif
+        if (m_clip_begin != m_previous_clip_position) {
+            /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+            seek(m_clip_begin/1000);
+            m_previous_clip_position = m_clip_begin;
+        }
+
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		if (fb != NULL && !strcmp(fb, "continue"))
@@ -738,20 +729,13 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
-#if 0
-        // XXXJACK: Removed this code, I think it is not needed.
-#ifndef EXP_KEEPING_RENDERER
-		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000));
-#else
-		if (where) m_audio_src->seek((net::timestamp_t)(where*1000000), m_clip_end);		
-		//m_audio_src->seek(m_clip_begin, m_clip_end);	
-#endif
-#endif
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
 		m_audio_src->start(m_event_processor, e);
 		m_is_playing = true;
 		m_is_paused = false;
+        m_previous_clip_position = -1; // We no longer know where we are
+        
 		m_lock.leave();
 		register_renderer(this);
 		if (m_intransition && ! m_transition_engine) {
@@ -782,30 +766,20 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where)
 	
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
-	if (m_audio_src) {
-
-		//xxxbo:
-#if 0
-		m_audio_src->seek(m_clip_begin);
-		m_audio_clock = 0;
-#endif
-		
+	if (m_audio_src) {		
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		
-		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
-		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin());
-		m_audio_src->start_prefetch(m_event_processor, e);
-		m_is_playing = true;
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
+		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
+		m_audio_src->start_prefetch(m_event_processor);
+		m_is_playing = true; // XXXJACK is this correct?
 		m_is_paused = false;
-		m_lock.leave();
-		//register_renderer(this);
+        m_previous_clip_position = m_clip_begin;
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch: no datasource");
-		m_lock.leave();
-		m_context->stopped(m_cookie, 0);
 	}
+    m_lock.leave();
 }
 #endif
 

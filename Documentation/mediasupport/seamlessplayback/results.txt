@@ -39,9 +39,9 @@ sptest-06
 
 sptest-07
 	audio: Is not better that sptest-02 (Jack, 25-Jun-09)
-	video: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
-	av: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
-	audio-modified: Same, also has ffmpeg error messages in output (Jack, 25-Jun-09)
+[!]	video: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
+[!]	av: Not better than sptest-02, also has visual artefacts at boundary (Jack, 25-Jun-09)
+[!]	audio-modified: Same, also has ffmpeg error messages in output (Jack, 25-Jun-09)
 	
 sptest-08:
 	audio: Perfect! (Jack, 25-Jun-09)
