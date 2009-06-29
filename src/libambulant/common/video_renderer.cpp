@@ -122,9 +122,9 @@ video_renderer::update_context_info(const lib::node *node, int cookie)
     // then the streams are multiplexed, and we should seek only a single stream.
     // We let the audio handler do the seeking, as the video handler can
     // much more easily skip frames, etc.
-
+    AM_DBG lib::logger::get_logger()->debug("video_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_clip_begin != m_previous_clip_position) {
-        /*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+        AM_DBG lib::logger::get_logger()->debug("video_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 		seek(m_clip_begin/1000);
         m_previous_clip_position = m_clip_begin;
 	}
@@ -324,6 +324,7 @@ video_renderer::seek(double t)
 {
 	//assert(m_audio_renderer == NULL);
 	AM_DBG lib::logger::get_logger()->trace("video_renderer: seek(%f) curtime=%f", t, (double)m_timer->elapsed()/1000.0);
+    assert( t >= 0);
 	long int t_ms = (long int)(t*1000.0);
 #if 0
 	// m_timer is already changed by the scheduler.
@@ -441,6 +442,7 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
+    AM_DBG lib::logger::get_logger()->debug("data_avail(%s): %lld", m_node->get_sig().c_str(), frame_ts_micros);
 
 	if (buf == NULL) {
 		// This can only happen immedeately after a seek, or if we have read past end-of-file.

@@ -331,6 +331,7 @@ void
 ffmpeg_demux::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
 #ifndef EXP_KEEPING_RENDERER
     if (m_seektime != time) {
         AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::seek(%ld): was %ld", time, m_seektime);
@@ -422,10 +423,16 @@ ffmpeg_demux::run()
 			}
 			//int64_t seektime = m_seektime;
 #endif
+#if 0
+            // XXXJACK (29-Jun-09) I think I'm seeing funny artifacts because of this code (playing sptest-02 and sptest-07
+            // of the seamless plaback tests). Trying to disable it.
+            // The code here was introduced in r1.60 to fix bug #2051134, ogg/vorbis skips audio at the beginning.
+            // Need to regress that one.
             if (m_con->start_time != AV_NOPTS_VALUE) {
                 seektime += m_con->start_time;
                 /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_parser::run: add another %lld to seek for ffmpeg start_time", m_con->start_time);
             }
+#endif
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
 			int seek_streamnr = -1;
 			if (video_streamnr >= 0) {

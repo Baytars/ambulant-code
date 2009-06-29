@@ -323,6 +323,7 @@ cocoa_video_renderer::seek(double where)
 {
 	m_lock.enter();
 	lib::logger::get_logger()->debug("cocoa_video_renderer::seek(%f)", where);
+    assert( where >= 0);
 	Movie mov = [m_movie quickTimeMovie];
 	TimeValue movtime;
 	TimeScale movscale = GetMovieTimeScale(mov);

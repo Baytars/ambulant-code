@@ -158,6 +158,7 @@ void
 demux_audio_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
 	assert(m_thread);
     if (time == m_current_seek_position) {
         m_lock.leave();
@@ -424,6 +425,7 @@ void
 demux_video_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
     if (time == m_current_seek_position) {
         m_lock.leave();
         return;

@@ -599,6 +599,7 @@ void
 ffmpeg_decoder_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
 	int nbytes = m_buffer.size();
     /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
 	if (nbytes) {
@@ -1045,6 +1046,7 @@ void
 ffmpeg_resample_datasource::seek(timestamp_t time)
 {
 	m_lock.enter();
+    assert( time >= 0);
 	int nbytes = m_buffer.size();
     AM_DBG lib::logger::get_logger()->debug("ffmpeg_resample_datasource(0x%x)::seek(%ld), discard %d bytes", (void*)this, (long)time, nbytes);
 	if (nbytes) {
