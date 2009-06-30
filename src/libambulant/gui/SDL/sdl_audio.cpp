@@ -747,6 +747,39 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	}
 }
 
+void
+gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much)
+{
+	m_lock.enter();
+#ifdef EXP_KEEPING_RENDERER
+	if (m_is_playing) {
+		lib::logger::get_logger()->trace("sdl_audio_renderer::start_prefetch(0x%x): already started", (void*)this);
+		m_lock.leave();
+		return;
+	}
+	
+#endif
+    if (!m_node) abort();
+	
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
+											(void *)this, m_node->get_sig().c_str(), where);
+	if (m_audio_src) {		
+		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
+			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
+		
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
+		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
+		m_audio_src->start_prefetch(m_event_processor);
+		m_is_playing = true; // XXXJACK is this correct?
+		m_is_paused = false;
+        m_previous_clip_position = m_clip_begin;
+	} else {
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch: no datasource");
+	}
+    m_lock.leave();
+}
+
+
 #ifdef EXP_KEEPING_RENDERER
 void
 gui::sdl::sdl_audio_renderer::start_prefetch(double where)

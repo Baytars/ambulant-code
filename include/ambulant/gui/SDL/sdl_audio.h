@@ -85,6 +85,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 	common::duration get_dur();
 	void start(double where);
 	void stop();
+	void preroll(double when, double where, double how_much);
 #ifdef EXP_KEEPING_RENDERER
 	void start_prefetch(double where);
 	void stop_but_keeping_renderer();

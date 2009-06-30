@@ -72,6 +72,9 @@ class AMBULANTAPI playable_imp : public playable {
 //	void seek(double where) {}
 	void wantclicks(bool want) { m_wantclicks = want;}
 	void preroll(double when, double where, double how_much) {}
+#ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(double t) {};
+#endif
 	duration get_dur() { return duration(true, 0);}
 	cookie_type get_cookie() const { return m_cookie;}
   protected:

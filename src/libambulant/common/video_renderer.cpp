@@ -201,6 +201,53 @@ video_renderer::start (double where)
 	m_dest->show(this);
 }
 
+void
+video_renderer::preroll(double when, double where, double how_much)
+{
+	m_lock.enter();
+	if (m_activated) {
+		lib::logger::get_logger()->trace("video_renderer.start_prefetch(0x%x): already started", (void*)this);
+		m_lock.leave();
+		return;
+	}
+	if (!m_src) {
+		lib::logger::get_logger()->trace("video_renderer.start_prefetch: no datasource, skipping media item");
+		m_context->stopped(m_cookie, 0);
+		m_lock.leave();
+		return;
+	}
+	// Tell the datasource how we like our pixels.
+	m_src->set_pixel_layout(pixel_layout());
+	
+	m_activated = true;
+	
+	// Now we need to define where we start prefetching. This depends on m_clip_begin (microseconds)
+	// and where (seconds).
+	assert(m_clip_begin >= 0);
+	assert(where >= 0);
+	m_epoch = (long)(m_clip_begin/1000) - (int)(where*1000);
+	m_is_paused = false;
+	
+	// We need to initial these variables over here
+	m_paused_epoch = 0;
+	m_last_frame_timestamp = -1;
+	m_frame_displayed = 0;
+	m_frame_duplicate = 0;
+	m_frame_early = 0;
+	m_frame_late = 0;
+	m_previous_clip_position = m_clip_begin;
+	m_frame_missing = 0;
+	
+    // XXXJACK: check that this set_buffer_size makes sense...
+	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
+	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
+	m_src->start_prefetch (m_event_processor);
+	if (m_audio_renderer) 
+		m_audio_renderer->start_prefetch(where);
+	
+	m_lock.leave();	
+}
+
 #ifdef EXP_KEEPING_RENDERER
 void
 video_renderer::start_prefetch (double where)
