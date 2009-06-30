@@ -127,7 +127,7 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	virtual void start(double t) = 0;
 	
 #ifdef EXP_KEEPING_RENDERER
-	virtual void start_prefetch(double t) {};
+	virtual void start_prefetch(double t = 0) = 0;
 #endif
 	
 	/// Stop playback.
@@ -161,7 +161,7 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	/// when: the estimated time when this playable start() will be called
 	/// where: where playing will start in media time
 	/// how_much: the duration of the media that will be played
-	virtual void preroll(double when, double where, double how_much) = 0;
+	virtual void preroll(double when = 0, double where = 0, double how_much = 0) = 0;
 	
 	/// Get duration of media item.
 	/// Returns a pair of values:

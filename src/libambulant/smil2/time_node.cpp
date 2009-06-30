@@ -838,7 +838,8 @@ void time_node::start_prefetch(time_type offset) {
 	common::playable *np = create_playable();
 	const lib::transition_info *trans_in = m_attrs.get_trans_in();
 	if(np) {
-		np->start_prefetch(time_type_to_secs(offset()));
+		//np->start_prefetch(time_type_to_secs(offset()));
+		np->preroll(time_type_to_secs(offset()));
 	}
 }
 #endif //EXP_KEEPING_RENDERER
