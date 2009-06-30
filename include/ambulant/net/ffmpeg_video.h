@@ -62,6 +62,8 @@ class ffmpeg_video_datasource_factory : public video_datasource_factory {
 
 typedef std::pair<timestamp_t, char*> ts_pointer_pair;
 
+#if 0
+// No reason to use a priority queue: the frames arrive in correct order.
 class sorted_frame_compare {
  public:
 	bool operator () (const ts_pointer_pair left, const ts_pointer_pair right) {
@@ -69,6 +71,9 @@ class sorted_frame_compare {
   	}
 };
 typedef std::priority_queue<ts_pointer_pair, std::vector<ts_pointer_pair>, sorted_frame_compare > sorted_frames;
+#else
+typedef std::queue<ts_pointer_pair> sorted_frames;
+#endif
 
 class ffmpeg_video_decoder_datasource:
 	virtual public video_datasource,
