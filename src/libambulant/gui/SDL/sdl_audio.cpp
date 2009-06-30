@@ -407,7 +407,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (rv) assert(*ptr);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: time=%d, wanted %d bytes, returning %d bytes", m_event_processor->get_timer()->elapsed(), bytes_wanted, rv);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
 		// Also set volume(s)
 		m_volcount = 0;
 		if (m_dest) {
@@ -494,9 +494,6 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
         /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
         m_previous_clip_position = m_clip_end;
-		//assert(m_fill_continue);
-		const char * fb = m_node->get_attribute("fill");
-		//assert(fb && !strcmp(fb, "continue"));
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -646,7 +643,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_cookie = cookie;
 	_init_clip_begin_end();
 	
-    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+    /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_audio_src) {
 		m_audio_clock = 0;
 		

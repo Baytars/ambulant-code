@@ -258,12 +258,7 @@ video_renderer::start_prefetch (double where)
 		m_lock.leave();
 		return;
 	}
-	if (!m_src) {
-		lib::logger::get_logger()->trace("video_renderer.start_prefetch: no datasource, skipping media item");
-		m_context->stopped(m_cookie, 0);
-		m_lock.leave();
-		return;
-	}
+
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
 
@@ -301,29 +296,14 @@ video_renderer::stop_but_keeping_renderer()
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-	m_context->stopped(m_cookie, 0);
-#if 0 //xxxbo: this part of code is here for supporting prefetch (sptest-07-video/av.smil). 
-	if (m_node->get_local_name() != "prefetch") {
-		if (m_dest) m_dest->renderer_done(this);
-		m_dest = NULL; //xxxbo: comment out this line, otherwise it will break other sptests, i.e. sptest-01, etc 
-	}
-#endif
 
 	m_activated = false;
-    // XXXJACK: I don't trust this code. I am pretty sure that we should also call stop_but_keeping_renderer() in the audio renderer.
-//	if (m_dest) {
-//		m_dest->renderer_done(this);
-//		m_dest = NULL;
-//	}
-//	if (m_audio_renderer) {
-//		m_audio_renderer->stop();
-//		m_audio_renderer->release();
-//		m_audio_renderer = NULL;
-//	}
 	
 	if (m_audio_renderer) {
 		m_audio_renderer->stop_but_keeping_renderer();
-	}
+	} else {
+        m_context->stopped(m_cookie, 0);
+    }
 	m_lock.leave();
 }
 #endif
@@ -339,7 +319,6 @@ video_renderer::stop()
 		return;
 	}
     // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
-	m_context->stopped(m_cookie, 0);
 	m_activated = false;
 	if (m_dest) {
 #ifdef EXP_KEEPING_RENDERER
@@ -356,7 +335,9 @@ video_renderer::stop()
 		m_audio_renderer->stop();
 		m_audio_renderer->release();
 		m_audio_renderer = NULL;
-	}
+	} else {
+        m_context->stopped(m_cookie, 0);
+    }
 	if (m_src) {
 		m_src->stop();
 		m_src->release();
@@ -490,13 +471,15 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
-    /*AM_DBG*/ lib::logger::get_logger()->debug("data_avail(%s): %lld", m_node->get_sig().c_str(), frame_ts_micros);
+    AM_DBG lib::logger::get_logger()->debug("data_avail(%s): %lld", m_node->get_sig().c_str(), frame_ts_micros);
 
 	if (buf == NULL) {
 		// This can only happen immedeately after a seek, or if we have read past end-of-file.
  		lib::logger::get_logger()->debug("video_renderer::data_avail: get_frame returned NULL");
         if (m_src->end_of_file()) {
-            m_context->stopped(m_cookie, 0);
+            // If we have an audio renderer we let it send the stopped() callback.
+            if (m_audio_renderer == NULL)
+                m_context->stopped(m_cookie, 0);
         } else {
             assert(m_last_frame_timestamp < 0);
         }
@@ -515,8 +498,8 @@ video_renderer::data_avail()
 			m_src = NULL;
 		}
 		m_lock.leave();
-        // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
-		m_context->stopped(m_cookie, 0);
+        // If we have an audio renderer we should let it do the stopped() callback.
+		if (m_audio_renderer == NULL) m_context->stopped(m_cookie, 0);
 		//stop(); // XXX Attempt by Jack. I think this is really a bug in the scheduler, so it may need to go some time.
 		lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 			m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
@@ -529,8 +512,8 @@ video_renderer::data_avail()
     }
     if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
         AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
-        // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
-        m_context->stopped(m_cookie, 0);
+        // If we have an audio renderer we should let it do the stopped() callback.
+        if (m_audio_renderer == NULL) m_context->stopped(m_cookie, 0);
         
         // Remember how far we officially got (discounting any fill=continue behaviour)
         m_previous_clip_position = m_clip_end;
