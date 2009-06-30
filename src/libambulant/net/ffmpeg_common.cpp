@@ -123,11 +123,10 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	m_nstream(0),
 	m_clip_begin(clip_begin),
 	m_clip_end(clip_end),
-	m_seektime(0),
-	m_seektime_changed(false)
+	m_clip_begin_changed(false)
 {
 	assert(m_clip_begin >= 0);
-	if ( m_clip_begin ) m_seektime_changed = true;
+	if ( m_clip_begin ) m_clip_begin_changed = true;
 	
 	m_audio_fmt = audio_format("ffmpeg");
 	m_audio_fmt.bits = 16;
@@ -321,8 +320,8 @@ ffmpeg_demux::read_ahead(timestamp_t time)
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::read_ahead(%d), m_clip_begin was %d", time, m_clip_begin);
     if (m_clip_begin != time) {
-        m_clip_begin = time; // XXXX Or m_seek_time??
-        m_seektime_changed = true;
+        m_clip_begin = time;
+        m_clip_begin_changed = true;
     }
 	m_lock.leave();
 }
@@ -332,16 +331,8 @@ ffmpeg_demux::seek(timestamp_t time)
 {
 	m_lock.enter();
     assert( time >= 0);
-#ifndef EXP_KEEPING_RENDERER
-    if (m_seektime != time) {
-        AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::seek(%ld): was %ld", time, m_seektime);
-        m_seektime = time;
-        m_seektime_changed = true;
-    }
-#else
-	m_seektime = time;
-	m_seektime_changed = true;
-#endif
+	m_clip_begin = time;
+	m_clip_begin_changed = true;
 	m_lock.leave();
 }
 
@@ -351,7 +342,6 @@ void
 ffmpeg_demux::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
-	// Note, we only set m_seektime changed if we change the *current* position, not the end position.
 	m_clip_end = clip_end;
 	m_lock.leave();
 }
@@ -387,8 +377,9 @@ ffmpeg_demux::run()
 	int pkt_nr;
 	int video_streamnr = video_stream_nr();
     int audio_streamnr = audio_stream_nr();
-	timestamp_t pts = 0;
-#if 1
+	int64_t pts = 0;
+//#define RESYNC_TO_INITIAL_AUDIO_PTS 1
+#if RESYNC_TO_INITIAL_AUDIO_PTS
 	timestamp_t initial_audio_pts = 0;
 	bool initial_audio_pts_set = false;
 #endif
@@ -405,24 +396,12 @@ ffmpeg_demux::run()
 		pkt->pts = 0;
 		// Read a packet
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run:  started");
-		if (m_seektime_changed) {
+		if (m_clip_begin_changed) {
 #ifdef EXP_KEEPING_RENDERER
 			eof_sent_to_clients = false;
 #endif
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld+%lld=%lld", m_clip_begin, m_seektime, m_clip_begin+m_seektime);
-#ifndef EXP_KEEPING_RENDERER //xxxbo note: I don't understand why seektime = m_clip_begin+m_seektime;
-			int64_t seektime = m_clip_begin+m_seektime;
-#else
-			int64_t seektime;
-			if (m_seektime == 0) 
-				seektime = m_clip_begin;
-			else
-			{
-				m_clip_begin = 0;
-				seektime = m_seektime;
-			}
-			//int64_t seektime = m_seektime;
-#endif
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
+			int64_t seektime = m_clip_begin;
 #if 0
             // XXXJACK (29-Jun-09) I think I'm seeing funny artifacts because of this code (playing sptest-02 and sptest-07
             // of the seamless plaback tests). Trying to disable it.
@@ -447,7 +426,7 @@ ffmpeg_demux::run()
 			if (seekresult < 0) {
 				lib::logger::get_logger()->debug("ffmpeg_demux: av_seek_frame() returned %d", seekresult);
 			}
-			m_seektime_changed = false;
+			m_clip_begin_changed = false;
 		}
 		m_lock.leave();
 		int ret = av_read_frame(m_con, pkt);
@@ -509,29 +488,35 @@ ffmpeg_demux::run()
 					pts = pkt->pts;
 				}
 #endif
-				if (pts != AV_NOPTS_VALUE)
+				if (pts != AV_NOPTS_VALUE) {
 					pts = av_rescale_q(pts, m_con->streams[pkt->stream_index]->time_base, AMBULANT_TIMEBASE);
+#if RESYNC_TO_INITIAL_AUDIO_PTS
+                    // We seem to be getting values with a non-zero epoch sometimes (?)
+                    // Remember initial audio pts, and resync everything to that.
+                    // Fixes bug #2046564.
+                    if (!initial_audio_pts_set && pkt->stream_index == audio_streamnr) {
+                        initial_audio_pts = pts;
 #if 1
-				// We seem to be getting values with a non-zero epoch sometimes (?)
-				// Remember initial audio pts, and resync everything to that.
-				// Fixes bug #2046564.
-				if (!initial_audio_pts_set && pkt->stream_index == audio_streamnr) {
-					initial_audio_pts = pts;
-#if 1
-                    // Bugfix to bugfix: need to take initial seek/clipbegin into account too
-                    initial_audio_pts -= (m_clip_begin + m_seektime);
+                        // Bugfix to bugfix: need to take initial seek/clipbegin into account too
+                        initial_audio_pts -= m_clip_begin;
 #endif
-					initial_audio_pts_set = true;
-				}
-				if (pts != AV_NOPTS_VALUE) pts -= initial_audio_pts;
-#endif
+                        initial_audio_pts_set = true;
+                    }
+                    pts -= initial_audio_pts;
+#else // RESYNC_TO_INITIAL_AUDIO_PTS
+                    // If we don't resync to initial audio PTS we resync to start_time.
+                    int64_t stream_start = m_con->start_time; // m_con->streams[audio_streamnr]->start_time;
+                    if (stream_start != AV_NOPTS_VALUE) pts -= stream_start;
+                    // assert(pts >= 0);
+#endif // RESYNC_TO_INITIAL_AUDIO_PTS
+                }
 			}
 			bool accepted = false;
 			while ( ! accepted && sink && !exit_requested()) { 
 				m_current_sink = sink;
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
-				accepted = sink->push_data(pts, pkt->data, pkt->size);
+				accepted = sink->push_data((timestamp_t)pts, pkt->data, pkt->size);
 				if ( ! accepted) {
 					// wait until space available in sink
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: waiting for buffer space for stream %d", pkt->stream_index);

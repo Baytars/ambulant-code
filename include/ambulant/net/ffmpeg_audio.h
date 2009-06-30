@@ -143,7 +143,7 @@ class ffmpeg_decoder_datasource: virtual public audio_datasource, virtual public
 	audio_format m_fmt;
 	lib::event_processor *m_event_processor;
   	pkt_audio_datasource* m_src;
-  	timestamp_t m_elapsed;
+  	timestamp_t m_elapsed;      // Timestamp of the very last sample in the buffer
 	bool m_is_audio_ds;
 	
 	databuffer m_buffer;
