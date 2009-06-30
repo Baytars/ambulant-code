@@ -407,7 +407,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (rv) assert(*ptr);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
 		// Also set volume(s)
 		m_volcount = 0;
 		if (m_dest) {

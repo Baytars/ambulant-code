@@ -480,6 +480,7 @@ ffmpeg_video_decoder_datasource::read_ahead(timestamp_t clip_begin)
 {
 	assert(m_src);
 	m_src->read_ahead(clip_begin);
+    m_oldest_timestamp_wanted = clip_begin;
 }
 
 void
@@ -489,24 +490,34 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
     assert( time >= 0);
 	// We leave one frame in the queue: there could be a callback outstanding which
 	// will otherwise run into problems in get_frame().
-#ifndef EXP_KEEPING_RENDERER
-	while ( m_frames.size() > 1) {
-		_pop_top_frame();
-	}
-#else //xxxbo: I just hack here to support prefetch for video, need think it carefully later.
 
-    // XXXJACK We should cater for the frame corresponding to "time" being in our queue, i.e. for
-    // very small seek-forward calls, by just discarding a couple of frames.
-    int nframes = m_frames.size();
-    if (nframes > 0) {
-        AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes);
-    }
-	while ( m_frames.size() > 0) {
-		_pop_top_frame();
-	}	
-#endif
-	if (m_src) m_src->seek(time);
 	m_oldest_timestamp_wanted = time;
+
+    if (m_frames.size() > 0) {
+        // There are frames in the buffer. If we have to seek back we discard all of them.
+        // If we have to seek ahead we try skipping.
+        int nframes_dropped = 0;
+        
+        if (m_frames.top().first > time + 30000 /* 30ms is a guess for frame duration */) {
+            while ( m_frames.size() > 0) {
+                _pop_top_frame();
+                nframes_dropped++;
+            }	
+        } else {
+            while (m_frames.size() > 0 && m_frames.top().first < time) {
+                _pop_top_frame();
+                nframes_dropped++;
+            }
+            if (m_frames.size() > 0) {
+                // We started with a frame before "time" and now we are after "time".
+                // Therefore, we have implemented the complete seek.
+                m_lock.leave();
+                return;
+            }
+        }
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes_dropped);
+	}
+	if (m_src) m_src->seek(time);
 	m_lock.leave();
 }
 

@@ -104,7 +104,7 @@ class ffmpeg_video_decoder_datasource:
 #endif
     void data_avail();
 	bool buffer_full();
-  	timestamp_t get_clip_end() { return m_src->get_clip_end(); };
+  	timestamp_t get_clip_end() { return m_src->get_clip_begin(); };
   	timestamp_t get_clip_begin() { return m_src->get_clip_begin(); };
 	timestamp_t get_start_time() { return m_src->get_start_time(); };
 	void set_pixel_layout(pixel_order l) { m_pixel_layout = l; };
