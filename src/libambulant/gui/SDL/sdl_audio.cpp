@@ -465,7 +465,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	still_busy = (size != 0);
 	still_busy |= restart_audio_input();
 	if (!still_busy) {
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
 		// We cannot call unregister_renderer from here, because we are called from the
 		// SDL callback and already holding the m_global_lock. So, in stead
 		// we use the event processor to unregister ourselves later.
@@ -478,6 +478,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 			m_audio_src = NULL;
 		}
 #endif
+        m_previous_clip_position = m_clip_end;
 		m_lock.leave();
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
@@ -491,7 +492,8 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
     xxxtotsize += size;
     net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
-        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
+        /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
+        m_previous_clip_position = m_clip_end;
 		//assert(m_fill_continue);
 		const char * fb = m_node->get_attribute("fill");
 		//assert(fb && !strcmp(fb, "continue"));
@@ -513,13 +515,6 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
     bool more_data = (m_audio_src != NULL && m_is_playing);
     if (more_data && m_audio_src->end_of_file())
         more_data = false;
-#ifdef EXP_KEEPING_RENDERER
-    if (more_data) {
-        std::string tag = m_node->get_local_name();
-        if (tag == "prefetch" && m_audio_src->end_of_file_prefetch())
-            more_data = false;
-    }
-#endif
     if (!more_data)
         return false;
         
@@ -626,7 +621,7 @@ void
 gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
 		m_lock.leave();
 		std::string tag = m_node->get_local_name();
@@ -651,7 +646,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_cookie = cookie;
 	_init_clip_begin_end();
 	
-    /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_audio_src) {
 		m_audio_clock = 0;
 		
