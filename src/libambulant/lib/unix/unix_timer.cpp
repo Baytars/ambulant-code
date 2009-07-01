@@ -24,6 +24,7 @@
 #include "ambulant/lib/unix/unix_timer.h"
 #include "ambulant/lib/logger.h"
 #include <sys/time.h>
+#include <assert.h>
 
 using namespace ambulant;
 
