@@ -70,6 +70,9 @@ class basicvideo_player : public common::playable {
 	void endseek(double t);
 	common::duration get_dur();
 	void wantclicks(bool want) {}
+#ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(double t = 0) {};
+#endif
 	void preroll(double when, double where, double how_much) {}
 	cookie_type get_cookie() const { return m_cookie;}
 	void setrect(const lib::rect& rect);
