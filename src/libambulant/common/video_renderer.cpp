@@ -308,6 +308,7 @@ video_renderer::stop_but_keeping_renderer()
 }
 #endif
 
+#if 0
 void
 video_renderer::stop()
 { 
@@ -347,6 +348,53 @@ video_renderer::stop()
 		m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 	m_lock.leave();
 }
+#endif
+
+bool
+video_renderer::stop()
+{ 
+	m_lock.enter();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
+	m_context->stopped(m_cookie, 0);
+
+	m_activated = false;
+	if (m_audio_renderer) {
+		m_audio_renderer->stop();
+	}
+	m_lock.leave();
+#if 0
+	const char * fb = m_node->get_attribute("fill");
+	if (fb != NULL && !strcmp(fb, "continue"))
+		return false; // fill = continue
+	else
+		return true; // fill != continue
+#endif
+	return false; // xxxbo: note, "false" menas this renderer is reusable.
+}
+
+void 
+video_renderer::post_stop()
+{
+	m_lock.enter();
+	if (m_dest) {
+		m_dest->renderer_done(this);
+		m_dest = NULL;
+	}
+	if (m_audio_renderer) {
+		m_audio_renderer->post_stop();
+		m_audio_renderer->release();
+		m_audio_renderer = NULL;
+	}
+	if (m_src) {
+		m_src->stop();
+		m_src->release();
+		m_src = NULL;
+	}
+	lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
+									 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
+	m_lock.leave();	
+}
+
 
 void
 video_renderer::seek(double t)

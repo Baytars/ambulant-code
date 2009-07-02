@@ -663,7 +663,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 }
 #endif
 
-
+#if 0
 void
 gui::sdl::sdl_audio_renderer::stop()
 {
@@ -685,6 +685,40 @@ gui::sdl::sdl_audio_renderer::stop()
 #endif
 	}
 	m_lock.leave();
+}
+#endif
+bool 
+gui::sdl::sdl_audio_renderer::stop()
+{
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
+	if (m_is_playing) {
+		m_lock.leave();
+		std::string tag = m_node->get_local_name();
+		if (tag != "prefetch") {
+			unregister_renderer(this);
+		}
+		// XXX Should we call stopped_callback?
+		m_context->stopped(m_cookie, 0);
+		m_lock.enter();
+	}
+	m_is_playing = false;
+	m_lock.leave();	
+
+	return false; // xxxbo NOTE, "return false" means that this renderer is reusable.
+}
+
+void
+gui::sdl::sdl_audio_renderer::post_stop()
+{
+	m_lock.enter();
+	if (m_audio_src) {
+		m_audio_src->stop();
+		m_audio_src->release();
+		m_audio_src = NULL;
+	}
+	m_lock.leave();
+	
 }
 
 void

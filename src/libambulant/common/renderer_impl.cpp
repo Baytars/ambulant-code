@@ -88,6 +88,7 @@ renderer_playable::start(double t)
 	m_dest->show(this);
 }
 
+#if 0
 void
 renderer_playable::stop()
 {
@@ -99,6 +100,20 @@ renderer_playable::stop()
 		m_dest = NULL;
 	}
 	m_activated = false;
+}
+#endif
+bool
+renderer_playable::stop()
+{
+	AM_DBG lib::logger::get_logger()->debug("renderer_playable.stop(0x%x)", (void *)this);
+	if (!m_activated) {
+		lib::logger::get_logger()->trace("renderer_playable.stop(0x%x): not started", (void*)this);
+	} else {
+		if (m_dest)	m_dest->renderer_done(this);
+		m_dest = NULL;
+	}
+	m_activated = false;
+	return true; // xxxbo note, true means it cannot be reused.
 }
 
 #ifdef EXP_KEEPING_RENDERER
@@ -239,6 +254,7 @@ renderer_playable_ds::seek(double t)
 	lib::logger::get_logger()->trace("renderer_playable_ds: seek(%f) not implemented", t);
 }
 
+#if 0
 void
 renderer_playable_ds::stop()
 {
@@ -252,6 +268,22 @@ renderer_playable_ds::stop()
 	if (m_context)
 		m_context->stopped(m_cookie, 0);
 }
+#endif
+bool
+renderer_playable_ds::stop()
+{
+	AM_DBG lib::logger::get_logger()->debug("renderer_playable_ds.stop(0x%x %s)", (void *)this, m_node->get_sig().c_str());
+	renderer_playable::stop();
+	if (m_src) {
+		m_src->stop();
+		m_src->release();
+	}
+	m_src = NULL;
+	if (m_context)
+		m_context->stopped(m_cookie, 0);
+	return true; // xxxbo note, true means it cannot be reused.
+}
+
 
 renderer_playable_dsall::~renderer_playable_dsall()
 {

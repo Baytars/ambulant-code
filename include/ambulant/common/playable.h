@@ -135,7 +135,11 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	/// Resets playable to its initial state.
 	/// The playable may be invoked again later
 	/// and therefore may keep its data cashed.
-	virtual void stop() = 0;
+	//virtual void stop() = 0;
+	virtual bool stop() = 0;
+	
+	/// Playback stops. May only be called if stop() returned true.
+	virtual void post_stop() = 0;
 #ifdef EXP_KEEPING_RENDERER
 	virtual void stop_but_keeping_renderer() {}
 #endif

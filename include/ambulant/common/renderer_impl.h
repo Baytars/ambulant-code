@@ -72,6 +72,7 @@ class AMBULANTAPI playable_imp : public playable {
 //	void seek(double where) {}
 	void wantclicks(bool want) { m_wantclicks = want;}
 	void preroll(double when, double where, double how_much) {}
+	void post_stop() {};
 #ifdef EXP_KEEPING_RENDERER
 	void start_prefetch(double t) {};
 #endif
@@ -108,7 +109,9 @@ class AMBULANTAPI renderer_playable : public playable_imp, public renderer {
 	renderer *get_renderer() { return this; }
 	void transition_freeze_end(lib::rect r) { m_context->transitioned(m_cookie); }
 	virtual void start(double t);
-	virtual void stop();
+	//virtual void stop();
+	virtual bool stop();
+//	virtual void post_stop() {};
 #ifdef EXP_KEEPING_RENDERER
 	virtual void stop_keeping_renderer();
 #endif
@@ -145,7 +148,8 @@ class AMBULANTAPI renderer_playable_ds : public renderer_playable {
 	virtual void start(double where);
 	virtual void seek(double t);
 //	virtual void freeze() {}
-	virtual void stop();
+//	virtual void stop();
+	virtual bool stop();
 //	virtual void pause() {}
 //	virtual void resume() {}
 //	virtual void wantclicks(bool want);

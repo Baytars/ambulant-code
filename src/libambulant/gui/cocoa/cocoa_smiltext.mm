@@ -160,6 +160,7 @@ cocoa_smiltext_renderer::seek(double t)
 	//renderer_playable::seek(t);
 }
 
+#if 0
 void
 cocoa_smiltext_renderer::stop()
 {
@@ -167,7 +168,15 @@ cocoa_smiltext_renderer::stop()
 	renderer_playable::stop();
 	m_context->stopped(m_cookie);
 }
-
+#endif
+bool
+cocoa_smiltext_renderer::stop()
+{
+	m_engine.stop();
+	renderer_playable::stop();
+	m_context->stopped(m_cookie);
+	return true; //xxxbo notes, true means this renderer cannot be reused.
+}
 void
 cocoa_smiltext_renderer::pause(pause_display d)
 {

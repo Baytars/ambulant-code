@@ -79,7 +79,9 @@ class video_renderer : public common::renderer_playable {
     virtual void redraw(const lib::rect &dirty, common::gui_window *window);
 	
 	void start(double where);
-    void stop();
+    //void stop();
+	bool stop();
+	void post_stop();
 	void preroll(double when, double where, double how_much);
 
 #ifdef EXP_KEEPING_RENDERER
