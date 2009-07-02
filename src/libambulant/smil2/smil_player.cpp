@@ -354,12 +354,14 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		m_playables_cs.leave();
  
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
+#if 0 //xxxbo: for testing the new stop(), the 2rd Jul. 2009
 		//xxxbo: stop the previous renderer
 		//xxxbo: To support continuous playback, we don't stop the previous renderer.
 		const char * fb = n->get_attribute("fill");
 		if (fb == NULL || strcmp(fb, "continue"))
 			np->stop_but_keeping_renderer();
 			//np->stop();
+#endif
 	}
     if (np) {
         //xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
@@ -462,21 +464,47 @@ void smil_player::stop_playable(const lib::node *n) {
                  _destroy_playable(victim.second, victim.first);
                 return;
             }
-            m_playables_cs.enter();
-            m_playables_url_based[(victim.first->get_url("src")).get_url()] = victim.second;
-            m_playables_cs.leave();
-
-            // Add a event to destroy this playable on next 20000 microseconds, however, Jack thinks there is another option...
-            typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
-            lib::event *destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
-            //xxxbo: if this playable is created for prefetch, we don't destroy it.
-            //xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
-            std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
-            if(it != m_dom2tn->end() && !(*it).second->is_prefetch())  {
-                //xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
-                AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
-                m_event_processor->add_event(destroy_event, 20, lib::ep_high);
-            }
+			//xxxbo: stop the previous renderer
+			//xxxbo: To support continuous playback, we don't stop the previous renderer.
+			const char * fb = n->get_attribute("fill");
+			if (fb == NULL || strcmp(fb, "continue")) {
+				if (!victim.second->stop()) { 
+					//xxxbo: For reusable renderer, we need to append it to the cache first 
+					//and then schedule an event to remove it from the cache and call its post_stop after some little while (20 miliseocond).
+					m_playables_cs.enter();
+					m_playables_url_based[(victim.first->get_url("src")).get_url()] = victim.second;
+					m_playables_cs.leave();
+					
+					// Add a event to destroy this playable on next 20000 microseconds, however, Jack thinks there is another option...
+					typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
+					lib::event *destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
+					//xxxbo: if this playable is created for prefetch, we don't destroy it.
+					//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
+					std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
+					if(it != m_dom2tn->end() && !(*it).second->is_prefetch())  {
+						//xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
+						AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
+						m_event_processor->add_event(destroy_event, 20, lib::ep_high);
+					}
+				}
+			}
+			else {
+				m_playables_cs.enter();
+				m_playables_url_based[(victim.first->get_url("src")).get_url()] = victim.second;
+				m_playables_cs.leave();
+				
+				// Add a event to destroy this playable on next 20000 microseconds, however, Jack thinks there is another option...
+				typedef std::pair<const lib::node*, common::playable*> gb_victim_arg;
+				lib::event *destroy_event = new lib::scalar_arg_callback_event<smil_player, gb_victim_arg>(this, &smil_player::_destroy_playable_in_cache, victim);
+				//xxxbo: if this playable is created for prefetch, we don't destroy it.
+				//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
+				std::map<int, time_node*>::iterator it = m_dom2tn->find(victim.first->get_numid());
+				if(it != m_dom2tn->end() && !(*it).second->is_prefetch())  {
+					//xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
+					AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
+					m_event_processor->add_event(destroy_event, 20, lib::ep_high);
+				}				
+			}
 		}
 		else {
 			_destroy_playable(victim.second, victim.first);
@@ -965,7 +993,8 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 	
 		m_logger->debug("%s[%s]._destroy_playable 0x%x", tag.c_str(), (pid?pid:"no-id"), np);
 	}
-	np->stop();
+	//np->stop();
+	if (!np->stop()) np->post_stop(); //xxxbo: stop() return false means that the renderer is reusable, so we need call post_stop 
 	int rem = np->release();
 	if (rem > 1) m_logger->debug("smil_player::_destroy_playable: playable 0x%x still has refcount of %d", np, rem);
 }
@@ -983,7 +1012,11 @@ void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common:
 		m_playables_url_based.erase(it_url_based);
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::_destroy_playble_in_cache: stop the playble in the cache for %s", victim.first->get_sig().c_str());
-		victim.second->stop();
+		//victim.second->stop(); 
+		//xxxbo: For node with continue=fill, we didn't call its stop in stop_playable, so call it here.
+		const char * fb = victim.first->get_attribute("fill");
+		if (fb != NULL && !strcmp(fb, "continue")) victim.second->stop(); 
+		victim.second->post_stop();
 		int rem = victim.second->release();
 		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
 	}

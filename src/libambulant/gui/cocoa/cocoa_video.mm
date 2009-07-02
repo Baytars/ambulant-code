@@ -263,6 +263,7 @@ cocoa_video_renderer::start(double where)
 	m_lock.leave();
 }
 
+#if 0
 void
 cocoa_video_renderer::stop()
 {
@@ -286,6 +287,32 @@ cocoa_video_renderer::stop()
 	m_lock.leave();
 	m_context->stopped(m_cookie);
 }
+#endif
+bool
+cocoa_video_renderer::stop()
+{
+	m_lock.enter();
+	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
+	if (m_movie_view) {
+		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: removing m_movie_view 0x%x", (void *)m_movie_view);
+		[MovieCreator performSelectorOnMainThread: @selector(removeFromSuperview:) withObject: m_movie_view waitUntilDone: NO];
+		m_movie_view = NULL;
+		// XXXJACK Should call releaseOverlayWindow here
+	}
+	if (m_movie) {
+		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: release m_movie 0x%x", (void *)m_movie);
+		[m_movie release];
+		m_movie = NULL;
+	}
+	[pool release];
+	m_lock.leave();
+	m_context->stopped(m_cookie);
+	return true; //xxxbo notes, true means this renderer cannot be reused.
+}
+	
 
 void
 cocoa_video_renderer::pause(pause_display d)
