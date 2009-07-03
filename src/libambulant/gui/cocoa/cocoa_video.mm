@@ -44,7 +44,8 @@
 }
 + (void)removeFromSuperview: (QTMovieView *)view;
 
-- (MovieCreator *)init: (ambulant::net::timestamp_t)begintime;
+- (MovieCreator *)init;
+- (void)setClipBegin: (ambulant::net::timestamp_t)begintime;
 - (QTMovie *)movie;
 - (void)movieWithURL: (NSURL*)url;
 - (void)moviePrepare: (id)sender;
@@ -58,11 +59,15 @@
     [view removeFromSuperview];	 
 }
  
-- (MovieCreator *)init: (ambulant::net::timestamp_t)begintime
+- (MovieCreator *)init
 {
 	self = [super init];
-	clip_begin = begintime;
 	return self;
+}
+    
+- (void)setClipBegin: (ambulant::net::timestamp_t)begintime
+{
+	clip_begin = begintime;
 }
 
 - (QTMovie *)movie
@@ -79,7 +84,7 @@
         nil];
     movie = [[QTMovie movieWithAttributes:attrs error:nil] retain];
     SetMovieRate([movie quickTimeMovie], 0);
-    [self moviePrepare: self];
+//    [self moviePrepare: self];
 }
 
 - (void)moviePrepare: (id) sender
@@ -141,35 +146,14 @@ cocoa_video_renderer::cocoa_video_renderer(
 	common::factories *fp,
 	common::playable_factory_machdep *mdp)
 :	renderer_playable(context, cookie, node, evp, fp, mdp),
-	m_url(node->get_url("src")),
+	m_url(),
 	m_movie(NULL),
 	m_movie_view(NULL),
-	m_offscreen_window(NULL),
-	m_offscreen(false),
-	m_paused(false)
+    m_mc(NULL),
+	m_paused(false),
+    m_renderer_state(rs_created)
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSURL *nsurl = [NSURL URLWithString: [NSString stringWithCString: m_url.get_url().c_str()]];
-//	NSURL *nsurl = [NSURL fileURLWithPath: [NSString stringWithCString: m_url.get_url().c_str()]];
-	if (!nsurl) {
-		lib::logger::get_logger()->error(gettext("%s: cannot convert to URL"), m_url.get_url().c_str());
-		return;
-	}
-	
-	_init_clip_begin_end();
-	MovieCreator *mc = [[MovieCreator alloc] init: m_clip_begin];
-	[mc performSelectorOnMainThread: @selector(movieWithURL:) withObject: nsurl waitUntilDone: YES];
-//	[mc performSelectorOnMainThread: @selector(moviePrepare:) withObject: nil waitUntilDone: YES];
-    m_movie = [mc movie];
-	[mc release];
-	
-	if (!m_movie) {
-		lib::logger::get_logger()->error(gettext("%s: cannot open movie"), [[nsurl absoluteString] cString]);
-		return;
-	}
-	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer: cocoa_video_renderer(0x%x), m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
-	
-	[pool release];
+//    init_with_node(node);
 }
 
 cocoa_video_renderer::~cocoa_video_renderer()
@@ -186,13 +170,62 @@ cocoa_video_renderer::~cocoa_video_renderer()
 		m_movie_view = NULL;
 		// XXXJACK Should call releaseOverlayWindow here
 	}
-	if (m_offscreen_window) {
-		[m_offscreen_window release];
-		m_offscreen_window = NULL;
-	}
+    if (m_mc) {
+        [(MovieCreator *)m_mc release];
+        m_mc = NULL;
+    }
 	[pool release];
 	m_lock.leave();
 
+}
+
+void 
+cocoa_video_renderer::init_with_node(const lib::node *n)
+{
+	m_lock.enter();
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	renderer_playable::init_with_node(n);
+    assert(m_renderer_state == rs_created || m_renderer_state == rs_prerolled || m_renderer_state == rs_stopped);
+    m_renderer_state = rs_inited;
+    
+    m_node = n;
+    if (m_movie == NULL) {
+        assert(m_mc == NULL);
+        assert(m_url.is_empty_path() || m_url.same_document(m_node->get_url("src")));
+        // Apparently the first call.
+        m_url = m_node->get_url("src");
+        NSURL *nsurl = [NSURL URLWithString: [NSString stringWithCString: m_url.get_url().c_str()]];
+        if (!nsurl) {
+            lib::logger::get_logger()->error(gettext("%s: cannot convert to URL"), m_url.get_url().c_str());
+            goto bad;
+        }
+        m_mc = (void*)[[[MovieCreator alloc] init] retain];
+        [(MovieCreator *)m_mc performSelectorOnMainThread: @selector(movieWithURL:) withObject: nsurl waitUntilDone: YES];
+        m_movie = [(MovieCreator *)m_mc movie];
+    }
+	if (!m_movie) {
+		lib::logger::get_logger()->error(gettext("%s: cannot open movie"), m_url.get_url().c_str());
+		goto bad;
+	}
+	
+	_init_clip_begin_end();
+    [(MovieCreator *)m_mc setClipBegin: m_clip_begin];
+	
+	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer: cocoa_video_renderer(0x%x), m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
+	
+  bad:
+	[pool release];
+	m_lock.leave();
+}
+
+void 
+cocoa_video_renderer::preroll(double when, double where, double how_much)
+{
+	m_lock.enter();
+    assert(m_renderer_state == rs_inited || m_renderer_state == rs_prerolled || m_renderer_state == rs_stopped);
+    m_renderer_state = rs_prerolled;
+	[(MovieCreator *)m_mc performSelectorOnMainThread: @selector(moviePrepare:) withObject: nil waitUntilDone: YES];
+	m_lock.leave();
 }
 
 common::duration 
@@ -200,6 +233,8 @@ cocoa_video_renderer::get_dur()
 {
 	common::duration rv(false, 0);
 	m_lock.enter();
+    assert(m_renderer_state == rs_inited || m_renderer_state == rs_prerolled || m_renderer_state == rs_started || m_renderer_state == rs_stopped);
+    
 	if (m_movie) {
 		Movie mov = [m_movie quickTimeMovie];
 		AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::get_dur QTMovie is 0x%x", (void *)mov);
@@ -226,7 +261,10 @@ cocoa_video_renderer::start(double where)
 		m_context->stopped(m_cookie);
 		return;
 	}
+    preroll(0, where, 0);
 	m_lock.enter();
+    assert(m_renderer_state == rs_prerolled);
+    m_renderer_state = rs_started;
 	Movie mov = [m_movie quickTimeMovie];
 #if 0
 	if (where > 0) {
@@ -249,7 +287,18 @@ cocoa_video_renderer::start(double where)
 bool
 cocoa_video_renderer::stop()
 {
+    assert(m_renderer_state == rs_started);
+    m_renderer_state = rs_stopped;
+	m_context->stopped(m_cookie);
+	return false;
+}
+	
+void
+cocoa_video_renderer::post_stop()
+{
 	m_lock.enter();
+    assert(m_renderer_state == rs_stopped);
+    m_renderer_state = rs_dead;
 	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_dest) m_dest->renderer_done(this);
@@ -267,15 +316,13 @@ cocoa_video_renderer::stop()
 	}
 	[pool release];
 	m_lock.leave();
-	m_context->stopped(m_cookie);
-	return true; //xxxbo notes, true means this renderer cannot be reused.
 }
-	
 
 void
 cocoa_video_renderer::pause(pause_display d)
 {
 	m_lock.enter();
+    assert(m_renderer_state == rs_started);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::pause(0x%x)", this);
 	m_paused = true;
@@ -292,6 +339,7 @@ void
 cocoa_video_renderer::resume()
 {
 	m_lock.enter();
+    assert(m_renderer_state == rs_started);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::resume(0x%x)", this);
 	m_paused = false;
@@ -364,6 +412,7 @@ void
 cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 {
 	m_lock.enter();
+    assert(m_renderer_state == rs_started || m_renderer_state == rs_stopped);
 	if (!m_movie) {
 		m_lock.leave();
 		return;

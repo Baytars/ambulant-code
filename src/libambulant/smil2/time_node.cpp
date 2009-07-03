@@ -1538,7 +1538,7 @@ void time_node::remove(qtime_type timestamp) {
 			(*it)->remove(qt);
 	} 
 	if(is_animation()) stop_animation();
-#ifdef WITH_SMIL30
+#ifdef WITH_SMIL30xxxxJACK_REMOVED_THIS
 	/* else nothing to do for statecommands */
 	if (is_prefetch()) stop_playable();
 #endif
