@@ -23,6 +23,7 @@ am__api_version="1.9"
 #
 # Allow either included or standard ltdl
 #
+LT_CONFIG_LTDL_DIR([libltdl])
 AC_WITH_LTDL
 AC_LIBLTDL_CONVENIENCE
 AC_LIBTOOL_DLOPEN
