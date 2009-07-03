@@ -87,6 +87,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 //	void stop();
 	bool stop();
 	void post_stop();
+	void init_with_node(const lib::node *n);
 	void preroll(double when, double where, double how_much);
 #ifdef EXP_KEEPING_RENDERER
 	void start_prefetch(double where);

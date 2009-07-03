@@ -22,7 +22,7 @@ create(event_processor *evp, playable_notification *context)
 	
 init_with_node(node *n)
 	/// Bind the renderer to a node, either prefetch or media.
-	/// Records node, URL, clip_begin/end, etc.
+	/// Records node, cookie, URL, clip_begin/end, etc.
 	
 renderer::set_surface(surface *dest)
 	/// Bind renderer output to a surface.
@@ -50,7 +50,7 @@ stop()
 	/// post_stop() is required.
 
 post_stop()
-	/// Playback stops. May only be called if stop() returned true.
+	/// Playback stops. May only be called if stop() returned false.
 	
 I'm ignoring pause(), resume(), seek() and wantclicks() here, as they have no influence
 on the grand scheme of things. I am assuming that these calls can only be issued
