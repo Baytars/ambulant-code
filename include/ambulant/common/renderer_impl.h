@@ -73,6 +73,7 @@ class AMBULANTAPI playable_imp : public playable {
 	void wantclicks(bool want) { m_wantclicks = want;}
 	void preroll(double when, double where, double how_much) {}
 	void post_stop() {};
+	void init_with_node(const lib::node *n) {};
 #ifdef EXP_KEEPING_RENDERER
 	void start_prefetch(double t) {};
 #endif
@@ -111,6 +112,7 @@ class AMBULANTAPI renderer_playable : public playable_imp, public renderer {
 	virtual void start(double t);
 	//virtual void stop();
 	virtual bool stop();
+	virtual void init_with_node(const lib::node *n);
 //	virtual void post_stop() {};
 #ifdef EXP_KEEPING_RENDERER
 	virtual void stop_keeping_renderer();

@@ -331,7 +331,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			assert(rend);	// This code should never be executed for non-rendering playables, Jack thinks.
 			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
 			if (n->get_local_name() == "prefetch") surf = NULL;
-			AM_DBG lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
 			if (rend && surf) {
 				rend->set_surface(surf);
 			}
@@ -365,7 +365,8 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 	}
     if (np) {
         //xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
-        np->update_context_info(n, n->get_numid());
+        //np->update_context_info(n, n->get_numid());
+		np->init_with_node(n);
     }
 #endif
 	

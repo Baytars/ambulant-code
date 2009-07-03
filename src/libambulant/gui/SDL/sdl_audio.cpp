@@ -635,6 +635,29 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 	m_lock.leave();
 }
 
+void
+gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
+{
+	renderer_playable::init_with_node(n);
+
+	if (m_audio_src) {
+		m_audio_clock = 0;
+		
+        if (m_clip_begin != m_previous_clip_position) {
+            /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+            seek(m_clip_begin/1000);
+            m_previous_clip_position = m_clip_begin;
+        }
+		
+		const char * fb = n->get_attribute("fill");
+		//For "fill=continue", we pass -1 to the datasource classes. 
+		if (fb != NULL && !strcmp(fb, "continue"))
+			m_audio_src->set_clip_end(-1);
+		else 
+			m_audio_src->set_clip_end(m_clip_end);	
+	}	
+}
+
 void 
 gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int cookie)
 {

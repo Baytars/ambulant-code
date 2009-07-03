@@ -109,6 +109,27 @@ video_renderer::~video_renderer() {
 	m_lock.leave();
 }
 
+
+void
+video_renderer::init_with_node(const lib::node *n)
+{
+	renderer_playable::init_with_node(n);
+	// Assumption in the following code (by Jack): if we have an audio renderer
+    // then the streams are multiplexed, and we should seek only a single stream.
+    // We let the audio handler do the seeking, as the video handler can
+    // much more easily skip frames, etc.
+    AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+	if (m_clip_begin != m_previous_clip_position) {
+        /*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+		seek(m_clip_begin/1000);
+        m_previous_clip_position = m_clip_begin;
+	}
+	if (m_audio_renderer) {
+		m_audio_renderer->init_with_node(n);
+	} 
+	
+}
+
 #ifdef EXP_KEEPING_RENDERER
 void 
 video_renderer::update_context_info(const lib::node *node, int cookie)
@@ -138,6 +159,11 @@ void
 video_renderer::start (double where)
 {
 	m_lock.enter();
+	/*AM_DBG*/ { 
+        std::string tag = m_node->get_local_name();
+        assert(tag != "prefetch");
+    }
+	
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.start(0x%x): already started", (void*)this);
 		m_lock.leave();
