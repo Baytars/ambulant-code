@@ -34,7 +34,7 @@
 #define AM_DBG if(0)
 #endif
 
-#define POLL_INTERVAL 200  /* milliseconds */
+#define POLL_INTERVAL 20  /* milliseconds */
 
 // Helper class to create QTMovie in main thread
 @interface MovieCreator : NSObject
@@ -42,12 +42,22 @@
 	QTMovie *movie;
 	ambulant::net::timestamp_t clip_begin;
 }
++ (void)removeFromSuperview: (QTMovieView *)view;
+
 - (MovieCreator *)init: (ambulant::net::timestamp_t)begintime;
 - (QTMovie *)movie;
 - (void)movieWithURL: (NSURL*)url;
 - (void)moviePrepare: (id)sender;
 @end
+
 @implementation MovieCreator
+
++ (void)removeFromSuperview: (QTMovieView *)view	 
+{	 
+    [view pause: self];	 
+    [view removeFromSuperview];	 
+}
+ 
 - (MovieCreator *)init: (ambulant::net::timestamp_t)begintime
 {
 	self = [super init];
@@ -68,6 +78,7 @@
         [NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
         nil];
     movie = [[QTMovie movieWithAttributes:attrs error:nil] retain];
+    SetMovieRate([movie quickTimeMovie], 0);
     [self moviePrepare: self];
 }
 
@@ -158,26 +169,6 @@ cocoa_video_renderer::cocoa_video_renderer(
 	}
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer: cocoa_video_renderer(0x%x), m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
 	
-#if 0
-	Movie mov = [m_movie quickTimeMovie];
-	TimeValue movtime;
-	// Calling SetMovieTimeValue here can cause deadlocks, it seems, probably due to
-	// a misunderstanding of QT threading intricacies on my side. The workaround
-	// is that we call it later, just after we've started playback (in the redraw
-	// routine). But: this feels like a hack so I'm not sure this is a real solution
-	// and not merely masks the problem.
-	if (m_clip_begin) {
-		TimeScale movscale = GetMovieTimeScale(mov);
-		movtime = (TimeValue)(m_clip_begin*(double)movscale/1000000.0);
-		SetMovieTimeValue(mov, movtime);
-	} else {
-		movtime = GetMovieTime(mov, nil);
-	}
-	Fixed playRate = GetMoviePreferredRate(mov);
-	PrePrerollMovie(mov, movtime, playRate, nil, nil);
-	PrerollMovie(mov, movtime, playRate);
-	//SetMovieRate(mov, playRate);
-#endif
 	[pool release];
 }
 
@@ -236,9 +227,9 @@ cocoa_video_renderer::start(double where)
 		return;
 	}
 	m_lock.enter();
+	Movie mov = [m_movie quickTimeMovie];
 #if 0
 	if (where > 0) {
-		Movie mov = [m_movie quickTimeMovie];
 		TimeValue movtime;
 		TimeScale movscale = GetMovieTimeScale(mov);
 		movtime = (TimeValue)((where+m_clip_begin/1000000.0)*movscale);
@@ -247,6 +238,11 @@ cocoa_video_renderer::start(double where)
 #endif
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+    _fix_video_epoch();
+#endif
+    Fixed playRate = GetMoviePreferredRate(mov);
+//    SetMovieRate(mov, playRate);
 	m_lock.leave();
 }
 
@@ -303,6 +299,9 @@ cocoa_video_renderer::resume()
 		if ([m_movie_view isHidden]) [m_movie_view setHidden: NO];
 		[m_movie_view play: NULL];
 	}
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+    _fix_video_epoch();
+#endif
 	[pool release];
 	m_lock.leave();
 }
@@ -345,6 +344,9 @@ cocoa_video_renderer::_poll_playing()
 	}
 	
 	if (!is_stopped) {
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+        _fix_clock_drift();
+#endif
 		// schedule another call in a while
 		ambulant::lib::event *e = new poll_callback(this, &cocoa_video_renderer::_poll_playing);
 		m_event_processor->add_event(e, POLL_INTERVAL, ambulant::lib::ep_low);
@@ -403,6 +405,41 @@ cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 	
 	m_lock.leave();
 }
+
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+void 
+cocoa_video_renderer::_fix_video_epoch()
+{
+    Movie mov = [m_movie quickTimeMovie];
+    TimeValue movtime = GetMovieTime(mov, NULL);
+    TimeScale movscale = GetMovieTimeScale(mov);
+    double curtime = (double)movtime / (double)movscale;
+    m_video_epoch = m_event_processor->get_timer()->elapsed() - lib::timer::signed_time_type(curtime*1000.0);
+}
+
+void 
+cocoa_video_renderer::_fix_clock_drift()
+{
+    Movie mov = [m_movie quickTimeMovie];
+    TimeValue movtime = GetMovieTime(mov, NULL);
+    TimeScale movscale = GetMovieTimeScale(mov);
+    double curtime = (double)movtime / (double)movscale;
+    lib::timer::signed_time_type expected_time = m_video_epoch + lib::timer::signed_time_type(curtime*1000.0);
+    lib::timer::signed_time_type clock_drift = expected_time - m_event_processor->get_timer()->elapsed();
+    
+    // If we have drifted too far we assume something fishy is going on and resync.
+    if (clock_drift < -100000 || clock_drift > 100000) {
+        lib::logger::get_logger()->trace("cocoa_video: Quicktime clock %dms ahead. Resync.");
+        _fix_video_epoch();
+        return;
+    }
+    if (clock_drift < -1 || clock_drift > 1) {
+        lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
+        // XXX For now, assume residual_clock_drift always zero.
+    }
+}
+#endif
+
 
 } // namespace cocoa
 

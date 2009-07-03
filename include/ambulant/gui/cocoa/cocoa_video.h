@@ -74,6 +74,12 @@ class cocoa_video_renderer :
 	NSWindow *m_onscreen_window;
 	bool m_offscreen;
 	bool m_paused;
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
+    lib::timer::signed_time_type m_video_epoch;    // Ambulant clock value corresponding to video clock 0.
+    void _fix_video_epoch();    // Set m_video_epoch according to current movie time
+    void _fix_clock_drift();    // Synchronise movie clock and ambulant clock
+#endif
+
 	critical_section m_lock;
 };
 
