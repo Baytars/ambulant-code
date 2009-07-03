@@ -17,8 +17,8 @@ In the right region, you should see the same, 4 seconds delayed.
 There is no audio.
 <clear begin="16s"/>
 </smilText>
-<video id="media-01" src="media-video.mpg" region="left"/>
-<video begin="4s" id="media-02" src="media-video.mpg" region="right"/>
+<video id="media-01" src="media-video.mp4" region="left"/>
+<video begin="4s" id="media-02" src="media-video.mp4" region="right"/>
 </par>
 </body>
 </smil>

@@ -31,10 +31,10 @@ Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom,<tev next="0.5s"/><tev next="0
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom!<tev next="0.5s"/><tev next="0.5s"/>
 </smilText>
 <seq>
-<video id="media-01" src="media-video.mpg" region="left" clipEnd="4s"/>
-<video id="media-02" src="media-video.mpg" region="left" clipBegin="4s" clipEnd="8s"/>
-<video id="media-03" src="media-video.mpg" region="left" clipBegin="8s" clipEnd="12s"/>
-<video id="media-04" src="media-video.mpg" region="left" clipBegin="12s"/>
+<video id="media-01" src="media-video.mp4" region="left" clipEnd="4s"/>
+<video id="media-02" src="media-video.mp4" region="left" clipBegin="4s" clipEnd="8s"/>
+<video id="media-03" src="media-video.mp4" region="left" clipBegin="8s" clipEnd="12s"/>
+<video id="media-04" src="media-video.mp4" region="left" clipBegin="12s"/>
 </seq>
 </par>
 </body>
