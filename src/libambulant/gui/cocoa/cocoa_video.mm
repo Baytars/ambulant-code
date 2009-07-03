@@ -45,9 +45,7 @@
 - (MovieCreator *)init: (ambulant::net::timestamp_t)begintime;
 - (QTMovie *)movie;
 - (void)movieWithURL: (NSURL*)url;
-+ (void)removeFromSuperview: (QTMovieView *)view;
-+ (void)removeFromSuperview: (QTMovieView *)view;
-+ (void)removeFromSuperview: (QTMovieView *)view;
+- (void)moviePrepare: (id)sender;
 @end
 @implementation MovieCreator
 - (MovieCreator *)init: (ambulant::net::timestamp_t)begintime
@@ -70,7 +68,11 @@
         [NSNumber numberWithBool:NO], QTMovieOpenAsyncOKAttribute,
         nil];
     movie = [[QTMovie movieWithAttributes:attrs error:nil] retain];
+    [self moviePrepare: self];
+}
 
+- (void)moviePrepare: (id) sender
+{
 	Movie mov = [movie quickTimeMovie];
 	TimeValue movtime;
 	if (clip_begin) {
@@ -81,18 +83,12 @@
 		movtime = GetMovieTime(mov, nil);
 	}
 	MoviesTask(mov, 0);
-#if 0
+#if 1
 	Fixed playRate = GetMoviePreferredRate(mov);
 	PrePrerollMovie(mov, movtime, playRate, nil, nil);
 	PrerollMovie(mov, movtime, playRate);
 	MoviesTask(mov, 0);
 #endif
-}
-
-+ (void)removeFromSuperview: (QTMovieView *)view
-{
-	[view pause: self];
-	[view removeFromSuperview];
 }
 @end
 
@@ -106,18 +102,6 @@ namespace cocoa {
 
 typedef lib::no_arg_callback<cocoa_video_renderer> poll_callback;
 
-#ifdef OLD_OFFSCREEN_CODE
-// Helper routine to forward quicktime redraw notifications to the cocoa_video_renderer
-// object. This is installed when needed (when we go to offscreen mode). According
-// to the QT docs installing such a redraw handler may slowdown rendering.
-static OSErr
-movieDidDrawFrame(Movie theMovie, long refCon)
-{
-	cocoa_video_renderer *r = reinterpret_cast<cocoa_video_renderer*> (refCon);
-	r->_qt_did_redraw();
-	return 0;
-}
-#endif
 
 extern const char cocoa_video_playable_tag[] = "video";
 extern const char cocoa_video_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererCocoa");
@@ -164,7 +148,8 @@ cocoa_video_renderer::cocoa_video_renderer(
 	_init_clip_begin_end();
 	MovieCreator *mc = [[MovieCreator alloc] init: m_clip_begin];
 	[mc performSelectorOnMainThread: @selector(movieWithURL:) withObject: nsurl waitUntilDone: YES];
-	m_movie = [mc movie];
+//	[mc performSelectorOnMainThread: @selector(moviePrepare:) withObject: nil waitUntilDone: YES];
+    m_movie = [mc movie];
 	[mc release];
 	
 	if (!m_movie) {
@@ -251,6 +236,7 @@ cocoa_video_renderer::start(double where)
 		return;
 	}
 	m_lock.enter();
+#if 0
 	if (where > 0) {
 		Movie mov = [m_movie quickTimeMovie];
 		TimeValue movtime;
@@ -258,36 +244,12 @@ cocoa_video_renderer::start(double where)
 		movtime = (TimeValue)((where+m_clip_begin/1000000.0)*movscale);
 		SetMovieTimeValue(mov, movtime);
 	}
+#endif
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
 	m_lock.leave();
 }
 
-#if 0
-void
-cocoa_video_renderer::stop()
-{
-	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	if (m_dest) m_dest->renderer_done(this);
-	m_dest = NULL;
-	if (m_movie_view) {
-		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: removing m_movie_view 0x%x", (void *)m_movie_view);
-		[MovieCreator performSelectorOnMainThread: @selector(removeFromSuperview:) withObject: m_movie_view waitUntilDone: NO];
-		m_movie_view = NULL;
-		// XXXJACK Should call releaseOverlayWindow here
-	}
-	if (m_movie) {
-		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: release m_movie 0x%x", (void *)m_movie);
-		[m_movie release];
-		m_movie = NULL;
-	}
-	[pool release];
-	m_lock.leave();
-	m_context->stopped(m_cookie);
-}
-#endif
 bool
 cocoa_video_renderer::stop()
 {
@@ -439,87 +401,8 @@ cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 	// Set things up so subsequent redraws go to the overlay window
 	[view useOverlayWindow];
 	
-#ifdef OLD_OFFSCREEN_CODE
-	_copy_bits(view, frameRect);
-#endif
 	m_lock.leave();
 }
-
-#ifdef OLD_OFFSCREEN_CODE
-void
-cocoa_video_renderer::_qt_did_redraw()
-{
-	if (!m_offscreen) return;
-	if (!m_dest) return;
-	m_dest->need_redraw();
-}
-	
-void
-cocoa_video_renderer::_copy_bits(NSView *dst, NSRect& dstrect)
-{
-	if (!m_offscreen) return;
-	AM_DBG NSLog(@"_copy_bits()");
-	[m_movie_view lockFocus];
-	NSBitmapImageRep *src = [[NSBitmapImageRep alloc] initWithFocusedViewRect: [m_movie_view bounds]];
-	NSRect srcrect = [m_movie_view bounds];
-	[m_movie_view unlockFocus];
-	[dst lockFocus];
-	[src drawInRect: dstrect];
-	[dst unlockFocus];
-	[src release];
-}
-
-void cocoa_video_renderer::_go_offscreen()
-{
-	if (m_offscreen) return;
-	m_offscreen = true;
-	
-	// Set up the redraw-done callback.
-    MovieDrawingCompleteUPP myUpp = NewMovieDrawingCompleteUPP (movieDidDrawFrame);
-	if (!m_movie) return;
-	Movie mov = [m_movie quickTimeMovie];
-	if (!mov) return;
-	SetMovieDrawingCompleteProc(mov,
-		movieDrawingCallWhenChanged,
-		myUpp,
-		(long)this);
-	DisposeMovieDrawingCompleteUPP (myUpp);
-	
-	// Create the offscreen window, if it isn't there already.
-	// For easy coding we make it as big as the normal rect.
-	if (!m_offscreen_window) {
-		m_onscreen_window = [m_movie_view window];
-		NSRect rect = NSMakeRect(0,0,2000,2000); // XXXJACK
-		m_offscreen_window = [[NSWindow alloc] initWithContentRect: rect 
-			styleMask: NSBorderlessWindowMask 
-			backing: NSBackingStoreNonretained
-			defer: NO];
-	}
-	
-	// Move the display offscreen
-	NSView *contentview = [m_offscreen_window contentView];
-	[contentview addSubview: m_movie_view];
-}
-
-void
-cocoa_video_renderer::_go_onscreen()
-{
-	if (!m_offscreen) return;
-	m_offscreen = false;
-	
-	// Clear the redraw-done callback
-	if (!m_movie) return;
-	Movie mov = [m_movie quickTimeMovie];
-	if (!mov) return;
-	SetMovieDrawingCompleteProc(mov, movieDrawingCallWhenChanged, nil, nil);
-	
-	// Move the display onscreen.
-	assert(m_offscreen_window);
-	assert(m_onscreen_window);
-	NSView *contentview = [m_onscreen_window contentView];
-	[contentview addSubview: m_movie_view];
-}
-#endif /* OLD_OFFSCREEN_CODE */
 
 } // namespace cocoa
 

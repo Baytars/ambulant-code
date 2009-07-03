@@ -228,7 +228,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	m_outtransition(NULL),
 	m_transition_engine(NULL),
     m_previous_clip_position(-1)
-#ifdef AMBULANT_INSTRUMENT_AUDIO_DRIFT
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
     , m_audio_clock(0)
 #endif
 {
@@ -276,7 +276,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 	m_intransition(NULL),
 	m_outtransition(NULL),
 	m_transition_engine(NULL)
-#ifdef AMBULANT_INSTRUMENT_AUDIO_DRIFT
+#ifdef AMBULANT_FIX_AUDIO_DRIFT
     , m_audio_clock(0)
 #endif
 {
