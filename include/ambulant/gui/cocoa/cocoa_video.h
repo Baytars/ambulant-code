@@ -56,6 +56,14 @@ class cocoa_video_renderer :
 //	void freeze() {}
 //	void stop();
 	bool stop();
+	void post_stop();
+	void init_with_node(const lib::node *n);
+	void preroll(double when, double where, double how_much);
+#ifdef EXP_KEEPING_RENDERER
+	void start_prefetch(double where) { assert(0); };
+	void stop_but_keeping_renderer() { assert(0); };
+	void update_context_info(const lib::node *node, int cookie) { assert(0); };
+#endif
 	void pause(pause_display d=display_show);
 	void resume();
 	void seek(double t);
@@ -66,13 +74,12 @@ class cocoa_video_renderer :
 	void set_intransition(const lib::transition_info *info) {};
 	void start_outtransition(const lib::transition_info *info) {};
   private:
+    enum { rs_created, rs_inited, rs_prerolled, rs_started, rs_stopped, rs_dead } m_renderer_state; // Debugging, mainly
 	void _poll_playing();
-	net::url m_url;
-	QTMovie *m_movie;
-	QTMovieView *m_movie_view;
-	NSWindow *m_offscreen_window;
-	NSWindow *m_onscreen_window;
-	bool m_offscreen;
+	net::url m_url;             // The URL of the movie we play
+	QTMovie *m_movie;           // The movie itself
+	QTMovieView *m_movie_view;  // The view displaying the movie
+    void *m_mc;                 // Our helper ObjC class to run methods in the main thread
 	bool m_paused;
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
     lib::timer::signed_time_type m_video_epoch;    // Ambulant clock value corresponding to video clock 0.
