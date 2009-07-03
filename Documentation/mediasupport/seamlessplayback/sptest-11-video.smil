@@ -20,16 +20,16 @@ Uses fill=continue on media items.
 </smilText>
 <seq>
 <par id="par-01">
-<video id="media-01" fill="continue" src="media-video.mpg" region="left" clipEnd="4s"/>
+<video id="media-01" fill="continue" src="media-video.mp4" region="left" clipEnd="4s"/>
 </par>
 <par id="par-02">
-<video id="media-02" fill="continue" src="media-video-copy.mpg" region="right" clipBegin="4s" clipEnd="8s"/>
+<video id="media-02" fill="continue" src="media-video-copy.mp4" region="right" clipBegin="4s" clipEnd="8s"/>
 </par>
 <par id="par-03">
-<video id="media-03" fill="continue" src="media-video.mpg" region="left" clipBegin="8s" clipEnd="12s"/>
+<video id="media-03" fill="continue" src="media-video.mp4" region="left" clipBegin="8s" clipEnd="12s"/>
 </par>
 <par id="par-04">
-<video id="media-04" fill="continue" src="media-video-copy.mpg" region="right" clipBegin="12s"/>
+<video id="media-04" fill="continue" src="media-video-copy.mp4" region="right" clipBegin="12s"/>
 </par>
 </seq>
 </par>
