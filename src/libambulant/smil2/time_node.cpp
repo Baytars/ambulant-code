@@ -733,7 +733,7 @@ void time_node::activate(qtime_type timestamp) {
 			assert(m_state->ident() == ts_active);
 			raise_update_event(timestamp);
 			sync_node()->raise_update_event(timestamp);
-		}
+        }
 #endif
 		else start_playable(sd_offset);
 		if(m_timer) m_timer->resume();
@@ -829,18 +829,14 @@ void time_node::start_prefetch(time_type offset) {
 		AM_DBG m_logger->debug("start_prefetch(%ld): ffwd skip %s", offset(), get_sig().c_str());
 		return;
 	}
-//	if(!is_playable() ) {
-//		return;
-//	}
 	qtime_type timestamp(this, offset);
 	AM_DBG m_logger->debug("%s[%s].start_prefetch(%ld) DT:%ld", m_attrs.get_tag().c_str(), 
 						   m_attrs.get_id().c_str(), offset(), timestamp.as_doc_time_value());
 	common::playable *np = create_playable();
 	const lib::transition_info *trans_in = m_attrs.get_trans_in();
 	if(np) {
-		//np->start_prefetch(time_type_to_secs(offset()));
 		np->preroll(time_type_to_secs(offset()));
-	}
+    }
 }
 #endif //EXP_KEEPING_RENDERER
 
@@ -944,7 +940,7 @@ void time_node::stop_playable() {
 	if(!is_playable() && !is_prefetch()) return;
 	if(!m_needs_remove) return;
 	m_eom_flag = true;
-	AM_DBG m_logger->debug("%s[%s].stop()", m_attrs.get_tag().c_str(), 
+	/*AM_DBG*/ m_logger->debug("%s[%s].stop()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_context->stop_playable(m_node);
 }
@@ -1538,11 +1534,9 @@ void time_node::remove(qtime_type timestamp) {
 			(*it)->remove(qt);
 	} 
 	if(is_animation()) stop_animation();
-#ifdef WITH_SMIL30
-	/* else nothing to do for statecommands */
-	if (is_prefetch()) stop_playable();
-#endif
+	else if (is_prefetch()) stop_playable();
 	else if(is_playable()) stop_playable();
+	/* else nothing to do for statecommands */
 	if(m_timer) m_timer->stop();
 	m_needs_remove = false;
 }
