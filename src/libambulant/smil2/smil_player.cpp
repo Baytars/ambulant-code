@@ -986,8 +986,6 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 	
 		m_logger->debug("%s[%s]._destroy_playable 0x%x", tag.c_str(), (pid?pid:"no-id"), np);
 	}
-	//np->stop();
-	if (!np->stop()) np->post_stop(); //xxxbo: stop() return false means that the renderer is reusable, so we need call post_stop 
 	int rem = np->release();
 	if (rem > 1) m_logger->debug("smil_player::_destroy_playable: playable 0x%x still has refcount of %d", np, rem);
 }
@@ -1005,11 +1003,6 @@ void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common:
 		m_playables_url_based.erase(it_url_based);
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::_destroy_playble_in_cache: stop the playble in the cache for %s", victim.first->get_sig().c_str());
-		//victim.second->stop(); 
-		//xxxbo: For node with continue=fill, we didn't call its stop in stop_playable, so call it here.
-		const char * fb = victim.first->get_attribute("fill");
-		if (fb != NULL && !strcmp(fb, "continue")) victim.second->stop(); 
-		victim.second->post_stop();
 		int rem = victim.second->release();
 		if (rem > 1) m_logger->debug("smil_player::_destroy_playble_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
 	}

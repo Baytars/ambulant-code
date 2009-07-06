@@ -74,7 +74,7 @@ class cocoa_video_renderer :
 	void set_intransition(const lib::transition_info *info) {};
 	void start_outtransition(const lib::transition_info *info) {};
   private:
-    enum { rs_created, rs_inited, rs_prerolled, rs_started, rs_stopped, rs_dead } m_renderer_state; // Debugging, mainly
+    enum { rs_created, rs_inited, rs_prerolled, rs_started, rs_stopped, rs_fullstopped } m_renderer_state; // Debugging, mainly
 	void _poll_playing();
 	net::url m_url;             // The URL of the movie we play
 	QTMovie *m_movie;           // The movie itself

@@ -20,6 +20,10 @@ playable and renderer API
 create(event_processor *evp, playable_notification *context)	
 	/// Constructor function.
 	
+destructor()
+	/// Can be called in any state, i.e. simulates stop() and post_stop()
+	/// as required.
+	
 init_with_node(node *n)
 	/// Bind the renderer to a node, either prefetch or media.
 	/// Records node, cookie, URL, clip_begin/end, etc.
