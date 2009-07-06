@@ -154,14 +154,14 @@ cocoa_video_renderer::cocoa_video_renderer(
     m_previous_clip_position(-1),
     m_renderer_state(rs_created)
 {
-    /*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer::cocoa_video_renderer(0x%x)", this);
+    AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::cocoa_video_renderer(0x%x)", this);
 //    init_with_node(node);
 }
 
 cocoa_video_renderer::~cocoa_video_renderer()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer::~cocoa_video_renderer(0x%x), m_movie=0x%x", this, m_movie);
+	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::~cocoa_video_renderer(0x%x), m_movie=0x%x", this, m_movie);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_movie) {
 		[m_movie release];
@@ -486,6 +486,9 @@ cocoa_video_renderer::_fix_clock_drift()
     }
     if (clock_drift < -1 || clock_drift > 1) {
         lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
+        if (residual_clock_drift) {
+            lib::logger::get_logger()->debug("cocoa_video_renderer: not implemented: adjusting audio clock by %ld ms", residual_clock_drift);
+        }
         // XXX For now, assume residual_clock_drift always zero.
     }
 }

@@ -393,7 +393,9 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
-            // XXX For now, assume residual_clock_drift always zero.
+            if (residual_clock_drift) {
+                lib::logger::get_logger()->debug("sdl_audio_renderer: not implemented: adjusting audio clock by %ld ms", residual_clock_drift);
+            }
         }
         // Update the audio clock
         lib::timer::time_type delta = (bytes_wanted * 1000) / (44100*2*2); // Warning: rounding error possible
@@ -465,7 +467,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 	still_busy = (size != 0);
 	still_busy |= restart_audio_input();
 	if (!still_busy) {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::playdone: calling m_context->stopped() this = (x%x)",this);
 		// We cannot call unregister_renderer from here, because we are called from the
 		// SDL callback and already holding the m_global_lock. So, in stead
 		// we use the event processor to unregister ourselves later.
@@ -492,7 +494,7 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
     xxxtotsize += size;
     net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
-        /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
+        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
         m_previous_clip_position = m_clip_end;
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
@@ -522,7 +524,7 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		m_audio_src->start(m_event_processor, e);
 	}
 #else
-	/*AM_DBG*/ {
+	AM_DBG {
         std::string tag = m_node->get_local_name();
         assert(tag != "prefetch");
     }
@@ -619,7 +621,7 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer() //xxxbo: This api is o
 {
 	assert(0);
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
 		m_lock.leave();
 		std::string tag = m_node->get_local_name();
@@ -646,7 +648,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		m_audio_clock = 0;
 		
         if (m_clip_begin != m_previous_clip_position) {
-            /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+            AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 			m_lock.leave();
             seek(m_clip_begin/1000);
 			m_lock.enter();
@@ -672,12 +674,12 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 	m_cookie = cookie;
 	_init_clip_begin_end();
 	
-    /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_audio_src) {
 		m_audio_clock = 0;
 		
         if (m_clip_begin != m_previous_clip_position) {
-            /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+            AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
             seek(m_clip_begin/1000);
             m_previous_clip_position = m_clip_begin;
         }

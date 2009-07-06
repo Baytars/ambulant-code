@@ -427,6 +427,7 @@ time_node::calc_next_interval(interval_type prev) {
 // timestamp: "scheduled now" in parent simple time
 // This is the state change hook for this node.
 void time_node::set_state(time_state_type state, qtime_type timestamp, time_node *oproot) {
+    AM_DBG if (has_debug()) m_logger->debug("set_state(%s) %s -> %s", get_sig().c_str(), time_state_str(m_state->ident()), time_state_str(state));
 	if(m_state->ident() == state) return;
 #if 1
 	// Stopgap bug fix by Jack: while seeking to a destination node,
@@ -833,7 +834,6 @@ void time_node::start_prefetch(time_type offset) {
 	AM_DBG m_logger->debug("%s[%s].start_prefetch(%ld) DT:%ld", m_attrs.get_tag().c_str(), 
 						   m_attrs.get_id().c_str(), offset(), timestamp.as_doc_time_value());
 	common::playable *np = create_playable();
-	const lib::transition_info *trans_in = m_attrs.get_trans_in();
 	if(np) {
 		np->preroll(time_type_to_secs(offset()));
     }
@@ -940,7 +940,7 @@ void time_node::stop_playable() {
 	if(!is_playable() && !is_prefetch()) return;
 	if(!m_needs_remove) return;
 	m_eom_flag = true;
-	/*AM_DBG*/ m_logger->debug("%s[%s].stop()", m_attrs.get_tag().c_str(), 
+	AM_DBG m_logger->debug("%s[%s].stop()", m_attrs.get_tag().c_str(), 
 		m_attrs.get_id().c_str());
 	m_context->stop_playable(m_node);
 }

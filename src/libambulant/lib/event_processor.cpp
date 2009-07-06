@@ -145,7 +145,7 @@ event_processor_impl::serve_events()
         // If the clock is behind, we set it forward. But we don't advance it past the
         // next event that is due to be scheduled.
         // If the clock is too fast we simply set it back.
-        time_type next_event_time = std::min(
+        timer::signed_time_type next_event_time = std::min(
             m_low_delta_timer.next_event_time(),
             std::min(
                 m_med_delta_timer.next_event_time(),

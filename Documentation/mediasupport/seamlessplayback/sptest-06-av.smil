@@ -31,8 +31,8 @@ Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom,<tev next="0.5s"/><tev next="0
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom!<tev next="0.5s"/><tev next="0.5s"/>
 </smilText>
 <seq>
-<video id="media-01" src="media-av.mp4" region="left" clipEnd="4s"/>
-<video id="media-02" src="media-av.mp4" region="left" clipBegin="4s" clipEnd="8s"/>
+<video id="media-01" src="media-av.mp4" region="left" clipEnd="4s" _debug="1"/>
+<video id="media-02" src="media-av.mp4" region="left" clipBegin="4s" clipEnd="8s" _debug="2"/>
 <video id="media-03" src="media-av.mp4" region="left" clipBegin="8s" clipEnd="12s"/>
 <video id="media-04" src="media-av.mp4" region="left" clipBegin="12s"/>
 </seq>
