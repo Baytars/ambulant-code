@@ -159,8 +159,8 @@ void
 renderer_playable::init_with_node(const lib::node *n)
 {
 	m_node = n;
-	_init_clip_begin_end();
 	m_cookie = n->get_numid();
+	_init_clip_begin_end();
 }
 
 void

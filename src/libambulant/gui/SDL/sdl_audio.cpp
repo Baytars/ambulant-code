@@ -615,8 +615,9 @@ gui::sdl::sdl_audio_renderer::is_playing()
 
 #ifdef EXP_KEEPING_RENDERER
 void
-gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
+gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer() //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);
 	m_lock.enter();
 	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	if (m_is_playing) {
@@ -638,14 +639,17 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer()
 void
 gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 {
+	m_lock.enter();
 	renderer_playable::init_with_node(n);
-
+	
 	if (m_audio_src) {
 		m_audio_clock = 0;
 		
         if (m_clip_begin != m_previous_clip_position) {
             /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+			m_lock.leave();
             seek(m_clip_begin/1000);
+			m_lock.enter();
             m_previous_clip_position = m_clip_begin;
         }
 		
@@ -656,11 +660,13 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		else 
 			m_audio_src->set_clip_end(m_clip_end);	
 	}	
+	m_lock.leave();
 }
 
 void 
-gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int cookie)
+gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int cookie) //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);
     AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info(%s), this=0x%x, ds=0x%x", node->get_sig().c_str(), (void*)this, (void*)m_audio_src);
 	m_node = node;
 	m_cookie = cookie;
@@ -734,7 +740,7 @@ void
 gui::sdl::sdl_audio_renderer::post_stop()
 {
 	m_lock.enter();
-	m_is_playing = false;
+	m_is_playing = false;  //xxxbo: This stops audio playback at the next data_avail callback through the false return value from restart_audio_input
 	m_lock.leave();
 	
 }
@@ -831,8 +837,9 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 
 #ifdef EXP_KEEPING_RENDERER
 void
-gui::sdl::sdl_audio_renderer::start_prefetch(double where)
+gui::sdl::sdl_audio_renderer::start_prefetch(double where) //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);
 	m_lock.enter();
 #ifdef EXP_KEEPING_RENDERER
 	if (m_is_playing) {
