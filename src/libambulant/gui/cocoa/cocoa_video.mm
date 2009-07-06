@@ -186,7 +186,7 @@ cocoa_video_renderer::init_with_node(const lib::node *n)
 	m_lock.enter();
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	renderer_playable::init_with_node(n);
-    assert(m_renderer_state == rs_created || m_renderer_state == rs_prerolled || m_renderer_state == rs_stopped);
+    assert(m_renderer_state == rs_created || m_renderer_state == rs_prerolled || m_renderer_state == rs_stopped || m_renderer_state == rs_fullstopped);
     m_renderer_state = rs_inited;
     
     m_node = n;
@@ -300,7 +300,7 @@ cocoa_video_renderer::post_stop()
 {
 	m_lock.enter();
     assert(m_renderer_state == rs_stopped);
-    m_renderer_state = rs_dead;
+    m_renderer_state = rs_fullstopped;
 	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_dest) m_dest->renderer_done(this);
