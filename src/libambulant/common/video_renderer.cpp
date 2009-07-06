@@ -343,47 +343,6 @@ video_renderer::stop_but_keeping_renderer() //xxxbo: This api is obsolete and wi
 }
 #endif
 
-#if 0
-void
-video_renderer::stop()
-{ 
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-	if (!m_activated) {
-		lib::logger::get_logger()->trace("video_renderer.stop(0x%x): not started", (void*)this);
-		m_lock.leave();
-		return;
-	}
-    // XXXJACK: if we have an audio renderer we should let it do the stopped() callback.
-	m_activated = false;
-	if (m_dest) {
-#ifdef EXP_KEEPING_RENDERER
-        // XXXJACK: I'm not happy with releasing the lock here. Is there a good reason for it??
-		m_lock.leave();
-#endif
-		m_dest->renderer_done(this);
-		m_dest = NULL;
-#ifdef EXP_KEEPING_RENDERER
-		m_lock.enter();
-#endif
-	}
-	if (m_audio_renderer) {
-		m_audio_renderer->stop();
-		m_audio_renderer->release();
-		m_audio_renderer = NULL;
-	} else {
-        m_context->stopped(m_cookie, 0);
-    }
-	if (m_src) {
-		m_src->stop();
-		m_src->release();
-		m_src = NULL;
-	}
-	lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
-		m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
-	m_lock.leave();
-}
-#endif
 
 bool
 video_renderer::stop()
@@ -397,7 +356,7 @@ video_renderer::stop()
         m_context->stopped(m_cookie, 0);
     }
 	m_lock.leave();
-	return false; // xxxbo: note, "false" menas this renderer is reusable.
+	return false; // xxxbo: note, "false" means this renderer is reusable (and still running, needing post_stop() to actually stop)
 }
 
 void 

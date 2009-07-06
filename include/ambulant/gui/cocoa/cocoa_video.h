@@ -81,6 +81,7 @@ class cocoa_video_renderer :
 	QTMovieView *m_movie_view;  // The view displaying the movie
     void *m_mc;                 // Our helper ObjC class to run methods in the main thread
 	bool m_paused;
+    net::timestamp_t m_previous_clip_position; // Where we are officially positioned
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
     lib::timer::signed_time_type m_video_epoch;    // Ambulant clock value corresponding to video clock 0.
     void _fix_video_epoch();    // Set m_video_epoch according to current movie time

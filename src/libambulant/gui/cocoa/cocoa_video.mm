@@ -41,12 +41,12 @@
 @interface MovieCreator : NSObject
 {
 	QTMovie *movie;
-	ambulant::net::timestamp_t clip_begin;
+	ambulant::net::timestamp_t position_wanted;
 }
 + (void)removeFromSuperview: (QTMovieView *)view;
 
 - (MovieCreator *)init;
-- (void)setClipBegin: (ambulant::net::timestamp_t)begintime;
+- (void)setPositionWanted: (ambulant::net::timestamp_t)begintime;
 - (QTMovie *)movie;
 - (void)movieWithURL: (NSURL*)url;
 - (void)moviePrepare: (id)sender;
@@ -55,9 +55,10 @@
 @implementation MovieCreator
 
 + (void)removeFromSuperview: (QTMovieView *)view	 
-{	 
+{
+    [view retain];
     [view pause: self];	 
-    [view removeFromSuperview];	 
+    [view removeFromSuperview];
 }
  
 - (MovieCreator *)init
@@ -66,9 +67,9 @@
 	return self;
 }
     
-- (void)setClipBegin: (ambulant::net::timestamp_t)begintime
+- (void)setPositionWanted: (ambulant::net::timestamp_t)begintime
 {
-	clip_begin = begintime;
+	position_wanted = begintime;
 }
 
 - (QTMovie *)movie
@@ -92,20 +93,19 @@
 {
 	Movie mov = [movie quickTimeMovie];
 	TimeValue movtime;
-	if (clip_begin) {
+	if (position_wanted >= 0) {
 		TimeScale movscale = GetMovieTimeScale(mov);
-		movtime = (TimeValue)(clip_begin*(double)movscale/1000000.0);
+		movtime = (TimeValue)(position_wanted*(double)movscale/1000000.0);
 		SetMovieTimeValue(mov, movtime);
-	} else {
-		movtime = GetMovieTime(mov, nil);
-	}
-	MoviesTask(mov, 0);
-#if 1
-	Fixed playRate = GetMoviePreferredRate(mov);
-	PrePrerollMovie(mov, movtime, playRate, nil, nil);
-	PrerollMovie(mov, movtime, playRate);
-	MoviesTask(mov, 0);
-#endif
+        Fixed playRate = GetMovieRate(mov);
+        if (playRate == 0) {
+            playRate = GetMoviePreferredRate(mov);
+            PrePrerollMovie(mov, movtime, playRate, nil, nil);
+            PrerollMovie(mov, movtime, playRate);
+        }
+        MoviesTask(mov, 0);
+    }
+    position_wanted = -1;
 }
 @end
 
@@ -152,6 +152,7 @@ cocoa_video_renderer::cocoa_video_renderer(
 	m_movie_view(NULL),
     m_mc(NULL),
 	m_paused(false),
+    m_previous_clip_position(-1),
     m_renderer_state(rs_created)
 {
 //    init_with_node(node);
@@ -210,7 +211,10 @@ cocoa_video_renderer::init_with_node(const lib::node *n)
 	}
 	
 	_init_clip_begin_end();
-    [(MovieCreator *)m_mc setClipBegin: m_clip_begin];
+    if (m_clip_begin != m_previous_clip_position) {
+        [(MovieCreator *)m_mc setPositionWanted: m_clip_begin];
+    }
+    m_previous_clip_position = m_clip_begin;
 	
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer(0x%x)::init_with_node, m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
 	
@@ -266,22 +270,16 @@ cocoa_video_renderer::start(double where)
 	m_lock.enter();
     assert(m_renderer_state == rs_prerolled);
     m_renderer_state = rs_started;
+    assert(m_movie);
 	Movie mov = [m_movie quickTimeMovie];
-#if 0
-	if (where > 0) {
-		TimeValue movtime;
-		TimeScale movscale = GetMovieTimeScale(mov);
-		movtime = (TimeValue)((where+m_clip_begin/1000000.0)*movscale);
-		SetMovieTimeValue(mov, movtime);
-	}
-#endif
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
     _fix_video_epoch();
 #endif
     Fixed playRate = GetMoviePreferredRate(mov);
-//    SetMovieRate(mov, playRate);
+    SetMovieRate(mov, playRate);
+    m_previous_clip_position = -1;
 	m_lock.leave();
 }
 
@@ -301,20 +299,13 @@ cocoa_video_renderer::post_stop()
 	m_lock.enter();
     assert(m_renderer_state == rs_stopped);
     m_renderer_state = rs_fullstopped;
-	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::stop(0x%x)", this);
+	AM_DBG logger::get_logger()->debug("cocoa_video_renderer::post_stop(0x%x)", this);
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_dest) m_dest->renderer_done(this);
 	m_dest = NULL;
 	if (m_movie_view) {
-		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: removing m_movie_view 0x%x", (void *)m_movie_view);
+		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.post_stop: removing m_movie_view 0x%x", (void *)m_movie_view);
 		[MovieCreator performSelectorOnMainThread: @selector(removeFromSuperview:) withObject: m_movie_view waitUntilDone: NO];
-		m_movie_view = NULL;
-		// XXXJACK Should call releaseOverlayWindow here
-	}
-	if (m_movie) {
-		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.stop: release m_movie 0x%x", (void *)m_movie);
-		[m_movie release];
-		m_movie = NULL;
 	}
 	[pool release];
 	m_lock.leave();
@@ -389,7 +380,8 @@ cocoa_video_renderer::_poll_playing()
 		double curtime = (double)movtime / (double)movscale;
 		if ( curtime > (m_clip_end/1000000.0)) {
 			is_stopped = true;
-			if (m_movie_view) [m_movie_view pause: NULL];
+			// if (m_movie_view) [m_movie_view pause: NULL];
+            m_previous_clip_position = m_clip_end;
 		}
 	}
 	
@@ -430,29 +422,35 @@ cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 	AmbulantView *view = (AmbulantView *)cwindow->view();
 	NSRect frameRect = [view NSRectForAmbulantRect: &dstrect];
 
-	if (m_movie && !m_movie_view) {
-		// Create the movie view and link it in
+	if (!m_movie_view) {
+		// Create the movie view if it doesn't exist already
 		AM_DBG logger::get_logger()->debug("cocoa_video_renderer.redraw: creating movie view");
 		m_movie_view = [[QTMovieView alloc] initWithFrame: frameRect];
 		[m_movie_view setControllerVisible: NO];
-		[view addSubview: m_movie_view];
-		[m_movie_view release];
-		// Set the movie playing
 		[m_movie_view setMovie: m_movie];
-		[m_movie_view play: NULL];
-		// Create the overlay window
+    }
+    
+    NSView *parent = [m_movie_view superview];
+    if (parent != (NSView *)view) {
+        // Put the movie view into the hierarchy, possibly removing it from the old place first.
+        if (parent) {
+            [m_movie_view retain];
+            [m_movie_view removeFromSuperviewWithoutNeedingDisplay];
+        }
+		[view addSubview: m_movie_view];
+        [m_movie_view release];
 		[view requireOverlayWindow];
+        // Set things up so subsequent redraws go to the overlay window
+        [view useOverlayWindow];
 		// And start the poll task
 		ambulant::lib::event *e = new poll_callback(this, &cocoa_video_renderer::_poll_playing);
 		m_event_processor->add_event(e, POLL_INTERVAL, ambulant::lib::ep_low);
-	} else {
-		//  Need to compare frameRect to current Qt rect and move if needed
-        if (!NSEqualRects(frameRect, [m_movie_view frame]) ) {
-            [m_movie_view setFrame: frameRect];
-        }
-	}
-	// Set things up so subsequent redraws go to the overlay window
-	[view useOverlayWindow];
+    }
+    
+    //  Need to compare frameRect to current Qt rect and move if needed
+    if (!NSEqualRects(frameRect, [m_movie_view frame]) ) {
+        [m_movie_view setFrame: frameRect];
+    }
 	
 	m_lock.leave();
 }
