@@ -113,6 +113,7 @@ video_renderer::~video_renderer() {
 void
 video_renderer::init_with_node(const lib::node *n)
 {
+	m_lock.enter();
 	renderer_playable::init_with_node(n);
 	// Assumption in the following code (by Jack): if we have an audio renderer
     // then the streams are multiplexed, and we should seek only a single stream.
@@ -121,19 +122,22 @@ video_renderer::init_with_node(const lib::node *n)
     AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 	if (m_clip_begin != m_previous_clip_position) {
         /*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+		m_lock.leave();
 		seek(m_clip_begin/1000);
+		m_lock.enter();
         m_previous_clip_position = m_clip_begin;
 	}
 	if (m_audio_renderer) {
 		m_audio_renderer->init_with_node(n);
 	} 
-	
+	m_lock.leave();
 }
 
 #ifdef EXP_KEEPING_RENDERER
 void 
-video_renderer::update_context_info(const lib::node *node, int cookie)
+video_renderer::update_context_info(const lib::node *node, int cookie) //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);
     // XXXJAC: Why no locking here???
 	m_node = node;
 	m_cookie = cookie;
@@ -271,15 +275,16 @@ video_renderer::preroll(double when, double where, double how_much)
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
 	m_src->start_prefetch (m_event_processor);
 	if (m_audio_renderer) 
-		m_audio_renderer->start_prefetch(where);
+		m_audio_renderer->preroll(where);
 	
 	m_lock.leave();	
 }
 
 #ifdef EXP_KEEPING_RENDERER
 void
-video_renderer::start_prefetch (double where)
+video_renderer::start_prefetch (double where) //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);
 	m_lock.enter();
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.start_prefetch(0x%x): already started", (void*)this);
@@ -322,8 +327,9 @@ video_renderer::start_prefetch (double where)
 }
 
 void
-video_renderer::stop_but_keeping_renderer()
+video_renderer::stop_but_keeping_renderer() //xxxbo: This api is obsolete and will be removed later
 {
+	assert(0);  
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 
