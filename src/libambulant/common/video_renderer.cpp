@@ -121,7 +121,7 @@ video_renderer::init_with_node(const lib::node *n)
     // much more easily skip frames, etc.
     AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 	if (m_clip_begin != m_previous_clip_position) {
-        /*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+        AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 		m_lock.leave();
 		seek(m_clip_begin/1000);
 		m_lock.enter();
@@ -149,7 +149,7 @@ video_renderer::update_context_info(const lib::node *node, int cookie) //xxxbo: 
     // much more easily skip frames, etc.
     AM_DBG lib::logger::get_logger()->debug("video_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 	if (m_clip_begin != m_previous_clip_position) {
-        /*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
+        AM_DBG lib::logger::get_logger()->debug("video_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
 		seek(m_clip_begin/1000);
         m_previous_clip_position = m_clip_begin;
 	}
@@ -163,7 +163,7 @@ void
 video_renderer::start (double where)
 {
 	m_lock.enter();
-	/*AM_DBG*/ { 
+	AM_DBG { 
         std::string tag = m_node->get_local_name();
         assert(tag != "prefetch");
     }
@@ -348,7 +348,7 @@ bool
 video_renderer::stop()
 { 
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 
 	if (m_audio_renderer) {
 		m_audio_renderer->stop();
@@ -531,7 +531,7 @@ video_renderer::data_avail()
 		return;
 	}
 #else
-    /*AM_DBG*/ { 
+    AM_DBG { 
         std::string tag = m_node->get_local_name();
         assert(tag != "prefetch");
     }

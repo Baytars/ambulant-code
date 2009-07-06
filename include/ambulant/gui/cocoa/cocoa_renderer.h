@@ -103,7 +103,7 @@ class cocoa_renderer : public RP_Base {
 #endif
  	virtual bool stop() {
 		stop_transition();
-		RP_Base::stop();
+		return RP_Base::stop();
 	}
 	
     void redraw(const rect &dirty, gui_window *window) {
