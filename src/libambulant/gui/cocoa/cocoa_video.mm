@@ -30,7 +30,6 @@
 #include <Cocoa/Cocoa.h>
 #include <QuickTime/QuickTime.h>
 
-#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -155,13 +154,14 @@ cocoa_video_renderer::cocoa_video_renderer(
     m_previous_clip_position(-1),
     m_renderer_state(rs_created)
 {
+    /*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer::cocoa_video_renderer(0x%x)", this);
 //    init_with_node(node);
 }
 
 cocoa_video_renderer::~cocoa_video_renderer()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer: ~cocoa_video_renderer(0x%x), m_movie=0x%x", this, m_movie);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer::~cocoa_video_renderer(0x%x), m_movie=0x%x", this, m_movie);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (m_movie) {
 		[m_movie release];
@@ -275,18 +275,23 @@ cocoa_video_renderer::start(double where)
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
-    _fix_video_epoch();
+    if (GetMovieRate(mov) == 0) {
+        _fix_video_epoch();
+    }
 #endif
     Fixed playRate = GetMoviePreferredRate(mov);
     SetMovieRate(mov, playRate);
     m_previous_clip_position = -1;
+    // And start the poll task
+    ambulant::lib::event *e = new poll_callback(this, &cocoa_video_renderer::_poll_playing);
+    m_event_processor->add_event(e, POLL_INTERVAL, ambulant::lib::ep_low);
 	m_lock.leave();
 }
 
 bool
 cocoa_video_renderer::stop()
 {
-    /*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer(0x%x)::stop()", (void*)this);
+    AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer(0x%x)::stop()", (void*)this);
     assert(m_renderer_state == rs_prerolled || m_renderer_state == rs_started || m_renderer_state == rs_stopped);
     m_renderer_state = rs_stopped;
 	m_context->stopped(m_cookie);
@@ -366,7 +371,7 @@ void
 cocoa_video_renderer::_poll_playing()
 {
 	m_lock.enter();
-	if (m_movie == NULL || m_movie_view == NULL) {
+	if (m_movie == NULL) {
 		// Movie is not running. No need to continue polling right now
 		m_lock.leave();
 		return;
@@ -442,9 +447,6 @@ cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 		[view requireOverlayWindow];
         // Set things up so subsequent redraws go to the overlay window
         [view useOverlayWindow];
-		// And start the poll task
-		ambulant::lib::event *e = new poll_callback(this, &cocoa_video_renderer::_poll_playing);
-		m_event_processor->add_event(e, POLL_INTERVAL, ambulant::lib::ep_low);
     }
     
     //  Need to compare frameRect to current Qt rect and move if needed
