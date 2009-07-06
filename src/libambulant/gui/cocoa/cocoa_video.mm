@@ -30,6 +30,7 @@
 #include <Cocoa/Cocoa.h>
 #include <QuickTime/QuickTime.h>
 
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -211,7 +212,7 @@ cocoa_video_renderer::init_with_node(const lib::node *n)
 	_init_clip_begin_end();
     [(MovieCreator *)m_mc setClipBegin: m_clip_begin];
 	
-	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer: cocoa_video_renderer(0x%x), m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
+	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer(0x%x)::init_with_node, m_movie=0x%x url=%s clipbegin=%d", this, m_movie, m_url.get_url().c_str(), m_clip_begin);
 	
   bad:
 	[pool release];
@@ -287,7 +288,8 @@ cocoa_video_renderer::start(double where)
 bool
 cocoa_video_renderer::stop()
 {
-    assert(m_renderer_state == rs_started);
+    /*AM_DBG*/ lib::logger::get_logger()->debug("cocoa_video_renderer(0x%x)::stop()", (void*)this);
+    assert(m_renderer_state == rs_prerolled || m_renderer_state == rs_started || m_renderer_state == rs_stopped);
     m_renderer_state = rs_stopped;
 	m_context->stopped(m_cookie);
 	return false;
@@ -322,7 +324,7 @@ void
 cocoa_video_renderer::pause(pause_display d)
 {
 	m_lock.enter();
-    assert(m_renderer_state == rs_started);
+    assert(m_renderer_state == rs_prerolled || m_renderer_state == rs_started || m_renderer_state == rs_stopped);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::pause(0x%x)", this);
 	m_paused = true;
@@ -339,7 +341,7 @@ void
 cocoa_video_renderer::resume()
 {
 	m_lock.enter();
-    assert(m_renderer_state == rs_started);
+    assert(m_renderer_state == rs_prerolled || m_renderer_state == rs_started || m_renderer_state == rs_stopped);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::resume(0x%x)", this);
 	m_paused = false;

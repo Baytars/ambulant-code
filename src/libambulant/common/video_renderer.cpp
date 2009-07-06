@@ -245,8 +245,10 @@ video_renderer::preroll(double when, double where, double how_much)
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
 	
+#if 0
 	m_activated = true;
-	
+#endif
+
 	// Now we need to define where we start prefetching. This depends on m_clip_begin (microseconds)
 	// and where (seconds).
 	assert(m_clip_begin >= 0);
@@ -288,8 +290,10 @@ video_renderer::start_prefetch (double where)
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
 
+#if 0
 	m_activated = true;
-	
+#endif
+
 	// Now we need to define where we start prefetching. This depends on m_clip_begin (microseconds)
 	// and where (seconds).
 	assert(m_clip_begin >= 0);
@@ -323,7 +327,6 @@ video_renderer::stop_but_keeping_renderer()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 
-	m_activated = false;
 	
 	if (m_audio_renderer) {
 		m_audio_renderer->stop_but_keeping_renderer();
@@ -381,20 +384,13 @@ video_renderer::stop()
 { 
 	m_lock.enter();
 	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-	m_context->stopped(m_cookie, 0);
 
-	m_activated = false;
 	if (m_audio_renderer) {
 		m_audio_renderer->stop();
-	}
+	} else {
+        m_context->stopped(m_cookie, 0);
+    }
 	m_lock.leave();
-#if 0
-	const char * fb = m_node->get_attribute("fill");
-	if (fb != NULL && !strcmp(fb, "continue"))
-		return false; // fill = continue
-	else
-		return true; // fill != continue
-#endif
 	return false; // xxxbo: note, "false" menas this renderer is reusable.
 }
 
@@ -402,20 +398,9 @@ void
 video_renderer::post_stop()
 {
 	m_lock.enter();
-	if (m_dest) {
-		m_dest->renderer_done(this);
-		m_dest = NULL;
-	}
-	if (m_audio_renderer) {
+    m_activated = false;    // This stops video playback at the next data_avail callback
+	if (m_audio_renderer)
 		m_audio_renderer->post_stop();
-		m_audio_renderer->release();
-		m_audio_renderer = NULL;
-	}
-	if (m_src) {
-		m_src->stop();
-		m_src->release();
-		m_src = NULL;
-	}
 	lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 									 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 	m_lock.leave();	
@@ -534,7 +519,8 @@ video_renderer::data_avail()
 		m_lock.leave();
 		return;
 	}
-	
+	assert(m_dest);
+    
 	m_size.w = m_src->width();
 	m_size.h = m_src->height();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: size=(%d, %d)", m_size.w, m_size.h);
