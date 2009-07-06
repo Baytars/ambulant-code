@@ -725,7 +725,6 @@ gui::sdl::sdl_audio_renderer::stop()
 		m_context->stopped(m_cookie, 0);
 		m_lock.enter();
 	}
-	m_is_playing = false;
 	m_lock.leave();	
 
 	return false; // xxxbo NOTE, "return false" means that this renderer is reusable.
@@ -735,11 +734,7 @@ void
 gui::sdl::sdl_audio_renderer::post_stop()
 {
 	m_lock.enter();
-	if (m_audio_src) {
-		m_audio_src->stop();
-		m_audio_src->release();
-		m_audio_src = NULL;
-	}
+	m_is_playing = false;
 	m_lock.leave();
 	
 }
