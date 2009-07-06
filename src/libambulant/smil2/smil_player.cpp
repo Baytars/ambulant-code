@@ -461,7 +461,7 @@ void smil_player::stop_playable(const lib::node *n) {
     // 2. Store in cache, don't stop playback (cachable, fill=continue)
     // 3. Store in cache, but stop playback (cachable, no fill=continue)
     bool can_cache = true;
-    bool must_post_stop = false;
+    bool must_post_stop;
 
     must_post_stop = !victim.second->stop();
     if (n->get_attribute("src") == NULL) {
@@ -476,11 +476,11 @@ void smil_player::stop_playable(const lib::node *n) {
             can_cache = false;
         }
     }
-    if (can_cache && !must_post_stop) {
+    if (can_cache && must_post_stop) {
         // Should we completely stop playback?
         const char * fb = n->get_attribute("fill");
-        if (fb == NULL || strcmp(fb, "continue") == 0) {
-            must_post_stop = true;
+        if (fb != NULL && strcmp(fb, "continue") == 0) {
+            must_post_stop = false;
         }
     }
     if (must_post_stop) {
