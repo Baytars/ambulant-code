@@ -6,6 +6,7 @@
 <region xml:id="right" left="340" top="10" width="320" height="240" backgroundColor="gray"/>
 <region xml:id="bottom" left="10" width="650" top="260" height="100" backgroundColor="white"/>
 </layout>
+<state src="mediafiles.xml"/>
 </head>
 <body>
 <par>
@@ -33,10 +34,10 @@ Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom,<tev next="0.5s"/><tev next="0
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom!<tev next="0.5s"/><tev next="0.5s"/>
 </smilText>
 <seq>
-<audio id="media-01" fill="continue" src="media-audio.mp3" region="left" clipEnd="4s"/>
-<audio id="media-02" fill="continue" src="media-audio.mp3" region="left" clipBegin="4s" clipEnd="8s"/>
-<audio id="media-03" fill="continue" src="media-audio.mp3" region="left" clipBegin="8s" clipEnd="12s"/>
-<audio id="media-04" src="media-audio.mp3" region="left" clipBegin="12s"/>
+<audio id="media-01" fill="continue" src="{audio1}" region="left" clipEnd="4s"/>
+<audio id="media-02" fill="continue" src="{audio1}" region="left" clipBegin="4s" clipEnd="8s"/>
+<audio id="media-03" fill="continue" src="{audio1}" region="left" clipBegin="8s" clipEnd="12s"/>
+<audio id="media-04" src="{audio1}" region="left" clipBegin="12s"/>
 </seq>
 </par>
 </body>

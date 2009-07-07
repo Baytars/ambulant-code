@@ -1,0 +1,9 @@
+<data>
+  <av1>media-av.mpg</av1>
+  <av2>media-av-copy.mpg</av2>
+  <audio1>media-audio.mp3</audio1>
+  <audio2>media-audio-copy.mp3</audio2>
+  <audiomod>media-audio-modified.mp3</audiomod>
+  <video1>media-video.mpg</video1>
+  <video2>media-video-copy.mpg</video2>
+</data>

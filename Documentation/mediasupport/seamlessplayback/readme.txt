@@ -3,6 +3,10 @@ of continuous media.
 Most tests come in 3 variations, "-audio" with MP3 audio, "-video" with MPEG-1 video (no
 audio) and "-av" with MPEG-1 combined audio/video.
 
+All tests use SMIL State constructs to pick up the media URLs from the file "mediafiles.xml".
+So, to change all tests to use a different encoding (MPEG-1 vs. H264) or protocol
+(file: versus rtsp:) or anything like that you only need to change mediafiles.xml.
+
 sptest-00
 	Test that basic functionality works: audio/video playback (MPEG/mp3) and
 	smilText.
@@ -49,3 +53,8 @@ sptest-10:
 	
 sptest-11:
 	End-in-time with fill=continue. Like sptest-10, but with fill=continue.
+	
+sptest-12:
+	Test that clipBegin/clipEnd work in the first place. (This happens to be
+	untrue for Quicktime playback of MPEG-1 movies...)
+	
