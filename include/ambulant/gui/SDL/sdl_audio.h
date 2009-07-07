@@ -120,7 +120,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 	net::audio_datasource *m_audio_src;
 	lib::critical_section m_lock;
 	
-	bool m_is_playing;
+	bool m_is_playing;  // Invariant: m_is_playing === register_renderer() has been called.
 	bool m_is_paused;
   	bool m_read_ptr_called;
 	bool m_audio_started;
