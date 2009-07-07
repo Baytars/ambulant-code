@@ -177,7 +177,7 @@ gui::sdl::sdl_audio_renderer::sdl_callback(Uint8 *stream, int len)
 		// no transitions: use simple copy
 		Uint8 *single_data;
 
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_callback(0x%x, %d) [one stream] calling get_data()", (void*) stream, len);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_callback(0x%x, %d) [one stream] calling 0x%x.get_data()", (void*) stream, len, *first);
 
 		int single_len = (*first)->get_data(len, &single_data);
 		assert(single_len <= len);
@@ -633,6 +633,7 @@ gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer() //xxxbo: This api is o
 		m_lock.enter();
 	}
 	m_is_playing = false;
+    unregister_renderer(this);
 	//m_context->stopped(m_cookie, 0);
 
 	m_lock.leave();
@@ -710,7 +711,7 @@ gui::sdl::sdl_audio_renderer::post_stop()
 {
 	m_lock.enter();
 	m_is_playing = false;
-//    unregister_renderer(this);
+    unregister_renderer(this);
 	m_lock.leave();
 	
 }
@@ -795,7 +796,6 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
 		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
 		m_audio_src->start_prefetch(m_event_processor);
-		m_is_playing = true; // XXXJACK is this correct?
 		m_is_paused = false;
         m_previous_clip_position = m_clip_begin;
 	} else {
@@ -830,7 +830,6 @@ gui::sdl::sdl_audio_renderer::start_prefetch(double where) //xxxbo: This api is 
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
 		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
 		m_audio_src->start_prefetch(m_event_processor);
-		m_is_playing = true; // XXXJACK is this correct?
 		m_is_paused = false;
         m_previous_clip_position = m_clip_begin;
 	} else {
