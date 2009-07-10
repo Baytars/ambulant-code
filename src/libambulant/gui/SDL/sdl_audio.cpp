@@ -389,7 +389,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         }
         // Now communicate it to the clock.
         { // if (clock_drift < -20 || clock_drift > 20) {
-            AM_DBG if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
@@ -409,7 +409,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (rv) assert(*ptr);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
 		// Also set volume(s)
 		m_volcount = 0;
 		if (m_dest) {
@@ -701,6 +701,7 @@ gui::sdl::sdl_audio_renderer::stop()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
 	m_context->stopped(m_cookie, 0);
+	
 	m_lock.leave();	
 
 	return false; // xxxbo NOTE, "return false" means that this renderer is reusable.

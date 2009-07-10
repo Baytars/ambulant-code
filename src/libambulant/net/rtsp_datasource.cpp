@@ -526,13 +526,15 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 	timestamp_t rpts =  (timestamp_t)(pts.tv_sec - m_context->first_sync_time.tv_sec) * 1000000LL  +  (timestamp_t) (pts.tv_usec - m_context->first_sync_time.tv_usec);
 	if(m_context->sinks[m_context->audio_stream]) {
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling _push_data_to_sink");
-		_push_data_to_sink(m_context->audio_stream, rpts, (uint8_t*) m_context->audio_packet, sz);
+		//_push_data_to_sink(m_context->audio_stream, rpts, (uint8_t*) m_context->audio_packet, sz);
+		//xxxbo: 10-07-2009: note, I don't understand why should I plus m_clip_begin like this, but it does help a little bit.  
+		_push_data_to_sink(m_context->audio_stream, rpts+m_clip_begin, (uint8_t*) m_context->audio_packet, sz);
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling push_data_to_sink done");
 	}
 	assert (m_context->audio_packet);
 	free(m_context->audio_packet);
 	m_context->audio_packet = NULL;
-    AM_DBG lib::logger::get_logger()->debug("after reading audio: pts=%lld, end=%lld", rpts, m_context->last_expected_pts);
+    /*AM_DBG*/ lib::logger::get_logger()->debug("after reading audio: pts=%lld, end=%lld", rpts, m_context->last_expected_pts);
 	if (m_context->last_expected_pts >= 0 && rpts >= m_context->last_expected_pts) {
 		lib::logger::get_logger()->debug("after_reading_audio: last_pts = %lld", rpts);
 	 	m_context->eof = true;
