@@ -71,11 +71,19 @@ ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context, timestamp_t clip_
 	m_clip_begin(clip_begin),
 	m_clip_end(clip_end),
 	m_seektime(0),
+#ifndef CLIP_BEGIN_CHANGED
 	m_seektime_changed(false)
+#else
+	m_clip_begin_changed(false)
+#endif
 //,	m_critical_section()
 {
 	assert(m_clip_begin >= 0);
+#ifndef CLIP_BEGIN_CHANGED
 	if ( m_clip_begin ) m_seektime_changed = true;
+#else
+	if ( m_clip_begin ) m_clip_begin_changed = true;
+#endif
 
 	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::rtsp_demux(0x%x)", (void*) this);
 
@@ -234,8 +242,17 @@ void
 ambulant::net::rtsp_demux::read_ahead(timestamp_t time)
 {	
 	m_critical_section.enter();
+#ifndef CLIP_BEGIN_CHANGED
 	m_clip_begin = time;
 	m_seektime_changed = true;
+#else
+	AM_DBG lib::logger::get_logger()->debug("rtsp_demux::read_ahead(%d), m_clip_begin was %d", time, m_clip_begin);
+    if (m_clip_begin != time) {
+        m_clip_begin = time;
+        m_clip_begin_changed = true;
+    }
+#endif
+	
 	m_critical_section.leave();
 }
 
@@ -244,8 +261,13 @@ ambulant::net::rtsp_demux::seek(timestamp_t time)
 {
 	m_critical_section.enter();
     assert( time >= 0);
+#ifndef CLIP_BEGIN_CHANGED	
 	m_seektime = time;
 	m_seektime_changed = true;
+#else
+	m_clip_begin = time;
+	m_clip_begin_changed = true;
+#endif
 	m_critical_section.leave();
 }
 
@@ -414,7 +436,11 @@ ambulant::net::rtsp_demux::run()
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return 1;
 	}
+#ifndef CLIP_BEGIN_CHANGED
 	m_seektime_changed = false;
+#else
+	m_clip_begin_changed = false;
+#endif
 	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() starting the loop ");
 	m_critical_section.enter();
 	add_ref();
@@ -427,10 +453,23 @@ ambulant::net::rtsp_demux::run()
 		m_context->blocking_flag = 0;
 		
 		// First thing to do for each loop iteration: check whether we need to seek.
+#ifndef CLIP_BEGIN_CHANGED
 		if (m_seektime_changed) {
+#else
+		if (m_clip_begin_changed) {
+#endif
 			// Note: we have not tested (yet) how seeking influences the timestamps returned by live555. Needs to be
 			// tested later.
-			float seektime_secs = (m_clip_begin+m_seektime)/1000000.0;
+#ifndef CLIP_BEGIN_CHANGED
+			//float seektime_secs = (m_clip_begin+m_seektime)/1000000.0;
+			float seektime_secs = 0.0;
+			if (m_seektime == 0)
+				seektime_secs = m_clip_begin/1000000.0;
+			else
+				seektime_secs = m_seektime/1000000.0;
+#else
+			float seektime_secs = m_clip_begin/1000000.0;
+#endif
 			AM_DBG lib::logger::get_logger()->debug("rtsp_demux::run: seeking to %f", seektime_secs);
 			if(!m_context->rtsp_client->pauseMediaSession(*m_context->media_session)) {
 				lib::logger::get_logger()->error("pausing RTSP media session failed");
@@ -438,7 +477,11 @@ ambulant::net::rtsp_demux::run()
 			if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, seektime_secs, -1.0, 1.0)) {
 				lib::logger::get_logger()->error("resuming RTSP media session failed");
 			}
+#ifndef CLIP_BEGIN_CHANGED
 			m_seektime_changed = false;
+#else
+			m_clip_begin_changed = false;
+#endif
 		}
 		if (m_context->audio_subsession && m_context->need_audio) {
             assert(!m_context->audio_packet);
