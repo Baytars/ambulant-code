@@ -400,7 +400,7 @@ ffmpeg_decoder_datasource::data_avail()
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);
 			
 			ts_packet_t audio_packet = m_src->get_ts_packet_t();
-            /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed %lld, pts %lld", m_elapsed, audio_packet.timestamp);
+            AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed %lld, pts %lld", m_elapsed, audio_packet.timestamp);
 			uint8_t *inbuf = (uint8_t*) audio_packet.data;
 			sz = audio_packet.size;
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: %d bytes available", sz);
@@ -450,11 +450,8 @@ ffmpeg_decoder_datasource::data_avail()
 					assert(m_fmt.samplerate);
 					timestamp_t duration = ((timestamp_t) outsize) * sizeof(uint8_t)*8 / (m_fmt.samplerate* m_fmt.channels * m_fmt.bits);
 					timestamp_t old_elapsed = audio_packet.timestamp;
-					//xxxbo09-07-2009: I have no idea why the following code line can make the sptest-12 work, however the original like above does not.
-					// But, apparently, plus 4000000 is not correct at all in princple. 
-					//timestamp_t old_elapsed = audio_packet.timestamp + 4000000; 
 					m_elapsed = old_elapsed + duration;
-					/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail elapsed = %d ", m_elapsed);
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail elapsed = %d ", m_elapsed);
 
 					// We need to do some tricks to handle clip_begin falling within this buffer.
 					// First we push all the data we have into the buffer, then we check whether the beginning

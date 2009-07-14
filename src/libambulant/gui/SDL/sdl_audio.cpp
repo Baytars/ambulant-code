@@ -409,7 +409,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		if (rv) assert(*ptr);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
-		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
 		// Also set volume(s)
 		m_volcount = 0;
 		if (m_dest) {
@@ -541,6 +541,11 @@ void
 gui::sdl::sdl_audio_renderer::data_avail()
 {
 	m_lock.enter();
+	/*AM_DBG*/ { 
+        std::string tag = m_node->get_local_name();
+        assert(tag != "prefetch");
+    }
+	
 	//assert(m_audio_src);
 	if (!m_audio_src) {				
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: m_audio_src already deleted");
@@ -649,7 +654,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		m_audio_clock = 0;
 		
         if (m_clip_begin != m_previous_clip_position) {
-            AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
+            /*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 			m_lock.leave();
             seek(m_clip_begin/1000);
 			m_lock.enter();
@@ -738,6 +743,11 @@ void
 gui::sdl::sdl_audio_renderer::start(double where)
 {
 	m_lock.enter();
+	/*AM_DBG*/ { 
+        std::string tag = m_node->get_local_name();
+        assert(tag != "prefetch");
+    }
+	
 #ifdef EXP_KEEPING_RENDERER
 	if (m_is_playing) {
 		lib::logger::get_logger()->trace("sdl_audio_renderer.start(0x%x): already started", (void*)this);
@@ -780,7 +790,7 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 	m_lock.enter();
 #ifdef EXP_KEEPING_RENDERER
 	if (m_is_playing) {
-		lib::logger::get_logger()->trace("sdl_audio_renderer::start_prefetch(0x%x): already started", (void*)this);
+		lib::logger::get_logger()->trace("sdl_audio_renderer::preroll(0x%x): already started", (void*)this);
 		m_lock.leave();
 		return;
 	}
@@ -788,19 +798,21 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 #endif
     if (!m_node) abort();
 	
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(0x%x, %s, where=%f)", 
 											(void *)this, m_node->get_sig().c_str(), where);
 	if (m_audio_src) {		
 		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
-		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
+		//m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
+		// xxxbo: please note, the above line on set_buffer_size will make sptest-07-av.smil(local playback H264 video) broken
+		// at the fourth fragment(video is ok but audio is something like white noise). 14-07-2009
 		m_audio_src->start_prefetch(m_event_processor);
 		m_is_paused = false;
         m_previous_clip_position = m_clip_begin;
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch: no datasource");
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll: no datasource");
 	}
     m_lock.leave();
 }
