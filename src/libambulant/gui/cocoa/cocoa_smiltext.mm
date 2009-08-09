@@ -305,7 +305,7 @@ cocoa_smiltext_renderer::smiltext_changed()
 				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
 						green:greenf((*i).m_color)
 						blue:bluef((*i).m_color)
-						alpha:alfa];
+						alpha:(CGFloat)alfa];
 				[attrs setValue:color forKey:NSForegroundColorAttributeName];
 			}
 			if (!(*i).m_bg_transparent) {
@@ -318,7 +318,7 @@ cocoa_smiltext_renderer::smiltext_changed()
 				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
 						green:greenf((*i).m_bg_color)
 						blue:bluef((*i).m_bg_color)
-						alpha:alfa];
+						alpha:(CGFloat)alfa];
 				[attrs setValue:color forKey:NSBackgroundColorAttributeName];
 			}
 			// Finally do paragraph settings (which are cached)
@@ -433,6 +433,10 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 		layout_size.width = INFINITE_WIDTH;
 		has_hmovement = true;
 		break;
+    case smil2::stm_replace:
+    case smil2::stm_append:
+        // Normal cases
+        break;
 	}
 
 	NSSize old_layout_size;
@@ -504,13 +508,13 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	NSPoint logical_origin = NSMakePoint(0, 0);
 	if (m_params.m_mode == smil2::stm_crawl) {
 		double now = m_event_processor->get_timer()->elapsed() - m_epoch;
-		logical_origin.x += now * m_params.m_rate / 1000;
-		visible_origin.x -= now * m_params.m_rate / 1000;
+		logical_origin.x += float(now * m_params.m_rate / 1000);
+		visible_origin.x -= float(now * m_params.m_rate / 1000);
 		// XXX see below
 	}
 	if (m_params.m_mode == smil2::stm_scroll) {
 		double now = m_event_processor->get_timer()->elapsed() - m_epoch;
-		visible_origin.y -= now * m_params.m_rate / 1000;
+		visible_origin.y -= float(now * m_params.m_rate / 1000);
 		if (visible_origin.y < 0) {
 			logical_origin.y -= visible_origin.y;
 			// visible_origin.y = 0;
@@ -553,11 +557,11 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 			// bits.
 			NSImage *tmpsrc = [view getTransitionTmpSurface];
 			[tmpsrc lockFocus];
-			[[NSColor colorWithDeviceWhite: 1.0 alpha: 0.0] set];
+			[[NSColor colorWithDeviceWhite: (CGFloat)1.0 alpha: (CGFloat)0.0] set];
 			NSRectFill(cocoa_dstrect);
 			[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
 			[tmpsrc unlockFocus];
-			[tmpsrc drawInRect: cocoa_dstrect fromRect: cocoa_dstrect operation: NSCompositeSourceOver fraction: 1.0];
+			[tmpsrc drawInRect: cocoa_dstrect fromRect: cocoa_dstrect operation: NSCompositeSourceOver fraction: (CGFloat)1.0];
 		} else {
 			// Otherwise we simply let NSLayoutManager do the work
 			[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
