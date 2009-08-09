@@ -328,7 +328,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			surface *surf = m_layout_manager->get_surface(n);
 			assert(surf);	// XXXJACK: at least, I think it cannot be NULL....
 			common::renderer *rend = np->get_renderer();
-			assert(rend);	// This code should never be executed for non-rendering playables, Jack thinks.
+//			assert(rend);	// Assert can fail if the playable failed to create fully (incorrect url, for example)
 			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
 			if (n->get_local_name() == "prefetch") surf = NULL;
 			/*AM_DBG*/ lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
@@ -360,7 +360,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		//xxxbo: stop the previous renderer
 		//xxxbo: To support continuous playback, we don't stop the previous renderer.
 		const char * fb = n->get_attribute("fill");
-		if (fb == NULL || strcmp(fb, "continue"))
+		if (fb == NULL || strcmp(fb, "ambulant:continue") != 0)
 			np->stop_but_keeping_renderer();
 			//np->stop();
 #endif
@@ -481,7 +481,7 @@ void smil_player::stop_playable(const lib::node *n) {
     if (can_cache && must_post_stop) {
         // Should we completely stop playback?
         const char * fb = n->get_attribute("fill");
-        if (fb != NULL && strcmp(fb, "continue") == 0) {
+        if (fb != NULL && strcmp(fb, "ambulant:continue") == 0) {
             must_post_stop = false;
         }
     }
