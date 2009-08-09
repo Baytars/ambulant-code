@@ -393,7 +393,7 @@ video_renderer::seek(double t)
         m_src->seek(t_ms, m_clip_begin); // xxxjack: wrong! Only if != prev clipend!!!
 		//For "fill=continue", we pass -1 to the datasource classes. 
 		const char * fb = m_node->get_attribute("fill");
-		if (fb != NULL && !strcmp(fb, "continue"))
+		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
 			m_src->set_clip_end(-1);
 		else
 			m_src->set_clip_end(m_clip_end);
@@ -549,7 +549,8 @@ video_renderer::data_avail()
         // To support continuous playback, when frame_ts_micros > m_clip_end, 
         // we continue playback, unless we are prefetching.
         const char * fb = m_node->get_attribute("fill");
-        if (m_src->end_of_file() || fb == NULL || strcmp(fb, "continue")) {
+        // XXXJACK: the following if tested for fb=="ambulant:continue", I don't believe that.
+        if (m_src->end_of_file() || fb == NULL || strcmp(fb, "ambulant:continue") != 0) {
             m_lock.leave();
             return;
         }

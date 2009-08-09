@@ -246,7 +246,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 #else
     const char * fb = m_node->get_attribute("fill");
     //For "fill=continue", we pass -1 to the datasource classes. 
-    if (fb != NULL && !strcmp(fb, "continue")) {
+    if (fb != NULL && strcmp(fb, "ambulant:continue") != 0) {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, -1);
     } else {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
@@ -663,7 +663,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		
 		const char * fb = n->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && !strcmp(fb, "continue"))
+		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
 			m_audio_src->set_clip_end(-1);
 		else 
 			m_audio_src->set_clip_end(m_clip_end);	
@@ -692,7 +692,7 @@ gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int coo
 
 		const char * fb = node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && !strcmp(fb, "continue"))
+		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
 			m_audio_src->set_clip_end(-1);
 		else 
 			m_audio_src->set_clip_end(m_clip_end);	
@@ -866,7 +866,7 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 	if (m_audio_src) {
 		const char * fb = m_node->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && !strcmp(fb, "continue"))
+		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
 			m_audio_src->seek((net::timestamp_t)(where*1000), -1);
 		else
 			m_audio_src->seek((net::timestamp_t)(where*1000), m_clip_end);	

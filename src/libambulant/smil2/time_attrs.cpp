@@ -544,7 +544,7 @@ void time_attrs::parse_fill() {
 	else if(fill == "freeze") m_fill = fill_freeze;
 	else if(fill == "hold") m_fill = fill_hold;
 #ifdef EXP_KEEPING_RENDERER
-	else if(fill == "continue") m_fill = fill_continue;
+	else if(fill == "ambulant:continue") m_fill = fill_continue;
 #endif
 	else if(fill == "transition") m_fill = fill_transition;
 	else if(fill == "auto") m_fill = fill_auto;
@@ -577,7 +577,7 @@ fill_behavior time_attrs::get_default_fill() {
 			else if(fill == "freeze") {retfb = fill_freeze; break;}
 			else if(fill == "hold") {retfb = fill_hold; break;}
 #ifdef EXP_KEEPING_RENDERER
-			else if(fill == "continue") {retfb = fill_continue; break;}
+			else if(fill == "ambulant:continue") {retfb = fill_continue; break;}
 #endif
 			else if(fill == "transition") {retfb = fill_transition; break;}
 			else if(fill == "auto") {retfb = fill_auto; break;}
@@ -768,7 +768,7 @@ std::string smil2::repr(fill_behavior f) {
 		case fill_freeze: return "freeze";
 		case fill_hold: return "hold";
 #ifdef EXP_KEEPING_RENDERER
-		case fill_continue: return "continue";
+		case fill_continue: return "ambulant:continue";
 #endif
 		case fill_transition: return "transition";
 		case fill_auto: return "auto";
