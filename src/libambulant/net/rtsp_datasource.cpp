@@ -432,7 +432,7 @@ ambulant::net::rtsp_demux::run()
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return 1;
 	}
-	if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, (m_clip_begin+m_seektime)/1000000.0, -1.0, 1.0)) {
+	if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, float((m_clip_begin+m_seektime)/1000000.0), -1.0F, 1.0F)) {
 		lib::logger::get_logger()->error("playing RTSP connection failed");
 		return 1;
 	}
@@ -462,19 +462,19 @@ ambulant::net::rtsp_demux::run()
 			// tested later.
 #ifndef CLIP_BEGIN_CHANGED
 			//float seektime_secs = (m_clip_begin+m_seektime)/1000000.0;
-			float seektime_secs = 0.0;
+			double seektime_secs = 0.0;
 			if (m_seektime == 0)
 				seektime_secs = m_clip_begin/1000000.0;
 			else
 				seektime_secs = m_seektime/1000000.0;
 #else
-			float seektime_secs = m_clip_begin/1000000.0;
+			double seektime_secs = m_clip_begin/1000000.0;
 #endif
 			AM_DBG lib::logger::get_logger()->debug("rtsp_demux::run: seeking to %f", seektime_secs);
 			if(!m_context->rtsp_client->pauseMediaSession(*m_context->media_session)) {
 				lib::logger::get_logger()->error("pausing RTSP media session failed");
 			}
-			if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, seektime_secs, -1.0, 1.0)) {
+			if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, (float)seektime_secs, -1.0F, 1.0F)) {
 				lib::logger::get_logger()->error("resuming RTSP media session failed");
 			}
 #ifndef CLIP_BEGIN_CHANGED
@@ -550,7 +550,7 @@ ambulant::net::rtsp_demux::cancel()
 }
 
 void 
-rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval pts, unsigned dur)
 {
 	m_critical_section.enter();
 	AM_DBG lib::logger::get_logger()->debug("after_reading_audio: called sz = %d, truncated = %d", sz, truncated);
@@ -591,11 +591,11 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 }	
 
 void 
-rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval pts, unsigned duration)
+rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval pts, unsigned dur)
 {
 	m_critical_section.enter();
 	assert(m_context);
-	AM_DBG lib::logger::get_logger()->debug("after_reading_video: called sz = %d, truncated = %d pts=(%d s, %d us), dur=%d", sz, truncated, pts.tv_sec, pts.tv_usec, duration);
+	AM_DBG lib::logger::get_logger()->debug("after_reading_video: called sz = %d, truncated = %d pts=(%d s, %d us), dur=%d", sz, truncated, pts.tv_sec, pts.tv_usec, dur);
     if (truncated)
         lib::logger::get_logger()->trace("rtsp_demux: truncated video packet");
 	assert(m_context->video_packet);
@@ -648,6 +648,8 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 #ifdef ENABLE_LIVE555_PTS_CORRECTION
     // Guess frame duration. This assumes that the lowest difference between wto adjacent frames is the duration.
     // If we ever get a stream where the duration increases (i.e. frame rate decreases) we're hosed.
+    
+    // XXXJACK: I get a compiler warning here about implicit conversion of 64 to 32 bit. Need to check.
     timestamp_t delta_pts = abs(rpts-m_context->last_pts);
     if (m_context->frame_duration == 0 || (delta_pts != 0 && delta_pts < m_context->frame_duration)) {
         m_context->frame_duration = delta_pts;

@@ -193,9 +193,9 @@ lib::node_impl::node_impl(const node_impl* other)
 }
 
 // Data node
-lib::node_impl::node_impl(const char *data, int size, const node_context *ctx)
+lib::node_impl::node_impl(const char *data, int sz, const node_context *ctx)
 :	m_local_name(""),
-	m_data(lib::xml_string(data, size)),
+	m_data(lib::xml_string(data, sz)),
 	m_is_data_node(true),
 	m_context(ctx),
 	m_parent(0), m_next(0), m_child(0) {

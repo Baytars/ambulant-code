@@ -42,9 +42,9 @@ lib::unix::unix_timer::set_speed(double speed)
 
 #ifdef AMBULANT_FIX_AUDIO_DRIFT
 void
-lib::unix::unix_timer::skew(signed_time_type skew)
+lib::unix::unix_timer::skew(signed_time_type sk)
 {
-    assert(skew == 0);
+    assert(sk == 0);
 }
 #endif
 

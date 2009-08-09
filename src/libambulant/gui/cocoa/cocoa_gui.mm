@@ -733,7 +733,7 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 		[tmp_window setBackgroundColor:[NSColor clearColor]];
 		[tmp_window setLevel:[overlay_window level]];
 		[tmp_window setHasShadow:NO];
-		[tmp_window setAlphaValue:0.0];
+		[tmp_window setAlphaValue:(CGFloat)0.0];
 		src_view = [[NSView alloc] initWithFrame:[self bounds]];
 		[tmp_window setContentView:src_view];
 		[tmp_window orderFront:self];
@@ -871,7 +871,7 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 		[[self getTransitionOldSource] drawInRect: bounds
 			fromRect: bounds
 			operation: NSCompositeCopy
-			fraction: 1.0];
+			fraction: (CGFloat)1.0];
 		fullscreen_engine->step(fullscreen_now);
 	} else {
 		AM_DBG NSLog(@"_screenTransitionPostRedraw: no screen transition engine");
@@ -880,7 +880,7 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 		[[self getTransitionNewSource] drawInRect: bounds
 			fromRect: bounds
 			operation: NSCompositeCopy
-			fraction: 1.0];
+			fraction: (CGFloat)1.0];
 	}
 
 	if (fullscreen_count == 0) {

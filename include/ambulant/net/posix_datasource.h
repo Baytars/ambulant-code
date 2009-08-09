@@ -94,7 +94,7 @@ class posix_datasource : virtual public datasource, virtual public lib::ref_coun
 	const std::string m_filename;
   	databuffer *m_buffer;
 
-  	int m_filesize;
+  	off_t m_filesize;
 	int m_stream;
 	bool m_end_of_file;
 	lib::critical_section m_lock;

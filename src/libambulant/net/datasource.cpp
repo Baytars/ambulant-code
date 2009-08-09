@@ -80,12 +80,12 @@ filter_datasource_impl::~filter_datasource_impl()
 };
 
 size_t
-filter_datasource_impl::_process(char *data, size_t size)
+filter_datasource_impl::_process(char *data, size_t sz)
 {
-	char *optr = m_databuf.get_write_ptr(size);
-	memcpy(optr, data, size);
-	m_databuf.pushdata(size);
-	return size;
+	char *optr = m_databuf.get_write_ptr(sz);
+	memcpy(optr, data, sz);
+	m_databuf.pushdata(sz);
+	return sz;
 }
 
 void

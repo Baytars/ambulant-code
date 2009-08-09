@@ -21,7 +21,9 @@
 #include <math.h>
 #include <map>
 #define round(x) ((int)((x)+0.5))
+#ifndef INT64_C
 #define INT64_C(x) x##LL
+#endif
 
 #include "ambulant/net/ffmpeg_common.h" 
 #include "ambulant/net/datasource.h"
@@ -178,7 +180,6 @@ ffmpeg_demux::get_clip_begin()
 AVFormatContext *
 ffmpeg_demux::supported(const net::url& url)
 {
-	/*XXXJACK*/int strsize = sizeof(ByteIOContext);
 	ffmpeg_init();
 	// Setup struct to allow ffmpeg to determine whether it supports this
 	AVInputFormat *fmt;

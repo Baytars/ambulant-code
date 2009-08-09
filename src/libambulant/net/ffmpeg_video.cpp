@@ -30,7 +30,9 @@
 #include "ambulant/lib/asb.h"
 #include "ambulant/net/url.h"
 #define round(x) ((int)((x)+0.5))
+#ifndef INT64_C
 #define INT64_C(x) x##LL
+#endif
 
 // WARNING: turning on AM_DBG globally for the ffmpeg code seems to trigger
 // a condition that makes the whole player hang or collapse. So you probably
@@ -469,9 +471,9 @@ ffmpeg_video_decoder_datasource::_need_fmt_uptodate()
 	if (m_fmt.frameduration <= 0) {
 		// And convert the timestamp
 		// XXXJACK: Bad code. Use av_rescale_q with correct timebases.
-		timestamp_t frameduration = (timestamp_t) round(m_con->time_base.num *1000000.0 / (double) m_con->time_base.den) ;
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_need_fmt_uptodate(): frameduration = %lld, %d %d", frameduration, m_con->time_base.num, m_con->time_base.den);
-		m_fmt.frameduration = frameduration;
+		timestamp_t framedur = (timestamp_t) round(m_con->time_base.num *1000000.0 / (double) m_con->time_base.den) ;
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::_need_fmt_uptodate(): frameduration = %lld, %d %d", framedur, m_con->time_base.num, m_con->time_base.den);
+		m_fmt.frameduration = framedur;
 	}
 }
 
@@ -747,39 +749,39 @@ ffmpeg_video_decoder_datasource::data_avail()
 #ifndef FFMPEG_SUPPORTS_ALPHA_LAST
 			if (must_swab_2341) {
 				int lcount = w*h;
-				unsigned long *ptr = (unsigned long *)framedata;
+				unsigned long *lptr = (unsigned long *)framedata;
 				while (lcount--) {
-					long oval = *ptr;
+					long oval = *lptr;
 					long nval =
 						((oval & 0xffffff) << 8) |
 						((oval >> 24) & 0xff);
-					*ptr++ = nval;
+					*lptr++ = nval;
 				}
 			}
 			if (must_swab_4321) {
 				int lcount = w*h;
-				unsigned long *ptr = (unsigned long *)framedata;
+				unsigned long *lptr = (unsigned long *)framedata;
 				while (lcount--) {
-					long oval = *ptr;
+					long oval = *lptr;
 					long nval =
 						(oval << 24) |
 						((oval & 0xff00) << 8) |
 						((oval >> 8) & 0xff00) |
 						((oval >> 24) & 0xff);
-					*ptr++ = nval;
+					*lptr++ = nval;
 				}
 			}
 			if (must_swab_1432) {
 				int lcount = w*h;
-				unsigned long *ptr = (unsigned long *)framedata;
+				unsigned long *lptr = (unsigned long *)framedata;
 				while (lcount--) {
-					long oval = *ptr;
+					long oval = *lptr;
 					long nval =
 						(oval & 0xff000000) |
 						((oval & 0xff) << 16) |
 						(oval & 0xff00) |
 						((oval >> 16) & 0xff);
-					*ptr++ = nval;
+					*lptr++ = nval;
 				}
 			}
 #endif // FFMPEG_SUPPORTS_ALPHA_LAST
