@@ -305,7 +305,7 @@ cocoa_smiltext_renderer::smiltext_changed()
 				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
 						green:greenf((*i).m_color)
 						blue:bluef((*i).m_color)
-						alpha:(CGFloat)alfa];
+						alpha:(float)alfa];
 				[attrs setValue:color forKey:NSForegroundColorAttributeName];
 			}
 			if (!(*i).m_bg_transparent) {
@@ -318,7 +318,7 @@ cocoa_smiltext_renderer::smiltext_changed()
 				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
 						green:greenf((*i).m_bg_color)
 						blue:bluef((*i).m_bg_color)
-						alpha:(CGFloat)alfa];
+						alpha:(float)alfa];
 				[attrs setValue:color forKey:NSBackgroundColorAttributeName];
 			}
 			// Finally do paragraph settings (which are cached)
@@ -557,11 +557,11 @@ cocoa_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 			// bits.
 			NSImage *tmpsrc = [view getTransitionTmpSurface];
 			[tmpsrc lockFocus];
-			[[NSColor colorWithDeviceWhite: (CGFloat)1.0 alpha: (CGFloat)0.0] set];
+			[[NSColor colorWithDeviceWhite: 1.0f alpha: 0.0f] set];
 			NSRectFill(cocoa_dstrect);
 			[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
 			[tmpsrc unlockFocus];
-			[tmpsrc drawInRect: cocoa_dstrect fromRect: cocoa_dstrect operation: NSCompositeSourceOver fraction: (CGFloat)1.0];
+			[tmpsrc drawInRect: cocoa_dstrect fromRect: cocoa_dstrect operation: NSCompositeSourceOver fraction: 1.0f];
 		} else {
 			// Otherwise we simply let NSLayoutManager do the work
 			[m_layout_manager drawBackgroundForGlyphRange: glyph_range atPoint: visible_origin];
