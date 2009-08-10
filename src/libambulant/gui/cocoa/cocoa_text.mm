@@ -157,7 +157,7 @@ cocoa_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 			NSColor *nscolor = [NSColor colorWithCalibratedRed:redf(m_text_color)
 					green:greenf(m_text_color)
 					blue:bluef(m_text_color)
-					alpha:(CGFloat)alfa];
+					alpha:(float)alfa];
 #else
 			NSColor *nscolor = [NSColor colorWithCalibratedRed:redf(m_text_color)
 					green:greenf(m_text_color)
