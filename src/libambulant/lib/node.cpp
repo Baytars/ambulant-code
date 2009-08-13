@@ -513,6 +513,14 @@ std::string lib::node_impl::get_sig() const {
 		s += " id=\"";
 		s += pid;
 		s += "\"";
+	} else {
+		// If we have no id we try the url
+		const char *url = get_attribute("src");
+		if (url) {
+			s += " src=\"";
+			s += url;
+			s += "\"";
+		}
 	}
     const char *debug = get_attribute("_debug");
     if (debug) {
