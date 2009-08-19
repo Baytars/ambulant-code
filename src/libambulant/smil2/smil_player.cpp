@@ -323,7 +323,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			//assert(m_playables_url_based.empty());
 			m_playables_cs.leave();
 			// xxxx copy code from _new_playable to call set_surface()
-#if 1
+
 			assert(np);
 			surface *surf = m_layout_manager->get_surface(n);
 			assert(surf);	// XXXJACK: at least, I think it cannot be NULL....
@@ -335,7 +335,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 			if (rend && surf) {
 				rend->set_surface(surf);
 			}
-#endif
+
 		} else {
             AM_DBG lib::logger::get_logger()->debug("%s: no cached playable", n->get_sig().c_str());
         }
@@ -356,14 +356,6 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		m_playables_cs.leave();
  
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
-#if 0 //xxxbo: for testing the new stop(), the 2rd Jul. 2009
-		//xxxbo: stop the previous renderer
-		//xxxbo: To support continuous playback, we don't stop the previous renderer.
-		const char * fb = n->get_attribute("fill");
-		if (fb == NULL || strcmp(fb, "ambulant:continue") != 0)
-			np->stop_but_keeping_renderer();
-			//np->stop();
-#endif
 	}
     if (np) {
         //xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node

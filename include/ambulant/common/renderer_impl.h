@@ -74,9 +74,7 @@ class AMBULANTAPI playable_imp : public playable {
 	void preroll(double when, double where, double how_much) {}
 	void post_stop() {};
 	void init_with_node(const lib::node *n) {};
-#ifdef EXP_KEEPING_RENDERER
-	void start_prefetch(double t) {};
-#endif
+
 	duration get_dur() { return duration(true, 0);}
 	cookie_type get_cookie() const { return m_cookie;}
   protected:
@@ -110,13 +108,8 @@ class AMBULANTAPI renderer_playable : public playable_imp, public renderer {
 	renderer *get_renderer() { return this; }
 	void transition_freeze_end(lib::rect r) { m_context->transitioned(m_cookie); }
 	virtual void start(double t);
-	//virtual void stop();
 	virtual bool stop();
 	virtual void init_with_node(const lib::node *n);
-//	virtual void post_stop() {};
-#ifdef EXP_KEEPING_RENDERER
-	virtual void stop_keeping_renderer();
-#endif
   protected:
 	virtual void _init_clip_begin_end();	///< Fill m_clip_begin and m_clip_end
 	surface *m_dest;		///< The surface we should render to.

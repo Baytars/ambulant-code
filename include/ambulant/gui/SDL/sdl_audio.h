@@ -89,15 +89,6 @@ class sdl_audio_renderer : public common::renderer_playable {
 	void post_stop();
 	void init_with_node(const lib::node *n);
 	void preroll(double when, double where, double how_much);
-#ifdef EXP_KEEPING_RENDERER
-	void start_prefetch(double where);
-	void stop_but_keeping_renderer();
-	//xxxbo:
-	/// Update the context info.
-	/// According to the node to which this playable is associated, 
-	/// update the clipbegin and clipend info.
-	void update_context_info(const lib::node *node, int cookie);
-#endif
 	void seek(double t);
 	void pause(common::pause_display d=common::display_show);
 	void resume();

@@ -32,6 +32,7 @@ Va<tev next="0.5s"/>der <tev next="0.5s"/>Ja<tev next="0.5s"/>cob,<tev next="0.5
 <param name="renderer" value="http://www.ambulantplayer.org/component/RendererVideo"/>
 </prefetch>
 </par>
+
 <par xml:id="par-02">
 <smilText xml:id="text-02" xml:space="preserve" region="right">
 Slaapt <tev next="0.5s"/>gij <tev next="0.5s"/>nog?<tev next="0.5s"/><tev next="0.5s"/>
@@ -42,6 +43,7 @@ Slaapt <tev next="0.5s"/>gij <tev next="0.5s"/>nog?<tev next="0.5s"/><tev next="
 <param name="renderer" value="http://www.ambulantplayer.org/component/RendererVideo"/>
 </prefetch>
 </par>
+
 <par xml:id="par-03">
 <smilText xml:id="text-03" xml:space="preserve" region="right">
 Al<tev next="0.25s"/>le <tev next="0.25s"/>klok<tev next="0.25s"/>ken <tev next="0.25s"/>lui<tev next="0.5s"/>den,<tev next="0.5s"/>
@@ -52,6 +54,7 @@ Al<tev next="0.25s"/>le <tev next="0.25s"/>klok<tev next="0.25s"/>ken <tev next=
 <param name="renderer" value="http://www.ambulantplayer.org/component/RendererVideo"/>
 </prefetch>
 </par>
+
 <par xml:id="par-04">
 <smilText xml:id="text-04" xml:space="preserve" region="right">
 Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom,<tev next="0.5s"/><tev next="0.5s"/>
@@ -59,6 +62,7 @@ Bim, <tev next="0.5s"/>bam, <tev next="0.5s"/>bom!<tev next="0.5s"/><tev next="0
 </smilText>
 <video xml:id="media-04" src="{av2}" region="left" clipBegin="12s"/>
 </par>
+
 </seq>
 </par>
 </body>

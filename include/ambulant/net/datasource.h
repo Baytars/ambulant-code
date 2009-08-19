@@ -288,8 +288,6 @@ class audio_datasource_mixin {
 #ifdef EXP_KEEPING_RENDERER
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;	
-	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
-	virtual void set_buffer_size(timestamp_t clip_duration) = 0;
 #endif
 	/// At what timestamp value should the audio playback stop?
 	virtual timestamp_t get_clip_end() = 0;
@@ -309,10 +307,6 @@ class audio_datasource_mixin {
 class audio_datasource : public datasource, public audio_datasource_mixin {
   public:
 	virtual ~audio_datasource() {};
-#ifdef EXP_KEEPING_RENDERER
-	/// Return true if the end of the file is reached.
-	virtual bool end_of_file_prefetch() = 0;
-#endif
 };
 
 class pkt_audio_datasource : public pkt_datasource, public audio_datasource_mixin {
@@ -340,8 +334,6 @@ class raw_audio_datasource:
 #ifdef EXP_KEEPING_RENDERER
 	void set_clip_end(timestamp_t clip_end){};
 	void start_prefetch(lib::event_processor *evp) {};
-	void set_buffer_size(timestamp_t clip_duration){};
-	bool end_of_file_prefetch() { return m_src->end_of_file(); };
 #endif
     void readdone(int len) { m_src->readdone(len); };
     bool end_of_file() { return m_src->end_of_file(); };
@@ -426,11 +418,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 #ifdef EXP_KEEPING_RENDERER
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;
-	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
-	virtual void set_buffer_size(timestamp_t clip_duration) = 0;
 	virtual void start_prefetch(lib::event_processor *evp) = 0;
-	/// Return true if all data has been consumed.
-  	virtual bool end_of_file_prefetch() = 0;
 #endif
 	/// At what timestamp value should the video playback stop?
 	virtual timestamp_t get_clip_end() = 0;

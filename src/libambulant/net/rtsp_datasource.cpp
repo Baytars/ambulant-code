@@ -570,8 +570,17 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 	if(m_context->sinks[m_context->audio_stream]) {
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling _push_data_to_sink");
 		//_push_data_to_sink(m_context->audio_stream, rpts, (uint8_t*) m_context->audio_packet, sz);
-		//xxxbo: 10-07-2009: note, I don't understand why should I plus m_clip_begin like this, but it does help a little bit.  
-		_push_data_to_sink(m_context->audio_stream, rpts+m_clip_begin, (uint8_t*) m_context->audio_packet, sz);
+ 
+#if 0 //xxxbo: 15-07-2009
+		if (rpts + m_clip_begin > m_clip_end) {
+			m_context->eof = true;
+			m_critical_section.leave();
+			return;
+		}
+		else
+#endif //xxxbo: 15-07-2009
+			//xxxbo: 10-07-2009: note, I don't understand why should I plus m_clip_begin like this, but it does help a little bit.
+			_push_data_to_sink(m_context->audio_stream, rpts+m_clip_begin, (uint8_t*) m_context->audio_packet, sz);
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: calling push_data_to_sink done");
 	}
 	assert (m_context->audio_packet);

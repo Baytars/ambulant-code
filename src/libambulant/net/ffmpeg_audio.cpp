@@ -558,14 +558,6 @@ ffmpeg_decoder_datasource::end_of_file()
 	return rv;
 }
 
-#ifdef EXP_KEEPING_RENDERER
-bool 
-ffmpeg_decoder_datasource::end_of_file_prefetch()
-{
-	return m_src->end_of_file();	
-}
-#endif
-
 bool 
 ffmpeg_decoder_datasource::_end_of_file()
 {
@@ -631,16 +623,6 @@ ffmpeg_decoder_datasource::set_clip_end(timestamp_t clip_end)
 	m_src->set_clip_end(clip_end);
 } 
 
-void 
-ffmpeg_decoder_datasource::set_buffer_size(timestamp_t clip_duration)
-{
-	m_lock.enter();
-	//xxxbo: here, the exact buffer size should be computed according to clip_duration, 
-	//       I just set the max size of buffer to unlimited for simple reason, and will 
-	//       fix it later.
-	m_buffer.set_max_size(0);
-	m_lock.leave();
-}
 #endif
 
 bool 
@@ -1079,16 +1061,6 @@ ffmpeg_resample_datasource::set_clip_end(timestamp_t clip_end)
 	m_lock.leave();
 } 
 
-void
-ffmpeg_resample_datasource::set_buffer_size(timestamp_t clip_duration)
-{
-	m_lock.enter();
-	//xxxbo: here, the exact buffer size should be computed according to clip_duration, 
-	//       I just set the max size of buffer to unlimited for simple reason, and will 
-	//       fix it later.
-	m_buffer.set_max_size(0);
-	m_lock.leave();
-}
 #endif
 
 

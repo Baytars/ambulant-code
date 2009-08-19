@@ -246,7 +246,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 #else
     const char * fb = m_node->get_attribute("fill");
     //For "fill=continue", we pass -1 to the datasource classes. 
-    if (fb != NULL && strcmp(fb, "ambulant:continue") != 0) {
+    if (fb != NULL && strcmp(fb, "ambulant:continue") == 0) {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, -1);
     } else {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
@@ -621,28 +621,6 @@ gui::sdl::sdl_audio_renderer::is_playing()
 }
 
 #ifdef EXP_KEEPING_RENDERER
-void
-gui::sdl::sdl_audio_renderer::stop_but_keeping_renderer() //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x, cookie=%d", (void *) this, (void*)m_dest, (int)m_cookie);
-	if (m_is_playing) {
-		m_lock.leave();
-		std::string tag = m_node->get_local_name();
-		if (tag != "prefetch") {
-			unregister_renderer(this);
-		}
-		// XXX Should we call stopped_callback?
-		m_context->stopped(m_cookie, 0);
-		m_lock.enter();
-	}
-	m_is_playing = false;
-    unregister_renderer(this);
-	//m_context->stopped(m_cookie, 0);
-
-	m_lock.leave();
-}
 
 void
 gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
@@ -663,7 +641,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		
 		const char * fb = n->get_attribute("fill");
 		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
+		if (fb != NULL && strcmp(fb, "ambulant:continue") == 0)
 			m_audio_src->set_clip_end(-1);
 		else 
 			m_audio_src->set_clip_end(m_clip_end);	
@@ -671,33 +649,6 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 	m_lock.leave();
 }
 
-void 
-gui::sdl::sdl_audio_renderer::update_context_info(const lib::node *node, int cookie) //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);
-    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info(%s), this=0x%x, ds=0x%x", node->get_sig().c_str(), (void*)this, (void*)m_audio_src);
-	m_node = node;
-	m_cookie = cookie;
-	_init_clip_begin_end();
-	
-    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
-	if (m_audio_src) {
-		m_audio_clock = 0;
-		
-        if (m_clip_begin != m_previous_clip_position) {
-            AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
-            seek(m_clip_begin/1000);
-            m_previous_clip_position = m_clip_begin;
-        }
-
-		const char * fb = node->get_attribute("fill");
-		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
-			m_audio_src->set_clip_end(-1);
-		else 
-			m_audio_src->set_clip_end(m_clip_end);	
-	}
-}
 #endif
 
 bool 
@@ -805,9 +756,6 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
-		//m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
-		// xxxbo: please note, the above line on set_buffer_size will make sptest-07-av.smil(local playback H264 video) broken
-		// at the fourth fragment(video is ok but audio is something like white noise). 14-07-2009
 		m_audio_src->start_prefetch(m_event_processor);
 		m_is_paused = false;
         m_previous_clip_position = m_clip_begin;
@@ -818,40 +766,6 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 }
 
 
-#ifdef EXP_KEEPING_RENDERER
-void
-gui::sdl::sdl_audio_renderer::start_prefetch(double where) //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);
-	m_lock.enter();
-#ifdef EXP_KEEPING_RENDERER
-	if (m_is_playing) {
-		lib::logger::get_logger()->trace("sdl_audio_renderer::start_prefetch(0x%x): already started", (void*)this);
-		m_lock.leave();
-		return;
-	}
-	
-#endif
-    if (!m_node) abort();
-	
-	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(0x%x, %s, where=%f)", 
-											(void *)this, m_node->get_sig().c_str(), where);
-	if (m_audio_src) {		
-		if (m_audio_src->get_start_time() != m_audio_src->get_clip_begin())
-			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
-		
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
-		m_audio_src->set_buffer_size(m_audio_src->get_clip_end() - m_audio_src->get_clip_begin()); // XXXJACK is this correct?
-		m_audio_src->start_prefetch(m_event_processor);
-		m_is_paused = false;
-        m_previous_clip_position = m_clip_begin;
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start_prefetch: no datasource");
-	}
-    m_lock.leave();
-}
-#endif
-
 void
 gui::sdl::sdl_audio_renderer::seek(double where)
 {
@@ -859,21 +773,6 @@ gui::sdl::sdl_audio_renderer::seek(double where)
 	AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer: seek(0x%x, %f)", this, where);
     assert( where >= 0);
 	if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000));
-#if 0
-    // XXXJACK: Removed this code, I think it is not needed.
-#ifndef EXP_KEEPING_RENDERER
-	//if (m_audio_src) m_audio_src->seek((net::timestamp_t)(where*1000), m_clip_end);	
-	if (m_audio_src) {
-		const char * fb = m_node->get_attribute("fill");
-		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
-			m_audio_src->seek((net::timestamp_t)(where*1000), -1);
-		else
-			m_audio_src->seek((net::timestamp_t)(where*1000), m_clip_end);	
-	}
-#endif
-	// XXXJACK: Should restart SDL
-#endif
 	m_lock.leave();
 }
 
