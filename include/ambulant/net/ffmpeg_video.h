@@ -103,9 +103,7 @@ class ffmpeg_video_decoder_datasource:
 	void seek(timestamp_t time);
 #ifdef EXP_KEEPING_RENDERER
 	void set_clip_end(timestamp_t clip_end);
-	void set_buffer_size(timestamp_t clip_duration);
 	void start_prefetch(lib::event_processor *evp);  
-	bool end_of_file_prefetch();		
 #endif
     void data_avail();
 	bool buffer_full();

@@ -133,31 +133,6 @@ video_renderer::init_with_node(const lib::node *n)
 	m_lock.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
-void 
-video_renderer::update_context_info(const lib::node *node, int cookie) //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);
-    // XXXJAC: Why no locking here???
-	m_node = node;
-	m_cookie = cookie;
-	_init_clip_begin_end();
-    
-    // Assumption in the following code (by Jack): if we have an audio renderer
-    // then the streams are multiplexed, and we should seek only a single stream.
-    // We let the audio handler do the seeking, as the video handler can
-    // much more easily skip frames, etc.
-    AM_DBG lib::logger::get_logger()->debug("video_renderer::update_context_info: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
-	if (m_clip_begin != m_previous_clip_position) {
-        AM_DBG lib::logger::get_logger()->debug("video_renderer: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, node->get_sig().c_str());
-		seek(m_clip_begin/1000);
-        m_previous_clip_position = m_clip_begin;
-	}
-	if (m_audio_renderer) {
-		m_audio_renderer->update_context_info(node, cookie);
-	} 
-}
-#endif
 
 void
 video_renderer::start (double where)
@@ -236,12 +211,12 @@ video_renderer::preroll(double when, double where, double how_much)
 {
 	m_lock.enter();
 	if (m_activated) {
-		lib::logger::get_logger()->trace("video_renderer.start_prefetch(0x%x): already started", (void*)this);
+		lib::logger::get_logger()->trace("video_renderer.preroll(0x%x): already started", (void*)this);
 		m_lock.leave();
 		return;
 	}
 	if (!m_src) {
-		lib::logger::get_logger()->trace("video_renderer.start_prefetch: no datasource, skipping media item");
+		lib::logger::get_logger()->trace("video_renderer.preroll: no datasource, skipping media item");
 		m_context->stopped(m_cookie, 0);
 		m_lock.leave();
 		return;
@@ -270,8 +245,6 @@ video_renderer::preroll(double when, double where, double how_much)
 	m_previous_clip_position = m_clip_begin;
 	m_frame_missing = 0;
 	
-    // XXXJACK: check that this set_buffer_size makes sense...
-	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
 	m_src->start_prefetch (m_event_processor);
 	if (m_audio_renderer) 
@@ -279,69 +252,6 @@ video_renderer::preroll(double when, double where, double how_much)
 	
 	m_lock.leave();	
 }
-
-#ifdef EXP_KEEPING_RENDERER
-void
-video_renderer::start_prefetch (double where) //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);
-	m_lock.enter();
-	if (m_activated) {
-		lib::logger::get_logger()->trace("video_renderer.start_prefetch(0x%x): already started", (void*)this);
-		m_lock.leave();
-		return;
-	}
-
-	// Tell the datasource how we like our pixels.
-	m_src->set_pixel_layout(pixel_layout());
-
-#if 0
-	m_activated = true;
-#endif
-
-	// Now we need to define where we start prefetching. This depends on m_clip_begin (microseconds)
-	// and where (seconds).
-	assert(m_clip_begin >= 0);
-	assert(where >= 0);
-	m_epoch = (long)(m_clip_begin/1000) - (int)(where*1000);
-	m_is_paused = false;
-	
-	// We need to initial these variables over here
-	m_paused_epoch = 0;
-	m_last_frame_timestamp = -1;
-	m_frame_displayed = 0;
-	m_frame_duplicate = 0;
-	m_frame_early = 0;
-	m_frame_late = 0;
-	m_previous_clip_position = m_clip_begin;
-	m_frame_missing = 0;
-	
-    // XXXJACK: check that this set_buffer_size makes sense...
-	m_src->set_buffer_size(m_src->get_clip_end() - m_src->get_clip_begin());
-	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
-	m_src->start_prefetch (m_event_processor);
-	if (m_audio_renderer) 
-		m_audio_renderer->start_prefetch(where);
-	
-	m_lock.leave();	
-}
-
-void
-video_renderer::stop_but_keeping_renderer() //xxxbo: This api is obsolete and will be removed later
-{
-	assert(0);  
-	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop_but_keeping_renderer() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
-
-	
-	if (m_audio_renderer) {
-		m_audio_renderer->stop_but_keeping_renderer();
-	} else {
-        m_context->stopped(m_cookie, 0);
-    }
-	m_lock.leave();
-}
-#endif
 
 
 bool
@@ -379,29 +289,7 @@ video_renderer::seek(double t)
 	AM_DBG lib::logger::get_logger()->trace("video_renderer: seek(%f) curtime=%f", t, (double)m_timer->elapsed()/1000.0);
     assert( t >= 0);
 	long int t_ms = (long int)(t*1000.0);
-#if 0
-	// m_timer is already changed by the scheduler.
-	long int delta = t_ms - m_timer->elapsed();  // Positive delta: move forward in time
-	m_epoch -= delta;	// Which means the epoch moves back in time
-#endif
 	if (m_src) m_src->seek(t_ms);
-#if 0
-    // XXXJACK: removed this code, I think it is not needed.
-#ifndef EXP_KEEPING_RENDERER
-	//if (m_src) m_src->seek(t_ms, m_clip_end);
-	if (m_src) {
-        m_src->seek(t_ms, m_clip_begin); // xxxjack: wrong! Only if != prev clipend!!!
-		//For "fill=continue", we pass -1 to the datasource classes. 
-		const char * fb = m_node->get_attribute("fill");
-		if (fb != NULL && strcmp(fb, "ambulant:continue") != 0)
-			m_src->set_clip_end(-1);
-		else
-			m_src->set_clip_end(m_clip_end);
-	}
-	m_last_frame_timestamp = -1;
-#endif
-#endif
-	//if (m_audio_renderer) m_audio_renderer->seek(t);
 }
 
 common::duration 
@@ -598,7 +486,7 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES

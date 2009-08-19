@@ -59,11 +59,6 @@ class cocoa_video_renderer :
 	void post_stop();
 	void init_with_node(const lib::node *n);
 	void preroll(double when, double where, double how_much);
-#ifdef EXP_KEEPING_RENDERER
-	void start_prefetch(double where) { assert(0); };
-	void stop_but_keeping_renderer() { assert(0); };
-	void update_context_info(const lib::node *node, int cookie) { assert(0); };
-#endif
 	void pause(pause_display d=display_show);
 	void resume();
 	void seek(double t);

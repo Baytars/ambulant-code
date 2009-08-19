@@ -532,18 +532,6 @@ ffmpeg_video_decoder_datasource::set_clip_end(timestamp_t clip_end)
 	m_lock.leave();
 }
 
-void
-ffmpeg_video_decoder_datasource::set_buffer_size(timestamp_t clip_duration)
-{
-	m_lock.enter();
-	//xxxbo: here, the exact buffer size should be computed according to clip_duration, 
-	//       I just set the max size of buffer to 100,000 because I don't know how to calculate it yet, and will 
-	//       fix it later.
-#undef MAX_VIDEO_FRAMES 
-#define MAX_VIDEO_FRAMES 100000
-	m_lock.leave();
-}
-
 #endif
 
 void 
@@ -833,15 +821,6 @@ ffmpeg_video_decoder_datasource::end_of_file()
 	m_lock.leave();
 	return rv;
 }
-
-#ifdef EXP_KEEPING_RENDERER
-// xxxbo: Note, for prefetch, m_frames.size() > 0 is always true, so we should rely on downstream datasource to make decision  
-bool 
-ffmpeg_video_decoder_datasource::end_of_file_prefetch()
-{
-	return m_src == NULL || m_src->end_of_file();	
-}
-#endif
 
 bool 
 ffmpeg_video_decoder_datasource::_end_of_file()

@@ -77,9 +77,6 @@ class trace_playable : virtual public playable {
 			m_id.c_str(), when, where, how_much);	
 	}
 	
-#ifdef EXP_KEEPING_RENDERER
-	void start_prefetch(double t) {};
-#endif
 
 	duration get_dur() {
 		trace_call("get_dur");

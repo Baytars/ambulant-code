@@ -95,7 +95,6 @@ class demux_audio_datasource:
   	void seek(timestamp_t time);
 #ifdef EXP_KEEPING_RENDERER
   	void set_clip_end(timestamp_t clip_end);	
-	void set_buffer_size(timestamp_t){};
 #endif
 	bool push_data(timestamp_t pts, const uint8_t *data, int size);
 	bool end_of_file();
@@ -144,12 +143,7 @@ class demux_video_datasource:
 	void seek(timestamp_t time);
 #ifdef EXP_KEEPING_RENDERER
 	void set_clip_end(timestamp_t clip_end);
-	/// Set buffe size for supportting prefetch, or 0 for unlimited buffer size.
-	void set_buffer_size(timestamp_t clip_duration){};
 	void start_prefetch(lib::event_processor *evp){};
-	/// Return true if all data has been consumed.
-  	bool end_of_file_prefetch(){return false;};
-	
 #endif
 	void start_frame(ambulant::lib::event_processor *evp, ambulant::lib::event *callbackk, timestamp_t timestamp);
 	void stop();  

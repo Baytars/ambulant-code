@@ -116,22 +116,6 @@ renderer_playable::stop()
 	return true; // xxxbo note, true means it cannot be reused.
 }
 
-#ifdef EXP_KEEPING_RENDERER
-void
-renderer_playable::stop_keeping_renderer()
-{
-	AM_DBG lib::logger::get_logger()->debug("renderer_playable.stop_keeping_renderer(0x%x)", (void *)this);
-	if (!m_activated) {
-		lib::logger::get_logger()->trace("renderer_playable.stop_keeping_renderer(0x%x): not started", (void*)this);
-	} else {
-		if (m_dest)	m_dest->renderer_done(this);
-		m_dest = NULL;
-	}
-	m_activated = false;
-	
-}
-#endif
-
 bool
 renderer_playable::user_event(const lib::point &where, int what) {
 	AM_DBG lib::logger::get_logger()->debug("%s: renderer_playable::user_event((%d,%d), %d) -> %d", m_node->get_sig().c_str(), where.x, where.y, what, m_cookie);
