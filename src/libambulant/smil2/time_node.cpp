@@ -835,6 +835,9 @@ void time_node::start_prefetch(time_type offset) {
 						   m_attrs.get_id().c_str(), offset(), timestamp.as_doc_time_value());
 	common::playable *np = create_playable();
 	if(np) {
+		// XXXJACK: I think offset isn't the right parameter here. The intention of the
+		// preroll() first argument is that it indicates when the result of prefetching
+		// is going to be needed.
 		np->preroll(time_type_to_secs(offset()));
     }
 }
