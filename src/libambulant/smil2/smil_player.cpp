@@ -358,8 +358,7 @@ AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.le
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);	
 	}
     if (np) {
-        //xxxbo: update the context info of np, for example, clipbegin, clipend, and cookie according to the node
-        //np->update_context_info(n, n->get_numid());
+        // Update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->init_with_node(n);
     }
 #endif
