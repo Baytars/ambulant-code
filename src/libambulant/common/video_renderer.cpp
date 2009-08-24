@@ -434,11 +434,10 @@ video_renderer::data_avail()
         lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
                                          m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
         
-        // To support continuous playback, when frame_ts_micros > m_clip_end, 
-        // we continue playback, unless we are prefetching.
-        const char * fb = m_node->get_attribute("fill");
-        // XXXJACK: the following if tested for fb=="ambulant:continue", I don't believe that.
-        if (m_src->end_of_file() || fb == NULL || strcmp(fb, "ambulant:continue") != 0) {
+        // If we are past real end-of-file we always stop playback.
+        // If we are past clip_end we continue playback if we're playing a fill=ambulant:continue node.
+        // XXXJACK: this may lead to multiple stopped() callbacks (above). Need to fix.
+        if (m_src->end_of_file() || !is_fill_continue_node()) {
             m_lock.leave();
             return;
         }

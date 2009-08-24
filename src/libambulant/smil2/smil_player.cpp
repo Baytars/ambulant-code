@@ -302,11 +302,11 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 	common::playable *np = (it != m_playables.end())?(*it).second:0;
 	if(np == NULL) {
 		np = _new_playable(n);
-AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
+        AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
-AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
+        AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
 	}
 #else
 	common::playable *np = NULL;
@@ -470,7 +470,9 @@ void smil_player::stop_playable(const lib::node *n) {
         }
     }
     if (can_cache && must_post_stop) {
-        // Should we completely stop playback?
+        // If we are playing a fill=ambulant:continue node we want to continue playback for a while,
+        // so we don't call post_stop. The scheduler will arrange for it being called in a short while, unless
+        // this renderer is reused in the mean time.
         const char * fb = n->get_attribute("fill");
         if (fb != NULL && strcmp(fb, "ambulant:continue") == 0) {
             must_post_stop = false;
