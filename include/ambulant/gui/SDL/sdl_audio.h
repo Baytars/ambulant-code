@@ -121,7 +121,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 	const lib::transition_info* m_outtransition;
 	smil2::audio_transition_engine* m_transition_engine;
     net::timestamp_t m_previous_clip_position;
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     lib::timer::time_type m_audio_clock;
 #endif
 	// class methods and attributes:

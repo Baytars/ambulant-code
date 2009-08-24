@@ -93,7 +93,7 @@ class demux_audio_datasource:
 	void stop();  
 	void read_ahead(timestamp_t clip_begin);
   	void seek(timestamp_t time);
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
   	void set_clip_end(timestamp_t clip_end);	
 #endif
 	bool push_data(timestamp_t pts, const uint8_t *data, int size);
@@ -141,7 +141,7 @@ class demux_video_datasource:
 	void set_pixel_layout(pixel_order l) { assert(l == pixel_unknown); }
 	void read_ahead(timestamp_t clip_begin);
 	void seek(timestamp_t time);
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	void set_clip_end(timestamp_t clip_end);
 	void start_prefetch(lib::event_processor *evp){};
 #endif

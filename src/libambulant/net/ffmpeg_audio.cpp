@@ -350,7 +350,7 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 	m_lock.leave();
 }
  
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 ffmpeg_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 {
@@ -368,7 +368,7 @@ ffmpeg_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 	}
 	m_lock.leave();
 }
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 
 void 
 ffmpeg_decoder_datasource::readdone(int len)
@@ -475,7 +475,7 @@ ffmpeg_decoder_datasource::data_avail()
 							m_buffer.readdone(bytes_unwanted);
 						}
 					} else {
-						/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed = %lld < clip_begin = %lld, skipped %d bytes", m_elapsed, m_src->get_clip_begin(), outsize);
+						AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed = %lld < clip_begin = %lld, skipped %d bytes", m_elapsed, m_src->get_clip_begin(), outsize);
 						m_buffer.pushdata(0);
 					}
 
@@ -493,7 +493,7 @@ ffmpeg_decoder_datasource::data_avail()
 		}
 		// Restart reading if we still have room to accomodate more data
 		// XXX The note regarding m_elapsed holds here as well.
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 		if (!m_src->end_of_file() && m_event_processor && !m_buffer.buffer_full() && !_clip_end() ) {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling m_src->start() again");
 			lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
@@ -535,7 +535,7 @@ ffmpeg_decoder_datasource::data_avail()
 		} else {
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
 		}		
-#endif//EXP_KEEPING_RENDERER
+#endif//WITH_SEAMLESS_PLAYBACK
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No decoder, flushing available data");
 	}
@@ -616,7 +616,7 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 	m_lock.leave();
 } 
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 ffmpeg_decoder_datasource::set_clip_end(timestamp_t clip_end)
 {
@@ -684,7 +684,7 @@ ffmpeg_decoder_datasource::get_clip_begin()
 	return clip_begin;
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 timestamp_t
 ffmpeg_decoder_datasource::get_elapsed()
 {
@@ -1052,7 +1052,7 @@ ffmpeg_resample_datasource::seek(timestamp_t time)
 	m_lock.leave();
 } 
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 ffmpeg_resample_datasource::set_clip_end(timestamp_t clip_end)
 {
@@ -1158,7 +1158,7 @@ ffmpeg_resample_datasource::start(ambulant::lib::event_processor *evp, ambulant:
 	m_lock.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 ffmpeg_resample_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 {
@@ -1176,7 +1176,7 @@ ffmpeg_resample_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 	}
 	m_lock.leave();
 }
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 
 common::duration
 ffmpeg_resample_datasource::get_dur()

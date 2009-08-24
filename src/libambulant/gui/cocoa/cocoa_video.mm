@@ -274,7 +274,7 @@ cocoa_video_renderer::start(double where)
 	Movie mov = [m_movie quickTimeMovie];
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     if (GetMovieRate(mov) == 0) {
         _fix_video_epoch();
     }
@@ -345,7 +345,7 @@ cocoa_video_renderer::resume()
 		if ([m_movie_view isHidden]) [m_movie_view setHidden: NO];
 		[m_movie_view play: NULL];
 	}
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     _fix_video_epoch();
 #endif
 	[pool release];
@@ -391,7 +391,7 @@ cocoa_video_renderer::_poll_playing()
 	}
 	
 	if (!is_stopped) {
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
         _fix_clock_drift();
 #endif
 		// schedule another call in a while
@@ -457,7 +457,7 @@ cocoa_video_renderer::redraw(const rect &dirty, gui_window *window)
 	m_lock.leave();
 }
 
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
 void 
 cocoa_video_renderer::_fix_video_epoch()
 {

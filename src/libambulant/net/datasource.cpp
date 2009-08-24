@@ -50,7 +50,7 @@ class mem_datasource : virtual public datasource, virtual public ambulant::lib::
 	void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) {
 		evp->add_event(callback, 0, ambulant::lib::ep_med);
 	};
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	void start_prefetch(ambulant::lib::event_processor *evp) {};
 #endif
 	void readdone(int len) { m_databuf.readdone(len); };

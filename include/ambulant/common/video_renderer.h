@@ -117,7 +117,7 @@ class video_renderer : public common::renderer_playable {
 	long int m_frame_early;
 	long int m_frame_late;
 	long int m_frame_missing;
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	net::timestamp_t m_previous_clip_position;      
 #endif
   protected:

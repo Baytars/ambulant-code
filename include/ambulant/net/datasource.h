@@ -229,7 +229,7 @@ class AMBULANTAPI datasource : virtual public ambulant::lib::ref_counted {
 	/// When the data is available (or end of file reached) exactly one
 	/// callback is scheduled through the event_processor.
 	virtual void start(ambulant::lib::event_processor *evp, ambulant::lib::event *callback) = 0;
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	virtual void start_prefetch(ambulant::lib::event_processor *evp) = 0;
 #endif
 	
@@ -285,7 +285,7 @@ class audio_datasource_mixin {
 	/// to work.
 	virtual void seek(timestamp_t time) = 0;
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;	
 #endif
@@ -299,7 +299,7 @@ class audio_datasource_mixin {
 	virtual timestamp_t get_start_time() = 0;
 	/// Return the duration of the audio data, if known.
 	virtual common::duration get_dur() = 0;
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	virtual timestamp_t get_elapsed() { assert(0); return 0;};
 #endif
 };
@@ -331,7 +331,7 @@ class raw_audio_datasource:
 	void stop() { m_src->stop(); };  
 	void read_ahead(timestamp_t time){};
   	void seek(timestamp_t time){};
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	void set_clip_end(timestamp_t clip_end){};
 	void start_prefetch(lib::event_processor *evp) {};
 #endif
@@ -415,7 +415,7 @@ class video_datasource : virtual public lib::ref_counted_obj {
 	/// Fast forward (or reverse) to a specific place in time.
 	virtual void seek(timestamp_t time) = 0;
     
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;
 	virtual void start_prefetch(lib::event_processor *evp) = 0;
@@ -664,7 +664,7 @@ class abstract_demux : public BASE_THREAD, public lib::ref_counted_obj {
 	/// provided to the sinks this call may be implemented as no-op.
 	virtual void seek(timestamp_t time) = 0;
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
     /// Set end-of-clip (which works like end of file), or -1 for real end of file.
 	virtual void set_clip_end(timestamp_t clip_end) = 0;	
 #endif

@@ -114,7 +114,7 @@ smil_player::~smil_player() {
 		if (rem > 1) m_logger->trace("smil_player::~smil_player: playable 0x%x still has refcount of %d", (*it).second, rem);
 	}
 	
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	// clean up the playable cache as well
 	std::map<const std::string, common::playable *>::iterator it_url_based; 
 	for(it_url_based = m_playables_url_based.begin();it_url_based!=m_playables_url_based.end();it_url_based++) {
@@ -224,7 +224,7 @@ void smil_player::start() {
 // Command to stop playback
 void smil_player::stop() {
     AM_DBG lib::logger::get_logger()->debug("smil_player::stop()");
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	assert(m_playables_url_based.empty());
 #endif
 	m_lock.enter();
@@ -296,7 +296,7 @@ void smil_player::done_playback() {
 // Request to create a playable for the node.
 common::playable *smil_player::create_playable(const lib::node *n) {
     assert(n);
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	std::map<const lib::node*, common::playable *>::iterator it = 
 		m_playables.find(n);
 	common::playable *np = (it != m_playables.end())?(*it).second:0;
@@ -331,7 +331,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 //			assert(rend);	// Assert can fail if the playable failed to create fully (incorrect url, for example)
 			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
 			if (n->get_local_name() == "prefetch") surf = NULL;
-			/*AM_DBG*/ lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
+			AM_DBG lib::logger::get_logger()->debug("%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n->get_sig().c_str(), np, rend, surf);
 			if (rend && surf) {
 				rend->set_surface(surf);
 			}
@@ -448,7 +448,7 @@ void smil_player::stop_playable(const lib::node *n) {
     assert(victim.second); // Jack thinks we should always have a playable when we get here. Remove assert if untrue:-)
 	if (victim.second == NULL) return;
     
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
     // There are now three possibilities:
     // 1. Destroy. Not cachable, or no URL.
     // 2. Store in cache, don't stop playback (cachable, fill=continue)
@@ -986,7 +986,7 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 	if (rem > 1) m_logger->debug("smil_player::_destroy_playable: playable 0x%x still has refcount of %d", np, rem);
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void smil_player::_destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim) {
 
 	assert(victim.first);

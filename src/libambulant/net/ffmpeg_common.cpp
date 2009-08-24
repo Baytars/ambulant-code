@@ -337,7 +337,7 @@ ffmpeg_demux::seek(timestamp_t time)
 	m_lock.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 
 void
 ffmpeg_demux::set_clip_end(timestamp_t clip_end)
@@ -346,7 +346,7 @@ ffmpeg_demux::set_clip_end(timestamp_t clip_end)
 	m_clip_end = clip_end;
 	m_lock.leave();
 }
-#endif//EXP_KEEPING_RENDERER
+#endif//WITH_SEAMLESS_PLAYBACK
 
 void
 ffmpeg_demux::remove_datasink(int stream_index)
@@ -387,7 +387,7 @@ ffmpeg_demux::run()
 	pkt_nr = 0;
 	assert(m_con);
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	bool eof_sent_to_clients = false;
 #endif
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: started");
@@ -398,7 +398,7 @@ ffmpeg_demux::run()
 		// Read a packet
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run:  started");
 		if (m_clip_begin_changed) {
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 			eof_sent_to_clients = false;
 #endif
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
@@ -433,7 +433,7 @@ ffmpeg_demux::run()
 		int ret = av_read_frame(m_con, pkt);
 		m_lock.enter();
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size);
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 		if (ret < 0) break;
 #else
 		if (ret < 0) {

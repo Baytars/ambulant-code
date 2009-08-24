@@ -139,7 +139,7 @@ event_processor_impl::serve_events()
 		// it must be a low priority event
 		(void) serve_event(m_low_delta_timer, &m_low_q);
 	}
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     timer::signed_time_type drift = m_timer->get_drift();
     if (drift > 0) {
         // If the clock is behind, we set it forward. But we don't advance it past the

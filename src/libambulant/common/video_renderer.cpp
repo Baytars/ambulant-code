@@ -55,7 +55,7 @@ video_renderer::video_renderer(
 	m_frame_duplicate(0),
 	m_frame_early(0),
 	m_frame_late(0),
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	m_previous_clip_position(-1),
 #endif
 	m_frame_missing(0)
@@ -66,7 +66,7 @@ video_renderer::video_renderer(
 	
 	_init_clip_begin_end();
 	
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	m_previous_clip_position = m_clip_begin;
 #endif
 
@@ -119,6 +119,7 @@ video_renderer::init_with_node(const lib::node *n)
     // then the streams are multiplexed, and we should seek only a single stream.
     // We let the audio handler do the seeking, as the video handler can
     // much more easily skip frames, etc.
+#ifdef WITH_SEAMLESS_PLAYBACK
     AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 	if (m_clip_begin != m_previous_clip_position) {
         AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
@@ -127,6 +128,11 @@ video_renderer::init_with_node(const lib::node *n)
 		m_lock.enter();
         m_previous_clip_position = m_clip_begin;
 	}
+#else
+		m_lock.leave();
+		seek(m_clip_begin/1000);
+		m_lock.enter();
+#endif // WITH_SEAMLESS_PLAYBACK
 	if (m_audio_renderer) {
 		m_audio_renderer->init_with_node(n);
 	} 
@@ -194,7 +200,7 @@ video_renderer::start (double where)
 	if (m_audio_renderer) 
 		m_audio_renderer->start(where);
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
     // We now no longer know where we are (until we get to end-of-clip).
     m_previous_clip_position = -1;
 #endif
@@ -209,6 +215,7 @@ video_renderer::start (double where)
 void
 video_renderer::preroll(double when, double where, double how_much)
 {
+#ifdef WITH_SEAMLESS_PLAYBACK
 	m_lock.enter();
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.preroll(0x%x): already started", (void*)this);
@@ -223,10 +230,6 @@ video_renderer::preroll(double when, double where, double how_much)
 	}
 	// Tell the datasource how we like our pixels.
 	m_src->set_pixel_layout(pixel_layout());
-	
-#if 0
-	m_activated = true;
-#endif
 
 	// Now we need to define where we start prefetching. This depends on m_clip_begin (microseconds)
 	// and where (seconds).
@@ -251,6 +254,7 @@ video_renderer::preroll(double when, double where, double how_much)
 		m_audio_renderer->preroll(where);
 	
 	m_lock.leave();	
+#endif // WITH_SEAMLESS_PLAYBACK
 }
 
 
@@ -258,7 +262,7 @@ bool
 video_renderer::stop()
 { 
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::stop() this=0x%x, dest=0x%x", (void *) this, (void*)m_dest);
 
 	if (m_audio_renderer) {
 		m_audio_renderer->stop();
@@ -274,8 +278,11 @@ video_renderer::post_stop()
 {
 	m_lock.enter();
     m_activated = false;    // This stops video playback at the next data_avail callback
+    if (m_dest) m_dest->renderer_done(this);
+    m_dest = NULL;
 	if (m_audio_renderer)
 		m_audio_renderer->post_stop();
+    m_audio_renderer = NULL;
 	lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 									 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 	m_lock.leave();	
@@ -402,7 +409,7 @@ video_renderer::data_avail()
 	net::timestamp_t frame_duration = m_src->frameduration(); // XXX For now: assume 30fps
 	
 	// If we are at the end of the clip we stop and signal the scheduler..
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 		if (m_src) {
@@ -485,7 +492,7 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES

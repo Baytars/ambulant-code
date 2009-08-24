@@ -271,7 +271,7 @@ ambulant::net::rtsp_demux::seek(timestamp_t time)
 	m_critical_section.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void
 ambulant::net::rtsp_demux::set_clip_end(timestamp_t clip_end)
 {
@@ -586,7 +586,7 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 	assert (m_context->audio_packet);
 	free(m_context->audio_packet);
 	m_context->audio_packet = NULL;
-    /*AM_DBG*/ lib::logger::get_logger()->debug("after reading audio: pts=%lld, end=%lld", rpts, m_context->last_expected_pts);
+    AM_DBG lib::logger::get_logger()->debug("after reading audio: pts=%lld, end=%lld", rpts, m_context->last_expected_pts);
 	if (m_context->last_expected_pts >= 0 && rpts >= m_context->last_expected_pts) {
 		lib::logger::get_logger()->debug("after_reading_audio: last_pts = %lld", rpts);
 	 	m_context->eof = true;

@@ -112,7 +112,7 @@ class ffmpeg_raw_datasource:
 	~ffmpeg_raw_datasource();
 
 	void start(lib::event_processor *evp, lib::event *callback);  
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	void start_prefetch(lib::event_processor *evp){};  // XXXJACK need to implement this at some point
 #endif
 	void stop();

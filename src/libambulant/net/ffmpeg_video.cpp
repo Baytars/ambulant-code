@@ -252,7 +252,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	ambulant::lib::event *callbackk, timestamp_t timestamp)
 {
 	m_lock.enter();
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 //	m_start_input = true;
 #endif
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: (this = 0x%x)", (void*) this);
@@ -263,7 +263,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame(): m_client_callback already set!");
 	}
 
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again
@@ -326,7 +326,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	
 #endif
 	// Don't restart our source if we are at end of file.
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	if ( _end_of_file() ) m_start_input = false;
 #endif
 	
@@ -340,7 +340,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	m_lock.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp)
 {
@@ -350,7 +350,7 @@ ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *
     m_event_processor = evp;
     
 	// Don't restart our source if we are at end of file.
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	if ( _end_of_file() ) m_start_input = false;
 #endif
 	
@@ -523,7 +523,7 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
 	m_lock.leave();
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void
 ffmpeg_video_decoder_datasource::set_clip_end(timestamp_t clip_end)
 {

@@ -543,7 +543,7 @@ void time_attrs::parse_fill() {
 	if(fill == "remove") m_fill = fill_remove;
 	else if(fill == "freeze") m_fill = fill_freeze;
 	else if(fill == "hold") m_fill = fill_hold;
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	else if(fill == "ambulant:continue") m_fill = fill_continue;
 #endif
 	else if(fill == "transition") m_fill = fill_transition;
@@ -576,7 +576,7 @@ fill_behavior time_attrs::get_default_fill() {
 			if(fill == "remove") {retfb = fill_remove; break;}
 			else if(fill == "freeze") {retfb = fill_freeze; break;}
 			else if(fill == "hold") {retfb = fill_hold; break;}
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 			else if(fill == "ambulant:continue") {retfb = fill_continue; break;}
 #endif
 			else if(fill == "transition") {retfb = fill_transition; break;}
@@ -767,7 +767,7 @@ std::string smil2::repr(fill_behavior f) {
 		case fill_remove: return "remove";
 		case fill_freeze: return "freeze";
 		case fill_hold: return "hold";
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 		case fill_continue: return "ambulant:continue";
 #endif
 		case fill_transition: return "transition";

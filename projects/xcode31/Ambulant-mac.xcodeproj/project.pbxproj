@@ -1725,7 +1725,6 @@
 					"WITH_FFMPEG_AVFORMAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_SMIL30=1",
-					EXP_KEEPING_RENDERER,
 				);
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = "Ambulant-mac";
