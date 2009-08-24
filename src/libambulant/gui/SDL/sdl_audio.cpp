@@ -244,9 +244,8 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 #ifndef EXP_KEEPING_RENDERER
     m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
 #else
-    const char * fb = m_node->get_attribute("fill");
-    //For "fill=continue", we pass -1 to the datasource classes. 
-    if (fb != NULL && strcmp(fb, "ambulant:continue") == 0) {
+     //For "fill=continue", we pass -1 to the datasource classes. 
+    if (is_fill_continue_node()) {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, -1);
     } else {
         m_audio_src = factory->get_datasource_factory()->new_audio_datasource(url, supported, m_clip_begin, m_clip_end);
@@ -639,9 +638,9 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
             m_previous_clip_position = m_clip_begin;
         }
 		
-		const char * fb = n->get_attribute("fill");
-		//For "fill=continue", we pass -1 to the datasource classes. 
-		if (fb != NULL && strcmp(fb, "ambulant:continue") == 0)
+		// For "fill=continue", we pass -1 to the datasource classes, as we want to continue to receive
+        // audio after clip end.
+		if (is_fill_continue_node())
 			m_audio_src->set_clip_end(-1);
 		else 
 			m_audio_src->set_clip_end(m_clip_end);	
