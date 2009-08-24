@@ -26,8 +26,6 @@
 #ifndef AMBULANT_LIB_TIMER_H
 #define AMBULANT_LIB_TIMER_H
 
-#define WITH_CLOCK_SYNC
-
 #include "ambulant/config/config.h"
 #include "ambulant/lib/mtsync.h"
 #include <set>
