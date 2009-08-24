@@ -1725,8 +1725,11 @@
 					"WITH_FFMPEG_AVFORMAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_SMIL30=1",
+					"WITH_SEAMLESS_PLAYBACK=1",
+					"WITH_CLOCK_SYNC=1",
 				);
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_GENERATE_MAP_FILE = YES;
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
@@ -1749,8 +1752,11 @@
 					"WITH_FFMPEG_AVFORMAT=1",
 					"WITH_OVERLAY_WINDOW=1",
 					"WITH_SMIL30=1",
+					"WITH_SEAMLESS_PLAYBACK=1",
+					"WITH_CLOCK_SYNC=1",
 				);
 				INSTALL_PATH = "$(HOME)/Applications";
+				LD_GENERATE_MAP_FILE = YES;
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
 			};
