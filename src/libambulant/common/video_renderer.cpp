@@ -282,7 +282,6 @@ video_renderer::post_stop()
     m_dest = NULL;
 	if (m_audio_renderer)
 		m_audio_renderer->post_stop();
-    m_audio_renderer = NULL;
 	lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
 									 m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
 	m_lock.leave();	
