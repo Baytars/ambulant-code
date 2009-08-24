@@ -77,7 +77,7 @@ class cocoa_video_renderer :
     void *m_mc;                 // Our helper ObjC class to run methods in the main thread
 	bool m_paused;
     net::timestamp_t m_previous_clip_position; // Where we are officially positioned
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     lib::timer::signed_time_type m_video_epoch;    // Ambulant clock value corresponding to video clock 0.
     void _fix_video_epoch();    // Set m_video_epoch according to current movie time
     void _fix_clock_drift();    // Synchronise movie clock and ambulant clock

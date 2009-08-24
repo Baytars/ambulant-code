@@ -173,7 +173,7 @@ demux_audio_datasource::seek(timestamp_t time)
 	m_thread->seek(time);
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 demux_audio_datasource::set_clip_end(timestamp_t clip_end)
 {
@@ -445,7 +445,7 @@ demux_video_datasource::seek(timestamp_t time)
 	m_thread->seek(time);
 }
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void 
 demux_video_datasource::set_clip_end(timestamp_t clip_end)
 {
@@ -470,7 +470,7 @@ demux_video_datasource::start_frame(ambulant::lib::event_processor *evp,
 		lib::logger::get_logger()->debug("demux_video_datasource::start(): m_client_callback already set!");
 	}
 
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 	if (m_frames.size() > 0 /* XXXX Check timestamp! */ || _end_of_file() ) {
 		// We have data (or EOF) available. Don't bother starting up our source again, in stead
 		// immedeately signal our client again

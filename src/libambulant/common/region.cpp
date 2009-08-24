@@ -238,7 +238,7 @@ surface_impl::redraw(const lib::rect &r, gui_window *window)
 	
 	std::list<gui_events*>::iterator ar;
 	for (ar=m_renderers.begin(); ar!=m_renderers.end(); ar++) {
-		AM_DBG lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
+		/*AM_DBG*/ lib::logger::get_logger()->debug("surface_impl.redraw(0x%x %s) ->renderer 0x%x", (void *)this, m_name.c_str(), (void *)(*ar));
 		(*ar)->redraw(our_rect, window);
 	}
 		

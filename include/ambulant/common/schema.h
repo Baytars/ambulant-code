@@ -95,11 +95,11 @@ class schema {
 	bool is_statecommand(const lib::xml_string& qname) const;
 #endif // WITH_SMIL30
 	
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	/// Return true if an element with tag qname is a prefetch.
 	bool is_prefetch(const lib::xml_string& qname) const;
 
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 
  	schema();
  	~schema();
@@ -113,9 +113,9 @@ class schema {
 #ifdef WITH_SMIL30
 	std::set<std::string> m_statecommands;
 #endif // WITH_SMIL30
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	std::set<std::string> m_prefetch;
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 };
 
 } // namespace common

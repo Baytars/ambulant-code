@@ -138,6 +138,8 @@ cocoa_smiltext_renderer::cocoa_smiltext_renderer(
 cocoa_smiltext_renderer::~cocoa_smiltext_renderer()
 {
 	m_lock.enter();
+    if (m_dest)	m_dest->renderer_done(this);
+    m_dest = NULL;
 	[m_text_storage release];
 	m_text_storage = NULL;
 	m_lock.leave();
@@ -160,15 +162,6 @@ cocoa_smiltext_renderer::seek(double t)
 	//renderer_playable::seek(t);
 }
 
-#if 0
-void
-cocoa_smiltext_renderer::stop()
-{
-	m_engine.stop();
-	renderer_playable::stop();
-	m_context->stopped(m_cookie);
-}
-#endif
 bool
 cocoa_smiltext_renderer::stop()
 {

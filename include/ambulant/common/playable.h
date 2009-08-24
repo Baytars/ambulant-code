@@ -113,13 +113,10 @@ class AMBULANTAPI playable : public lib::ref_counted_obj {
 	
 	virtual ~playable() {}
 	
-	//xxxbo:
-#ifdef EXP_KEEPING_RENDERER
 	/// Update the context info.
 	/// According to the node to which this playable is associated, 
 	/// update the clipbegin and clipend info.
 	virtual void init_with_node(const lib::node *n) = 0;
-#endif
 	
 	/// Start playback.
 	/// Starts playing at media time t independent 
@@ -285,7 +282,7 @@ class single_playable_factory : public playable_factory {
 	bool supports(renderer_select *rs)
 	{
 		const lib::xml_string& tag = rs->get_tag();
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 		if (tag != "" && tag != "ref" && tag != Tag) return false;
 #else
 		if (tag != "" && tag != "ref" && tag != Tag && tag != "prefetch") return false;

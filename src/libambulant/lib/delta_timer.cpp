@@ -139,7 +139,7 @@ void lib::delta_timer::get_ready_delta_events(time_type delta, std::queue<event*
 	AM_DBG  if(!queue.empty()) write_trace();
 }
 
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
 lib::timer::time_type lib::delta_timer::next_event_time() const
 {
     std::list<timeout_event>::const_iterator it = m_events.begin();

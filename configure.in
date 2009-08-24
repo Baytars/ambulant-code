@@ -199,16 +199,28 @@ AC_MSG_RESULT($with_smil30)
 #
 # Do we want seamless playback support?
 #
-test_smil30=true
 AC_MSG_CHECKING(for --with-seamless-playback)
-AC_ARG_WITH([seamless],[
+AC_ARG_WITH([seamless-playback],[
     AS_HELP_STRING([--with-seamless-playback],[Enable seamless audio/video playback])
     ],[with_seamless=${withval}], [with_seamless=yes])
 if test "x$with_seamless" = xyes;
 then
-    AC_DEFINE(EXP_KEEPING_RENDERER, 1, [Define to enable seamless playback support])
+    AC_DEFINE(WITH_SEAMLESS_PLAYBACK, 1, [Define to enable seamless playback support])
 fi
 AC_MSG_RESULT($with_seamless)
+
+#
+# Do we want clock resynchronisation?
+#
+AC_MSG_CHECKING(for --with-clock-sync)
+AC_ARG_WITH([clock-sync],[
+    AS_HELP_STRING([--with-clock-sync],[Resynchronise presentation clock to audio clock])
+    ],[with_clock_sync=${withval}], [with_clock_sync=yes])
+if test "x$with_clock_sync" = xyes;
+then
+    AC_DEFINE(WITH_CLOCK_SYNC, 1, [Define to enable resyncing presentation clock to audio clock])
+fi
+AC_MSG_RESULT($with_clock_sync)
 
 #
 # Do we want external DOM tree support?
@@ -1178,6 +1190,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
     Enable SMIL 3.0:                ${test_smil30}
     Enable overlay window:          ${test_overlay}
     Build with seamless playback:   ${with_seamless}
+    Build with audio clock sync:    ${with_clock_sync}
     Enable SMIL test layout:        ${test_smil_test}
     Build with Python support:      ${with_python}
     Build with Python plugin:       ${with_python_plugin}

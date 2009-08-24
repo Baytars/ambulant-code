@@ -88,20 +88,6 @@ renderer_playable::start(double t)
 	m_dest->show(this);
 }
 
-#if 0
-void
-renderer_playable::stop()
-{
-	AM_DBG lib::logger::get_logger()->debug("renderer_playable.stop(0x%x)", (void *)this);
-	if (!m_activated) {
-		lib::logger::get_logger()->trace("renderer_playable.stop(0x%x): not started", (void*)this);
-	} else {
-		if (m_dest)	m_dest->renderer_done(this);
-		m_dest = NULL;
-	}
-	m_activated = false;
-}
-#endif
 bool
 renderer_playable::stop()
 {

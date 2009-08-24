@@ -26,7 +26,7 @@
 #ifndef AMBULANT_LIB_TIMER_H
 #define AMBULANT_LIB_TIMER_H
 
-#define AMBULANT_FIX_AUDIO_DRIFT
+#define WITH_CLOCK_SYNC
 
 #include "ambulant/config/config.h"
 #include "ambulant/lib/mtsync.h"
@@ -54,7 +54,7 @@ class timer {
 	/// Gets the realtime speed of this timer as modulated by its parent.
 	virtual double get_realtime_speed() const = 0;
     
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     /// Signals that some realtime renderer has detected a clock drift.
     /// Positive values means the clock has to speed up, negative numbers that the clock has to slow down.
     /// Returns the amount of drift that the clock will _not_ fix, in other words: the amount of drift
@@ -178,7 +178,7 @@ class timer_control_impl : public timer_control {
 	/// as modulated by its parent.
 	double get_realtime_speed() const ;
 
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     /// Signals that some realtime renderer has detected a clock drift.
     /// Positive values means the clock has to speed up, negative numbers that the clock has to slow down.
     /// Returns true if the clock has recorded the fact, fase if the renderer itself has to adjust.
@@ -206,7 +206,7 @@ class timer_control_impl : public timer_control {
 	time_type m_local_epoch;
 	double m_speed;
 	bool m_running;
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     signed_time_type m_drift;
 #endif
 	critical_section m_lock;

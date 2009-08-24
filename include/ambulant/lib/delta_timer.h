@@ -74,7 +74,7 @@ class delta_timer {
 	/// Clear all events.
 	void clear();
     
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     /// Return the delay until the next event, or a large number.
     time_type next_event_time() const;
 #endif

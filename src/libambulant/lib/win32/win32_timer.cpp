@@ -68,13 +68,13 @@ lib::win32::win32_timer::elapsed() const {
 	return time_type(dt);
 }
 
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
 void
 lib::win32::win32_timer::skew(signed_time_type skew)
 {
 	assert(skew==0);
 }
-#endif // AMBULANT_FIX_AUDIO_DRIFT
+#endif // WITH_CLOCK_SYNC
 
 // Factory routine for the machine-independent
 // timer class

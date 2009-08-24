@@ -48,7 +48,7 @@ lib::timer_control_impl::timer_control_impl(lib::timer* parent, double speed /* 
 	m_local_epoch(0),
 	m_speed(speed),
 	m_running(run)
-#ifdef AMBULANT_FIX_AUDIO_DRIFT
+#ifdef WITH_CLOCK_SYNC
     ,
     m_drift(0)
 #endif

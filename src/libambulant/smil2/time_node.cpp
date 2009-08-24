@@ -727,7 +727,7 @@ void time_node::activate(qtime_type timestamp) {
 			sync_node()->raise_update_event(timestamp);
 		}
 #endif // WITH_SMIL30
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 		//xxxbo: the entrence point for prefetch
 		else if (is_prefetch()) {
 			start_prefetch(sd_offset);
@@ -824,7 +824,7 @@ void time_node::start_statecommand(time_type offset) {
 }
 #endif // WITH_SMIL30
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 void time_node::start_prefetch(time_type offset) {
 	if(m_ffwd_mode) {
 		AM_DBG m_logger->debug("start_prefetch(%ld): ffwd skip %s", offset(), get_sig().c_str());
@@ -841,7 +841,7 @@ void time_node::start_prefetch(time_type offset) {
 		np->preroll(time_type_to_secs(offset()));
     }
 }
-#endif //EXP_KEEPING_RENDERER
+#endif //WITH_SEAMLESS_PLAYBACK
 
 // Returns true when this node is associated with a playable
 bool time_node::is_playable() const {
@@ -874,7 +874,7 @@ bool time_node::is_statecommand() const {
 
 // Returns true when this node is a prefetch 
 bool time_node::is_prefetch() const {
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	const common::schema *sch = common::schema::get_instance();
 	AM_DBG lib::logger::get_logger()->debug("is_prefetch: 0x%x %s\n", m_node, m_node->get_sig().c_str());
 	const lib::xml_string& qn = m_node->get_local_name();
@@ -882,7 +882,7 @@ bool time_node::is_prefetch() const {
 	return sch->is_prefetch(qn);
 #else
 	return false;
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 }
 //////////////////////////
 // Playables shell
@@ -1487,7 +1487,7 @@ void time_node::fill(qtime_type timestamp) {
 			for(it = cl.begin(); it != cl.end(); it++)
 				(*it)->fill(qt);
 		} 
-#ifndef EXP_KEEPING_RENDERER
+#ifndef WITH_SEAMLESS_PLAYBACK
 		if(is_playable()) pause_playable();
 #else
 		if (fb != fill_continue && is_playable()) pause_playable();

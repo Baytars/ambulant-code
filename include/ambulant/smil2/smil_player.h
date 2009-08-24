@@ -176,7 +176,7 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
  private:
 	common::playable* _new_playable(const lib::node *n); 
 	void _destroy_playable(common::playable *r, const lib::node *n); 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	void _destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim);
 #endif
 	common::playable* _get_playable(const lib::node *n) {
@@ -213,7 +213,7 @@ class smil_player : public common::player, /* public common::player_feedback,*/ 
 	bool m_wait_for_eom_flag;
 	std::map<const lib::node*, common::playable *> m_playables;
 	//xxxbo: 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	std::map<const std::string, common::playable *> m_playables_url_based;
 
 #endif

@@ -57,11 +57,11 @@ static const char* statecommand_elements[] = {
 };
 #endif // WITH_SMIL30
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 static const char* prefetch_elements[] = {
 	"prefetch"
 };
-#endif EXP_KEEPING_RENDERER
+#endif WITH_SEAMLESS_PLAYBACK
 
 // Create the smplest possible schema factory
 // Its sole purpose is to create privately the schema singleton.
@@ -117,14 +117,14 @@ schema::schema() {
 	}
 #endif // WITH_SMIL30
 	
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 	n = sizeof(prefetch_elements)/sizeof(const char *);
 	for(i =0;i<n;i++) {
 		m_time_elements.insert(prefetch_elements[i]);
 		m_prefetch.insert(prefetch_elements[i]);
 	}
 	
-#endif // EXP_KEEPING_RENDERER
+#endif // WITH_SEAMLESS_PLAYBACK
 		
 	n = sizeof(layout_elements)/sizeof(const char *);
 	for(i=0; i<n; i++) {
@@ -160,11 +160,11 @@ bool schema::is_statecommand(const lib::xml_string& tag) const {
 }
 #endif // WITH_SMIL30
 
-#ifdef EXP_KEEPING_RENDERER
+#ifdef WITH_SEAMLESS_PLAYBACK
 bool schema::is_prefetch(const lib::xml_string& tag) const {
 	return m_prefetch.find(tag) != m_prefetch.end();
 }
-#endif //EXP_KEEPING_RENDERER
+#endif //WITH_SEAMLESS_PLAYBACK
 
 const char* 
 ambulant::common::time_container_type_as_str(time_container_type t) {
