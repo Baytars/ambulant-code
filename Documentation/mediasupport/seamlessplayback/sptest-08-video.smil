@@ -1,4 +1,4 @@
-<smil version="3.0">
+<smil version="3.0" systemComponent="http://www.ambulantplayer.org/component/SeamlessPlayback">
 <head>
 <layout>
 <root-layout width="670" height="370" backgroundColor="black"/>
