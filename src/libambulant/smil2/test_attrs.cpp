@@ -391,6 +391,9 @@ void test_attrs::set_default_tests_attrs() {
     set_current_system_component_value(AM_SYSTEM_COMPONENT("Version2.0"), true);
     set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION), true);
     set_current_system_component_value(AM_SYSTEM_COMPONENT("Version" AMBULANT_VERSION "Exact"), true);
+#ifdef EXP_KEEPING_RENDERER
+    set_current_system_component_value(AM_SYSTEM_COMPONENT("SeamlessPlayback"), true);
+#endif
 }
 
 #ifdef WITH_SMIL30
