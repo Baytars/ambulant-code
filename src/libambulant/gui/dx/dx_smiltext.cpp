@@ -121,6 +121,9 @@ gui::dx::dx_smiltext_renderer::~dx_smiltext_renderer() {
 	AM_DBG lib::logger::get_logger()->debug("~dx_smiltext_renderer(0x%x), m_region_dds=0x%x, m_hdc=0x%x", this, m_region_dds, m_hdc);
 	m_lock.enter();
 
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
+
 	if (m_region_dds) {
 		if (m_hdc) {
 			HRESULT hr = m_region_dds->ReleaseDC(m_hdc);
