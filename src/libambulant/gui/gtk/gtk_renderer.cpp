@@ -101,13 +101,13 @@ gtk_transition_renderer::start_outtransition(const lib::transition_info *info)
 	if (m_transition_dest) m_transition_dest->need_redraw();
 }
 
-void
+bool
 gtk_transition_renderer::stop()
 {
 	m_lock.enter();
 	if (!m_trans_engine) {
 	   m_lock.leave();
-	   return;
+	   return true;
     }
 	delete m_trans_engine;
 	m_trans_engine = NULL;
@@ -117,6 +117,7 @@ gtk_transition_renderer::stop()
 	m_lock.leave();
 	if (m_transition_dest) m_transition_dest->transition_done();
 	m_view = NULL;
+	return true;
 }
 
 void

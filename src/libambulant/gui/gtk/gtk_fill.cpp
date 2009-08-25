@@ -101,7 +101,7 @@ gtk_fill_renderer::start_outtransition(lib::transition_info *info)
 	m_lock.leave();
 }
 
-void
+bool
 gtk_fill_renderer::stop()
 {
 	m_lock.enter();
@@ -116,6 +116,7 @@ gtk_fill_renderer::stop()
 	assert(m_context);
 	m_context->stopped(m_cookie);
 	m_lock.leave();
+	return true;
 }
 
 void
