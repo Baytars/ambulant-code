@@ -54,7 +54,7 @@ class dsvideo_renderer_factory : public common::playable_factory {
 	bool supports(common::renderer_select *rs)
 	{
 		const lib::xml_string& tag = rs->get_tag();
-		if (tag != "" && tag != "video" && tag != "prefetch" ) return false;
+		if (tag != "" && tag != "video" && tag != "prefetch" && tag != "ref") return false;
 		const char *renderer_uri = rs->get_renderer_uri();
 		if (renderer_uri != NULL && 
 			strcmp(renderer_uri, AM_SYSTEM_COMPONENT("RendererOpen")) != 0 &&
@@ -70,8 +70,7 @@ class dsvideo_renderer_factory : public common::playable_factory {
 		lib::event_processor *evp)
 	{
 		lib::xml_string tag = node->get_local_name();
-		if (tag == "video" || tag == "prefetch")
-			return new gui::dx::dx_dsvideo_renderer(context, cookie, node, evp, m_factory, NULL);
+		return new gui::dx::dx_dsvideo_renderer(context, cookie, node, evp, m_factory, NULL);
 		return NULL;
 	}
 		
