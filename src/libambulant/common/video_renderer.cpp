@@ -92,12 +92,6 @@ video_renderer::video_renderer(
 }
 
 video_renderer::~video_renderer() {
-#if 0
-    // Jack removed the call to stop(): things may be falling apart already. 
-    // And calling stop() serves no more purpose, really.
-	// m_audio_ds released by audio renderer
-	stop(); // releases m_src, m_audio_renderer (in most cases)
-#endif
 	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
     if (m_dest) m_dest->renderer_done(this);
