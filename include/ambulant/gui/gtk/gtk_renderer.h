@@ -65,7 +65,7 @@ class gtk_transition_renderer : public ref_counted_obj {
 
 	void set_surface(common::surface *dest);
 	void start(double where);
-	bool stop();
+	void stop();
 	void redraw_pre(gui_window *window);
 	void redraw_post(gui_window *window);
 	void set_intransition(const lib::transition_info *info);
@@ -118,9 +118,10 @@ class gtk_renderer : public RP_Base {
 		RP_Base::start(where);
 	}
 	
- 	virtual void stop() {
+ 	virtual bool stop() {
 		stop_transition();
 		RP_Base::stop();
+		return true;
 	}
 
 	void redraw(const rect &dirty, gui_window *window) {
