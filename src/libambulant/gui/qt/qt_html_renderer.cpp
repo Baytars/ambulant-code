@@ -152,7 +152,7 @@ gui::qt::qt_html_renderer::start(double t) {
 qt_html_renderer::~qt_html_renderer() {
 }
 
-void
+bool
 gui::qt::qt_html_renderer::stop() {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("qt_html_renderer::stop(0x%x)", this);
@@ -162,5 +162,6 @@ gui::qt::qt_html_renderer::stop() {
 	if (m_html_browser)
 	   m_html_browser->hide(m_event_processor);
 	m_lock.leave();
+	return true;
 }
 #endif/*WITH_QT_HTML_WIDGET*/
