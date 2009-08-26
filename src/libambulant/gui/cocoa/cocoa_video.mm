@@ -270,7 +270,12 @@ cocoa_video_renderer::start(double where)
 	m_lock.enter();
     assert(m_renderer_state == rs_prerolled);
     m_renderer_state = rs_started;
-    assert(m_movie);
+    if(m_movie == NULL) {
+        m_renderer_state = rs_stopped;
+        m_context->stopped(m_cookie);
+        m_lock.leave();
+        return;
+    }
 	Movie mov = [m_movie quickTimeMovie];
 	m_paused = false;
 	m_dest->show(this); // XXX Do we need this?
