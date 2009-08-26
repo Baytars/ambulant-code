@@ -163,6 +163,8 @@ cocoa_video_renderer::~cocoa_video_renderer()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("cocoa_video_renderer::~cocoa_video_renderer(0x%x), m_movie=0x%x", this, m_movie);
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	if (m_dest) m_dest->renderer_done(this);
+	m_dest = NULL;
 	if (m_movie) {
 		[m_movie release];
 		m_movie = NULL;
