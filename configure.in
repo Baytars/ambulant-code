@@ -1226,3 +1226,7 @@ AC_MSG_RESULT([$ffmpeg_warning]);
 AC_MSG_RESULT([$live_warning]);
 AC_MSG_RESULT([$expat_warning]);
 AC_MSG_RESULT([$python_warning]);
+
+echo "Attempting to fix libtool, assuming 2.2.6"
+sh $srcdir/fixlibtool226.sh
+
