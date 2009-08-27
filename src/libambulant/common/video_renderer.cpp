@@ -48,6 +48,7 @@ video_renderer::video_renderer(
 	m_timer(NULL),
 	m_epoch(0),
 	m_activated(false),
+	m_post_stop_called(false),
 	m_is_paused(false),
 	m_paused_epoch(0),
 	m_last_frame_timestamp(-1),
@@ -145,6 +146,7 @@ video_renderer::start (double where)
 	
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.start(0x%x): already started", (void*)this);
+		m_post_stop_called = false;
 		m_lock.leave();
         // XXXJACK: stopgap for continuous renderering: call show().
         // Interaction renderer/surface needs rethinking.
@@ -218,7 +220,6 @@ video_renderer::preroll(double when, double where, double how_much)
 	}
 	if (!m_src) {
 		lib::logger::get_logger()->trace("video_renderer.preroll: no datasource, skipping media item");
-		m_context->stopped(m_cookie, 0);
 		m_lock.leave();
 		return;
 	}
@@ -271,8 +272,8 @@ void
 video_renderer::post_stop()
 {
 	m_lock.enter();
-    m_activated = false;    // This stops video playback at the next data_avail callback
-    if (m_dest) m_dest->renderer_done(this);
+	m_post_stop_called = true;
+	if (m_dest) m_dest->renderer_done(this);
     m_dest = NULL;
 	if (m_audio_renderer)
 		m_audio_renderer->post_stop();
@@ -367,8 +368,9 @@ video_renderer::data_avail()
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail(this = 0x%x):", (void *) this);
-	if (!m_activated || !m_src) {
+	if (m_post_stop_called || !m_activated || !m_src) {
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: returning (already shutting down)");
+		m_activated = false;
 		m_lock.leave();
 		return;
 	}

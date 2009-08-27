@@ -309,7 +309,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\include"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_HTML_WIDGET;WITH_SMIL30;EXP_KEEPING_RENDERER"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;AMBULANT_USE_DLL;WITH_WINDOWS_PLUGINS;WITH_HTML_WIDGET;WITH_SMIL30;WITH_SEAMLESS_PLAYBACK;WITH_CLOCK_SYNC"
 				MinimalRebuild="false"
 				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"
