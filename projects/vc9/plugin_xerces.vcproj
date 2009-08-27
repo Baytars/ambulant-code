@@ -142,6 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				IgnoreImportLibrary="true"
 				OutputFile="../../bin/win32/libamplugin_xerces.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
