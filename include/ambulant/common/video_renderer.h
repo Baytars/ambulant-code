@@ -108,7 +108,8 @@ class video_renderer : public common::renderer_playable {
 	double now();
 	lib::timer *m_timer;
 	long int m_epoch;
-	bool m_activated;
+	bool m_activated;			// True if a datasource callback is outstanding
+	bool m_post_stop_called;	// True if we are expecting only one more callback
 	bool m_is_paused;
 	long int m_paused_epoch;
 	net::timestamp_t m_last_frame_timestamp;

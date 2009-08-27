@@ -221,6 +221,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 :	common::renderer_playable(context, cookie, node, evp, factory, mdp),
 	m_audio_src(NULL),
 	m_is_playing(false),
+	m_is_reading(false),
 	m_is_paused(false),
 	m_read_ptr_called(false),
 	m_volcount(0),
@@ -270,6 +271,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 :	common::renderer_playable(context, cookie, node, evp, factory, NULL),
 	m_audio_src(ds),
 	m_is_playing(false),
+	m_is_reading(false),
 	m_is_paused(false),
 	m_read_ptr_called(false),
 	m_intransition(NULL),
@@ -311,7 +313,7 @@ gui::sdl::sdl_audio_renderer::~sdl_audio_renderer()
 		unregister_renderer(this);
 		m_lock.enter();
 	}
-	
+	assert(!m_is_reading);
 	if (m_audio_src) {
 		m_audio_src->release();
 		m_audio_src = NULL;
@@ -388,7 +390,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
         }
         // Now communicate it to the clock.
         { // if (clock_drift < -20 || clock_drift > 20) {
-            AM_DBG if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+            /*AM_DBG*/ if (clock_drift) lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
             // We communicate the drift to the clock. The clock will return true if it will take
             // care of the adjustment, and false if we need to do it (by skipping or inserting audio)
             lib::timer::signed_time_type residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
@@ -477,11 +479,9 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 		return;
 	}
 #ifdef WITH_SEAMLESS_PLAYBACK
-    static long xxxtotsize;
-    xxxtotsize += size;
     net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
-        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld, after %ld bytes", (long)cur_audio_time, xxxtotsize);
+        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld", (long)cur_audio_time);
         m_previous_clip_position = m_clip_end;
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
@@ -501,26 +501,22 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
     bool more_data = (m_audio_src != NULL && m_is_playing);
     if (more_data && m_audio_src->end_of_file())
         more_data = false;
-    if (!more_data)
+	if (!more_data) {
+		m_is_reading = false;
         return false;
+	}
         
 #ifndef WITH_SEAMLESS_PLAYBACK
-	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
-		// Start reading 
-		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
-		m_audio_src->start(m_event_processor, e);
-	}
-#else
 	AM_DBG {
         std::string tag = m_node->get_local_name();
         assert(tag != "prefetch");
     }
-    if (m_audio_src->size() < s_min_buffer_size_bytes ) {
+#endif
+	if (m_audio_src->size() < s_min_buffer_size_bytes ) {
         // Start reading 
         lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
         m_audio_src->start(m_event_processor, e);
     }
-#endif
 	return true;
 }
 
@@ -541,37 +537,7 @@ gui::sdl::sdl_audio_renderer::data_avail()
 	}
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: %d bytes available", m_audio_src->size());
 	
-#ifndef WITH_SEAMLESS_PLAYBACK
 	restart_audio_input();
-#else
-	std::string tag = m_node->get_local_name();
-	if (tag == "prefetch") {
-		bool still_buzy = restart_audio_input();
-		if (!still_buzy) {
-			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::prefetch_done: calling m_context->stopped() this = (x%x)",this);
-			// We cannot call unregister_renderer from here, because we are called from the
-			// SDL callback and already holding the m_global_lock. So, in stead
-			// we use the event processor to unregister ourselves later.
-#ifndef WITH_SEAMLESS_PLAYBACK
-			lib::event *e = new readdone_callback(this, &sdl_audio_renderer::stop);
-			m_event_processor->add_event(e, 0, ambulant::lib::ep_med);
-			if (m_audio_src) {
-				m_audio_src->stop();
-				m_audio_src->release();
-				m_audio_src = NULL;
-			}
-#endif
-			m_lock.leave();
-			if (m_context) {
-				//m_context->stopped(m_cookie, 0);
-			} else {
-				AM_DBG lib::logger::get_logger()->trace("sdl_audio_renderer(0x%x): m_context is  NULL", (void*)this);
-			}
-			return;		
-		}
-	}
-	else restart_audio_input();
-#endif
 	
 	m_lock.leave();
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::data_avail: done");
@@ -702,8 +668,9 @@ gui::sdl::sdl_audio_renderer::start(double where)
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::start(): m_audio_src->start(0x%x, 0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, (void*)e, this, (void*)m_audio_src);
-		m_audio_src->start(m_event_processor, e);
+		if (!m_is_reading) m_audio_src->start(m_event_processor, e);
 		m_is_playing = true;
+		m_is_reading = true;
 		m_is_paused = false;
         m_previous_clip_position = -1; // We no longer know where we are
         

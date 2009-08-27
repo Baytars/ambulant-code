@@ -112,6 +112,7 @@ class sdl_audio_renderer : public common::renderer_playable {
 	lib::critical_section m_lock;
 	
 	bool m_is_playing;  // Invariant: m_is_playing === register_renderer() has been called.
+	bool m_is_reading;	// Invariant: m_is_reading === m_audio_src->start() has been called.
 	bool m_is_paused;
   	bool m_read_ptr_called;
 	bool m_audio_started;
