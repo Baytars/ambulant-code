@@ -78,29 +78,6 @@ depends, see third_party_packages/readme.txt. Most configure options
 specified in the "Building for Linux" section are also relevant for
 Mac OS X.
 
-	===================
-	IMPORTANT: libtool 1.5 (which ships with Tiger) is not good enough for Ambulant,
-	you need to install libtool 2.2.6.
-	Unfortunately, it seems that libtool 2.2.6 is broken on MacOSX.
-	After the libtool script has been generated, edit it manually. After the line
-		
-		/* The mapping between symbol names and symbols.  */
-	
-	insert a line
-	
-		#define lt_ptr void *
-		
-	You may also have to do this in libltdl/libtool. If you don't do this you
-	will get a strange error 
-	
-		libltdlcS.c:22: error: 'lt_ptr' undeclared here (not in a function)
-		
-	Also, you need to modify the definition of libext to
-		
-		libext="a"
-		
-	=====================
-
 Then the normal "configure"/"make"/"sudo make install" combo can be used
 here in the toplevel directory to create the player, see further down
 in this document for details if you are not familiar with
