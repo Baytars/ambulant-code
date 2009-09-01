@@ -382,7 +382,11 @@ global_playable_factory_impl::new_playable(
 	// If we don't have a renderer selected yet select one
 	playable *rv = NULL;
     playable_factory *pf = rs->get_playable_factory();
-	if (pf == NULL) {
+	if (pf) {
+        // Use the cached factory
+        rv = pf->new_playable(context, cookie, node, evp);
+    } else {
+        // No cached factory. Use (and cache) the first one that works.
 		for(i=m_factories.begin(); i != m_factories.end(); i++) {
 			if ((*i)->supports(rs)) {
 				rv = (*i)->new_playable(context, cookie, node, evp);
