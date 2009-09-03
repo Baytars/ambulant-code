@@ -54,12 +54,8 @@ class event_processor :
   
   protected:
 	virtual unsigned long run();
-	
-  private:
-	void wait_event();
-	void wakeup();
-	pthread_cond_t m_queue_condition;
-	pthread_mutex_t m_queue_mutex;	
+	bool _wait_event();
+	void _wakeup();
 };
 
 
