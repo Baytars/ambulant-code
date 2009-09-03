@@ -58,7 +58,7 @@ event_processor_impl::add_event(event *pe, time_type t,
 				    event_priority priority) {
 
  	AM_DBG logger::get_logger()->debug("add_event(0x%x, t=%d, pri=%d)",pe,t,priority);
-	m_delta_timer_cs.enter();
+	m_lock.enter();
 	switch(priority) {
 		case ep_high: 
 			m_high_delta_timer.insert(pe, t);
@@ -70,8 +70,8 @@ event_processor_impl::add_event(event *pe, time_type t,
 			m_low_delta_timer.insert(pe, t);
 			break;
 	}
-	wakeup();
-	m_delta_timer_cs.leave();
+	_wakeup();
+	m_lock.leave();
 }
 
 bool
@@ -79,7 +79,7 @@ event_processor_impl::cancel_event(event *pe,
 				       event_priority priority) {
 	bool succeeded = false;
  	AM_DBG logger::get_logger()->debug("cancel_event(0x%x, pri=%d)",pe,priority);
-	m_delta_timer_cs.enter();
+	m_lock.enter();
 	switch(priority) {
 		case ep_high: 
 			succeeded = m_high_delta_timer.cancel(pe);
@@ -91,46 +91,46 @@ event_processor_impl::cancel_event(event *pe,
 			succeeded = m_low_delta_timer.cancel(pe);
 			break;
 	}
-	m_delta_timer_cs.leave();
+	m_lock.leave();
 	return succeeded;
 }
 	
 void
 event_processor_impl::cancel_all_events() {
 	AM_DBG logger::get_logger()->debug("cancel_all_events()");
-	m_delta_timer_cs.enter();
+	m_lock.enter();
 	m_high_delta_timer.clear();
 	m_med_delta_timer.clear();
 	m_low_delta_timer.clear();
- 	m_delta_timer_cs.leave();
+ 	m_lock.leave();
 }
 
 void 
-event_processor_impl::serve_events()
+event_processor_impl::_serve_events()
 // serve all events in the high-med-low prioritity run queues
 // in the right order, after checking with their delta timers
 {
 	if (m_observer) m_observer->lock_redraw();
 	// check all delta_timer queues, in the right order
-	while (events_available(m_high_delta_timer, &m_high_q)
-		|| events_available(m_med_delta_timer, &m_med_q)
-		|| events_available(m_low_delta_timer, &m_low_q)) {
+	while (_events_available(m_high_delta_timer, &m_high_q)
+		|| _events_available(m_med_delta_timer, &m_med_q)
+		|| _events_available(m_low_delta_timer, &m_low_q)) {
 		// There was at least one event
 		// First try to serve the high priority event
-		if (serve_event(m_high_delta_timer, &m_high_q)) {
+		if (_serve_event(m_high_delta_timer, &m_high_q)) {
 			// serving the event may generate another event
 			// of any priority, must check all queues again
 			continue;
 	  	}
 		// If there was no high priority event, then try to
 		// serve one medium priority event
-		if (serve_event(m_med_delta_timer, &m_med_q))
+		if (_serve_event(m_med_delta_timer, &m_med_q))
 			// again, serving this event may generate another
 			// of any priority, so check all queues
 			continue;
 		// There was no medium priority event either, so 
 		// it must be a low priority event
-		(void) serve_event(m_low_delta_timer, &m_low_q);
+		(void) _serve_event(m_low_delta_timer, &m_low_q);
 	}
 #ifdef WITH_CLOCK_SYNC
     timer::signed_time_type drift = m_timer->get_drift();
@@ -155,29 +155,31 @@ event_processor_impl::serve_events()
 }
 
 bool
-event_processor_impl::events_available(delta_timer& dt, std::queue<event*> *qp)
+event_processor_impl::_events_available(delta_timer& dt, std::queue<event*> *qp)
 // check, if needed, with a delta_timer to fill its run queue
 // return true if the run queue contains any events
 {
   	if (qp->empty()) {
-		m_delta_timer_cs.enter();
+//		m_lock.leave();
 		dt.execute(*qp);
-		m_delta_timer_cs.leave();
+//		m_lock.enter();
 	}
-	return ! qp->empty();
+	return !qp->empty();
 }
 
 bool
-event_processor_impl::serve_event(delta_timer& dt, std::queue<event*> *qp)
+event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 // serve a single event from a delta_timer run queue
 // return true if an event was served
 {
-	bool must_serve = ! qp->empty();
+	bool must_serve = !qp->empty();
 	if (must_serve) {
 		event *e = qp->front();
 	 	AM_DBG logger::get_logger()->debug("serve_event(0x%x)",e);
 		qp->pop();
+        m_lock.leave();
 		e->fire();
+        m_lock.enter();
 		delete e;
 	}
 	return must_serve; 

@@ -58,9 +58,6 @@ class event_processor {
 	/// Cancel a previously scheduled event.
 	virtual bool cancel_event(event *pe, event_priority priority = ep_low) = 0;
 	
-	// Fires waiting events.
-	virtual void serve_events() = 0;
-
 	// Get the underlying timer.
 	virtual timer *get_timer() const = 0;
 	
@@ -108,31 +105,38 @@ class event_processor_impl : public event_processor {
 	void add_event(event *pe, time_type t, event_priority priority);
 	bool cancel_event(event *pe, event_priority priority = ep_low);
 	void cancel_all_events();
-	void serve_events();
 	void stop_processor_thread() {};
 	void set_observer(event_processor_observer *obs) {m_observer = obs; };
 #ifndef NDEBUG
 	void dump();
 #endif
   protected:
+    // Called by platform-specific subclasses.
+    // Should hold m_lock when calling.
+	void _serve_events();
+    
 	// called by add_event
-	// wakes up thread executing serve_events
-	virtual void wakeup() = 0;
+	// wakes up thread executing serve_events.
+    // Should hold m_lock when calling.
+	virtual void _wakeup() = 0;
 	
 	// wait until some thread calls wakeup
-	virtual void wait_event() = 0;
+	virtual bool _wait_event() = 0;
 
 	// the timer for this processor
 	timer *m_timer;
 	event_processor_observer *m_observer;
+
+	// protects whole data structure
+	critical_section_cv m_lock;  
  private:
 	// check, if needed, with a delta_timer to fill its run queue
 	// return true if the run queue contains any events
-	bool events_available(delta_timer& dt, std::queue<event*> *qp);
+	bool _events_available(delta_timer& dt, std::queue<event*> *qp);
 
 	// serve a single event from a delta_timer run queue
 	// return true if an event was served
-	bool serve_event(delta_timer& dt, std::queue<event*> *qp);
+	bool _serve_event(delta_timer& dt, std::queue<event*> *qp);
 	
 	// high priority delta timer and its event queue
 	delta_timer m_high_delta_timer;
@@ -146,8 +150,6 @@ class event_processor_impl : public event_processor {
 	delta_timer m_low_delta_timer;
 	std::queue<event*> m_low_q;
 	
-	// protects delta timer lists
-	critical_section m_delta_timer_cs;  
 };
 
 /// Machine-dependent factory function
