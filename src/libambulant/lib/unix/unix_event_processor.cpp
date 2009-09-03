@@ -32,7 +32,6 @@ using namespace ambulant;
 lib::unix::event_processor::event_processor(timer *t) 
 :   event_processor_impl(t)
 {
-	int err;
 	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x created", (void *)this);
     m_lock.enter();
 	start();
@@ -41,7 +40,6 @@ lib::unix::event_processor::event_processor(timer *t)
 
 lib::unix::event_processor::~event_processor()
 {
-	int err;
 	stop();
     m_lock.enter();
 	assert( ! is_running());
@@ -52,7 +50,6 @@ lib::unix::event_processor::~event_processor()
 unsigned long
 lib::unix::event_processor::run()
 {
-	int err;
 	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x started", (void *)this);
 	m_lock.enter();
 	while(!exit_requested()) {	
