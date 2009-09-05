@@ -165,6 +165,9 @@ class audio_player : public common::playable {
 	static void set_global_rate(double rate);
 	static double change_global_rate(double adjustment);
   private:
+    void set_rate_values(double crossFadeSpeed, int crossFadeWindowLength, 
+		int cycleSpeed, int silenceLoudnessThreshold,
+		int silenceRemainderLength, int silenceSpeed);
 	IVuppInterface *m_audio_speedup;
 	void initialize_speedup_filter();
 	static void register_player(audio_player *cur);
