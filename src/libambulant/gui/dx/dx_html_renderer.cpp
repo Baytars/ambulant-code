@@ -38,7 +38,7 @@
 #include "ambulant/lib/string_util.h"
 #include "ambulant/smil2/params.h"
 
-// #define AM_DBG
+#define AM_DBG if(1)
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -147,6 +147,7 @@ gui::dx::dx_html_renderer::start(double t) {
 	m_activated = true;
 	m_context->started(m_cookie);
 	if (!it->uses_screen_reader()) m_context->stopped(m_cookie); // XXXJack
+	AM_DBG lib::logger::get_logger()->debug("dx_html_renderer::start -- end of function");
 }
 
 common::duration
