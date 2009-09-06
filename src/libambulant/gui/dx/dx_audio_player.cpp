@@ -429,7 +429,7 @@ bad:
 }
 
 std::set<gui::dx::audio_player *> gui::dx::audio_player::s_active_players;
-double gui::dx::audio_player::s_current_playback_rate = 1.0;
+int gui::dx::audio_player::s_current_playback_rate = 0;
 
 void gui::dx::audio_player::register_player(gui::dx::audio_player *cur) {
 	s_active_players.insert(cur);
@@ -439,66 +439,83 @@ void gui::dx::audio_player::unregister_player(audio_player *cur) {
 	s_active_players.erase(cur);
 }
 
-void gui::dx::audio_player::set_rate(double rate) {
+void gui::dx::audio_player::set_rate(int rate) {
 	if (m_audio_speedup) {
 
 		char ch_rate[25];
 		sprintf(ch_rate, "Amb Rate = %.3f", rate);
 		AM_DBG lib::logger::get_logger()->trace(ch_rate);
 
-		//m_audio_speedup->setCycleSpeed((short)(rate*100));
+		//The rate value sets come from TPB Reader settings
+		//there are 15 distinct settings, from approximately 
+		//60% speed to 2x speed
+		//default rate = 0
+		//single step increments = +/- 1
 
-		/*
-		fncbSaveRegistryData "Vupp\Speed0", "60, 2500, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed1", "75, 3000, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed2", "80, 3000, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed3", "85, 3000, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed4", "90, 3000, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed5", "100, 3000, 100, 20, 1000, 100"
-   fncbSaveRegistryData "Vupp\Speed6", "100, 3000, 120, 20, 1000, 110"
-   fncbSaveRegistryData "Vupp\Speed7", "100, 3000, 140, 25, 1000, 150"
-   fncbSaveRegistryData "Vupp\Speed8", "100, 3000, 170, 25, 1000, 150"
-   fncbSaveRegistryData "Vupp\Speed9", "100, 3000, 200, 25, 1000, 150"
-   fncbSaveRegistryData "Vupp\Speed10", "105, 3000, 250, 30, 1000, 150"
-   fncbSaveRegistryData "Vupp\Speed11", "110, 3000, 300, 30, 1000, 150"
-   fncbSaveRegistryData "Vupp\Speed12", "115, 3000, 200, 30, 1000, 175"
-   fncbSaveRegistryData "Vupp\Speed13", "130, 3000, 200, 30, 1000, 175"
-   fncbSaveRegistryData "Vupp\Speed14", "150, 3000, 200, 30, 1000, 200"
-   fncbSaveRegistryData "Vupp\Speed15", "200, 3000, 300, 30, 500, 500"
-   */
-		if (rate <= 0)
+		if (rate <= -5)
 		{
-			//Vupp Speed 0
+			//slowest speed
 			set_rate_values(.60, 2500, 100, 20, 1000, 100);
 		}
-		else if (rate == 0.5)
+		else if (rate == -4)
 		{
-			//Vupp Speed 3
+			set_rate_values(.75, 3000, 100, 20, 1000, 100);
+		}
+		else if (rate == -3)
+		{
+			set_rate_values(.80, 3000, 100, 20, 1000, 100);
+		}
+		else if (rate == -2)
+		{
 			set_rate_values(.85, 3000, 100, 20, 1000, 100);
 		}
-		else if (rate == 1.0)
+		else if (rate == -1)
 		{
-			//Vupp Speed 5
+			set_rate_values(.90, 3000, 100, 20, 1000, 100);
+		}
+		else if (rate == 0)
+		{
+			//normal speed
 			set_rate_values(1.00, 3000, 100, 20, 1000, 100);
 		}
-		else if (rate == 1.5)
+		else if (rate == 1)
 		{
-			//Vupp Speed 7
+			set_rate_values(1.00, 3000, 120, 20, 1000, 110);
+		}
+		else if (rate == 2)
+		{
 			set_rate_values(1.00, 3000, 140, 25, 1000, 150);
 		}
-		else if (rate == 2.0)
+		else if (rate == 3)
 		{
-			//Vupp Speed 9
+			set_rate_values(1.00, 3000, 170, 25, 1000, 150);			
+		}
+		else if (rate == 4)
+		{
 			set_rate_values(1.00, 3000, 200, 25, 1000, 150);
 		}
-		else if (rate == 2.5)
+		else if (rate == 5)
 		{
-			//Vupp Speed 13
+			set_rate_values(1.05, 3000, 250, 30, 1000, 150);			
+		}
+		else if (rate == 6)
+		{
+			set_rate_values(1.10, 3000, 300, 30, 1000, 150);
+		}
+		else if (rate == 7)
+		{
+			set_rate_values(1.15, 3000, 200, 30, 1000, 175);
+		}
+   		else if (rate == 8)
+		{
 			set_rate_values(1.30, 3000, 200, 30, 1000, 175);
 		}
-		else if (rate >= 3.0)
+		else if (rate == 9)
 		{
-			//Vupp Speed 15
+			set_rate_values(1.50, 3000, 200, 30, 1000, 200);
+		}
+		else if (rate >= 10)
+		{
 			set_rate_values(2.00, 3000, 300, 30, 500, 500);
 		}
 		
@@ -516,7 +533,7 @@ void gui::dx::audio_player::set_rate_values(double crossFadeSpeed, int crossFade
 		m_audio_speedup->setSilenceSpeed(silenceSpeed);
 }
 
-void gui::dx::audio_player::set_global_rate(double rate) {
+void gui::dx::audio_player::set_global_rate(int rate) {
 	s_current_playback_rate = rate;
 	std::set<gui::dx::audio_player *>::iterator i;
 
@@ -524,7 +541,9 @@ void gui::dx::audio_player::set_global_rate(double rate) {
 		(*i)->set_rate(rate);
 }
 
-double gui::dx::audio_player::change_global_rate(double adjustment) {
+int gui::dx::audio_player::change_global_rate(int adjustment) {
+	//use an adjustment of +/- 1 for a single step change
+	
 	if (adjustment != 0.0)
 		set_global_rate(s_current_playback_rate+adjustment);
 	return s_current_playback_rate;
