@@ -161,9 +161,10 @@ class audio_player : public common::playable {
 	IBasicAudio *m_basic_audio;
 #ifdef WITH_TPB_AUDIO_SPEEDUP
   public:
-	void set_rate(double rate);
-	static void set_global_rate(double rate);
-	static double change_global_rate(double adjustment);
+    //-5 to 10 (0 = normal speed)
+	void set_rate(int rate);
+	static void set_global_rate(int rate);
+	static int change_global_rate(int adjustment);
   private:
     void set_rate_values(double crossFadeSpeed, int crossFadeWindowLength, 
 		int cycleSpeed, int silenceLoudnessThreshold,
@@ -173,7 +174,7 @@ class audio_player : public common::playable {
 	static void register_player(audio_player *cur);
 	static void unregister_player(audio_player *cur);
 	static std::set<audio_player *> s_active_players;
-	static double s_current_playback_rate;
+	static int s_current_playback_rate;
 #endif
 };
 	
