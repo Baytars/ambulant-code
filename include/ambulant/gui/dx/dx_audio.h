@@ -76,9 +76,9 @@ AMBULANTAPI void set_global_level(double level);
 /// Change the overall soundlevel
 AMBULANTAPI double change_global_level(double factor);
 /// Set the overall playback speed
-AMBULANTAPI void set_global_rate(double rate);
+AMBULANTAPI void set_global_rate(int rate);
 /// Change the overall playback speed
-AMBULANTAPI double change_global_rate(double factor);
+AMBULANTAPI int change_global_rate(int adjustment);
 } // namespace dx
 
 } // namespace gui
