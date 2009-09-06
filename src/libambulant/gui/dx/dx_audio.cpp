@@ -250,19 +250,19 @@ gui::dx::change_global_level(double factor)
 }
 
 void
-gui::dx::set_global_rate(double rate)
+gui::dx::set_global_rate(int rate)
 {
 #ifdef WITH_TPB_AUDIO_SPEEDUP
 	gui::dx::audio_player::set_global_rate(rate);
 #endif
 }
 
-double
-gui::dx::change_global_rate(double factor)
+int
+gui::dx::change_global_rate(int adjustment)
 {
 #ifdef WITH_TPB_AUDIO_SPEEDUP
-	return gui::dx::audio_player::change_global_rate(factor);
+	return gui::dx::audio_player::change_global_rate(adjustment);
 #else
-	return 1.0;
+	return 0;
 #endif
 }
