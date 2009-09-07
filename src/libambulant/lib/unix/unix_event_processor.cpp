@@ -20,7 +20,7 @@
 /* 
  * @$Id$ 
  */
-
+#if 0
 #include "ambulant/lib/unix/unix_event_processor.h"
 
 #ifndef AM_DBG
@@ -79,3 +79,4 @@ lib::event_processor_factory(timer *t)
 {
 	return new unix::event_processor(t);
 }
+#endif
