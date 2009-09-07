@@ -29,6 +29,7 @@
 #define MIN_EVENT_DELAY 1
 
 // How many video frames we would like to buffer at most
+//#define WITH_SMALL_BUFFERS
 #ifdef WITH_SMALL_BUFFERS
 #define MAX_VIDEO_FRAMES 15
 #else
@@ -585,7 +586,7 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 		return false;
 	}
 	m_src_end_of_file = (sz == 0);
-	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): receiving data sz=%d ,pts=%lld", sz, pts);
+	AM_DBG AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): receiving data sz=%d ,pts=%lld", sz, pts);
 	if(sz > 0) {
 		//m_frame_nr++;
 		//write_data(m_frame_nr, (char*) inbuf, sz);

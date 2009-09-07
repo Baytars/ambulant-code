@@ -437,7 +437,7 @@ ffmpeg_demux::run()
 		if (ret < 0) break;
 #else
 		if (ret < 0) {
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: wait some time before continuing the while loop");
+			AM_DBG AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: wait some time before continuing the while loop");
 			if (!eof_sent_to_clients) {
 				
 				for (int i=0; i<MAX_STREAMS; i++) {

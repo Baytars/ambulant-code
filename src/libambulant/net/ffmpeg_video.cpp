@@ -48,8 +48,10 @@
 // On second thoughts this seems a bad idea, so setting MIN_VIDEO_FRAMES to zero.
 #define MIN_VIDEO_FRAMES 0
 // How many video frames we would like to buffer at most.
+//#define WITH_SMALL_BUFFERS
+
 #ifdef WITH_SMALL_BUFFERS
-#define MAX_VIDEO_FRAMES 30
+#define MAX_VIDEO_FRAMES 15
 #else
 #define MAX_VIDEO_FRAMES 100
 #endif

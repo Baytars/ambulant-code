@@ -644,7 +644,7 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 			// This idea is borrowed from mplayer at demux_rtp.cpp::after_reading
 			Boolean hasBeenSynchronized = subsession->rtpSource()->hasBeenSynchronizedUsingRTCP();
 			if (hasBeenSynchronized) {
-				AM_DBG lib::logger::get_logger()->debug("after_reading_video: resync video, from %ds %dus to %ds %dus", m_context->first_sync_time.tv_sec, m_context->first_sync_time.tv_usec, pts.tv_sec, pts.tv_usec);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("after_reading_video: resync video, from %ds %dus to %ds %dus", m_context->first_sync_time.tv_sec, m_context->first_sync_time.tv_usec, pts.tv_sec, pts.tv_usec);
 				m_context->first_sync_time.tv_sec = pts.tv_sec;
 				m_context->first_sync_time.tv_usec = pts.tv_usec;
 				m_context->last_pts = 0;
@@ -655,7 +655,7 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
 	timestamp_t rpts =  (timestamp_t)(pts.tv_sec - m_context->first_sync_time.tv_sec) * 1000000LL  +  (timestamp_t) (pts.tv_usec - m_context->first_sync_time.tv_usec);
 	AM_DBG lib::logger::get_logger()->debug("after_reading_video: called timestamp 0x%08.8x%08.8x, sec = %d, usec =  %d", (long)(rpts>>32), (long)(rpts&0xffffffff), pts.tv_sec, pts.tv_usec);
 #ifdef ENABLE_LIVE555_PTS_CORRECTION
-    // Guess frame duration. This assumes that the lowest difference between wto adjacent frames is the duration.
+    // Guess frame duration. This assumes that the lowest difference between two adjacent frames is the duration.
     // If we ever get a stream where the duration increases (i.e. frame rate decreases) we're hosed.
     
     // XXXJACK: I get a compiler warning here about implicit conversion of 64 to 32 bit. Need to check.
@@ -691,8 +691,8 @@ rtsp_demux::after_reading_video(unsigned sz, unsigned truncated, struct timeval 
             }
             m_context->last_emit_pts = out_pts;
 #endif
-           AM_DBG lib::logger::get_logger()->debug("Video packet length (buffered)=%d, timestamp=%lld, rpts=%lld synced=%d", m_context->vbufferlen, out_pts+m_clip_begin, rpts+m_clip_begin, m_context->video_subsession->rtpSource()->hasBeenSynchronizedUsingRTCP());
-            _push_data_to_sink(m_context->video_stream, out_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
+           AM_DBG lib::logger::get_logger()->debug("rtsp_demux::after_reading_video: Video packet length (buffered)=%d, timestamp=%lld, rpts=%lld synced=%d", m_context->vbufferlen, out_pts+m_clip_begin, rpts+m_clip_begin, m_context->video_subsession->rtpSource()->hasBeenSynchronizedUsingRTCP());
+			_push_data_to_sink(m_context->video_stream, out_pts+m_clip_begin, (uint8_t*) m_context->vbuffer, m_context->vbufferlen);
             free(m_context->vbuffer);
             m_context->vbuffer = NULL;
             m_context->vbufferlen = 0;
@@ -775,6 +775,10 @@ rtsp_demux::_push_data_to_sink (int sink_index, timestamp_t pts, const uint8_t* 
 		if (accepted) {
 			m_critical_section.enter();
 			return;
+		}
+		//xxxbo: 2009-08-21 output this message if there is no space anymore. 
+		else {
+			lib::logger::get_logger()->debug("rtsp_demux::_push_data_to_sink: the accepted = %d", accepted);
 		}
 		// Now we have to wait until there is room in the sink buffer.
 		// sleep 10 millisec, hardly noticeable

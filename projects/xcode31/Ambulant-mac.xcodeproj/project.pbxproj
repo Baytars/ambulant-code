@@ -136,6 +136,7 @@
 		04E13B240BD786120074AF09 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E13B230BD786120074AF09 /* state.cpp */; };
 		04E13B280BD786380074AF09 /* cocoa_smiltext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04E13B270BD786380074AF09 /* cocoa_smiltext.mm */; };
 		04E13B350BD786A40074AF09 /* smiltext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E13B340BD786A40074AF09 /* smiltext.cpp */; };
+		386EC3A91051257700C7B127 /* CHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 386EC3A81051257700C7B127 /* CHUD.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -581,6 +582,7 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		386EC3A81051257700C7B127 /* CHUD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CHUD.framework; path = /System/Library/PrivateFrameworks/CHUD.framework; sourceTree = "<absolute>"; };
 		8D1107320486CEB800E47090 /* Ambulant-mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ambulant-mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -611,6 +613,7 @@
 				049656B20BCAEC13002C00DF /* Carbon.framework in Frameworks */,
 				0480CD000CDD1D5C0025344B /* libfaad.a in Frameworks */,
 				04430D390E506F6400029503 /* libbz2.dylib in Frameworks */,
+				386EC3A91051257700C7B127 /* CHUD.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1338,6 +1341,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				386EC3A81051257700C7B127 /* CHUD.framework */,
 				049656B10BCAEC13002C00DF /* Carbon.framework */,
 				049655FE0BCAE9E0002C00DF /* QTKit.framework */,
 				049655FF0BCAE9E0002C00DF /* AudioUnit.framework */,
@@ -1684,6 +1688,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1710,6 +1718,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1731,6 +1740,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_GENERATE_MAP_FILE = YES;
 				PRODUCT_NAME = "Ambulant-mac";
+				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -1739,6 +1749,10 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;

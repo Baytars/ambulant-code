@@ -41,6 +41,8 @@
 
 // data_buffer
 
+//#define WITH_SMALL_BUFFERS
+
 #ifdef WITH_SMALL_BUFFERS
 #define DEFAULT_MAX_BUF_SIZE 100000
 #else
