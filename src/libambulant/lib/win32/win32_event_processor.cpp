@@ -20,7 +20,7 @@
 /* 
  * @$Id$ 
  */
-
+#if 0
 #include "ambulant/lib/win32/win32_event_processor.h"
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/mtsync.h"
@@ -82,3 +82,4 @@ void lib::win32::event_processor::wait_event() {
 void lib::win32::event_processor::wakeup() {
 	SetEvent(m_wait_event);
 }
+#endif

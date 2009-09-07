@@ -22,7 +22,7 @@
 /* 
  * @$Id$ 
  */
-
+#if 0
 #ifndef AMBULANT_LIB_WIN32_EVENT_PROCESSOR_H
 #define AMBULANT_LIB_WIN32_EVENT_PROCESSOR_H
 
@@ -89,4 +89,4 @@ class event_processor :
 } // namespace ambulant
 
 #endif // AMBULANT_LIB_WIN32_EVENT_PROCESSOR_H
-
+#endif

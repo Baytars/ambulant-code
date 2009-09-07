@@ -26,7 +26,9 @@
 #include "ambulant/lib/logger.h"
 #include <map>
 
-//#define AM_DBG if(1)
+#if defined(AMBULANT_PLATFORM_WIN32) || defined(AMBULANT_PLATFORM_WIN32_WCE)
+#include <windows.h>
+#endif
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -35,6 +37,12 @@
 using namespace ambulant;
 using namespace lib;
 
+lib::event_processor *
+lib::event_processor_factory(timer *t)
+{
+	return new event_processor_impl(t);
+}
+
 event_processor_impl::event_processor_impl(timer *t) 
 :	m_timer(t),
     m_high_delta_timer(t), 
@@ -42,23 +50,62 @@ event_processor_impl::event_processor_impl(timer *t)
     m_low_delta_timer(t),
     m_observer(NULL)
 {
+    m_lock.enter();
     assert(t != 0);
+    start();
+    m_lock.leave();
 }
 
-event_processor_impl::~event_processor_impl() {
-	// the timer is not owned by this
+event_processor_impl::~event_processor_impl()
+{
+	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x deleted", (void *)this);
+	stop();
+	assert( ! is_running());
  	cancel_all_events();
 }
 
 timer *
-event_processor_impl::get_timer() const { return m_timer; }
+event_processor_impl::get_timer() const
+{
+    return m_timer;
+}
+
+unsigned long
+event_processor_impl::run()
+{
+	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x started", (void *)this);
+#if defined(AMBULANT_PLATFORM_WIN32) || defined(AMBULANT_PLATFORM_WIN32_WCE)
+    HRESULT hr;
+#if defined(AMBULANT_PLATFORM_WIN32_WCE)
+	hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+#else
+	hr = CoInitialize(NULL);
+#endif // AMBULANT_PLATFORM_WIN32_WCE
+	if (hr) {
+		lib::logger::get_logger()->trace("win32_event_processor::run: CoInitializeEx failed with 0x%x", hr);
+	}
+#endif AMBULANT_PLATFORM_WIN32 || AMBULANT_PLATFORM_WIN32_WCE
+	m_lock.enter();
+	while(!exit_requested()) {	
+		_serve_events();		
+		(void)m_lock.wait(10000);
+	}
+    m_lock.leave();
+#if defined(AMBULANT_PLATFORM_WIN32) || defined(AMBULANT_PLATFORM_WIN32_WCE)
+    CoUninitialize();
+#endif
+	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x stopped", (void *)this);
+	return 0;
+}
 
 void 
 event_processor_impl::add_event(event *pe, time_type t, 
-				    event_priority priority) {
+				    event_priority priority)
+{
 
  	AM_DBG logger::get_logger()->debug("add_event(0x%x, t=%d, pri=%d)",pe,t,priority);
 	m_lock.enter();
+    // Insert the event into the correct queue.
 	switch(priority) {
 		case ep_high: 
 			m_high_delta_timer.insert(pe, t);
@@ -70,13 +117,15 @@ event_processor_impl::add_event(event *pe, time_type t,
 			m_low_delta_timer.insert(pe, t);
 			break;
 	}
-	_wakeup();
+    // Signal the event handler thread
+	m_lock.signal();
 	m_lock.leave();
 }
 
 bool
 event_processor_impl::cancel_event(event *pe, 
-				       event_priority priority) {
+				       event_priority priority)
+{
 	bool succeeded = false;
  	AM_DBG logger::get_logger()->debug("cancel_event(0x%x, pri=%d)",pe,priority);
 	m_lock.enter();
@@ -96,7 +145,8 @@ event_processor_impl::cancel_event(event *pe,
 }
 	
 void
-event_processor_impl::cancel_all_events() {
+event_processor_impl::cancel_all_events()
+{
 	AM_DBG logger::get_logger()->debug("cancel_all_events()");
 	m_lock.enter();
 	m_high_delta_timer.clear();
@@ -105,10 +155,10 @@ event_processor_impl::cancel_all_events() {
  	m_lock.leave();
 }
 
-void 
-event_processor_impl::_serve_events()
 // serve all events in the high-med-low prioritity run queues
 // in the right order, after checking with their delta timers
+void 
+event_processor_impl::_serve_events()
 {
 	if (m_observer) m_observer->lock_redraw();
 	// check all delta_timer queues, in the right order
