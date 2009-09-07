@@ -31,8 +31,58 @@
 #define AM_DBG if(0)
 #endif
 
+#if 0
+#define GAP_MEASURING_BEGINS()
+#define GAP_MEASURING_ENDS()
+#define GAP_BEGINS(foo)
+#define GAP_ENDS()
+#else
+#define GB_MEASURING_GAP 1
+#include <sys/time.h>
+#include <time.h>
+#include <CHUD/CHUD.h>
+static bool we_are_in_gap = false;
+static bool we_are_in_gap_gb = false;
+static int gap = 0;
+static bool chud_inited = false;
+
+#define GAP_MEASURING_BEGINS() do { \
+::chudInitialize(); \
+::chudAcquireRemoteAccess(); \
+} while(0)
+
+#define GAP_MEASURING_ENDS() do { \
+::chudReleaseRemoteAccess(); \
+} while(0)
+
+#define GAP_BEGINS(foo) do { \
+we_are_in_gap = true; \
+ambulant::lib::logger::get_logger()->trace("GAP BEGINS"); \
+::chudStartRemotePerfMonitor(foo); \
+} while(0)
+
+#define GAP_ENDS() do {	\
+if (we_are_in_gap) { \
+we_are_in_gap = false;  \
+::chudStopRemotePerfMonitor(); \
+ambulant::lib::logger::get_logger()->trace("GAP ENDS"); \
+}} while(0)
+
+class foo {
+public:
+	foo() {
+		GAP_MEASURING_BEGINS();
+	}
+	~foo() {
+		GAP_MEASURING_ENDS();
+	}
+};
+static foo s_foo;
+#endif
+
 using namespace ambulant;
 using namespace common;
+
 
 video_renderer::video_renderer(
 	playable_notification *context,
@@ -430,7 +480,21 @@ video_renderer::data_avail()
         
         // Remember how far we officially got (discounting any fill=continue behaviour)
         m_previous_clip_position = m_clip_end;
-        
+		GAP_BEGINS("video-gap");
+#ifdef GB_MEASURING_GAP
+		we_are_in_gap_gb = true; 
+		gap = 0;
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		FILE * pFile;
+		pFile = fopen ("/Users/bogao/Dropbox/SeamlessDocuments/NLUUG-Measuring.txt","a+");
+		if (pFile!=NULL)
+		{
+			fprintf(pFile, "GAP_BEGINS: %d.%06d\t", tv.tv_sec,  tv.tv_usec);
+			fclose (pFile);
+		}
+		gap = tv.tv_sec*1000 + tv.tv_usec/1000;
+#endif
         lib::logger::get_logger()->debug("video_renderer: displayed %d frames; skipped %d dups, %d late, %d early, %d NULL",
                                          m_frame_displayed, m_frame_duplicate, m_frame_late, m_frame_early, m_frame_missing);
         
@@ -485,6 +549,23 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
+#ifdef GB_MEASURING_GAP
+		//GAP_ENDS();
+		if (we_are_in_gap_gb) {
+			we_are_in_gap_gb = false;
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			gap = tv.tv_sec*1000 + tv.tv_usec/1000 - gap;
+			FILE * pFile;
+			pFile = fopen ("/Users/bogao/Dropbox/SeamlessDocuments/NLUUG-Measuring.txt","a+");
+			if (pFile!=NULL)
+			{
+				fprintf(pFile, "GAP_ENDS: %d.%06d\t GAP = %d\n", tv.tv_sec,  tv.tv_usec, gap);
+				fclose (pFile);
+			}
+		}
+#endif
+		GAP_ENDS();
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);

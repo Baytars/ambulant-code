@@ -722,6 +722,9 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 
 - (NSImage *)_getOnScreenImage
 {
+#if 1
+	return NULL;
+#else
 	NSView *src_view = self;
 	NSWindow *tmp_window = NULL;
 #ifdef WITH_QUICKTIME_OVERLAY
@@ -756,10 +759,14 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 #endif
 	rv = [rv autorelease];
 	return rv;
+#endif
 }
 
 - (NSImage *)getOnScreenImageForRect: (NSRect)bounds
 {
+#if 1
+	return NULL;
+#else
 	// Note: this method does not take overlaying things such as Quicktime
 	// movies into account.
 	NSSize size = NSMakeSize(NSWidth(bounds), NSHeight(bounds));
@@ -781,17 +788,25 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 #endif
 	rv = [rv autorelease];
 	return rv;
+#endif
 }
 
 - (NSImage *)getTransitionOldSource
 {
+#if 1
+	return NULL;
+#else
 	if (fullscreen_count && fullscreen_oldimage)
 		return fullscreen_oldimage;
 	return [self getOnScreenImageForRect: [self bounds]];
+#endif
 }
 
 - (NSImage *)getTransitionNewSource
 {
+#if 1
+	return NULL;
+#else
 	NSRect bounds = [self bounds];
 	NSSize size = NSMakeSize(NSWidth(bounds), NSHeight(bounds));
 	NSImage *rv = [[NSImage alloc] initWithSize: size];
@@ -805,6 +820,7 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 #endif
 	rv = [rv autorelease];
 	return rv;
+#endif
 }
 
 - (void) startScreenTransition
@@ -844,6 +860,9 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 
 - (void) _screenTransitionPostRedraw
 {
+#if 1
+	return;
+#else
 	if (fullscreen_count == 0 && fullscreen_oldimage == NULL) {
 		// Neither in fullscreen transition nor wrapping one up.
 		// Take a snapshot of the screen and return.
@@ -890,6 +909,7 @@ cocoa_gui_screen::get_screenshot(const char *type, char **out_data, size_t *out_
 		fullscreen_oldimage = NULL;
 		fullscreen_engine = NULL;
 	}
+#endif
 }
 
 // Called by a renderer if it requires an overlay window.
