@@ -57,29 +57,60 @@ class AMBULANTAPI critical_section : public ambulant::lib::base_critical_section
 	void enter() { EnterCriticalSection(&m_cs);}
 	void leave() { LeaveCriticalSection(&m_cs);}
 
-  crotected:
+  protected:
 	CRITICAL_SECTION m_cs;
 };
 
-class AMBULANTAPI critical_section_cv :public critical_section,  public ambulant::lib::critical_section_cv {
+#ifdef WITH_WIN32_CONDITION_VARIABLE
+class AMBULANTAPI critical_section_cv :public critical_section,  public ambulant::lib::base_critical_section_cv {
   public:
-	  critical_section_cv() : critical_section() { m_event = CreateEvent(NULL, TRUE, FALSE, NULL); }
-	  ~condition() { CloseHandle(m_event); }
+	critical_section_cv()
+	:	critical_section()
+	{ 
+		InitializeConditionVariable(&m_cv);
+	}
+	~critical_section_cv() {
+		CloseHandle(m_event);
+	}
 	
-	  void signal() { SetEvent(m_event); enter(); }
-	  bool wait(int microseconds) {
-		  DWORD timeout = microseconds < 0 ? INFINITE : microseconds/1000;
-          leave();
-		  bool rv = WaitForSingleObject(m_event, timeout) == WAIT_OBJECT_0;
-          enter();
-		  if (rv) {
-			  ResetEvent(m_event);
-		  }
-		  return rv;
-	  }
+	void signal() {
+		WakeConditionVariable(&m_cv);
+	}
+	bool wait(int microseconds) {
+		DWORD timeout = microseconds < 0 ? INFINITE : microseconds/1000;
+		bool rv = SleepConditionVariableCS(&m_cv, &m_cs, timeout);
+		return rv;
+	}
+  private:
+	CONDITION_VARIABLE m_cv;
+};
+#else
+class AMBULANTAPI critical_section_cv :public critical_section,  public ambulant::lib::base_critical_section_cv {
+  public:
+	critical_section_cv()
+	:	critical_section()
+	{ 
+		m_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+	}
+	~critical_section_cv() {
+		CloseHandle(m_event);
+	}
+	
+	void signal() {
+		SetEvent(m_event);
+	}
+	bool wait(int microseconds = -1) {
+		DWORD timeout = microseconds < 0 ? INFINITE : microseconds/1000;
+		leave();
+		bool rv = WaitForSingleObject(m_event, timeout) == WAIT_OBJECT_0;
+		enter();
+		if (rv) ResetEvent(m_event);
+		return rv;
+	}
   private:
 	HANDLE m_event;
 };
+#endif
 } // namespace win32
 
 } // namespace lib
