@@ -93,7 +93,7 @@ class cg_renderer : public RP_Base {
 		RP_Base::start(where);
 	}
 	
- 	virtual void stop() {
+ 	virtual bool stop() {
 		RP_Base::stop();
 	}
 	

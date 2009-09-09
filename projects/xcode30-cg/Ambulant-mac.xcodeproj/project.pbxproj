@@ -1724,8 +1724,9 @@
 					"\"$(SRCROOT)/../../../../packages/xerces-c-src_2_7_0/lib\"",
 				);
 				PREBINDING = NO;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = macosx10.5;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../third_party_packages/ffmpeg-universal /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../third_party_packages/ffmpeg ../../include ../../third_party_packages/ffmpeg-universal /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
 			name = Debug;
 		};
@@ -1752,7 +1753,7 @@
 				);
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../third_party_packages/ffmpeg-universal /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../third_party_packages/ffmpeg ../../include ../../third_party_packages/ffmpeg-universal /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
 			name = Release;
 		};
