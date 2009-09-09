@@ -87,9 +87,6 @@
 		041613C4072078C400A8B0B6 /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		041613C5072078C400A8B0B6 /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		041613C6072078C400A8B0B6 /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		041613C7072078C400A8B0B6 /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		041613C8072078C400A8B0B6 /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		041613C9072078C400A8B0B6 /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		041613CA072078C400A8B0B6 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		041613CB072078C400A8B0B6 /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		041613CD072078C400A8B0B6 /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -113,7 +110,6 @@
 		041613DF072078C400A8B0B6 /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		041613E0072078C400A8B0B6 /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		041613E1072078C400A8B0B6 /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		041613E2072078C400A8B0B6 /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		041613E3072078C400A8B0B6 /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		041613E4072078C400A8B0B6 /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		041613E5072078C400A8B0B6 /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -181,9 +177,6 @@
 		04161427072078C400A8B0B6 /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		04161428072078C400A8B0B6 /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		04161429072078C400A8B0B6 /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		0416142B072078C400A8B0B6 /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		0416142C072078C400A8B0B6 /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		0416142D072078C400A8B0B6 /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		0416142E072078C400A8B0B6 /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		0416142F072078C400A8B0B6 /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		04161430072078C400A8B0B6 /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -206,7 +199,6 @@
 		04161441072078C400A8B0B6 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		04161442072078C400A8B0B6 /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		04161443072078C400A8B0B6 /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		04161444072078C400A8B0B6 /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		04161445072078C400A8B0B6 /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		04161446072078C400A8B0B6 /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		04161447072078C400A8B0B6 /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -301,9 +293,6 @@
 		0416552508F331530017F91F /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		0416552608F331530017F91F /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		0416552708F331530017F91F /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		0416552808F331530017F91F /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		0416552908F331530017F91F /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		0416552A08F331530017F91F /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		0416552B08F331530017F91F /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		0416552C08F331530017F91F /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		0416552D08F331530017F91F /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -327,7 +316,6 @@
 		0416553F08F331530017F91F /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		0416554008F331530017F91F /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		0416554108F331530017F91F /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		0416554208F331530017F91F /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		0416554308F331530017F91F /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		0416554408F331530017F91F /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		0416554508F331530017F91F /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -407,9 +395,6 @@
 		0416559108F331530017F91F /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		0416559208F331530017F91F /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		0416559308F331530017F91F /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		0416559408F331530017F91F /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		0416559508F331530017F91F /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		0416559608F331530017F91F /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		0416559708F331530017F91F /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		0416559808F331530017F91F /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		0416559908F331530017F91F /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -432,7 +417,6 @@
 		041655AA08F331530017F91F /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		041655AB08F331530017F91F /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		041655AC08F331530017F91F /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		041655AD08F331530017F91F /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		041655AE08F331530017F91F /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		041655AF08F331530017F91F /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		041655B008F331530017F91F /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -562,9 +546,6 @@
 		0427F7460898352F0022C4EC /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		0427F7470898352F0022C4EC /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		0427F7480898352F0022C4EC /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		0427F7490898352F0022C4EC /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		0427F74A0898352F0022C4EC /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		0427F74B0898352F0022C4EC /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		0427F74C0898352F0022C4EC /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		0427F74D0898352F0022C4EC /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		0427F74F0898352F0022C4EC /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -588,7 +569,6 @@
 		0427F7610898352F0022C4EC /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		0427F7620898352F0022C4EC /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		0427F7630898352F0022C4EC /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		0427F7640898352F0022C4EC /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		0427F7650898352F0022C4EC /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		0427F7660898352F0022C4EC /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		0427F7670898352F0022C4EC /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -659,9 +639,6 @@
 		0427F7AC0898352F0022C4EC /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		0427F7AD0898352F0022C4EC /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		0427F7AE0898352F0022C4EC /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		0427F7B00898352F0022C4EC /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		0427F7B10898352F0022C4EC /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		0427F7B20898352F0022C4EC /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		0427F7B30898352F0022C4EC /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		0427F7B40898352F0022C4EC /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		0427F7B50898352F0022C4EC /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -684,7 +661,6 @@
 		0427F7C60898352F0022C4EC /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		0427F7C70898352F0022C4EC /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		0427F7C80898352F0022C4EC /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		0427F7C90898352F0022C4EC /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		0427F7CA0898352F0022C4EC /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		0427F7CB0898352F0022C4EC /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		0427F7CC0898352F0022C4EC /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -724,8 +700,6 @@
 		042D9BDA061D8A40002F255F /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
 		042D9BDD061D8A69002F255F /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		042D9BDE061D8A69002F255F /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		042D9BE2061D8AC9002F255F /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
-		042D9BE4061D8AE0002F255F /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		042E61C10ACD4F5400E9D087 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B4470AB567C1001566DE /* libavcodec.a */; };
 		042E61C20ACD4F6200E9D087 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B4490AB567D5001566DE /* libavformat.a */; };
 		042E61C30ACD4F6300E9D087 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B44B0AB567DE001566DE /* libavutil.a */; };
@@ -803,9 +777,6 @@
 		04382C3605D7AEE700CFA029 /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		04382C3705D7AEE700CFA029 /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		04382C3805D7AEE700CFA029 /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		04382C4205D7AEE700CFA029 /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		04382C4305D7AEE700CFA029 /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		04382C4405D7AEE700CFA029 /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		04382C4605D7AEE700CFA029 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		04382C4705D7AEE700CFA029 /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		04382C4B05D7AEE700CFA029 /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -969,9 +940,6 @@
 		04600E5F0894E6B000B553A2 /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		04600E600894E6B000B553A2 /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		04600E610894E6B000B553A2 /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		04600E620894E6B000B553A2 /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		04600E630894E6B000B553A2 /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		04600E640894E6B000B553A2 /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		04600E650894E6B000B553A2 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		04600E660894E6B000B553A2 /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		04600E680894E6B000B553A2 /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -995,7 +963,6 @@
 		04600E7A0894E6B000B553A2 /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		04600E7B0894E6B000B553A2 /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		04600E7C0894E6B000B553A2 /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		04600E7D0894E6B000B553A2 /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		04600E7E0894E6B000B553A2 /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		04600E7F0894E6B000B553A2 /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		04600E800894E6B000B553A2 /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -1066,9 +1033,6 @@
 		04600EC50894E6B000B553A2 /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		04600EC60894E6B000B553A2 /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		04600EC70894E6B000B553A2 /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		04600EC90894E6B000B553A2 /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		04600ECA0894E6B000B553A2 /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		04600ECB0894E6B000B553A2 /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		04600ECC0894E6B000B553A2 /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		04600ECD0894E6B000B553A2 /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		04600ECE0894E6B000B553A2 /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -1091,7 +1055,6 @@
 		04600EDF0894E6B000B553A2 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		04600EE00894E6B000B553A2 /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		04600EE10894E6B000B553A2 /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		04600EE20894E6B000B553A2 /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		04600EE30894E6B000B553A2 /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		04600EE40894E6B000B553A2 /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		04600EE50894E6B000B553A2 /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -1308,9 +1271,6 @@
 		0493205D089519EF00F38A0A /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		0493205E089519EF00F38A0A /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		0493205F089519EF00F38A0A /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		04932060089519EF00F38A0A /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		04932061089519EF00F38A0A /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		04932062089519EF00F38A0A /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		04932063089519EF00F38A0A /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		04932064089519EF00F38A0A /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		04932066089519EF00F38A0A /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -1334,7 +1294,6 @@
 		04932078089519EF00F38A0A /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		04932079089519EF00F38A0A /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		0493207A089519EF00F38A0A /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		0493207B089519EF00F38A0A /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		0493207C089519EF00F38A0A /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		0493207D089519EF00F38A0A /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		0493207E089519EF00F38A0A /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -1405,9 +1364,6 @@
 		049320C5089519EF00F38A0A /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		049320C6089519EF00F38A0A /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		049320C7089519EF00F38A0A /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		049320C9089519EF00F38A0A /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		049320CA089519EF00F38A0A /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		049320CB089519EF00F38A0A /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		049320CC089519EF00F38A0A /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		049320CD089519EF00F38A0A /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		049320CE089519EF00F38A0A /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -1430,7 +1386,6 @@
 		049320DF089519EF00F38A0A /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		049320E0089519EF00F38A0A /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		049320E1089519EF00F38A0A /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		049320E2089519EF00F38A0A /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		049320E3089519EF00F38A0A /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		049320E4089519EF00F38A0A /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		049320E5089519EF00F38A0A /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -1479,13 +1434,6 @@
 		04A156560BA6FA1D00E09D93 /* scripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 04A156510BA6FA1D00E09D93 /* scripting.h */; };
 		04A156570BA6FA1D00E09D93 /* scripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 04A156510BA6FA1D00E09D93 /* scripting.h */; };
 		04A156580BA6FA1D00E09D93 /* scripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 04A156510BA6FA1D00E09D93 /* scripting.h */; };
-		04A1566D0BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A1566E0BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A1566F0BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A156700BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A156710BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A156720BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
-		04A156730BA6FD5700E09D93 /* scripting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04A1566C0BA6FD5700E09D93 /* scripting.cpp */; };
 		04A554A40BBBF708002A147A /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B4470AB567C1001566DE /* libavcodec.a */; };
 		04A554A50BBBF718002A147A /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B4490AB567D5001566DE /* libavformat.a */; };
 		04A554A60BBBF724002A147A /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0452B44B0AB567DE001566DE /* libavutil.a */; };
@@ -1573,9 +1521,6 @@
 		04D335560992B50200BAEEA7 /* unix_mtsync.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6C05D7AEE600CFA029 /* unix_mtsync.h */; };
 		04D335570992B50200BAEEA7 /* unix_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6D05D7AEE600CFA029 /* unix_thread.h */; };
 		04D335580992B50200BAEEA7 /* unix_timer.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B6E05D7AEE600CFA029 /* unix_timer.h */; };
-		04D335590992B50200BAEEA7 /* mms_player.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7A05D7AEE600CFA029 /* mms_player.h */; };
-		04D3355A0992B50200BAEEA7 /* timeline_builder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7B05D7AEE600CFA029 /* timeline_builder.h */; };
-		04D3355B0992B50200BAEEA7 /* timelines.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7C05D7AEE600CFA029 /* timelines.h */; };
 		04D3355C0992B50200BAEEA7 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B7F05D7AEE600CFA029 /* connection.h */; };
 		04D3355D0992B50200BAEEA7 /* datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8005D7AEE600CFA029 /* datasource.h */; };
 		04D3355E0992B50200BAEEA7 /* socket.h in Headers */ = {isa = PBXBuildFile; fileRef = 04382B8405D7AEE600CFA029 /* socket.h */; };
@@ -1599,7 +1544,6 @@
 		04D335700992B50200BAEEA7 /* stdio_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0478D955060B382C004224C0 /* stdio_datasource.h */; };
 		04D335710992B50200BAEEA7 /* none_factory.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD5061D8A40002F255F /* none_factory.h */; };
 		04D335720992B50200BAEEA7 /* none_video_renderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BD7061D8A40002F255F /* none_video_renderer.h */; };
-		04D335730992B50200BAEEA7 /* raw_video_datasource.h in Headers */ = {isa = PBXBuildFile; fileRef = 042D9BE1061D8AC9002F255F /* raw_video_datasource.h */; };
 		04D335740992B50200BAEEA7 /* none_area.h in Headers */ = {isa = PBXBuildFile; fileRef = 0469447106249C0D0007093B /* none_area.h */; };
 		04D335750992B50200BAEEA7 /* amstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB39F0625548200A75828 /* amstream.h */; };
 		04D335760992B50200BAEEA7 /* byte_buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 045BB3A00625548200A75828 /* byte_buffer.h */; };
@@ -1682,9 +1626,6 @@
 		04D335C70992B50200BAEEA7 /* cocoa_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0491CB7705B5ABAE007105A3 /* cocoa_fill.mm */; };
 		04D335C80992B50200BAEEA7 /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1E05CDB420003C92BF /* sdl.cpp */; };
 		04D335C90992B50200BAEEA7 /* sdl_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 048A7E1F05CDB420003C92BF /* sdl_audio.cpp */; };
-		04D335CA0992B50200BAEEA7 /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		04D335CB0992B50200BAEEA7 /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		04D335CC0992B50200BAEEA7 /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		04D335CD0992B50200BAEEA7 /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		04D335CE0992B50200BAEEA7 /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		04D335CF0992B50200BAEEA7 /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -1707,7 +1648,6 @@
 		04D335E00992B50200BAEEA7 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0478D957060B383E004224C0 /* stdio_datasource.cpp */; };
 		04D335E10992B50200BAEEA7 /* none_factory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDB061D8A69002F255F /* none_factory.cpp */; };
 		04D335E20992B50200BAEEA7 /* none_video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BDC061D8A69002F255F /* none_video_renderer.cpp */; };
-		04D335E30992B50200BAEEA7 /* raw_video_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */; };
 		04D335E40992B50200BAEEA7 /* cocoa_image.mm in Sources */ = {isa = PBXBuildFile; fileRef = 042239CC0536F48E0010C447 /* cocoa_image.mm */; };
 		04D335E50992B50200BAEEA7 /* none_area.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0469447506249D3B0007093B /* none_area.cpp */; };
 		04D335E60992B50200BAEEA7 /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E19D970641477B0052BF5B /* transition.cpp */; };
@@ -1773,9 +1713,6 @@
 		04E976BA067FA5DB00AE60D0 /* gpaths.h in Headers */ = {isa = PBXBuildFile; fileRef = 04E976B9067FA5DA00AE60D0 /* gpaths.h */; };
 		04E976BC067FA5F500AE60D0 /* gpaths.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E976BB067FA5F500AE60D0 /* gpaths.cpp */; };
 		04EA3151068AED1F00DD982C /* embedder.h in Headers */ = {isa = PBXBuildFile; fileRef = 04EA3150068AED1F00DD982C /* embedder.h */; };
-		04EA7C4905D7C48600487047 /* mms_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3B05D7C48600487047 /* mms_player.cpp */; };
-		04EA7C4A05D7C48600487047 /* timeline_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3C05D7C48600487047 /* timeline_builder.cpp */; };
-		04EA7C4B05D7C48600487047 /* timelines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C3D05D7C48600487047 /* timelines.cpp */; };
 		04EA7C4D05D7C48600487047 /* smil_layout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4005D7C48600487047 /* smil_layout.cpp */; };
 		04EA7C4E05D7C48600487047 /* smil_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4105D7C48600487047 /* smil_player.cpp */; };
 		04EA7C4F05D7C48600487047 /* smil_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04EA7C4205D7C48600487047 /* smil_time.cpp */; };
@@ -1926,8 +1863,6 @@
 		042D9BD7061D8A40002F255F /* none_video_renderer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = none_video_renderer.h; sourceTree = "<group>"; };
 		042D9BDB061D8A69002F255F /* none_factory.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = none_factory.cpp; sourceTree = "<group>"; };
 		042D9BDC061D8A69002F255F /* none_video_renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = none_video_renderer.cpp; sourceTree = "<group>"; };
-		042D9BE1061D8AC9002F255F /* raw_video_datasource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = raw_video_datasource.h; sourceTree = "<group>"; };
-		042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = raw_video_datasource.cpp; sourceTree = "<group>"; };
 		042EBB4408EC849700DB2F0E /* cocoa_html.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cocoa_html.h; sourceTree = "<group>"; };
 		042EBB4A08EC84B500DB2F0E /* cocoa_html.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = cocoa_html.mm; sourceTree = "<group>"; };
 		042EBCD4093E5D18005CFBC8 /* DTDCache */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DTDCache; path = ../../Extras/DTDCache; sourceTree = SOURCE_ROOT; };
@@ -1989,9 +1924,6 @@
 		04382B6C05D7AEE600CFA029 /* unix_mtsync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = unix_mtsync.h; sourceTree = "<group>"; };
 		04382B6D05D7AEE600CFA029 /* unix_thread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = unix_thread.h; sourceTree = "<group>"; };
 		04382B6E05D7AEE600CFA029 /* unix_timer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = unix_timer.h; sourceTree = "<group>"; };
-		04382B7A05D7AEE600CFA029 /* mms_player.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = mms_player.h; sourceTree = "<group>"; };
-		04382B7B05D7AEE600CFA029 /* timeline_builder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = timeline_builder.h; sourceTree = "<group>"; };
-		04382B7C05D7AEE600CFA029 /* timelines.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = timelines.h; sourceTree = "<group>"; };
 		04382B7F05D7AEE600CFA029 /* connection.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = connection.h; sourceTree = "<group>"; };
 		04382B8005D7AEE600CFA029 /* datasource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = datasource.h; sourceTree = "<group>"; };
 		04382B8405D7AEE600CFA029 /* socket.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
@@ -2118,7 +2050,6 @@
 		049F6F4B061430590082B27A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		04A107720748E0A6002EA347 /* factory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = factory.h; sourceTree = "<group>"; };
 		04A156510BA6FA1D00E09D93 /* scripting.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = scripting.h; sourceTree = "<group>"; };
-		04A1566C0BA6FD5700E09D93 /* scripting.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = scripting.cpp; sourceTree = "<group>"; };
 		04AC5D0A05FF6C04003CD4DC /* document.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = document.cpp; sourceTree = "<group>"; };
 		04AD6622060A5A9200487334 /* pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pause.png; sourceTree = "<group>"; };
 		04AD6623060A5A9200487334 /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
@@ -2159,9 +2090,6 @@
 		04E976B9067FA5DA00AE60D0 /* gpaths.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gpaths.h; sourceTree = "<group>"; };
 		04E976BB067FA5F500AE60D0 /* gpaths.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gpaths.cpp; sourceTree = "<group>"; };
 		04EA3150068AED1F00DD982C /* embedder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = embedder.h; sourceTree = "<group>"; };
-		04EA7C3B05D7C48600487047 /* mms_player.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = mms_player.cpp; sourceTree = "<group>"; };
-		04EA7C3C05D7C48600487047 /* timeline_builder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = timeline_builder.cpp; sourceTree = "<group>"; };
-		04EA7C3D05D7C48600487047 /* timelines.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = timelines.cpp; sourceTree = "<group>"; };
 		04EA7C4005D7C48600487047 /* smil_layout.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = smil_layout.cpp; sourceTree = "<group>"; };
 		04EA7C4105D7C48600487047 /* smil_player.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = smil_player.cpp; sourceTree = "<group>"; };
 		04EA7C4205D7C48600487047 /* smil_time.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = smil_time.cpp; sourceTree = "<group>"; };
@@ -2405,7 +2333,6 @@
 		042AF8F8053C2F020010C447 /* common */ = {
 			isa = PBXGroup;
 			children = (
-				04A1566C0BA6FD5700E09D93 /* scripting.cpp */,
 				047846AF0989710800A3E39F /* gui_player.cpp */,
 				04F8447F0986E7CA00398A72 /* factory.cpp */,
 				0471BDAE089E272700C44EA0 /* renderer_impl.cpp */,
@@ -2437,7 +2364,6 @@
 				04382AD005D7AEE600CFA029 /* config */,
 				04382B0605D7AEE600CFA029 /* gui */,
 				04382B4805D7AEE600CFA029 /* lib */,
-				04382B7805D7AEE600CFA029 /* mms */,
 				04382B7D05D7AEE600CFA029 /* net */,
 				04382B8605D7AEE600CFA029 /* smil2 */,
 				04382B9205D7AEE600CFA029 /* version.h */,
@@ -2623,16 +2549,6 @@
 			path = unix;
 			sourceTree = "<group>";
 		};
-		04382B7805D7AEE600CFA029 /* mms */ = {
-			isa = PBXGroup;
-			children = (
-				04382B7A05D7AEE600CFA029 /* mms_player.h */,
-				04382B7B05D7AEE600CFA029 /* timeline_builder.h */,
-				04382B7C05D7AEE600CFA029 /* timelines.h */,
-			);
-			path = mms;
-			sourceTree = "<group>";
-		};
 		04382B7D05D7AEE600CFA029 /* net */ = {
 			isa = PBXGroup;
 			children = (
@@ -2644,7 +2560,6 @@
 				0471BDDF089E3F6300C44EA0 /* ffmpeg_video.h */,
 				04600F270894EB8500B553A2 /* rtsp_datasource.h */,
 				04600F280894EB8500B553A2 /* rtsp_factory.h */,
-				042D9BE1061D8AC9002F255F /* raw_video_datasource.h */,
 				04382B7F05D7AEE600CFA029 /* connection.h */,
 				04AE676D05E55CC300023FEA /* databuffer.h */,
 				04382B8005D7AEE600CFA029 /* datasource.h */,
@@ -2692,7 +2607,6 @@
 				042AF8F8053C2F020010C447 /* common */,
 				0444D323051F2EEF0010C447 /* gui */,
 				0444D328051F2EEF0010C447 /* lib */,
-				04EA7C3A05D7C48600487047 /* mms */,
 				0444D34D051F2EF00010C447 /* net */,
 				04EA7C3E05D7C48600487047 /* smil2 */,
 			);
@@ -2786,7 +2700,6 @@
 				0471BDCE089E3D3900C44EA0 /* ffmpeg_video.cpp */,
 				04600F2B0894EB9800B553A2 /* rtsp_datasource.cpp */,
 				04600F2C0894EB9800B553A2 /* rtsp_factory.cpp */,
-				042D9BE3061D8AE0002F255F /* raw_video_datasource.cpp */,
 				04AE677105E55CEC00023FEA /* databuffer.cpp */,
 				0444D34E051F2EF00010C447 /* datasource.cpp */,
 				04AE677205E55CEC00023FEA /* posix_datasource.cpp */,
@@ -2813,16 +2726,6 @@
 				048A7E1F05CDB420003C92BF /* sdl_audio.cpp */,
 			);
 			path = SDL;
-			sourceTree = "<group>";
-		};
-		04EA7C3A05D7C48600487047 /* mms */ = {
-			isa = PBXGroup;
-			children = (
-				04EA7C3B05D7C48600487047 /* mms_player.cpp */,
-				04EA7C3C05D7C48600487047 /* timeline_builder.cpp */,
-				04EA7C3D05D7C48600487047 /* timelines.cpp */,
-			);
-			path = mms;
 			sourceTree = "<group>";
 		};
 		04EA7C3E05D7C48600487047 /* smil2 */ = {
@@ -3055,9 +2958,6 @@
 				041613C4072078C400A8B0B6 /* unix_mtsync.h in Headers */,
 				041613C5072078C400A8B0B6 /* unix_thread.h in Headers */,
 				041613C6072078C400A8B0B6 /* unix_timer.h in Headers */,
-				041613C7072078C400A8B0B6 /* mms_player.h in Headers */,
-				041613C8072078C400A8B0B6 /* timeline_builder.h in Headers */,
-				041613C9072078C400A8B0B6 /* timelines.h in Headers */,
 				041613CA072078C400A8B0B6 /* connection.h in Headers */,
 				041613CB072078C400A8B0B6 /* datasource.h in Headers */,
 				041613CD072078C400A8B0B6 /* socket.h in Headers */,
@@ -3081,7 +2981,6 @@
 				041613DF072078C400A8B0B6 /* stdio_datasource.h in Headers */,
 				041613E0072078C400A8B0B6 /* none_factory.h in Headers */,
 				041613E1072078C400A8B0B6 /* none_video_renderer.h in Headers */,
-				041613E2072078C400A8B0B6 /* raw_video_datasource.h in Headers */,
 				041613E3072078C400A8B0B6 /* none_area.h in Headers */,
 				041613E4072078C400A8B0B6 /* amstream.h in Headers */,
 				041613E5072078C400A8B0B6 /* byte_buffer.h in Headers */,
@@ -3192,9 +3091,6 @@
 				0416552508F331530017F91F /* unix_mtsync.h in Headers */,
 				0416552608F331530017F91F /* unix_thread.h in Headers */,
 				0416552708F331530017F91F /* unix_timer.h in Headers */,
-				0416552808F331530017F91F /* mms_player.h in Headers */,
-				0416552908F331530017F91F /* timeline_builder.h in Headers */,
-				0416552A08F331530017F91F /* timelines.h in Headers */,
 				0416552B08F331530017F91F /* connection.h in Headers */,
 				0416552C08F331530017F91F /* datasource.h in Headers */,
 				0416552D08F331530017F91F /* socket.h in Headers */,
@@ -3218,7 +3114,6 @@
 				0416553F08F331530017F91F /* stdio_datasource.h in Headers */,
 				0416554008F331530017F91F /* none_factory.h in Headers */,
 				0416554108F331530017F91F /* none_video_renderer.h in Headers */,
-				0416554208F331530017F91F /* raw_video_datasource.h in Headers */,
 				0416554308F331530017F91F /* none_area.h in Headers */,
 				0416554408F331530017F91F /* amstream.h in Headers */,
 				0416554508F331530017F91F /* byte_buffer.h in Headers */,
@@ -3333,9 +3228,6 @@
 				0427F7460898352F0022C4EC /* unix_mtsync.h in Headers */,
 				0427F7470898352F0022C4EC /* unix_thread.h in Headers */,
 				0427F7480898352F0022C4EC /* unix_timer.h in Headers */,
-				0427F7490898352F0022C4EC /* mms_player.h in Headers */,
-				0427F74A0898352F0022C4EC /* timeline_builder.h in Headers */,
-				0427F74B0898352F0022C4EC /* timelines.h in Headers */,
 				0427F74C0898352F0022C4EC /* connection.h in Headers */,
 				0427F74D0898352F0022C4EC /* datasource.h in Headers */,
 				0427F74F0898352F0022C4EC /* socket.h in Headers */,
@@ -3359,7 +3251,6 @@
 				0427F7610898352F0022C4EC /* stdio_datasource.h in Headers */,
 				0427F7620898352F0022C4EC /* none_factory.h in Headers */,
 				0427F7630898352F0022C4EC /* none_video_renderer.h in Headers */,
-				0427F7640898352F0022C4EC /* raw_video_datasource.h in Headers */,
 				0427F7650898352F0022C4EC /* none_area.h in Headers */,
 				0427F7660898352F0022C4EC /* amstream.h in Headers */,
 				0427F7670898352F0022C4EC /* byte_buffer.h in Headers */,
@@ -3472,9 +3363,6 @@
 				04600E5F0894E6B000B553A2 /* unix_mtsync.h in Headers */,
 				04600E600894E6B000B553A2 /* unix_thread.h in Headers */,
 				04600E610894E6B000B553A2 /* unix_timer.h in Headers */,
-				04600E620894E6B000B553A2 /* mms_player.h in Headers */,
-				04600E630894E6B000B553A2 /* timeline_builder.h in Headers */,
-				04600E640894E6B000B553A2 /* timelines.h in Headers */,
 				04600E650894E6B000B553A2 /* connection.h in Headers */,
 				04600E660894E6B000B553A2 /* datasource.h in Headers */,
 				04600E680894E6B000B553A2 /* socket.h in Headers */,
@@ -3498,7 +3386,6 @@
 				04600E7A0894E6B000B553A2 /* stdio_datasource.h in Headers */,
 				04600E7B0894E6B000B553A2 /* none_factory.h in Headers */,
 				04600E7C0894E6B000B553A2 /* none_video_renderer.h in Headers */,
-				04600E7D0894E6B000B553A2 /* raw_video_datasource.h in Headers */,
 				04600E7E0894E6B000B553A2 /* none_area.h in Headers */,
 				04600E7F0894E6B000B553A2 /* amstream.h in Headers */,
 				04600E800894E6B000B553A2 /* byte_buffer.h in Headers */,
@@ -3613,9 +3500,6 @@
 				0493205D089519EF00F38A0A /* unix_mtsync.h in Headers */,
 				0493205E089519EF00F38A0A /* unix_thread.h in Headers */,
 				0493205F089519EF00F38A0A /* unix_timer.h in Headers */,
-				04932060089519EF00F38A0A /* mms_player.h in Headers */,
-				04932061089519EF00F38A0A /* timeline_builder.h in Headers */,
-				04932062089519EF00F38A0A /* timelines.h in Headers */,
 				04932063089519EF00F38A0A /* connection.h in Headers */,
 				04932064089519EF00F38A0A /* datasource.h in Headers */,
 				04932066089519EF00F38A0A /* socket.h in Headers */,
@@ -3639,7 +3523,6 @@
 				04932078089519EF00F38A0A /* stdio_datasource.h in Headers */,
 				04932079089519EF00F38A0A /* none_factory.h in Headers */,
 				0493207A089519EF00F38A0A /* none_video_renderer.h in Headers */,
-				0493207B089519EF00F38A0A /* raw_video_datasource.h in Headers */,
 				0493207C089519EF00F38A0A /* none_area.h in Headers */,
 				0493207D089519EF00F38A0A /* amstream.h in Headers */,
 				0493207E089519EF00F38A0A /* byte_buffer.h in Headers */,
@@ -3752,9 +3635,6 @@
 				04D335560992B50200BAEEA7 /* unix_mtsync.h in Headers */,
 				04D335570992B50200BAEEA7 /* unix_thread.h in Headers */,
 				04D335580992B50200BAEEA7 /* unix_timer.h in Headers */,
-				04D335590992B50200BAEEA7 /* mms_player.h in Headers */,
-				04D3355A0992B50200BAEEA7 /* timeline_builder.h in Headers */,
-				04D3355B0992B50200BAEEA7 /* timelines.h in Headers */,
 				04D3355C0992B50200BAEEA7 /* connection.h in Headers */,
 				04D3355D0992B50200BAEEA7 /* datasource.h in Headers */,
 				04D3355E0992B50200BAEEA7 /* socket.h in Headers */,
@@ -3778,7 +3658,6 @@
 				04D335700992B50200BAEEA7 /* stdio_datasource.h in Headers */,
 				04D335710992B50200BAEEA7 /* none_factory.h in Headers */,
 				04D335720992B50200BAEEA7 /* none_video_renderer.h in Headers */,
-				04D335730992B50200BAEEA7 /* raw_video_datasource.h in Headers */,
 				04D335740992B50200BAEEA7 /* none_area.h in Headers */,
 				04D335750992B50200BAEEA7 /* amstream.h in Headers */,
 				04D335760992B50200BAEEA7 /* byte_buffer.h in Headers */,
@@ -3891,9 +3770,6 @@
 				04382C3605D7AEE700CFA029 /* unix_mtsync.h in Headers */,
 				04382C3705D7AEE700CFA029 /* unix_thread.h in Headers */,
 				04382C3805D7AEE700CFA029 /* unix_timer.h in Headers */,
-				04382C4205D7AEE700CFA029 /* mms_player.h in Headers */,
-				04382C4305D7AEE700CFA029 /* timeline_builder.h in Headers */,
-				04382C4405D7AEE700CFA029 /* timelines.h in Headers */,
 				04382C4605D7AEE700CFA029 /* connection.h in Headers */,
 				04382C4705D7AEE700CFA029 /* datasource.h in Headers */,
 				04382C4B05D7AEE700CFA029 /* socket.h in Headers */,
@@ -3917,7 +3793,6 @@
 				0478D956060B382C004224C0 /* stdio_datasource.h in Headers */,
 				042D9BD8061D8A40002F255F /* none_factory.h in Headers */,
 				042D9BDA061D8A40002F255F /* none_video_renderer.h in Headers */,
-				042D9BE2061D8AC9002F255F /* raw_video_datasource.h in Headers */,
 				0469447206249C0D0007093B /* none_area.h in Headers */,
 				045BB3A40625548200A75828 /* amstream.h in Headers */,
 				045BB3A50625548200A75828 /* byte_buffer.h in Headers */,
@@ -4118,6 +3993,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 048AE6D40931D8CC00637C32 /* Build configuration list for PBXProject "fullcocoambulant" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -4129,6 +4005,7 @@
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* cocoambulant */;
 			projectDirPath = "";
+			projectRoot = ../../../../../..;
 			targets = (
 				8D15AC270486D014006FF6A4 /* cocoambulant-nolive */,
 				04161386072078C400A8B0B6 /* cocoambulant-noxerces-nolive */,
@@ -4406,9 +4283,6 @@
 				04161427072078C400A8B0B6 /* cocoa_fill.mm in Sources */,
 				04161428072078C400A8B0B6 /* sdl.cpp in Sources */,
 				04161429072078C400A8B0B6 /* sdl_audio.cpp in Sources */,
-				0416142B072078C400A8B0B6 /* mms_player.cpp in Sources */,
-				0416142C072078C400A8B0B6 /* timeline_builder.cpp in Sources */,
-				0416142D072078C400A8B0B6 /* timelines.cpp in Sources */,
 				0416142E072078C400A8B0B6 /* smil_layout.cpp in Sources */,
 				0416142F072078C400A8B0B6 /* smil_player.cpp in Sources */,
 				04161430072078C400A8B0B6 /* smil_time.cpp in Sources */,
@@ -4431,7 +4305,6 @@
 				04161441072078C400A8B0B6 /* stdio_datasource.cpp in Sources */,
 				04161442072078C400A8B0B6 /* none_factory.cpp in Sources */,
 				04161443072078C400A8B0B6 /* none_video_renderer.cpp in Sources */,
-				04161444072078C400A8B0B6 /* raw_video_datasource.cpp in Sources */,
 				04161445072078C400A8B0B6 /* cocoa_image.mm in Sources */,
 				04161446072078C400A8B0B6 /* none_area.cpp in Sources */,
 				04161447072078C400A8B0B6 /* transition.cpp in Sources */,
@@ -4463,7 +4336,6 @@
 				04F844810986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B10989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD050B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A156720BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142B00BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8680BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C3B0BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4503,9 +4375,6 @@
 				0416559108F331530017F91F /* cocoa_fill.mm in Sources */,
 				0416559208F331530017F91F /* sdl.cpp in Sources */,
 				0416559308F331530017F91F /* sdl_audio.cpp in Sources */,
-				0416559408F331530017F91F /* mms_player.cpp in Sources */,
-				0416559508F331530017F91F /* timeline_builder.cpp in Sources */,
-				0416559608F331530017F91F /* timelines.cpp in Sources */,
 				0416559708F331530017F91F /* smil_layout.cpp in Sources */,
 				0416559808F331530017F91F /* smil_player.cpp in Sources */,
 				0416559908F331530017F91F /* smil_time.cpp in Sources */,
@@ -4528,7 +4397,6 @@
 				041655AA08F331530017F91F /* stdio_datasource.cpp in Sources */,
 				041655AB08F331530017F91F /* none_factory.cpp in Sources */,
 				041655AC08F331530017F91F /* none_video_renderer.cpp in Sources */,
-				041655AD08F331530017F91F /* raw_video_datasource.cpp in Sources */,
 				041655AE08F331530017F91F /* cocoa_image.mm in Sources */,
 				041655AF08F331530017F91F /* none_area.cpp in Sources */,
 				041655B008F331530017F91F /* transition.cpp in Sources */,
@@ -4563,7 +4431,6 @@
 				04F844850986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B50989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD000B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A1566D0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AB0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8630BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C370BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4603,9 +4470,6 @@
 				0427F7AC0898352F0022C4EC /* cocoa_fill.mm in Sources */,
 				0427F7AD0898352F0022C4EC /* sdl.cpp in Sources */,
 				0427F7AE0898352F0022C4EC /* sdl_audio.cpp in Sources */,
-				0427F7B00898352F0022C4EC /* mms_player.cpp in Sources */,
-				0427F7B10898352F0022C4EC /* timeline_builder.cpp in Sources */,
-				0427F7B20898352F0022C4EC /* timelines.cpp in Sources */,
 				0427F7B30898352F0022C4EC /* smil_layout.cpp in Sources */,
 				0427F7B40898352F0022C4EC /* smil_player.cpp in Sources */,
 				0427F7B50898352F0022C4EC /* smil_time.cpp in Sources */,
@@ -4628,7 +4492,6 @@
 				0427F7C60898352F0022C4EC /* stdio_datasource.cpp in Sources */,
 				0427F7C70898352F0022C4EC /* none_factory.cpp in Sources */,
 				0427F7C80898352F0022C4EC /* none_video_renderer.cpp in Sources */,
-				0427F7C90898352F0022C4EC /* raw_video_datasource.cpp in Sources */,
 				0427F7CA0898352F0022C4EC /* cocoa_image.mm in Sources */,
 				0427F7CB0898352F0022C4EC /* none_area.cpp in Sources */,
 				0427F7CC0898352F0022C4EC /* transition.cpp in Sources */,
@@ -4661,7 +4524,6 @@
 				04F844840986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B40989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD020B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A1566F0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AD0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8650BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C380BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4701,9 +4563,6 @@
 				04600EC50894E6B000B553A2 /* cocoa_fill.mm in Sources */,
 				04600EC60894E6B000B553A2 /* sdl.cpp in Sources */,
 				04600EC70894E6B000B553A2 /* sdl_audio.cpp in Sources */,
-				04600EC90894E6B000B553A2 /* mms_player.cpp in Sources */,
-				04600ECA0894E6B000B553A2 /* timeline_builder.cpp in Sources */,
-				04600ECB0894E6B000B553A2 /* timelines.cpp in Sources */,
 				04600ECC0894E6B000B553A2 /* smil_layout.cpp in Sources */,
 				04600ECD0894E6B000B553A2 /* smil_player.cpp in Sources */,
 				04600ECE0894E6B000B553A2 /* smil_time.cpp in Sources */,
@@ -4726,7 +4585,6 @@
 				04600EDF0894E6B000B553A2 /* stdio_datasource.cpp in Sources */,
 				04600EE00894E6B000B553A2 /* none_factory.cpp in Sources */,
 				04600EE10894E6B000B553A2 /* none_video_renderer.cpp in Sources */,
-				04600EE20894E6B000B553A2 /* raw_video_datasource.cpp in Sources */,
 				04600EE30894E6B000B553A2 /* cocoa_image.mm in Sources */,
 				04600EE40894E6B000B553A2 /* none_area.cpp in Sources */,
 				04600EE50894E6B000B553A2 /* transition.cpp in Sources */,
@@ -4761,7 +4619,6 @@
 				04F844820986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B20989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD040B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A156710BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AF0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8670BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C3A0BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4801,9 +4658,6 @@
 				049320C5089519EF00F38A0A /* cocoa_fill.mm in Sources */,
 				049320C6089519EF00F38A0A /* sdl.cpp in Sources */,
 				049320C7089519EF00F38A0A /* sdl_audio.cpp in Sources */,
-				049320C9089519EF00F38A0A /* mms_player.cpp in Sources */,
-				049320CA089519EF00F38A0A /* timeline_builder.cpp in Sources */,
-				049320CB089519EF00F38A0A /* timelines.cpp in Sources */,
 				049320CC089519EF00F38A0A /* smil_layout.cpp in Sources */,
 				049320CD089519EF00F38A0A /* smil_player.cpp in Sources */,
 				049320CE089519EF00F38A0A /* smil_time.cpp in Sources */,
@@ -4826,7 +4680,6 @@
 				049320DF089519EF00F38A0A /* stdio_datasource.cpp in Sources */,
 				049320E0089519EF00F38A0A /* none_factory.cpp in Sources */,
 				049320E1089519EF00F38A0A /* none_video_renderer.cpp in Sources */,
-				049320E2089519EF00F38A0A /* raw_video_datasource.cpp in Sources */,
 				049320E3089519EF00F38A0A /* cocoa_image.mm in Sources */,
 				049320E4089519EF00F38A0A /* none_area.cpp in Sources */,
 				049320E5089519EF00F38A0A /* transition.cpp in Sources */,
@@ -4859,7 +4712,6 @@
 				04F844830986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B30989710900A3E39F /* gui_player.cpp in Sources */,
 				046ECD030B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A156700BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AE0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8660BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C390BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4899,9 +4751,6 @@
 				04D335C70992B50200BAEEA7 /* cocoa_fill.mm in Sources */,
 				04D335C80992B50200BAEEA7 /* sdl.cpp in Sources */,
 				04D335C90992B50200BAEEA7 /* sdl_audio.cpp in Sources */,
-				04D335CA0992B50200BAEEA7 /* mms_player.cpp in Sources */,
-				04D335CB0992B50200BAEEA7 /* timeline_builder.cpp in Sources */,
-				04D335CC0992B50200BAEEA7 /* timelines.cpp in Sources */,
 				04D335CD0992B50200BAEEA7 /* smil_layout.cpp in Sources */,
 				04D335CE0992B50200BAEEA7 /* smil_player.cpp in Sources */,
 				04D335CF0992B50200BAEEA7 /* smil_time.cpp in Sources */,
@@ -4924,7 +4773,6 @@
 				04D335E00992B50200BAEEA7 /* stdio_datasource.cpp in Sources */,
 				04D335E10992B50200BAEEA7 /* none_factory.cpp in Sources */,
 				04D335E20992B50200BAEEA7 /* none_video_renderer.cpp in Sources */,
-				04D335E30992B50200BAEEA7 /* raw_video_datasource.cpp in Sources */,
 				04D335E40992B50200BAEEA7 /* cocoa_image.mm in Sources */,
 				04D335E50992B50200BAEEA7 /* none_area.cpp in Sources */,
 				04D335E60992B50200BAEEA7 /* transition.cpp in Sources */,
@@ -4957,7 +4805,6 @@
 				04D336030992B50200BAEEA7 /* factory.cpp in Sources */,
 				04D336040992B50200BAEEA7 /* gui_player.cpp in Sources */,
 				046ECD010B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A1566E0BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142AC0BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8640BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C360BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -4997,9 +4844,6 @@
 				0491CB7805B5ABAF007105A3 /* cocoa_fill.mm in Sources */,
 				048A7E2005CDB420003C92BF /* sdl.cpp in Sources */,
 				048A7E2105CDB420003C92BF /* sdl_audio.cpp in Sources */,
-				04EA7C4905D7C48600487047 /* mms_player.cpp in Sources */,
-				04EA7C4A05D7C48600487047 /* timeline_builder.cpp in Sources */,
-				04EA7C4B05D7C48600487047 /* timelines.cpp in Sources */,
 				04EA7C4D05D7C48600487047 /* smil_layout.cpp in Sources */,
 				04EA7C4E05D7C48600487047 /* smil_player.cpp in Sources */,
 				04EA7C4F05D7C48600487047 /* smil_time.cpp in Sources */,
@@ -5022,7 +4866,6 @@
 				0478D958060B383E004224C0 /* stdio_datasource.cpp in Sources */,
 				042D9BDD061D8A69002F255F /* none_factory.cpp in Sources */,
 				042D9BDE061D8A69002F255F /* none_video_renderer.cpp in Sources */,
-				042D9BE4061D8AE0002F255F /* raw_video_datasource.cpp in Sources */,
 				048467B3062171980045A7A7 /* cocoa_image.mm in Sources */,
 				0469447606249D3C0007093B /* none_area.cpp in Sources */,
 				04E19D980641477B0052BF5B /* transition.cpp in Sources */,
@@ -5055,7 +4898,6 @@
 				04F844800986E7CA00398A72 /* factory.cpp in Sources */,
 				047846B00989710800A3E39F /* gui_player.cpp in Sources */,
 				046ECD060B9DB9F6002E50E6 /* cocoa_ink.mm in Sources */,
-				04A156730BA6FD5700E09D93 /* scripting.cpp in Sources */,
 				048142B10BAEAB0A006A8BF1 /* nscontext.cpp in Sources */,
 				043EA8690BB01656009C20D2 /* cocoa_smiltext.mm in Sources */,
 				041C3C3C0BB094EA002E9997 /* smiltext.cpp in Sources */,
@@ -5168,7 +5010,6 @@
 				);
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -5377,7 +5218,6 @@
 				);
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -5582,7 +5422,6 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/../../../../packages/ffmpeg-universal/libavutil\"";
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -5851,7 +5690,6 @@
 				);
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -6104,7 +5942,6 @@
 				);
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -6372,7 +6209,6 @@
 				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../../../packages/ffmpeg-universal/libavutil\"";
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
@@ -6665,7 +6501,6 @@
 				);
 				LIBRARY_STYLE = Static;
 				MACOSX_DEPLOYMENT_TARGET = "";
-				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = cocoambulant;
