@@ -736,8 +736,10 @@ demux_video_datasource::get_audio_datasource()
 		//XXX a factory should take care of getting a decoder ds.
 		audio_format fmt = m_audio_src->get_audio_format();
 		audio_datasource *dds = NULL;
+#ifdef WITH_FFMPEG // DOES_NOT_WORK_IN_IPHONE_YET
 		if (ffmpeg_decoder_datasource::supported(fmt))
 			dds = new ffmpeg_decoder_datasource(m_audio_src);
+#endif//WITH_FFMPEG // DOES_NOT_WORK_IN_IPHONE_YET
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::get_audio_datasource: decoder ds = 0x%x", (void*)dds);
 		if (dds == NULL) {
 			lib::logger::get_logger()->warn(gettext("%s: Ignoring audio, unsupported encoding"), m_url.get_url().c_str());

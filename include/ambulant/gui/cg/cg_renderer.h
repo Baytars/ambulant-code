@@ -94,7 +94,7 @@ class cg_renderer : public RP_Base {
 	}
 	
  	virtual bool stop() {
-		RP_Base::stop();
+		return RP_Base::stop();
 	}
 	
     void redraw(const rect &dirty, gui_window *window) {

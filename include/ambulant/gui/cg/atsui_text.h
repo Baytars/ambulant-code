@@ -22,12 +22,14 @@
 /* 
  * @$Id$ 
  */
-
+#ifdef	DOES_NOT_WORK_ON_IPHONE
 #ifndef AMBULANT_GUI_CG_ATSUI_TEXT_H
 #define AMBULANT_GUI_CG_ATSUI_TEXT_H
 
 #include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/lib/mtsync.h"
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
 #include <ApplicationServices/ApplicationServices.h>
 
 namespace ambulant {
@@ -67,3 +69,4 @@ class atsui_text_renderer : public cg_renderer<renderer_playable_dsall> {
 } // namespace ambulant
 
 #endif // AMBULANT_GUI_CG_ATSUI_TEXT_H
+#endif//DOES_NOT_WORK_ON_IPHONE

@@ -295,7 +295,11 @@ bad:
 - (CGContextRef) getCGContext
 {
 #ifdef WITH_UIKIT
+#ifdef DOES_NOT_WORK_ON_IPHONE
 	return UICurrentContext();
+#else //MAYBE_WORKS_ON_IPHONE
+	return UIGraphicsGetCurrentContext();
+#endif//MAYBE_WORKS_ON_IPHONE
 #else
 	return (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
 #endif
