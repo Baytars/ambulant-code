@@ -29,7 +29,9 @@
 #include "ambulant/smil2/transition.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/gui/cg/cg_renderer.h"
+#ifdef	DOES_NOT_WORK_ON_IPHONE
 #include <ApplicationServices/ApplicationServices.h>
+#endif//DOES_NOT_WORK_ON_IPHONE
 
 namespace ambulant {
 

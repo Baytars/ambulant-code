@@ -96,12 +96,14 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	if (m_data && !m_image) {
 		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: creating image");
 		m_nsdata = (CFDataRef)[NSData dataWithBytesNoCopy: m_data length: m_data_size freeWhenDone: NO];
+#ifdef DOES_NOT_WORK_ON_IPHONE
 		CGImageSourceRef rdr = CGImageSourceCreateWithData(m_nsdata, NULL);
 		if (rdr == NULL) {
 			logger::get_logger()->error("%s: could not create image reader", m_node->get_url("src").get_url().c_str());
 			return;
 		}
 		m_image = CGImageSourceCreateImageAtIndex(rdr, 0, NULL);
+#endif//DOES_NOT_WORK_ON_IPHONE
 		if (!m_image)
 			logger::get_logger()->error("%s: could not create CGImage", m_node->get_url("src").get_url().c_str());
 		m_size = lib::size(CGImageGetWidth(m_image), CGImageGetHeight(m_image));

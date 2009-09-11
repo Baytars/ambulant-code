@@ -167,7 +167,6 @@
 		043902C80BD7955000E13028 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../../Extras/Welcome/data; sourceTree = SOURCE_ROOT; };
 		043902D50BD7956400E13028 /* DTDCache */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DTDCache; path = ../../Extras/DTDCache; sourceTree = SOURCE_ROOT; };
 		0480CCFF0CDD1D5C0025344B /* libfaad.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfaad.a; path = /usr/local/lib/libfaad.a; sourceTree = "<absolute>"; };
-		049650600BCADE2B002C00DF /* Ambulant.pch */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Ambulant.pch; path = ../../src/player_macosx/Ambulant.pch; sourceTree = SOURCE_ROOT; };
 		049650610BCADE2B002C00DF /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ../../src/player_macosx/main.m; sourceTree = SOURCE_ROOT; };
 		049650630BCADE62002C00DF /* LogController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = LogController.h; path = ../../src/player_macosx/LogController.h; sourceTree = SOURCE_ROOT; };
 		049650640BCADE62002C00DF /* LogController.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; name = LogController.mm; path = ../../src/player_macosx/LogController.mm; sourceTree = SOURCE_ROOT; };
@@ -1396,7 +1395,6 @@
 			children = (
 				049650720BCADE83002C00DF /* mainloop.cpp */,
 				049650730BCADE83002C00DF /* mainloop.h */,
-				049650600BCADE2B002C00DF /* Ambulant.pch */,
 				049650610BCADE2B002C00DF /* main.m */,
 			);
 			name = "Other Sources";

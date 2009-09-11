@@ -20,7 +20,7 @@
 /* 
  * @$Id$ 
  */
-
+#ifdef DOES_NOT_WORK_ON_IPHONE
 #include "ambulant/gui/cg/atsui_text.h"
 #include "ambulant/gui/cg/cg_gui.h"
 #include "ambulant/common/region_info.h"
@@ -217,3 +217,4 @@ atsui_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 } // namespace gui
 
 } //namespace ambulant
+#endif//DOES_NOT_WORK_ON_IPHONE
