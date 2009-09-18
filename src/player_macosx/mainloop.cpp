@@ -23,7 +23,7 @@
 
 #include "MyAmbulantView.h"
 #include <iostream>
-#include <ApplicationServices/ApplicationServices.h>
+//#include <ApplicationServices/ApplicationServices.h>
 #include "mainloop.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/timer.h"
@@ -59,6 +59,7 @@
 #define AM_DBG if(0)
 #endif
 
+#ifdef DOES_NOT_WORK_ON_IPHONE
 using namespace ambulant;
 
 mainloop::mainloop(const char *urlstr, void *view, ambulant::common::embedder *app)
@@ -269,4 +270,4 @@ mainloop::node_focussed(const lib::node *n)
 	AM_DBG lib::logger::get_logger()->debug("node_focussed: nothing to show");
 //	set_statusline(m_view, "???");
 }
-			
+#endif//DOES_NOT_WORK_ON_IPHONE		
