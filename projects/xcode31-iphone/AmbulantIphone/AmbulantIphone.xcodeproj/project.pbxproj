@@ -7,29 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* AmbulantIphoneAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.m */; };
-		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		2899E5220DE3E06400AC0155 /* AmbulantIphoneViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* AmbulantIphoneViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
-		28D7ACF80DDB3853001CB0EB /* AmbulantIphoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.m */; };
-		9312493610627A0600F1592B /* AmbulantIphoneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9312493510627A0600F1592B /* AmbulantIphoneView.m */; };
-		9312494D106281EE00F1592B /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9312494B106281EE00F1592B /* mainloop.cpp */; };
+		930C0DCA1063C04100569791 /* unix_event_processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247DA106278B300F1592B /* unix_event_processor.cpp */; };
+		930C0DCB1063C04100569791 /* unix_mtsync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247DB106278B300F1592B /* unix_mtsync.cpp */; };
+		930C0DCC1063C04100569791 /* unix_thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247DC106278B300F1592B /* unix_thread.cpp */; };
+		930C0DCD1063C04100569791 /* unix_timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247DD106278B300F1592B /* unix_timer.cpp */; };
+		930C0DCF1063C0AD00569791 /* event_processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247CB106278B300F1592B /* event_processor.cpp */; };
+		930C0DD21063C0E800569791 /* delta_timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247C9106278B300F1592B /* delta_timer.cpp */; };
+		930C0E6E1063CC3300569791 /* AmbulantIphoneView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9312493510627A0600F1592B /* AmbulantIphoneView.mm */; };
+		93C106981063BCD6003BEA83 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		93C106991063BCEE003BEA83 /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9312494B106281EE00F1592B /* mainloop.cpp */; };
+		93C1069A1063BCF5003BEA83 /* AmbulantIphoneViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.mm */; };
+		93C1069B1063BCFC003BEA83 /* AmbulantIphoneAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.mm */; };
+		93C175191063BDE5003BEA83 /* get_version.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93124781106278B300F1592B /* get_version.cpp */; };
+		93C1751A1063BDFF003BEA83 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931247CE106278B300F1592B /* logger.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* AmbulantIphoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantIphoneAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmbulantIphoneAppDelegate.m; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AmbulantIphoneAppDelegate.mm; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* AmbulantIphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AmbulantIphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		2899E5210DE3E06400AC0155 /* AmbulantIphoneViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AmbulantIphoneViewController.xib; sourceTree = "<group>"; };
 		28AD733E0D9D9553002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		28D7ACF60DDB3853001CB0EB /* AmbulantIphoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantIphoneViewController.h; sourceTree = "<group>"; };
-		28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmbulantIphoneViewController.m; sourceTree = "<group>"; };
+		28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AmbulantIphoneViewController.mm; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* AmbulantIphone_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantIphone_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* AmbulantIphone-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AmbulantIphone-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
@@ -414,7 +422,7 @@
 		93124912106278B300F1592B /* transition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = transition.h; sourceTree = "<group>"; };
 		93124913106278B300F1592B /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
 		9312493410627A0600F1592B /* AmbulantIphoneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AmbulantIphoneView.h; sourceTree = "<group>"; };
-		9312493510627A0600F1592B /* AmbulantIphoneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AmbulantIphoneView.m; sourceTree = "<group>"; };
+		9312493510627A0600F1592B /* AmbulantIphoneView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AmbulantIphoneView.mm; sourceTree = "<group>"; };
 		9312494B106281EE00F1592B /* mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop.cpp; path = ../../../src/player_macosx/mainloop.cpp; sourceTree = SOURCE_ROOT; };
 		9312494C106281EE00F1592B /* mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mainloop.h; path = ../../../src/player_macosx/mainloop.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -437,9 +445,9 @@
 			isa = PBXGroup;
 			children = (
 				1D3623240D0F684500981E51 /* AmbulantIphoneAppDelegate.h */,
-				1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.m */,
+				1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* AmbulantIphoneViewController.h */,
-				28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.m */,
+				28D7ACF70DDB3853001CB0EB /* AmbulantIphoneViewController.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -455,14 +463,14 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				93124772106278B300F1592B /* ambulant */,
 				080E96DDFE201D6D7F000001 /* Classes */,
+				9312493410627A0600F1592B /* AmbulantIphoneView.h */,
+				9312493510627A0600F1592B /* AmbulantIphoneView.mm */,
+				93124772106278B300F1592B /* ambulant */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				9312493410627A0600F1592B /* AmbulantIphoneView.h */,
-				9312493510627A0600F1592B /* AmbulantIphoneView.m */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1238,11 +1246,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
-				1D3623260D0F684500981E51 /* AmbulantIphoneAppDelegate.m in Sources */,
-				28D7ACF80DDB3853001CB0EB /* AmbulantIphoneViewController.m in Sources */,
-				9312493610627A0600F1592B /* AmbulantIphoneView.m in Sources */,
-				9312494D106281EE00F1592B /* mainloop.cpp in Sources */,
+				930C0DCF1063C0AD00569791 /* event_processor.cpp in Sources */,
+				930C0DD21063C0E800569791 /* delta_timer.cpp in Sources */,
+				93C1751A1063BDFF003BEA83 /* logger.cpp in Sources */,
+				930C0DCA1063C04100569791 /* unix_event_processor.cpp in Sources */,
+				930C0DCB1063C04100569791 /* unix_mtsync.cpp in Sources */,
+				930C0DCC1063C04100569791 /* unix_thread.cpp in Sources */,
+				930C0DCD1063C04100569791 /* unix_timer.cpp in Sources */,
+				930C0E6E1063CC3300569791 /* AmbulantIphoneView.mm in Sources */,
+				93C175191063BDE5003BEA83 /* get_version.cpp in Sources */,
+				93C1069B1063BCFC003BEA83 /* AmbulantIphoneAppDelegate.mm in Sources */,
+				93C1069A1063BCF5003BEA83 /* AmbulantIphoneViewController.mm in Sources */,
+				93C106991063BCEE003BEA83 /* mainloop.cpp in Sources */,
+				93C106981063BCD6003BEA83 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1280,9 +1296,13 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = TARGET_CARBON;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "../../AmbulantIphone/AmbulantIphone-Info.plist\n../../src/";
 				INFOPLIST_OUTPUT_FORMAT = "same-as-input";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1290,9 +1310,9 @@
 				);
 				PLIST_FILE_OUTPUT_FORMAT = "same-as-input";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.0;
+				SDKROOT = iphonesimulator3.0;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
-				USER_HEADER_SEARCH_PATHS = "./ ../../../../include ../../../include ../../include ../../third_party_packages/ffmpeg ../../third_party_packages/ffmpeg-universal ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "./ ../../../../../../include ../../../../../include ../../../../include ../../../include ../../include ../../third_party_packages/ffmpeg ../../third_party_packages/ffmpeg-universal ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
 			name = Debug;
 		};

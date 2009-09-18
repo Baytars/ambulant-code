@@ -20,7 +20,7 @@
 /* 
  * @$Id$ 
  */
-
+#define DOES_NOT_WORK_ON_IPHONE
 #include "ambulant/gui/cg/cg_gui.h"
 #include "ambulant/gui/cg/cg_image.h"
 #include "ambulant/common/region_dim.h"
