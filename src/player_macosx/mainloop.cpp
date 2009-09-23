@@ -59,7 +59,7 @@
 #define AM_DBG if(0)
 #endif
 
-#ifdef DOES_NOT_WORK_ON_IPHONE
+#ifdef DOES_NOT_WORK_ON_IPHONE		
 using namespace ambulant;
 
 mainloop::mainloop(const char *urlstr, void *view, ambulant::common::embedder *app)
@@ -271,3 +271,4 @@ mainloop::node_focussed(const lib::node *n)
 //	set_statusline(m_view, "???");
 }
 #endif//DOES_NOT_WORK_ON_IPHONE		
+

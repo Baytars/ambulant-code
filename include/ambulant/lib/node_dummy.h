@@ -29,7 +29,6 @@
 #include "ambulant/config/config.h"
 #include "ambulant/lib/node.h"
 
-
 namespace ambulant {
 
 namespace lib {
