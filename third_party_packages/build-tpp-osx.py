@@ -117,7 +117,7 @@ third_party_packages={
 	'mac10.6' : [
 		TPP("expat", 
 			url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
-			checkcmd="echo $PATH && pkg-config --atleast-version=2.0.0 expat",
+			checkcmd="pkg-config --atleast-version=2.0.0 expat",
 			buildcmd=
 				"cd expat-2.0.1 && "
 				"patch < %s/third_party_packages/expat.patch && "
@@ -157,7 +157,7 @@ third_party_packages={
 			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
 			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
 			buildcmd=
-				"cd SDL-1.3.0-4703 && "
+				"cd SDL-1.3.0-* && "
 				"./configure --prefix='%s' "
 					"CFLAGS='%s -framework ForceFeedback' "
 					"LDFLAGS='-framework ForceFeedback' &&"
@@ -195,7 +195,7 @@ third_party_packages={
 	'linux' : [
 		TPP("expat", 
 			url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
-			checkcmd="echo $PATH && pkg-config --atleast-version=2.0.0 expat",
+			checkcmd="pkg-config --atleast-version=2.0.0 expat",
 			buildcmd=
 				"cd expat-2.0.1 && "
 				"patch < %s/third_party_packages/expat.patch && "
@@ -227,8 +227,8 @@ third_party_packages={
 			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
 			buildcmd=
 				"cd ffmpeg-0.5 && "
-				"%s --enable-gpl --enable-libfaad "
-				"make $(MAKEFLAGS) & "
+				"%s --enable-gpl --enable-libfaad &&"
+				"make $(MAKEFLAGS) && "
 				"make install " % 
 					(LINUX_COMMON_CONFIGURE)
 			),
@@ -236,7 +236,7 @@ third_party_packages={
 			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
 			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
 			buildcmd=
-				"cd SDL-1.3.0-4703 && "
+				"cd SDL-1.3.0-* && "
 				"%s &&"
 				"make $(MAKEFLAGS) && "
 				"make install" % (LINUX_COMMON_CONFIGURE)
@@ -251,7 +251,7 @@ third_party_packages={
 			),
 		TPP("gettext",
 			url="http://ftp.gnu.org/pub/gnu/gettext/gettext-0.17.tar.gz",
-			checkcmd="test -f %s/lib/libintl.a" % COMMON_INSTALLDIR,
+			checkcmd="test -d %s/lib/gettext -o -d /usr/lib/gettext" % COMMON_INSTALLDIR,
 			buildcmd=
 				"cd gettext-0.17 && "
 				"%s --disable-csharp && "
@@ -273,7 +273,7 @@ third_party_packages={
 
 def main():
 	if len(sys.argv) != 2 or sys.argv[1] not in third_party_packages:
-		print "Usage: %s platform"
+		print "Usage: %s platform" % sys.argv[0]
 		print "Platform is one of:", ' '.join(third_party_packages.keys())
 		return 2
 	allok = True
