@@ -105,8 +105,12 @@ def appendPath(varname, value):
 	
 AMBULANT_DIR="%s/src/ambulant" % os.getenv("HOME")
 COMMON_INSTALLDIR=os.path.join(os.getcwd(), "installed")
-MAC_COMMON_CFLAGS="-arch i386 -arch x86_64"
-MAC_COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s'	" % (COMMON_INSTALLDIR, MAC_COMMON_CFLAGS)
+
+MAC104_COMMON_CFLAGS="-arch i386 -arch ppc"
+MAC104_COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s'	" % (COMMON_INSTALLDIR, MAC104_COMMON_CFLAGS)
+
+MAC106_COMMON_CFLAGS="-arch i386 -arch x86_64"
+MAC106_COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s'	" % (COMMON_INSTALLDIR, MAC106_COMMON_CFLAGS)
 
 LINUX_COMMON_CONFIGURE="./configure --prefix='%s'" % COMMON_INSTALLDIR
 
@@ -124,7 +128,7 @@ third_party_packages={
 				"autoconf && "
 				"%s && "
 				"make $(MAKEFLAGS) && "
-				"make install" % (AMBULANT_DIR, MAC_COMMON_CONFIGURE)
+				"make install" % (AMBULANT_DIR, MAC106_COMMON_CONFIGURE)
 			),
 		TPP("xerces-c",
 			url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
@@ -133,7 +137,7 @@ third_party_packages={
 				"cd xerces-c-3.0.1 && "
 				"%s CXXFLAGS='%s' --disable-dependency-tracking && "
 				"make $(MAKEFLAGS) && "
-				"make install" % (MAC_COMMON_CONFIGURE, MAC_COMMON_CFLAGS)
+				"make install" % (MAC106_COMMON_CONFIGURE, MAC106_COMMON_CFLAGS)
 			),
 		TPP("faad2",
 			url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
@@ -142,7 +146,7 @@ third_party_packages={
 				"cd faad2-2.7 && "
 				"%s --disable-dependency-tracking && "
 				"make $(MAKEFLAGS) && "
-				"make install" % MAC_COMMON_CONFIGURE
+				"make install" % MAC106_COMMON_CONFIGURE
 			),
 		TPP("ffmpeg",
 			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
@@ -160,9 +164,9 @@ third_party_packages={
 				"cd SDL-1.3.0-* && "
 				"./configure --prefix='%s' "
 					"CFLAGS='%s -framework ForceFeedback' "
-					"LDFLAGS='-framework ForceFeedback' &&"
+					"LDFLAGS='%s -framework ForceFeedback' &&"
 				"make $(MAKEFLAGS) && "
-				"make install" % (COMMON_INSTALLDIR, MAC_COMMON_CFLAGS)
+				"make install" % (COMMON_INSTALLDIR, MAC106_COMMON_CFLAGS, MAC106_COMMON_CFLAGS)
 			),
 		TPP("live",
 			url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
@@ -180,7 +184,7 @@ third_party_packages={
 				"cd gettext-0.17 && "
 				"%s --disable-csharp && "
 				"make $(MAKEFLAGS) && "
-				"make install" % MAC_COMMON_CONFIGURE
+				"make install" % MAC106_COMMON_CONFIGURE
 			),
 		TPP("libxml2",
 			url="ftp://xmlsoft.org/libxml2/libxml2-2.7.5.tar.gz",
@@ -189,7 +193,85 @@ third_party_packages={
 				"cd libxml2-2.7.5 && "
 				"%s --disable-dependency-tracking && "
 				"make $(MAKEFLAGS) && "
-				"make install" % MAC_COMMON_CONFIGURE
+				"make install" % MAC106_COMMON_CONFIGURE
+			)
+		],
+	'mac10.4' : [
+		TPP("expat", 
+			url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
+			checkcmd="pkg-config --atleast-version=2.0.0 expat",
+			buildcmd=
+				"cd expat-2.0.1 && "
+				"patch < %s/third_party_packages/expat.patch && "
+				"autoconf && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (AMBULANT_DIR, MAC104_COMMON_CONFIGURE)
+			),
+		TPP("xerces-c",
+			url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
+			checkcmd="pkg-config --atleast-version=3.0.0 xerces-c",
+			buildcmd=
+				"cd xerces-c-3.0.1 && "
+				"%s CXXFLAGS='%s' --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (MAC104_COMMON_CONFIGURE, MAC104_COMMON_CFLAGS)
+			),
+		TPP("faad2",
+			url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
+			checkcmd="test -f %s/lib/libfaad.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd faad2-2.7 && "
+				"%s --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC104_COMMON_CONFIGURE
+			),
+		TPP("ffmpeg",
+			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
+			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
+			buildcmd=
+				"mkdir ffmpeg-0.5-universal && "
+				"cd ffmpeg-0.5-universal && "
+				"%s/third_party_packages/ffmpeg-osx-fatbuild.sh %s/ffmpeg-0.5 all" % 
+					(AMBULANT_DIR, os.getcwd())
+			),
+		TPP("SDL",
+			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
+			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
+			buildcmd=
+				"cd SDL-1.3.0-* && "
+				"./configure --prefix='%s' "
+					"CFLAGS='%s -framework ForceFeedback' "
+					"LDFLAGS='%s -framework ForceFeedback' &&"
+				"make $(MAKEFLAGS) && "
+				"make install" % (COMMON_INSTALLDIR, MAC104_COMMON_CFLAGS, MAC104_COMMON_CFLAGS)
+			),
+		TPP("live",
+			url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
+			checkcmd="test -f ./live/liveMedia/libliveMedia.a",
+			buildcmd=
+				"cd live && "
+				"tar xf %s/third_party_packages/live-osx-fatbuild-patches.tar && "
+				"./genMakefiles macosx3264 && "
+				"make $(MAKEFLAGS) " % AMBULANT_DIR
+			),
+		TPP("gettext",
+			url="http://ftp.gnu.org/pub/gnu/gettext/gettext-0.17.tar.gz",
+			checkcmd="test -f %s/lib/libintl.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd gettext-0.17 && "
+				"%s --disable-csharp && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC104_COMMON_CONFIGURE
+			),
+		TPP("libxml2",
+			url="ftp://xmlsoft.org/libxml2/libxml2-2.7.5.tar.gz",
+			checkcmd="pkg-config --atleast-version=2.6.9 libxml-2.0",
+			buildcmd=
+				"cd libxml2-2.7.5 && "
+				"%s --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC104_COMMON_CONFIGURE
 			)
 		],
 	'linux' : [
