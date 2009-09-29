@@ -5,7 +5,7 @@ import urllib
 import urlparse
 import posixpath
 
-NORUN=True
+NORUN=False
 
 class TPP:
 	def __init__(self, name, url, downloadedfile=None, extractcmd=None, checkcmd=None, buildcmd=None):
@@ -38,7 +38,7 @@ class TPP:
 		if NORUN:
 			print >>self.output, "+ dry run, skip execution"
 			return True
-		sts = subprocess.call(cmd, stdout=self.output, stderr=subprocess.STDOUT)
+		sts = subprocess.call(cmd, shell=True, stdout=self.output, stderr=subprocess.STDOUT)
 		print >>self.output, "+ run status:", sts
 		return sts == 0
 		
@@ -106,7 +106,7 @@ third_party_packages=[
 		url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
 		checkcmd="pkg-config --atleast-version=3.0.0 xerces-c",
 		buildcmd=
-			"cd xxxx && "
+			"cd xerces-c-3.0.1 && "
 			"%s CXXFLAGS='%s' --disable-dependency-tracking && "
 			"make && "
 			"make install" % (COMMON_CONFIGURE, COMMON_CFLAGS)
@@ -115,7 +115,7 @@ third_party_packages=[
 		url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
 		checkcmd="test -f %s/lib/libfaad.a" % COMMON_INSTALLDIR,
 		buildcmd=
-			"cd faad2 && "
+			"cd faad2-2.7 && "
 			"%s --disable-dependency-tracking && "
 			"make && "
 			"make install" % COMMON_CONFIGURE
