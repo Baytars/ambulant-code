@@ -198,13 +198,14 @@ LDADD = \
 	$(extra_xerces_LDADD) \
 	$(LIBINTL) \
 	$(LIBICONV) \
+	$(LIBLTDL) \
     $(top_builddir)/src/libambulant/.libs/libambulant.a \
     -lstdc++
 AM_LDFLAGS= \
     -framework Cocoa \
     -framework QTKit \
-    -framework WebKit
-# XXXJACK for 32-bit, add     -framework QuickTime 
+    -framework WebKit \
+    -weak_framework QuickTime 
 
 AM_CPPFLAGS = \
     -I$(top_builddir)/include -I$(top_srcdir)/include \
