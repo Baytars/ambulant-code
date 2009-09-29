@@ -5,6 +5,7 @@ import urllib
 import urlparse
 import posixpath
 
+NOCHECK=False
 NORUN=False
 
 class TPP:
@@ -33,11 +34,12 @@ class TPP:
 		self.output.close()
 		self.output = None
 		
-	def _command(self, cmd):
+	def _command(self, cmd, force=False):
 		print >>self.output, "+ run:", cmd
-		if NORUN:
+		if NORUN and not force:
 			print >>self.output, "+ dry run, skip execution"
 			return True
+		self.output.flush()
 		sts = subprocess.call(cmd, shell=True, stdout=self.output, stderr=subprocess.STDOUT)
 		print >>self.output, "+ run status:", sts
 		return sts == 0
@@ -46,10 +48,10 @@ class TPP:
 		if not self.checkcmd:
 			print >>self.output, "+ skip availability check"
 			return True
-		if NORUN:
+		if NOCHECK:
 			print >>self.output, "+ dry run, pretend failure:", self.checkcmd
 			return False
-		return self._command(self.checkcmd)
+		return self._command(self.checkcmd, force=True)
 		
 	def download(self):
 		print >>self.output, "+ download:", self.url
@@ -87,91 +89,195 @@ class TPP:
 		self.end()
 		return ok
 
+def appendPath(varname, value):
+	"""Append a value to a colon-separated environment variable, if
+	it isn't in there already.
+	"""
+	oldvalue = os.getenv(varname)
+	if not oldvalue:
+		os.putenv(varname, value)
+		return
+	
+	oldlist = oldvalue.split(':')
+	if not value in oldlist:
+		oldlist.append(value)
+	os.putenv(varname, ':'.join(oldlist))
+	
 AMBULANT_DIR="%s/src/ambulant" % os.getenv("HOME")
 COMMON_INSTALLDIR=os.path.join(os.getcwd(), "installed")
-COMMON_CFLAGS="-arch i386 -arch x86_64"
-COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s'	" % (COMMON_INSTALLDIR, COMMON_CFLAGS)
+MAC_COMMON_CFLAGS="-arch i386 -arch x86_64"
+MAC_COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s'	" % (COMMON_INSTALLDIR, MAC_COMMON_CFLAGS)
 
-third_party_packages=[
-	TPP("expat", 
-		url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
-		checkcmd="pkg-config --atleast-version=2.0.0 expat",
-		buildcmd=
-			"cd expat-2.0.1 && "
-			"%s && "
-			"make && "
-			"make install" % COMMON_CONFIGURE
-		),
-	TPP("xerces-c",
-		url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
-		checkcmd="pkg-config --atleast-version=3.0.0 xerces-c",
-		buildcmd=
-			"cd xerces-c-3.0.1 && "
-			"%s CXXFLAGS='%s' --disable-dependency-tracking && "
-			"make && "
-			"make install" % (COMMON_CONFIGURE, COMMON_CFLAGS)
-		),
-	TPP("faad2",
-		url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
-		checkcmd="test -f %s/lib/libfaad.a" % COMMON_INSTALLDIR,
-		buildcmd=
-			"cd faad2-2.7 && "
-			"%s --disable-dependency-tracking && "
-			"make && "
-			"make install" % COMMON_CONFIGURE
-		),
-	TPP("ffmpeg",
-		url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
-		checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
-		buildcmd=
-			"mkdir ffmpeg-0.5-universal && "
-			"cd ffmpeg-0.5-universal && "
-			"%s/third_party_packages/ffmpeg-osx-fatbuild.sh %s/ffmpeg-0.5 all" % 
-				(AMBULANT_DIR, os.getcwd())
-		),
-	TPP("SDL",
-		url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
-		checkcmd="pkg-config --atleast-version=1.3.0 sdl",
-		buildcmd=
-			"cd SDL-1.3.0-4703 && "
-			"./configure --prefix='%s' "
-				"CFLAGS='%s -framework ForceFeedback' "
-				"LDFLAGS='-framework ForceFeedback' &&"
-			"make && "
-			"make install" % (COMMON_INSTALLDIR, COMMON_CFLAGS)
-		),
-	TPP("live",
-		url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-		checkcmd="test -f ./live/liveMedia/libliveMedia.a",
-		buildcmd=
-			"cd live && "
-			"tar xf %s/third_party_packages/live-osx-fatbuild-patches.tar && "
-			"./genMakefiles macosx3264 && "
-			"make" % AMBULANT_DIR
-		),
-	TPP("gettext",
-		url="http://ftp.gnu.org/pub/gnu/gettext/gettext-0.17.tar.gz",
-		checkcmd="test -f %s/lib/libintl.a" % COMMON_INSTALLDIR,
-		buildcmd=
-			"cd gettext-0.17 && "
-			"%s --disable-csharp && "
-			"make && "
-			"make install" % COMMON_CONFIGURE
-		),
-	TPP("libxml2",
-		url="ftp://xmlsoft.org/libxml2/libxml2-2.7.5.tar.gz",
-		checkcmd="pkgconfig --atleast-version=2.6.9 libxml-2.0",
-		buildcmd=
-			"cd libxml2-2.7.5 && "
-			"%s --disable-dependency-tracking && "
-			"make && "
-			"make install" % COMMON_CONFIGURE
-		)
-]
+LINUX_COMMON_CONFIGURE="./configure --prefix='%s'" % COMMON_INSTALLDIR
+
+appendPath("PATH", os.path.join(COMMON_INSTALLDIR, "bin"))
+appendPath("PKG_CONFIG_PATH", os.path.join(COMMON_INSTALLDIR, "lib/pkgconfig"))
+
+third_party_packages={
+	'mac10.6' : [
+		TPP("expat", 
+			url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
+			checkcmd="echo $PATH && pkg-config --atleast-version=2.0.0 expat",
+			buildcmd=
+				"cd expat-2.0.1 && "
+				"patch < %s/third_party_packages/expat.patch && "
+				"autoconf && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (AMBULANT_DIR, MAC_COMMON_CONFIGURE)
+			),
+		TPP("xerces-c",
+			url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
+			checkcmd="pkg-config --atleast-version=3.0.0 xerces-c",
+			buildcmd=
+				"cd xerces-c-3.0.1 && "
+				"%s CXXFLAGS='%s' --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (MAC_COMMON_CONFIGURE, MAC_COMMON_CFLAGS)
+			),
+		TPP("faad2",
+			url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
+			checkcmd="test -f %s/lib/libfaad.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd faad2-2.7 && "
+				"%s --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC_COMMON_CONFIGURE
+			),
+		TPP("ffmpeg",
+			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
+			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
+			buildcmd=
+				"mkdir ffmpeg-0.5-universal && "
+				"cd ffmpeg-0.5-universal && "
+				"%s/third_party_packages/ffmpeg-osx-fatbuild.sh %s/ffmpeg-0.5 all" % 
+					(AMBULANT_DIR, os.getcwd())
+			),
+		TPP("SDL",
+			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
+			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
+			buildcmd=
+				"cd SDL-1.3.0-4703 && "
+				"./configure --prefix='%s' "
+					"CFLAGS='%s -framework ForceFeedback' "
+					"LDFLAGS='-framework ForceFeedback' &&"
+				"make $(MAKEFLAGS) && "
+				"make install" % (COMMON_INSTALLDIR, MAC_COMMON_CFLAGS)
+			),
+		TPP("live",
+			url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
+			checkcmd="test -f ./live/liveMedia/libliveMedia.a",
+			buildcmd=
+				"cd live && "
+				"tar xf %s/third_party_packages/live-osx-fatbuild-patches.tar && "
+				"./genMakefiles macosx3264 && "
+				"make $(MAKEFLAGS) " % AMBULANT_DIR
+			),
+		TPP("gettext",
+			url="http://ftp.gnu.org/pub/gnu/gettext/gettext-0.17.tar.gz",
+			checkcmd="test -f %s/lib/libintl.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd gettext-0.17 && "
+				"%s --disable-csharp && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC_COMMON_CONFIGURE
+			),
+		TPP("libxml2",
+			url="ftp://xmlsoft.org/libxml2/libxml2-2.7.5.tar.gz",
+			checkcmd="pkg-config --atleast-version=2.6.9 libxml-2.0",
+			buildcmd=
+				"cd libxml2-2.7.5 && "
+				"%s --disable-dependency-tracking && "
+				"make $(MAKEFLAGS) && "
+				"make install" % MAC_COMMON_CONFIGURE
+			)
+		],
+	'linux' : [
+		TPP("expat", 
+			url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
+			checkcmd="echo $PATH && pkg-config --atleast-version=2.0.0 expat",
+			buildcmd=
+				"cd expat-2.0.1 && "
+				"patch < %s/third_party_packages/expat.patch && "
+				"autoconf && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (AMBULANT_DIR, LINUX_COMMON_CONFIGURE)
+			),
+		TPP("xerces-c",
+			url="http://apache.mirror.transip.nl/xerces/c/3/sources/xerces-c-3.0.1.tar.gz",
+			checkcmd="pkg-config --atleast-version=3.0.0 xerces-c",
+			buildcmd=
+				"cd xerces-c-3.0.1 && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % (LINUX_COMMON_CONFIGURE)
+			),
+		TPP("faad2",
+			url="http://downloads.sourceforge.net/project/faac/faad2-src/faad2-2.7/faad2-2.7.tar.gz?use_mirror=autoselect",
+			checkcmd="test -f %s/lib/libfaad.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd faad2-2.7 && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % LINUX_COMMON_CONFIGURE
+			),
+		TPP("ffmpeg",
+			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
+			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
+			buildcmd=
+				"cd ffmpeg-0.5 && "
+				"%s --enable-gpl --enable-libfaad "
+				"make $(MAKEFLAGS) & "
+				"make install " % 
+					(LINUX_COMMON_CONFIGURE)
+			),
+		TPP("SDL",
+			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
+			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
+			buildcmd=
+				"cd SDL-1.3.0-4703 && "
+				"%s &&"
+				"make $(MAKEFLAGS) && "
+				"make install" % (LINUX_COMMON_CONFIGURE)
+			),
+		TPP("live",
+			url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
+			checkcmd="test -f ./live/liveMedia/libliveMedia.a",
+			buildcmd=
+				"cd live && "
+				"./genMakefiles linux && "
+				"make $(MAKEFLAGS) "
+			),
+		TPP("gettext",
+			url="http://ftp.gnu.org/pub/gnu/gettext/gettext-0.17.tar.gz",
+			checkcmd="test -f %s/lib/libintl.a" % COMMON_INSTALLDIR,
+			buildcmd=
+				"cd gettext-0.17 && "
+				"%s --disable-csharp && "
+				"make $(MAKEFLAGS) && "
+				"make install" % LINUX_COMMON_CONFIGURE
+			),
+		TPP("libxml2",
+			url="ftp://xmlsoft.org/libxml2/libxml2-2.7.5.tar.gz",
+			checkcmd="pkg-config --atleast-version=2.6.9 libxml-2.0",
+			buildcmd=
+				"cd libxml2-2.7.5 && "
+				"%s && "
+				"make $(MAKEFLAGS) && "
+				"make install" % LINUX_COMMON_CONFIGURE
+			)
+		],
+	
+}
 
 def main():
+	if len(sys.argv) != 2 or sys.argv[1] not in third_party_packages:
+		print "Usage: %s platform"
+		print "Platform is one of:", ' '.join(third_party_packages.keys())
+		return 2
 	allok = True
-	for pkg in third_party_packages:
+	for pkg in third_party_packages[sys.argv[1]]:
 		print "+ processing:", pkg.name
 		ok = pkg.run()
 		if ok:
