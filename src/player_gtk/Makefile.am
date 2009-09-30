@@ -26,8 +26,8 @@ extra_gstreamer_DEFINES=
 endif
 
 if WITH_LIVE
-extra_live_LDADD=$(LIVE_LIBS)
-extra_live_DEFINES=$(top_builddir)/src/libambulant/.libs/libambulant_live.a $(LIVE_CFLAGS) -DWITH_LIVE
+extra_live_LDADD=$(top_builddir)/src/libambulant/.libs/libambulant_live.a $(LIVE_LIBS)
+extra_live_DEFINES=$(LIVE_CFLAGS) -DWITH_LIVE
 else
 extra_live_DEFINES=
 extra_live_LDADD =
