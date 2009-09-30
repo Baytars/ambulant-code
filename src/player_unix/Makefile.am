@@ -61,7 +61,7 @@ extra_xerces_LDADD=
 endif
 
 #if USE_NLS
-extra_nls_DEFINES=-DLOCALEDIR= \"$(datadir)/locale \"
+extra_nls_DEFINES=-DLOCALEDIR=\"$(datadir)/locale\"
 #else
 #extra_nls_DEFINES=
 #endif
@@ -84,7 +84,7 @@ AM_LDFLAGS= \
 	-export-dynamic
  
 AM_CPPFLAGS = \
-	-DAMBULANT_DATADIR= \"$(pkgdatadir) \" \
+	-DAMBULANT_DATADIR=\"$(pkgdatadir)\" \
 	$(extra_expat_DEFINES) \
 	$(extra_ffmpeg_DEFINES) \
 	$(extra_nls_DEFINES) \

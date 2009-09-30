@@ -309,7 +309,7 @@ third_party_packages={
 			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
 			buildcmd=
 				"cd ffmpeg-0.5 && "
-				"%s --enable-gpl --enable-libfaad &&"
+				"%s --enable-gpl --enable-libfaad --enable-swscale &&"
 				"make $(MAKEFLAGS) && "
 				"make install " % 
 					(LINUX_COMMON_CONFIGURE)
