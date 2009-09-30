@@ -559,17 +559,7 @@ if test "x$test_qt" = "xtrue"; then
 	PKG_CHECK_MODULES(QT,[qt-mt >= 3.3.0], test_qt=true, test_qt=false)
 fi
 if test "x$test_qt" = "xtrue"; then
-	LIBQT_INCLUDES="$QT_CFLAGS -DHAVE_LIBQT=1"
-	LIBQT_LIBS="$QT_LIBS"
-	LIBQTPKG="libqt"
 	QT_PREFIX="`pkg-config --variable=exec_prefix qt-mt`"
-elif test "x$QTDIR" != "x" -a "x$test_qt4" == "x"; then
-	AC_MSG_NOTICE([Old-style qt configuration, Qt directory in QTDIR environment variable])
-        test_qt=true
-	LIBQT_INCLUDES="$QT_CFLAGS -DHAVE_LIBQT=1"
-	LIBQT_LIBS="$QT_LIBS"
-	LIBQTPKG="libqt"
-	QT_PREFIX="$QTDIR"
 fi
 
 if test "x$test_qt" = "xtrue"; then
@@ -581,9 +571,8 @@ fi
 set +x
 AC_MSG_RESULT($test_qt)
 AM_CONDITIONAL(WITH_QT, test "x$test_qt" = "xtrue")
-AC_SUBST(LIBQTPKG)
-AC_SUBST(LIBQT_INCLUDES)
-AC_SUBST(LIBQT_LIBS)
+AC_SUBST(QT_CFLAGS)
+AC_SUBST(QT_LIBS)
 AC_SUBST(QT_PREFIX)
 
 
