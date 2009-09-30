@@ -36,7 +36,8 @@ diff -ruN expat-2.0.1-orig/Makefile.in expat-2.0.1/Makefile.in
  
 -installlib: $(LIBRARY) $(APIHEADER)
 +installlib: $(LIBRARY) $(APIHEADER) expat.pc
- 	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir)
+- 	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir)
++ 	$(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir) $(DESTDIR)$(pkgconfigdir)
  	$(LIBTOOL) --mode=install $(INSTALL) $(LIBRARY) $(DESTDIR)$(libdir)/$(LIBRARY)
  	for FN in $(APIHEADER) ; do $(INSTALL_DATA) $$FN $(DESTDIR)$(includedir) ; done
 +	$(INSTALL_DATA) expat.pc $(DESTDIR)$(pkgconfigdir)/expat.pc
