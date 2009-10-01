@@ -44,6 +44,11 @@
 #endif
 #include <stdarg.h>
 
+#ifndef NSINTEGER_DEFINED
+typedef int NSInteger;
+typedef unsigned int NSUInteger;
+#endif
+
 class nslog_ostream : public ambulant::lib::ostream {
 	bool is_open() const {return true;}
 	void close() {}

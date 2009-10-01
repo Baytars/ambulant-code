@@ -100,42 +100,45 @@ with_frontend=false
 AC_MSG_CHECKING(for --with-universalsdk)
 AC_ARG_WITH(universalsdk,
     AS_HELP_STRING([--with-universalsdk],[Build MacOSX 10.4 universal (ppc/intel) binary]),
-[
-    need_sysroot=no
-    case $withval in
-    yes)
-        withval=/Developer/SDKs/MacOSX10.4u.sdk
-        case `uname -r` in
-        8*) 
-            need_sysroot=yes
-            ;;
-        esac
-        ;;
-    *)	need_sysroot=yes
-    	;;
-    esac
-    case $withval in
-    no)
-        with_universalsdk=false
-        need_sysroot=no
-        ;;
-    *)
-        with_universalsdk=true
-        if test $need_sysroot = yes ; then
-            sysroot="-isysroot ${withval}"
-        else
-            sysroot=""
-        fi
-        CFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${CFLAGS}"
-        CXXFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${CXXFLAGS}"
-        OBJCFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${OBJCFLAGS}"
-        #LDFLAGS="-arch ppc -arch i386 ${sysroot} -L/usr/local/lib ${LDFLAGS}"
-        ;;
-    esac
-],
-[
-    with_universalsdk=false
-])
+	[
+		need_sysroot=no
+		case $withval in
+		yes)
+			withval=/Developer/SDKs/MacOSX10.4u.sdk
+			case `uname -r` in
+			8*) 
+				need_sysroot=yes
+				;;
+			esac
+			;;
+		*)	need_sysroot=yes
+			;;
+		esac
+		case $withval in
+		no)
+			with_universalsdk=false
+			need_sysroot=no
+			;;
+		*)
+			with_universalsdk=true
+			if test $need_sysroot = yes ; then
+				sysroot="-isysroot ${withval}"
+			else
+				sysroot=""
+			fi
+			CFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${CFLAGS}"
+			CXXFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${CXXFLAGS}"
+			OBJCFLAGS="-arch ppc -arch i386 ${sysroot} -I/usr/local/include ${OBJCFLAGS}"
+			#LDFLAGS="-arch ppc -arch i386 ${sysroot} -L/usr/local/lib ${LDFLAGS}"
+			# Need to pass these to recursive configure calls to (esp. libltdl)
+			export CFLAGS
+			ac_configure_args="$ac_configure_args --disable-dependency-tracking"
+			;;
+		esac
+	],
+	[with_universalsdk=false])
+AC_MSG_RESULT($with_universalsdk)
+
 #
 # Do we want MacOSX fat (32/64 bit) binary support?
 #
