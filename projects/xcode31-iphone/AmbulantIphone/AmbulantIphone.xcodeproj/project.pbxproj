@@ -19,10 +19,8 @@
 		939255D8106A2DE400B749F8 /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 939255CD106A2DE400B749F8 /* Makefile.am */; };
 		939255F1106A2E3600B749F8 /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 939255E9106A2E3600B749F8 /* Makefile.am */; };
 		93925609106A2E4F00B749F8 /* Makefile.am in Resources */ = {isa = PBXBuildFile; fileRef = 939255F8106A2E4E00B749F8 /* Makefile.am */; };
-		939DD2AD106A4DF400C6C6DE /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 939DD29F106A4DF400C6C6DE /* libexpat.a */; };
 		939DD2E7106A510200C6C6DE /* gpaths.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C142106A24FA00493626 /* gpaths.cpp */; };
 		93C106981063BCD6003BEA83 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
-		93C106991063BCEE003BEA83 /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9312494B106281EE00F1592B /* mainloop.cpp */; };
 		93C1069B1063BCFC003BEA83 /* AmbulantIphoneAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AmbulantIphoneAppDelegate.mm */; };
 		93C2C232106A25D700493626 /* video_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C0F5106A24FA00493626 /* video_renderer.cpp */; };
 		93C2C236106A261800493626 /* logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C143106A24FA00493626 /* logger.cpp */; };
@@ -87,6 +85,23 @@
 		93C2C27E106A272400493626 /* cg_fill.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C0FB106A24FA00493626 /* cg_fill.mm */; };
 		93C2C280106A272900493626 /* event_processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C140106A24FA00493626 /* event_processor.cpp */; };
 		93C2C281106A273B00493626 /* stdio_datasource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C2C168106A24FA00493626 /* stdio_datasource.cpp */; };
+		93CB38D210721FBE0060B53C /* mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CB38D110721FBE0060B53C /* mainloop.cpp */; };
+		93CB3A0E1072565A0060B53C /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93CB3A0D1072565A0060B53C /* libexpat.a */; };
+		93FC7255107388FF00F774E8 /* ambulant.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7243107388FF00F774E8 /* ambulant.png */; };
+		93FC7256107388FF00F774E8 /* AmbulantTune.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7244107388FF00F774E8 /* AmbulantTune.mp3 */; };
+		93FC7257107388FF00F774E8 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7245107388FF00F774E8 /* background.png */; };
+		93FC7258107388FF00F774E8 /* extensible.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7246107388FF00F774E8 /* extensible.png */; };
+		93FC7259107388FF00F774E8 /* fast.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7247107388FF00F774E8 /* fast.png */; };
+		93FC725A107388FF00F774E8 /* opensource.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7248107388FF00F774E8 /* opensource.png */; };
+		93FC725B107388FF00F774E8 /* portable.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7249107388FF00F774E8 /* portable.png */; };
+		93FC725C107388FF00F774E8 /* visit.png in Resources */ = {isa = PBXBuildFile; fileRef = 93FC724A107388FF00F774E8 /* visit.png */; };
+		93FC725D107388FF00F774E8 /* Recording#02.aif in Resources */ = {isa = PBXBuildFile; fileRef = 93FC724E107388FF00F774E8 /* Recording#02.aif */; };
+		93FC725E107388FF00F774E8 /* Recording#07.aif in Resources */ = {isa = PBXBuildFile; fileRef = 93FC724F107388FF00F774E8 /* Recording#07.aif */; };
+		93FC725F107388FF00F774E8 /* projectData in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7250107388FF00F774E8 /* projectData */; };
+		93FC7260107388FF00F774E8 /* image.psd in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7251107388FF00F774E8 /* image.psd */; };
+		93FC7261107388FF00F774E8 /* Welcome-smiltext.smil in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7252107388FF00F774E8 /* Welcome-smiltext.smil */; };
+		93FC7262107388FF00F774E8 /* Welcome.smil in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7253107388FF00F774E8 /* Welcome.smil */; };
+		93FC7263107388FF00F774E8 /* Welcome.smil.xx in Resources */ = {isa = PBXBuildFile; fileRef = 93FC7254107388FF00F774E8 /* Welcome.smil.xx */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,7 +119,6 @@
 		8D1107310486CEB800E47090 /* AmbulantIphone-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AmbulantIphone-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9312493410627A0600F1592B /* AmbulantIphoneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AmbulantIphoneView.h; path = ../AmbulantIphoneView.h; sourceTree = "<group>"; };
 		9312493510627A0600F1592B /* AmbulantIphoneView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AmbulantIphoneView.mm; path = ../AmbulantIphoneView.mm; sourceTree = "<group>"; };
-		9312494B106281EE00F1592B /* mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop.cpp; path = ../../../src/player_macosx/mainloop.cpp; sourceTree = SOURCE_ROOT; };
 		9312494C106281EE00F1592B /* mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mainloop.h; path = ../../../src/player_macosx/mainloop.h; sourceTree = SOURCE_ROOT; };
 		939255A1106A2DE400B749F8 /* abstract_mtsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = abstract_mtsync.h; sourceTree = "<group>"; };
 		939255A2106A2DE400B749F8 /* amstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = amstream.h; sourceTree = "<group>"; };
@@ -479,6 +493,23 @@
 		93C2C20D106A24FB00493626 /* gtk_transition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gtk_transition.h; sourceTree = "<group>"; };
 		93C2C20E106A24FB00493626 /* gtk_video_renderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gtk_video_renderer.h; sourceTree = "<group>"; };
 		93C2C20F106A24FB00493626 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		93CB38D110721FBE0060B53C /* mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop.cpp; path = ../../../src/player_macosx/mainloop.cpp; sourceTree = SOURCE_ROOT; };
+		93CB3A0D1072565A0060B53C /* libexpat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libexpat.a; path = "../../../third_party_packages/expat-iphone/lib/libexpat.a"; sourceTree = SOURCE_ROOT; };
+		93FC7243107388FF00F774E8 /* ambulant.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ambulant.png; sourceTree = "<group>"; };
+		93FC7244107388FF00F774E8 /* AmbulantTune.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = AmbulantTune.mp3; sourceTree = "<group>"; };
+		93FC7245107388FF00F774E8 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
+		93FC7246107388FF00F774E8 /* extensible.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = extensible.png; sourceTree = "<group>"; };
+		93FC7247107388FF00F774E8 /* fast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fast.png; sourceTree = "<group>"; };
+		93FC7248107388FF00F774E8 /* opensource.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = opensource.png; sourceTree = "<group>"; };
+		93FC7249107388FF00F774E8 /* portable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = portable.png; sourceTree = "<group>"; };
+		93FC724A107388FF00F774E8 /* visit.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = visit.png; sourceTree = "<group>"; };
+		93FC724E107388FF00F774E8 /* Recording#02.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Recording#02.aif"; sourceTree = "<group>"; };
+		93FC724F107388FF00F774E8 /* Recording#07.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Recording#07.aif"; sourceTree = "<group>"; };
+		93FC7250107388FF00F774E8 /* projectData */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = projectData; sourceTree = "<group>"; };
+		93FC7251107388FF00F774E8 /* image.psd */ = {isa = PBXFileReference; lastKnownFileType = file; path = image.psd; sourceTree = "<group>"; };
+		93FC7252107388FF00F774E8 /* Welcome-smiltext.smil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Welcome-smiltext.smil"; sourceTree = "<group>"; };
+		93FC7253107388FF00F774E8 /* Welcome.smil */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Welcome.smil; sourceTree = "<group>"; };
+		93FC7254107388FF00F774E8 /* Welcome.smil.xx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Welcome.smil.xx; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -489,7 +520,7 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
-				939DD2AD106A4DF400C6C6DE /* libexpat.a in Frameworks */,
+				93CB3A0E1072565A0060B53C /* libexpat.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,7 +564,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				9312494B106281EE00F1592B /* mainloop.cpp */,
+				93CB38D110721FBE0060B53C /* mainloop.cpp */,
 				9312494C106281EE00F1592B /* mainloop.h */,
 				32CA4F630368D1EE00C91783 /* AmbulantIphone_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
@@ -544,6 +575,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				93FC7241107388FE00F774E8 /* Welcome */,
 				2899E5210DE3E06400AC0155 /* AmbulantIphoneViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* AmbulantIphone-Info.plist */,
@@ -701,6 +733,7 @@
 				939DD29D106A4DF400C6C6DE /* libfaad.a */,
 				939DD29E106A4DF400C6C6DE /* libltdl.a */,
 				939DD29F106A4DF400C6C6DE /* libexpat.a */,
+				93CB3A0D1072565A0060B53C /* libexpat.a */,
 				939DD2A0106A4DF400C6C6DE /* libxerces-c.dylib */,
 				939DD2A1106A4DF400C6C6DE /* libliveMedia.a */,
 				939DD2A2106A4DF400C6C6DE /* libUsageEnvironment.a */,
@@ -1223,6 +1256,60 @@
 			path = gtk;
 			sourceTree = "<group>";
 		};
+		93FC7241107388FE00F774E8 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				93FC7242107388FE00F774E8 /* data */,
+				93FC724B107388FF00F774E8 /* src */,
+				93FC7252107388FF00F774E8 /* Welcome-smiltext.smil */,
+				93FC7253107388FF00F774E8 /* Welcome.smil */,
+				93FC7254107388FF00F774E8 /* Welcome.smil.xx */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+		93FC7242107388FE00F774E8 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				93FC7243107388FF00F774E8 /* ambulant.png */,
+				93FC7244107388FF00F774E8 /* AmbulantTune.mp3 */,
+				93FC7245107388FF00F774E8 /* background.png */,
+				93FC7246107388FF00F774E8 /* extensible.png */,
+				93FC7247107388FF00F774E8 /* fast.png */,
+				93FC7248107388FF00F774E8 /* opensource.png */,
+				93FC7249107388FF00F774E8 /* portable.png */,
+				93FC724A107388FF00F774E8 /* visit.png */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		93FC724B107388FF00F774E8 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				93FC724C107388FF00F774E8 /* AmbulantTune.band */,
+				93FC7251107388FF00F774E8 /* image.psd */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		93FC724C107388FF00F774E8 /* AmbulantTune.band */ = {
+			isa = PBXGroup;
+			children = (
+				93FC724D107388FF00F774E8 /* Media */,
+				93FC7250107388FF00F774E8 /* projectData */,
+			);
+			path = AmbulantTune.band;
+			sourceTree = "<group>";
+		};
+		93FC724D107388FF00F774E8 /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				93FC724E107388FF00F774E8 /* Recording#02.aif */,
+				93FC724F107388FF00F774E8 /* Recording#07.aif */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1272,6 +1359,21 @@
 				939255D8106A2DE400B749F8 /* Makefile.am in Resources */,
 				939255F1106A2E3600B749F8 /* Makefile.am in Resources */,
 				93925609106A2E4F00B749F8 /* Makefile.am in Resources */,
+				93FC7255107388FF00F774E8 /* ambulant.png in Resources */,
+				93FC7256107388FF00F774E8 /* AmbulantTune.mp3 in Resources */,
+				93FC7257107388FF00F774E8 /* background.png in Resources */,
+				93FC7258107388FF00F774E8 /* extensible.png in Resources */,
+				93FC7259107388FF00F774E8 /* fast.png in Resources */,
+				93FC725A107388FF00F774E8 /* opensource.png in Resources */,
+				93FC725B107388FF00F774E8 /* portable.png in Resources */,
+				93FC725C107388FF00F774E8 /* visit.png in Resources */,
+				93FC725D107388FF00F774E8 /* Recording#02.aif in Resources */,
+				93FC725E107388FF00F774E8 /* Recording#07.aif in Resources */,
+				93FC725F107388FF00F774E8 /* projectData in Resources */,
+				93FC7260107388FF00F774E8 /* image.psd in Resources */,
+				93FC7261107388FF00F774E8 /* Welcome-smiltext.smil in Resources */,
+				93FC7262107388FF00F774E8 /* Welcome.smil in Resources */,
+				93FC7263107388FF00F774E8 /* Welcome.smil.xx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1284,7 +1386,6 @@
 			files = (
 				930C0E6E1063CC3300569791 /* AmbulantIphoneView.mm in Sources */,
 				93C1069B1063BCFC003BEA83 /* AmbulantIphoneAppDelegate.mm in Sources */,
-				93C106991063BCEE003BEA83 /* mainloop.cpp in Sources */,
 				93C106981063BCD6003BEA83 /* main.m in Sources */,
 				93C2C232106A25D700493626 /* video_renderer.cpp in Sources */,
 				93C2C236106A261800493626 /* logger.cpp in Sources */,
@@ -1351,6 +1452,7 @@
 				93C2C281106A273B00493626 /* stdio_datasource.cpp in Sources */,
 				939DD2E7106A510200C6C6DE /* gpaths.cpp in Sources */,
 				935B9523106A7879009343A8 /* AmbulantIphoneViewController.mm in Sources */,
+				93CB38D210721FBE0060B53C /* mainloop.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1360,24 +1462,32 @@
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = AmbulantIphone_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					WITH_SMIL30,
+					WITH_EXPAT,
+					WITH_UIKIT,
+					WITH_CG,
+					NONE_PLAYER,
+				);
+				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "AmbulantIphone-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../../packages/ffmpeg-universal/libavformat\"",
 					"\"$(SRCROOT)/../../../../../packages/ffmpeg-universal/libavcodec\"",
 					"\"$(SRCROOT)/../../../../../packages/ffmpeg-universal/libavutil\"",
-					"\"$(SRCROOT)/../../../third_party_packages/expat-unix/lib\"",
 					"\"$(SRCROOT)/../../../../../packages/xerces-unix/lib\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/liveMedia\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/UsageEnvironment\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../../third_party_packages/expat-iphone/lib\"",
 				);
 				PRODUCT_NAME = AmbulantIphone;
 			};
@@ -1402,6 +1512,7 @@
 					"\"$(SRCROOT)/../../../third_party_packages/live/UsageEnvironment\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../../third_party_packages/expat-iphone/lib\"",
 				);
 				PRODUCT_NAME = AmbulantIphone;
 			};
@@ -1416,21 +1527,22 @@
 				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					WITH_SMIL30,
 					WITH_EXPAT,
 					WITH_UIKIT,
 					TARGET_CARBON,
+					WITH_CG,
+					NONE_PLAYER,
 				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = WITH_COCOA;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "../../AmbulantIphone/AmbulantIphone-Info.plist\n../../src/";
 				INFOPLIST_OUTPUT_FORMAT = "same-as-input";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"../../third_party_packages/expat-unix/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PLIST_FILE_OUTPUT_FORMAT = "same-as-input";
 				PREBINDING = NO;
-				SDKROOT = iphonesimulator3.0;
+				SDKROOT = iphoneos3.0;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-16";
 				USER_HEADER_SEARCH_PATHS = "../../../third_party_packages/expat-unix/include ../../../include ../../third_party_packages/ffmpeg ../../third_party_packages/ffmpeg-universal ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
