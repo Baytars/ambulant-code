@@ -103,7 +103,7 @@ endif
 
 if WITH_QT
 toolkit_qt_libraries = libambulant_qt.la
-qtincludes = $(LIBQT_INCLUDES)
+qtincludes = $(QT_CFLAGS)
 
 libambulant_qt_la_SOURCES = \
 	gui/qt/qt_renderer.cpp \
