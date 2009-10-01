@@ -59,7 +59,6 @@
 #define AM_DBG if(0)
 #endif
 
-#ifdef DOES_NOT_WORK_ON_IPHONE		
 using namespace ambulant;
 
 mainloop::mainloop(const char *urlstr, void *view, ambulant::common::embedder *app)
@@ -110,10 +109,10 @@ mainloop::init_playable_factory()
 	set_playable_factory(pf);
 #ifndef NONE_PLAYER
 #ifdef WITH_CG
-	pf->add_factory(gui::cg::create_cg_dsvideo_playable_factory(this, NULL));
+//	pf->add_factory(gui::cg::create_cg_dsvideo_playable_factory(this, NULL));
 	pf->add_factory(gui::cg::create_cg_fill_playable_factory(this, NULL));
-//	pf->add_factory(gui::cg::create_cg_html_playable_factory(this, NULL));
-	pf->add_factory(gui::cg::create_cg_image_playable_factory(this, NULL));
+	pf->add_factory(gui::cg::create_cg_html_playable_factory(this, NULL));
+//	pf->add_factory(gui::cg::create_cg_image_playable_factory(this, NULL));
 //	pf->add_factory(gui::cg::create_cg_ink_playable_factory(this, NULL));
 //	pf->add_factory(gui::cg::create_cg_smiltext_playable_factory(this, NULL));
 	pf->add_factory(gui::cg::create_cg_text_playable_factory(this, NULL));
@@ -144,7 +143,7 @@ mainloop::init_window_factory()
 	set_window_factory(gui::none::create_none_window_factory());
 #else
 #ifdef WITH_CG
-	set_window_factory(gui::cg::create_cg_window_factory(m_view));
+//	set_window_factory(gui::cg::create_cg_window_factory(m_view));
 #else
 	set_window_factory(gui::cocoa::create_cocoa_window_factory(m_view));
 #endif
@@ -237,7 +236,7 @@ mainloop::get_gui_screen()
 {
 
 #ifdef WITH_CG
-	if (!m_gui_screen) m_gui_screen = new gui::cg::cg_gui_screen(m_view);
+//X	if (!m_gui_screen) m_gui_screen = new gui::cg::cg_gui_screen(m_view);
 #else
 	if (!m_gui_screen) m_gui_screen = new gui::cocoa::cocoa_gui_screen(m_view);
 #endif
@@ -249,14 +248,14 @@ mainloop::node_focussed(const lib::node *n)
 {
 	if (n == NULL) {
 		AM_DBG lib::logger::get_logger()->debug("node_focussed(0)");
-		set_statusline(m_view, "");
+//X		set_statusline(m_view, "");
 		return;
 	}
 	AM_DBG lib::logger::get_logger()->debug("node_focussed(%s)", n->get_sig().c_str());
 	const char *alt = n->get_attribute("alt");
 	if (alt) {
 		AM_DBG lib::logger::get_logger()->debug("node_focussed: alt=%s", alt);
-		set_statusline(m_view, alt);
+//X		set_statusline(m_view, alt);
 		return;
 	}
 	const char *href = n->get_attribute("href");
@@ -264,11 +263,12 @@ mainloop::node_focussed(const lib::node *n)
 		AM_DBG lib::logger::get_logger()->debug("node_focussed: href=%s", href);
 		std::string msg = "Go to ";
 		msg += href;
-		set_statusline(m_view, msg.c_str());
+//X		set_statusline(m_view, msg.c_str());
 		return;
 	}
 	AM_DBG lib::logger::get_logger()->debug("node_focussed: nothing to show");
-//	set_statusline(m_view, "???");
+//X	set_statusline(m_view, "???");
 }
+#ifdef DOES_NOT_WORK_ON_IPHONE		
 #endif//DOES_NOT_WORK_ON_IPHONE		
 
