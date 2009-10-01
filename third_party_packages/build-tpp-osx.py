@@ -309,10 +309,10 @@ third_party_packages={
 			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
 			buildcmd=
 				"cd ffmpeg-0.5 && "
-				"%s --enable-gpl --enable-libfaad --enable-swscale --enable-shared &&"
+				"%s --enable-gpl --enable-libfaad --enable-swscale --enable-shared --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
 				"make $(MAKEFLAGS) && "
 				"make install " % 
-					(LINUX_COMMON_CONFIGURE)
+					(LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
 			),
 		TPP("SDL",
 			url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",

@@ -552,17 +552,17 @@ AC_ARG_WITH(qt,
      ])
 # qt4 is not supported yet
 test_qt4=false
-if test "x$test_qt" = "xtrue"; then
+if $test_qt4; then
 	PKG_CHECK_MODULES(QT,[Qt >= 4.0.0], test_qt4=true, test_qt4=false)
 fi
-if test "x$test_qt" = "xtrue"; then
+if $test_qt; then
 	PKG_CHECK_MODULES(QT,[qt-mt >= 3.3.0], test_qt=true, test_qt=false)
 fi
-if test "x$test_qt" = "xtrue"; then
+if $test_qt; then
 	QT_PREFIX="`pkg-config --variable=exec_prefix qt-mt`"
 fi
 
-if test "x$test_qt" = "xtrue"; then
+if $test_qt; then
     with_frontend=true
 fi
 #if test "x$test_qt4" = "xtrue"; then
@@ -792,12 +792,13 @@ if $test_ffmpeg; then
 	PKG_CHECK_MODULES(LIBAVFORMAT,[libavformat >= 52.14.0], , test_ffmpeg=false)
 	PKG_CHECK_EXISTS([libswscale >= 0.7.1],
 		PKG_CHECK_MODULES(LIBSWSCALE, [libswscale >= 0.7.1], test_ffmpeg_swscale=true, test_ffmpeg_swscale=false), 
-		[
-			LIBSWSCALE_CFLAGS=
-			LIBSWSCALE_LIBS=
-			test_ffmpeg_swscale=false
-		])
-		
+		[test_ffmpeg_swscale=false])
+	if $test_ffmpeg_swscale; then
+		:
+	else
+		LIBSWSCALE_CFLAGS=""
+		LIBSWSCALE_LIBS=""
+	fi
 	FFMPEG_CFLAGS="${LIBAVFORMAT_CFLAGS} ${LIBAVCODEC_CFLAGS} ${LIBAVUTIL_CFLAGS} ${LIBSWSCALE_CFLAGS}"
 	FFMPEG_LIBS="${LIBAVFORMAT_LIBS} ${LIBAVCODEC_LIBS} ${LIBAVUTIL_LIBS} ${LIBSWSCALE_LIBS}"
 fi
