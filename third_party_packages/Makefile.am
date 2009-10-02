@@ -1,5 +1,5 @@
 EXTRA_DIST = \
-	build-third_party_packages.py \
+	build-third-party-packages.py \
 	readme.txt \
 	readme-osx.txt \
 	ffmpeg-osx-fatbuild.sh \

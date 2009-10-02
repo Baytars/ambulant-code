@@ -6,12 +6,18 @@ EXTRA_DIST=MyAmbulantView.mm MyDocument.mm LogController.mm mainloop.cpp MyAppDe
 	Info.plist version.plist \
 	fullcocoambulant.xcodeproj \
 	cocoambulant.icns \
+	Ambulant.icns \
+	AmbulantDocSmil.icns \
+	AmbulantDocGrins.icns \
+	AmbulantDocDaisy.icns \
 	play.png \
 	pause.png \
 	playactive.png \
 	stop.png \
 	systemTestSettings.xml \
 	genappleindex.sh \
+	internalize_dylibs.py \
+	testdependencies \
 	ui_icons.psd
 
 if WITH_CG
