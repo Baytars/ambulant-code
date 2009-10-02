@@ -20,6 +20,8 @@ EXTRA_DIST=MyAmbulantView.mm MyDocument.mm LogController.mm mainloop.cpp MyAppDe
 	testdependencies \
 	ui_icons.psd
 
+PYTHON=python
+
 if WITH_CG
 extra_cg_LDADD=$(top_builddir)/src/libambulant/.libs/libambulant_cg.a
 else
@@ -92,7 +94,8 @@ BUILDAPPNAME = "AmbulantPlayer"
 # Script to test dependencies
 TESTDEP=$(srcdir)/testdependencies
 
-cocoambulant_bundle: cocoambulant_executable
+cocoambulant_bundle: $(BUILDAPPNAME).app
+$(BUILDAPPNAME).app: cocoambulant_executable
 	mkdir -p $(BUILDAPPNAME).app/Contents/MacOS
 	mkdir -p $(BUILDAPPNAME).app/Contents/Resources
 	echo -n "APPLAmbl" > $(BUILDAPPNAME).app/Contents/PkgInfo
@@ -113,24 +116,14 @@ cocoambulant_bundle: cocoambulant_executable
 	cd ../plugins; \
 	$(MAKE) $(AM_MAKEFLAGS) pkglibdir=$$pkglibdir install 
 	
-
-#	The next bit is gross. Xerces only builds as a dynamic library. This means
-#	we must copy that library into the .app bundle (in the Frameworks dir) and
-#	change the plugin to refer to that copy of the xerces library in stead of
-#	the one it was linked to.
-if WITH_XERCES_PLUGIN
-	mkdir -p $(BUILDAPPNAME).app/Contents/Frameworks
-	cp $(top_builddir)/third_party_packages/xerces-unix/lib/libxerces-c.27.dylib $(BUILDAPPNAME).app/Contents/Frameworks
-	install_name_tool -change `otool -D $(top_builddir)/third_party_packages/xerces-unix/lib/libxerces-c.27.dylib | tail -n 1` \
-		@loader_path/../Frameworks/libxerces-c.27.dylib $(BUILDAPPNAME).app/Contents/PlugIns/libamplugin_xerces$(SO)
-	install_name_tool -id @loader_path/../Frameworks/libxerces-c.27.dylib $(BUILDAPPNAME).app/Contents/Frameworks/libxerces-c.27.dylib
-endif
+#	Internalize any non-system shared libraries we use
+	$(PYTHON) $(srcdir)/internalize_dylibs.py -v $(BUILDAPPNAME).app
 
 #	Install gettext localizations
 	localedir=`pwd`/$(BUILDAPPNAME).app/Contents/Resources/locale; \
 	cd ../../po ; \
 	$(MAKE) $(AM_MAKEFLAGS) localedir=$$localedir install
-    
+	
 #	Install Cocoa localizations
 	mkdir -p $(BUILDAPPNAME).app/Contents/Resources/English.lproj
 	$(INSTALL_DATA) $(srcdir)/English.lproj/Credits.rtf $(BUILDAPPNAME).app/Contents/Resources/English.lproj
@@ -189,7 +182,8 @@ endif
 	$(INSTALL_PROGRAM_ENV) $(INSTALL_PROGRAM) cocoambulant_executable `pwd`/$(BUILDAPPNAME).app/Contents/MacOS/Ambulant-mac
 	strip -x `pwd`/$(BUILDAPPNAME).app/Contents/MacOS/Ambulant-mac
 	
-#   Test for problematic dependencies
+#	Test for problematic dependencies
+	$(PYTHON) $(srcdir)/internalize_dylibs.py -c $(BUILDAPPNAME).app
 	$(TESTDEP) `pwd`/$(BUILDAPPNAME).app/Contents/MacOS/Ambulant-mac
 	$(TESTDEP) `pwd`/$(BUILDAPPNAME).app/Contents/PlugIns/*
 	$(TESTDEP) `pwd`/$(BUILDAPPNAME).app/Contents/Frameworks/*
@@ -205,22 +199,22 @@ LDADD = \
 	$(LIBINTL) \
 	$(LIBICONV) \
 	$(LIBLTDL) \
-    $(top_builddir)/src/libambulant/.libs/libambulant.a \
-    -lstdc++
+	$(top_builddir)/src/libambulant/.libs/libambulant.a \
+	-lstdc++
 AM_LDFLAGS= \
-    -framework Cocoa \
-    -framework QTKit \
-    -framework WebKit \
-    -weak_framework QuickTime 
+	-framework Cocoa \
+	-framework QTKit \
+	-framework WebKit \
+	-weak_framework QuickTime 
 
 AM_CPPFLAGS = \
-    -I$(top_builddir)/include -I$(top_srcdir)/include \
-    $(extra_expat_DEFINES) \
+	-I$(top_builddir)/include -I$(top_srcdir)/include \
+	$(extra_expat_DEFINES) \
 	$(extra_ffmpeg_DEFINES) \
 	$(extra_nls_DEFINES) \
 	$(extra_live_DEFINES) \
 	$(extra_sdl_DEFINES) \
-    $(extra_xerces_DEFINES)
+	$(extra_xerces_DEFINES)
 
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
