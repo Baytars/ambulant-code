@@ -38,7 +38,12 @@ class Internalizer:
 		self.todo = {}
 		self.done = {}
 		self.used = {}
+				
+		self.norun = False
+		self.verbose = False
+		self.work_done = False
 		
+	def add_standard(self):
 		for dirpath, dirnames, filenames in os.walk(self.run_dir):
 			for name in filenames:
 				name = os.path.join(dirpath, name)
@@ -51,23 +56,19 @@ class Internalizer:
 			for name in filenames:
 				name = os.path.join(dirpath, name)
 				self.add(name)
-		
-		self.norun = False
-		
+
 	def add(self, src, copy=False):
-		print "* add?", src
 		while os.path.islink(src):
 			src = os.path.realpath(src)
 		if src in self.todo or src in self.done:
 			return
 		if not self.is_loadable(src):
 			return
-		print '* add', src
+		if self.verbose: print '* add', src
 		if copy:
 			dstname = os.path.basename(src)
 			if dstname in self.used:
 				print '** destname', dstname, 'in use'
-				import pdb ; pdb.set_trace()
 				return
 			self.used[dstname] = True
 		else:
@@ -82,8 +83,7 @@ class Internalizer:
 			self.done[src] = dst
 		
 	def process(self, src, dst):
-		print
-		print '* process', src, dst
+		if self.verbose: print '* process', src, dst
 		libraries = self.get_libs(src)
 		must_change = []
 		for lib in libraries:
@@ -93,7 +93,7 @@ class Internalizer:
 		if dst:
 			self.copy(src, dst)
 			self.set_name(dst)
-			src = dst
+			src = os.path.join(self.framework_dir, dst)
 		for lib in must_change:
 			self.modify_reference(src, lib)
 		
@@ -101,10 +101,14 @@ class Internalizer:
 		if '.framework/' in src:
 			print '** Warning: About to copy from framework:', src
 		dstfilename = os.path.join(self.framework_dir, dst)
-		if self.norun:
+		if self.verbose:
 			print 'copy', src, dstfilename
-		else:
+		if not self.norun:
+			dstdir = os.path.dirname(dstfilename)
+			if not os.path.exists(dstdir):
+				os.mkdir(dstdir)
 			shutil.copy(src, dstfilename)
+		self.work_done = True
 		
 	def get_libs(self, src):
 		proc = subprocess.Popen(['otool', '-L', src],
@@ -120,23 +124,25 @@ class Internalizer:
 	def set_name(self, dst):
 		dstfilename = os.path.join(self.framework_dir, dst)
 		dstfileid = os.path.join("@loader_path/../Frameworks/", os.path.basename(dst))
-		if self.norun:
+		if self.verbose:
 			print 'setname', dstfilename, dstfileid
-		else:
-			assert 0
+		if not self.norun:
+			subprocess.check_call(['install_name_tool', '-id', dstfileid, dstfilename])
+		self.work_done = True
 			
 	def modify_reference(self, dst, lib):
 		reallib = os.path.realpath(lib)
 		libid = os.path.join("@loader_path/../Frameworks/", os.path.basename(reallib))
-		if self.norun:
+		if self.verbose:
 			print 'modify_lib_reference', dst, lib, libid
+		if not self.norun:
+			subprocess.check_call(['install_name_tool', '-change', lib, libid, dst])
+		self.work_done = True
 			
 	def must_copy(self, lib):
 		for prefix in self.safe_prefixes:
 			if  os.path.commonprefix([prefix, lib]) == prefix:
-				print '* no_copy', lib
 				return False
-		print '* must_copy', lib
 		return True
 		
 	def is_loadable(self, file):
@@ -154,13 +160,41 @@ class Internalizer:
 		return rv
 		
 def main():
+	norun = False
+	verbose = False
+	check = False
+	if len(sys.argv) > 2:
+		if sys.argv[1] == '-v':	
+			verbose = True
+			del sys.argv[1]
+		if sys.argv[1] == '-n':
+			norun = True
+			del sys.argv[1]
+		if sys.argv[1] == '-c':
+			check = True
+			del sys.argv[1]
 	if len(sys.argv) != 2:
-		print 'Usage: %s bundlepath '% sys.argv[0]
+		print 'Usage: %s [-vnc] bundlepath '% sys.argv[0]
 		print 'Recursively slurp dylibs used in a bundle.'
+		print '-n\tNo-run, only print actions, do not do the work'
+		print '-v\tVerbose, print actions as well as doing them'
+		print '-c\tCheck, do nothing, print nothing, return nonzero exit status if there was work'
 		sys.exit(1)
 	internalizer = Internalizer(os.path.realpath(sys.argv[1]), MACOSX_BUNDLE_DIRS)
-	internalizer.norun = True
+	if norun:
+		internalizer.norun = True
+		internalizer.verbose = True
+	elif verbose:
+		internalizer.verbose = True
+	elif check:
+		internalizer.norun = True
+		
+	internalizer.add_standard()
 	internalizer.run()
+	
+	if check:
+		if internalizer.work_done:
+			sys.exit(1)
 		
 if __name__ == '__main__':
 	main()
