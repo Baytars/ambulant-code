@@ -55,6 +55,7 @@ class Internalizer:
 		self.norun = False
 		
 	def add(self, src, copy=False):
+		print "* add?", src
 		while os.path.islink(src):
 			src = os.path.realpath(src)
 		if src in self.todo or src in self.done:
@@ -66,6 +67,7 @@ class Internalizer:
 			dstname = os.path.basename(src)
 			if dstname in self.used:
 				print '** destname', dstname, 'in use'
+				import pdb ; pdb.set_trace()
 				return
 			self.used[dstname] = True
 		else:
@@ -75,11 +77,13 @@ class Internalizer:
 	def run(self):
 		while self.todo:
 			src, dst = self.todo.items()[0]
-			del self.todo[src]
 			self.process(src, dst)
+			del self.todo[src]
 			self.done[src] = dst
 		
 	def process(self, src, dst):
+		print
+		print '* process', src, dst
 		libraries = self.get_libs(src)
 		must_change = []
 		for lib in libraries:
@@ -89,8 +93,9 @@ class Internalizer:
 		if dst:
 			self.copy(src, dst)
 			self.set_name(dst)
+			src = dst
 		for lib in must_change:
-			self.modify_reference(dst, lib)
+			self.modify_reference(src, lib)
 		
 	def copy(self, src, dst):
 		if '.framework/' in src:
@@ -114,29 +119,37 @@ class Internalizer:
 		
 	def set_name(self, dst):
 		dstfilename = os.path.join(self.framework_dir, dst)
-		dstfileid = os.path.join("@loader_path/../Frameworks/", dst)
+		dstfileid = os.path.join("@loader_path/../Frameworks/", os.path.basename(dst))
 		if self.norun:
 			print 'setname', dstfilename, dstfileid
 		else:
 			assert 0
 			
 	def modify_reference(self, dst, lib):
-		libid = os.path.join("@loader_path/../Frameworks/", lib)
+		reallib = os.path.realpath(lib)
+		libid = os.path.join("@loader_path/../Frameworks/", os.path.basename(reallib))
 		if self.norun:
-			print 'modify-lib', dst, lib, libid
+			print 'modify_lib_reference', dst, lib, libid
 			
 	def must_copy(self, lib):
 		for prefix in self.safe_prefixes:
 			if  os.path.commonprefix([prefix, lib]) == prefix:
+				print '* no_copy', lib
 				return False
+		print '* must_copy', lib
 		return True
 		
 	def is_loadable(self, file):
 		proc = subprocess.Popen(['file', file], 
 				stdout=subprocess.PIPE,
 				stderr=open('/dev/null', 'w'))
-		line = proc.stdout.readline()
-		rv = 'Mach-O' in line
+		line = proc.stdout.read()
+		rv = ('Mach-O executable' in line or
+			'Mach-O 64-bit executable' in line or
+			'Mach-O bundle' in line or
+			'Mach-O 64-bit bundle' in line or
+			'Mach-O dynamically linked shared library' in line or
+			'Mach-O 64-bit dynamically linked shared library' in line)
 		sts = proc.wait()
 		return rv
 		
