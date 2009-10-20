@@ -199,7 +199,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib xerces-c_2.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib xerces-c_3.lib"
 				OutputFile="..\..\bin\win32\libambulant_shwin32.dll"
 				AdditionalLibraryDirectories="..\..\lib\win32"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
@@ -280,7 +280,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib xerces-c_2D.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib xerces-c_3D.lib"
 				OutputFile="..\..\bin\win32\libambulant_shwin32_D.dll"
 				AdditionalLibraryDirectories="..\..\lib\win32;..\..\third_party_packages\vld-10"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"

@@ -44,12 +44,16 @@
 // Assuming "xml-xerces/c/src" of the distribution 
 // is in the include path and bin directory in the lib path
 
-#include "xercesc/parsers/SAXParser.hpp"
-#include "xercesc/sax/HandlerBase.hpp"
+#include "xercesc/sax2/SAX2XMLReader.hpp"
 #include "xercesc/util/XMLString.hpp"
 #include "xercesc/util/PlatformUtils.hpp"
+#include "xercesc/sax2/DefaultHandler.hpp"
 
+XERCES_CPP_NAMESPACE_USE
 
+XERCES_CPP_NAMESPACE_BEGIN
+class Attributes;
+XERCES_CPP_NAMESPACE_END
 
 namespace ambulant {
 
@@ -68,9 +72,9 @@ class xerces_factory : public parser_factory {
 ///////////////////////////
 // Adapter for xerces parser
 
-using namespace xercesc;
+//using namespace xercesc;
 
-class xerces_sax_parser : public HandlerBase, public xml_parser {
+class xerces_sax_parser : public DefaultHandler, public xml_parser {
   public:
 	enum {NS_SEP = ':'};
 
@@ -85,37 +89,39 @@ class xerces_sax_parser : public HandlerBase, public xml_parser {
        
 	void set_error_handler(sax_error_handler *h);
 
-	void startElement(const XMLCh* const name, AttributeList& attrs);
+	void startElement(const   XMLCh* const    uri,
+		const   XMLCh* const    localname,
+		const   XMLCh* const    qname,
+		const   Attributes&	attributes);
 
- 	void endElement(const XMLCh* const name);   
+ 	void endElement(const XMLCh* const uri,
+		const XMLCh* const localname,
+		const XMLCh* const qname);   
 
-	void characters(const XMLCh* const chars, const unsigned int length);
-        
-	void ignorableWhitespace(const XMLCh* const chars,
-				 const unsigned int length) {}
+	void characters(const XMLCh* const chars, const XMLSize_t length);
     
-	void resetDocument() {}
-
 	void warning(const SAXParseException& exception);
 
 	void error(const SAXParseException& exception);
 
 	void fatalError(const SAXParseException& exception);
 	
-	void set_do_validating(bool b) { m_saxparser->setDoValidation(b);}
-	void set_do_schema(bool b) { m_saxparser->setDoSchema(b);}
+	void set_do_validating(bool b) { m_saxparser->setFeature(XMLUni::fgSAX2CoreValidation, b);}
+	void set_do_schema(bool b) { m_saxparser->setFeature(XMLUni::fgXercesSchema, b);}
+
+	
 	
 	// -------------------------------------------------------------
 	//  Handlers for the SAX EntityResolver interface
 	// -------------------------------------------------------------
-	InputSource* resolveEntity(const XMLCh* const publicId , const XMLCh* const systemId);
+	xercesc_3_0::InputSource* resolveEntity(const XMLCh* const publicId , const XMLCh* const systemId);
   private:
-	static void to_qattrs(AttributeList& attrs, q_attributes_list& list);
+	static void to_qattrs(Attributes& attrs, q_attributes_list& list);
 	static q_name_pair to_q_name_pair(const XMLCh* name);
 
-	static SAXParser::ValSchemes ambulant_val_scheme_2_xerces_ValSchemes(std::string v);
+	static SAX2XMLReader::ValSchemes ambulant_val_scheme_2_xerces_ValSchemes(std::string v);
 
-	SAXParser *m_saxparser;  
+	SAX2XMLReader *m_saxparser;  
 	lib::logger *m_logger;
 	sax_content_handler *m_content_handler;
 	sax_error_handler *m_error_handler;

@@ -30,7 +30,8 @@
 #ifdef	WITH_XERCES
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/LocalFileInputSource.hpp>
-
+#include <xercesc/sax2/XMLReaderFactory.hpp>
+#include <xercesc/sax2/Attributes.hpp>
 #include <fstream>
 #include <map>
 
@@ -42,8 +43,6 @@
 using namespace ambulant;
 
 using namespace lib;
-
-
 
 
 lib::xml_parser*
@@ -79,24 +78,36 @@ xerces_sax_parser::xerces_sax_parser(sax_content_handler*content_handler,
 	m_logger = lib::logger::get_logger();
         AM_DBG m_logger->debug("xerces_sax_parser::xerces_sax_parser()");
 	XMLPlatformUtils::Initialize();
-	m_saxparser = new SAXParser();
+	m_saxparser = XMLReaderFactory::createXMLReader();
 	
 	common::preferences* prefs = common::preferences::get_preferences();
 	// Don't attempt to load external DTD if validation is off
-	m_saxparser->setLoadExternalDTD(false);
+	m_saxparser->setFeature(XMLUni::fgXercesLoadExternalDTD, false);
+	
 	// Val_Never, Val_Always, Val_Auto
-	m_saxparser->setValidationScheme(ambulant_val_scheme_2_xerces_ValSchemes(prefs->m_validation_scheme));
+	SAX2XMLReader::ValSchemes val = ambulant_val_scheme_2_xerces_ValSchemes(prefs->m_validation_scheme);
+	if (val == SAX2XMLReader::Val_Always){
+		m_saxparser->setFeature(XMLUni::fgSAX2CoreValidation, true); 
+		m_saxparser->setFeature(XMLUni::fgXercesDynamic, false);
+	}
+	else if (val == SAX2XMLReader::Val_Never){
+		m_saxparser->setFeature(XMLUni::fgSAX2CoreValidation, false);
+	}
+	else if (val == SAX2XMLReader::Val_Auto){
+		m_saxparser->setFeature(XMLUni::fgSAX2CoreValidation, true); 
+		m_saxparser->setFeature(XMLUni::fgXercesDynamic, true);
+	}
 	
 	// If set to true, namespace processing must also be turned on
-	m_saxparser->setDoSchema(prefs->m_do_schema);
+	m_saxparser->setFeature(XMLUni::fgXercesSchema, prefs->m_do_schema);
 
 	// True to turn on full schema constraint checking
-	m_saxparser->setValidationSchemaFullChecking(prefs->m_validation_schema_full_checking);
+	m_saxparser->setFeature(XMLUni::fgXercesSchemaFullChecking, prefs->m_validation_schema_full_checking);
 	
 	// true: understand namespaces; false: otherwise
-	m_saxparser->setDoNamespaces(prefs->m_do_namespaces);
-	
-	m_saxparser->setDocumentHandler(this);
+	m_saxparser->setFeature(XMLUni::fgSAX2CoreNameSpaces, prefs->m_do_namespaces);
+
+	m_saxparser->setContentHandler(this);
 	m_saxparser->setErrorHandler(this);
 	m_saxparser->setEntityResolver(this);
 }
@@ -159,30 +170,34 @@ xerces_sax_parser::set_error_handler(sax_error_handler *h) {
 }
 
 void
-xerces_sax_parser::startElement(const XMLCh* const name,
-				AttributeList& attrs) {
-	char *cname = XMLString::transcode(name);
+xerces_sax_parser::startElement(const   XMLCh* const    uri,
+		const   XMLCh* const    localname,
+		const   XMLCh* const    qname,
+		const   Attributes&	attrs) {
+	char *cname = XMLString::transcode(qname);
 	AM_DBG m_logger->debug("*** startElement %s", cname);
-	q_name_pair qname = to_q_name_pair(name);
+	q_name_pair my_qname = to_q_name_pair(qname);
 	q_attributes_list qattrs;
-	to_qattrs(attrs, qattrs);
-	m_content_handler->start_element(qname, qattrs);
+	to_qattrs((xercesc_3_0::Attributes&)attrs, qattrs);
+	m_content_handler->start_element(my_qname, qattrs);
 	XMLString::release(&cname);
 	// XXXJACK release attrs?
 }
 
 void
-xerces_sax_parser::endElement(const XMLCh* const name) {
-	char *cname = XMLString::transcode(name);
+xerces_sax_parser::endElement(const XMLCh* const uri,
+		const XMLCh* const localname,
+		const XMLCh* const qname) {
+	char *cname = XMLString::transcode(qname);
 	AM_DBG m_logger->debug("*** endElement %s", cname);
-	q_name_pair qname = to_q_name_pair(name);
-	m_content_handler->end_element(qname);
+	q_name_pair my_qname = to_q_name_pair(qname);
+	m_content_handler->end_element(my_qname);
 	XMLString::release(&cname);
 }
 
 void 
 xerces_sax_parser::characters(const XMLCh* const chars,
-			      const unsigned int length) {
+			      const XMLSize_t length) {
 	char *c_chars = XMLString::transcode(chars);
 	m_content_handler->characters(c_chars, length); 
 	XMLString::release(&c_chars);
@@ -204,13 +219,13 @@ xerces_sax_parser::fatalError(const SAXParseException& exception)  {
 }
 	
 void
-xerces_sax_parser::to_qattrs(AttributeList& attrs, 
+xerces_sax_parser::to_qattrs(Attributes& attrs, 
 			     q_attributes_list& list) {
 	if (attrs.getLength() == 0) return;
 	for (int i = 0; i < (int)attrs.getLength(); i++) {
 		char* value = XMLString::transcode(attrs.getValue(i));
 		xml_string xmlvalue(value);
-		q_attribute_pair qap (to_q_name_pair(attrs.getName(i)),
+		q_attribute_pair qap (to_q_name_pair(attrs.getLocalName(i)),
 				      xmlvalue);
 		list.push_back(q_attribute_pair(qap));
 		XMLString::release(&value);
@@ -235,16 +250,16 @@ xerces_sax_parser::to_q_name_pair(const XMLCh* name) {
 	return  qn;
 }
 
-SAXParser::ValSchemes
+SAX2XMLReader::ValSchemes
 xerces_sax_parser::ambulant_val_scheme_2_xerces_ValSchemes(std::string v) {
-	SAXParser::ValSchemes rv = SAXParser::Val_Never;
+	SAX2XMLReader::ValSchemes rv = SAX2XMLReader::Val_Never;
 
 	if (v == "never")
-		rv = SAXParser::Val_Never;
+		rv = SAX2XMLReader::Val_Never;
 	else if (v == "always")
-		rv = SAXParser::Val_Always;
+		rv = SAX2XMLReader::Val_Always;
 	else if (v == "auto")
-		rv = SAXParser::Val_Auto;
+		rv = SAX2XMLReader::Val_Auto;
 
 	return rv;
 }
@@ -338,5 +353,4 @@ xerces_sax_parser::resolveEntity(const XMLCh* const publicId , const XMLCh* cons
 	XMLString::release(&systemId_ts);
 	return local_input_source;
 }
-
 #endif/*WITH_XERCES*/
