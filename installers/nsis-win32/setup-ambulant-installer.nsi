@@ -93,9 +93,10 @@ Section "Core Components" CoreSection
   File "..\..\bin\win32\libambulant_shwin32.dll"
   File "..\..\bin\win32\libamplugin_state_xpath.dll"
   File "..\..\bin\win32\libamplugin_ffmpeg.dll"
-  File "..\..\bin\win32\avcodec-51.dll"
+  File "..\..\bin\win32\avcodec-52.dll"
   File "..\..\bin\win32\avformat-52.dll"
-  File "..\..\bin\win32\avutil-49.dll"
+  File "..\..\bin\win32\avutil-50.dll"
+  File "..\..\bin\win32\swscale-0.dll"
   File "..\..\bin\win32\SDL.dll"
 !else
   File "..\..\bin\win32\AmbulantPlayer.exe"
@@ -130,7 +131,7 @@ Section "Core Components" CoreSection
   File "..\..\Extras\Welcome\data\*.mp3"
 SectionEnd
 
-Section "VC90 Runtime" RuntimeSection
+Section /o "VC90 Runtime" RuntimeSection
 
 !ifdef DISTRIBUTE_VC7_RT
 ; *** The all critical MSVC7 Dependencies
@@ -205,10 +206,12 @@ Section "Python Plugin" PythonSection
   SetOutPath "$INSTDIR"
   File "..\..\bin\win32\libamplugin_python.dll"
   File "..\..\bin\win32\ambulant.pyd"
+!ifdef DISTRIBUTE_PYTHON_STATE_PLUGN
   SetOutPath "$INSTDIR\pyamplugin_state"
   File "..\..\bin\win32\pyamplugin_state\*.py"
   File "..\..\bin\win32\pyamplugin_state\*.pyc"
   File /nonfatal "..\..\bin\win32\pyamplugin_state\*.pyo"
+!endif
 SectionEnd
 !endif
 
@@ -231,7 +234,19 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-
+Function .onInit
+  ; The core section is always installed
+  IntOp $0 ${SF_SELECTED} | ${SF_RO}
+  SectionSetFlags ${CoreSection} $0
+  
+  ; Do we need to install the VC9 runtime?
+  ; Don't install if SP1 or later has been installed.
+  ; Note that a missing key reads as "0".
+  ReadRegDWORD $0 HKLM SOFTWARE\Microsoft\DevDiv\VC\Servicing\9.0 SP
+  IntCmp $0 1 +2 0 +2
+    SectionSetFlags ${RuntimeSection} ${SF_SELECTED}
+    
+FunctionEnd
 
 Function un.onUninstSuccess
   HideWindow
@@ -248,12 +263,15 @@ Section Uninstall
   Delete "$INSTDIR\libambulant_shwin32.dll"
   Delete "$INSTDIR\libamplugin_state_xpath.dll"
   Delete "$INSTDIR\libamplugin_ffmpeg.dll"
-  Delete "$INSTDIR\avcodec-51.dll"
+  Delete "$INSTDIR\avcodec-52.dll"
   Delete "$INSTDIR\avformat-52.dll"
-  Delete "$INSTDIR\avutil-49.dll"
+  Delete "$INSTDIR\avutil-50.dll"
+  Delete "$INSTDIR\swscale-0.dll"
   Delete "$INSTDIR\SDL.dll"
 
   RMDir /r "$INSTDIR\Extras"
+  
+  RMDir /r "$INSTDIR\Downloaded"
 
   Delete "$INSTDIR\xerces-c_2_8.dll"
   Delete "$INSTDIR\settings.xml"
