@@ -115,8 +115,8 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 	strcpy(m_String, ua);
 	extern NPP s_npambulant_last_instance;
 	/* copy argument names and values, as some browers (Chrome) re-use their space */
-	m_argn = (char**) malloc (sizeof(char*)*argc);
-	m_argv = (char**) malloc (sizeof(char*)*argc);
+	m_argn = (char**) malloc (sizeof(char*)*m_argc);
+	m_argv = (char**) malloc (sizeof(char*)*m_argc);
 	for (int i=0; i<m_argc; i++) {
 		m_argn[i] = strdup(argn[i]);
 		m_argv[i] = strdup(argv[i]);
@@ -144,11 +144,13 @@ npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 {
         const char* version = ambulant::get_version();
 AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, version);
+#ifndef NDEBUG
 	if (getenv("AMBULANT_DEBUG") != 0) {
 		ambulant::lib::logger::get_logger()->set_ostream(new stderr_ostream);
 		ambulant::lib::logger::get_logger()->set_level(ambulant::lib::logger::LEVEL_DEBUG);
 		ambulant::lib::logger::get_logger()->debug("npambulant: DEBUG enabled. Ambulant version: %s\n", version);
 	}
+#endif //NDEBUG
 	if(aWindow == NULL)
 		return FALSE;
 	// prepare for dynamic linking ffmpeg
@@ -223,7 +225,7 @@ AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, ver
 		}
 	if (arg_str == NULL)
         	return false;
-    net::url file_url;
+	net::url file_url;
 	net::url arg_url = net::url::from_url (arg_str);
 	char* url_str = NULL;
 	if (arg_url.is_absolute()) {
