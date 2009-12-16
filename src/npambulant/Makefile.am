@@ -255,7 +255,7 @@ npambulant_plugin_dir: .libs/$(NPAMBULANT)
 		$(PYTHON) $(srcdir)/internalize_shlibs.py \
 		npambulant_plugin_dir/plugins
 #	Check that internalization worked
-	$(PYTHON) $(srcdir)/internalize_shlibs.py -c npambulant_plugin_dir/plugins
+#XXXX	$(PYTHON) $(srcdir)/internalize_shlibs.py -c npambulant_plugin_dir/plugins
 #	Copy manifest file (only used for xpt distributions)
 	@case $(ARCH) in		    \
 		x86_64|X86_64)      \
