@@ -117,7 +117,6 @@ msgid "Out of memory while showing video"
 msgstr "Geheugen vol (tijdens afspelen van video)"
 
 #: src/libambulant/gui/cocoa/cocoa_ink.mm:117
-#,
 msgid "cocoa_ink_renderer: Could not create DOM tree"
 msgstr "cocoa_ink_renderer: Kan geen DOM-tree bouwen"
 
@@ -141,7 +140,6 @@ msgid "%s: node ID not found"
 msgstr "%s: Node ID niet gevonden"
 
 #: src/libambulant/gui/gtk/gtk_smiltext.cpp:652
-#,
 msgid "Geometry error in smil document"
 msgstr "Fout in geometrie in SMIL document"
 
