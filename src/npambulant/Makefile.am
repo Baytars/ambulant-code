@@ -41,7 +41,7 @@ PYTHON=python
 #------------------------------------------------------
 if WITH_GTK
 extra_gtk_DEFINES=-DWITH_GTK -DMOZ_X11 $(GTK_CFLAGS)
-extra_gtk_LDADD=../player_gtk/gtk_mainloop.o -lambulant_gtk $(GTK_LIBS)
+extra_gtk_LDADD=../player_gtk/gtk_mainloop.o -L$(ambulantlibdir) -lambulant_gtk $(GTK_LIBS)
 else
 extra_gtk_DEFINES=
 extra_gtk_LDADD=
