@@ -73,7 +73,6 @@
 #define USE_BASIC_VIDEO
 #else
 #define USE_DX_VIDEO
-#define USE_BASIC_VIDEO // XXXJACK ta2 testing
 #endif
 
 #ifdef USE_DS_VIDEO
