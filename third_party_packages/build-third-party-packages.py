@@ -364,6 +364,7 @@ third_party_packages={
 			checkcmd="test -f ./live/liveMedia/libliveMedia.a",
 			buildcmd=
 				"cd live && "
+		                "( grep fPIC config.linux >/dev/null || patch -i ../live.patch config.linux ) &&"
 				"./genMakefiles linux && "
 				"make $(MAKEFLAGS) "
 			),
