@@ -160,7 +160,11 @@ event_processor_impl::cancel_all_events()
 void 
 event_processor_impl::_serve_events()
 {
-	if (m_observer) m_observer->lock_redraw();
+	if (m_observer) {
+		m_lock.leave();
+		m_observer->lock_redraw();
+		m_lock.enter();
+	}
 	// check all delta_timer queues, in the right order
 	while (_events_available(m_high_delta_timer, &m_high_q)
 		|| _events_available(m_med_delta_timer, &m_med_q)
@@ -202,7 +206,11 @@ event_processor_impl::_serve_events()
 #endif
         
             
-	if (m_observer) m_observer->unlock_redraw();
+	if (m_observer) {
+		m_lock.leave();
+		m_observer->unlock_redraw();
+		m_lock.enter();
+	}
 }
 
 bool
