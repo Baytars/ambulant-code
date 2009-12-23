@@ -106,8 +106,12 @@ gui::sdl::sdl_audio_renderer::init()
 	desired.userdata = NULL;
 	err = SDL_OpenAudio(&desired, &obtained);
 	if (err < 0) {
-	  lib::logger::get_logger()->trace("sdl_renderer_playable_ds.init: SDL_OpenAudio failed: error %s", SDL_GetError());
-		lib::logger::get_logger()->error(gettext("Cannot open SDL audio output stream"));
+		lib::logger::get_logger()->trace("sdl_renderer_playable_ds.init: SDL_OpenAudio failed: error %s", SDL_GetError());
+		static bool warned_before;
+		if (!warned_before) {
+			lib::logger::get_logger()->error(gettext("Cannot open SDL audio output stream: %s"), SDL_GetError());
+			warned_before = true;
+		}
 		s_static_lock.leave();
     	return err;
 	}
