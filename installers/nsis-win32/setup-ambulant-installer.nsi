@@ -42,6 +42,9 @@
 !define DOWNLOAD_VC9_RT
 !define DOWNLOAD_VC9_RT_URL "http://download.microsoft.com/download/d/d/9/dd9a82d0-52ef-40db-8dab-795376989c03/vcredist_x86.exe"
 
+; File associations
+!include "FileAssociation.nsh"
+
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 
@@ -101,6 +104,9 @@ Section "Core Components" CoreSection
 !else
   File "..\..\bin\win32\AmbulantPlayer.exe"
 !endif
+  ${registerExtension} "$INSTDIR\AmbulantPlayer.exe" ".smil" "SMIL Multimedia Presentation"
+  ${registerExtension} "$INSTDIR\AmbulantPlayer.exe" ".smi" "SMIL Multimedia Presentation"
+
   CreateDirectory "$SMPROGRAMS\Ambulant"
   CreateDirectory "$SMPROGRAMS\Ambulant\${PRODUCT_NAME} ${PRODUCT_VERSION_BASE}"
   CreateShortCut "$SMPROGRAMS\Ambulant\${PRODUCT_NAME} ${PRODUCT_VERSION_BASE}\Ambulant Player.lnk" "$INSTDIR\AmbulantPlayer.exe"
@@ -302,6 +308,9 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   RMDir "$INSTDIR"
   RMDir "$SMPROGRAMS\Ambulant"
+
+  ${unregisterExtension} ".smil" "SMIL Multimedia Presentation"
+  ${unregisterExtension} ".smi" "SMIL Multimedia Presentation"
  
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
