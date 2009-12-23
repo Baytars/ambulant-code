@@ -227,12 +227,12 @@ gui::dx::dx_player::init_playable_factory()
 	pf->add_factory(create_dx_area_playable_factory(this, this));
 	pf->add_factory(create_dx_audio_playable_factory(this, this));
 	pf->add_factory(create_dx_brush_playable_factory(this, this));
-#ifdef WITH_HTML_WIDGET
-	pf->add_factory(create_dx_html_playable_factory(this, this));
-#endif
 	pf->add_factory(create_dx_image_playable_factory(this, this));
 	pf->add_factory(create_dx_smiltext_playable_factory(this, this));
 	pf->add_factory(create_dx_text_playable_factory(this, this));
+#ifdef WITH_HTML_WIDGET
+	pf->add_factory(create_dx_html_playable_factory(this, this));
+#endif
 #ifdef USE_BASIC_VIDEO
 	pf->add_factory(create_dx_basicvideo_playable_factory(this, this));
 #endif
