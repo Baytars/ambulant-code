@@ -58,6 +58,7 @@ const char* mimetypes =
 application/smil+xml:.smil:W3C Smil 3.0 Playable Multimedia file;\
 application/x-ambulant-smil:.smil:W3C Smil 3.0 Ambulant Player compatible file;";
 
+#ifndef NDEBUG
 class stderr_ostream : public ambulant::lib::ostream {
 	bool is_open() const {return true;}
 	void close() {}
@@ -71,6 +72,7 @@ int stderr_ostream::write(const char *cstr)
 	fprintf(stderr, "%s", cstr);
 	return strlen(cstr);
 }
+#endif//!NDEBUG
 
 npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 		       int argc, char* argn[], char* argv[], NPSavedData* data) :
@@ -92,7 +94,6 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 	m_lpOldProc = NULL;
 	m_OldWindow = NULL;
 #endif
-
 	NPN_GetValue(m_pNPInstance, NPNVWindowNPObject, &m_window_obj);
 
 	sStartPlayer_id = NPN_GetStringIdentifier("startPlayer");
@@ -115,8 +116,8 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 	strcpy(m_String, ua);
 	extern NPP s_npambulant_last_instance;
 	/* copy argument names and values, as some browers (Chrome) re-use their space */
-	m_argn = (char**) malloc (sizeof(char*)*m_argc);
-	m_argv = (char**) malloc (sizeof(char*)*m_argc);
+	m_argn = (char**) malloc (sizeof(char*)*argc);
+	m_argv = (char**) malloc (sizeof(char*)*argc);
 	for (int i=0; i<m_argc; i++) {
 		m_argn[i] = strdup(argn[i]);
 		m_argv[i] = strdup(argv[i]);
@@ -144,19 +145,21 @@ npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 {
         const char* version = ambulant::get_version();
 AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, version);
-#ifndef NDEBUG
+#if 0
 	if (getenv("AMBULANT_DEBUG") != 0) {
 		ambulant::lib::logger::get_logger()->set_ostream(new stderr_ostream);
 		ambulant::lib::logger::get_logger()->set_level(ambulant::lib::logger::LEVEL_DEBUG);
 		ambulant::lib::logger::get_logger()->debug("npambulant: DEBUG enabled. Ambulant version: %s\n", version);
 	}
-#endif //NDEBUG
+#endif
+	ambulant::lib::logger::get_logger()->set_level(ambulant::lib::logger::LEVEL_SHOW);
 	if(aWindow == NULL)
 		return FALSE;
 	// prepare for dynamic linking ffmpeg
 	ambulant::common::preferences *prefs = ambulant::common::preferences::get_preferences();
 	prefs->m_prefer_ffmpeg = true;
 	prefs->m_use_plugins = true;
+	prefs->m_log_level = ambulant::lib::logger::LEVEL_SHOW;
 #ifdef XP_WIN32
 	// for Windows, ffmpeg is only available as plugin
 	prefs->m_plugin_dir = lib::win32::get_module_dir()+"\\plugins\\";
@@ -168,6 +171,7 @@ AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, ver
 	    fprintf(stderr, "npambulant::init_ambulant:  dladdr(\"main\") failed, cannot use ambulant plugins\n");
 	    prefs->m_use_plugins = false;
 	} else {
+#ifdef WITH_LTDL_PLUGINS
 	    char* path = strdup(p.dli_fname); // full path of this firefox plugin 
 	    char* ffplugindir = dirname(path);
 		char* npambulant_plugins = "/npambulant/plugins";
@@ -175,6 +179,9 @@ AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, ver
 	    sprintf(amplugin_path, "%s%s", ffplugindir, npambulant_plugins);
 	    prefs->m_plugin_dir = amplugin_path;
 	    free (path);
+#else //WITH_LTDL_PLUGINS
+		prefs->m_use_plugins = false;
+#endif//WITH_LTDL_PLUGINS
 	}    
 
 #endif//!XP_WIN3: Linux, Mac
@@ -225,7 +232,7 @@ AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, ver
 		}
 	if (arg_str == NULL)
         	return false;
-	net::url file_url;
+    net::url file_url;
 	net::url arg_url = net::url::from_url (arg_str);
 	char* url_str = NULL;
 	if (arg_url.is_absolute()) {
@@ -401,6 +408,16 @@ npambulant::shut()
 #endif
 	m_ambulant_player = NULL; // deleted by mainloop
 	m_bInitialized = FALSE;
+    //XXXX SDL_Quit() forgets to do clear the environment variable ESD_NO_SPAWN
+    // the variable was included in the environment by calling  putenv(char* string),
+    // using the data section from the plugin as storage for 'string'.man putenv says:
+    // "The string pointed to by 'string' becomes part of the environment"
+    // this caused firefox to crash after npambulant was shut and removed, because
+    // when using getenv() it hit a pointer to a string that was no longer there.
+    // unsetenv() is not available on Windows.
+#ifndef XP_WIN
+    unsetenv("ESD_NO_SPAWN");
+#endif//XP_WIN
 }
 
 NPBool
