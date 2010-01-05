@@ -54,11 +54,44 @@ const AVRational AMBULANT_TIMEBASE = {1, 1000000};
 using namespace ambulant;
 using namespace net;
 
+// There is a bug in the ffpmeg http seek code, which causes http header data to be
+// interspersed into the datastream. This bug has been registered in the ambulant bug database as
+// #2916230. It has also been submitted to the ffmpeg developer team, as
+// <https://roundup.ffmpeg.org/roundup/ffmpeg/issue1631>, but so far it hasn't been fixed.
+// In the mean time, we have the workaround of disabling http seek, for the versions of
+// ffmpeg we know are faulty.
+// If a new ffmpeg becomes available, please test whether it has been fixed. If not: update
+// FFMPEG_HTTP_SEEK_BUG_MAX_VERSION_TESTED. If it has been fixed: update FFMPEG_HTTP_SEEK_BUG_MAX_VERSION.
+
+#define FFMPEG_HTTP_SEEK_BUG_MIN_VERSION ((51<<16)+(12<<8)+2)
+#define FFMPEG_HTTP_SEEK_BUG_MAX_VERSION ((99<<16)+(99<<16)+99)
+#define FFMPEG_HTTP_SEEK_BUG_MAX_VERSION_TESTED ((52<<16)+(46<<8)+0)
+
+#if LIBAVFORMAT_BUILD >= FFMPEG_HTTP_SEEK_BUG_MIN_VERSION && LIBAVFORMAT_BUILD <= FFMPEG_HTTP_SEEK_BUG_MAX_VERSION
+#if LIBAVFORMAT_BUILD > FFMPEG_HTTP_SEEK_BUG_MAX_VERSION_TESTED
+#error Current libavformat version not tested for http seek bug. See comment here for details.
+#endif
+#define FFMPEG_HTTP_SEEK_BUG
+#endif
+
+#ifdef FFMPEG_HTTP_SEEK_BUG
+extern "C" {
+int64_t http_seek_workaround(URLContext *h, int64_t pos, int whence)
+{
+    return -1;
+}
+}
+#endif // FFMPEG_HTTP_SEEK_BUG
+
 void 
 ambulant::net::ffmpeg_init()
 {
 	static bool is_inited = false;
 	if (is_inited) return;
+#ifdef FFMPEG_HTTP_SEEK_BUG
+    extern URLProtocol http_protocol;
+    http_protocol.url_seek = http_seek_workaround;
+#endif // FFMPEG_HTTP_SEEK_BUG
 	avcodec_init();
 	av_register_all();
 	is_inited = true;
