@@ -351,11 +351,15 @@ char* npambulant::get_document_location()
 }
 
 NPBool
-npambulant::init(NPWindow* pNPWindow)
+npambulant::setWindow(NPWindow* pNPWindow)
 {
 	if(pNPWindow == NULL)
 		return FALSE;
+	if (m_Window && m_Window != pNPWindow)
+		ambulant::lib::logger::get_logger()->trace("npambulant: NPWindow changed from 0x%x to 0x%x", m_Window, pNPWindow);
 #ifdef XP_WIN
+	if (m_hWnd && m_hwnd != (HWND)pNPWindow->window)
+		ambulant::lib::logger::get_logger()->trace("npambulant: HWND changed from 0x%x to 0x%x", m_hWnd, (HWND)pNPWindow->window);
 	m_hWnd = (HWND)pNPWindow->window;
 	if(m_hWnd == NULL)
 		return FALSE;
@@ -369,7 +373,22 @@ npambulant::init(NPWindow* pNPWindow)
 #endif
 
 	m_Window = pNPWindow;
+}
 
+NPBool
+npambulant::init()
+{
+	if (!m_pNPInstance) {
+		ambulant::lib::logger::get_logger()->trace("npambulant: init called without NPInstance");
+		return FALSE;
+	}
+	if (!m_Window) {
+		ambulant::lib::logger::get_logger()->trace("npambulant: init called without NPWindow");
+		return FALSE;
+	}
+	if (m_bInitialized) {
+		ambulant::lib::logger::get_logger()->trace("npambulant: init called twice");
+	}
 	m_bInitialized = TRUE;
 	return init_ambulant(m_pNPInstance, m_Window);
 }
