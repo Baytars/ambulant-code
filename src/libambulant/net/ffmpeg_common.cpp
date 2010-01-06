@@ -88,12 +88,14 @@ ambulant::net::ffmpeg_init()
 {
 	static bool is_inited = false;
 	if (is_inited) return;
-#ifdef FFMPEG_HTTP_SEEK_BUG
-    extern URLProtocol http_protocol;
-    http_protocol.url_seek = http_seek_workaround;
-#endif // FFMPEG_HTTP_SEEK_BUG
 	avcodec_init();
 	av_register_all();
+#ifdef FFMPEG_HTTP_SEEK_BUG
+	URLProtocol *p = av_protocol_next(NULL);
+	while (p && strcmp(p->name, "http") != 0)
+		p = av_protocol_next(p);
+	if (p) p->url_seek = http_seek_workaround;
+#endif // FFMPEG_HTTP_SEEK_BUG
 	is_inited = true;
 }
 
