@@ -104,9 +104,9 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 403;
-		modificationTime = 281228571.279947;
+		modificationTime = 282581713.362251;
 		originalNumberOfMultipleMatches = 1;
-		state = 1;
+		state = 0;
 	};
 	04D5B7EC10C333EF00D2CC1D /* ffmpeg_common.cpp */ = {
 		isa = PBXFileReference;
@@ -114,11 +114,6 @@
 		name = ffmpeg_common.cpp;
 		path = /Users/jack/src/ambulant/src/libambulant/net/ffmpeg_common.cpp;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 8775}}";
-			sepNavSelRange = "{11871, 0}";
-			sepNavVisRange = "{11728, 313}";
-		};
 	};
 	04D5B7EF10C3343100D2CC1D /* AmbulantWebView.mm:60 */ = {
 		isa = PBXFileBreakpoint;
@@ -134,7 +129,7 @@
 		ignoreCount = 0;
 		lineNumber = 60;
 		location = AmbulantWebKitPlugin;
-		modificationTime = 281228519.504729;
+		modificationTime = 282581713.362288;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -152,7 +147,7 @@
 		ignoreCount = 0;
 		lineNumber = 52;
 		location = AmbulantWebKitPlugin;
-		modificationTime = 281228519.50523;
+		modificationTime = 282581713.362311;
 		originalNumberOfMultipleMatches = 1;
 		state = 2;
 	};
@@ -172,7 +167,7 @@
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecturePreference = x86_64;
-		activeBuildConfigurationName = "Debug-10.6";
+		activeBuildConfigurationName = "Release-10.6";
 		activeExecutable = 049CF80410A03FD400E6593B /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		breakpoints = (
@@ -280,7 +275,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					145,
+					301,
 					60,
 					20,
 					48,
@@ -297,8 +292,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 281228003;
-			PBXWorkspaceStateSaveDate = 281228003;
+			PBXPerProjectTemplateStateSaveDate = 282581632;
+			PBXWorkspaceStateSaveDate = 282581632;
 		};
 		sourceControlManager = 04E8E403109F3BE300B7C8C9 /* Source Control */;
 		userBuildSettings = {
