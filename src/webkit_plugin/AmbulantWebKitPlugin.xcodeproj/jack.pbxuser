@@ -16,16 +16,16 @@
 	};
 	049775B70958ADC500A7690F /* AmbulantWebView.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {761, 945}}";
-			sepNavSelRange = "{1810, 0}";
-			sepNavVisRange = "{1087, 1220}";
+			sepNavIntBoundsRect = "{{0, 0}, {939, 945}}";
+			sepNavSelRange = "{2093, 9}";
+			sepNavVisRange = "{114, 2193}";
 		};
 	};
 	049775B80958ADC500A7690F /* AmbulantWebView.mm */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {761, 2865}}";
-			sepNavSelRange = "{1216, 0}";
-			sepNavVisRange = "{1048, 842}";
+			sepNavIntBoundsRect = "{{0, 0}, {933, 3510}}";
+			sepNavSelRange = "{4817, 0}";
+			sepNavVisRange = "{4695, 211}";
 		};
 	};
 	049CF80410A03FD400E6593B /* Safari */ = {
@@ -37,7 +37,7 @@
 			"http://ambulantplayer.org/Demos.shtml",
 		);
 		autoAttachOnCrash = 1;
-		breakpointsEnabled = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -91,66 +91,6 @@
 		path = /Applications/Safari.app;
 		sourceTree = "<absolute>";
 	};
-	04D5B7EB10C333EF00D2CC1D /* ffmpeg_common.cpp:403 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 04D5B7EC10C333EF00D2CC1D /* ffmpeg_common.cpp */;
-		functionName = "ffmpeg_demux::run()";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 403;
-		modificationTime = 282581713.362251;
-		originalNumberOfMultipleMatches = 1;
-		state = 0;
-	};
-	04D5B7EC10C333EF00D2CC1D /* ffmpeg_common.cpp */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = sourcecode.cpp.cpp;
-		name = ffmpeg_common.cpp;
-		path = /Users/jack/src/ambulant/src/libambulant/net/ffmpeg_common.cpp;
-		sourceTree = "<absolute>";
-	};
-	04D5B7EF10C3343100D2CC1D /* AmbulantWebView.mm:60 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
-		functionName = "-dealloc";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 60;
-		location = AmbulantWebKitPlugin;
-		modificationTime = 282581713.362288;
-		originalNumberOfMultipleMatches = 1;
-		state = 2;
-	};
-	04D5B7F110C3343400D2CC1D /* AmbulantWebView.mm:52 */ = {
-		isa = PBXFileBreakpoint;
-		actions = (
-		);
-		breakpointStyle = 0;
-		continueAfterActions = 0;
-		countType = 0;
-		delayBeforeContinue = 0;
-		fileReference = 049775B80958ADC500A7690F /* AmbulantWebView.mm */;
-		functionName = "+plugInViewWithArguments:";
-		hitCount = 0;
-		ignoreCount = 0;
-		lineNumber = 52;
-		location = AmbulantWebKitPlugin;
-		modificationTime = 282581713.362311;
-		originalNumberOfMultipleMatches = 1;
-		state = 2;
-	};
 	04E8E403109F3BE300B7C8C9 /* Source Control */ = {
 		isa = PBXSourceControlManager;
 		fallbackIsa = XCSourceControlManager;
@@ -165,15 +105,47 @@
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
 	};
+	04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 04F8CA9510F4D87900EFF4EC /* proxy.py */;
+		rLen = 7;
+		rLoc = 1605;
+		rType = 0;
+	};
+	04F8CA9510F4D87900EFF4EC /* proxy.py */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = text.script.python;
+		name = proxy.py;
+		path = /Users/jack/src/ambulant/src/webkit_plugin/PlugIns/pyamplugin_webkitscripting/proxy.py;
+		sourceTree = "<absolute>";
+	};
+	04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 04F8CA9710F4D87900EFF4EC /* proxy.py */;
+		name = "proxy.py: 50";
+		rLen = 7;
+		rLoc = 1605;
+		rType = 0;
+		vrLen = 458;
+		vrLoc = 1449;
+	};
+	04F8CA9710F4D87900EFF4EC /* proxy.py */ = {
+		isa = PBXFileReference;
+		name = proxy.py;
+		path = /Users/jack/src/ambulant/src/webkit_plugin/PlugIns/pyamplugin_webkitscripting/proxy.py;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {733, 2700}}";
+			sepNavSelRange = "{1605, 7}";
+			sepNavVisRange = "{1449, 458}";
+		};
+	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecturePreference = x86_64;
 		activeBuildConfigurationName = "Release-10.6";
 		activeExecutable = 049CF80410A03FD400E6593B /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		breakpoints = (
-			04D5B7EB10C333EF00D2CC1D /* ffmpeg_common.cpp:403 */,
-			04D5B7EF10C3343100D2CC1D /* AmbulantWebView.mm:60 */,
-			04D5B7F110C3343400D2CC1D /* AmbulantWebView.mm:52 */,
 		);
 		codeSenseManager = 04E8E404109F3BE300B7C8C9 /* Code sense */;
 		executables = (
@@ -237,7 +209,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					185,
+					341,
 					20,
 					48,
 					43,
@@ -292,8 +264,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 282581632;
-			PBXWorkspaceStateSaveDate = 282581632;
+			PBXPerProjectTemplateStateSaveDate = 284468411;
+			PBXWorkspaceStateSaveDate = 284468411;
+		};
+		perUserProjectItems = {
+			04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */ = 04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */;
+			04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */ = 04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */;
 		};
 		sourceControlManager = 04E8E403109F3BE300B7C8C9 /* Source Control */;
 		userBuildSettings = {
