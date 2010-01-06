@@ -173,7 +173,7 @@ third_party_packages={
 			checkcmd="pkg-config --atleast-version=1.3.0 sdl",
 			buildcmd=
 				"cd SDL-1.3.0-* && "
-				"./configure --prefix='%s' "
+				"./configure --prefix='%s' --disable-dependency-tracking "
 					"CFLAGS='%s -framework ForceFeedback' "
 					"LDFLAGS='%s -framework ForceFeedback' &&"
 				"make $(MAKEFLAGS) && "
