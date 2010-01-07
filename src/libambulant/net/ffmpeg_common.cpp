@@ -76,9 +76,19 @@ using namespace net;
 
 #ifdef FFMPEG_HTTP_SEEK_BUG
 extern "C" {
+
+int64_t (*orig_http_seek)(URLContext *h, int64_t pos, int whence);
+
 int64_t http_seek_workaround(URLContext *h, int64_t pos, int whence)
 {
+#if 1
     return -1;
+#else
+    // Does not work yet
+    if ((pos == 0 && whence == AVSEEK_SIZE) || (pos == -1 && whence == SEEK_END) || pos > 10000000000LL)
+        return -1;
+    return orig_http_seek(h, pos, whence);
+#endif
 }
 }
 #endif // FFMPEG_HTTP_SEEK_BUG
@@ -94,7 +104,10 @@ ambulant::net::ffmpeg_init()
 	URLProtocol *p = av_protocol_next(NULL);
 	while (p && strcmp(p->name, "http") != 0)
 		p = av_protocol_next(p);
-	if (p) p->url_seek = http_seek_workaround;
+	if (p) {
+        orig_http_seek = p->url_seek;
+        p->url_seek = http_seek_workaround;
+    }
 #endif // FFMPEG_HTTP_SEEK_BUG
 	is_inited = true;
 }

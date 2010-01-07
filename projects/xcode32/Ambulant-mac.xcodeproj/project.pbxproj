@@ -116,10 +116,6 @@
 		049656090BCAE9E0002C00DF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656020BCAE9E0002C00DF /* OpenGL.framework */; };
 		0496560B0BCAE9E0002C00DF /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656040BCAE9E0002C00DF /* IOKit.framework */; };
 		0496561D0BCAEA42002C00DF /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656110BCAEA42002C00DF /* libexpat.a */; };
-		0496561F0BCAEA43002C00DF /* libliveMedia.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656130BCAEA42002C00DF /* libliveMedia.a */; };
-		049656200BCAEA43002C00DF /* libUsageEnvironment.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656140BCAEA42002C00DF /* libUsageEnvironment.a */; };
-		049656210BCAEA43002C00DF /* libBasicUsageEnvironment.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656150BCAEA42002C00DF /* libBasicUsageEnvironment.a */; };
-		049656220BCAEA43002C00DF /* libgroupsock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656160BCAEA42002C00DF /* libgroupsock.a */; };
 		049656240BCAEA43002C00DF /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656180BCAEA42002C00DF /* libz.dylib */; };
 		049656B20BCAEC13002C00DF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656B10BCAEC13002C00DF /* Carbon.framework */; };
 		04D5B88010C33DFA00D2CC1D /* libSDL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D5B87F10C33DFA00D2CC1D /* libSDL.a */; };
@@ -137,6 +133,12 @@
 		04D5B89C10C3415200D2CC1D /* cocoa_video.mm in Sources */ = {isa = PBXBuildFile; fileRef = 049652690BCAE3C5002C00DF /* cocoa_video.mm */; };
 		04E13B240BD786120074AF09 /* state.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E13B230BD786120074AF09 /* state.cpp */; };
 		04E13B350BD786A40074AF09 /* smiltext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E13B340BD786A40074AF09 /* smiltext.cpp */; };
+		04FB4B8C10F604B30095F275 /* CHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FB4B8B10F604B30095F275 /* CHUD.framework */; };
+		04FB4BB310F618770095F275 /* libBasicUsageEnvironment.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656150BCAEA42002C00DF /* libBasicUsageEnvironment.a */; };
+		04FB4BB410F618790095F275 /* libgroupsock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656160BCAEA42002C00DF /* libgroupsock.a */; };
+		04FB4BB510F6187A0095F275 /* libliveMedia.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656130BCAEA42002C00DF /* libliveMedia.a */; };
+		04FB4BB610F6187C0095F275 /* libUsageEnvironment.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 049656140BCAEA42002C00DF /* libUsageEnvironment.a */; };
+		04FB4BBA10F618A80095F275 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04FB4BB910F618A80095F275 /* QuickTime.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -590,6 +592,9 @@
 		04F884A50D2D056A0035EB76 /* gtk_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gtk_util.h; sourceTree = "<group>"; };
 		04F884A60D2D057A0035EB76 /* qt_smiltext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qt_smiltext.h; sourceTree = "<group>"; };
 		04F884A70D2D057A0035EB76 /* qt_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qt_util.h; sourceTree = "<group>"; };
+		04FB4B8B10F604B30095F275 /* CHUD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CHUD.framework; path = /System/Library/PrivateFrameworks/CHUD.framework; sourceTree = "<absolute>"; };
+		04FB4BB910F618A80095F275 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
+		04FB4BCE10F61BC50095F275 /* profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = profile.h; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -610,10 +615,6 @@
 				049656090BCAE9E0002C00DF /* OpenGL.framework in Frameworks */,
 				0496560B0BCAE9E0002C00DF /* IOKit.framework in Frameworks */,
 				0496561D0BCAEA42002C00DF /* libexpat.a in Frameworks */,
-				0496561F0BCAEA43002C00DF /* libliveMedia.a in Frameworks */,
-				049656200BCAEA43002C00DF /* libUsageEnvironment.a in Frameworks */,
-				049656210BCAEA43002C00DF /* libBasicUsageEnvironment.a in Frameworks */,
-				049656220BCAEA43002C00DF /* libgroupsock.a in Frameworks */,
 				049656240BCAEA43002C00DF /* libz.dylib in Frameworks */,
 				049656B20BCAEC13002C00DF /* Carbon.framework in Frameworks */,
 				04430D390E506F6400029503 /* libbz2.dylib in Frameworks */,
@@ -626,6 +627,12 @@
 				043D32B210DBB22500AECA2E /* libavutil.a in Frameworks */,
 				043D32BC10DBB2C500AECA2E /* libfaad.a in Frameworks */,
 				043D32C410DBB3FD00AECA2E /* libswscale.a in Frameworks */,
+				04FB4B8C10F604B30095F275 /* CHUD.framework in Frameworks */,
+				04FB4BB310F618770095F275 /* libBasicUsageEnvironment.a in Frameworks */,
+				04FB4BB410F618790095F275 /* libgroupsock.a in Frameworks */,
+				04FB4BB510F6187A0095F275 /* libliveMedia.a in Frameworks */,
+				04FB4BB610F6187C0095F275 /* libUsageEnvironment.a in Frameworks */,
+				04FB4BBA10F618A80095F275 /* QuickTime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -949,6 +956,7 @@
 		049651940BCAE333002C00DF /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				04FB4BCE10F61BC50095F275 /* profile.h */,
 				049651960BCAE333002C00DF /* abstract_mtsync.h */,
 				049651970BCAE333002C00DF /* amstream.h */,
 				049651980BCAE333002C00DF /* asb.h */,
@@ -1390,6 +1398,8 @@
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 				04834E48105A4B2400B7188B /* CoreAudio.framework */,
 				04834E87105A4D6E00B7188B /* ForceFeedback.framework */,
+				04FB4B8B10F604B30095F275 /* CHUD.framework */,
+				04FB4BB910F618A80095F275 /* QuickTime.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -1739,6 +1749,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1766,6 +1780,10 @@
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
 				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/installed/include ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
@@ -1811,6 +1829,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1834,6 +1856,10 @@
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
@@ -1895,6 +1921,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1923,6 +1953,10 @@
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
@@ -1934,6 +1968,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
@@ -1961,6 +1999,10 @@
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
@@ -1971,6 +2013,10 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks\"",
+				);
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1995,6 +2041,10 @@
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
 					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
 				WRAPPER_EXTENSION = app;
