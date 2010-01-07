@@ -457,7 +457,9 @@ ffmpeg_demux::run()
                 seek_streamnr = audio_streamnr;
 			}
             AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld scaled to mediatimebase", seektime);
-			int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
+			m_lock.leave();
+            int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
+            m_lock.enter();
 			if (seekresult < 0) {
 				lib::logger::get_logger()->debug("ffmpeg_demux: av_seek_frame() returned %d", seekresult);
 			}
@@ -546,7 +548,9 @@ ffmpeg_demux::run()
 			}
             // We are now going to push data to one of our clients. This means that we should re-send an EOF at the end, even if
             // we have already sent one earlier.
+#ifdef WITH_SEAMLESS_PLAYBACK
             eof_sent_to_clients = false;
+#endif
 			bool accepted = false;
 			while ( ! accepted && sink && !exit_requested()) { 
 				m_current_sink = sink;

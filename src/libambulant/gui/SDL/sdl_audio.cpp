@@ -638,11 +638,19 @@ gui::sdl::sdl_audio_renderer::stop()
 void
 gui::sdl::sdl_audio_renderer::post_stop()
 {
-	unregister_renderer(this);
-	m_lock.enter();
-	m_is_playing = false;
     // We must do the unregister outside the lock otherwise
     // we may get a deadlock. Potentially unsafe, but such is life...
+	unregister_renderer(this);
+
+	m_lock.enter();
+	m_is_playing = false;
+#ifndef WITH_SEAMLESS_PLAYBACK
+	if (m_audio_src) {
+        m_audio_src->stop();
+		m_audio_src->release();
+		m_audio_src = NULL;
+	}
+#endif // !WITH_SEAMLESS_PLAYBACK
 	m_lock.leave();
 	
 }
