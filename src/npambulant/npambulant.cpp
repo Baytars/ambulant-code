@@ -87,7 +87,8 @@ npambulant::npambulant(NPMIMEType mimetype, NPP pNPInstance, PRUint16 mode,
 	m_bInitialized(FALSE),
 	m_pScriptableObject(NULL),
 	m_autostart(true),
-	m_ambulant_player(NULL)
+	m_ambulant_player(NULL),
+	m_Window(NULL)
 {
 #ifdef XP_WIN
 	m_hWnd = NULL;
@@ -373,6 +374,8 @@ npambulant::setWindow(NPWindow* pNPWindow)
 #endif
 
 	m_Window = pNPWindow;
+	
+	return TRUE;
 }
 
 NPBool
