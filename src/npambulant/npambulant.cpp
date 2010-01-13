@@ -146,13 +146,13 @@ npambulant::init_ambulant(NPP npp, NPWindow* aWindow)
 {
         const char* version = ambulant::get_version();
 AM_DBG fprintf(stderr, "npambulant::init(0x%x) ambulant version\n", aWindow, version);
-#if 0
+#ifndef NDEBUG
 	if (getenv("AMBULANT_DEBUG") != 0) {
 		ambulant::lib::logger::get_logger()->set_ostream(new stderr_ostream);
 		ambulant::lib::logger::get_logger()->set_level(ambulant::lib::logger::LEVEL_DEBUG);
 		ambulant::lib::logger::get_logger()->debug("npambulant: DEBUG enabled. Ambulant version: %s\n", version);
 	}
-#endif
+#endif//NDEBUG
 	ambulant::lib::logger::get_logger()->set_level(ambulant::lib::logger::LEVEL_SHOW);
 	if(aWindow == NULL)
 		return FALSE;

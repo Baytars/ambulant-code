@@ -231,13 +231,14 @@ else
 build-npambulant: npambulant_plugin_dir
 npambulant_plugin_dir: .libs/$(NPAMBULANT)
 #	Create directory structure
-	-rm -r npambulant_plugin_dir
+	-rm -fr npambulant_plugin_dir
 	mkdir npambulant_plugin_dir
 	mkdir npambulant_plugin_dir/plugins
 	mkdir npambulant_plugin_dir/plugins/npambulant
 	mkdir npambulant_plugin_dir/plugins/npambulant/plugins
 #	Copy browser plugin
 	cp .libs/$(NPAMBULANT) npambulant_plugin_dir/plugins/npambulant.so
+	strip npambulant_plugin_dir/plugins/npambulant.so
 #	Install plugins for ambulant engine
 		pkglibdir=`pwd`/npambulant_plugin_dir/plugins/npambulant/plugins; \
 		cd ../plugins; \
@@ -263,6 +264,7 @@ npambulant_plugin_dir: .libs/$(NPAMBULANT)
 		i386|i686)			\
 			cp $(srcdir)/install-linux.rdf npambulant_plugin_dir/install.rdf ;;	\
 	esac
+	strip  npambulant_plugin_dir/plugins/npambulant/*.so*
 install-npambulant:  npambulant_plugin_dir
 	if [ `id -u` == "0" ]; then \
 			MOZILLA_PLUGINS=/usr/lib/$(MOZILLA_PLUGINS); \
