@@ -2,9 +2,9 @@
 {
 	045D0B7E0958C53F00C194EE /* mainloop.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {812, 3900}}";
-			sepNavSelRange = "{3450, 0}";
-			sepNavVisRange = "{3384, 191}";
+			sepNavIntBoundsRect = "{{0, 0}, {939, 4125}}";
+			sepNavSelRange = "{2625, 219}";
+			sepNavVisRange = "{1967, 2300}";
 		};
 	};
 	045D0B7F0958C53F00C194EE /* mainloop.h */ = {
@@ -104,41 +104,6 @@
 	04E8E404109F3BE300B7C8C9 /* Code sense */ = {
 		isa = PBXCodeSenseManager;
 		indexTemplatePath = "";
-	};
-	04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 04F8CA9510F4D87900EFF4EC /* proxy.py */;
-		rLen = 7;
-		rLoc = 1605;
-		rType = 0;
-	};
-	04F8CA9510F4D87900EFF4EC /* proxy.py */ = {
-		isa = PBXFileReference;
-		lastKnownFileType = text.script.python;
-		name = proxy.py;
-		path = /Users/jack/src/ambulant/src/webkit_plugin/PlugIns/pyamplugin_webkitscripting/proxy.py;
-		sourceTree = "<absolute>";
-	};
-	04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 04F8CA9710F4D87900EFF4EC /* proxy.py */;
-		name = "proxy.py: 50";
-		rLen = 7;
-		rLoc = 1605;
-		rType = 0;
-		vrLen = 458;
-		vrLoc = 1449;
-	};
-	04F8CA9710F4D87900EFF4EC /* proxy.py */ = {
-		isa = PBXFileReference;
-		name = proxy.py;
-		path = /Users/jack/src/ambulant/src/webkit_plugin/PlugIns/pyamplugin_webkitscripting/proxy.py;
-		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {733, 2700}}";
-			sepNavSelRange = "{1605, 7}";
-			sepNavVisRange = "{1449, 458}";
-		};
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecturePreference = x86_64;
@@ -264,12 +229,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 284468411;
-			PBXWorkspaceStateSaveDate = 284468411;
-		};
-		perUserProjectItems = {
-			04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */ = 04F8CA9410F4D87900EFF4EC /* PBXTextBookmark */;
-			04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */ = 04F8CA9610F4D87900EFF4EC /* PBXTextBookmark */;
+			PBXPerProjectTemplateStateSaveDate = 285173022;
+			PBXWorkspaceStateSaveDate = 285173022;
 		};
 		sourceControlManager = 04E8E403109F3BE300B7C8C9 /* Source Control */;
 		userBuildSettings = {

@@ -1995,16 +1995,13 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavcodec\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
-					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
-					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
-					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
-					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/live/UsageEnvironment\"",
 				);
 				PRODUCT_NAME = "Ambulant-mac";
+				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/live/liveMedia/include ../../build-3264/third_party_packages/live/BasicUsageEnvironment/include ../../build-3264/third_party_packages/live/groupsock/include ../../build-3264/third_party_packages/live/UsageEnvironment/include";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
