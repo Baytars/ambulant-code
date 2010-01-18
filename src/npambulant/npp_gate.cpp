@@ -206,6 +206,7 @@ NPError NPP_NewStream(NPP instance,
 
   if (pPlugin->isInitialized()) {
 	  fprintf(stderr, "npambulant: NPP_NewStream called twice\n");
+    return rv;
   }
   if (!pPlugin->init()) {
 	  rv = NPERR_GENERIC_ERROR;
