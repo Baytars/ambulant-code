@@ -368,6 +368,7 @@ ffmpeg_demux::add_datasink(demux_datasink *parent, int stream_index)
 	m_sinks[stream_index] = parent;
 	parent->add_ref();
 	m_nstream++;
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::add_datasink(0x%x): stream_index=%d parent=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, parent, m_current_sink, m_nstream); //XXXX
 	m_lock.leave();
 }
 
@@ -424,6 +425,7 @@ ffmpeg_demux::remove_datasink(int stream_index)
 			ds->release();
 		}
 	}
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::remove_datasink(0x%x): stream_index=%d ds=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, ds, m_current_sink, m_nstream); //XXXX
 	if (m_nstream <= 0) cancel();
 }
 
