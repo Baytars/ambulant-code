@@ -210,7 +210,9 @@ gui::sdl::sdl_audio_renderer::sdl_callback(Uint8 *stream, int len)
 		// No streams, or more than one: use an accumulation buffer
 		memset(stream, 0, len);
 		std::list<sdl_audio_renderer *>::iterator i;
+		int dbg_nstream = 0;
 		for (i=first; i != s_renderers.end(); i++) {
+			dbg_nstream++;
 			Uint8 *next_data;
 			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_callback(0x%x, %d))calling get_data() ", (void*) stream, len);
 			int next_len = (*i)->get_data(len, &next_data);
@@ -220,6 +222,7 @@ gui::sdl::sdl_audio_renderer::sdl_callback(Uint8 *stream, int len)
 			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_callback(0x%x, %d))calling get_data_done(%d) ", (void*) stream, len, next_len);
 			(*i)->get_data_done(next_len);
 		}
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_callback: got data from %d renderers", dbg_nstream);
 	}
 	s_static_lock.leave();
 }
@@ -425,6 +428,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		rv = m_audio_src->size();
 		*ptr = (Uint8 *) m_audio_src->get_read_ptr();
 		if (rv) assert(*ptr);
+		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: %d bytes available", rv);
 		if (rv > bytes_wanted)
 			rv = bytes_wanted;
 #ifdef WITH_CLOCK_SYNC
