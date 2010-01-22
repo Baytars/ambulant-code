@@ -1776,10 +1776,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavcodec\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
@@ -1808,20 +1804,14 @@
 				INFOPLIST_FILE = ../../src/player_macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../../packages/ffmpeg-0.5/libavformat",
-					"../../../../packages/ffmpeg-0.5/libavcodec",
-					"../../../../packages/ffmpeg-0.5/libavutil",
-					"../../third_party_packages/expat-unix/lib",
-					"../../third_party_packages/xerces-unix/lib",
-					../../third_party_packages/live/liveMedia,
-					../../third_party_packages/live/UsageEnvironment,
-					../../third_party_packages/live/BasicUsageEnvironment,
-					/usr/local/lib,
-					../../third_party_packages/live/groupsock,
-					"\"$(SRCROOT)/../../../../packages/xerces-c-src_2_7_0/lib\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PREBINDING = NO;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../../../packages/ffmpeg-0.5 /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/installed/include ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
 			name = "Debug-llvm";
 		};
@@ -1851,10 +1841,6 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavcodec\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
@@ -1899,21 +1885,15 @@
 				INFOPLIST_FILE = ../../src/player_macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../../packages/ffmpeg-0.5/libavformat",
-					"../../../../packages/ffmpeg-0.5/libavcodec",
-					"../../../../packages/ffmpeg-0.5/libavutil",
-					"../../third_party_packages/expat-unix/lib",
-					"../../third_party_packages/xerces-unix/lib",
-					../../third_party_packages/live/liveMedia,
-					../../third_party_packages/live/UsageEnvironment,
-					../../third_party_packages/live/BasicUsageEnvironment,
-					/usr/local/lib,
-					../../third_party_packages/live/groupsock,
-					"\"$(SRCROOT)/../../../../packages/xerces-c-src_2_7_0/lib\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				OTHER_CFLAGS = "";
 				PREBINDING = NO;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../../../packages/ffmpeg-0.5 /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/installed/include ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
 			};
 			name = "Debug-64-CG";
 		};
@@ -1948,10 +1928,6 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavcodec\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
@@ -2033,10 +2009,6 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavcodec\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavformat\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libavutil\"",
-					"\"$(SRCROOT)/../../../../packages/ffmpeg-0.5/libswscale\"",
 					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
 					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
@@ -2080,14 +2052,17 @@
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
 				PREBINDING = NO;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../../../packages/ffmpeg-0.5 /usr/local/include/SDL ../../../../packages/live/liveMedia/include ../../../../packages/live/BasicUsageEnvironment/include ../../../../packages/live/groupsock/include ../../../../packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/live/liveMedia/include ../../build-3264/third_party_packages/live/BasicUsageEnvironment/include ../../build-3264/third_party_packages/live/groupsock/include ../../build-3264/third_party_packages/live/UsageEnvironment/include";
 			};
 			name = Debug;
 		};
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					x86_64,
+					i386,
+				);
 				GCC_AUTO_VECTORIZATION = YES;
 				GCC_ENABLE_SSE3_EXTENSIONS = YES;
 				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
@@ -2099,20 +2074,14 @@
 				INFOPLIST_FILE = ../../src/player_macosx/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"../../../../packages/ffmpeg-0.5/libavformat",
-					"../../../../packages/ffmpeg-0.5/libavcodec",
-					"../../../../packages/ffmpeg-0.5/libavutil",
-					"../../third_party_packages/expat-unix/lib",
-					"../../third_party_packages/xerces-unix/lib",
-					../../third_party_packages/live/liveMedia,
-					../../third_party_packages/live/UsageEnvironment,
-					../../third_party_packages/live/BasicUsageEnvironment,
-					/usr/local/lib,
-					../../third_party_packages/live/groupsock,
-					"\"$(SRCROOT)/../../../../packages/xerces-c-src_2_7_0/lib\"",
+					"\"$(SRCROOT)/../../build-3264/third_party_packages/installed/lib\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/BasicUsageEnvironment\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/groupsock\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/liveMedia\"",
+					"\"$(SRCROOT)/../../third_party_packages/live/UsageEnvironment\"",
 				);
 				PREBINDING = NO;
-				USER_HEADER_SEARCH_PATHS = "../../include ../../../../packages/ffmpeg-0.5 /usr/local/include/SDL ../../third_party_packages/live/liveMedia/include ../../third_party_packages/live/BasicUsageEnvironment/include ../../third_party_packages/live/groupsock/include ../../third_party_packages/live/UsageEnvironment/include";
+				USER_HEADER_SEARCH_PATHS = "../../include ../../build-3264/third_party_packages/installed/include ../../build-3264/third_party_packages/installed/include/SDL ../../build-3264/third_party_packages/live/liveMedia/include ../../build-3264/third_party_packages/live/BasicUsageEnvironment/include ../../build-3264/third_party_packages/live/groupsock/include ../../build-3264/third_party_packages/live/UsageEnvironment/include";
 			};
 			name = Release;
 		};
