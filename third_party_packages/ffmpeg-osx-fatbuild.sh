@@ -17,7 +17,8 @@ PREFIX="--prefix=`cd ../installed ; pwd`"
 #
 # Set this to the global options you want to configure ffmpeg with.
 #
-CONFIGOPTS="$PREFIX --disable-encoders --enable-swscale --enable-gpl --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --enable-static --enable-shared --enable-libfaad --disable-libfaac"
+#CONFIGOPTS="$PREFIX --disable-encoders --enable-swscale --enable-gpl --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --enable-static --enable-shared --enable-libfaad --disable-libfaac"
+CONFIGOPTS="$PREFIX --disable-encoders --enable-gpl --disable-ffserver --disable-ffmpeg --disable-ffplay --enable-static --enable-shared --enable-libfaad --disable-libfaac"
 #
 # If you want to build for a different MacOSX version than the current one
 # define SYSROOT and MACOSX_DEPLOYMENT_TARGET
@@ -254,6 +255,9 @@ if $merge; then
     for i in avformat avutil avcodec swscale; do
     	cp build-$ANY_RANDOM_ARCH/lib$i/*.pc lib$i/
     done
+    if [ -f build-$ANY_RANDOM_ARCH/libavutil/avconfig.h ]; then
+        cp build-$ANY_RANDOM_ARCH/libavutil/avconfig.h libavutil/avconfig.h
+    fi
 else
     echo $0: skipping merge
 fi
