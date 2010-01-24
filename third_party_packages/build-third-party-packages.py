@@ -349,13 +349,22 @@ third_party_packages={
 				"make $(MAKEFLAGS) && "
 				"make install" % LINUX_COMMON_CONFIGURE
 			),
+##		TPP("ffmpeg",
+##			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
+##			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
+##			buildcmd=
+##				"cd ffmpeg-0.5 && "
+##				"%s --enable-gpl --enable-libfaad --enable-swscale --enable-shared --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
+##				"make $(MAKEFLAGS) && "
+##				"make install " % 
+##					(LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
+##			),
 		TPP("ffmpeg",
-			url="http://ffmpeg.org/releases/ffmpeg-0.5.tar.bz2",
+			url="http://homepages.cwi.nl/~jack/ambulant/ffmpeg-export-2010-01-22.tgz",
 			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
 			buildcmd=
-				"cd ffmpeg-0.5 && "
-				"%s --enable-gpl --enable-libfaad --enable-swscale --enable-shared --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
-				"make $(MAKEFLAGS) && "
+				"cd ffmpeg-export-2010-01-22 && "
+				"%s --enable-gpl --enable-libfaad --enable-shared --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
 				"make install " % 
 					(LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
 			),
