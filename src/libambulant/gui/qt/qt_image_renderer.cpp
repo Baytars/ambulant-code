@@ -29,7 +29,7 @@
 #include "ambulant/common/smil_alignment.h"
 #include "ambulant/smil2/test_attrs.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -172,8 +172,13 @@ qt_image_renderer::redraw_body(const rect &dirty,
 	bitBlt (&partialimage, 0, 0, &m_image, S_L, S_T, S_W, S_H, 0 );
 	QImage scaledimage = partialimage.smoothScale(D_W, D_H, QImage::ScaleFree);
 	N_L = 0; N_T = 0;
+#ifdef  WITH_DUMPIMAGES
+	char buf[128];
+	sprintf (buf,"m_image(0x%x)",&m_image);
+	DUMPIMAGE(&m_image, buf);
 	DUMPIMAGE(&partialimage, "partialimage");
 	DUMPIMAGE(&scaledimage, "scaledimage");
+#endif//WITH_DUMPIMAGES
 
 #ifdef	WITH_SMIL30
 	if (alpha_chroma != 1.0) {
