@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AmbulantPlayer 1.8\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2010-01-12 15:50+0100\n"
+"POT-Creation-Date: 2010-01-19 17:04+0100\n"
 "PO-Revision-Date: 2004-09-12 15:09+0200\n"
 "Last-Translator: Jack Jansen <Jack.Jansen@cwi.nl>\n"
 "Language-Team: English <Jack.Jansen@cwi.nl>\n"
@@ -124,12 +124,12 @@ msgstr "cocoa_ink_renderer: Kan geen DOM-tree bouwen"
 msgid "cocoa_ink_renderer: no <ink> found"
 msgstr ""
 
-#: src/libambulant/gui/cocoa/cocoa_video.mm:204
+#: src/libambulant/gui/cocoa/cocoa_video.mm:217
 #, c-format
 msgid "%s: cannot convert to URL"
 msgstr "Geen correcte internetlocatie (URL): %s"
 
-#: src/libambulant/gui/cocoa/cocoa_video.mm:212
+#: src/libambulant/gui/cocoa/cocoa_video.mm:225
 #, c-format
 msgid "%s: cannot open movie"
 msgstr "Videobestand kan niet geopend worden: %s"
@@ -156,17 +156,17 @@ msgstr "SDL audiokanaal kan niet geopend worden"
 msgid "Cannot open SDL audio output stream with required characteristics"
 msgstr "SDL audiokanaal kan niet geopend worden met de juiste eigenschappen"
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:271
+#: src/libambulant/gui/SDL/sdl_audio.cpp:274
 #, c-format
 msgid "%s: cannot open audio file"
 msgstr "Audiobestand kan niet geopend worden: %s"
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:273
+#: src/libambulant/gui/SDL/sdl_audio.cpp:276
 #, c-format
 msgid "%s: audio format not supported"
 msgstr "Onbekend audio formaat in: %s"
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:311
+#: src/libambulant/gui/SDL/sdl_audio.cpp:314
 #, c-format
 msgid "%s: cannot open"
 msgstr "Bestand kan niet geopend worden: %s"
@@ -264,10 +264,10 @@ msgstr "%s: kan geen audiokanaal meer aanmaken"
 #: src/libambulant/net/demux_datasource.cpp:143
 #: src/libambulant/net/ffmpeg_audio.cpp:335
 #: src/libambulant/net/ffmpeg_audio.cpp:404
-#: src/libambulant/net/ffmpeg_audio.cpp:500
-#: src/libambulant/net/ffmpeg_audio.cpp:907
-#: src/libambulant/net/ffmpeg_audio.cpp:946
-#: src/libambulant/net/ffmpeg_audio.cpp:1160
+#: src/libambulant/net/ffmpeg_audio.cpp:508
+#: src/libambulant/net/ffmpeg_audio.cpp:915
+#: src/libambulant/net/ffmpeg_audio.cpp:954
+#: src/libambulant/net/ffmpeg_audio.cpp:1168
 msgid "Programmer error encountered during audio playback"
 msgstr "Interne fout gedetecteerd tijdens het spelen van audio"
 
@@ -307,13 +307,13 @@ msgstr "%s: audio decoder \"%s\" wordt niet ondersteund"
 msgid "ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"
 msgstr "ffmpeg_decoder_datasource: kan %s(0x%x) decoder niet selecteren"
 
-#: src/libambulant/net/ffmpeg_audio.cpp:718
 #: src/libambulant/net/ffmpeg_audio.cpp:726
+#: src/libambulant/net/ffmpeg_audio.cpp:734
 #, c-format
 msgid "No support for \"%s\" audio"
 msgstr "Geen ondersteuning voor \"%s\" audio"
 
-#: src/libambulant/net/ffmpeg_audio.cpp:894
+#: src/libambulant/net/ffmpeg_audio.cpp:902
 msgid "Audio cannot be converted to 44Khz stereo"
 msgstr "Audio kan niet geconverteerd worden naar 44Khz stereo"
 
