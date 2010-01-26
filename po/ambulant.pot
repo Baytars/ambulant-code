@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
-"POT-Creation-Date: 2010-01-12 15:50+0100\n"
+"POT-Creation-Date: 2010-01-19 17:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,12 +120,12 @@ msgstr ""
 msgid "cocoa_ink_renderer: no <ink> found"
 msgstr ""
 
-#: src/libambulant/gui/cocoa/cocoa_video.mm:204
+#: src/libambulant/gui/cocoa/cocoa_video.mm:217
 #, c-format
 msgid "%s: cannot convert to URL"
 msgstr ""
 
-#: src/libambulant/gui/cocoa/cocoa_video.mm:212
+#: src/libambulant/gui/cocoa/cocoa_video.mm:225
 #, c-format
 msgid "%s: cannot open movie"
 msgstr ""
@@ -152,17 +152,17 @@ msgstr ""
 msgid "Cannot open SDL audio output stream with required characteristics"
 msgstr ""
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:271
+#: src/libambulant/gui/SDL/sdl_audio.cpp:274
 #, c-format
 msgid "%s: cannot open audio file"
 msgstr ""
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:273
+#: src/libambulant/gui/SDL/sdl_audio.cpp:276
 #, c-format
 msgid "%s: audio format not supported"
 msgstr ""
 
-#: src/libambulant/gui/SDL/sdl_audio.cpp:311
+#: src/libambulant/gui/SDL/sdl_audio.cpp:314
 #, c-format
 msgid "%s: cannot open"
 msgstr ""
@@ -260,10 +260,10 @@ msgstr ""
 #: src/libambulant/net/demux_datasource.cpp:143
 #: src/libambulant/net/ffmpeg_audio.cpp:335
 #: src/libambulant/net/ffmpeg_audio.cpp:404
-#: src/libambulant/net/ffmpeg_audio.cpp:500
-#: src/libambulant/net/ffmpeg_audio.cpp:907
-#: src/libambulant/net/ffmpeg_audio.cpp:946
-#: src/libambulant/net/ffmpeg_audio.cpp:1160
+#: src/libambulant/net/ffmpeg_audio.cpp:508
+#: src/libambulant/net/ffmpeg_audio.cpp:915
+#: src/libambulant/net/ffmpeg_audio.cpp:954
+#: src/libambulant/net/ffmpeg_audio.cpp:1168
 msgid "Programmer error encountered during audio playback"
 msgstr ""
 
@@ -303,13 +303,13 @@ msgstr ""
 msgid "ffmpeg_decoder_datasource: could not select %s(0x%x) decoder"
 msgstr ""
 
-#: src/libambulant/net/ffmpeg_audio.cpp:718
 #: src/libambulant/net/ffmpeg_audio.cpp:726
+#: src/libambulant/net/ffmpeg_audio.cpp:734
 #, c-format
 msgid "No support for \"%s\" audio"
 msgstr ""
 
-#: src/libambulant/net/ffmpeg_audio.cpp:894
+#: src/libambulant/net/ffmpeg_audio.cpp:902
 msgid "Audio cannot be converted to 44Khz stereo"
 msgstr ""
 
