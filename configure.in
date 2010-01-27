@@ -70,15 +70,13 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 	third_party_packages/Makefile
 	Documentation/Makefile
 	Extras/Makefile])
+	
 
-#if srcdir does not start with '/', set srcdir to absolute pathname
-if test  $(echo $srcdir | sed 's%^/%%') = $srcdir ; then srcdir=`pwd`/$srcdir; fi
-#if test $srcdir = "."  ; then srcdir=`pwd`; fi
 AC_CONFIG_COMMANDS([libtool_patch],[chmod 755 $srcdir/patch_libtool.sh;$srcdir/patch_libtool.sh])
 
 # Variables needed.
-export PATH=$srcdir/third_party_packages/installed/bin:$PATH
-export PKG_CONFIG_PATH=$srcdir/third_party_packages/installed/lib/pkgconfig:$PKG_CONFIG_PATH
+export PATH=`pwd`/third_party_packages/installed/bin:$PATH
+export PKG_CONFIG_PATH=`pwd`/third_party_packages/installed/lib/pkgconfig:$PKG_CONFIG_PATH
 
 #
 # Do we have pkg-config?
@@ -736,7 +734,7 @@ AC_ARG_WITH(live,
 		case "${withval}" in
 		yes)
 			# Assume it is in third_party_packages/live
-			live_root=$srcdir/third_party_packages/live
+			live_root=`pwd`/third_party_packages/live
 			test_live=true
 			;;
 		no)
@@ -748,8 +746,8 @@ AC_ARG_WITH(live,
 			;;
 		esac
 	],[
-		if test -f $srcdir/third_party_packages/live/liveMedia/libliveMedia.a; then
-			live_root=$srcdir/third_party_packages/live
+		if test -f `pwd`/third_party_packages/live/liveMedia/libliveMedia.a; then
+			live_root=`pwd`/third_party_packages/live
 			test_live=true
 		fi
 	])
@@ -921,14 +919,14 @@ AC_ARG_WITH([npambulant],
 	[with_npambulant=false])
 
 # when working with mozilla source trunk, uncomment next line
-# XULRUNNER_ROOT=$srcdir/third_party_packages/mozilla/ff-opt-static/dist
+# XULRUNNER_ROOT=`pwd`/third_party_packages/mozilla/ff-opt-static/dist
 if test x$with_npambulant = xtrue;
 then
-   if test -f $srcdir/third_party_packages/xulrunner-sdk/include/plugin/npapi.h; then
+   if test -f `pwd`/third_party_packages/xulrunner-sdk/include/plugin/npapi.h; then
 		# Require a xulrunner-sdk installation in third_party_packages
-		withvalabs=$srcdir/third_party_packages/xulrunner-sdk
+		withvalabs=`pwd`/third_party_packages/xulrunner-sdk
 		# for mozilla source trunk, uncomment next line
-		# withvalabs=$srcdir/third_party_packages/mozilla/ff-opt-static/dist
+		# withvalabs=`pwd`/third_party_packages/mozilla/ff-opt-static/dist
 		XULRUNNER_ROOT=${withvalabs}
 		XPIDL=${XULRUNNER_ROOT}/bin/xpidl
    elif test x`xulrunner --gre-version` = x1.9.0.6
