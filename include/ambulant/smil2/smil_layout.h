@@ -29,7 +29,6 @@
 #include "ambulant/config/config.h"
 #include "ambulant/common/layout.h"
 #include "ambulant/lib/node.h"
-#include "ambulant/lib/document.h"
 
 namespace ambulant {
 namespace common {
@@ -47,10 +46,7 @@ namespace smil2 {
 
 class region_node;
 
-class smil_layout_manager : 
-    public common::layout_manager,
-    public lib::avt_change_notification
-{
+class smil_layout_manager : public common::layout_manager {
   public:
 	smil_layout_manager(common::factories *factory, lib::document *doc);
 	~smil_layout_manager();
@@ -62,13 +58,10 @@ class smil_layout_manager :
 	common::animation_notification *get_animation_notification(const lib::node *node);
 	common::animation_destination *get_animation_destination(const lib::node *node);
 	common::surface_template *get_region(const lib::node *n);
-#ifdef WITH_SMIL30
-    void avt_value_changed_for(const lib::node *n);
-#endif // WITH_SMIL30
 	
   private:
 	lib::node *get_document_layout(lib::document *doc);
-	void build_layout_tree(lib::node *layout_root, lib::document *doc);
+	void build_layout_tree(lib::node *layout_root);
 	
 	region_node *get_region_node_for(const lib::node *n, bool nodeoverride);
 	common::surface *get_default_rendering_surface(const lib::node *n);
