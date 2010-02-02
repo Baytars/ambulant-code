@@ -23,11 +23,6 @@
 		name = smil_player.cpp;
 		path = /Users/jack/src/ambulant/src/libambulant/smil2/smil_player.cpp;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1264, 18465}}";
-			sepNavSelRange = "{6598, 0}";
-			sepNavVisRange = "{5714, 658}";
-		};
 	};
 	0432F3E71105F0F10077DDF8 /* state.cpp:57 */ = {
 		isa = PBXFileBreakpoint;
@@ -52,11 +47,6 @@
 		name = state.cpp;
 		path = /Users/jack/src/ambulant/src/libambulant/common/state.cpp;
 		sourceTree = "<absolute>";
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {939, 1290}}";
-			sepNavSelRange = "{2512, 0}";
-			sepNavVisRange = "{1021, 1492}";
-		};
 	};
 	0432F3EA1105F1020077DDF8 /* state.cpp:84 */ = {
 		isa = PBXFileBreakpoint;
@@ -200,7 +190,7 @@
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecturePreference = x86_64;
-		activeBuildConfigurationName = "Debug-10.6";
+		activeBuildConfigurationName = "Release-10.6";
 		activeExecutable = 049CF80410A03FD400E6593B /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		addToTargets = (
@@ -329,8 +319,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 285601691;
-			PBXWorkspaceStateSaveDate = 285601691;
+			PBXPerProjectTemplateStateSaveDate = 285605529;
+			PBXWorkspaceStateSaveDate = 285605529;
 		};
 		sourceControlManager = 04E8E403109F3BE300B7C8C9 /* Source Control */;
 		userBuildSettings = {

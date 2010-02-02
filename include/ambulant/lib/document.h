@@ -122,7 +122,7 @@ class AMBULANTAPI document : public node_context {
 	void set_state(common::state_component *state) { m_state = state; }	
 
 	/// Apply XSLT Attribute Value Template
-	const lib::xml_string apply_avt(const node* n, const lib::xml_string& attrname, const lib::xml_string& attrvalue) const;
+	lib::xml_string apply_avt(const node* n, const lib::xml_string& attrname, const lib::xml_string& attrvalue) const;
 #endif // WITH_SMIL30
 
   protected:
