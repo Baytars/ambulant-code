@@ -99,6 +99,15 @@ smil_player::initialize()
 	m_layout_manager->load_bgimages(m_factory);
 }
 
+#define SDL_AUDIO_BUG_HACK
+#ifdef  SDL_AUDIO_BUG_HACK
+// XXXX Quick fix for bug in sdl_audio_render: its refcount may be mixed up and
+// consequently its release() function did not result in proper cleanup.
+// As a result, upon exit() still some demux threads may be active.
+// For the browser plugins, this deadly, because after destroying Ambulant and
+// unloading its code, these threads may continue wildly and crash the browser.
+// The hack is to forece delete all "failing" playables
+#endif//SDL_AUDIO_BUG_HACK
 void
 smil_player::terminate()
 {
@@ -111,7 +120,15 @@ smil_player::terminate()
 	for(it = m_playables.begin();it!=m_playables.end();it++) {
         (*it).second->post_stop();
 		int rem = (*it).second->release();
-		if (rem > 0) m_logger->trace("smil_player::~smil_player: playable %s still has refcount of %d", (*it).second->get_sig().c_str(), rem);
+		if (rem > 0) 
+#ifdef  SDL_AUDIO_BUG_HACK
+		  {
+#endif//SDL_AUDIO_BUG_HACK
+			m_logger->trace("smil_player::terminate: playable(0x%x) %s still has refcount of %d", (*it).second, (*it).second->get_sig().c_str(), rem);
+#ifdef  SDL_AUDIO_BUG_HACK
+			delete (*it).second;
+		  }
+#endif//SDL_AUDIO_BUG_HACK
 	}
 	
 #ifdef WITH_SEAMLESS_PLAYBACK
@@ -120,7 +137,15 @@ smil_player::terminate()
 	for(it_url_based = m_playables_url_based.begin();it_url_based!=m_playables_url_based.end();it_url_based++) {
         (*it_url_based).second->post_stop();
 		int rem = (*it_url_based).second->release();
-		if (rem > 0) m_logger->trace("smil_player::~smil_player: url_based_playable %s still has refcount of %d", (*it_url_based).second->get_sig().c_str(), rem);
+		if (rem > 0)
+#ifdef  SDL_AUDIO_BUG_HACK
+		  {
+#endif//SDL_AUDIO_BUG_HACK
+			m_logger->trace("smil_player::terminate: url_based_playable(0x%x) %s still has refcount of %d)", (*it_url_based).second, (*it_url_based).second->get_sig().c_str(), rem);
+#ifdef  SDL_AUDIO_BUG_HACK
+			delete (*it_url_based).second;
+		  }
+#endif//SDL_AUDIO_BUG_HACK
 	}
 #endif
 	m_playables_cs.leave();
@@ -334,6 +359,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 		np = _new_playable(n);
         AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
+		lib::logger::get_logger()->debug("smil_player::create_playable(0x%x) new playable np(0x%x) %s",this,np,np->get_sig().c_str(),
 		m_playables[n] = np;
 		m_playables_cs.leave();
         AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
@@ -379,7 +405,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
@@ -391,6 +417,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
         // Update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->init_with_node(n);
     }
+    lib::logger::get_logger()->debug("smil_player::create_playable(0x%x) new playable np(0x%x) %s",this,np,np->get_sig().c_str());
 #endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
@@ -1028,7 +1055,8 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 		m_logger->debug("%s[%s]._destroy_playable 0x%x", tag.c_str(), (pid?pid:"no-id"), np);
 	}
 	int rem = np->release();
-	if (rem > 0) m_logger->debug("smil_player::_destroy_playable: playable 0x%x still has refcount of %d", np, rem);
+	if (rem > 0)
+	  m_logger->debug("smil_player::_destroy_playable: playable(0x%x) %s still has refcount of %d", np, np->get_sig().c_str(), rem);
 }
 
 #ifdef WITH_SEAMLESS_PLAYBACK
@@ -1057,7 +1085,8 @@ void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::
 		AM_DBG lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: stop the playable in the cache for %s", victim.first->get_sig().c_str());
 		victim.second->post_stop();
         int rem = victim.second->release();
-		if (rem > 0) m_logger->debug("smil_player::destroy_playable_in_cache: playable 0x%x still has refcount of %d", victim.second, rem);
+		if (rem > 0)
+			m_logger->debug("smil_player::destroy_playable_in_cache: playable(0x%x) still has refcount of %d", victim.second, victim.second->get_sig().c_str(), rem);
 	} else {
         m_playables_cs.leave();
         // Note that this is not an error, on the contrary: it could be that the playable has been reused.
