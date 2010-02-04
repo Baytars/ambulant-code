@@ -106,7 +106,9 @@ smil_player::initialize()
 // As a result, upon exit() still some demux threads may be active.
 // For the browser plugins, this deadly, because after destroying Ambulant and
 // unloading its code, these threads may continue wildly and crash the browser.
-// The hack is to forece delete all "failing" playables
+// The hack is to force delete all remaining playables. This must be done before
+// event_processor is deleted, since e.g. deletion of sdl_audio_renderer requires
+// callbacks to be executed.
 #endif//SDL_AUDIO_BUG_HACK
 void
 smil_player::terminate()
@@ -126,7 +128,8 @@ smil_player::terminate()
 #endif//SDL_AUDIO_BUG_HACK
 			m_logger->trace("smil_player::terminate: playable(0x%x) %s still has refcount of %d", (*it).second, (*it).second->get_sig().c_str(), rem);
 #ifdef  SDL_AUDIO_BUG_HACK
-			delete (*it).second;
+			while (rem > 0)
+			    rem = (*it).second->release();
 		  }
 #endif//SDL_AUDIO_BUG_HACK
 	}
@@ -143,7 +146,8 @@ smil_player::terminate()
 #endif//SDL_AUDIO_BUG_HACK
 			m_logger->trace("smil_player::terminate: url_based_playable(0x%x) %s still has refcount of %d)", (*it_url_based).second, (*it_url_based).second->get_sig().c_str(), rem);
 #ifdef  SDL_AUDIO_BUG_HACK
-			delete (*it_url_based).second;
+			while (rem > 0)
+			    rem = (*it_url_based).second->release();
 		  }
 #endif//SDL_AUDIO_BUG_HACK
 	}
@@ -359,7 +363,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 		np = _new_playable(n);
         AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
-		lib::logger::get_logger()->debug("smil_player::create_playable(0x%x) new playable np(0x%x) %s",this,np,np->get_sig().c_str(),
+	AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x) new playable np(0x%x) %s",this,np,np->get_sig().c_str(),
 		m_playables[n] = np;
 		m_playables_cs.leave();
         AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);
@@ -405,7 +409,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
@@ -417,7 +421,6 @@ common::playable *smil_player::create_playable(const lib::node *n) {
         // Update the context info of np, for example, clipbegin, clipend, and cookie according to the node
 		np->init_with_node(n);
     }
-    lib::logger::get_logger()->debug("smil_player::create_playable(0x%x) new playable np(0x%x) %s",this,np,np->get_sig().c_str());
 #endif
 	
 	// We also need to remember any accesskey attribute (as opposed to accesskey
