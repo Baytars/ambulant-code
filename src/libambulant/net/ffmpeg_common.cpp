@@ -179,7 +179,11 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	m_clip_end(clip_end),
 	m_clip_begin_changed(false)
 {
-	assert(m_clip_begin >= 0);
+//  assert(m_clip_begin >= 0);
+    if (m_clip_begin < 0); {
+		lib::logger::get_logger()->trace("ffmpeg_demux::ffmpeg_demux(): m_clip_begin=%d (ignored)", m_clip_begin);
+		m_clip_begin = 0;
+	}
 	if ( m_clip_begin ) m_clip_begin_changed = true;
 	
 	m_audio_fmt = audio_format("ffmpeg");
@@ -187,7 +191,7 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	int audio_idx = audio_stream_nr();
 	if ( audio_idx >= 0) {
 		m_audio_fmt.parameters = (void *) am_get_codec(con->streams[audio_idx]->codec);
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::supported: audio_codec_name=%s", am_get_codec_var(m_con->streams[audio_idx]->codec, codec_name));
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): audio_codec_name=%s", am_get_codec_var(m_con->streams[audio_idx]->codec, codec_name));
 		m_audio_fmt.samplerate = am_get_codec_var(con->streams[audio_idx]->codec, sample_rate);
 		m_audio_fmt.channels = am_get_codec_var(con->streams[audio_idx]->codec, channels);
 		m_audio_fmt.bits = 16;
@@ -197,9 +201,9 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	int video_idx = video_stream_nr();
 	if (video_idx >= 0) {
 		m_video_fmt.parameters = (void *) am_get_codec(m_con->streams[video_stream_nr()]->codec);
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::supported: video_codec_name=%s", am_get_codec_var(m_con->streams[video_stream_nr()]->codec, codec_name));
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): video_codec_name=%s", am_get_codec_var(m_con->streams[video_stream_nr()]->codec, codec_name));
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::supported: No Video stream ?");
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::ffmpeg_demux(): No Video stream ?");
 		m_video_fmt.parameters = NULL;
 	}
 	memset(m_sinks, 0, sizeof m_sinks);
