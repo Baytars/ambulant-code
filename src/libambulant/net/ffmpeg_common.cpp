@@ -433,6 +433,7 @@ ffmpeg_demux::remove_datasink(int stream_index)
 	if (m_nstream <= 0) cancel();
 }
 
+
 unsigned long
 ffmpeg_demux::run()
 {
@@ -446,6 +447,10 @@ ffmpeg_demux::run()
 	timestamp_t initial_audio_pts = 0;
 	bool initial_audio_pts_set = false;
 #endif
+
+///xxxbo 17-feb-2010
+	timestamp_t gb_initial_audio_pts = 0;
+
 	pkt_nr = 0;
 	assert(m_con);
 
@@ -543,9 +548,31 @@ ffmpeg_demux::run()
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: dts invalid using pts=%lld", pkt->dts);
 					pts = pkt->pts;
 				}
-#endif
+				
+				//xxxbo 17-feb-2010 To fix the chopping audio playback in vobis/ogg 
+				// For some reason which I don't understand, In the current version of ffmpeg, for reading vorbis in ogg,
+				// sometime, the pts and dts got by ffmpeg is not valid any more (which equal to AV_NOPTS_VALUE)
+				// and this kind of invalid value of pts and dts will last in the following packets for some
+				// small while. This invalid pts and dts will cause ffmpeg_decoder_datasource.data_avail dropping
+				// packets which should not be dropped. This kind of dropping will cause the chopping audio
+				// effect when playback vorbis in ogg. In this case, we use the latest valid pts as the current
+				// pts instead of the invalid AV_NOPTS_VALUE
+								
 				if (pts != AV_NOPTS_VALUE) {
 					pts = av_rescale_q(pts, m_con->streams[pkt->stream_index]->time_base, AMBULANT_TIMEBASE);
+					
+					if (pkt->stream_index == audio_streamnr)
+        		           	     gb_initial_audio_pts = pts; 
+                		} else {
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: pts and dts invalid using pts=%lld", gb_initial_audio_pts);
+					
+					gb_initial_audio_pts++;
+					pts = gb_initial_audio_pts;
+				//xxxbo 17-feb-2010 the end of fixing the chopping audio playback in vobis/ogg	
+				
+#endif
+
+					
 #if RESYNC_TO_INITIAL_AUDIO_PTS
                     // We seem to be getting values with a non-zero epoch sometimes (?)
                     // Remember initial audio pts, and resync everything to that.
