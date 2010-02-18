@@ -180,8 +180,8 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	m_clip_begin_changed(false)
 {
 //  assert(m_clip_begin >= 0);
-    if (m_clip_begin < 0); {
-		lib::logger::get_logger()->trace("ffmpeg_demux::ffmpeg_demux(): m_clip_begin=%d (ignored)", m_clip_begin);
+	if (m_clip_begin < 0) {
+		lib::logger::get_logger()->trace("ffmpeg_demux::ffmpeg_demux(): m_clip_begin=%lld (ignored)", m_clip_begin);
 		m_clip_begin = 0;
 	}
 	if ( m_clip_begin ) m_clip_begin_changed = true;
@@ -372,7 +372,7 @@ ffmpeg_demux::add_datasink(demux_datasink *parent, int stream_index)
 	m_sinks[stream_index] = parent;
 	parent->add_ref();
 	m_nstream++;
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::add_datasink(0x%x): stream_index=%d parent=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, parent, m_current_sink, m_nstream); //XXXX
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::add_datasink(0x%x): stream_index=%d parent=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, parent, m_current_sink, m_nstream);
 	m_lock.leave();
 }
 
@@ -429,7 +429,7 @@ ffmpeg_demux::remove_datasink(int stream_index)
 			ds->release();
 		}
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::remove_datasink(0x%x): stream_index=%d ds=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, ds, m_current_sink, m_nstream); //XXXX
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::remove_datasink(0x%x): stream_index=%d ds=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, ds, m_current_sink, m_nstream);
 	if (m_nstream <= 0) cancel();
 }
 
