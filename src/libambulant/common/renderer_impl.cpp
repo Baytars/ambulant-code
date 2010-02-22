@@ -176,6 +176,10 @@ renderer_playable::_init_clip_begin_end()
 		}	
 	}
 	AM_DBG lib::logger::get_logger()->debug("renderer_playable::init_clip_begin_end: cb=%lld, ce=%lld", cb,ce);
+	if (cb < 0) {
+		lib::logger::get_logger()->trace("%s: negative clipBegin value (%s) ignored",  m_node->get_sig().c_str(), clip_begin_attr);
+		cb = 0;
+	}
 	m_clip_begin = cb;
 	m_clip_end = ce;
 }
