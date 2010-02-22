@@ -179,11 +179,7 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 	m_clip_end(clip_end),
 	m_clip_begin_changed(false)
 {
-//  assert(m_clip_begin >= 0);
-	if (m_clip_begin < 0) {
-		lib::logger::get_logger()->trace("ffmpeg_demux::ffmpeg_demux(): m_clip_begin=%lld (ignored)", m_clip_begin);
-		m_clip_begin = 0;
-	}
+	assert(m_clip_begin >= 0);
 	if ( m_clip_begin ) m_clip_begin_changed = true;
 	
 	m_audio_fmt = audio_format("ffmpeg");
@@ -449,7 +445,7 @@ ffmpeg_demux::run()
 #endif
 
 ///xxxbo 17-feb-2010
-	timestamp_t gb_initial_audio_pts = 0;
+	timestamp_t last_valid_audio_pts = 0;
 
 	pkt_nr = 0;
 	assert(m_con);
@@ -562,12 +558,12 @@ ffmpeg_demux::run()
 					pts = av_rescale_q(pts, m_con->streams[pkt->stream_index]->time_base, AMBULANT_TIMEBASE);
 					
 					if (pkt->stream_index == audio_streamnr)
-        		           	     gb_initial_audio_pts = pts; 
+        		           	     last_valid_audio_pts = pts; 
                 		} else {
-					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: pts and dts invalid using pts=%lld", gb_initial_audio_pts);
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: pts and dts invalid using pts=%lld", last_valid_audio_pts);
 					
-					gb_initial_audio_pts++;
-					pts = gb_initial_audio_pts;
+					last_valid_audio_pts++;
+					pts = last_valid_audio_pts;
 				//xxxbo 17-feb-2010 the end of fixing the chopping audio playback in vobis/ogg	
 				
 #endif
