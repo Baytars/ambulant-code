@@ -385,7 +385,7 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 gui::sdl::sdl_audio_renderer::~sdl_audio_renderer()
 {
 	m_lock.enter();
-	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_audio_renderer::~sdl_audio_renderer(0x%x) m_audio_src=0x%x",  this, m_audio_src);		
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::~sdl_audio_renderer(0x%x) m_audio_src=0x%x",  this, m_audio_src);		
 	if (m_is_playing) {
 		m_lock.leave();
 		unregister_renderer(this);
@@ -561,8 +561,8 @@ gui::sdl::sdl_audio_renderer::get_data_done(int size)
 #ifdef WITH_SEAMLESS_PLAYBACK
 	net::timestamp_t cur_audio_time = m_audio_src->get_elapsed();
 	if (m_audio_src && m_clip_end >0 && cur_audio_time > m_clip_end) {
-        AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld", (long)cur_audio_time);
-        m_previous_clip_position = m_clip_end;
+		AM_DBG lib::logger::get_logger()->debug("sdl_renderer: stop at audio clock %ld", (long)cur_audio_time);
+		m_previous_clip_position = m_clip_end;
 		if (m_context) {
 			m_context->stopped(m_cookie, 0);
 		}
@@ -737,6 +737,7 @@ gui::sdl::sdl_audio_renderer::resume()
 void
 gui::sdl::sdl_audio_renderer::start(double where)
 {
+	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer.start(0x%x)", (void*)this);
 	preroll(0, where, 0);
 	m_lock.enter();
 	AM_DBG { 
