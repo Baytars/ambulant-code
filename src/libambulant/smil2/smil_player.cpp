@@ -376,14 +376,14 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 	}
 	if( np == NULL ) { 
 		np = _new_playable(n);
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x) _new_playable 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
 		m_playables_cs.leave();
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.leave", (void*)n);		
 	} else {
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
+		AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x), prior playable is found 0x%x", (void*)n, (void*)np);
 		AM_DBG lib::logger::get_logger()->debug("smil_player::create_playable(0x%x)cs.enter", (void*)n);
 		m_playables_cs.enter();
 		m_playables[n] = np;
@@ -411,7 +411,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 // Request to start the playable of the node.
 // When trans is not null the playable should transition in 
 void smil_player::start_playable(const lib::node *n, double t, const lib::transition_info *trans) {
-	/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::start_playable(0x%x, %f)", (void*)n, t);
+	AM_DBG lib::logger::get_logger()->debug("smil_player::start_playable(0x%x, %f)", (void*)n, t);
 	common::playable *np = create_playable(n);
     if (np == NULL) {
         stopped(n->get_numid(), t);
@@ -533,10 +533,10 @@ void smil_player::stop_playable(const lib::node *n) {
 			typedef std::pair<const lib::node*, common::playable*> destroy_event_arg;
 			lib::event *destroy_event = new lib::scalar_arg_callback<smil_player, destroy_event_arg>(this, &smil_player::destroy_playable_in_cache, victim);
 			//xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
-			/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
+			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
 			m_event_processor->add_event(destroy_event, 20, lib::ep_high);
 		} else {
-            		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer without destructor callback", victim.first->get_sig().c_str());
+            		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer without destructor callback", victim.first->get_sig().c_str());
 		}
 		return;
 	}
@@ -1037,7 +1037,7 @@ void smil_player::_destroy_playable(common::playable *np, const lib::node *n) {
 
 #ifdef WITH_SEAMLESS_PLAYBACK
 void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::playable*> victim) {
-	/*AM_DBG*/ m_logger->debug("smil_player::destroy_playable_in_cache: playable(0x%x) %s", victim.second, victim.second->get_sig().c_str());
+	AM_DBG m_logger->debug("smil_player::destroy_playable_in_cache: playable(0x%x) %s", victim.second, victim.second->get_sig().c_str());
 	m_lock.enter();
 	// If we are already terminating do nothing: the document may be gone
 	if (m_doc == NULL) {
@@ -1052,14 +1052,14 @@ void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::
 	std::map<const std::string, common::playable *>::iterator it_url_based = m_playables_url_based.find(url);
 	if (it_url_based != m_playables_url_based.end()) {
         	if ((*it_url_based).second != victim.second) {
-            		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: cache has different playable for %s, assuming %s is reused", url.c_str(), victim.first->get_sig().c_str());
+            		AM_DBG lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: cache has different playable for %s, assuming %s is reused", url.c_str(), victim.first->get_sig().c_str());
             		m_playables_cs.leave();
             		m_lock.leave();
         		return;
 		}
 		m_playables_url_based.erase(it_url_based);
 		m_playables_cs.leave();
-		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: stop the playable in the cache for %s", victim.first->get_sig().c_str());
+		AM_DBG lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: stop the playable in the cache for %s", victim.first->get_sig().c_str());
 		victim.second->post_stop();
 		long rem = victim.second->release();
 		if (rem > 0)
@@ -1067,7 +1067,7 @@ void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::
 	} else {
         	m_playables_cs.leave();
         	// Note that this is not an error, on the contrary: it could be that the playable has been reused.
-        	/*AM_DBG*/ m_logger->debug("smil_player::destroy_playable_in_cache: playable for %s no longer in cache", url.c_str());
+        	AM_DBG m_logger->debug("smil_player::destroy_playable_in_cache: playable for %s no longer in cache", url.c_str());
 	}
 	m_lock.leave();
 }
