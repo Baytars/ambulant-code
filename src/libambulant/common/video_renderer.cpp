@@ -28,6 +28,7 @@
 //#include "ambulant/net/datasource.h"
 #include "ambulant/lib/profile.h"
 
+//#define AM_DBG if(1)
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -121,7 +122,7 @@ video_renderer::init_with_node(const lib::node *n)
 		m_lock.leave();
 		seek(m_clip_begin/1000);
 		m_lock.enter();
-        m_previous_clip_position = m_clip_begin;
+                m_previous_clip_position = m_clip_begin;
 	}
 #else
 		m_lock.leave();
@@ -383,7 +384,7 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
-    AM_DBG lib::logger::get_logger()->debug("data_avail(%s): %lld, %d bytes", m_node->get_sig().c_str(), frame_ts_micros, size);
+	AM_DBG lib::logger::get_logger()->debug("data_avail(%s): %lld, %d bytes", m_node->get_sig().c_str(), frame_ts_micros, size);
 
 	if (buf == NULL) {
 		// This can only happen immedeately after a seek, or if we have read past end-of-file.
@@ -453,7 +454,7 @@ video_renderer::data_avail()
 	if (frame_ts_micros + frame_duration < m_clip_begin) {
 		// Frame from before begin-of-movie (funny comparison because of unsignedness). Skip silently, and schedule another callback asap.
 		AM_DBG lib::logger::get_logger()->debug("video_renderer: frame skipped, ts (%lld) < clip_begin(%lld)", frame_ts_micros, m_clip_begin);
-        m_src->frame_processed(frame_ts_micros);
+		m_src->frame_processed(frame_ts_micros);
 	} else
 #ifdef DROP_LATE_FRAMES
 	if (frame_ts_micros <= now_micros - frame_duration && !m_prev_frame_dropped) {
