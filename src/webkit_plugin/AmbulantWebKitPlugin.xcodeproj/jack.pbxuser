@@ -14,7 +14,6 @@
 		ignoreCount = 0;
 		lineNumber = 208;
 		modificationTime = 285603038.797141;
-		originalNumberOfMultipleMatches = 1;
 		state = 0;
 	};
 	0432F3D51105F06F0077DDF8 /* smil_player.cpp */ = {
@@ -38,7 +37,6 @@
 		ignoreCount = 0;
 		lineNumber = 57;
 		modificationTime = 285603038.798417;
-		originalNumberOfMultipleMatches = 1;
 		state = 0;
 	};
 	0432F3E81105F0F10077DDF8 /* state.cpp */ = {
@@ -62,7 +60,6 @@
 		ignoreCount = 0;
 		lineNumber = 84;
 		modificationTime = 285603038.799246;
-		originalNumberOfMultipleMatches = 1;
 		state = 0;
 	};
 	0432F3F41105F23A0077DDF8 /* mainloop.cpp:93 */ = {
@@ -80,7 +77,6 @@
 		lineNumber = 93;
 		location = AmbulantWebKitPlugin;
 		modificationTime = 285603808.319765;
-		originalNumberOfMultipleMatches = 1;
 		state = 1;
 	};
 	045D0B7E0958C53F00C194EE /* mainloop.cpp */ = {
@@ -139,9 +135,6 @@
 			};
 		};
 		customDataFormattersEnabled = 1;
-		dataTipCustomDataFormattersEnabled = 1;
-		dataTipShowTypeColumn = 1;
-		dataTipSortType = 0;
 		debuggerPlugin = GDBDebugging;
 		disassemblyDisplayState = 0;
 		dylibVariantSuffix = "";
@@ -160,7 +153,6 @@
 		name = Safari;
 		savedGlobals = {
 		};
-		showTypeColumn = 0;
 		sourceDirectories = (
 		);
 		startupPath = "<<ProjectDirectory>>";
@@ -190,7 +182,7 @@
 	};
 	089C1669FE841209C02AAC07 /* Project object */ = {
 		activeArchitecturePreference = x86_64;
-		activeBuildConfigurationName = "Release-10.6";
+		activeBuildConfigurationName = "Release-10.4";
 		activeExecutable = 049CF80410A03FD400E6593B /* Safari */;
 		activeTarget = 8D5B49AC048680CD000E48DA /* AmbulantWebKitPlugin */;
 		addToTargets = (
@@ -264,7 +256,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					185,
+					341,
 					20,
 					48,
 					43,
@@ -319,8 +311,8 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 287076700;
-			PBXWorkspaceStateSaveDate = 287076700;
+			PBXPerProjectTemplateStateSaveDate = 288695901;
+			PBXWorkspaceStateSaveDate = 288695901;
 		};
 		sourceControlManager = 04E8E403109F3BE300B7C8C9 /* Source Control */;
 		userBuildSettings = {
