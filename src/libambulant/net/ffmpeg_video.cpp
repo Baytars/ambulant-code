@@ -477,7 +477,7 @@ ffmpeg_video_decoder_datasource::read_ahead(timestamp_t clip_begin)
 {
 	assert(m_src);
 	m_src->read_ahead(clip_begin);
-    m_oldest_timestamp_wanted = clip_begin;
+	m_oldest_timestamp_wanted = clip_begin;
 }
 
 void

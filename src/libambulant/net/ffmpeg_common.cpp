@@ -471,15 +471,15 @@ ffmpeg_demux::run()
 			int seek_streamnr = -1;
 			if (video_streamnr >= 0) {
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
-                seek_streamnr = video_streamnr;
-            } else if (audio_streamnr >= 0) {
+				seek_streamnr = video_streamnr;
+			} else if (audio_streamnr >= 0) {
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
-                seek_streamnr = audio_streamnr;
+				seek_streamnr = audio_streamnr;
 			}
-            AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld scaled to mediatimebase", seektime);
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld scaled to mediatimebase", seektime);
 			m_lock.leave();
-            int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
-            m_lock.enter();
+			int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
+			m_lock.enter();
 			if (seekresult < 0) {
 				lib::logger::get_logger()->debug("ffmpeg_demux: av_seek_frame() returned %d", seekresult);
 			}
@@ -488,7 +488,7 @@ ffmpeg_demux::run()
 		m_lock.leave();
 		int ret = av_read_frame(m_con, pkt);
 		m_lock.enter();
-		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size);
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size, pkt->stream_index);
 #ifndef WITH_SEAMLESS_PLAYBACK
 		if (ret < 0) break;
 #else
