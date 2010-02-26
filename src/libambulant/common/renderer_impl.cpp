@@ -69,9 +69,9 @@ renderer_playable::~renderer_playable()
 void
 renderer_playable::init_with_node(const lib::node *n)
 {
-    m_node = n;
-    m_cookie = m_node->get_numid();
-    _init_clip_begin_end();
+	m_node = n;
+	m_cookie = m_node->get_numid();
+	_init_clip_begin_end();
 	const char *erase = m_node->get_attribute("erase");
 	if (erase && strcmp(erase, "never") == 0)
 		m_erase_never = true;
@@ -134,14 +134,33 @@ renderer_playable::user_event_sensitive(const lib::point &where) {
 void
 renderer_playable::_init_clip_begin_end()
 {
-	// here we have to get clip_begin/clip_end from the node
-	const char *clip_begin_attr = m_node->get_attribute("clipBegin");
 	net::timestamp_t cb = 0;
 	
+	const char* begin_attr =  m_node->get_attribute("begin");
+	//XXXX Fix for #2950428 (negative begin time). May not be correct/sufficient.
+	// Description in sec.5.4.3 of SMIL3.0 Rec. is complex.
+	// here we check for negative_begin time in the node, then simply add it to clipBegin
+	if (begin_attr) {
+		lib::mediaclipping_p parser;
+		std::string s(begin_attr);
+		std::string::const_iterator b = s.begin();
+		std::string::const_iterator e = s.end();
+		std::ptrdiff_t d = parser.parse(b, e);
+		if (d == -1) {
+			lib::logger::get_logger()->warn("Cannot parse begin");
+		} else {
+			net::timestamp_t begin_time = (net::timestamp_t)parser.get_time() * 1000;
+			if (begin_time < 0) // then add the abs.value to clip_begin_time
+				cb -= begin_time;
+			AM_DBG lib::logger::get_logger()->debug("parsed begin cb=%lld", cb);
+
+		}
+	}
+	// here we have to get clip_begin/clip_end from the node
+	const char *clip_begin_attr = m_node->get_attribute("clipBegin");
 	if (!clip_begin_attr) {
 		clip_begin_attr = m_node->get_attribute("clip-begin");
 	}
-	
 	if (clip_begin_attr) {
 		lib::mediaclipping_p parser;
 		std::string s(clip_begin_attr);
@@ -151,8 +170,8 @@ renderer_playable::_init_clip_begin_end()
 		if (d == -1) {
 			lib::logger::get_logger()->warn("Cannot parse clipBegin");
 		} else {
-			cb = (net::timestamp_t)parser.get_time() * 1000;
-			// lib::logger::get_logger()->warn("parsed clipBegin cb=%lld", cb);
+			cb += (net::timestamp_t)parser.get_time() * 1000;
+			AM_DBG lib::logger::get_logger()->debug("parsed clipBegin cb=%lld", cb);
 
 		}
 	}
