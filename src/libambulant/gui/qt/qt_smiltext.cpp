@@ -92,6 +92,7 @@ void
 gui::qt::qt_smiltext_renderer::start(double t) {
 	AM_DBG lib::logger::get_logger()->debug("qt_smiltext_renderer::start(0x%x)", this);
 		
+	gui::qt::qt_renderer<common::renderer_playable>::start(t);
 	m_lock.enter();
 //JNK?	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_layout_engine.start(t);

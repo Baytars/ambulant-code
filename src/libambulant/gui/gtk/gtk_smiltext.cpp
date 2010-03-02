@@ -129,6 +129,7 @@ gtk_smiltext_renderer::~gtk_smiltext_renderer()
 void
 gtk_smiltext_renderer::start(double t)
 {
+	gui::gtk::gtk_renderer<common::renderer_playable>::start(t);
 	m_epoch = m_event_processor->get_timer()->elapsed();
 	m_engine.start(t);
 	m_motion_done = false;
