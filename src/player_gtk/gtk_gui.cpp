@@ -929,7 +929,7 @@ gtk_gui::do_internal_message(gtk_message_event* e) {
 		g_signal_connect_swapped (dialog, "response",
 								  G_CALLBACK (gtk_widget_destroy),
 								  dialog);
-		gtk_widget_show_all ((GtkWidget*)dialog);
+		gtk_widget_show_all (GTK_WIDGET(dialog));
 		break;
 	case ambulant::lib::logger::LEVEL_ERROR:
 		dialog = (GtkMessageDialog*) gtk_message_dialog_new (NULL,
@@ -940,7 +940,7 @@ gtk_gui::do_internal_message(gtk_message_event* e) {
 		g_signal_connect_swapped (dialog, "response",
 								  G_CALLBACK (gtk_widget_destroy),
 								  dialog);
-		gtk_widget_show_all ((GtkWidget*)dialog);
+		gtk_widget_show_all (GTK_WIDGET(dialog));
 		break;
 	case ambulant::lib::logger::LEVEL_WARN:
 	default:
@@ -952,7 +952,7 @@ gtk_gui::do_internal_message(gtk_message_event* e) {
 		g_signal_connect_swapped (dialog, "response",
 								  G_CALLBACK (gtk_widget_destroy),
 								  dialog);
-		gtk_widget_show_all ((GtkWidget*)dialog);
+		gtk_widget_show_all (GTK_WIDGET(dialog));
 		break;
 	}
 #ifdef	LOCK_MESSAGE
