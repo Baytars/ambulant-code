@@ -626,10 +626,11 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 	m_lock.enter();
     bool skip_seek = false;
     assert( time >= 0);
-	/* Jack requested to disable the code to perform the seek by skipping byes in the buffer for #2954199
 	int nbytes = m_buffer.size();
     AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
 	if (nbytes) {
+#if 0
+        /* Temporarily disabled, to see whether it fixes #2954199 */
         timestamp_t buffer_begin_elapsed = m_elapsed - 1000000LL * (m_buffer.size() * 8) / (m_fmt.samplerate* m_fmt.channels * m_fmt.bits);
         // If the requested seek time falls within the buffer we are in luck, and do the seek by dropping some data.
         if (time >= buffer_begin_elapsed && time < m_elapsed) {
@@ -637,11 +638,11 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 			nbytes &= ~0x1; //  nbytes may be odd s.t. resulting pointer becomes unuseable for ffmpeg; fixes #2954199
             skip_seek = true;
         }
+#endif
         AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: flush buffer (%d bytes) due to seek", nbytes);
 		(void)m_buffer.get_read_ptr();
 		m_buffer.readdone(nbytes);
 	}
-	/ * end of disabled code for #2954199 */
     if (!skip_seek) {
         m_src->seek(time);
         m_elapsed = time; // XXXJACK not needed??
