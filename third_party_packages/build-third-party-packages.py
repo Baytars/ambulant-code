@@ -359,6 +359,10 @@ third_party_packages={
 				"make $(MAKEFLAGS) && "
 				"make install" % LINUX_COMMON_CONFIGURE
 			),
+## xulrunner-sdk is only needed for building npambulant firefox plugin
+##		TPP("xulrunner-sdk",
+##			url="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.2/sdk/xulrunner-1.9.2.en-US.linux-i686.sdk.tar.bz2"
+##		).
 ## ogg-vorbis-theora decoding are default enabled on most Linux installations
 ##		TPP("libogg",
 ##			url=" http://downloads.xiph.org/releases/ogg/libogg-1.1.4.tar.gz",
