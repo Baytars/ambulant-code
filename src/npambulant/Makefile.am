@@ -291,3 +291,9 @@ $(INSTALLER_ARCHIVE): npambulant_plugin_dir
 		zip -r ../$(INSTALLER_ARCHIVE) *
 #------------------------------------------------------
 
+EXTRA_DIST = \
+	install-linux64.rdf \
+	install-win32.rdf  \
+	internalize_shlibs.py \
+	README-linux \
+	README-win32.txt
