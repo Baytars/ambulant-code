@@ -664,7 +664,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 #ifdef WITH_CLOCK_SYNC
 		m_audio_clock = 0;
 #endif
-
+#ifdef JACK_THINKS_THIS_IS_WRONG_OR_UNNEEDED
 		if (m_clip_begin != m_previous_clip_position) {
 			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::init_with_node seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
 			m_lock.leave();
@@ -672,6 +672,7 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 			m_lock.enter();
 			m_previous_clip_position = m_clip_begin;
 		}
+#endif
 #ifdef WITH_SEAMLESS_PLAYBACK
 		// For "fill=continue", we pass -1 to the datasource classes, as we want to continue to receive
 		// audio after clip end.
@@ -801,9 +802,13 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		}
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
+        net::timestamp_t wtd_position = m_clip_begin + (net::timestamp_t)(where*1000000);
+        m_lock.leave();
+        seek(wtd_position/1000);
+        m_lock.enter();
+		m_previous_clip_position = wtd_position;
 		m_audio_src->start_prefetch(m_event_processor);
 		m_is_paused = false;
-		m_previous_clip_position = m_clip_begin;
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll: no datasource");
 	}
