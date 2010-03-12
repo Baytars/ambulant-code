@@ -829,6 +829,15 @@ ffmpeg_video_decoder_datasource::_end_of_file()
 bool 
 ffmpeg_video_decoder_datasource::_clip_end()
 {	
+	// private method - no need to lock
+	timestamp_t clip_end = m_src->get_clip_end();
+	if (clip_end == -1) return false;
+	
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::_clip_end(): m_elapsed=%lld , clip_end=%lld", m_elapsed, clip_end);
+	if (m_elapsed > clip_end) {
+		return true;
+	}
+	
 	return false;
 }
 
