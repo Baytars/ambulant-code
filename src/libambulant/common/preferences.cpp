@@ -62,7 +62,7 @@ preferences::preferences()
 	m_plugin_dir(""),
 	m_dynamic_content_control(false),
 	m_fullscreen(false),
-	m_prefer_rtsp_tcp(true)
+	m_prefer_rtsp_tcp(false)
 {
 	AM_DBG lib::logger::get_logger()->debug("preferences::preferences()");
 	load_preferences();
