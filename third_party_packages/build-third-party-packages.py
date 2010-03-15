@@ -422,6 +422,9 @@ third_party_packages={
 ##				"make install " % 
 ##					(LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
 ##			),
+		TPP("xulrunner-sdk",
+			url="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.1.7/sdk/xulrunner-1.9.1.7.en-US.linux-i686.sdk.tar.bz2"
+			),
 		TPP("ffmpeg",
 ##			url="http://homepages.cwi.nl/~jack/ambulant/ffmpeg-export-2010-01-22.tgz",
 			url="http://sourceforge.net/projects/ambulant/files/ffmpeg%20for%20Ambulant/ffmpeg-export-2010-01-22.tar.gz/download",
