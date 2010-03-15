@@ -295,6 +295,7 @@ $(INSTALLER_ARCHIVE): npambulant_plugin_dir
 #------------------------------------------------------
 
 EXTRA_DIST = \
+	install-linux.rdf \
 	install-linux64.rdf \
 	install-win32.rdf  \
 	internalize_shlibs.py \
