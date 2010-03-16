@@ -315,6 +315,10 @@ ffmpeg_decoder_datasource::start(ambulant::lib::event_processor *evp, ambulant::
 {
 	m_lock.enter();
 	bool restart_input = false;
+	if (m_src)
+		m_elapsed = m_src->get_start_time();
+	else
+		m_elapsed = 0;
 	if (m_client_callback != NULL) {
 		delete m_client_callback;
 		m_client_callback = NULL;
