@@ -341,7 +341,11 @@ ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *
 {
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_prefetch: (this = 0x%x)", (void*) this);
-	
+	m_elapsed = 0;
+	m_pts_last_frame = 0;
+  	m_oldest_timestamp_wanted = 0;
+	m_video_clock = 0;
+   
     m_event_processor = evp;
     
 	// Don't restart our source if we are at end of file.
