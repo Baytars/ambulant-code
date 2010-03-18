@@ -1,0 +1,233 @@
+<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 3.0 Language//EN" "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd">
+<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0" baseProfile="Language">
+    <head>
+      <layout>
+		<root-layout xml:id="root-layout" width="320" height="320" />
+		<region xml:id="videoRegion" left="0" top="0" width="320" height="240" />
+		<region xml:id="infoRegion" left="0" top="240" width="320"
+		height="80" textColor="black" />
+      </layout>
+    </head>
+    <body>
+        <seq>
+		  <!-- b1:0   e1:4   b2:8   e2:12 -->
+		  <par dur="4">
+			<smilText region="infoRegion" > b1:0   e1:4   b2:8   e2:12 </smilText>
+          </par>
+
+		  <!-- b1 < e1 < b2 < e2 -->
+		  <par dur="8" >
+			<smilText region="infoRegion"> b1 &lt; e1 &lt; b2 &lt; e2 </smilText>
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="16" ></video>
+			</seq>
+          </par>
+
+		  <!-- b1 < b2 < e1 < e2 -->
+		  <par dur="16">
+		  <smilText region="infoRegion" > b1 &lt; b2 &lt; e1 &lt; e2 </smilText>   
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="12" ></video>
+			</seq>
+          </par>
+
+		  <!-- b1 < b2 < e2 < e1 -->
+		  <par dur="16">
+			<smilText region="infoRegion"> b1 &lt; b2 &lt; e2 &lt; e1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < e2 < b1 < e1 -->
+		  <par dur="8">
+			<smilText region="infoRegion"> b2 &lt; e2 &lt; b1 &lt; e1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < e2 < e1 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> b2 &lt; e2 &lt; e1 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < b1 < e1 < e2 -->
+		  <par>
+			<smilText region="infoRegion"> b2 &lt; b1 &lt; e1 &lt; e2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="12" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < b1 < e2 < e1 -->
+		  <par>
+			<smilText region="infoRegion"> b2 &lt; b1 &lt; e2 &lt; e1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- b1 < e1 < e2 < b2 -->
+		  <par>
+			<smilText region="infoRegion" > b1 &lt; e1 &lt; e2 &lt; b2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- b1 < e2 < e1 < b2-->
+		  <par>
+			<smilText region="infoRegion"> b1 &lt; e2 &lt; e1 &lt; b2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- b1 < e2 < b2 < e1 -->
+		  <par>
+			<smilText region="infoRegion"> b1 &lt; e2 &lt; b2 &lt; e1 </smilText>
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < b2 < e2 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; b2 &lt; e2 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="0"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < b2 < b1 < e2 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; b2 &lt; b1 &lt; e2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="0"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="12" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < e2 < b1 < b2 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; e2 &lt; b1 &lt; b2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="0"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < e2 < b2 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; e2 &lt; b2 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="0"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="4" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < b1 < b2 < e2 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; b1 &lt; b2 &lt; e2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="0"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="12" ></video>
+			</seq>
+          </par>
+
+		  <!-- e1 < b1 < e2 < b2 -->
+		  <par>
+			<smilText region="infoRegion"> e1 &lt; b1 &lt; e2 &lt; b2 </smilText>    
+			<seq>
+			<video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="0"  ></video>
+			<video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < e1 < e2 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> b2 &lt; e1 &lt; e2 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="8" ></video>
+			</seq>
+          </par>
+
+		  <!-- b2 < e1 < b1 < e2 -->
+		  <par>
+			<smilText region="infoRegion"> b2 &lt; e1 &lt; b1 &lt; e2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="0" clipEnd="12" ></video>
+			</seq>
+          </par>
+
+		  <!-- e2 < b1 < e1 < b2 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; b1 &lt; e1 &lt; b2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="0" ></video>
+			</seq>
+          </par>
+
+		  <!-- e2 < b1 < b2 < e1 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; b1 &lt; b2 &lt; e1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="0" ></video>
+			</seq>
+          </par>
+
+		  <!-- e2 < e1 < b2 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; e1 &lt; b2 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="0" ></video>
+			</seq>
+          </par>
+
+		  <!-- e2 < e1 < b1 < b2 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; e1 &lt; b1 &lt; b2 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="4"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="0" ></video>
+			</seq>
+          </par>
+
+		  <!-- e2 < b2 < b1 < e1 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; b2 &lt; b1 &lt; e1 </smilText>    
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="8" clipEnd="12"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="0" ></video>
+          </par>
+
+		  <!-- e2 < b2 < e1 < b1 -->
+		  <par>
+			<smilText region="infoRegion"> e2 &lt; b2 &lt; e1 &lt; b1 </smilText>    
+			<seq>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="12" clipEnd="8"  ></video>
+            <video  region="videoRegion" src="media-av.mpg" clipBegin="4" clipEnd="0" ></video>
+			</seq>
+		  </par>
+        </seq>
+    </body>
+</smil>
