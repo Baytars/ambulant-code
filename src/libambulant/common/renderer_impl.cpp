@@ -180,6 +180,10 @@ renderer_playable::_init_clip_begin_end()
 		lib::logger::get_logger()->trace("%s: negative clipBegin value (%s) ignored",  m_node->get_sig().c_str(), clip_begin_attr);
 		cb = 0;
 	}
+	if (ce != -1 && ce < cb) {
+		lib::logger::get_logger()->trace("%s: clipEnd value (%s) ignored, before clipBegin value (%s)",  m_node->get_sig().c_str(),  clip_end_attr, clip_begin_attr);
+		ce = -1;
+	}
 	m_clip_begin = cb;
 	m_clip_end = ce;
 }
