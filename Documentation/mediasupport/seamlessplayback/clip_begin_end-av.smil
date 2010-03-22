@@ -12,13 +12,11 @@
     <body>
 	  <par>
 		  <!-- Legend -->
-		  <smilText region="legendRegion" >clipBegin/End values (sec): 0.0 (1st phrase), 4.1 (2nd phrase)
-        8.1 (3rd phrase), 12.2 (4rd phrase) </smilText>
+		  <smilText region="legendRegion" >clipBegin/End values (sec): 0.0 (1st phrase), 4.1 (2nd phrase) 8.1 (3rd phrase), 12.2 (4rd phrase) </smilText>
         <seq>
 		  <!-- b1:0   e1:4.1   b2:8.1   e2:12.2 -->
 		  <par dur="4.1">
-			<smilText region="infoRegion" >Next 2 video's (no audio) are played with different
-clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
+			<smilText region="infoRegion" >Next 2 video's with audio are played with different clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
           </par>
 
 		  <!-- b1 < e1 < b2 < e2 -->
@@ -26,8 +24,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b1e1b2e2v1.beginEvent" end="b1e1b2e2v1.endEvent" >  1a. b1 &lt; e2 &lt; e1 &lt; b2 || b1=0 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="b1e1b2e2v2.beginEvent" end="b1e1b2e2v2.endEvent" >  1b. b1 &lt; e2 &lt; e1 &lt; b2 || b2=8.1 e2=12.2 </smilText>    
 			<seq>
-            <video xml:id="b1e1b2e2v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="4.1"  ></video>
-            <video xml:id="b1e1b2e2v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="12.2" ></video>
+            <video xml:id="b1e1b2e2v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="4.1"  ></video>
+            <video xml:id="b1e1b2e2v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -36,8 +34,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 		  <smilText region="infoRegion" begin="b1b2e1e2v1.beginEvent" end="b1b2e1e2v1.endEvent" >  2a. b1 &lt; b2 &lt; e1 &lt; e2 || b1=0 e1=8.1 </smilText>   
 		  <smilText region="infoRegion" begin="b1b2e1e2v2.beginEvent" end="b1b2e1e2v2.endEvent" >  2b. b1 &lt; b2 &lt; e1 &lt; e2 || b2=4.1 e2=12.2 </smilText>   
 			<seq>
-            <video xml:id="b1b2e1e2v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="8.1"  ></video>
-            <video xml:id="b1b2e1e2v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="12.2" ></video>
+            <video xml:id="b1b2e1e2v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="8.1"  ></video>
+            <video xml:id="b1b2e1e2v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -46,8 +44,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b1b2e2e1v1.beginEvent" end="b1b2e2e1v1.endEvent">  3a. b1 &lt; b2 &lt; e2 &lt; e1 || b1=0 e1=12.2 </smilText>    
 			<smilText region="infoRegion" begin="b1b2e2e1v2.beginEvent" end="b1b2e2e1v2.endEvent">  3b. b1 &lt; b2 &lt; e2 &lt; e1 || b2=4.1 e2=8.1 </smilText>    
 			<seq>
-            <video xml:id="b1b2e2e1v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="12.2"  ></video>
-            <video xml:id="b1b2e2e1v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="8.1" ></video>
+            <video xml:id="b1b2e2e1v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="12.2"  ></video>
+            <video xml:id="b1b2e2e1v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -56,18 +54,18 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b2e2b1e1v1.beginEvent" end="b2e2b1e1v1.endEvent">  4a. b2 &lt; e2 &lt; b1 &lt; e1 || b1=8.1 e1=12.2 </smilText>    
 			<smilText region="infoRegion" begin="b2e2b1e1v2.beginEvent" end="b2e2b1e1v2.endEvent">  4b. b2 &lt; e2 &lt; b1 &lt; e1 || b2=0 e2=4.1 </smilText>    
 			<seq>
-            <video xml:id="b2e2b1e1v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="12.2"  ></video>
-            <video xml:id="b2e2b1e1v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="4.1" ></video>
+            <video xml:id="b2e2b1e1v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="12.2"  ></video>
+            <video xml:id="b2e2b1e1v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
 		  <!-- b2 < b1 < e1 < e2 --> 
 		  <par>
 			<smilText region="infoRegion" begin="b2b1e1e2v1.beginEvent" end="b2b1e1e2v1.endEvent">  5a. b2 &lt; b1 &lt; e1 &lt; e2 || b1=4.1 e1=8.1 </smilText>    
-			<smilText region="infoRegion" begin="b2b1e1e2v2.beginEvent" end="b2b1e1e2v2.endEvent">  5b. b2 &lt; b1 &lt; e1 &lt; e2 || b2=0 e2=12.2 </smilText>    
+			<smilText region="infoRegion" begin="b2b1e1e2v2.beginEvent" end="b2b1e1e2v2.endEvent">  5b. b2 &lt; b1 &lt; e1 &lt; e2 || b2=0 e2=12.2 </smilText>
 			<seq>
-            <video xml:id="b2b1e1e2v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="8.1" ></video>
-            <video xml:id="b2b1e1e2v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="12.2" ></video>
+            <video xml:id="b2b1e1e2v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="8.1" ></video>
+            <video xml:id="b2b1e1e2v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -76,8 +74,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b2b1e2e1v1.beginEvent" end="b2b1e2e1v1.endEvent">  6a. b2 &lt; b1 &lt; e2 &lt; e1 || b1=4.1 e1=12.2 </smilText>    
 			<smilText region="infoRegion" begin="b2b1e2e1v2.beginEvent" end="b2b1e2e1v2.endEvent">  6b. b2 &lt; b1 &lt; e2 &lt; e1 || b2=0 e2=8.1 </smilText>    
 			<seq>
-            <video xml:id="b2b1e2e1v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="12.2"  ></video>
-            <video xml:id="b2b1e2e1v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="8.1" ></video>
+            <video xml:id="b2b1e2e1v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="12.2"  ></video>
+            <video xml:id="b2b1e2e1v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -86,8 +84,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b1e1e2b2v1.beginEvent" end="b1e1e2b2v1.endEvent" >  7a. b1 &lt; e1 &lt; e2 &lt; b2 || b1=0 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="b1e1e2b2v2.beginEvent" end="b1e1e2b2v2.endEvent" >  7b. b1 &lt; e1 &lt; e2 &lt; b2 || b2=12.2 e2=8.1 </smilText>    
 			<seq>
-            <video xml:id="b1e1e2b2v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="4.1"  ></video>
-            <video xml:id="b1e1e2b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="8.1" ></video>
+            <video xml:id="b1e1e2b2v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="4.1"  ></video>
+            <video xml:id="b1e1e2b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -96,8 +94,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b2e2e1b1v1.beginEvent" end="b2e2e1b1v1.endEvent">  8a. b2 &lt; e2 &lt; e1 &lt; b1 || b1=12.2 e1=8.1 </smilText>    
 			<smilText region="infoRegion" begin="b2e2e1b1v2.beginEvent" end="b2e2e1b1v2.endEvent">  8b. b2 &lt; e2 &lt; e1 &lt; b1 || b2=0 e2=4.1 </smilText>    
 			<seq>
-            <video xml:id="b2e2e1b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="8.1"  ></video>
-            <video xml:id="b2e2e1b1v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="4.1" ></video>
+            <video xml:id="b2e2e1b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="8.1"  ></video>
+            <video xml:id="b2e2e1b1v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
@@ -106,8 +104,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b1e2e1b2v1.beginEvent" end="b1e2e1b2v1.endEvent" >  9a. b1 &lt; e2 &lt; e1 &lt; b2 || b1=0 e1=8.1 </smilText>    
 			<smilText region="infoRegion" begin="b1e2e1b2v2.beginEvent" end="b1e2e1b2v2.endEvent" >	9b. b1 &lt; e2 &lt; e1 &lt; b2 || b2=12.2 e2=4.1 </smilText>    
 			<seq>
-            <video xml:id="b1e2e1b2v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="8.1"  ></video>
-            <video xml:id="b1e2e1b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="4.1" ></video>
+            <video xml:id="b1e2e1b2v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="8.1"  ></video>
+            <video xml:id="b1e2e1b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
@@ -116,8 +114,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b1e2b2e1v1.beginEvent" end="b1e2b2e1v1.endEvent"> 10a. b1 &lt; e2 &lt; b2 &lt; e1 || b1=0 e1=12.2 </smilText>
 			<smilText region="infoRegion" begin="b1e2b2e1v2.beginEvent" end="b1e2b2e1v2.endEvent"> 10b. b1 &lt; e2 &lt; b2 &lt; e1 || b2=8.1 e2=4.1 </smilText>
 			<seq>
-            <video xml:id="b1e2b2e1v1" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="12.2"  ></video>
-            <video xml:id="b1e2b2e1v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="4.1" ></video>
+            <video xml:id="b1e2b2e1v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="12.2"  ></video>
+            <video xml:id="b1e2b2e1v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
@@ -126,8 +124,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1b2e2b1v1.beginEvent" end="e1b2e2b1v1.endEvent"> 11a. e1 &lt; b2 &lt; e2 &lt; b1 || b1=12.2 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1b2e2b1v2.beginEvent" end="e1b2e2b1v2.endEvent"> 11b. e1 &lt; b2 &lt; e2 &lt; b1 || b2=4.1 e2=8.1 </smilText>    
 			<seq>
-            <video xml:id="e1b2e2b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="0"  ></video>
-            <video xml:id="e1b2e2b1v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="8.1" ></video>
+            <video xml:id="e1b2e2b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="0"  ></video>
+            <video xml:id="e1b2e2b1v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -136,8 +134,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1b2b1e2v1.beginEvent" end="e1b2b1e2v1.endEvent"> 12a. e1 &lt; b2 &lt; b1 &lt; e2 || b1=8.10 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1b2b1e2v2.beginEvent" end="e1b2b1e2v2.endEvent"> 12b. e1 &lt; b2 &lt; b1 &lt; e2 || b2=4.1 e2=12.2 </smilText>    
 			<seq>
-            <video xml:id="e1b2b1e2v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="0"  ></video>
-            <video xml:id="e1b2b1e2v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="12.2" ></video>
+            <video xml:id="e1b2b1e2v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="0"  ></video>
+            <video xml:id="e1b2b1e2v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -146,8 +144,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1e2b1b2v1.beginEvent" end="e1e2b1b2v1.endEvent"> 13a. e1 &lt; e2 &lt; b1 &lt; b2 || b1=8.10 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1e2b1b2v2.beginEvent" end="e1e2b1b2v2.endEvent"> 13b. e1 &lt; e2 &lt; b1 &lt; b2 || b2=12.2 e2=4.1 </smilText>    
 			<seq>
-            <video xml:id="e1e2b1b2v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="0"  ></video>
-            <video xml:id="e1e2b1b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="4.1" ></video>
+            <video xml:id="e1e2b1b2v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="0"  ></video>
+            <video xml:id="e1e2b1b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
@@ -156,8 +154,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1e2b2b1v1.beginEvent" end="e1e2b2b1v1.endEvent"> 14a. e1 &lt; e2 &lt; b2 &lt; b1 || b1=12.2 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1e2b2b1v2.beginEvent" end="e1e2b2b1v2.endEvent"> 14b. e1 &lt; e2 &lt; b2 &lt; b1 || b2=8.1 e2=4.1 </smilText>    
 			<seq>
-            <video xml:id="e1e2b2b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="0"  ></video>
-            <video xml:id="e1e2b2b1v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="4.1" ></video>
+            <video xml:id="e1e2b2b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="0"  ></video>
+            <video xml:id="e1e2b2b1v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="4.1" ></video>
 			</seq>
           </par>
 
@@ -166,8 +164,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1b1b2e2v1.beginEvent" end="e1b1b2e2v1.endEvent"> 15a. e1 &lt; b1 &lt; b2 &lt; e2 || b1=4.1 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1b1b2e2v2.beginEvent" end="e1b1b2e2v2.endEvent"> 15b. e1 &lt; b1 &lt; b2 &lt; e2 || b2=8.1 e2=12.2 </smilText>    
 			<seq>
-            <video xml:id="e1b1b2e2v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="0"  ></video>
-            <video xml:id="e1b1b2e2v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="12.2" ></video>
+            <video xml:id="e1b1b2e2v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="0"  ></video>
+            <video xml:id="e1b1b2e2v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -176,8 +174,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e1b1e2b2v1.beginEvent" end="e1b1e2b2v1.endEvent"> 16a. e1 &lt; b1 &lt; e2 &lt; b2 || b1=4.1 e1=0 </smilText>    
 			<smilText region="infoRegion" begin="e1b1e2b2v2.beginEvent" end="e1b1e2b2v2.endEvent"> 16b. e1 &lt; b1 &lt; e2 &lt; b2 || b2=12.2 e2=8.1 </smilText>    
 			<seq>
-			<video xml:id="e1b1e2b2v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="0"  ></video>
-			<video xml:id="e1b1e2b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="8.1" ></video>
+			<video xml:id="e1b1e2b2v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="0"  ></video>
+			<video xml:id="e1b1e2b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -186,8 +184,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b2e1e2b1v1.beginEvent" end="b2e1e2b1v1.endEvent"> 17a. b2 &lt; e1 &lt; e2 &lt; b1 || b1=12.2 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="b2e1e2b1v2.beginEvent" end="b2e1e2b1v2.endEvent"> 17b. b2 &lt; e1 &lt; e2 &lt; b1 || b2=0 e2=8.1 </smilText>    
 			<seq>
-            <video xml:id="b2e1e2b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="4.1"  ></video>
-            <video xml:id="b2e1e2b1v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="8.1" ></video>
+            <video xml:id="b2e1e2b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="4.1"  ></video>
+            <video xml:id="b2e1e2b1v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="8.1" ></video>
 			</seq>
           </par>
 
@@ -196,8 +194,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="b2e1b1e2v1.beginEvent" end="b2e1b1e2v1.endEvent"> 18a. b2 &lt; e1 &lt; b1 &lt; e2 || b1=8.1 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="b2e1b1e2v2.beginEvent" end="b2e1b1e2v2.endEvent"> 18b. b2 &lt; e1 &lt; b1 &lt; e2 || b2=0 e2=12.2 </smilText>    
 			<seq>
-            <video xml:id="b2e1b1e2v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="4.1"  ></video>
-            <video xml:id="b2e1b1e2v2" region="videoRegion" src="{video1}" clipBegin="0" clipEnd="12.2" ></video>
+            <video xml:id="b2e1b1e2v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="4.1"  ></video>
+            <video xml:id="b2e1b1e2v2" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="12.2" ></video>
 			</seq>
           </par>
 
@@ -206,18 +204,18 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e2b1e1b2v1.beginEvent" end="e2b1e1b2v1.endEvent"> 19a. e2 &lt; b1 &lt; e1 &lt; b2 || b1=4.1 e1=8.1 </smilText>    
 			<smilText region="infoRegion" begin="e2b1e1b2v2.beginEvent" end="e2b1e1b2v2.endEvent"> 19b. e2 &lt; b1 &lt; e1 &lt; b2 || b2=12.2 e2=0 </smilText>    
 			<seq>
-            <video xml:id="e2b1e1b2v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="8.1"  ></video>
-            <video xml:id="e2b1e1b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="0" ></video>
+            <video xml:id="e2b1e1b2v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="8.1" ></video>
+            <video xml:id="e2b1e1b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="0" ></video>
 			</seq>
           </par>
 
 		  <!-- e2 < b1 < b2 < e1 -->
 		  <par>
 			<smilText region="infoRegion" begin="e2b1b2e1v1.beginEvent" end="e2b1b2e1v1.endEvent"> 20a. e2 &lt; b1 &lt; b2 &lt; e1 || b1=4.1 e1=12.2 </smilText>    
-			<smilText region="infoRegion" begin="e2b1b2e2v1.beginEvent" end="e2b1b2e1v2.endEvent"> 20b. e2 &lt; b1 &lt; b2 &lt; e1 || b2=8.1 e2=0 </smilText>    
+			<smilText region="infoRegion" begin="e2b1b2e1v2.beginEvent" end="e2b1b2e1v2.endEvent"> 20b. e2 &lt; b1 &lt; b2 &lt; e1 || b2=8.1 e2=0 </smilText>    
 			<seq>
-            <video xml:id="e2b1b2e1v1" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="12.2"  ></video>
-            <video xml:id="e2b1b2e1v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="0" ></video>
+            <video xml:id="e2b1b2e1v1" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="12.2"  ></video>
+            <video xml:id="e2b1b2e1v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="0" ></video>
 			</seq>
           </par>
 
@@ -226,27 +224,29 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e2e1b2b1v1.beginEvent" end="e2e1b2b1v1.endEvent"> 21a. e2 &lt; e1 &lt; b2 &lt; b1 || b1=12.2 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="e2e1b2b1v2.beginEvent" end="e2e1b2b1v2.endEvent"> 21b. e2 &lt; e1 &lt; b2 &lt; b1 || b2=8.1 e2=0 </smilText>    
 			<seq>
-            <video xml:id="e2e1b2b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="4.1"  ></video>
-            <video xml:id="e2e1b2b1v2" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="0" ></video>
+            <video xml:id="e2e1b2b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="4.1"  ></video>
+            <video xml:id="e2e1b2b1v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="0" ></video>
 			</seq>
           </par>
 
 		  <!-- e2 < e1 < b1 < b2 -->
 		  <par>
-			<smilText region="infoRegion" begin="e2b2b1e1v1.beginEvent" end="e2b2b1e1v1.endEvent"> 22a. e2 &lt; e1 &lt; b1 &lt; b2 || b1=8.10 e1=4.1 </smilText>    
-			<smilText region="infoRegion" begin="e2b2b1e1v2.beginEvent" end="e2b2b1e1v2.endEvent"> 22b. e2 &lt; e1 &lt; b1 &lt; b2 || b2=12.2 e2=0 </smilText>    
+			<smilText region="infoRegion" begin="e2e1b1b2v1.beginEvent" end="e2e1b1b2v1.endEvent"> 22a. e2 &lt; e1 &lt; b1 &lt; b2 || b1=8.10 e1=4.1 </smilText>    
+			<smilText region="infoRegion" begin="e2e1b1b2v2.beginEvent" end="e2e1b1b2v2.endEvent"> 22b. e2 &lt; e1 &lt; b1 &lt; b2 || b2=12.2 e2=0 </smilText>    
 			<seq>
-            <video xml:id="e2e1b1b2v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="4.1"  ></video>
-            <video xml:id="e2e1b1b2v2" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="0" ></video>
+            <video xml:id="e2e1b1b2v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="4.1"  ></video>
+            <video xml:id="e2e1b1b2v2" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="0" ></video>
 			</seq>
           </par>
 
 		  <!-- e2 < b2 < b1 < e1 -->
 		  <par>
-			<smilText region="infoRegion" begin="e2b2e1b1v1.beginEvent" end="e2b2e1b1v1.endEvent"> 23a. e2 &lt; b2 &lt; b1 &lt; e1 || b1=8.1 e1=12.2 </smilText>    
-			<smilText region="infoRegion" begin="e2b2e1b1v2.beginEvent" end="e2b2e1b1v2.endEvent"> 23b. e2 &lt; b2 &lt; b1 &lt; e1 || b2=4.1 e2=0 </smilText>    
-            <video xml:id="e2b2b1e1v1" region="videoRegion" src="{video1}" clipBegin="8.1" clipEnd="12.2"  ></video>
-            <video xml:id="e2b2b1e1v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="0" ></video>
+			<smilText region="infoRegion" begin="e2b2b1e1v1.beginEvent" end="e2b2b1e1v1.endEvent"> 23a. e2 &lt; b2 &lt; b1 &lt; e1 || b1=8.1 e1=12.2 </smilText>    
+			<smilText region="infoRegion" begin="e2b2b1e1v2.beginEvent" end="e2b2b1e1v2.endEvent"> 23b. e2 &lt; b2 &lt; b1 &lt; e1 || b2=4.1 e2=0 </smilText>    
+			<seq>
+            <video xml:id="e2b2b1e1v1" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="12.2"  ></video>
+            <video xml:id="e2b2b1e1v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="0" ></video>
+			</seq>
           </par>
 
 		  <!-- e2 < b2 < e1 < b1 -->
@@ -254,8 +254,8 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 			<smilText region="infoRegion" begin="e2b2e1b1v1.beginEvent" end="e2b2e1b1v1.endEvent"> 24a. e2 &lt; b2 &lt; e1 &lt; b1 || b1=12.2 e1=8.1 </smilText>    
 			<smilText region="infoRegion" begin="e2b2e1b1v2.beginEvent" end="e2b2e1b1v2.endEvent"> 24b. e2 &lt; b2 &lt; e1 &lt; b1 || b2=4.1 e2=0 </smilText>    
 			<seq>
-            <video xml:id="e2b2e1b1v1" region="videoRegion" src="{video1}" clipBegin="12.2" clipEnd="8.1"  ></video>
-            <video xml:id="e2b2e1b1v2" region="videoRegion" src="{video1}" clipBegin="4.1" clipEnd="0" ></video>
+            <video xml:id="e2b2e1b1v1" region="videoRegion" src="{av1}" clipBegin="12.2" clipEnd="8.1"  ></video>
+            <video xml:id="e2b2e1b1v2" region="videoRegion" src="{av1}" clipBegin="4.1" clipEnd="0" ></video>
 			</seq>
 		  </par>
 
