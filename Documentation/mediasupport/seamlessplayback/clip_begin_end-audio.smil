@@ -64,7 +64,7 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 		  <!-- b2 < b1 < e1 < e2 --> 
 		  <par>
 			<smilText region="infoRegion" begin="b2b1e1e2v1.beginEvent" end="b2b1e1e2v1.endEvent">  5a. b2 &lt; b1 &lt; e1 &lt; e2 || b1=4.1 e1=8.1 </smilText>    
-			<smilText region="infoRegion" begin="b2b1e1e2v2.beginEvent" end="b2b1e1e2v2.endEvent">  5b. b2 &lt; b1 &lt; e1 &lt; e2 || b2=0 e2=12.2 </smilText>    
+			<smilText region="infoRegion" begin="b2b1e1e2v2.beginEvent" end="b2b1e1e2v2.endEvent">  5b. b2 &lt; b1 &lt; e1 &lt; e2 || b2=0 e2=12.2 </smilText>
 			<seq>
             <audio xml:id="b2b1e1e2v1" region="audioRegion" src="{audio1}" clipBegin="4.1" clipEnd="8.1" ></audio>
             <audio xml:id="b2b1e1e2v2" region="audioRegion" src="{audio1}" clipBegin="0" clipEnd="12.2" ></audio>
@@ -234,7 +234,7 @@ clipBegin (b1/b2) and clipEnd (e1/e2) </smilText>
 		  <!-- e2 < e1 < b1 < b2 -->
 		  <par>
 			<smilText region="infoRegion" begin="e2e1b1b2v1.beginEvent" end="e2e1b1b2v1.endEvent"> 22a. e2 &lt; e1 &lt; b1 &lt; b2 || b1=8.10 e1=4.1 </smilText>    
-			<smilText region="infoRegion" begin="e2e1b1b2v2.beginEvent" end="e2e1b1b1v2.endEvent"> 22b. e2 &lt; e1 &lt; b1 &lt; b2 || b2=12.2 e2=0 </smilText>    
+			<smilText region="infoRegion" begin="e2e1b1b2v2.beginEvent" end="e2e1b1b2v2.endEvent"> 22b. e2 &lt; e1 &lt; b1 &lt; b2 || b2=12.2 e2=0 </smilText>    
 			<seq>
             <audio xml:id="e2e1b1b2v1" region="audioRegion" src="{audio1}" clipBegin="8.1" clipEnd="4.1"  ></audio>
             <audio xml:id="e2e1b1b2v2" region="audioRegion" src="{audio1}" clipBegin="12.2" clipEnd="0" ></audio>
