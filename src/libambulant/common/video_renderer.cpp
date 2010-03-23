@@ -111,20 +111,9 @@ video_renderer::init_with_node(const lib::node *n)
 {
 	m_lock.enter();
 	renderer_playable::init_with_node(n);
-#ifdef WITH_SEAMLESS_PLAYBACK
-#ifdef JACK_THINKS_THIS_IS_WRONG_OR_UNNEEDED
-    AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: old pos %lld new pos %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
-	if (m_clip_begin != m_previous_clip_position) {
-        AM_DBG lib::logger::get_logger()->debug("video_renderer::init_with_node: seek from %lld to %lld for %s", m_previous_clip_position, m_clip_begin, n->get_sig().c_str());
-		m_lock.leave();
-		seek(m_clip_begin/1000);
-		m_lock.enter();
-        m_previous_clip_position = m_clip_begin;
-	}
-#endif
-#else
+#ifndef WITH_SEAMLESS_PLAYBACK
     m_lock.leave();
-    seek(m_clip_begin/1000);
+    seek(m_clip_begin);
     m_lock.enter();
 #endif // WITH_SEAMLESS_PLAYBACK
 	if (m_audio_renderer) {
@@ -226,9 +215,6 @@ video_renderer::preroll(double when, double where, double how_much)
 	// and where (seconds).
 	assert(m_clip_begin >= 0);
 	assert(where >= 0);
-#ifdef JACK_THINKS_THIS_IS_WRONG_OR_UNNEEDED
-	m_epoch = (long)(m_clip_begin/1000) - (int)(where*1000);
-#endif
 	m_is_paused = false;
 	
 	// We need to initial these variables over here
@@ -241,7 +227,7 @@ video_renderer::preroll(double when, double where, double how_much)
 	m_previous_clip_position = m_clip_begin+(net::timestamp_t)(where*1000000);
 	m_frame_missing = 0;
 
-    m_src->seek((m_clip_begin/1000.0) + (where*1000));	
+    m_src->seek(m_clip_begin + (net::timestamp_t)(where*1000000));	
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
 	m_src->start_prefetch (m_event_processor);
 	if (m_audio_renderer) 
@@ -295,13 +281,12 @@ void
 video_renderer::seek(double t)
 {
     m_lock.enter();
-    // Note by Jack: the parameter should be seconds, but seems to be used as milliseconds...
-    // To be fixed...
 	//assert(m_audio_renderer == NULL);
+    // XXXJACK: Should we seek the audio renderer too??
 	AM_DBG lib::logger::get_logger()->trace("video_renderer: seek(%f) curtime=%f", t, (double)m_timer->elapsed()/1000.0);
     assert( t >= 0);
-	long int t_ms = (long int)(t*1000.0);
-	if (m_src) m_src->seek(t_ms);
+	net::timestamp_t t_us= (net::timestamp_t)(t*1000000);
+	if (m_src) m_src->seek(t_us);
     m_lock.leave();
 }
 
