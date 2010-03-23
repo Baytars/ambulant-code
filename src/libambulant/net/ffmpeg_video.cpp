@@ -479,6 +479,7 @@ ffmpeg_video_decoder_datasource::_need_fmt_uptodate()
 void
 ffmpeg_video_decoder_datasource::read_ahead(timestamp_t clip_begin)
 {
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::read_ahead(): clip_begin=%d", clip_begin);
 	assert(m_src);
 	m_src->read_ahead(clip_begin);
 	m_oldest_timestamp_wanted = clip_begin;

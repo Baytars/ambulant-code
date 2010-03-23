@@ -33,7 +33,7 @@
 // WARNING: turning on AM_DBG globally for the ffmpeg code seems to trigger
 // a condition that makes the whole player hang or collapse. So you probably
 // shouldn't do it:-)
-//#define AM_DBG
+//#define AM_DBG if(1)
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif 
@@ -380,6 +380,7 @@ void
 ffmpeg_demux::seek(timestamp_t time)
 {
 	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::seek(0x%x): time=%d", this, time);
     assert( time >= 0);
 	m_clip_begin = time;
 	m_clip_begin_changed = true;
@@ -392,6 +393,7 @@ void
 ffmpeg_demux::set_clip_end(timestamp_t clip_end)
 {
 	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_set_clip_end(0x%x): clip_end=%d", this, clip_end);
 	m_clip_end = clip_end;
 	m_lock.leave();
 }
