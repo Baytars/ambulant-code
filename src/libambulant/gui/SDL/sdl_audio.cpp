@@ -803,9 +803,7 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 		}
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
         net::timestamp_t wtd_position = m_clip_begin + (net::timestamp_t)(where*1000000);
-        m_lock.leave();
-        seek(wtd_position);
-        m_lock.enter();
+        m_audio_src->seek(wtd_position);
 		m_previous_clip_position = wtd_position;
 		m_audio_src->start_prefetch(m_event_processor);
 		m_is_paused = false;
