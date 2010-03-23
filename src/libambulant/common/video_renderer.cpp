@@ -139,6 +139,11 @@ video_renderer::start (double where)
 {
     preroll(0, where, 0);
 	m_lock.enter();
+	if (m_clip_end < m_clip_begin) {
+		m_context->stopped(m_cookie, 0);
+		m_lock.leave();
+		return;
+	}
 	AM_DBG { 
         std::string tag = m_node->get_local_name();
         assert(tag != "prefetch");
@@ -200,6 +205,10 @@ video_renderer::preroll(double when, double where, double how_much)
 {
 #ifdef WITH_SEAMLESS_PLAYBACK
 	m_lock.enter();
+	if (m_clip_end != -1 && m_clip_end < m_clip_begin) {
+		m_lock.leave();
+		return;
+	}
 	if (m_activated) {
 		lib::logger::get_logger()->trace("video_renderer.preroll(0x%x): already started", (void*)this);
 		m_lock.leave();

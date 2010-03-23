@@ -747,6 +747,11 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	}
 	
 #ifdef WITH_SEAMLESS_PLAYBACK
+	if (m_clip_end != -1 && m_clip_end < m_clip_begin) {
+		m_context->stopped(m_cookie, 0);
+		m_lock.leave();
+		return;
+	}
 	if (m_is_playing) {
 		lib::logger::get_logger()->trace("sdl_audio_renderer.start(0x%x): already started", (void*)this);
 		m_lock.leave();
@@ -788,6 +793,10 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 {
 #ifdef WITH_SEAMLESS_PLAYBACK
 	m_lock.enter();
+	if (m_clip_end != -1 && m_clip_end < m_clip_begin) {
+		m_lock.leave();
+		return;
+	}
 	if (m_is_playing) {
 		lib::logger::get_logger()->trace("sdl_audio_renderer::preroll(0x%x): already started", (void*)this);
 		m_lock.leave();
