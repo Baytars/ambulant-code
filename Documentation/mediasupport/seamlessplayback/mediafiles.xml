@@ -1,9 +1,21 @@
+<!-- HTTP playback, MPEG-1 video. Uncomment to enable. -->
+<!--
+<data>
+  <av1>http://homepages.cwi.nl/~kees/ambulant/media-av.mpg</av1>
+  <av2>http://homepages.cwi.nl/~kees/ambulant/media-av-copy.mpg</av2>
+  <audio1>rtsp://media2.cwi.nl/data/FrereJacques.mp3</audio1>
+  <audio2>http://homepages.cwi.nl/~kees/ambulant/media-audio-copy.mp3</audio2>
+  <audiomod>http://homepages.cwi.nl/~kees/ambulant/media-audio-modified.mp3</audiomod>
+  <video1>http://homepages.cwi.nl/~kees/ambulant/media-video.mpg</video1>
+  <video2>http://homepages.cwi.nl/~kees/ambulant/media-video-copy.mpg</video2>
+</data>
+ -->
 <!-- Local playback, MPEG-1 video. Uncomment to enable. -->
-<!-- -->
+<!--  -->
 <data>
   <av1>media-av.mpg</av1>
   <av2>media-av-copy.mpg</av2>
-  <audio1>media-audio.mp3</audio1>
+  <audio1>media-audio.wav</audio1>
   <audio2>media-audio-copy.mp3</audio2>
   <audiomod>media-audio-modified.mp3</audiomod>
   <video1>media-video.mpg</video1>
