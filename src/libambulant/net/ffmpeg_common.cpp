@@ -494,7 +494,6 @@ ffmpeg_demux::run()
 		m_lock.leave();
 		int ret = av_read_frame(m_con, pkt);
 		m_lock.enter();
-	
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size, pkt->stream_index);
 #ifndef WITH_SEAMLESS_PLAYBACK
 		if (ret < 0) break;
@@ -617,6 +616,7 @@ ffmpeg_demux::run()
 			// Jack and Bo.
 			while ( ! accepted && sink && !exit_requested() && !m_clip_begin_changed) { 
 				m_current_sink = sink;
+				if (pts == 10000000)
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
 				accepted = sink->push_data((timestamp_t)pts, pkt->data, pkt->size);
