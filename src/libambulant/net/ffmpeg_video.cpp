@@ -394,7 +394,8 @@ ffmpeg_video_decoder_datasource::frame_processed_keepdata(timestamp_t now, char 
 {
 	m_lock.enter();
 	m_oldest_timestamp_wanted = now+1;
-	AM_DBG lib::logger::get_logger()->trace("ffmpeg_video_decoder_datasource::frame_processed_keepdata(%lld)", now);
+
+	AM_DBG lib::logger::get_logger()->trace("ffmpeg_video_decoder_datasource::frame_processed_keepdata(%lld), m_oldest_timestamp_wanted = %lld", now, m_oldest_timestamp_wanted);
 	assert(m_frames.size() > 0);
 	assert(m_frames.front().first == now);
 	assert(m_frames.front().second == buf);
@@ -406,7 +407,12 @@ void
 ffmpeg_video_decoder_datasource::frame_processed(timestamp_t now)
 {
 	m_lock.enter();
+	//xxxbo 23-mar-2010
 	m_oldest_timestamp_wanted = now+1;
+
+
+	AM_DBG lib::logger::get_logger()->trace("ffmpeg_video_decoder_datasource::frame_processed(%lld), m_oldest_timestamp_wanted = %lld", now, m_oldest_timestamp_wanted);
+
 	if (m_frames.size() == 0) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::frame_processed: frame queue empty");
 		m_lock.leave();
@@ -518,7 +524,7 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
                 return;
             }
         }
-        AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes_dropped);
+        /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes_dropped);
 	}
 	if (m_src) m_src->seek(time);
 	m_lock.leave();
@@ -564,7 +570,10 @@ ffmpeg_video_decoder_datasource::data_avail()
 	// Get the input data
 	inbuf = (uint8_t*) m_src->get_frame(0, &ipts, &sz);
 	
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
+//xxxbo 24-mar-2010
+	//AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available, ipts = %lld", sz, ipts);
+
 	if(sz == 0 && !m_src->end_of_file() ) {
 		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: no data, not eof?");
 		m_lock.leave();
@@ -592,7 +601,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 			// We use skip_frame to make the decoder run faster in case we
 			// are not interested in the data (still seeking forward).
 			if (ipts != AV_NOPTS_VALUE && ipts < m_oldest_timestamp_wanted) {
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: setting hurry_up: ipts=%lld, m_oldest_timestamp_wanted=%lld (%lld us late)",ipts, m_oldest_timestamp_wanted, m_oldest_timestamp_wanted-ipts);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: setting hurry_up: ipts=%lld, m_oldest_timestamp_wanted=%lld (%lld us late)",ipts, m_oldest_timestamp_wanted, m_oldest_timestamp_wanted-ipts);
 				m_con->skip_frame = AVDISCARD_NONREF;
 				m_dropped_count++; // This is not necessarily correct
 			} else {
@@ -644,13 +653,13 @@ ffmpeg_video_decoder_datasource::data_avail()
 			m_frame_count++;
 			if (pts < m_oldest_timestamp_wanted) {
 				// A non-essential frame while skipping forward.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld < oldest-wanted=%lld", m_frame_count, pts, m_oldest_timestamp_wanted);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d, ts=%lld < oldest-wanted=%lld", m_frame_count, pts, m_oldest_timestamp_wanted);
 				drop_this_frame = true;
 			}
 			if (m_frames.size() > 0 && pts < m_frames.front().first) {
 				// A frame that came after this frame has already been consumed.
 				// We should drop this frame.
-				AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, later frame (ts=%lld) already displayed", m_frame_count, pts, m_frames.front().first);
+				/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropping frame %d (ts=%lld): too late, later frame (ts=%lld) already displayed", m_frame_count, pts, m_frames.front().first);
 				drop_this_frame = true;
 			}
 			m_elapsed = pts;

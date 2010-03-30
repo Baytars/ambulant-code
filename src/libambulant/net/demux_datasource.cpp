@@ -167,7 +167,6 @@ demux_audio_datasource::seek(timestamp_t time)
 		m_lock.leave();
 		return;
 	}
-	
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
     int nbuf = m_queue.size();
     if ( nbuf > 0) {
@@ -618,7 +617,6 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 		vframe.data = frame_data;
 		vframe.size = sz;
 		m_frames.push(ts_frame_pair(pts, vframe));
-
 	}		
 	if ( m_frames.size() || _end_of_file()  ) {
 		if ( m_client_callback ) {
