@@ -578,7 +578,7 @@ rtsp_demux::after_reading_audio(unsigned sz, unsigned truncated, struct timeval 
 		float start_time = ms->playStartTime();
 		float stop_time = ms->playEndTime();
 		// lib::logger::get_logger()->debug("after_reading_audio: hasBeenSynchronized=%d, start_time=%f, stop_time=%f ", hasBeenSynchronized, start_time, stop_time);
-		lib::logger::get_logger()->debug("after_reading_audio: start_time=%f, stop_time=%f ", start_time, stop_time);
+		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: start_time=%f, stop_time=%f ", start_time, stop_time);
 	}
 #endif
 	if (!m_context->first_sync_time_set) {
