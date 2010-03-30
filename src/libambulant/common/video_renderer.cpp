@@ -128,7 +128,7 @@ video_renderer::start (double where)
 {
     preroll(0, where, 0);
 	m_lock.enter();
-	if (m_clip_end < m_clip_begin) {
+	if (m_clip_end != -1 && m_clip_end < m_clip_begin) {
 		m_context->stopped(m_cookie, 0);
 		m_lock.leave();
 		return;
