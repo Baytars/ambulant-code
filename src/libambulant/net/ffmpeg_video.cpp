@@ -407,9 +407,8 @@ void
 ffmpeg_video_decoder_datasource::frame_processed(timestamp_t now)
 {
 	m_lock.enter();
-	//xxxbo 23-mar-2010
-	m_oldest_timestamp_wanted = now+1;
 
+	m_oldest_timestamp_wanted = now+1;
 
 	AM_DBG lib::logger::get_logger()->trace("ffmpeg_video_decoder_datasource::frame_processed(%lld), m_oldest_timestamp_wanted = %lld", now, m_oldest_timestamp_wanted);
 
@@ -499,6 +498,9 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
     assert( time >= 0);
 	// We leave one frame in the queue: there could be a callback outstanding which
 	// will otherwise run into problems in get_frame().
+	
+	// Do the seek before flush
+	if (m_src) m_src->seek(time);
 
 	m_oldest_timestamp_wanted = time;
 
@@ -526,7 +528,7 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
         }
         /*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource: flush cache (%d frames) due to seek", nframes_dropped);
 	}
-	if (m_src) m_src->seek(time);
+	//if (m_src) m_src->seek(time);
 	m_lock.leave();
 }
 
@@ -570,14 +572,19 @@ ffmpeg_video_decoder_datasource::data_avail()
 	// Get the input data
 	inbuf = (uint8_t*) m_src->get_frame(0, &ipts, &sz);
 	
-//xxxbo 24-mar-2010
-	//AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
+
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available, ipts = %lld", sz, ipts);
 
 	if(sz == 0 && !m_src->end_of_file() ) {
 		lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: no data, not eof?");
+#if 1
+		// Attempt at bug fix for hanging video
+		goto out_of_memory;
+#else
 		m_lock.leave();
 		return;
+#endif
 	}
 	
 	// No easy error conditions, so let's allocate our frame.
@@ -784,6 +791,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 			// Finally send the frame upstream.
 			std::pair<timestamp_t, char*> element(pts, framedata);
 			m_frames.push(element);
+
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): push pts = %lld into buffer", pts);
 			did_generate_frame = true;
 		} // End of while loop
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
@@ -794,14 +803,17 @@ ffmpeg_video_decoder_datasource::data_avail()
 	// Now tell our client, if we have data available or are at end of file.
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): m_frames.size() returns %d, (eof=%d)", m_frames.size(), m_src->end_of_file());
 	if (m_frames.size() > MIN_VIDEO_FRAMES || m_src->end_of_file()) {
+
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): there is some data for the renderer ! (eof=%d)", m_src->end_of_file());
 		if ( m_client_callback ) {
+			
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): calling client callback (eof=%d)", m_src->end_of_file());
 			assert(m_event_processor);
 			m_event_processor->add_event(m_client_callback, 0, ambulant::lib::ep_high);
 			m_client_callback = NULL;
 			//m_event_processor = NULL;
 		} else {
+		
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): No client callback!");
 		}
   	}

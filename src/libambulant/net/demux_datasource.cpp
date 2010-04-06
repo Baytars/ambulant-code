@@ -167,6 +167,9 @@ demux_audio_datasource::seek(timestamp_t time)
 		m_lock.leave();
 		return;
 	}
+
+	m_thread->seek(time);
+	
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::seek(%d): flushing %d packets", time, m_queue.size());
     int nbuf = m_queue.size();
     if ( nbuf > 0) {
@@ -181,7 +184,7 @@ demux_audio_datasource::seek(timestamp_t time)
 	// thread trying to deliver new data to this demux_datasource.
 	// NOTE 2: we do the seek after the flush, this may cause some incorrect data (from
 	// before the seek) to be deposited in our queue.
-	m_thread->seek(time);
+	//m_thread->seek(time);
 }
 
 #ifdef WITH_SEAMLESS_PLAYBACK
@@ -590,6 +593,7 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 	m_lock.enter();
 
 	m_src_end_of_file = (sz == 0);
+
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): receiving data sz=%d ,pts=%lld", sz, pts);
 	if ( ! m_thread) {
 		// video stopped
@@ -599,7 +603,7 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 	}
 	if ( _buffer_full()) {
 		// video stopped
-        AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): buffer full, returning");
+	        AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): buffer full, returning");
 		m_lock.leave();
 		return false;
 	}
@@ -620,7 +624,8 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, int sz)
 	}		
 	if ( m_frames.size() || _end_of_file()  ) {
 		if ( m_client_callback ) {
-			AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): calling client callback (eof=%d)", m_src_end_of_file);
+			AM_DBG
+			 lib::logger::get_logger()->debug("demux_video_datasource::push_data(): calling client callback (eof=%d)", m_src_end_of_file);
 			assert(m_event_processor);
 			m_event_processor->add_event(m_client_callback, MIN_EVENT_DELAY, ambulant::lib::ep_med);
 			m_client_callback = NULL;

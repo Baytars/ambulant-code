@@ -685,7 +685,7 @@ gui::sdl::sdl_audio_renderer::stop()
 	
 	m_lock.leave();	
 
-	return false; // xxxbo NOTE, "return false" means that this renderer is reusable.
+	return false; // NOTE, "return false" means that this renderer is reusable.
 }
 
 void
@@ -739,6 +739,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	
 #ifdef WITH_SEAMLESS_PLAYBACK
 	if (m_clip_end != -1 && m_clip_end < m_clip_begin) {
+		lib::logger::get_logger()->trace("sdl_audio_renderer.start: empty clip");
 		m_context->stopped(m_cookie, 0);
 		m_lock.leave();
 		return;

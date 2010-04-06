@@ -428,11 +428,12 @@ ffmpeg_decoder_datasource::data_avail()
 					// So we request 15 bytes more, pass an aligned pointer, and copy down if needed.
 					short *ffmpeg_outbuf = (short *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
 					AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio(0x%x, 0x%x, 0x%x(%d), 0x%x, %d)", (void*)m_con, (void*)outbuf, (void*)&outsize, outsize, (void*)inbuf, cursz);
-					/////xxxbo 12-feb-2010: Adapted to the new api avcodec_decode_audio3
+					// Adapted to the new api avcodec_decode_audio3
 					AVPacket avpkt;
 					av_init_packet(&avpkt);
 					avpkt.data = inbuf;
 					avpkt.size = cursz;
+					// The old api is as following
 					//int decoded = avcodec_decode_audio2(m_con, ffmpeg_outbuf, &outsize, inbuf, cursz);
 					int decoded = avcodec_decode_audio3(m_con, ffmpeg_outbuf, &outsize, &avpkt);
 					if (decoded < 0) outsize = 0;
@@ -627,7 +628,14 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 	m_lock.enter();
 	bool skip_seek = false;
 	assert( time >= 0);
-
+	
+	// Do the seek before the flush
+	#if 1
+	if (!skip_seek) {
+		m_src->seek(time);
+		m_elapsed = time; // XXXJACK not needed??
+	}
+	#endif
 	int nbytes = m_buffer.size();
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource(0x%x)::seek(%ld), discard %d bytes, old time was %ld", (void*)this, (long)time, nbytes, m_elapsed);
 	if (nbytes) {
@@ -646,10 +654,12 @@ ffmpeg_decoder_datasource::seek(timestamp_t time)
 		m_buffer.readdone(nbytes);
 	}
 	/* end of disabled code for #2954199 */
+	#if 0
 	if (!skip_seek) {
 		m_src->seek(time);
 		m_elapsed = time; // XXXJACK not needed??
 	}
+	#endif
 	m_lock.leave();
 } 
 
