@@ -157,7 +157,7 @@ ffmpeg_codec_id::ffmpeg_codec_id()
 #endif
 	add_codec("X-QT", CODEC_ID_MP3); //XXXX
 	
-	//xxxbo added h264 map between live and ffmpeg
+	// added h264 map between live and ffmpeg
 	add_codec("H264", CODEC_ID_H264);
 }
 
@@ -438,7 +438,7 @@ ffmpeg_demux::run()
 	bool initial_audio_pts_set = false;
 #endif
 
-///xxxbo 17-feb-2010
+// 17-feb-2010
 	timestamp_t last_valid_audio_pts = 0;
 
 	pkt_nr = 0;
@@ -464,16 +464,10 @@ ffmpeg_demux::run()
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
 			int seek_streamnr = -1;
 			
-			//xxxbo 26-mar-2010
-			#if 0
-			if (video_streamnr >= 0) {
-				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
-				seek_streamnr = video_streamnr;
-			} else if (audio_streamnr >= 0) {
-				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
-				seek_streamnr = audio_streamnr;
-			}
-			#else
+			// Open question: should we seek on the audio stream, the video stream
+			// or the default stream? Originally, we preferred the video stream
+			// Bo noticed (march 2010) that audio seems to work better for some files.
+			// But: there is no real reasoning behind this choice...
 			if (audio_streamnr >= 0) {
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
 				seek_streamnr = audio_streamnr;
@@ -481,7 +475,7 @@ ffmpeg_demux::run()
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
 				seek_streamnr = video_streamnr;
 			}
-			#endif
+			
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld scaled to mediatimebase", seektime);
 			m_lock.leave();
 			int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
@@ -533,25 +527,14 @@ ffmpeg_demux::run()
 			AM_DBG lib::logger::get_logger ()->debug ("ffmpeg_parser::run sending data to datasink (stream %d) (%lld, %lld, 0x%x, %d)", pkt->stream_index, pts, pkt->pts ,pkt->data, pkt->size);
 			if (sink && !exit_requested()) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: raw pts=%lld, dts=%lld", pkt->pts, pkt->dts);
-#if 0
-				// Gag me with a spoon... At some point (around begin 2008?) this code stopped working,
-				// and we actually have to do the reverse! In other words: it used to be that pts trumped
-				// dts on the packets ffmpeg returned, but recently it has become so that dts trumps
-				// pts??
-				// Maybe the explanation at <http://www.dranger.com/ffmpeg/tutorial05.html> is some help...
-				pts = pkt->pts;
-				if (pts == AV_NOPTS_VALUE) {
-					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: pts invalid using dts=%lld", pkt->dts);
-					pts = pkt->dts;
-				}
-#else
+
 				pts = pkt->dts;
 				if (pts == AV_NOPTS_VALUE) {
 					AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: dts invalid using pts=%lld", pkt->dts);
 					pts = pkt->pts;
 				}
-				
-				//xxxbo 17-feb-2010 To fix the chopping audio playback in vobis/ogg 
+#if 1	
+				// 17-feb-2010 To fix the chopping audio playback in vobis/ogg 
 				// For some reason which I don't understand, In the current version of ffmpeg, for reading vorbis in ogg,
 				// sometime, the pts and dts got by ffmpeg is not valid any more (which equal to AV_NOPTS_VALUE)
 				// and this kind of invalid value of pts and dts will last in the following packets for some
@@ -570,10 +553,7 @@ ffmpeg_demux::run()
 					
 					last_valid_audio_pts++;
 					pts = last_valid_audio_pts;
-				//xxxbo 17-feb-2010 the end of fixing the chopping audio playback in vobis/ogg	
-				
-#endif
-
+#endif // 1
 					
 #if RESYNC_TO_INITIAL_AUDIO_PTS
                     // We seem to be getting values with a non-zero epoch sometimes (?)
@@ -601,7 +581,6 @@ ffmpeg_demux::run()
 #endif
 			bool accepted = false;
 			
-			// xxxbo 26-mar-2010
 			// NOTE: Without checking the value of m_cli_begin_changed will possibly
 			// push the wrong packets to demux_datasource, which was read by the  
 			// av_read_frame after demux_datasource flushes its buffer. 
