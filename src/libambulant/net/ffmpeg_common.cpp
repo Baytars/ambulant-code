@@ -468,6 +468,7 @@ ffmpeg_demux::run()
 			// or the default stream? Originally, we preferred the video stream
 			// Bo noticed (march 2010) that audio seems to work better for some files.
 			// But: there is no real reasoning behind this choice...
+			#if 0
 			if (audio_streamnr >= 0) {
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
 				seek_streamnr = audio_streamnr;
@@ -475,6 +476,15 @@ ffmpeg_demux::run()
 				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
 				seek_streamnr = video_streamnr;
 			}
+			#else
+			if (video_streamnr >= 0) {
+				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
+				seek_streamnr = video_streamnr;
+			} else if (audio_streamnr >= 0) {
+				seektime = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
+				seek_streamnr = audio_streamnr;
+			} 
+			#endif
 			
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld scaled to mediatimebase", seektime);
 			m_lock.leave();
