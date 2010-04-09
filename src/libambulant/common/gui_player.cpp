@@ -129,7 +129,7 @@ gui_player::restart(bool reparse)
 	if (reparse) {
 		m_doc = create_document(m_url);
 		if(!m_doc) {
-			lib::logger::get_logger()->show("Failed to parse document %s", m_url.get_url().c_str());
+			lib::logger::get_logger()->show(gettext("Failed to parse document %s"), m_url.get_url().c_str());
 			return;
 		}
 	}

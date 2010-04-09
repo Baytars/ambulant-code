@@ -595,7 +595,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 		AVFrame *frame = avcodec_alloc_frame();
 		if (frame == NULL) {
 			lib::logger::get_logger()->debug("ffmpeg_video_decoder: avcodec_alloc_frame() failed");
-			lib::logger::get_logger()->error("Out of memory playing video");
+			lib::logger::get_logger()->error(gettext("Out of memory playing video"));
 			m_src->stop();
 			goto out_of_memory;
 		}
@@ -734,7 +734,7 @@ ffmpeg_video_decoder_datasource::data_avail()
  			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:framedata=0x%x", framedata);
 			if (framedata == NULL) {
 				lib::logger::get_logger()->debug("ffmpeg_video_decoder: malloc(%d) failed", m_size);
-				lib::logger::get_logger()->error("Out of memory playing video");
+				lib::logger::get_logger()->error(gettext("Out of memory playing video"));
 				m_src->stop();
 				sz = 0;
 				goto out_of_memory;

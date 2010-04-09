@@ -207,7 +207,7 @@ region_node::fix_from_dom_node()
 			if (strcmp(sbg_attr, "whenActive") == 0) sbg = false;
 			else if (strcmp(sbg_attr, "always") == 0) sbg = true;
 			else {
-				lib::logger::get_logger()->error("%s: Invalid showBackground value: %s", m_node->get_sig().c_str(), sbg_attr);
+				lib::logger::get_logger()->error(gettext("%s: Invalid showBackground value: %s"), m_node->get_sig().c_str(), sbg_attr);
 				lib::logger::get_logger()->warn(gettext("Ignoring minor errors in document"));
 			}
 		}

@@ -417,7 +417,7 @@ void net::url::_checkurl() const
 #if 0
 	// This is no longer valid, because escape-processing has been done on m_path
 	if (m_path.find_first_of(file_url_escape_reqd) != std::string::npos)
-		lib::logger::get_logger()->warn("%s: URL contains illegal characters", get_url().c_str());
+		lib::logger::get_logger()->warn(gettext("%s: URL contains illegal characters"), get_url().c_str());
 #endif
 }
 net::url::url() 
