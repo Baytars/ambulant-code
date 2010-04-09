@@ -310,7 +310,7 @@ find_cached_dtd(std::string url) {
 		mi = obsolete_dtd_cache_mapping.find(url);
 		if (mi != obsolete_dtd_cache_mapping.end()) {
 			result = mi->second;
-			lib::logger::get_logger()->warn("Obsolete DTD: %s", url.c_str());
+			lib::logger::get_logger()->warn(gettext("Obsolete DTD: %s"), url.c_str());
 		}
 	}
 	return result;
