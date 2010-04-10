@@ -1,6 +1,7 @@
 src/libambulant/common/gui_player.cpp
 src/libambulant/common/plugin_engine.cpp
 src/libambulant/common/region.cpp
+src/libambulant/common/renderer_impl.cpp
 src/libambulant/common/video_renderer.cpp
 src/libambulant/gui/cg/cg_gui.mm
 src/libambulant/gui/cocoa/cocoa_audio.mm
