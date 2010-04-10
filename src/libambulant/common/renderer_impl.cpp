@@ -170,7 +170,7 @@ renderer_playable::_init_clip_begin_end()
 		std::string::const_iterator e = s.end();
 		std::ptrdiff_t d = parser.parse(b, e);
 		if (d == -1) {
-			lib::logger::get_logger()->warn(gettext("Cannot parse %s)","clipEnd");
+			lib::logger::get_logger()->warn(gettext("Cannot parse %s"),"clipEnd");
 		} else {
 			ce = (net::timestamp_t)parser.get_time() * 1000;
 		}	
