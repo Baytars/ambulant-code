@@ -160,14 +160,16 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	// setup the basics.
 	context->scheduler = BasicTaskScheduler::createNew();
 	if (!context->scheduler) {
-		lib::logger::get_logger()->error(gettext("ambulant::net::rtsp_demux(net::url& url) failed to create scheduler"));
+		lib::logger::get_logger()->trace("ambulant::net::rtsp_demux(net::url& url) failed to create scheduler");
+		lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 		delete context;
 		return NULL;
 	}
 	
 	context->env = BasicUsageEnvironment::createNew(*context->scheduler);
 	if (!context->env) {
-		lib::logger::get_logger()->error(gettext("ambulant::net::rtsp_demux(net::url& url) failed to create UsageEnvironment"));
+		lib::logger::get_logger()->trace("ambulant::net::rtsp_demux(net::url& url) failed to create UsageEnvironment");
+		lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 		delete context;
 		return NULL;
 	}
@@ -175,7 +177,8 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	int verbose = 0;
 	context->rtsp_client = RTSPClient::createNew(*context->env, verbose, "AmbulantPlayer");
 	if (!context->rtsp_client) {
-		lib::logger::get_logger()->error(gettext("ambulant::net::rtsp_demux(net::url& url) failed to create a RTSP Client"));
+		lib::logger::get_logger()->trace("ambulant::net::rtsp_demux(net::url& url) failed to create a RTSP Client");
+		lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 		delete context;
 		return NULL;
 	}
@@ -185,8 +188,8 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	assert(ch_url);
 	context->sdp = context->rtsp_client->describeURL(ch_url);
 	if (!context->sdp) {
-	  lib::logger::get_logger()->error(gettext("%s: describeURL failed (no server available, not rtsp, or url not found?)"), ch_url);
-		//lib::logger::get_logger()->error(gettext("RTSP Connection Failed");
+		lib::logger::get_logger()->trace("%s: describeURL failed (no server available, not rtsp, or url not found?)", ch_url);
+		lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 		delete context;	
 		return NULL;
 	}
@@ -194,8 +197,8 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	AM_DBG lib::logger::get_logger()->debug("rtsp_demux: describe(\"%s\") -> \"%s\"", ch_url, context->sdp);
 	context->media_session = MediaSession::createNew(*context->env, context->sdp);
 	if (!context->media_session) {
-		lib::logger::get_logger()->error(gettext("%s: failed to create a MediaSession, sdp=%s)", ch_url, context->sdp);
-		//lib::logger::get_logger()->error(gettext("RTSP Connection Failed");
+		lib::logger::get_logger()->trace("%s: failed to create a MediaSession, sdp=%s", ch_url, context->sdp);
+		lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 		delete context;		
 		return NULL;
 	}	
@@ -304,8 +307,8 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
 	int stream_index = 0;
 	for(stream_index=0, (subsession = iter.next()); subsession != NULL; stream_index++, (subsession = iter.next())) {
 		if (!subsession->initiate()) {
-			lib::logger::get_logger()->error(gettext("rtsp_demux: failed to initiate subsession for medium \"%s\""), subsession->mediumName());
-			//lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
+			lib::logger::get_logger()->trace("rtsp_demux: failed to initiate subsession for medium \"%s\"", subsession->mediumName());
+			lib::logger::get_logger()->error(gettext("RTSP Connection Failed"));
 			delete context;
 			return NULL;
 		}
