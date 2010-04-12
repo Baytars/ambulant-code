@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: AmbulantPlayer 1.8\n"
+"Project-Id-Version: AmbulantPlayer 2.2\n"
 "Report-Msgid-Bugs-To: ambulant-feedback@ambulantPlayer.org\n"
 "POT-Creation-Date: 2010-04-10 23:04+0200\n"
 "PO-Revision-Date: 2004-09-12 15:09+0200\n"
@@ -21,7 +21,7 @@ msgstr "Kan document niet spelen: geen speler"
 
 #: src/libambulant/common/gui_player.cpp:132
 #: src/npambulant/cg_mainloop.cpp:196 src/player_macosx/mainloop.cpp:226
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to parse document %s"
 msgstr "Document kan niet geparseerd worden: %s"
 
@@ -77,7 +77,7 @@ msgstr "Interne fout gedetecteerd"
 
 #: src/libambulant/common/renderer_impl.cpp:152
 #: src/libambulant/common/renderer_impl.cpp:173
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot parse %s"
 msgstr "Foutieve waarde voor: %s"
 
@@ -153,7 +153,7 @@ msgid "%s: node ID not found"
 msgstr "%s: Node ID niet gevonden"
 
 #: src/libambulant/gui/gtk/gtk_smiltext.cpp:658
-#, fuzzy, c-format
+#, c-format
 msgid "Geometry error in smil document at %s"
 msgstr "Fout in geometrie in SMIL document"
 
@@ -162,7 +162,7 @@ msgid "Cannot initialize SDL audio library"
 msgstr "SDL audio-library kan niet geïnitialiseerd worden"
 
 #: src/libambulant/gui/SDL/sdl_audio.cpp:112
-#, fuzzy, c-format
+#, c-format
 msgid "Cannot open SDL audio output stream: %s"
 msgstr "SDL audiokanaal kan niet geopend worden"
 
@@ -352,7 +352,7 @@ msgstr "ffmpeg_video_decoder_datasource: kan %s(0x%x) decoder niet selecteren"
 
 #: src/libambulant/net/ffmpeg_video.cpp:598
 #: src/libambulant/net/ffmpeg_video.cpp:737
-#, fuzzy
+#, c-format
 msgid "Out of memory playing video"
 msgstr "Geheugen vol (tijdens afspelen van video)"
 
@@ -1014,7 +1014,7 @@ msgid "Plugin directory:\n"
 msgstr "Map voor insteekmodules:\n"
 
 #: src/player_wince/AmbulantPlayerView.cpp:191
-#, fuzzy, c-format
+#, c-format
 msgid "Ambulant Player: built on %s for WindowsCE/MFC"
 msgstr "Ambulant Player: gebouwd op %s voor Windows/MFC"
 

@@ -24,7 +24,7 @@
 			<smilText region="infoRegion" begin="b1e1b2e2v1.beginEvent" end="b1e1b2e2v1.endEvent" >  1a. b1&lt;e2&lt;e1&lt;b2 || b1=0 e1=4.1 </smilText>    
 			<smilText region="infoRegion" begin="b1e1b2e2v2.beginEvent" end="b1e1b2e2v2.endEvent" >  1b. b1&lt;e2&lt;e1&lt;b2 || b2=8.1 e2=12.2 </smilText>    
 			<seq>
-            <video xml:id="b1e1b2e2v1" region="videoRegion" src="{av1}" clipBegin="0" clipEnd="4.1"  ></video>
+            <video xml:id="b1e1b2e2v1" region="videoRegion" src="{av1}" clipBegin="par-1.beginEvent" clipEnd="4.1"  ></video>
             <video xml:id="b1e1b2e2v2" region="videoRegion" src="{av1}" clipBegin="8.1" clipEnd="12.2" ></video>
 			</seq>
           </par>
