@@ -125,6 +125,7 @@ msgstr "Kan audio niet starten: %s"
 #: src/libambulant/gui/cocoa/cocoa_dsvideo.mm:237
 #: src/libambulant/gui/cocoa/cocoa_dsvideo.mm:247
 #: src/libambulant/gui/cocoa/cocoa_dsvideo.mm:270
+#, c-format
 msgid "Out of memory while showing video"
 msgstr "Geheugen vol (tijdens afspelen van video)"
 
@@ -155,7 +156,7 @@ msgstr "%s: Node ID niet gevonden"
 #: src/libambulant/gui/gtk/gtk_smiltext.cpp:658
 #, c-format
 msgid "Geometry error in smil document at %s"
-msgstr "Fout in geometrie in SMIL document"
+msgstr "Fout in geometrie in SMIL document (%s)"
 
 #: src/libambulant/gui/SDL/sdl_audio.cpp:92
 msgid "Cannot initialize SDL audio library"
@@ -164,7 +165,7 @@ msgstr "SDL audio-library kan niet geïnitialiseerd worden"
 #: src/libambulant/gui/SDL/sdl_audio.cpp:112
 #, c-format
 msgid "Cannot open SDL audio output stream: %s"
-msgstr "SDL audiokanaal kan niet geopend worden"
+msgstr "SDL audiokanaal kan niet geopend worden: %s"
 
 #: src/libambulant/gui/SDL/sdl_audio.cpp:122
 msgid "Cannot open SDL audio output stream with required characteristics"
@@ -352,7 +353,6 @@ msgstr "ffmpeg_video_decoder_datasource: kan %s(0x%x) decoder niet selecteren"
 
 #: src/libambulant/net/ffmpeg_video.cpp:598
 #: src/libambulant/net/ffmpeg_video.cpp:737
-#, c-format
 msgid "Out of memory playing video"
 msgstr "Geheugen vol (tijdens afspelen van video)"
 
