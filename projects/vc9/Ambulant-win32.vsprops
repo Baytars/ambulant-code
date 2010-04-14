@@ -41,6 +41,8 @@
 -->
 
 <UserMacro Name="xerces_dir" Value="..\..\third_party_packages\xerces-c-3.1.0" PerformEnvironmentSet="true"/>
+<UserMacro Name="xerces_major" Value="3" PerformEnvironmentSet="true"/>
+<UserMacro Name="xerces_minor" Value="1" PerformEnvironmentSet="true"/>
 <!--
 	The next three are only needed if you want to build the firefox plugin.
 	If you don't have these: disable npambulant and npambulant-installer.
