@@ -96,6 +96,7 @@ video_renderer::video_renderer(
 video_renderer::~video_renderer() {
 	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
+
     if (m_dest) m_dest->renderer_done(this);
     m_dest = NULL;
 	if (m_audio_renderer) m_audio_renderer->release();
@@ -168,6 +169,11 @@ video_renderer::start (double where)
         // Renderer was already playing, possibly due to fill=continue or a late callback
 		lib::logger::get_logger()->trace("video_renderer.start(0x%x): already started", (void*)this);
 		m_post_stop_called = false;
+		#if 1
+		//xxxbo 15-04-2010 
+		m_lock.leave();
+		return;
+		#endif
     	} else {
         	lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
         	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
@@ -231,7 +237,10 @@ video_renderer::preroll(double when, double where, double how_much)
 	m_previous_clip_position = m_clip_begin+(net::timestamp_t)(where*1000000);
 	m_frame_missing = 0;
 
-    m_src->seek(m_clip_begin + (net::timestamp_t)(where*1000000));	
+	m_src->seek(m_clip_begin + (net::timestamp_t)(where*1000000));	
+	
+	AM_DBG lib::logger::get_logger()->debug("video_renderer::preroll(%f) seek to %lld", where, m_clip_begin);
+	
 	AM_DBG lib::logger::get_logger ()->debug ("video_renderer::preroll(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
 
 	/*if(!m_activated)*/ m_src->start_prefetch (m_event_processor);
