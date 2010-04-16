@@ -366,10 +366,13 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 			// XXXJACK: Dirty hack, for now: we don't want prefetch to render to a surface so we zap it. Need to fix.
 			if (n->get_local_name() == "prefetch") surf = NULL;
 			AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n, n->get_sig().c_str(), np, rend, surf);
-			if (rend && surf) {
-				rend->set_surface(surf);
+			//xxxbo 15-april-2010
+			#if 1
+     			if (rend && surf) {
+     				if (rend->get_surface() == NULL)
+					rend->set_surface(surf);
 			}
-
+			#endif
 		} else {
 			AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s: no cached playable", n, n->get_sig().c_str());
 		}
