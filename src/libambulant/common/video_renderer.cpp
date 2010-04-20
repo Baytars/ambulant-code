@@ -264,10 +264,10 @@ video_renderer::stop()
         	m_context->stopped(m_cookie, 0);
     	}
 
-	#if 1
+#ifdef  WITH_SEAMLESS_PLAYBACK
 	if (!is_fill_continue_node())
 		m_activated = false;
-	#endif
+#endif // WITH_SEAMLESS_PLAYBACK
 	
 	m_lock.leave();
 	return false; // note, "false" means this renderer is reusable (and still running, needing post_stop() to actually stop)
