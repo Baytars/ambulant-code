@@ -11,5 +11,5 @@ EXTRA_DIST = \
 	live_VC7 \
 	live_VC8 \
 	live_VC9 \
-	live_VC8_wince
-
+	live_VC8_wince \
+	live-osx-fatbuild-patches.tar 
