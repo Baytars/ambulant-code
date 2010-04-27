@@ -428,7 +428,7 @@ third_party_packages={
 			checkcmd="pkg-config --atleast-version=52.20.0 libavformat",
 			buildcmd=
 				"cd ffmpeg-export-2010-01-22 && "
-				"%s --enable-gpl --enable-libfaad --enable-shared --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
+				"%s --enable-gpl --enable-libfaad --enable-shared --disable-bzlib --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
 				"make install " % 
 					(LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
 			),
