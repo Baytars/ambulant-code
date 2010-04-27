@@ -542,11 +542,15 @@ void smil_player::stop_playable(const lib::node *n) {
 			// Add a event to destroy this playable on next 20000 microseconds, however, Jack thinks there is another option...
 			typedef std::pair<const lib::node*, common::playable*> destroy_event_arg;
 			lib::event *destroy_event = new lib::scalar_arg_callback<smil_player, destroy_event_arg>(this, &smil_player::destroy_playable_in_cache, victim);
-			//xxxbo: the unit of add_event is milisecond. This point is proved at 09-06-2009
-			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
-			m_event_processor->add_event(destroy_event, 20, lib::ep_high);
+			// XXXJACK: The following code is possibly incorrect. The assumption behind the design for deleting the
+            // playable with a timeout is that any event scheduled with delta_t=0 will be scheduled before the destruction.
+            // However, this may not be true, because the delta_t can be adjusted by the event processor.
+            // For now, we put the event in the low-priority queue. Kees thinks that this is good enough.
+            // Jack is not sure, but anything that forestalls me diving into this code is a welcome excuse:-)
+            AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
+			m_event_processor->add_event(destroy_event, 20, lib::ep_low);
 		} else {
-            		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer without destructor callback", victim.first->get_sig().c_str());
+            AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer without destructor callback", victim.first->get_sig().c_str());
 		}
 		return;
 	}
