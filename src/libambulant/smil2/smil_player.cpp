@@ -785,7 +785,7 @@ smil_player::pointed(int n, double t) {
 		// This "cannot happen", but it turns out it can:-)
 		// The scenario is that if a window shows up or disappear during
 		// a mouse move, depending on the GUI toolkit it can happen.
-		m_logger->debug("smil_player::pointed: m_new_focussed_nodes==NULL, ignoring");
+		AM_DBG m_logger->debug("smil_player::pointed: m_new_focussed_nodes==NULL, ignoring");
 		return;
 	}
 	m_new_focussed_nodes->insert(n);
