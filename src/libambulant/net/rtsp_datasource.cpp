@@ -63,7 +63,7 @@ static void
 on_source_close(void* data) 
 {
 	rtsp_context_t* context = (rtsp_context_t*) data;
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::on_source_close() context=0x%x", data);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::on_source_close() context=0x%x", data);
 	if (context) {
 		context->eof = true;
 		context->blocking_flag = ~0;
@@ -89,12 +89,12 @@ ambulant::net::rtsp_demux::rtsp_demux(rtsp_context_t* context, timestamp_t clip_
 	if ( m_clip_begin ) m_clip_begin_changed = true;
 #endif
 
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::rtsp_demux(0x%x)", (void*) this);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::rtsp_demux(0x%x)", (void*) this);
 
 }
 
 ambulant::net::rtsp_demux::~rtsp_demux() {
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::~rtsp_demux(0x%x)\n", (void*) this);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::~rtsp_demux(0x%x)\n", (void*) this);
 	delete m_context;
 }
 
@@ -106,7 +106,7 @@ static void watchDog (rtsp_context_t *context) {
             context->highest_pts_seen + context->idle_time > context->last_expected_pts) {
         context->eof = true;
     }
-    AM_DBG lib::logger::get_logger()->trace("watchDog: idle_time %lld, highest pts %lld, last pts %lld eof=%d", context->idle_time, context->highest_pts_seen, context->last_expected_pts,context->eof);
+    AM_DBG lib::logger::get_logger()->debug("watchDog: idle_time %lld, highest pts %lld, last pts %lld eof=%d", context->idle_time, context->highest_pts_seen, context->last_expected_pts,context->eof);
     context->blocking_flag = ~0;
 	context->env->taskScheduler().scheduleDelayedTask(uSecsToDelay,
 						 (TaskFunc*)watchDog, context);
@@ -115,7 +115,7 @@ static void watchDog (rtsp_context_t *context) {
 void 
 ambulant::net::rtsp_demux::add_datasink(demux_datasink *parent, int stream_index)
 {
-        AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::add_datasink(0x%x, parent=0x%x, stream_index=%d, m_context->nsinks=%d)", (void*) this,parent,stream_index,m_context->nsinks);
+        AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::add_datasink(0x%x, parent=0x%x, stream_index=%d, m_context->nsinks=%d)", (void*) this,parent,stream_index,m_context->nsinks);
 	m_critical_section.enter();
 	assert(stream_index >= 0 && stream_index < MAX_STREAMS);
 	assert(m_context && m_context->sinks && m_context->sinks[stream_index] == 0);
@@ -136,7 +136,7 @@ ambulant::net::rtsp_demux::remove_datasink(int stream_index)
 	if (ds) m_context->nsinks--;
     m_context->blocking_flag = ~0;
 	m_critical_section.leave();
-        AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::remove_datasink(0x%x), ds=0x%x,stream_index=%d, m_context->nsinks=%d", (void*) this,ds,stream_index,m_context->nsinks);
+        AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::remove_datasink(0x%x), ds=0x%x,stream_index=%d, m_context->nsinks=%d", (void*) this,ds,stream_index,m_context->nsinks);
     // XXXJACK This code suffers from the same problem as the ffmpeg_demux
     // code: if may get into a deadlock if we hold the lock
     // and it may deallocate ds while it's being used in run() otherwise.
@@ -210,7 +210,7 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 	context = _init_subsessions(context);
 	if (context == NULL) return NULL;
 	
-	lib::logger::get_logger()->trace("rtps_demux::supported(%s): duration=%ld", ch_url, context->last_expected_pts);
+	lib::logger::get_logger()->debug("rtps_demux::supported(%s): duration=%ld", ch_url, context->last_expected_pts);
 	return context;
 		
 }
@@ -246,7 +246,7 @@ void
 ambulant::net::rtsp_demux::read_ahead(timestamp_t time)
 {	
 	m_critical_section.enter();
-	AM_DBG lib::logger::get_logger()->trace("rtsp_demux::read_ahead(0x%x),  time=%lld, m_clip_begin was %lld",  this, time, m_clip_begin);
+	AM_DBG lib::logger::get_logger()->debug("rtsp_demux::read_ahead(0x%x),  time=%lld, m_clip_begin was %lld",  this, time, m_clip_begin);
 #ifndef CLIP_BEGIN_CHANGED
 	m_clip_begin = time;
 	m_seektime_changed = true;
@@ -264,7 +264,7 @@ void
 ambulant::net::rtsp_demux::seek(timestamp_t time)
 {
 	m_critical_section.enter();
-	AM_DBG lib::logger::get_logger()->trace("rtsp_demux::seek(0x%x),  time=%lld, m_clip_begin was %lld",this, time, m_clip_begin);
+	AM_DBG lib::logger::get_logger()->debug("rtsp_demux::seek(0x%x),  time=%lld, m_clip_begin was %lld",this, time, m_clip_begin);
     assert( time >= 0);
 #ifndef CLIP_BEGIN_CHANGED	
 	m_seektime = time;
@@ -283,7 +283,7 @@ ambulant::net::rtsp_demux::seek(timestamp_t time)
 void
 ambulant::net::rtsp_demux::set_clip_end(timestamp_t clip_end)
 {
-  AM_DBG lib::logger::get_logger()->trace("rtsp_demux::set_clip_end(0x%x),  clip_end=%lld, m_clip_end was %lld",this, clip_end, m_clip_end);
+  AM_DBG lib::logger::get_logger()->debug("rtsp_demux::set_clip_end(0x%x),  clip_end=%lld, m_clip_end was %lld",this, clip_end, m_clip_end);
 	m_critical_section.enter();
 	m_clip_end = clip_end;
 	m_critical_section.leave();
@@ -322,7 +322,7 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
             context->audio_subsession = subsession;
 			context->audio_codec_name = subsession->codecName();
 			context->audio_fmt = audio_format("live", context->audio_codec_name);
-			AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux(net::url& url), audio codecname :%s ",context->audio_codec_name);
+			AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url), audio codecname :%s ",context->audio_codec_name);
 			int rtp_sock_num = subsession->rtpSource()->RTPgs()->socketNum();
 			increaseReceiveBufferTo(*context->env, rtp_sock_num, DESIRED_AUDIO_BUF_SIZE);
 #ifdef WITH_FFMPEG
@@ -350,7 +350,7 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
             context->video_subsession = subsession;
 			context->video_codec_name = subsession->codecName();
 			context->video_fmt = video_format("live", context->video_codec_name);
-			AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux(net::url& url), video codecname :%s ",context->video_codec_name);
+			AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux(net::url& url), video codecname :%s ",context->video_codec_name);
 			int rtp_sock_num = subsession->rtpSource()->RTPgs()->socketNum();
 			increaseReceiveBufferTo(*context->env, rtp_sock_num, DESIRED_VIDEO_BUF_SIZE);
             // Try by Jack: disable waiting for packets, hope this fixes reorder problem.
@@ -423,14 +423,14 @@ ambulant::net::rtsp_demux::_init_subsessions(rtsp_context_t *context)
 unsigned long 
 ambulant::net::rtsp_demux::run() 
 {
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::run() called (%d)", m_context->need_audio);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run() called (%d)", m_context->need_audio);
 	if (!m_context->media_session) {
 		lib::logger::get_logger()->error(gettext("playing RTSP connection failed"));
 		return 1;
 	}
 	
 	//xxxbo 13 nov. 2009
-	AM_DBG lib::logger::get_logger()->trace("rtsp_demux::run() m_clip_begin=%lld, m_seektime = %lld playMediaSession(%f)", (long long int)m_clip_begin, (long long int)m_seektime,float((m_clip_begin+m_seektime)/1000000.0));
+	AM_DBG lib::logger::get_logger()->debug("rtsp_demux::run() m_clip_begin=%lld, m_seektime = %lld playMediaSession(%f)", (long long int)m_clip_begin, (long long int)m_seektime,float((m_clip_begin+m_seektime)/1000000.0));
 	
 	if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, float((m_clip_begin)/1000000.0), -1.0F, 1.0F)) {
 		lib::logger::get_logger()->error(gettext("playing RTSP connection failed"));
@@ -475,7 +475,7 @@ ambulant::net::rtsp_demux::run()
 				lib::logger::get_logger()->error(gettext("pausing RTSP media session failed"));
 			}
 			//xxxbo 13 nov. 2009
-			lib::logger::get_logger()->trace("rtsp_demux::run(0x%x) m_clip_begin=%d, playMediaSession(%f)",  this, m_clip_begin, seektime_secs);
+			lib::logger::get_logger()->debug("rtsp_demux::run(0x%x) m_clip_begin=%d, playMediaSession(%f)",  this, m_clip_begin, seektime_secs);
 			if(!m_context->rtsp_client->playMediaSession(*m_context->media_session, (float)seektime_secs, -1.0F, 1.0F)) {
 				lib::logger::get_logger()->error(gettext("resuming RTSP media session failed"));
 			}
@@ -524,7 +524,7 @@ ambulant::net::rtsp_demux::run()
 		}
 	}
 	m_context->nsinks = 0;
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::run(0x%x): returning", (void*)this);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::run(0x%x): returning", (void*)this);
 	m_critical_section.leave();
 	release();
 	return 0;
@@ -533,7 +533,7 @@ ambulant::net::rtsp_demux::run()
 void
 ambulant::net::rtsp_demux::_cancel()
 {
-	AM_DBG lib::logger::get_logger()->trace("ambulant::net::rtsp_demux::_cancel(0x%x): m_context=0x%x rtspClient=0x%x mediaSession=0x%x", (void*)this, m_context, m_context?m_context->rtsp_client:0,m_context?m_context->media_session:0);
+	AM_DBG lib::logger::get_logger()->debug("ambulant::net::rtsp_demux::_cancel(0x%x): m_context=0x%x rtspClient=0x%x mediaSession=0x%x", (void*)this, m_context, m_context?m_context->rtsp_client:0,m_context?m_context->media_session:0);
 	if (m_context) {
 	 	m_context->eof = true;
 		m_context->blocking_flag = ~0;

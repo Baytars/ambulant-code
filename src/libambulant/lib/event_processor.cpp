@@ -238,8 +238,8 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		qp->pop();
         m_lock.leave();
 		e->fire();
-        m_lock.enter();
 		delete e;
+        m_lock.enter();
 	}
 	return must_serve; 
 }
