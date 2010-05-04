@@ -36,4 +36,5 @@ DIST_SUBDIRS = libambulant plugins player_unix  player_gtk  player_macosx pyambu
 EXTRA_DIST= \
 	player_mfc \
 	player_wince \
+	ieambulant \
 	webkit_plugin 
