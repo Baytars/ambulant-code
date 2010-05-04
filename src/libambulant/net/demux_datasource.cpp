@@ -102,11 +102,6 @@ demux_audio_datasource::stop()
 	m_lock.enter();
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::stop(0x%x)", (void*)this);
 	
-	//xxxbo 4th-may-2010, the same should be done for demux_video_datasource? 
-#if 1
-	if (m_client_callback) delete m_client_callback;
-	m_client_callback = NULL;
-#endif
 	if (m_thread) {
 		abstract_demux *tmpthread = m_thread;
 		m_thread = NULL;
@@ -117,20 +112,11 @@ demux_audio_datasource::stop()
 	m_thread = NULL;
 	AM_DBG lib::logger::get_logger()->debug("demux_audio_datasource::stop: thread stopped");
 	
-	//xxxbo 4th-may-2010
-	// m_client_callback should be cleared and removed before remove_datasink to fix the problem as following 
-	//Thread 5 Crashed:
-	//0   libSystem.B.dylib             	0x92f7c2b5 usleep$NOCANCEL$UNIX2003 + 0
-	//1   libSystem.B.dylib             	0x92f9d9a8 abort + 105
-	//2   libambulant.0.dylib           	0x00c4f677 ambulant::lib::logger::fatal(char const*, ...) + 55
-	//3   libambulant.0.dylib           	0x00c68520 ambulant::lib::unix::critical_section::enter() + 80
-	//4   libambulant.0.dylib           	0x00c4ba5c ambulant::lib::event_processor_impl::add_event(ambulant::lib::event*, unsigned long, ambulant::lib::event_priority) + 44
-	//5   libambulant_ffmpeg.0.dylib    	0x00297f1e ambulant::net::demux_audio_datasource::push_data(long long, unsigned char const*, int) + 158
-	//6   libambulant_live.0.dylib      	0x001a0656 ambulant::net::rtsp_demux::remove_datasink(int) + 150
-#if 0
-	if (m_client_callback) delete m_client_callback;
-	m_client_callback = NULL;
-#endif
+	if (m_client_callback) {
+        lib::logger::get_logger()->debug("demux_audio_datasource::stop: m_client_callback non-NULL, after remove_datasink()");
+        delete m_client_callback;
+        m_client_callback = NULL;
+    }
 	while (m_queue.size() > 0) {
 		ts_packet_t tsp(0,NULL,0);
 		tsp = m_queue.front();
@@ -419,8 +405,11 @@ demux_video_datasource::stop()
 	}
 	m_thread = NULL;
 	AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::stop: thread stopped");
-	if (m_client_callback) delete m_client_callback;
-	m_client_callback = NULL;
+	if (m_client_callback) {
+        lib::logger::get_logger()->debug("demux_video_datasource::stop: m_client_callback != NULL after remove_datasink()");
+        delete m_client_callback;
+        m_client_callback = NULL;
+    }
 	if (m_old_frame.second.data) 
 		m_frames.push(m_old_frame);
 	while (m_frames.size() > 0) {
