@@ -240,6 +240,9 @@ gui::dx::dx_player::init_playable_factory()
 	pf->add_factory(create_dx_basicvideo_playable_factory(this, this));
 #endif
 #ifdef USE_DS_VIDEO
+	pf->add_factory(create_dx_dsvideo_playable_factory(this, this));
+#endif	
+#ifdef USE_DX_VIDEO
 	pf->add_factory(create_dx_video_playable_factory(this, this));
 #endif	
 }
