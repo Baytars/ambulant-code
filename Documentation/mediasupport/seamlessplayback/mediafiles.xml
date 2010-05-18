@@ -11,7 +11,7 @@
 </data>
  -->
 <!-- Local playback, MPEG-1 video. Uncomment to enable. -->
-<!-- -->
+<!--
 <data>
   <av1>media-av.mpg</av1>
   <av2>media-av-copy.mpg</av2>
@@ -21,7 +21,7 @@
   <video1>media-video.mpg</video1>
   <video2>media-video-copy.mpg</video2>
 </data>
-
+ -->
 <!-- Local playback, H264 video. Uncomment to enable. -->
 <!--
 <data>
