@@ -273,7 +273,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: 0x%x: trigger client callback timestamp_milli=%d delta_milli=%d, now_milli=%d, %d frames in buffer", this, (int)timestamp_milli, (int)delta_milli, (int)now_milli, m_frames.size());
 			// Sanity check: we don't want this to be more than a second into the future
 			if (delta_milli > 1000) {
-				lib::logger::get_logger()->trace("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
+				lib::logger::get_logger()->debug("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
 				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
 			}
 			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
@@ -303,7 +303,7 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame: 0x%x: trigger client callback timestamp_milli=%d delta_milli=%d, now_milli=%d, %d frames in buffer", this, (int)timestamp_milli, (int)delta_milli, (int)now_milli, m_frames.size());
 			// Sanity check: we don't want this to be more than a second into the future
 			if (delta_milli > 1000) {
-				lib::logger::get_logger()->trace("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
+				lib::logger::get_logger()->debug("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
 				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
 			}
 			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
