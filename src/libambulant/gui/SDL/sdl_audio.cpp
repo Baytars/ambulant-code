@@ -508,8 +508,12 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
 		rv = bytes_wanted;
 #ifdef WITH_CLOCK_SYNC
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::get_data: audio-clock=%d, wanted %d bytes, returning %d bytes", m_audio_clock, bytes_wanted, rv);
-    // XXXX if rv < bytes_wanted, we should also adjust m_audio_clock (thereby essentially stopping the system clock, until the audio
+    // if rv < bytes_wanted, we should also adjust m_audio_clock (thereby essentially stopping the system clock, until the audio
     // data has had a chance to catch up).
+    if (rv < bytes_wanted) {
+        lib::timer::time_type pushback_audio_clock = ((bytes_wanted-rv) * 1000) / (44100*2*2);
+        m_audio_clock -= pushback_audio_clock;
+    }
 #endif
 	// Also set volume(s)
 	m_volcount = 0;
@@ -691,6 +695,11 @@ gui::sdl::sdl_audio_renderer::init_with_node(const lib::node *n)
 		else 
 			m_audio_src->set_clip_end(m_clip_end);
 #endif
+#ifdef WITH_SEEK_IN_INITNODE
+        net::timestamp_t wtd_position = m_clip_begin;
+        m_audio_src->seek(wtd_position);
+		m_previous_clip_position = wtd_position;
+#endif
 	}	
 	m_lock.leave();
 }
@@ -822,9 +831,11 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 			lib::logger::get_logger()->trace("sdl_audio_renderer: warning: datasource does not support clipBegin");
 		}
 		AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::preroll(): m_audio_src->start_prefetch(0x%x) this = (x%x)m_audio_src=0x%x", (void*)m_event_processor, this, (void*)m_audio_src);
+#ifndef WITH_SEEK_IN_INITNODE
         net::timestamp_t wtd_position = m_clip_begin + (net::timestamp_t)(where*1000000);
         m_audio_src->seek(wtd_position);
 		m_previous_clip_position = wtd_position;
+#endif
 		m_audio_src->start_prefetch(m_event_processor);
 		m_is_paused = false;
 	} else {
