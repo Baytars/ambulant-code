@@ -223,21 +223,20 @@ lib::timer_control_impl::skew(signed_time_type skew_) {
     if (skew_ >= 0) {
         m_local_epoch += skew_;
     } else {
-#if 0
         // We don't want the clock to run backward. So, we fiddle the epochs.
         // We hold the lock, so we don't have to care about the order in which we do things.
 
         time_type parent_time = m_parent->elapsed();
         if (parent_time < m_parent_epoch) {
-            // If we are already skewing we should take that into account
-            skew_ += (m_parent_epoch - parent_time);
+            // If we are already skewing we don't re-skew, because we don't know whether this
+            // is a new request or a re-issue of the old one (because the perceived clock is
+            // still at the old value).
+            AM_DBG lib::logger::get_logger()->debug("skew: already skewing");
         } else {
             m_local_epoch += _apply_speed_manip(m_parent->elapsed() - m_parent_epoch);
+            AM_DBG lib::logger::get_logger()->debug("skew: actually skewing %dms from %d", skew_, parent_time);
+            m_parent_epoch = parent_time - skew_;
         }
-        /*AM_DBG*/ lib::logger::get_logger()->debug("skew: actually skewing %dms", skew_);
-        parent_time = m_parent->elapsed();
-        m_parent_epoch = parent_time - skew_;
-#endif
     }
     m_lock.leave();
 };
