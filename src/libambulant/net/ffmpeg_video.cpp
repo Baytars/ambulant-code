@@ -506,7 +506,8 @@ ffmpeg_video_decoder_datasource::seek(timestamp_t time)
     while ( m_frames.size() > 0) {
         _pop_top_frame();
         nframes_dropped++;
-    }	
+    }
+    AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::seek(%d): flushed %d frames", time, nframes_dropped);
 	m_lock.leave();
 }
 
