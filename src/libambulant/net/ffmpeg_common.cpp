@@ -458,7 +458,7 @@ ffmpeg_demux::run()
 #ifdef WITH_SEAMLESS_PLAYBACK
 			eof_sent_to_clients = false;
 #endif
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
+        AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
 			int64_t seektime = m_clip_begin;
 
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
