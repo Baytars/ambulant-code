@@ -458,7 +458,7 @@ ffmpeg_demux::run()
 #ifdef WITH_SEAMLESS_PLAYBACK
 			eof_sent_to_clients = false;
 #endif
-        AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
+            AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
 			int64_t seektime = m_clip_begin;
 
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
@@ -509,7 +509,7 @@ ffmpeg_demux::run()
 		if (ret < 0) break;
 #else
 		if (ret < 0) {
-			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: wait some time before continuing the while loop");
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: eof encountered (%d), wait some time before continuing the while loop", ret);
 			if (!eof_sent_to_clients) {
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: sending eof to clients");
 				for (int i=0; i<MAX_STREAMS; i++) {
