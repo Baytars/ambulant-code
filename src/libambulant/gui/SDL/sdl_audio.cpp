@@ -601,6 +601,7 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
     
 	// end-of-data condition testing is a bit convoluted, because m_node may not always be
 	// available.
+    AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::restart_audio_input: m_audio_src=0x%x, m_is_playing=%d, eof=%d", m_audio_src, m_is_playing, m_audio_src->end_of_file());
 	bool more_data = (m_audio_src != NULL && m_is_playing);
 	if (more_data && m_audio_src->end_of_file())
 		more_data = false;
@@ -619,7 +620,9 @@ gui::sdl::sdl_audio_renderer::restart_audio_input()
 		// Start reading 
 		lib::event *e = new readdone_callback(this, &sdl_audio_renderer::data_avail);
 		m_audio_src->start(m_event_processor, e);
-	}
+	} else {
+        m_audio_src->start_prefetch(m_event_processor);
+    }
 	return true;
 }
 
@@ -769,6 +772,7 @@ gui::sdl::sdl_audio_renderer::start(double where)
 	}
 	if (m_is_playing) {
 		lib::logger::get_logger()->trace("sdl_audio_renderer.start(0x%x): already started", (void*)this);
+        assert(!m_is_paused);
 		m_lock.leave();
 		return;
 	}
@@ -814,6 +818,7 @@ gui::sdl::sdl_audio_renderer::preroll(double when, double where, double how_much
 	}
 	if (m_is_playing) {
 		lib::logger::get_logger()->trace("sdl_audio_renderer::preroll(0x%x): already started", (void*)this);
+        assert(!m_is_paused);
 		m_lock.leave();
 		return;
 	}
