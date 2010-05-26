@@ -460,7 +460,24 @@ ffmpeg_demux::run()
 #endif
             AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: seek to %lld", m_clip_begin );
 			int64_t seektime = m_clip_begin;
-
+#define SEEK_ALL_STREAMS
+#ifdef SEEK_ALL_STREAMS
+            // Seeking in ffmpeg seems to cause no end to problems. The previous code, which seeked only one
+            // of the streams, seems to (sometimes? always?) leave the other stream positioned where it was.
+            // We work around this by seeking all streams.
+            int64_t seektime_a, seektime_v;
+			if (audio_streamnr >= 0)
+				int64_t seektime_a = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
+			if (video_streamnr >= 0)
+				seektime_v = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
+			int seekresult = 0;
+            m_lock.leave();
+			if (audio_streamnr >= 0)
+                seekresult = av_seek_frame(m_con, audio_streamnr, seektime_a, AVSEEK_FLAG_BACKWARD);
+			if (seekresult > 0 && video_streamnr >= 0)
+                seekresult = av_seek_frame(m_con, video_streamnr, seektime_v, AVSEEK_FLAG_BACKWARD);
+			m_lock.enter();
+#else
 			// If we have a video stream we should rescale our time offset to the timescale of the video stream.
 			int seek_streamnr = -1;
 			
@@ -496,6 +513,7 @@ ffmpeg_demux::run()
 			m_lock.leave();
 			int seekresult = av_seek_frame(m_con, seek_streamnr, seektime, AVSEEK_FLAG_BACKWARD);
 			m_lock.enter();
+#endif
 			if (seekresult < 0) {
 				lib::logger::get_logger()->debug("ffmpeg_demux: av_seek_frame() returned %d", seekresult);
 			}
