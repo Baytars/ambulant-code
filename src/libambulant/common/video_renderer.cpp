@@ -112,11 +112,6 @@ video_renderer::init_with_node(const lib::node *n)
 {
 	m_lock.enter();
 	renderer_playable::init_with_node(n);
-#ifdef WITH_SEEK_IN_INITNODE
-    m_lock.leave();
-    seek(m_clip_begin);
-    m_lock.enter();
-#endif
 #ifndef WITH_SEAMLESS_PLAYBACK
     m_lock.leave();
     seek(m_clip_begin);
@@ -239,11 +234,12 @@ video_renderer::preroll(double when, double where, double how_much)
 	m_frame_duplicate = 0;
 	m_frame_early = 0;
 	m_frame_late = 0;
-	m_previous_clip_position = m_clip_begin+(net::timestamp_t)(where*1000000);
 	m_frame_missing = 0;
-#ifndef WITH_SEEK_IN_INITNODE
-	m_src->seek(m_clip_begin + (net::timestamp_t)(where*1000000));	
-#endif
+    net::timestamp_t wtd_position = m_clip_begin+(net::timestamp_t)(where*1000000);
+    if (wtd_position != m_previous_clip_position) {
+        m_previous_clip_position = wtd_position;
+        m_src->seek(wtd_position);
+    }
 
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::preroll(%f) seek to %lld", where, m_clip_begin);
 	
