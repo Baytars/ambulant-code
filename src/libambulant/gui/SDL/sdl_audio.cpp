@@ -488,7 +488,7 @@ gui::sdl::sdl_audio_renderer::get_data(int bytes_wanted, Uint8 **ptr)
                 residual_clock_drift = clock_drift;
             }
         	if (residual_clock_drift) {
-                lib::logger::get_logger()->debug("sdl_audio_renderer: adjusting audio clock by %ld ms (audio skip/insert not implemented)", residual_clock_drift);
+                AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: adjusting audio clock by %ld ms (audio skip/insert not implemented)", residual_clock_drift);
                 m_audio_clock -= residual_clock_drift;
                 // XXXX We should also read and throw away audio data if residual_clock_drift is < 0, or insert zero bytes if it is > 0.
             }
