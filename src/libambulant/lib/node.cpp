@@ -406,7 +406,18 @@ lib::node_impl::get_attribute(const char *name) const {
 				const xml_string ns = name;
 				const xml_string& attrval = (*it).second;
 				if (attrval.find('{') != std::string::npos) {
-					const lib::xml_string rv = m_context->apply_avt(this, ns, attrval);
+					lib::xml_string rv = m_context->apply_avt(this, ns, attrval);
+#define AVT_STATC_STRING_HACK
+					// This code is a temporary hack, because a better but more involved solution
+					// has already been implemented on the trunk.
+					// Return values are remembered in a static cache. This will cause some leaks.
+#ifdef AVT_STATC_STRING_HACK
+					static std::set<std::string> cached_vals;
+					if (cached_vals.find(rv) == cached_vals.end()) {
+						cached_vals.insert(rv);
+					}
+					return (*cached_vals.find(rv)).c_str();
+#endif//AVT_STATC_STRING_HACK
 					return rv.c_str();
 				}
 			}
