@@ -467,7 +467,7 @@ ffmpeg_demux::run()
             // We work around this by seeking all streams.
             int64_t seektime_a, seektime_v;
 			if (audio_streamnr >= 0)
-				int64_t seektime_a = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
+				seektime_a = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[audio_streamnr]->time_base);
 			if (video_streamnr >= 0)
 				seektime_v = av_rescale_q(seektime, AMBULANT_TIMEBASE, m_con->streams[video_streamnr]->time_base);
 			int seekresult = 0;
