@@ -300,7 +300,7 @@ cocoa_video_renderer::start(double where)
         _fix_video_epoch();
     }
 #endif
-    [(MovieCreator *)m_mc performSelectorOnMainThread: @selector(movieStart:) withObject: nil waitUntilDone: YES];
+    [(MovieCreator *)m_mc performSelectorOnMainThread: @selector(movieStart:) withObject: nil waitUntilDone: NO];
     m_previous_clip_position = -1;
     // And start the poll task
     ambulant::lib::event *e = new poll_callback(this, &cocoa_video_renderer::_poll_playing);
