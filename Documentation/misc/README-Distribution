@@ -251,10 +251,10 @@ These instructions assume you are building on an Intel 10.5 mac.
     export MACOSX_DEPLOYMENT_TARGET=10.4
     python ../../third_party_packages/build-third-party-packages.py mac10.4
     
-- Configure (in build-dist-106) with
+- Configure (in build-dist-104) with
 
     export MACOSX_DEPLOYMENT_TARGET=10.4
-    ../configure --with-macfat --with-xerces-plugin --disable-dependency-tracking
+    ../configure --with-universalsdk=/Developer/SDKs/MacOSX10.4u.sdk  --with-xerces-plugin --disable-dependency-tracking
   
 - make:
     export MACOSX_DEPLOYMENT_TARGET=10.4
@@ -268,9 +268,9 @@ These instructions assume you are building on an Intel 10.5 mac.
   Getting the background picture correct is a bit of a trick:
   - After the disk is mounted, cd to it (terminal window)
   - mv .folderbg/folderbg.png folderbg.png
-  - In the finder, set it as background picture
+  - In the finder, set it as background picture (View->Show View Options->Background: Picture-Select)
   - mv folderbg.png .folderbg/folderbg.png
-  - align the icons, etc.
+  - align the icons, select View->Hide Toolbar, etc.
   - cd $HOME
   - unmount, and continue the script.
   
