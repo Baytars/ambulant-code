@@ -56,12 +56,21 @@ using lib::uint32;
 using lib::uchar;
 class dx_transition;
 
-// A viewport is a top-level DD surface.
+// Global DirectX parameters, mainly for choosing between 32bit RGB and
+// 32bit ARGB.
+class dxparams {
+public:
+	/// Singleton accessor.
+	static dxparams* I();
+	/// A color used as "transparent".
+	virtual lib::color_t transparent_color() = 0;
+	/// A color used to replace the above, if it occurs in the source data.
+	virtual lib::color_t transparent_replacement_color() = 0;
+	/// A color that "cannot occur".
+	virtual lib::color_t invalid_color() = 0;
+};
 
-// white is used as transparent color
-const lib::color_t CLR_DEFAULT		= RGB(255, 255, 255);
-// almost white is used as alternative color for white
-const lib::color_t CLR_ALTERNATIVE	= RGB(255, 255, 254);
+// A viewport is a top-level DD surface.
 
 class AMBULANTAPI viewport {
   public:
