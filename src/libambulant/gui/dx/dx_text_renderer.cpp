@@ -144,9 +144,9 @@ gui::dx::text_renderer::render(LONG x, LONG y, HFONT hfont) {
 	// Set the passed <param> values in the device context
 	// set color
 	SetBkMode(hdc, TRANSPARENT);
-	COLORREF crTextColor = (m_text_color == CLR_INVALID)?::GetSysColor(COLOR_WINDOWTEXT):m_text_color;
+	COLORREF crTextColor = (m_text_color == dxparams::I()->invalid_color())?::GetSysColor(COLOR_WINDOWTEXT):m_text_color;
 	::SetTextColor(hdc, crTextColor);
-	COLORREF crBkColor = (m_text_bgcolor == CLR_INVALID)?::GetSysColor(COLOR_WINDOW):m_text_bgcolor;
+	COLORREF crBkColor = (m_text_bgcolor == dxparams::I()->invalid_color())?::GetSysColor(COLOR_WINDOW):m_text_bgcolor;
 	::SetBkColor(hdc, crBkColor);
 
 	DWORD family = FF_DONTCARE | DEFAULT_PITCH;

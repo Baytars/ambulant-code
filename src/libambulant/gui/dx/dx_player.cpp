@@ -460,7 +460,7 @@ gui::dx::dx_player::new_window(const std::string &name,
 
 	// Clear the viewport
 	const common::region_info *ri = rgn->get_info();
-	winfo->v->set_background(ri?ri->get_bgcolor():CLR_INVALID);
+	winfo->v->set_background(ri?ri->get_bgcolor():dxparams::I()->invalid_color());
 	winfo->v->clear();
 
 	// Create a concrete gui_window

@@ -74,6 +74,39 @@ using lib::uchar;
 using ambulant::lib::win32::win_report_error;
 using ambulant::lib::win32::win_report_last_error;
 
+// --------------------------------------------------------------
+
+// DirectX parameter handling.
+// white is used as transparent color
+const lib::color_t CLR_DEFAULT		= RGB(255, 255, 255);
+// almost white is used as alternative color for white
+const lib::color_t CLR_ALTERNATIVE	= RGB(255, 255, 254);
+
+
+class dxparams_rgb : public gui::dx::dxparams {
+public:
+	lib::color_t transparent_color() { return RGB(255, 255, 255); }
+	lib::color_t transparent_replacement_color() { return RGB(255, 255, 254); }
+	lib::color_t invalid_color() { return CLR_INVALID; }
+};
+
+
+class dxparams_rgba : public gui::dx::dxparams {
+public:
+	lib::color_t transparent_color() { return 0; }
+	lib::color_t transparent_replacement_color() { return 0; }
+	lib::color_t invalid_color() { return 0x00123456; } // fully-transparent random-value:-)
+};
+
+static gui::dx::dxparams* cur_dxparams = NULL;
+
+gui::dx::dxparams* gui::dx::dxparams::I() {
+	if (cur_dxparams == NULL) {
+		cur_dxparams = new dxparams_rgb();
+	}
+	return cur_dxparams;
+}
+
 static struct error {
 	HRESULT hr;
 	char *name;
@@ -311,7 +344,7 @@ gui::dx::viewport::viewport(int width, int height, HWND hwnd)
 	red_bits(8), green_bits(8), blue_bits(8),
 	lo_red_bit(16), lo_green_bit(8), lo_blue_bit(0),
 	palette_entries(0),
-	m_bgd(CLR_DEFAULT) {
+	m_bgd(dxparams::I()->transparent_color()) {
 
 	viewport_logger = lib::logger::get_logger();
 
@@ -469,7 +502,7 @@ gui::dx::viewport::~viewport() {
 // Sets the background color of this viewport
 void
 gui::dx::viewport::set_background(lib::color_t color) {
-	m_bgd = (color == CLR_INVALID)?CLR_DEFAULT:color;
+	m_bgd = (color == dxparams::I()->invalid_color())?dxparams::I()->transparent_color():color;
 	m_ddbgd = convert(m_bgd);
 }
 
@@ -882,7 +915,7 @@ gui::dx::viewport::clear_surface(IDirectDrawSurface* p, lib::color_t clr, double
 	DDBLTFX bltfx;
 	memset(&bltfx, 0, sizeof(DDBLTFX));
 	bltfx.dwSize = sizeof(bltfx);
-	bltfx.dwFillColor = (clr == CLR_INVALID)?m_ddbgd:convert(clr);
+	bltfx.dwFillColor = (clr == dxparams::I()->invalid_color())?m_ddbgd:convert(clr);
 	RECT dst_rc;
 	set_rect(p, &dst_rc);
 	HRESULT hr = p->Blt(&dst_rc, 0, 0, DDBLT_COLORFILL | AM_DDBLT_WAIT, &bltfx);
@@ -1104,7 +1137,7 @@ gui::dx::viewport::draw(const std::basic_string<text_char>& text, const lib::rec
 		return;
 	}
 	SetBkMode(hdc, TRANSPARENT);
-	COLORREF crTextColor = (clr == CLR_INVALID)?::GetSysColor(COLOR_WINDOWTEXT):clr;
+	COLORREF crTextColor = (clr == dxparams::I()->invalid_color())?::GetSysColor(COLOR_WINDOWTEXT):clr;
 	::SetTextColor(hdc, crTextColor);
 	RECT dstRC = {rc.left(), rc.top(), rc.right(), rc.bottom()};
 	UINT uFormat = DT_CENTER | DT_WORDBREAK;
