@@ -186,7 +186,7 @@ void gui::dx::dx_img_wic_renderer::start(double t) {
 	}
 	hr = converter->Initialize(
 		source,
-		GUID_WICPixelFormat32bppBGR,
+		dxparams::I()->wic_format(),
 		WICBitmapDitherTypeNone,
 		NULL,
 		0.0,
@@ -238,7 +238,7 @@ gui::dx::dx_img_wic_renderer::_create_ddsurf(viewport *v)
 	// Check format (redundant, really, but still...)
     WICPixelFormatGUID pixelFormat;
     hr = m_original->GetPixelFormat(&pixelFormat);
-	if (!SUCCEEDED(hr) || (pixelFormat != GUID_WICPixelFormat32bppBGR)) {
+	if (!SUCCEEDED(hr) || (pixelFormat != dxparams::I()->wic_format())) {
 		lib::logger::get_logger()->debug("WIC renderer: Unexpected pixel format");
 		return;
 	}
@@ -250,18 +250,25 @@ gui::dx::dx_img_wic_renderer::_create_ddsurf(viewport *v)
 		lib::logger::get_logger()->debug("WIC renderer: GetSize() failed 0x%x", hr);
 		return;
 	}
-	BITMAPINFO bminfo;
+	struct myBITMAPINFO {
+		BITMAPINFOHEADER bmiHeader;
+		DWORD masks[4];
+	} bminfo;
 	ZeroMemory(&bminfo, sizeof(bminfo));
     bminfo.bmiHeader.biSize         = sizeof(BITMAPINFOHEADER);
     bminfo.bmiHeader.biWidth        = w;
     bminfo.bmiHeader.biHeight       = -(LONG)h;
     bminfo.bmiHeader.biPlanes       = 1;
     bminfo.bmiHeader.biBitCount     = 32;
-    bminfo.bmiHeader.biCompression  = BI_RGB;
+    bminfo.bmiHeader.biCompression  = dxparams::I()->bmi_compression();
+	bminfo.masks[0] = 0x00ff0000;
+	bminfo.masks[1] = 0x0000ff00;
+	bminfo.masks[2] = 0x000000ff;
+	bminfo.masks[3] = 0xff000000;
 	void *buffer;
 	HBITMAP dib_bitmap = CreateDIBSection(
 		NULL, 
-		&bminfo,
+		(BITMAPINFO *)&bminfo,
 		DIB_RGB_COLORS,
 		&buffer,
 		NULL,
