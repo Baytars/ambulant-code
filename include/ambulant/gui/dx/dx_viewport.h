@@ -44,6 +44,8 @@
 struct IDirectDraw;
 struct IDirectDrawSurface;
 struct tagPALETTEENTRY;
+struct _DDSURFACEDESC;
+struct _DDBLTFX;
 
 namespace ambulant {
 
@@ -72,6 +74,10 @@ public:
 	virtual DWORD bmi_compression() = 0;
 	/// Return Windows Imaging Component pixel format
 	virtual const GUID& wic_format() = 0;
+	/// Fill selected portions of a DDSURFACEDESC
+	virtual void fill_ddsd(struct _DDSURFACEDESC& sd, DWORD flags) = 0;
+	/// Return DD blit effects structure for main surface.
+	virtual struct _DDBLTFX *ddbltfx() = 0;
 
 };
 
