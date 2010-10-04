@@ -31,6 +31,9 @@
 #include "ambulant/common/renderer_impl.h"
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/smil2/transition.h"
+#ifdef WITH_D2D
+#error Including dx include file while building for Direct2D
+#endif
 
 namespace ambulant {
 

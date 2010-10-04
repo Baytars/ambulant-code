@@ -23,6 +23,7 @@
 #include "stdafx.h"
 #include "ambulant/config/config.h"
 #include "ambulant/gui/dx/html_bridge.h"
+#include "ambulant/common/player.h"
 #include "AmbulantPlayer.h"
 #include "MainFrm.h"
 
@@ -34,9 +35,6 @@
 #include <fstream>
 #include <string>
 
-// DX Player
-#include "ambulant/gui/dx/dx_player.h"
-#include "ambulant/gui/dx/dx_wmuser.h"
 
 #include "ambulant/common/preferences.h"
 #include "ambulant/lib/logger.h"
@@ -83,11 +81,23 @@ log_os(get_log_filename().c_str());
 #endif
 
 using namespace ambulant;
-//#define AM_PLAYER_DG
+#ifdef WITH_D2D
+#include "ambulant/gui/d2/d2_player.h"
+#include "ambulant/gui/dx/dx_wmuser.h"
+#else
+// DX Player
+#include "ambulant/gui/dx/dx_player.h"
+#include "ambulant/gui/dx/dx_wmuser.h"
+#endif
 
+#ifdef WITH_D2D
+typedef ambulant::gui::d2::d2_player dg_or_dx_player;
+typedef ambulant::gui::d2::d2_player_callbacks gui_callbacks;
+
+#else
 typedef gui::dx::dx_player dg_or_dx_player;
 typedef gui::dx::dx_player_callbacks gui_callbacks;
-
+#endif
 // The handle of the single window instance
 static HWND s_hwnd;
 
@@ -259,7 +269,7 @@ MmView::MmView()
 MmView::~MmView()
 {
 	topView = NULL;
-	gui::dx::dx_player::cleanup();
+	dg_or_dx_player::cleanup();
 }
 
 BOOL MmView::PreCreateWindow(CREATESTRUCT& cs)
