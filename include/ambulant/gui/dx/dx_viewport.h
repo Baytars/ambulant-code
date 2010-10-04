@@ -40,6 +40,9 @@
 #include "ambulant/lib/mtsync.h"
 #include "ambulant/common/preferences.h"
 #include "ambulant/net/datasource.h"
+#ifdef WITH_D2D
+#error Including dx include file while building for Direct2D
+#endif
 
 struct IDirectDraw;
 struct IDirectDrawSurface;
