@@ -68,6 +68,11 @@ public:
 	virtual lib::color_t transparent_replacement_color() = 0;
 	/// A color that "cannot occur".
 	virtual lib::color_t invalid_color() = 0;
+	/// Return value for BITMAPINFO compression field
+	virtual DWORD bmi_compression() = 0;
+	/// Return Windows Imaging Component pixel format
+	virtual const GUID& wic_format() = 0;
+
 };
 
 // A viewport is a top-level DD surface.

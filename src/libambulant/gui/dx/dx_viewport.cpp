@@ -31,6 +31,7 @@
 #include <mmsystem.h>
 // For older versions of DirectX, this could be d3d8types.h
 #include <d3d9types.h>
+#include <wincodec.h>
 
 #include "ambulant/gui/dx/dx_viewport.h"
 #include "ambulant/gui/dx/dx_audio_player.h" // Only to define the TPB GUID
@@ -88,6 +89,8 @@ public:
 	lib::color_t transparent_color() { return RGB(255, 255, 255); }
 	lib::color_t transparent_replacement_color() { return RGB(255, 255, 254); }
 	lib::color_t invalid_color() { return CLR_INVALID; }
+	DWORD bmi_compression() { return BI_RGB; }
+	const GUID& wic_format() { return GUID_WICPixelFormat32bppBGR; }
 };
 
 
@@ -96,6 +99,8 @@ public:
 	lib::color_t transparent_color() { return 0; }
 	lib::color_t transparent_replacement_color() { return 0; }
 	lib::color_t invalid_color() { return 0x00123456; } // fully-transparent random-value:-)
+	DWORD bmi_compression() { return BI_BITFIELDS; }
+	const GUID& wic_format() { return GUID_WICPixelFormat32bppBGRA; }
 };
 
 static gui::dx::dxparams* cur_dxparams = NULL;
