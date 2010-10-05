@@ -24,7 +24,7 @@
 #include "ambulant/config/config.h"
 #include "ambulant/gui/d2/d2_player.h"
 //#include "ambulant/gui/d2/d2_viewport.h"
-//#include "ambulant/gui/d2/d2_window.h"
+#include "ambulant/gui/d2/d2_window.h"
 #include "ambulant/gui/dx/dx_wmuser.h"
 #include "ambulant/gui/dx/dx_rgn.h"
 //#include "ambulant/gui/d2/d2_transition.h"
@@ -210,7 +210,7 @@ gui::d2::d2_player::~d2_player() {
 	m_player = NULL;
 	assert(m_windows.empty());
 	if(gui::dx::dx_gui_region::s_counter != 0)
-		m_logger->warn("Undeleted gui regions: %d", dx_gui_region::s_counter);
+		m_logger->warn("Undeleted gui regions: %d", dx::dx_gui_region::s_counter);
 }
 
 void
@@ -413,15 +413,17 @@ void gui::d2::d2_player::on_char(int ch) {
 
 void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	wininfo *wi = get_wininfo(hwnd);
-	if(wi) wi->v->redraw(hdc);
+//JNK	if(wi) wi->v->redraw(hdc);
 }
 
 void gui::d2::d2_player::on_done() {
+#ifdef JNK
 	std::map<std::string, wininfo*>::iterator it;
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
 		(*it).second->v->clear();
 		(*it).second->v->redraw();
 	}
+#endif
 }
 
 void gui::d2::d2_player::lock_redraw() {
@@ -468,7 +470,7 @@ gui::d2::d2_player::new_window(const std::string &name,
 #endif
 
 	// Create a concrete gui_window
-	winfo->w = new d2_window(name, bounds, rgn, this, winfo->v);
+	winfo->w = new d2_window(name, bounds, rgn, this);
 	winfo->f = 0;
 
 	// Store the wininfo struct
@@ -506,7 +508,11 @@ gui::d2::d2_player::get_default_size() {
 
 common::bgrenderer*
 gui::d2::d2_player::new_background_renderer(const common::region_info *src) {
+#ifdef D2NOTYET
 	return new d2_bgrenderer(src);
+#else
+	return NULL;
+#endif
 }
 
 #ifdef JNK
@@ -545,21 +551,25 @@ gui::d2::d2_player::get_main_window() {
 }
 
 void gui::d2::d2_player::set_intransition(common::playable *p, const lib::transition_info *info) {
+#ifdef D2NOTYET
 	AM_DBG lib::logger::get_logger()->debug("set_intransition : %s", repr(info->m_type).c_str());
 	d2_transition *tr = set_transition(p, info, false);
 	// XXXX Note by Jack: the next two steps really shouldn't be done for
 	// intransitions, they should be done later (when playback starts).
 	tr->first_step();
 	if(!m_update_event) schedule_update();
+#endif
 }
 
 void gui::d2::d2_player::start_outtransition(common::playable *p, const lib::transition_info *info) {
+#ifdef D2NOTYET
 	lib::logger::get_logger()->debug("start_outtransition : %s", repr(info->m_type).c_str());
 	d2_transition *tr = set_transition(p, info, true);
 	// XXXX Note by Jack: the next two steps really shouldn't be done for
 	// intransitions, they should be done later (when playback starts).
 	tr->first_step();
 	if(!m_update_event) schedule_update();
+#endif
 }
 
 gui::d2::d2_transition *
@@ -567,6 +577,7 @@ gui::d2::d2_player::set_transition(common::playable *p,
 	const lib::transition_info *info,
 	bool is_outtransition)
 {
+#ifdef D2NOTYET
 	assert(m_player);
 	lib::timer_control *timer = new lib::timer_control_impl(m_player->get_timer(), 1.0, false);
 	d2_transition *tr = make_transition(info->m_type, p, timer);
@@ -575,6 +586,9 @@ gui::d2::d2_player::set_transition(common::playable *p,
 	if (info->m_scope == lib::scope_screen) surf = surf->get_top_surface();
 	tr->init(surf, is_outtransition, info);
 	return tr;
+#else
+	return NULL;
+#endif
 }
 
 bool gui::d2::d2_player::has_transitions() const {
@@ -582,6 +596,7 @@ bool gui::d2::d2_player::has_transitions() const {
 }
 
 void gui::d2::d2_player::update_transitions() {
+#ifdef D2NOTYET
 	m_trmap_cs.enter();
 	assert(m_player);
 	lib::timer::time_type pt = m_player->get_timer()->elapsed();
@@ -612,14 +627,17 @@ void gui::d2::d2_player::update_transitions() {
 	}
 	//unlock_redraw();
 	m_trmap_cs.leave();
+#endif
 }
 
 void gui::d2::d2_player::clear_transitions() {
+#ifdef D2NOTYET
 	m_trmap_cs.enter();
 	for(trmap_t::iterator it=m_trmap.begin();it!=m_trmap.end();it++)
 		delete (*it).second;
 	m_trmap.clear();
 	m_trmap_cs.leave();
+#endif
 }
 
 gui::d2::d2_transition *gui::d2::d2_player::get_transition(common::playable *p) {
@@ -644,17 +662,21 @@ void gui::d2::d2_player::stopped(common::playable *p) {
 }
 
 void gui::d2::d2_player::paused(common::playable *p) {
+#ifdef D2NOTYET
 	trmap_t::iterator it = m_trmap.find(p);
 	if(it != m_trmap.end()) {
 		(*it).second->pause();
 	}
+#endif
 }
 
 void gui::d2::d2_player::resumed(common::playable *p) {
+#ifdef D2NOTYET
 	trmap_t::iterator it = m_trmap.find(p);
 	if(it != m_trmap.end()) {
 		(*it).second->resume();
 	}
+#endif
 }
 
 void gui::d2::d2_player::update_callback() {
