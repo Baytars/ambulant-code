@@ -36,14 +36,8 @@
 #include "ambulant/lib/textptr.h"
 #include "ambulant/lib/logger.h"
 #include "ambulant/lib/transition_info.h"
-
-//#include "vld.h" // Enable to use Visual Leak Detector... uhm... leak detection?
-
 #include "ambulant/common/plugin_engine.h"
-
 #include "ambulant/smil2/transition.h"
-
-// Players
 #include "ambulant/smil2/smil_player.h"
 #include "ambulant/smil2/test_attrs.h"
 
@@ -118,6 +112,9 @@
 #include "ambulant/net/ffmpeg_factory.h"
 #include "ambulant/net/rtsp_factory.h"
 #endif
+
+#include <d2d1.h>
+
 //#define AM_DBG
 
 #ifndef AM_DBG
@@ -312,7 +309,7 @@ void gui::d2::d2_player::play() {
 		lock_redraw();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
-			d2_window *d2win = (d2_window *)(*it).second->w;
+			d2_window *d2win = (d2_window *)(*it).second->m_window;
 			d2win->need_redraw();
 		}
 		common::gui_player::play();
@@ -323,7 +320,7 @@ void gui::d2::d2_player::play() {
 void gui::d2::d2_player::stop() {
 	if(m_player) {
 		m_update_event = 0;
-		clear_transitions();
+		_clear_transitions();
 		common::gui_player::stop();
 	}
 }
@@ -380,7 +377,7 @@ void gui::d2::d2_player::restart(bool reparse) {
 void gui::d2::d2_player::on_click(int x, int y, HWND hwnd) {
 	if(!m_player) return;
 	lib::point pt(x, y);
-	d2_window *d2win = (d2_window *) get_window(hwnd);
+	d2_window *d2win = (d2_window *) _get_window(hwnd);
 	if(!d2win) return;
 	region *r = d2win->get_region();
 	if(r)
@@ -390,7 +387,7 @@ void gui::d2::d2_player::on_click(int x, int y, HWND hwnd) {
 int gui::d2::d2_player::get_cursor(int x, int y, HWND hwnd) {
 	if(!m_player) return 0;
 	lib::point pt(x, y);
-	d2_window *d2win = (d2_window *) get_window(hwnd);
+	d2_window *d2win = (d2_window *) _get_window(hwnd);
 	if(!d2win) return 0;
 	region *r = d2win->get_region();
 	m_player->before_mousemove(0);
@@ -412,7 +409,7 @@ void gui::d2::d2_player::on_char(int ch) {
 }
 
 void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
-	wininfo *wi = get_wininfo(hwnd);
+	wininfo *wi = _get_wininfo(hwnd);
 //JNK	if(wi) wi->v->redraw(hdc);
 }
 
@@ -429,14 +426,14 @@ void gui::d2::d2_player::on_done() {
 void gui::d2::d2_player::lock_redraw() {
 	std::map<std::string, wininfo*>::iterator it;
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
-		(*it).second->w->lock_redraw();
+		(*it).second->m_window->lock_redraw();
 	}
 }
 
 void gui::d2::d2_player::unlock_redraw() {
 	std::map<std::string, wininfo*>::iterator it;
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
-		(*it).second->w->unlock_redraw();
+		(*it).second->m_window->unlock_redraw();
 	}
 }
 
@@ -454,7 +451,7 @@ gui::d2::d2_player::new_window(const std::string &name,
 	wininfo *winfo = new wininfo;
 
 	// Create an os window
-	winfo->h = m_hoster.new_os_window();
+	winfo->m_hwnd = m_hoster.new_os_window();
 #ifdef JNK
 	// Create the associated d2 viewport
 	winfo->v = create_viewport(bounds.w, bounds.h, winfo->h);
@@ -470,15 +467,15 @@ gui::d2::d2_player::new_window(const std::string &name,
 #endif
 
 	// Create a concrete gui_window
-	winfo->w = new d2_window(name, bounds, rgn, this);
-	winfo->f = 0;
+	winfo->m_window = new d2_window(name, bounds, rgn, this);
+//JNK	winfo->f = 0;
 
 	// Store the wininfo struct
 	m_windows[name] = winfo;
 	AM_DBG m_logger->debug("windows: %d", m_windows.size());
 
 	// Return gui_window
-	return winfo->w;
+	return winfo->m_window;
 }
 
 void
@@ -493,7 +490,7 @@ gui::d2::d2_player::window_done(const std::string &name) {
 	wi->v->redraw();
 	delete wi->v;
 #endif
-	m_hoster.destroy_os_window(wi->h);
+	m_hoster.destroy_os_window(wi->m_hwnd);
 	delete wi;
 	AM_DBG m_logger->debug("windows: %d", m_windows.size());
 }
@@ -526,28 +523,28 @@ gui::d2::viewport* gui::d2::d2_player::create_viewport(int w, int h, HWND hwnd) 
 #endif
 
 gui::d2::d2_player::wininfo*
-gui::d2::d2_player::get_wininfo(HWND hwnd) {
+gui::d2::d2_player::_get_wininfo(HWND hwnd) {
 	wininfo *winfo = 0;
 	std::map<std::string, wininfo*>::iterator it;
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
 		wininfo *wi = (*it).second;
-		if(wi->h = hwnd) {winfo = wi;break;}
+		if(wi->m_hwnd = hwnd) {winfo = wi;break;}
 	}
 	return winfo;
 }
 
 common::gui_window *
-gui::d2::d2_player::get_window(HWND hwnd) {
-	wininfo *wi = get_wininfo(hwnd);
-	return wi?wi->w:0;
+gui::d2::d2_player::_get_window(HWND hwnd) {
+	wininfo *wi = _get_wininfo(hwnd);
+	return wi?wi->m_window:0;
 }
 
 HWND
-gui::d2::d2_player::get_main_window() {
+gui::d2::d2_player::_get_main_window() {
 	// XXXX Unsure that this is correct: we just return any window
 	std::map<std::string, wininfo*>::iterator it = m_windows.begin();
 	if (it == m_windows.end()) return NULL;
-	return (*it).second->h;
+	return (*it).second->m_hwnd;
 }
 
 void gui::d2::d2_player::set_intransition(common::playable *p, const lib::transition_info *info) {
@@ -573,7 +570,8 @@ void gui::d2::d2_player::start_outtransition(common::playable *p, const lib::tra
 }
 
 gui::d2::d2_transition *
-gui::d2::d2_player::set_transition(common::playable *p,
+gui::d2::d2_player::_set_transition(
+	common::playable *p,
 	const lib::transition_info *info,
 	bool is_outtransition)
 {
@@ -591,11 +589,11 @@ gui::d2::d2_player::set_transition(common::playable *p,
 #endif
 }
 
-bool gui::d2::d2_player::has_transitions() const {
+bool gui::d2::d2_player::_has_transitions() const {
 	return !m_trmap.empty();
 }
 
-void gui::d2::d2_player::update_transitions() {
+void gui::d2::d2_player::_update_transitions() {
 #ifdef D2NOTYET
 	m_trmap_cs.enter();
 	assert(m_player);
@@ -630,7 +628,7 @@ void gui::d2::d2_player::update_transitions() {
 #endif
 }
 
-void gui::d2::d2_player::clear_transitions() {
+void gui::d2::d2_player::_clear_transitions() {
 #ifdef D2NOTYET
 	m_trmap_cs.enter();
 	for(trmap_t::iterator it=m_trmap.begin();it!=m_trmap.end();it++)
@@ -640,7 +638,8 @@ void gui::d2::d2_player::clear_transitions() {
 #endif
 }
 
-gui::d2::d2_transition *gui::d2::d2_player::get_transition(common::playable *p) {
+gui::d2::d2_transition *
+gui::d2::d2_player::_get_transition(common::playable *p) {
 	trmap_t::iterator it = m_trmap.find(p);
 	return (it != m_trmap.end())?(*it).second:0;
 }
@@ -679,21 +678,21 @@ void gui::d2::d2_player::resumed(common::playable *p) {
 #endif
 }
 
-void gui::d2::d2_player::update_callback() {
+void gui::d2::d2_player::_update_callback() {
 	if(!m_update_event) return;
-	if(has_transitions()) {
-		update_transitions();
-		schedule_update();
+	if(_has_transitions()) {
+		_update_transitions();
+		_schedule_update();
 	} else {
 		m_update_event = 0;
 	}
 }
 
-void gui::d2::d2_player::schedule_update() {
+void gui::d2::d2_player::_schedule_update() {
 	if(!m_player) return;
 	lib::event_processor *evp = m_player->get_evp();
 	m_update_event = new lib::no_arg_callback_event<d2_player>(this,
-		&d2_player::update_callback);
+		&d2_player::_update_callback);
 	evp->add_event(m_update_event, 50, lib::ep_high);
 }
 
@@ -727,7 +726,7 @@ void gui::d2::d2_player::show_file(const net::url& href) {
 
 void gui::d2::d2_player::done(common::player *p) {
 	m_update_event = 0;
-	clear_transitions();
+	_clear_transitions();
 	if(!m_frames.empty()) {
 		frame *pf = m_frames.top();
 		m_frames.pop();
@@ -738,21 +737,21 @@ void gui::d2::d2_player::done(common::player *p) {
 		assert(0); // resume();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
-			d2_window *d2win = (d2_window *)(*it).second->w;
+			d2_window *d2win = (d2_window *)(*it).second->m_hwnd;
 			d2win->need_redraw();
 		}
 	}
 }
 
 void gui::d2::d2_player::close(common::player *p) {
-	PostMessage(get_main_window(), WM_CLOSE, 0, 0);
+	PostMessage(_get_main_window(), WM_CLOSE, 0, 0);
 }
 
 void gui::d2::d2_player::open(net::url newdoc, bool startnewdoc, common::player *old) {
 	std::string urlstr = newdoc.get_url();
 	if(old) {
 		// Replace the current document
-		PostMessage(get_main_window(), WM_REPLACE_DOC,
+		PostMessage(_get_main_window(), WM_REPLACE_DOC,
 			startnewdoc?1:0, LPARAM(new std::string(urlstr)));
 		return;
 	}

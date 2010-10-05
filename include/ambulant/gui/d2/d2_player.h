@@ -67,7 +67,6 @@ namespace gui {
 
 namespace d2 {
 
-class viewport;
 class d2_window;
 class d2_transition;
 
@@ -140,37 +139,41 @@ class AMBULANTAPI d2_player :
 	void on_done();
 
 	common::window_factory *get_window_factory() { return this;}
-	viewport* create_viewport(int w, int h, HWND hwnd);
 	void redraw(HWND hwnd, HDC hdc);
 
 	///////////////////
 	// Timeslices services and transitions
-	void update_callback();
-	void schedule_update();
-	void update_transitions();
-	void clear_transitions();
-	bool has_transitions() const;
 	void stopped(common::playable *p);
 	void paused(common::playable *p);
 	void resumed(common::playable *p);
 	void set_intransition(common::playable *p, const lib::transition_info *info);
 	void start_outtransition(common::playable *p, const lib::transition_info *info);
-	d2_transition *get_transition(common::playable *p);
 
-  private:
-	d2_transition *set_transition(common::playable *p, const lib::transition_info *info, bool is_outtransition);
-	common::gui_window* get_window(HWND hwnd);
-	HWND get_main_window();
 	void lock_redraw();
 	void unlock_redraw();
 
+  private:
+	// Structure to keep hwnd/window and rendertarget together
+	struct wininfo {
+		HWND m_hwnd; 
+		void *m_rendertarget;
+		d2_window *m_window;
+//JNK		long m_f;
+	};
+	wininfo* _get_wininfo(HWND hwnd);
+	common::gui_window* _get_window(HWND hwnd);
+	HWND _get_main_window();
+
+	void _update_callback();
+	void _schedule_update();
+	void _update_transitions();
+	void _clear_transitions();
+	bool _has_transitions() const;
+	d2_transition *_get_transition(common::playable *p);
+	d2_transition *_set_transition(common::playable *p, const lib::transition_info *info, bool is_outtransition);
+
 	// The hosting application
 	d2_player_callbacks &m_hoster;
-	// The current document URL
-//	net::url m_url;
-	// The current view
-	struct wininfo {HWND h; viewport *v; d2_window *w; long f;};
-	wininfo* get_wininfo(HWND hwnd);
 
 	lib::event *m_update_event;
 
