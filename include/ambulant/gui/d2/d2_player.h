@@ -48,6 +48,9 @@
 #include "ambulant/gui/dx/html_bridge.h"
 //#include "ambulant/gui/d2/d2_playable.h"
 
+interface ID2D1Factory;
+interface ID2D1HwndRenderTarget;
+
 namespace ambulant {
 
 // classes used by d2_player
@@ -153,10 +156,11 @@ class AMBULANTAPI d2_player :
 	void unlock_redraw();
 
   private:
+
 	// Structure to keep hwnd/window and rendertarget together
 	struct wininfo {
 		HWND m_hwnd; 
-		void *m_rendertarget;
+		ID2D1HwndRenderTarget *m_rendertarget;
 		d2_window *m_window;
 //JNK		long m_f;
 	};
@@ -164,6 +168,13 @@ class AMBULANTAPI d2_player :
 	common::gui_window* _get_window(HWND hwnd);
 	HWND _get_main_window();
 
+    // Our Direct2D glue
+    ID2D1Factory *m_d2d;
+	void _recreate_d2d(wininfo *wi);
+	void _discard_d2d();
+
+	// Transition handling
+	lib::event *m_update_event;
 	void _update_callback();
 	void _schedule_update();
 	void _update_transitions();
@@ -174,8 +185,6 @@ class AMBULANTAPI d2_player :
 
 	// The hosting application
 	d2_player_callbacks &m_hoster;
-
-	lib::event *m_update_event;
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -199,6 +208,7 @@ class AMBULANTAPI d2_player :
 #pragma warning(pop)
 #endif
 
+	// The logger
 	lib::logger *m_logger;
 };
 

@@ -196,6 +196,9 @@ CWnd* topView = NULL;
 IMPLEMENT_DYNCREATE(MmView, CView)
 
 BEGIN_MESSAGE_MAP(MmView, CView)
+#ifdef not_WITH_D2D
+	ON_WM_PAINT()
+#endif
 	ON_WM_DESTROY()
 	ON_COMMAND(ID_FILE_PLAY, OnFilePlay)
 	ON_UPDATE_COMMAND_UI(ID_FILE_PLAY, OnUpdateFilePlay)
@@ -281,7 +284,6 @@ BOOL MmView::PreCreateWindow(CREATESTRUCT& cs)
 }
 
 // MmView drawing
-
 void MmView::OnDraw(CDC* pDC)
 {
 	MmDoc* pDoc = GetDocument();
