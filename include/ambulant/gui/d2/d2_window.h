@@ -47,8 +47,6 @@ namespace gui {
 
 namespace d2 {
 
-class viewport;
-
 class d2_window : public common::gui_window {
   public:
 	d2_window(const std::string& name,
@@ -70,8 +68,6 @@ class d2_window : public common::gui_window {
   private:
 	void _need_redraw(const lib::rect& r);
 
-	// gui_window:
-	// passive_region *m_region;
 	region *m_rgn;
 	std::string m_name; // for easy access
 	lib::rect m_viewrc;

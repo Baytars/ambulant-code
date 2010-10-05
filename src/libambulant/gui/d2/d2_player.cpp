@@ -125,8 +125,12 @@ using namespace ambulant;
 
 int gui::dx::dx_gui_region::s_counter = 0;
 
-gui::d2::d2_player::d2_player(d2_player_callbacks &hoster, common::player_feedback *feedback, const net::url& u)
-:	m_hoster(hoster),
+gui::d2::d2_player::d2_player(
+	d2_player_callbacks &hoster,
+	common::player_feedback *feedback,
+	const net::url& u)
+:	m_d2d(NULL),
+	m_hoster(hoster),
 	m_update_event(0),
 	m_logger(lib::logger::get_logger())
 {
@@ -135,6 +139,19 @@ gui::d2::d2_player::d2_player(d2_player_callbacks &hoster, common::player_feedba
 	init_factories();
 	init_plugins();
 
+	// Create Direct2D factory
+	HRESULT hr;
+	hr = CoInitialize(NULL);
+	assert(SUCCEEDED(hr));
+	D2D1_FACTORY_OPTIONS options = { D2D1_DEBUG_LEVEL_INFORMATION };
+	hr = D2D1CreateFactory(
+		D2D1_FACTORY_TYPE_MULTI_THREADED,
+		IID_ID2D1Factory,
+		&options,
+		(void**)&m_d2d);
+	if (!SUCCEEDED(hr)) {
+		m_logger->fatal("Cannot initialize Direct2D: error 0x%x", hr);
+	}
 	// Order the factories according to the preferences
 	common::preferences *prefs = common::preferences::get_preferences();
 	if (prefs->m_prefer_ffmpeg)
@@ -208,6 +225,10 @@ gui::d2::d2_player::~d2_player() {
 	assert(m_windows.empty());
 	if(gui::dx::dx_gui_region::s_counter != 0)
 		m_logger->warn("Undeleted gui regions: %d", dx::dx_gui_region::s_counter);
+	assert(m_d2d);
+	m_d2d->Release();
+	m_d2d = NULL;
+	CoUninitialize();
 }
 
 void
@@ -303,6 +324,37 @@ gui::d2::d2_player::init_parser_factory()
 #endif
 }
 
+void
+gui::d2::d2_player::_recreate_d2d(wininfo *wi)
+{
+	if (wi->m_rendertarget) return;
+	assert(wi->m_hwnd);
+
+	RECT rc;
+	GetClientRect(wi->m_hwnd, &rc);
+	D2D1_SIZE_U size = D2D1::SizeU(rc.right-rc.left, rc.bottom-rc.top);
+
+	HRESULT hr = m_d2d->CreateHwndRenderTarget(
+		D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(), 0, 0, D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),
+		D2D1::HwndRenderTargetProperties(wi->m_hwnd, size, D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS),
+		&wi->m_rendertarget);
+
+	if (!SUCCEEDED(hr))
+		m_logger->trace("D2D CreateHwndRenderTarget: error 0x%x", hr);
+}
+
+void
+gui::d2::d2_player::_discard_d2d()
+{
+	std::map<std::string, wininfo*>::iterator it;
+	for(it=m_windows.begin();it!=m_windows.end();it++) {
+		wininfo *wi = it->second;
+		if (wi->m_rendertarget) {
+			wi->m_rendertarget->Release();
+			wi->m_rendertarget = NULL;
+		}
+	}
+}
 
 void gui::d2::d2_player::play() {
 	if(m_player) {
@@ -323,6 +375,7 @@ void gui::d2::d2_player::stop() {
 		_clear_transitions();
 		common::gui_player::stop();
 	}
+	_discard_d2d();
 }
 
 void gui::d2::d2_player::pause() {
@@ -409,7 +462,90 @@ void gui::d2::d2_player::on_char(int ch) {
 }
 
 void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
+	HRESULT hr = S_OK;
+	// Create the Direct2D resources, in case they were lost
 	wininfo *wi = _get_wininfo(hwnd);
+	assert(wi);
+	if (wi == NULL) return;
+	_recreate_d2d(wi);
+	ID2D1HwndRenderTarget *rt = wi->m_rendertarget;
+	if (rt == NULL) return;
+	
+	/*AM_DBG*/ m_logger->debug("redraw, rt=0x%x", rt);
+	ID2D1SolidColorBrush*	lsgbrush;
+	ID2D1LinearGradientBrush* lgbrush;
+    hr = rt->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::LightSlateGray, 0.3f),
+		&lsgbrush
+    );
+    
+	// Create an array of gradient stops to put in the gradient stop
+	// collection that will be used in the gradient brush.
+	ID2D1GradientStopCollection *pGradientStops = NULL;
+
+	D2D1_GRADIENT_STOP gradientStops[2];
+	gradientStops[0].color = D2D1::ColorF(D2D1::ColorF::Blue, 1);
+	gradientStops[0].position = 0.0f;
+	gradientStops[1].color = D2D1::ColorF(D2D1::ColorF::Red, 1);
+	gradientStops[1].position = 1.0f;
+	// Create the ID2D1GradientStopCollection from a previously
+	// declared array of D2D1_GRADIENT_STOP structs.
+	hr = rt->CreateGradientStopCollection(
+		gradientStops,
+		2,
+		D2D1_GAMMA_2_2,
+		D2D1_EXTEND_MODE_CLAMP,
+		&pGradientStops
+		);
+	// The line that determines the direction of the gradient starts at
+	// the upper-left corner of the square and ends at the lower-right corner.
+
+	if (SUCCEEDED(hr))
+	{
+		hr = rt->CreateLinearGradientBrush(
+			D2D1::LinearGradientBrushProperties(
+			D2D1::Point2F(0, 0),
+			D2D1::Point2F(300, 300)),
+			pGradientStops,
+			&lgbrush
+			);
+	}
+
+	rt->BeginDraw();
+	rt->SetTransform(D2D1::Matrix3x2F::Identity());
+	rt->Clear(D2D1::ColorF(D2D1::ColorF::White));
+	D2D1_SIZE_F rtSize = rt->GetSize();
+	// Draw a grid background.
+	int width = static_cast<int>(rtSize.width);
+	int height = static_cast<int>(rtSize.height);
+
+	// Draw two rectangles.
+	D2D1_RECT_F rectangle1 = D2D1::RectF(
+		rtSize.width/2 - 50.0f,
+		rtSize.height/2 - 50.0f,
+		rtSize.width/2 + 50.0f,
+		rtSize.height/2 + 50.0f
+		);
+
+	D2D1_RECT_F rectangle2 = D2D1::RectF(
+		rtSize.width/2 - 100.0f,
+		rtSize.height/2 - 100.0f,
+		rtSize.width/2 + 100.0f,
+		rtSize.height/2 + 100.0f
+		);
+
+	// Draw the outline of a rectangle.
+	rt->FillRectangle(&rectangle2, lgbrush);
+
+
+	// Draw a filled rectangle.
+	rt->FillRectangle(&rectangle1, lsgbrush);
+
+	hr = rt->EndDraw();
+	pGradientStops->Release();
+	lgbrush->Release();
+	lsgbrush->Release();
+
 //JNK	if(wi) wi->v->redraw(hdc);
 }
 
@@ -452,10 +588,9 @@ gui::d2::d2_player::new_window(const std::string &name,
 
 	// Create an os window
 	winfo->m_hwnd = m_hoster.new_os_window();
-#ifdef JNK
-	// Create the associated d2 viewport
-	winfo->v = create_viewport(bounds.w, bounds.h, winfo->h);
-#endif
+
+	// Rendertarget will be created on-demand
+	winfo->m_rendertarget = NULL;
 	// Region?
 	region *rgn = (region *) src;
 
@@ -490,6 +625,9 @@ gui::d2::d2_player::window_done(const std::string &name) {
 	wi->v->redraw();
 	delete wi->v;
 #endif
+	if (wi->m_rendertarget) {
+		wi->m_rendertarget->Release();
+	}
 	m_hoster.destroy_os_window(wi->m_hwnd);
 	delete wi;
 	AM_DBG m_logger->debug("windows: %d", m_windows.size());
@@ -528,7 +666,7 @@ gui::d2::d2_player::_get_wininfo(HWND hwnd) {
 	std::map<std::string, wininfo*>::iterator it;
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
 		wininfo *wi = (*it).second;
-		if(wi->m_hwnd = hwnd) {winfo = wi;break;}
+		if(wi->m_hwnd == hwnd) {winfo = wi;break;}
 	}
 	return winfo;
 }
@@ -737,7 +875,7 @@ void gui::d2::d2_player::done(common::player *p) {
 		assert(0); // resume();
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
-			d2_window *d2win = (d2_window *)(*it).second->m_hwnd;
+			d2_window *d2win = (*it).second->m_window;
 			d2win->need_redraw();
 		}
 	}
