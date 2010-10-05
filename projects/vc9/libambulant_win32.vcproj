@@ -602,6 +602,10 @@
 						RelativePath="..\..\src\libambulant\gui\d2\d2_player.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\..\src\libambulant\gui\d2\d2_window.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -1015,6 +1019,10 @@
 						>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_player.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_window.h"
 							>
 						</File>
 					</Filter>
