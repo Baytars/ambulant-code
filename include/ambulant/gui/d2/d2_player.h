@@ -73,6 +73,16 @@ namespace d2 {
 class d2_window;
 class d2_transition;
 
+/// Abstract class to be implemented by renderers that allocate
+/// Direct2D resources.
+/// After registering the class with the d2_player, the discard_d2d
+/// method will be called when Direct2D signals that cached resources
+/// are no longer valid.
+class AMBULANTAPI d2_resources {
+public:
+	virtual void recreate_d2d() = 0;
+	virtual void discard_d2d() = 0;
+};
 
 class d2_player_callbacks : public html_browser_factory {
   public:
@@ -84,7 +94,7 @@ class d2_player_callbacks : public html_browser_factory {
 class AMBULANTAPI d2_player :
 	public common::gui_player,
 	public common::window_factory,
-//	public d2_playables_context,
+	public common::playable_factory_machdep,
 	public common::embedder,
 	public lib::event_processor_observer
 {
@@ -155,6 +165,14 @@ class AMBULANTAPI d2_player :
 	void lock_redraw();
 	void unlock_redraw();
 
+	// Direct2D resource management
+	void register_resources(d2_resources *resource) {
+		m_resources.insert(resource);
+	}
+	void unregister_resources(d2_resources *resource) {
+		m_resources.erase(resource);
+	}
+	ID2D1HwndRenderTarget *get_rendertarget() { return m_cur_rendertarget; }
   private:
 
 	// Structure to keep hwnd/window and rendertarget together
@@ -164,6 +182,8 @@ class AMBULANTAPI d2_player :
 		d2_window *m_window;
 //JNK		long m_f;
 	};
+	// Valid only during redraw():
+	ID2D1HwndRenderTarget *m_cur_rendertarget;
 	wininfo* _get_wininfo(HWND hwnd);
 	common::gui_window* _get_window(HWND hwnd);
 	HWND _get_main_window();
@@ -207,6 +227,9 @@ class AMBULANTAPI d2_player :
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+
+	// Direct2D resource management
+	std::set<d2_resources*> m_resources;
 
 	// The logger
 	lib::logger *m_logger;

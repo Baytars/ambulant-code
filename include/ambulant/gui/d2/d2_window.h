@@ -52,11 +52,13 @@ class d2_window : public common::gui_window {
 	d2_window(const std::string& name,
 		lib::size bounds,
 		region *rgn,
-		common::window_factory *wf);
+		common::window_factory *wf,
+		HWND hwnd);
 	~d2_window();
 
 	void need_redraw(const lib::rect& r);
 	void redraw(const lib::rect& r);
+	void redraw();
 	void need_redraw();
 	void redraw_now();
 	void need_events(bool onoff) { /* Always get them on windows */ }
@@ -68,7 +70,8 @@ class d2_window : public common::gui_window {
   private:
 	void _need_redraw(const lib::rect& r);
 
-	region *m_rgn;
+	region *m_rgn;	// Ambulant window
+	HWND m_hwnd;	// Windows window
 	std::string m_name; // for easy access
 	lib::rect m_viewrc;
 	common::window_factory *m_wf;
