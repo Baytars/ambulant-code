@@ -107,7 +107,7 @@ d2_fill_renderer::redraw_body(const rect &dirty, gui_window *window)
 	
 	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
 	assert(rt);
-	D2D1_RECT_U rr = D2D1::RectU(r.left(), r.top(), r.right(), r.bottom());
+	D2D1_RECT_F rr = D2D1::RectF(dstrect_whole.left(), dstrect_whole.top(), dstrect_whole.right(), dstrect_whole.bottom());
 	rt->FillRectangle(rr, m_brush);
 	m_lock.leave();
 }
@@ -153,6 +153,8 @@ d2_fill_renderer::discard_d2d()
 
 d2_background_renderer::~d2_background_renderer()
 {
+	if (m_d2player) m_d2player->unregister_resources(this);
+	discard_d2d();
 #ifdef D2D_NOTYET
 	if (m_bgimage)
 		[m_bgimage release];
@@ -163,6 +165,10 @@ d2_background_renderer::~d2_background_renderer()
 void
 d2_background_renderer::redraw(const lib::rect &dirty, common::gui_window *window)
 {
+	recreate_d2d();
+	// XXX Incorrect for bgimage and no color:
+	if (!m_mustrender || m_brush == NULL) return;
+
 	const rect &r =	 m_dst->get_rect();
 	AM_DBG logger::get_logger()->debug("d2_bg_renderer::drawbackground(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
@@ -171,21 +177,11 @@ d2_background_renderer::redraw(const lib::rect &dirty, common::gui_window *windo
 	AM_DBG lib::logger::get_logger()->debug("d2_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
 	rect dstrect_whole = r;
 	dstrect_whole.translate(m_dst->get_global_topleft());
-	double opacity = m_src->get_bgopacity();
-	if (m_src && opacity > 0) {
-		// First find our whole area (which we have to clear to background color)
-		// XXXX Fill with background color
-		color_t bgcolor = m_src->get_bgcolor();
-		AM_DBG lib::logger::get_logger()->debug("d2_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)bgcolor, opacity);
-#ifdef JNK
-		NSColor *d2_bgcolor = [NSColor colorWithCalibratedRed:redf(bgcolor)
-					green:greenf(bgcolor)
-					blue:bluef(bgcolor)
-					alpha:(float)opacity];
-		[d2_bgcolor set];
-		NSRectFillUsingOperation(d2_dstrect_whole, NSCompositeSourceAtop);
-#endif
-	}
+
+	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
+	assert(rt);
+	D2D1_RECT_F rr = D2D1::RectF(dstrect_whole.left(), dstrect_whole.top(), dstrect_whole.right(), dstrect_whole.bottom());
+	rt->FillRectangle(rr, m_brush);
 #ifdef D2D_NOTYET
 	if (m_bgimage) {
 		AM_DBG lib::logger::get_logger()->debug("d2_background_renderer::redraw(): drawing image");
@@ -238,6 +234,39 @@ d2_background_renderer::keep_as_background()
 
 	m_bgimage = [[view getOnScreenImageForRect: d2_dstrect_whole] retain];
 #endif
+}
+
+
+void 
+d2_background_renderer::recreate_d2d()
+{
+	if (m_brush) return;
+	HRESULT hr = S_OK;
+	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
+	assert(rt);
+	// Fill with  color
+	assert(m_src);
+	double opacity = m_src->get_bgopacity();
+	if (opacity > 0) {
+		// First find our whole area (which we have to clear to background color)
+		// XXXX Fill with background color
+		m_mustrender = true;
+		color_t bgcolor = m_src->get_bgcolor();
+		AM_DBG lib::logger::get_logger()->debug("d2_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)bgcolor, opacity);
+		hr = rt->CreateSolidColorBrush(D2D1::ColorF(redf(bgcolor), greenf(bgcolor), bluef(bgcolor), opacity), &m_brush);
+		if (!SUCCEEDED(hr)) lib::logger::get_logger()->trace("CreateSolidColorBrush: error 0x%x", hr);
+	} else {
+		m_mustrender = false;
+	}
+}
+
+void
+d2_background_renderer::discard_d2d()
+{
+	if (m_brush) {
+		m_brush->Release();
+		m_brush = NULL;
+	}
 }
 
 } // namespace d2

@@ -652,7 +652,7 @@ gui::d2::d2_player::get_default_size() {
 
 common::bgrenderer*
 gui::d2::d2_player::new_background_renderer(const common::region_info *src) {
-	return new d2_background_renderer(src);
+	return new d2_background_renderer(src, this);
 }
 
 #ifdef JNK
