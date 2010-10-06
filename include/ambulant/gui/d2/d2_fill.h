@@ -54,7 +54,9 @@ class d2_fill_renderer : public d2_renderer<renderer_playable> {
 		event_processor *evp,
 		common::factories *fp,
 		common::playable_factory_machdep *mdp)
-	:	d2_renderer<renderer_playable>(context, cookie, node, evp, fp, mdp) {};
+	:	d2_renderer<renderer_playable>(context, cookie, node, evp, fp, mdp),
+		m_brush(NULL)
+	{};
 	~d2_fill_renderer();
 
 //	void freeze() {}
@@ -70,17 +72,29 @@ class d2_fill_renderer : public d2_renderer<renderer_playable> {
 	critical_section m_lock;
 };
 
-class d2_background_renderer : public background_renderer {
+class d2_background_renderer : public background_renderer, public d2_resources {
   public:
-	d2_background_renderer(const common::region_info *src)
+	d2_background_renderer(const common::region_info *src, common::playable_factory_machdep *mdp)
 	:   background_renderer(src),
-		m_bgimage(NULL) {}
+		m_d2player(dynamic_cast<d2_player*>(mdp)),
+		m_brush(NULL),
+		m_bgimage(NULL),
+		m_mustrender(false)
+	{
+		assert(m_d2player);
+		m_d2player->register_resources(this);
+	}
 	~d2_background_renderer();
 	void redraw(const lib::rect &dirty, common::gui_window *window);
 	void keep_as_background();
 	void highlight(common::gui_window *window);
+	void recreate_d2d();
+	void discard_d2d();
   private:
+    d2_player *m_d2player;
+	ID2D1SolidColorBrush *m_brush;
 	void *m_bgimage;
+	bool m_mustrender;
 };
 
 } // namespace d2
