@@ -23,7 +23,6 @@
 
 #include "ambulant/config/config.h"
 #include "ambulant/gui/d2/d2_player.h"
-//#include "ambulant/gui/d2/d2_viewport.h"
 #include "ambulant/gui/d2/d2_window.h"
 #include "ambulant/gui/dx/dx_wmuser.h"
 #include "ambulant/gui/dx/dx_rgn.h"
@@ -43,7 +42,7 @@
 
 // Renderer playables
 //#include "ambulant/gui/d2/html_bridge.h"
-//#include "ambulant/gui/d2/d2_bgrenderer.h"
+#include "ambulant/gui/d2/d2_fill.h"
 //#include "ambulant/gui/d2/d2_text.h"
 #ifdef	WITH_SMIL30
 //#include "ambulant/gui/d2/d2_smiltext.h"
@@ -51,7 +50,6 @@
 //#include "ambulant/gui/d2/d2_html_renderer.h"
 //#include "ambulant/gui/d2/d2_img.h"
 //#include "ambulant/gui/d2/d2_img_wic.h"
-//#include "ambulant/gui/d2/d2_brush.h"
 
 // Select audio renderer to use.
 // Multiple selections are possible.
@@ -250,6 +248,7 @@ gui::d2::d2_player::init_playable_factory()
 {
 	common::global_playable_factory *pf = common::get_global_playable_factory();
 	set_playable_factory(pf);
+	pf->add_factory(create_d2_fill_playable_factory(this, this));
 #if 0
 	// Add the playable factory
 	pf->add_factory(create_d2_area_playable_factory(this, this));
@@ -259,7 +258,6 @@ gui::d2::d2_player::init_playable_factory()
 #ifdef USE_SDL_AUDIO
 	pf->add_factory(gui::sdl::create_sdl_playable_factory(this));
 #endif
-	pf->add_factory(create_d2_brush_playable_factory(this, this));
 #ifdef WITH_WIC
 	pf->add_factory(create_d2_image_wic_playable_factory(this, this));
 #endif
@@ -354,6 +352,10 @@ gui::d2::d2_player::_discard_d2d()
 			wi->m_rendertarget = NULL;
 		}
 	}
+	std::set<d2_resources*>::iterator rit;
+	for(rit=m_resources.begin(); rit!=m_resources.end(); rit++) {
+		(*rit)->discard_d2d();
+	}
 }
 
 void gui::d2::d2_player::play() {
@@ -362,7 +364,7 @@ void gui::d2::d2_player::play() {
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
 			d2_window *d2win = (d2_window *)(*it).second->m_window;
-			d2win->need_redraw();
+			d2win->redraw();
 		}
 		common::gui_player::play();
 		unlock_redraw();
@@ -468,9 +470,9 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	assert(wi);
 	if (wi == NULL) return;
 	_recreate_d2d(wi);
-	ID2D1HwndRenderTarget *rt = wi->m_rendertarget;
+	ID2D1HwndRenderTarget *rt = m_cur_rendertarget = wi->m_rendertarget;
 	if (rt == NULL) return;
-	
+#if 0
 	/*AM_DBG*/ m_logger->debug("redraw, rt=0x%x", rt);
 	ID2D1SolidColorBrush*	lsgbrush;
 	ID2D1LinearGradientBrush* lgbrush;
@@ -547,6 +549,13 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	lsgbrush->Release();
 
 //JNK	if(wi) wi->v->redraw(hdc);
+#endif
+	rt->BeginDraw();
+	wi->m_window->redraw();
+	hr = rt->EndDraw();
+	if (hr == D2DERR_RECREATE_TARGET) {
+		_discard_d2d();
+	}
 }
 
 void gui::d2::d2_player::on_done() {
@@ -602,7 +611,7 @@ gui::d2::d2_player::new_window(const std::string &name,
 #endif
 
 	// Create a concrete gui_window
-	winfo->m_window = new d2_window(name, bounds, rgn, this);
+	winfo->m_window = new d2_window(name, bounds, rgn, this, winfo->m_hwnd);
 //JNK	winfo->f = 0;
 
 	// Store the wininfo struct
@@ -643,11 +652,7 @@ gui::d2::d2_player::get_default_size() {
 
 common::bgrenderer*
 gui::d2::d2_player::new_background_renderer(const common::region_info *src) {
-#ifdef D2NOTYET
-	return new d2_bgrenderer(src);
-#else
-	return NULL;
-#endif
+	return new d2_background_renderer(src);
 }
 
 #ifdef JNK
@@ -876,7 +881,7 @@ void gui::d2::d2_player::done(common::player *p) {
 		std::map<std::string, wininfo*>::iterator it;
 		for(it=m_windows.begin();it!=m_windows.end();it++) {
 			d2_window *d2win = (*it).second->m_window;
-			d2win->need_redraw();
+			d2win->redraw();
 		}
 	}
 }

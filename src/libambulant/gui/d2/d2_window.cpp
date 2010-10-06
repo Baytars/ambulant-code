@@ -35,10 +35,12 @@ using namespace ambulant;
 gui::d2::d2_window::d2_window(const std::string& name,
 	lib::size bounds,
 	region *rgn,
-	common::window_factory *wf)
+	common::window_factory *wf,
+	HWND hwnd)
 :	common::gui_window(rgn),
 	m_rgn(rgn),
 	m_name(name),
+	m_hwnd(hwnd),
 	m_viewrc(lib::point(0, 0), lib::size(bounds.w, bounds.h)),
 	m_wf(wf),
 	m_locked(0),
@@ -53,27 +55,31 @@ gui::d2::d2_window::~d2_window() {
 	m_wf->window_done(m_name);
 }
 
+void gui::d2::d2_window::_need_redraw(const lib::rect &r) {
+	if(!m_locked) {
+		RECT rr = {r.left(), r.top(), r.right(), r.bottom()};
+		InvalidateRect(m_hwnd, &rr, 0);
+	} else {
+		if(!m_redraw_rect_valid) {
+			m_redraw_rect = r;
+			m_redraw_rect_valid = true;
+		} else m_redraw_rect |= r;
+	}}
+
 void gui::d2::d2_window::need_redraw(const lib::rect &r) {
 	m_redraw_rect_lock.enter();
 	_need_redraw(r);
 	m_redraw_rect_lock.leave();
 }
 
-void gui::d2::d2_window::_need_redraw(const lib::rect &r) {
+void gui::d2::d2_window::redraw(const lib::rect &r) {
 	// clip rect to this window since the layout does not do this
 	lib::rect rc = r;
 	rc &= m_viewrc;
 	if(!m_locked) {
 		AM_DBG lib::logger::get_logger()->debug("d2_window::need_redraw(%d,%d,%d,%d): drawing", rc.left(), rc.top(), rc.width(), rc.height());
 		//assert(!m_redraw_rect_valid);
-#ifdef JNK
-		m_viewport->set_fullscreen_transition(NULL);
-		m_viewport->clear(rc, GetSysColor(COLOR_WINDOW), 1.0);
-#endif
 		m_rgn->redraw(rc, this);
-#ifdef JNK
-		m_viewport->schedule_redraw(rc);
-#endif
 	} else {
 		AM_DBG lib::logger::get_logger()->debug("d2_window::need_redraw(%d,%d,%d,%d): queueing", rc.left(), rc.top(), rc.width(), rc.height());
 		if(!m_redraw_rect_valid) {
@@ -84,6 +90,8 @@ void gui::d2::d2_window::_need_redraw(const lib::rect &r) {
 }
 
 void gui::d2::d2_window::redraw_now() {
+	assert(0); // When is this called??
+#ifdef JNK
 	m_redraw_rect_lock.enter();
 	int keep_lock = m_locked;
 	m_locked = 0;
@@ -92,10 +100,11 @@ void gui::d2::d2_window::redraw_now() {
 	m_redraw_rect_valid = false;
 	m_locked = keep_lock;
 	m_redraw_rect_lock.leave();
+#endif
 }
 
-void gui::d2::d2_window::need_redraw() {
-	need_redraw(m_viewrc);
+void gui::d2::d2_window::redraw() {
+	redraw(m_viewrc);
 }
 
 void gui::d2::d2_window::lock_redraw() {
