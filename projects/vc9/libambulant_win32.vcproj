@@ -759,6 +759,10 @@
 					Name="d2"
 					>
 					<File
+						RelativePath="..\..\src\libambulant\gui\d2\d2_basicvideo.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_fill.cpp"
 						>
 					</File>
@@ -1189,6 +1193,10 @@
 					<Filter
 						Name="d2"
 						>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_basicvideo.h"
+							>
+						</File>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_fill.h"
 							>

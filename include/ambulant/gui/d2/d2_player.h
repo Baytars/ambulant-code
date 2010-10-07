@@ -172,7 +172,14 @@ class AMBULANTAPI d2_player :
 	void unregister_resources(d2_resources *resource) {
 		m_resources.erase(resource);
 	}
-	ID2D1HwndRenderTarget *get_rendertarget() { return m_cur_rendertarget; }
+	// Get current rendertarget, only valid while redrawing
+	ID2D1HwndRenderTarget *get_rendertarget() {
+		return m_cur_wininfo?m_cur_wininfo->m_rendertarget:NULL;
+	}
+	// Get current hwnd, only valid while redrawing
+	HWND get_hwnd() {
+		return m_cur_wininfo?m_cur_wininfo->m_hwnd:_get_main_window();
+	}
   private:
 
 	// Structure to keep hwnd/window and rendertarget together
@@ -183,7 +190,7 @@ class AMBULANTAPI d2_player :
 //JNK		long m_f;
 	};
 	// Valid only during redraw():
-	ID2D1HwndRenderTarget *m_cur_rendertarget;
+	wininfo* m_cur_wininfo;
 	wininfo* _get_wininfo(HWND hwnd);
 	common::gui_window* _get_window(HWND hwnd);
 	HWND _get_main_window();
