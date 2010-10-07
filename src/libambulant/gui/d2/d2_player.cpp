@@ -69,14 +69,11 @@
 
 // Select video renderer to use.
 // Multiple selections are possible.
-#ifdef WITH_FFMPEG
-// Define this one to use the datasource-based video renderer
-#define USE_DS_VIDEO
-#endif
+//#define USE_DS_VIDEO
 // Define this one to use the minimal DirectX video renderer
-// #define USE_BASIC_VIDEO
+#define USE_BASIC_VIDEO
 // Define this one to use the more full-featured DirectX video renderer
-#define USE_D2_VIDEO
+//#define USE_D2_VIDEO
 
 #ifdef USE_DS_VIDEO
 #include "ambulant/gui/d2/d2_dsvideo.h"
@@ -130,6 +127,7 @@ gui::d2::d2_player::d2_player(
 :	m_d2d(NULL),
 	m_hoster(hoster),
 	m_update_event(0),
+	m_cur_wininfo(NULL),
 	m_logger(lib::logger::get_logger())
 {
 	set_embedder(this);
@@ -250,6 +248,9 @@ gui::d2::d2_player::init_playable_factory()
 	set_playable_factory(pf);
 	pf->add_factory(create_d2_fill_playable_factory(this, this));
 	pf->add_factory(create_d2_image_playable_factory(this, this));
+#ifdef USE_BASIC_VIDEO
+	pf->add_factory(create_d2_basicvideo_playable_factory(this, this));
+#endif
 #if 0
 	// Add the playable factory
 	pf->add_factory(create_d2_area_playable_factory(this, this));
@@ -467,92 +468,17 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	assert(wi);
 	if (wi == NULL) return;
 	_recreate_d2d(wi);
-	ID2D1HwndRenderTarget *rt = m_cur_rendertarget = wi->m_rendertarget;
+	m_cur_wininfo = wi;
+	ID2D1HwndRenderTarget *rt = wi->m_rendertarget;
 	if (rt == NULL) return;
-#if 0
-	/*AM_DBG*/ m_logger->debug("redraw, rt=0x%x", rt);
-	ID2D1SolidColorBrush*	lsgbrush;
-	ID2D1LinearGradientBrush* lgbrush;
-    hr = rt->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::LightSlateGray, 0.3f),
-		&lsgbrush
-    );
-    
-	// Create an array of gradient stops to put in the gradient stop
-	// collection that will be used in the gradient brush.
-	ID2D1GradientStopCollection *pGradientStops = NULL;
 
-	D2D1_GRADIENT_STOP gradientStops[2];
-	gradientStops[0].color = D2D1::ColorF(D2D1::ColorF::Blue, 1);
-	gradientStops[0].position = 0.0f;
-	gradientStops[1].color = D2D1::ColorF(D2D1::ColorF::Red, 1);
-	gradientStops[1].position = 1.0f;
-	// Create the ID2D1GradientStopCollection from a previously
-	// declared array of D2D1_GRADIENT_STOP structs.
-	hr = rt->CreateGradientStopCollection(
-		gradientStops,
-		2,
-		D2D1_GAMMA_2_2,
-		D2D1_EXTEND_MODE_CLAMP,
-		&pGradientStops
-		);
-	// The line that determines the direction of the gradient starts at
-	// the upper-left corner of the square and ends at the lower-right corner.
-
-	if (SUCCEEDED(hr))
-	{
-		hr = rt->CreateLinearGradientBrush(
-			D2D1::LinearGradientBrushProperties(
-			D2D1::Point2F(0, 0),
-			D2D1::Point2F(300, 300)),
-			pGradientStops,
-			&lgbrush
-			);
-	}
-
-	rt->BeginDraw();
-	rt->SetTransform(D2D1::Matrix3x2F::Identity());
-	rt->Clear(D2D1::ColorF(D2D1::ColorF::White));
-	D2D1_SIZE_F rtSize = rt->GetSize();
-	// Draw a grid background.
-	int width = static_cast<int>(rtSize.width);
-	int height = static_cast<int>(rtSize.height);
-
-	// Draw two rectangles.
-	D2D1_RECT_F rectangle1 = D2D1::RectF(
-		rtSize.width/2 - 50.0f,
-		rtSize.height/2 - 50.0f,
-		rtSize.width/2 + 50.0f,
-		rtSize.height/2 + 50.0f
-		);
-
-	D2D1_RECT_F rectangle2 = D2D1::RectF(
-		rtSize.width/2 - 100.0f,
-		rtSize.height/2 - 100.0f,
-		rtSize.width/2 + 100.0f,
-		rtSize.height/2 + 100.0f
-		);
-
-	// Draw the outline of a rectangle.
-	rt->FillRectangle(&rectangle2, lgbrush);
-
-
-	// Draw a filled rectangle.
-	rt->FillRectangle(&rectangle1, lsgbrush);
-
-	hr = rt->EndDraw();
-	pGradientStops->Release();
-	lgbrush->Release();
-	lsgbrush->Release();
-
-//JNK	if(wi) wi->v->redraw(hdc);
-#endif
 	rt->BeginDraw();
 	wi->m_window->redraw();
 	hr = rt->EndDraw();
 	if (hr == D2DERR_RECREATE_TARGET) {
 		_discard_d2d();
 	}
+	m_cur_wininfo = NULL;
 }
 
 void gui::d2::d2_player::on_done() {
@@ -681,7 +607,7 @@ gui::d2::d2_player::_get_window(HWND hwnd) {
 
 HWND
 gui::d2::d2_player::_get_main_window() {
-	// XXXX Unsure that this is correct: we just return any window
+	// This assumes the main window is the first window
 	std::map<std::string, wininfo*>::iterator it = m_windows.begin();
 	if (it == m_windows.end()) return NULL;
 	return (*it).second->m_hwnd;
