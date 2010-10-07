@@ -97,6 +97,7 @@ class d2_basicvideo_renderer : public common::renderer_playable {
 
 	// for debugging
 	lib::rect m_msg_rect;
+	DWORD m_rot_index;
 
 };
 
