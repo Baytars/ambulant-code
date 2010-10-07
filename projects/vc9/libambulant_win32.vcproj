@@ -763,6 +763,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\libambulant\gui\d2\d2_img.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_player.cpp"
 						>
 					</File>
@@ -1187,6 +1191,10 @@
 						>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_fill.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_img.h"
 							>
 						</File>
 						<File

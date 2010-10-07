@@ -48,7 +48,7 @@
 //#include "ambulant/gui/d2/d2_smiltext.h"
 #endif/*WITH_SMIL30*/
 //#include "ambulant/gui/d2/d2_html_renderer.h"
-//#include "ambulant/gui/d2/d2_img.h"
+#include "ambulant/gui/d2/d2_img.h"
 //#include "ambulant/gui/d2/d2_img_wic.h"
 
 // Select audio renderer to use.
@@ -249,6 +249,7 @@ gui::d2::d2_player::init_playable_factory()
 	common::global_playable_factory *pf = common::get_global_playable_factory();
 	set_playable_factory(pf);
 	pf->add_factory(create_d2_fill_playable_factory(this, this));
+	pf->add_factory(create_d2_image_playable_factory(this, this));
 #if 0
 	// Add the playable factory
 	pf->add_factory(create_d2_area_playable_factory(this, this));
@@ -258,10 +259,6 @@ gui::d2::d2_player::init_playable_factory()
 #ifdef USE_SDL_AUDIO
 	pf->add_factory(gui::sdl::create_sdl_playable_factory(this));
 #endif
-#ifdef WITH_WIC
-	pf->add_factory(create_d2_image_wic_playable_factory(this, this));
-#endif
-	pf->add_factory(create_d2_image_playable_factory(this, this));
 	pf->add_factory(create_d2_smiltext_playable_factory(this, this));
 	pf->add_factory(create_d2_text_playable_factory(this, this));
 #ifdef WITH_HTML_WIDGET
