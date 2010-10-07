@@ -39,6 +39,13 @@
 #include <vfwmsgs.h>
 #include <tchar.h>
 
+#ifdef WITH_DX_EVR
+#include <mfidl.h>
+#include <evr.h>
+#pragma comment (lib,"mfuuid.lib")
+
+#endif
+
 #pragma comment (lib,"winmm.lib")
 #pragma comment (lib,"amstrmid.lib")
 #pragma comment (lib,"strmiids.lib")
@@ -124,6 +131,10 @@ gui::d2::d2_basicvideo_renderer::d2_basicvideo_renderer(
 	m_basic_audio(NULL),
 	m_video_window(NULL),
 	m_graph_builder(NULL),
+#ifdef WITH_DX_EVR
+	m_evr(NULL),
+	m_evr_control(NULL),
+#endif
 	m_update_event(0),
 	m_d2player(dynamic_cast<d2_player*>(mdp)),
 	m_rot_index(0)
@@ -154,6 +165,16 @@ gui::d2::d2_basicvideo_renderer::~d2_basicvideo_renderer() {
 		m_video_window->Release();
 		m_video_window = 0;
 	}
+#ifdef WITH_DX_EVR
+	if (m_evr) {
+		m_evr->Release();
+		m_evr = NULL;
+	}
+	if (m_evr_control) {
+		m_evr_control->Release();
+		m_evr_control = NULL;
+	}
+#endif
 	if(m_graph_builder) {
 		RemoveFromRot(m_rot_index);
 		m_graph_builder->Release();
@@ -187,7 +208,13 @@ void gui::d2::d2_basicvideo_renderer::start(double t) {
 
 	lib::rect r = surf->get_rect();
 	r.translate(surf->get_global_topleft());
+#ifdef WITH_DX_EVR
+	MFVideoNormalizedRect src_rect = {0.0f, 0.0f, 1.0f, 1.0f};
+	RECT dst_rect = { r.left(), r.top(), r.right(), r.bottom() };
+	m_evr_control->SetVideoPosition(&src_rect, &dst_rect); 
+#else
 //TODO	m_player->setrect(r);
+#endif
 	// Has this been activated
 	if(m_activated) {
 		// repeat
@@ -226,6 +253,16 @@ bool gui::d2::d2_basicvideo_renderer::_open(const std::string& url, HWND parent)
 		return false;
 	}
 	AddToRot(m_graph_builder, &m_rot_index);
+	// We now optionally add a specific output handler.
+#ifdef WITH_DX_EVR
+	hr = CoCreateInstance(CLSID_EnhancedVideoRenderer, 0, CLSCTX_INPROC_SERVER,
+		IID_IBaseFilter, (void**)&m_evr);
+	if (FAILED(hr)) {
+		lib::win32::win_report_error("CoCreateInstance(CLSID_EnhancedVideoRenderer, ...)", hr);
+		return false;
+	}
+	m_graph_builder->AddFilter(m_evr, _T("Enhanced Video Renderer"));
+#endif
 	WCHAR wsz[MAX_PATH];
 	MultiByteToWideChar(CP_ACP,0, url.c_str(), -1, wsz, MAX_PATH);
 	hr = m_graph_builder->RenderFile(wsz, 0);
@@ -259,6 +296,22 @@ bool gui::d2::d2_basicvideo_renderer::_open(const std::string& url, HWND parent)
 	if(FAILED(hr)) {
 		lib::win32::win_report_error("QueryInterface(IID_IBasicAudio, ...)", hr);
 	}
+#ifdef WITH_DX_EVR
+	IMFGetService *get_service;
+	hr = m_evr->QueryInterface(IID_IMFGetService, (void**)&get_service);
+	if (FAILED(hr)) {
+		lib::win32::win_report_error("QueryInterface(IID_IMFGetService, ...)", hr);
+	}
+	hr = get_service->GetService(MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (LPVOID*)&m_evr_control);
+	if (FAILED(hr)) {
+		lib::win32::win_report_error("QueryInterface(IID_IMFVideoDisplayControl, ...)", hr);
+	}
+	hr = m_evr_control->SetVideoWindow(parent);
+	if (FAILED(hr)) {
+		lib::win32::win_report_error("SetVideoWindow(...)", hr);
+	}
+
+#else
 	hr = m_graph_builder->QueryInterface(IID_IVideoWindow, (void **) &m_video_window);
 	if(FAILED(hr)) {
 		lib::win32::win_report_error("QueryInterface(IID_IVideoWindow, ...)", hr);
@@ -287,6 +340,7 @@ bool gui::d2::d2_basicvideo_renderer::_open(const std::string& url, HWND parent)
 			lib::win32::win_report_error("put_MessageDrain()", hr);
 		}
 	}
+#endif
 	return true;
 }
 
