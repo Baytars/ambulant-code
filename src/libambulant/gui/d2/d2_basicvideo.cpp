@@ -134,6 +134,7 @@ gui::d2::d2_basicvideo_renderer::d2_basicvideo_renderer(
 #ifdef WITH_DX_EVR
 	m_evr(NULL),
 	m_evr_control(NULL),
+	m_evr_hwnd(NULL),
 #endif
 	m_update_event(0),
 	m_d2player(dynamic_cast<d2_player*>(mdp)),
@@ -174,6 +175,10 @@ gui::d2::d2_basicvideo_renderer::~d2_basicvideo_renderer() {
 		m_evr_control->Release();
 		m_evr_control = NULL;
 	}
+	if (m_evr_hwnd) {
+		DestroyWindow(m_evr_hwnd);
+		m_evr_hwnd = NULL;
+	}
 #endif
 	if(m_graph_builder) {
 		RemoveFromRot(m_rot_index);
@@ -210,7 +215,8 @@ void gui::d2::d2_basicvideo_renderer::start(double t) {
 	r.translate(surf->get_global_topleft());
 #ifdef WITH_DX_EVR
 	MFVideoNormalizedRect src_rect = {0.0f, 0.0f, 1.0f, 1.0f};
-	RECT dst_rect = { r.left(), r.top(), r.right(), r.bottom() };
+	RECT dst_rect = { 0, 0, r.right(), r.bottom() };
+	SetWindowPos(m_evr_hwnd, 0, r.left(), r.top(), r.right(), r.bottom(), SWP_SHOWWINDOW);
 	m_evr_control->SetVideoPosition(&src_rect, &dst_rect); 
 #else
 //TODO	m_player->setrect(r);
@@ -306,7 +312,15 @@ bool gui::d2::d2_basicvideo_renderer::_open(const std::string& url, HWND parent)
 	if (FAILED(hr)) {
 		lib::win32::win_report_error("QueryInterface(IID_IMFVideoDisplayControl, ...)", hr);
 	}
-	hr = m_evr_control->SetVideoWindow(parent);
+	m_evr_hwnd = CreateWindowEx(
+		0,L"Button", 
+		L"RTPWindow",
+		WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
+		0, 0, 100, 100, 
+		parent, NULL, NULL, NULL);
+	assert(m_evr_hwnd);
+
+	hr = m_evr_control->SetVideoWindow(m_evr_hwnd);
 	if (FAILED(hr)) {
 		lib::win32::win_report_error("SetVideoWindow(...)", hr);
 	}

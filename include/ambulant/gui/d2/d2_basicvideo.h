@@ -100,6 +100,7 @@ class d2_basicvideo_renderer : public common::renderer_playable {
 #ifdef WITH_DX_EVR
 	IBaseFilter *m_evr;
 	IMFVideoDisplayControl *m_evr_control;
+	HWND m_evr_hwnd;
 #endif
 
 	d2_player *m_d2player;
