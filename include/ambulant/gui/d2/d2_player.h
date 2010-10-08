@@ -50,6 +50,9 @@
 
 interface ID2D1Factory;
 interface ID2D1HwndRenderTarget;
+interface ID2D1RenderTarget;
+interface ID2D1Bitmap;
+interface IWICBitmap;
 
 namespace ambulant {
 
@@ -84,6 +87,13 @@ public:
 	virtual void discard_d2d() = 0;
 };
 
+/// This is the callback interface to obtain (partial) screenshots
+/// from the rendered content.
+class AMBULANTAPI d2_capture_callback {
+public:
+	virtual void captured(IWICBitmap *bitmap) = 0;
+};
+
 class d2_player_callbacks : public html_browser_factory {
   public:
 	virtual HWND new_os_window() = 0;
@@ -96,7 +106,8 @@ class AMBULANTAPI d2_player :
 	public common::window_factory,
 	public common::playable_factory_machdep,
 	public common::embedder,
-	public lib::event_processor_observer
+	public lib::event_processor_observer,
+	public d2_capture_callback
 {
 
   public:
@@ -172,6 +183,15 @@ class AMBULANTAPI d2_player :
 	void unregister_resources(d2_resources *resource) {
 		m_resources.erase(resource);
 	}
+
+	// Schedule a capture of the output are
+	void schedule_capture(lib::rect area, d2_capture_callback *cb) {
+		m_captures.push_back(std::pair<lib::rect, d2_capture_callback *>(area, cb));
+	}
+
+	// Global capture-callback: saves snapshots, keeps bitmap for transitions, etc.
+	void captured(IWICBitmap *bitmap);
+
 	// Get current rendertarget, only valid while redrawing
 	ID2D1HwndRenderTarget *get_rendertarget() {
 		return m_cur_wininfo?m_cur_wininfo->m_rendertarget:NULL;
@@ -209,6 +229,11 @@ class AMBULANTAPI d2_player :
 	bool _has_transitions() const;
 	d2_transition *_get_transition(common::playable *p);
 	d2_transition *_set_transition(common::playable *p, const lib::transition_info *info, bool is_outtransition);
+
+	// Capturing screen output
+	ID2D1Bitmap *_capture_bitmap(lib::rect r, ID2D1RenderTarget *src_rt, ID2D1RenderTarget *dst_rt);
+	IWICBitmap *_capture_wic(lib::rect r, ID2D1RenderTarget *src_rt);
+	std::list<std::pair<lib::rect, d2_capture_callback *> > m_captures;
 
 	// The hosting application
 	d2_player_callbacks &m_hoster;
