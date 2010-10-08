@@ -510,3 +510,4 @@ void gui::d2::d2_basicvideo_renderer::_schedule_update() {
 		&d2_basicvideo_renderer::_update_callback);
 	m_event_processor->add_event(m_update_event, 50, lib::ep_med);
 }
+

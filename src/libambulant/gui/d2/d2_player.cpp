@@ -34,6 +34,7 @@
 #include "ambulant/lib/document.h"
 #include "ambulant/lib/textptr.h"
 #include "ambulant/lib/logger.h"
+#include "ambulant/lib/win32/win32_error.h"
 #include "ambulant/lib/transition_info.h"
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/smil2/transition.h"
@@ -109,6 +110,7 @@
 #endif
 
 #include <d2d1.h>
+#include <wincodec.h>
 
 //#define AM_DBG
 
@@ -336,7 +338,7 @@ gui::d2::d2_player::_recreate_d2d(wininfo *wi)
 		&wi->m_rendertarget);
 
 	if (!SUCCEEDED(hr))
-		m_logger->trace("D2D CreateHwndRenderTarget: error 0x%x", hr);
+		lib::win32::win_trace_error("CreateHwndRenderTarget", hr);
 }
 
 void
@@ -458,6 +460,10 @@ std::string gui::d2::d2_player::get_pointed_node_str() {
 }
 
 void gui::d2::d2_player::on_char(int ch) {
+	/*AM_DBG*/ if (ch == 's') {
+		m_logger->debug("d2_player: scheduling screen snapshot");
+		schedule_capture(lib::rect(), this);
+	}
 	if(m_player) m_player->on_char(ch);
 }
 
@@ -475,11 +481,126 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	rt->BeginDraw();
 	wi->m_window->redraw();
 	hr = rt->EndDraw();
-	if (hr == D2DERR_RECREATE_TARGET) {
-		_discard_d2d();
-	}
 	m_cur_wininfo = NULL;
+	if (hr == D2DERR_RECREATE_TARGET) {
+		// This happens if something serious changed (like move to a
+		// different display). Throw away evertyhing that is device-dependent,
+		// it will be re-created next time around.
+		_discard_d2d();
+	} else {
+		// Handle capture callbacks.
+		std::list<std::pair<lib::rect, d2_capture_callback *> >::iterator it;
+		for(it=m_captures.begin(); it != m_captures.end(); it++) {
+			d2_capture_callback *cb = it->second;
+			IWICBitmap *bitmap = _capture_wic(it->first, rt);
+			cb->captured(bitmap);
+		}
+		m_captures.clear();
+	}
 }
+
+ID2D1Bitmap *
+gui::d2::d2_player::_capture_bitmap(lib::rect r, ID2D1RenderTarget *src_rt, ID2D1RenderTarget *dst_rt)
+{
+	HRESULT hr;
+	D2D1_SIZE_U src_size = { r.width(), r.height() };
+	if (r.size() == lib::size(0,0)) {
+		D2D1_SIZE_F rt_size = src_rt->GetSize();
+		src_size.width = rt_size.width;
+		src_size.height = rt_size.height;
+	}
+//	D2D1_RECT_U src_rect = { r.left(), r.top(), r.left()+src_size.width, r.top()+src_size.height };
+	ID2D1Bitmap *bitmap;
+	D2D1_BITMAP_PROPERTIES props = D2D1::BitmapProperties();
+	D2D1_PIXEL_FORMAT rt_format = dst_rt->GetPixelFormat();
+	props.pixelFormat = rt_format;
+	hr = dst_rt->CreateBitmap(src_size, props, &bitmap);
+	if (!SUCCEEDED(hr)) {
+		lib::win32::win_trace_error("capture: CreateBitmap", hr);
+		return NULL;
+	}
+//	D2D1_POINT_2U dst_point = { 0, 0};
+	hr = bitmap->CopyFromRenderTarget(NULL, src_rt, NULL);
+	if (!SUCCEEDED(hr)) {
+		lib::win32::win_trace_error("capture: CopyFromRenderTarget", hr);
+		bitmap->Release();
+		return NULL;
+	}
+	return bitmap;
+}
+
+IWICBitmap *
+gui::d2::d2_player::_capture_wic(lib::rect r, ID2D1RenderTarget *src_rt)
+{
+	static IWICImagingFactory *wf = NULL;
+	HRESULT hr;
+	// Create the WIC factory, if it hasn'tbeen done earlier
+	if (wf == NULL) {
+		hr = CoCreateInstance(
+			CLSID_WICImagingFactory,
+			NULL,
+			CLSCTX_INPROC_SERVER,
+			IID_IWICImagingFactory,
+			reinterpret_cast<void **>(&wf)
+			);
+		if (!SUCCEEDED(hr)) {
+			lib::win32::win_trace_error("capture: CoCreateInstance(IWICImagingFactory)", hr);
+			return NULL;
+		}
+	}
+
+	// Create the WIC bitmap
+	D2D1_SIZE_F src_size = src_rt->GetSize();
+	if (r.size() == lib::size(0,0)) {
+		r = lib::rect(lib::point(0,0), lib::size(int(src_size.width), int(src_size.height)));
+	}
+	IWICBitmap *bitmap;
+    hr = wf->CreateBitmap(
+        r.width(),
+        r.height(),
+        GUID_WICPixelFormat32bppBGR,
+        WICBitmapCacheOnLoad,
+        &bitmap
+        );
+	if (!SUCCEEDED(hr)) {
+		lib::win32::win_trace_error("capture: WIC CreateBitmap", hr);
+		return NULL;
+	}
+
+	// Create the D2D render target for the new bitmap
+	ID2D1RenderTarget *dst_rt;
+    hr = m_d2d->CreateWicBitmapRenderTarget(
+        bitmap,
+        D2D1::RenderTargetProperties(),
+        &dst_rt
+        );
+	if (!SUCCEEDED(hr)) {
+		lib::win32::win_trace_error("capture: CreateWicBitmapRenderTarget", hr);
+		return NULL;
+	}
+
+	// Copy the data from the old render target to a bitmap in
+	// the new target, then render it.
+	ID2D1Bitmap *src_bitmap = _capture_bitmap(r, src_rt, dst_rt);
+	if (src_bitmap) {
+		dst_rt->BeginDraw();
+		D2D1_RECT_F dst_rect = { r.left(), r.top(), r.right(), r.bottom() };
+		dst_rt->DrawBitmap(src_bitmap, dst_rect);
+		hr = dst_rt->EndDraw();
+		// Ignore result, nothing we can do.
+	} else {
+		// Creating the D2D bitmap failed. Release the result.
+		bitmap->Release();
+		bitmap = NULL;
+	}
+
+	// We can release the drawing stuff, now
+	if (src_bitmap) src_bitmap->Release();
+	dst_rt->Release();
+
+	return bitmap;
+}
+
 
 void gui::d2::d2_player::on_done() {
 #ifdef JNK
@@ -853,3 +974,9 @@ void gui::d2::d2_player::open(net::url newdoc, bool startnewdoc, common::player 
 	if(startnewdoc) play();
 }
 
+void
+gui::d2::d2_player::captured(IWICBitmap *bitmap)
+{
+	/*AM_DBG*/ m_logger->debug("d2_player::captured called");
+	if (bitmap) bitmap->Release();
+}
