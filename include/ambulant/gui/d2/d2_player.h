@@ -73,6 +73,7 @@ namespace gui {
 
 namespace d2 {
 
+
 class d2_window;
 class d2_transition;
 
