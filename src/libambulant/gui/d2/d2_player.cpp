@@ -558,7 +558,7 @@ gui::d2::d2_player::_capture_wic(lib::rect r, ID2D1RenderTarget *src_rt)
     hr = wf->CreateBitmap(
         r.width(),
         r.height(),
-        GUID_WICPixelFormat32bppBGR,
+        GUID_WICPixelFormat32bppBGRA,
         WICBitmapCacheOnLoad,
         &bitmap
         );

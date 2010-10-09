@@ -90,8 +90,8 @@ void gui::d2::d2_window::redraw(const lib::rect &r) {
 }
 
 void gui::d2::d2_window::redraw_now() {
-	assert(0); // When is this called??
 #ifdef JNK
+	assert(0); // When is this called??
 	m_redraw_rect_lock.enter();
 	int keep_lock = m_locked;
 	m_locked = 0;

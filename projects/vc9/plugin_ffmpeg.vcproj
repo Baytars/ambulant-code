@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="plugin_ffmpeg"
 	ProjectGUID="{EED7FDFC-068B-4035-BF6C-855E9CCC9A3A}"
 	RootNamespace="plugin_ffmpeg"
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\include;&quot;$(sdl_dir)\include&quot;;&quot;$(ffmpeg_dir)&quot;;&quot;..\..\third_party_packages\ffmpeg-windows-compat&quot;;&quot;$(live555_dir)\UsageEnvironment\include&quot;;&quot;$(live555_dir)\liveMedia\include&quot;;&quot;$(live555_dir)\groupsock\include&quot;;&quot;$(live555_dir)\BasicUsageEnvironment\include&quot;"
-				PreprocessorDefinitions="$(global_ambulant_defines);WIN32;_DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;WITH_SMIL30;WITH_FFMPEG;WITH_LIVE;WITH_SDL;WITH_DSVIDEO"
+				PreprocessorDefinitions="$(global_ambulant_defines);WIN32;_DEBUG;_WINDOWS;_USRDLL;PLUGIN_EXPORTS;WITH_SMIL30;WITH_FFMPEG;WITH_LIVE;WITH_SDL;WITH_DSVIDEO;WITH_D2D"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -247,8 +247,20 @@
 				Name="dsvideo"
 				>
 				<File
+					RelativePath="..\..\src\libambulant\gui\d2\d2_dsvideo.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\libambulant\gui\dx\dx_dsvideo.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\libambulant\common\video_renderer.cpp"
@@ -265,8 +277,20 @@
 				Name="dsvideo"
 				>
 				<File
+					RelativePath="..\..\include\ambulant\gui\d2\d2_dsvideo.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\ambulant\gui\dx\dx_dsvideo.h"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\include\ambulant\common\video_renderer.h"

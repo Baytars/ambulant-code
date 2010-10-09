@@ -40,7 +40,6 @@
 #endif
 
 using namespace ambulant;
-
 inline D2D1_RECT_F d2_rectf(lib::rect r) {
 	return D2D1::RectF(r.left(), r.top(), r.right(), r.bottom());
 }
@@ -332,6 +331,7 @@ bool gui::d2::d2_img_renderer::user_event(const lib::point& pt, int what) {
 	}
 	return true;
 }
+
 void
 gui::d2::d2_img_renderer::recreate_d2d()
 {
