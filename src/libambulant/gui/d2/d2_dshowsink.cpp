@@ -2,6 +2,7 @@
 //#include <streams.h>
 
 #include "ambulant/gui/d2/d2_dshowsink.h"
+#include "ambulant/lib/logger.h"
 //for unicode
 //#include "tchar.h"
 
@@ -254,6 +255,7 @@ HRESULT CVideoD2DBitmapRenderer::DoRenderSample( IMediaSample * pSample )
 
 	// Get the video bitmap buffer
 	pSample->GetPointer( &pBmpBuffer );
+	ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::DoRenderSample() called");
 #ifdef JNK
 	// Lock the Texture
 	D3DLOCKED_RECT d3dlr;

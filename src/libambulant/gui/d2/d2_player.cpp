@@ -70,11 +70,12 @@
 
 // Select video renderer to use.
 // Multiple selections are possible.
+// Define the next one to use a builtin open source video renderer.
 //#define USE_DS_VIDEO
-// Define this one to use the minimal DirectX video renderer
-#define USE_BASIC_VIDEO
-// Define this one to use the more full-featured DirectX video renderer
-//#define USE_D2_VIDEO
+// Define this one to use the minimal DirectShow video renderer
+//#define USE_BASIC_VIDEO
+// Define this one to use the more full-featured DirectShow/Direct2D video renderer
+#define USE_D2_VIDEO
 
 #ifdef USE_DS_VIDEO
 #include "ambulant/gui/d2/d2_dsvideo.h"
@@ -83,7 +84,7 @@
 #include "ambulant/gui/d2/d2_basicvideo.h"
 #endif
 #ifdef USE_D2_VIDEO
-//#include "ambulant/gui/d2/d2_video.h"
+#include "ambulant/gui/d2/d2_d2video.h"
 #endif
 
 // "Renderer" playables
@@ -253,6 +254,9 @@ gui::d2::d2_player::init_playable_factory()
 #ifdef USE_BASIC_VIDEO
 	pf->add_factory(create_d2_basicvideo_playable_factory(this, this));
 #endif
+#ifdef USE_D2_VIDEO
+	pf->add_factory(create_d2_d2video_playable_factory(this, this));
+#endif
 #if 0
 	// Add the playable factory
 	pf->add_factory(create_d2_area_playable_factory(this, this));
@@ -267,14 +271,8 @@ gui::d2::d2_player::init_playable_factory()
 #ifdef WITH_HTML_WIDGET
 	pf->add_factory(create_d2_html_playable_factory(this, this));
 #endif
-#ifdef USE_BASIC_VIDEO
-	pf->add_factory(create_d2_basicvideo_playable_factory(this, this));
-#endif
 #ifdef USE_DS_VIDEO
 	pf->add_factory(create_d2_dsvideo_playable_factory(this, this));
-#endif
-#ifdef USE_D2_VIDEO
-	pf->add_factory(create_d2_video_playable_factory(this, this));
 #endif
 #endif
 }
