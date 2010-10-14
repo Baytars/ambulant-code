@@ -259,7 +259,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;&quot;$(expat_dir)\lib&quot;;&quot;$(jpeg_dir)&quot;;&quot;$(zlib_dir)&quot;;&quot;$(lpng_dir)&quot;;&quot;$(xerces_dir)\src&quot;"
+				AdditionalIncludeDirectories="&quot;$(FrameworkSDKDir)\Samples\multimedia\directshow\baseclasses&quot;;..\..\include;&quot;$(expat_dir)\lib&quot;;&quot;$(jpeg_dir)&quot;;&quot;$(zlib_dir)&quot;;&quot;$(lpng_dir)&quot;;&quot;$(xerces_dir)\src&quot;"
 				PreprocessorDefinitions="$(global_ambulant_defines);WIN32;_DEBUG;_LIB;_AMBULANT;XML_STATIC;AMBULANT_BUILD_DLL;WITH_EXPAT;WITH_WINDOWS_PLUGINS;WITH_D2D"
 				RuntimeLibrary="3"
 				TreatWChar_tAsBuiltInType="false"
@@ -281,9 +281,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib strmbasd.lib"
 				OutputFile="..\..\bin\win32\libambulant_shwin32_D.dll"
-				AdditionalLibraryDirectories="..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;"
+				AdditionalLibraryDirectories="..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;&quot;$(FrameworkSDKDir)\Samples\multimedia\directshow\baseclasses\Debug&quot;"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="1"
@@ -765,6 +765,13 @@
 					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_dshowsink.cpp"
 						>
+						<FileConfiguration
+							Name="DebugShlib|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_fill.cpp"
@@ -1199,6 +1206,10 @@
 						>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_basicvideo.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_d2video.h"
 							>
 						</File>
 						<File
