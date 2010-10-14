@@ -22,6 +22,8 @@
  */
 
 #include "ambulant/gui/d2/d2_d2video.h"
+#include <tchar.h>
+#include "ambulant/gui/d2/d2_dshowsink.h"
 //#include "ambulant/gui/d2/d2_window.h"
 //#include "ambulant/gui/d2/d2_transition.h"
 #include "ambulant/lib/node.h"
@@ -33,18 +35,11 @@
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/test_attrs.h"
 
+
 #include <control.h>
 #include <strmif.h>
 #include <uuids.h>
 #include <vfwmsgs.h>
-#include <tchar.h>
-
-#ifdef WITH_DX_EVR
-#include <mfidl.h>
-#include <evr.h>
-#pragma comment (lib,"mfuuid.lib")
-
-#endif
 
 #pragma comment (lib,"winmm.lib")
 #pragma comment (lib,"amstrmid.lib")
@@ -66,7 +61,8 @@
 #define AddToRot(x, y) do { *y = 0; } while (0)
 #define RemoveFromRot(y) do { assert(y == 0); } while (0)
 #else
-HRESULT AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
+static HRESULT
+AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
 {
 	HRESULT hr;
     IMoniker * pMoniker;
@@ -91,7 +87,8 @@ HRESULT AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
     return hr;
 }
 
-void RemoveFromRot(DWORD pdwRegister)
+static void
+RemoveFromRot(DWORD pdwRegister)
 {
     IRunningObjectTable *pROT;
     if (SUCCEEDED(GetRunningObjectTable(0, &pROT)))
@@ -130,13 +127,8 @@ gui::d2::d2_d2video_renderer::d2_d2video_renderer(
 	m_media_position(NULL),
 	m_media_control(NULL),
 	m_basic_audio(NULL),
-	m_video_window(NULL),
 	m_graph_builder(NULL),
-#ifdef WITH_DX_EVR
-	m_evr(NULL),
-	m_evr_control(NULL),
-	m_evr_hwnd(NULL),
-#endif
+	m_video_sink(NULL),
 	m_update_event(0),
 	m_d2player(dynamic_cast<d2_player*>(mdp)),
 	m_rot_index(0)
@@ -163,24 +155,10 @@ gui::d2::d2_d2video_renderer::~d2_d2video_renderer() {
 		m_basic_audio->Release();
 		m_basic_audio = 0;
 	}
-	if (m_video_window) {
-		m_video_window->Release();
-		m_video_window = 0;
+	if (m_video_sink) {
+		m_video_sink->Release();
+		m_video_sink = 0;
 	}
-#ifdef WITH_DX_EVR
-	if (m_evr) {
-		m_evr->Release();
-		m_evr = NULL;
-	}
-	if (m_evr_control) {
-		m_evr_control->Release();
-		m_evr_control = NULL;
-	}
-	if (m_evr_hwnd) {
-		DestroyWindow(m_evr_hwnd);
-		m_evr_hwnd = NULL;
-	}
-#endif
 	if(m_graph_builder) {
 		RemoveFromRot(m_rot_index);
 		m_graph_builder->Release();
@@ -214,14 +192,6 @@ void gui::d2::d2_d2video_renderer::start(double t) {
 
 	lib::rect r = surf->get_rect();
 	r.translate(surf->get_global_topleft());
-#ifdef WITH_DX_EVR
-	MFVideoNormalizedRect src_rect = {0.0f, 0.0f, 1.0f, 1.0f};
-	RECT dst_rect = { 0, 0, r.right(), r.bottom() };
-	SetWindowPos(m_evr_hwnd, 0, r.left(), r.top(), r.right(), r.bottom(), SWP_SHOWWINDOW);
-	m_evr_control->SetVideoPosition(&src_rect, &dst_rect); 
-#else
-//TODO	m_player->setrect(r);
-#endif
 	// Has this been activated
 	if(m_activated) {
 		// repeat
@@ -261,15 +231,14 @@ bool gui::d2::d2_d2video_renderer::_open(const std::string& url, HWND parent) {
 	}
 	AddToRot(m_graph_builder, &m_rot_index);
 	// We now optionally add a specific output handler.
-#ifdef WITH_DX_EVR
-	hr = CoCreateInstance(CLSID_EnhancedVideoRenderer, 0, CLSCTX_INPROC_SERVER,
-		IID_IBaseFilter, (void**)&m_evr);
-	if (FAILED(hr)) {
-		lib::win32::win_report_error("CoCreateInstance(CLSID_EnhancedVideoRenderer, ...)", hr);
+	m_video_sink = new CVideoD2DBitmapRenderer(NULL, &hr);
+	if(FAILED(hr)) {
+		lib::win32::win_report_error("CVideoD2DBitmapRenderer()", hr);
 		return false;
 	}
-	m_graph_builder->AddFilter(m_evr, _T("Enhanced Video Renderer"));
-#endif
+
+	m_graph_builder->AddFilter(m_video_sink, _T("Direct2D Bitmap Renderer"));
+
 	WCHAR wsz[MAX_PATH];
 	MultiByteToWideChar(CP_ACP,0, url.c_str(), -1, wsz, MAX_PATH);
 	hr = m_graph_builder->RenderFile(wsz, 0);
@@ -303,59 +272,7 @@ bool gui::d2::d2_d2video_renderer::_open(const std::string& url, HWND parent) {
 	if(FAILED(hr)) {
 		lib::win32::win_report_error("QueryInterface(IID_IBasicAudio, ...)", hr);
 	}
-#ifdef WITH_DX_EVR
-	IMFGetService *get_service;
-	hr = m_evr->QueryInterface(IID_IMFGetService, (void**)&get_service);
-	if (FAILED(hr)) {
-		lib::win32::win_report_error("QueryInterface(IID_IMFGetService, ...)", hr);
-	}
-	hr = get_service->GetService(MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (LPVOID*)&m_evr_control);
-	if (FAILED(hr)) {
-		lib::win32::win_report_error("QueryInterface(IID_IMFVideoDisplayControl, ...)", hr);
-	}
-	m_evr_hwnd = CreateWindowEx(
-		0,L"Button", 
-		L"RTPWindow",
-		WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS,
-		0, 0, 100, 100, 
-		parent, NULL, NULL, NULL);
-	assert(m_evr_hwnd);
 
-	hr = m_evr_control->SetVideoWindow(m_evr_hwnd);
-	if (FAILED(hr)) {
-		lib::win32::win_report_error("SetVideoWindow(...)", hr);
-	}
-
-#else
-	hr = m_graph_builder->QueryInterface(IID_IVideoWindow, (void **) &m_video_window);
-	if(FAILED(hr)) {
-		lib::win32::win_report_error("QueryInterface(IID_IVideoWindow, ...)", hr);
-	}
-
-	// Reposition output window
-	if (m_video_window) {
-		hr = m_video_window->put_Owner((OAHWND)parent);
-		if (FAILED(hr)) {
-			lib::win32::win_report_error("put_Owner()", hr);
-		}
-		long style;
-		hr = m_video_window->get_WindowStyle(&style);
-		if (FAILED(hr)) {
-			lib::win32::win_report_error("get_WindowStyle()", hr);
-		}
-		lib::logger::get_logger()->debug("basicvideo_player: windowStyle was 0x%x", style);
-		style |= WS_CHILD|WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-		style &= ~(WS_CAPTION|WS_BORDER|WS_DLGFRAME|WS_SYSMENU|WS_SIZEBOX|WS_MINIMIZEBOX);
-		hr = m_video_window->put_WindowStyle(style);
-		if (FAILED(hr)) {
-			lib::win32::win_report_error("put_WindowStyle()", hr);
-		}
-		hr = m_video_window->put_MessageDrain((OAHWND)parent);
-		if (FAILED(hr)) {
-			lib::win32::win_report_error("put_MessageDrain()", hr);
-		}
-	}
-#endif
 	return true;
 }
 
