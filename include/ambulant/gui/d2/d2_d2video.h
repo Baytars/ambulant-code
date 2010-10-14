@@ -32,8 +32,6 @@
 #include "ambulant/gui/d2/d2_player.h"
 #include "ambulant/lib/mtsync.h"
 
-#define WITH_DX_EVR
-
 interface IGraphBuilder;
 interface IMediaControl;
 interface IMediaPosition;
@@ -41,9 +39,7 @@ interface IMediaEvent;
 interface IBasicAudio;
 interface IVideoWindow;
 interface IBaseFilter;
-#ifdef WITH_DX_EVR
-interface IMFVideoDisplayControl;
-#endif
+class CVideoD2DBitmapRenderer;
 
 namespace ambulant {
 
@@ -96,12 +92,7 @@ class d2_d2video_renderer : public common::renderer_playable {
 	IMediaPosition *m_media_position;
 	IMediaEvent *m_media_event;
 	IBasicAudio *m_basic_audio;
-	IVideoWindow *m_video_window;
-#ifdef WITH_DX_EVR
-	IBaseFilter *m_evr;
-	IMFVideoDisplayControl *m_evr_control;
-	HWND m_evr_hwnd;
-#endif
+	CVideoD2DBitmapRenderer *m_video_sink;
 
 	d2_player *m_d2player;
 	lib::critical_section m_cs;

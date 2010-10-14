@@ -66,7 +66,8 @@
 #define AddToRot(x, y) do { *y = 0; } while (0)
 #define RemoveFromRot(y) do { assert(y == 0); } while (0)
 #else
-HRESULT AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
+static HRESULT
+AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
 {
 	HRESULT hr;
     IMoniker * pMoniker;
@@ -91,7 +92,8 @@ HRESULT AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
     return hr;
 }
 
-void RemoveFromRot(DWORD pdwRegister)
+static void
+RemoveFromRot(DWORD pdwRegister)
 {
     IRunningObjectTable *pROT;
     if (SUCCEEDED(GetRunningObjectTable(0, &pROT)))
