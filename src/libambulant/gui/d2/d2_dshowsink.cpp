@@ -3,7 +3,7 @@
 
 #include "ambulant/gui/d2/d2_dshowsink.h"
 //for unicode
-#include "tchar.h"
+//#include "tchar.h"
 
 //Every Direct3D application this
 //#include <d3d9.h>
@@ -103,7 +103,7 @@ CVideoD2DBitmapRenderer::CVideoD2DBitmapRenderer( LPUNKNOWN pUnk, HRESULT *phr )
 //-----------------------------------------------------------------------------
 // CVideoTextureRenderer destructor
 //-----------------------------------------------------------------------------
-CVideoTextureRenderer::~CVideoTextureRenderer()
+CVideoD2DBitmapRenderer::~CVideoD2DBitmapRenderer()
 {
 #ifdef JNK
 	//Clean Up
@@ -123,7 +123,7 @@ CVideoTextureRenderer::~CVideoTextureRenderer()
 // CheckMediaType: This method forces the graph to give us an R8G8B8 video
 // type, making our copy to texture memory trivial.
 //-----------------------------------------------------------------------------
-HRESULT CVideoTextureRenderer::CheckMediaType(const CMediaType *pmt)
+HRESULT CVideoD2DBitmapRenderer::CheckMediaType(const CMediaType *pmt)
 {
 	HRESULT   hr = E_FAIL;
 	VIDEOINFO *pvi=0;
@@ -150,9 +150,9 @@ HRESULT CVideoTextureRenderer::CheckMediaType(const CMediaType *pmt)
 //-----------------------------------------------------------------------------
 // SetMediaType: Graph connection has been made.
 //-----------------------------------------------------------------------------
-HRESULT CVideoTextureRenderer::SetMediaType(const CMediaType *pmt)
+HRESULT CVideoD2DBitmapRenderer::SetMediaType(const CMediaType *pmt)
 {
-	HRESULT hr;
+//JNK	HRESULT hr;
 
 	UINT uintWidth = 2;
 	UINT uintHeight = 2;
@@ -238,18 +238,19 @@ HRESULT CVideoTextureRenderer::SetMediaType(const CMediaType *pmt)
 //-----------------------------------------------------------------------------
 // DoRenderSample: A sample has been delivered. Copy it to the texture.
 //-----------------------------------------------------------------------------
-HRESULT CVideoTextureRenderer::DoRenderSample( IMediaSample * pSample )
+HRESULT CVideoD2DBitmapRenderer::DoRenderSample( IMediaSample * pSample )
 {
-	BYTE  *pBmpBuffer, *pTexBuffer; // Bitmap buffer, texture buffer
-	LONG  lTexPitch;                // Pitch of bitmap, texture
+	BYTE  *pBmpBuffer;
+//JNK	BYTE *pTexBuffer; // Bitmap buffer, texture buffer
+//JNK	LONG  lTexPitch;                // Pitch of bitmap, texture
 
 	BYTE  * pbS = NULL;
 	BYTE * pBMPBytes = NULL;
 	BYTE * pTextureBytes = NULL;
-	UINT row, col, dwordWidth;
+//JNK	UINT row, col, dwordWidth;
 
 	CheckPointer(pSample,E_POINTER);
-	CheckPointer(m_lpVideoTargetTexture,E_UNEXPECTED);
+//JNK	CheckPointer(m_lpVideoTargetTexture,E_UNEXPECTED);
 
 	// Get the video bitmap buffer
 	pSample->GetPointer( &pBmpBuffer );

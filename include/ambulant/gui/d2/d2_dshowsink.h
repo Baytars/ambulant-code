@@ -44,11 +44,11 @@ public:
 	//-----------------------------------------------------------------------------
 //	struct __declspec(uuid("{AB1B2AB5-18A0-49D5-814F-E2CB454D5D28}")) CLSID_TextureRenderer;
 
-	CVideoD2DBitmapRenderer::CVideoD2DBitmapRenderer(LPUNKNOWN pUnk, HRESULT *phr);
+	CVideoD2DBitmapRenderer(LPUNKNOWN pUnk, HRESULT *phr);
 
-	CVideoTextureRenderer::~CVideoTextureRenderer();
+	~CVideoD2DBitmapRenderer();
 
-	HRESULT CVideoTextureRenderer::CheckMediaType(const CMediaType *pmt);
+	HRESULT CheckMediaType(const CMediaType *pmt);
 	
 	HRESULT SetMediaType(const CMediaType *pmt);
 
