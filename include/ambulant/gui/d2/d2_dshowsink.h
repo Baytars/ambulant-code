@@ -34,6 +34,17 @@
 // If you don't have it you should re-install the SDK and include the sample code.
 #include "streams.h"
 
+interface ID2D1RenderTarget;
+interface ID2D1Bitmap;
+
+class CVideoD2DBitmapRenderer;
+
+class IVideoD2DBitmapRendererCallback
+{
+  public:
+	virtual void BitmapAvailable(CVideoD2DBitmapRenderer *caller) = 0;
+};
+
 class CVideoD2DBitmapRenderer : public CBaseVideoRenderer
 {
 
@@ -52,8 +63,22 @@ public:
 	
 	HRESULT SetMediaType(const CMediaType *pmt);
 
-	HRESULT DoRenderSample(IMediaSample * pSample );
+	HRESULT DoRenderSample(IMediaSample * pSample);
 
+	void SetRenderTarget(ID2D1RenderTarget *rt);
+
+	void SetCallback(IVideoD2DBitmapRendererCallback *callback);
+	
+	ID2D1Bitmap *LockBitmap();
+
+	void UnlockBitmap();
+
+	void DestroyBitmap();
+private:
+	ID2D1RenderTarget *m_rt;
+	ID2D1Bitmap *m_d2bitmap;
+//	ID2D1Bitmap *m_d2bitmap_next;
+	IVideoD2DBitmapRendererCallback *m_callback;
 #ifdef JNK
 	void SetVideoTexture(LPDIRECT3DTEXTURE9* ppTexture);
 #endif // JNK
@@ -61,9 +86,10 @@ public:
 #ifdef JNK
 	BOOL m_bUseDynamicTextures;
 #endif // JNK
-	LONG m_lVidWidth;   // Video width
-	LONG m_lVidHeight;  // Video Height
-	LONG m_lVidPitch;   // Video Pitch
+	int m_width;   // Video width
+	int m_height;  // Video Height
+	int m_pitch;   // Video Pitch
+	bool m_has_alpha;
 
 #ifdef JNK
 	//The rendertarget where our renderer renders the video to

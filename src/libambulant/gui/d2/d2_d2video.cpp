@@ -22,7 +22,6 @@
  */
 
 #include "ambulant/gui/d2/d2_d2video.h"
-#include <tchar.h>
 #include "ambulant/gui/d2/d2_dshowsink.h"
 //#include "ambulant/gui/d2/d2_window.h"
 //#include "ambulant/gui/d2/d2_transition.h"
@@ -40,6 +39,9 @@
 #include <strmif.h>
 #include <uuids.h>
 #include <vfwmsgs.h>
+
+#include <d2d1.h>
+#include <d2d1helper.h>
 
 #pragma comment (lib,"winmm.lib")
 #pragma comment (lib,"amstrmid.lib")
@@ -73,7 +75,7 @@ AddToRot(IUnknown *pUnkGraph, DWORD *pdwRegister)
     }
 	wchar_t wsz[256];
 
-    _stprintf_s(wsz, TEXT("FilterGraph %08x pid %08x"), (DWORD_PTR)pUnkGraph,
+    swprintf_s(wsz, L"FilterGraph %08x pid %08x", (DWORD_PTR)pUnkGraph,
 		GetCurrentProcessId());
 //	MultiByteToWideChar( CP_ACP, 0, str, strlen(str)+1, wsz, sizeof(wsz)/sizeof(wsz[0]) );
 
@@ -99,6 +101,12 @@ RemoveFromRot(DWORD pdwRegister)
 }
 #endif
 using namespace ambulant;
+
+
+inline D2D1_RECT_F d2_rectf(lib::rect r) {
+	return D2D1::RectF(r.left(), r.top(), r.right(), r.bottom());
+}
+
 extern const char d2_d2video_playable_tag[] = "video";
 extern const char d2_d2video_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectXVideo");
 extern const char d2_d2video_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererVideo");
@@ -122,7 +130,7 @@ gui::d2::d2_d2video_renderer::d2_d2video_renderer(
 	lib::event_processor* evp,
 	common::factories *fp,
 	common::playable_factory_machdep *mdp)
-:	common::renderer_playable(context, cookie, node, evp, fp, mdp),
+:	d2_renderer<common::renderer_playable>(context, cookie, node, evp, fp, mdp),
 	m_media_event(NULL),
 	m_media_position(NULL),
 	m_media_control(NULL),
@@ -155,10 +163,14 @@ gui::d2::d2_d2video_renderer::~d2_d2video_renderer() {
 		m_basic_audio->Release();
 		m_basic_audio = 0;
 	}
+#if 0
+	// For reasons unknown, we should not release the video
+	// sink. Maybe the AddRef() is missing?
 	if (m_video_sink) {
 		m_video_sink->Release();
 		m_video_sink = 0;
 	}
+#endif
 	if(m_graph_builder) {
 		RemoveFromRot(m_rot_index);
 		m_graph_builder->Release();
@@ -189,6 +201,12 @@ void gui::d2::d2_d2video_renderer::start(double t) {
 		m_context->stopped(m_cookie);
 		return;
 	}
+
+	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
+	if (rt) {
+		m_video_sink->SetRenderTarget(rt);
+	}
+	m_video_sink->SetCallback(this);
 
 	lib::rect r = surf->get_rect();
 	r.translate(surf->get_global_topleft());
@@ -237,7 +255,7 @@ bool gui::d2::d2_d2video_renderer::_open(const std::string& url, HWND parent) {
 		return false;
 	}
 
-	m_graph_builder->AddFilter(m_video_sink, _T("Direct2D Bitmap Renderer"));
+	m_graph_builder->AddFilter(m_video_sink, L"Direct2D Bitmap Renderer");
 
 	WCHAR wsz[MAX_PATH];
 	MultiByteToWideChar(CP_ACP,0, url.c_str(), -1, wsz, MAX_PATH);
@@ -398,9 +416,68 @@ bool gui::d2::d2_d2video_renderer::user_event(const lib::point& pt, int what) {
 	return true;
 }
 
-void gui::d2::d2_d2video_renderer::redraw(const lib::rect &dirty, common::gui_window *window)
+void gui::d2::d2_d2video_renderer::redraw_body(const lib::rect &dirty, common::gui_window *window)
 {
+	recreate_d2d();
+	if (m_video_sink == NULL) return;
+	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
+	if (rt == NULL) return;
+	m_video_sink->SetRenderTarget(rt);
+	ID2D1Bitmap *bitmap = m_video_sink->LockBitmap();
+	if (bitmap == NULL) return;
 
+	lib::rect img_rect1;
+	lib::rect img_reg_rc;
+	D2D1_SIZE_U bmsize = bitmap->GetPixelSize();
+	lib::size srcsize(bmsize.width, bmsize.height);
+
+#ifdef WITH_SMIL30
+	lib::rect croprect = m_dest->get_crop_rect(srcsize);
+	AM_DBG lib::logger::get_logger()->debug("get_crop_rect(%d,%d) -> (%d, %d, %d, %d)", srcsize.w, srcsize.h, croprect.left(), croprect.top(), croprect.width(), croprect.height());
+	img_reg_rc = m_dest->get_fit_rect(croprect, srcsize, &img_rect1, m_alignment);
+	double alpha_media = 1.0, alpha_media_bg = 1.0, alpha_chroma = 1.0;
+	lib::color_t chroma_low = lib::color_t(0x000000), chroma_high = lib::color_t(0xFFFFFF);
+	const common::region_info *ri = m_dest->get_info();
+	if (ri) {
+		alpha_media = ri->get_mediaopacity();
+//???		alpha_media_bg = ri->get_mediabgopacity();
+//???		m_bgopacity = ri->get_bgopacity();
+		if (ri->is_chromakey_specified()) {
+			alpha_chroma = ri->get_chromakeyopacity();
+			lib::color_t chromakey = ri->get_chromakey();
+			lib::color_t chromakeytolerance = ri->get_chromakeytolerance();
+			lib::compute_chroma_range(chromakey, chromakeytolerance, &chroma_low, &chroma_high);
+		} else alpha_chroma = alpha_media;
+	}
+#else
+	// Get fit rectangles
+	img_reg_rc = m_dest->get_fit_rect(srcsize, &img_rect1, m_alignment);
+#endif
+	img_reg_rc.translate(m_dest->get_global_topleft());
+
+	lib::rect img_rect(img_rect1);
+	rt->DrawBitmap(
+		bitmap,
+		d2_rectf(img_reg_rc),
+		alpha_media,
+		D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+		d2_rectf(img_rect));
+
+	m_video_sink->UnlockBitmap();
+}
+
+void gui::d2::d2_d2video_renderer::BitmapAvailable(CVideoD2DBitmapRenderer *caller)
+{
+	if (m_dest) m_dest->need_redraw();
+}
+
+void gui::d2::d2_d2video_renderer::recreate_d2d()
+{
+}
+
+void gui::d2::d2_d2video_renderer::discard_d2d()
+{
+	if (m_video_sink) m_video_sink->DestroyBitmap();
 }
 
 void gui::d2::d2_d2video_renderer::_update_callback() {

@@ -30,6 +30,8 @@
 #include "ambulant/lib/event.h"
 #include "ambulant/common/renderer_impl.h"
 #include "ambulant/gui/d2/d2_player.h"
+#include "ambulant/gui/d2/d2_renderer.h"
+#include "ambulant/gui/d2/d2_dshowsink.h"
 #include "ambulant/lib/mtsync.h"
 
 interface IGraphBuilder;
@@ -47,11 +49,12 @@ namespace gui {
 
 namespace d2 {
 
-class basicvideo_player;
-
 common::playable_factory *create_d2_d2video_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp);
 
-class d2_d2video_renderer : public common::renderer_playable {
+class d2_d2video_renderer
+:	public d2_renderer<common::renderer_playable>,
+	public IVideoD2DBitmapRendererCallback
+{
   public:
 	d2_d2video_renderer(
 		common::playable_notification *context,
@@ -61,6 +64,7 @@ class d2_d2video_renderer : public common::renderer_playable {
 		common::factories *fp,
 		common::playable_factory_machdep *d2player);
 	~d2_d2video_renderer();
+	common::duration get_dur();
 	void start(double t);
 	//void stop();
 	bool stop();
@@ -68,11 +72,12 @@ class d2_d2video_renderer : public common::renderer_playable {
 	void seek(double t);
 	void resume();
 	bool user_event(const lib::point& pt, int what);
-	void redraw(const lib::rect &dirty, common::gui_window *window);
-	common::duration get_dur();
-	void set_intransition(const lib::transition_info *info) {};
-	void start_outtransition(const lib::transition_info *info) {};
+	void redraw_body(const lib::rect &dirty, common::gui_window *window);
 
+	void recreate_d2d();
+	void discard_d2d();
+
+	void BitmapAvailable(CVideoD2DBitmapRenderer *caller);
   private:
     bool _open(const std::string& url, HWND parent);
 	bool _can_play();
