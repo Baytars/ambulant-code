@@ -456,12 +456,21 @@ void gui::d2::d2_d2video_renderer::redraw_body(const lib::rect &dirty, common::g
 	img_reg_rc.translate(m_dest->get_global_topleft());
 
 	lib::rect img_rect(img_rect1);
+	D2D1_RECT_F d2rect = d2_rectf(img_rect);
+	// Video images are upside-down, so we modify the matrix and
+	// re-set it after the bitblit.
+	D2D1_MATRIX_3X2_F oldmatrix;
+	rt->GetTransform(&oldmatrix);
+	D2D1_MATRIX_3X2_F newmatrix =
+		D2D1::Matrix3x2F::Scale(1.0f, -1.0f, D2D1::Point2F((d2rect.left+d2rect.right)/2, (d2rect.top+d2rect.bottom)/2));
+	rt->SetTransform(&newmatrix);
 	rt->DrawBitmap(
 		bitmap,
 		d2_rectf(img_reg_rc),
 		alpha_media,
 		D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
-		d2_rectf(img_rect));
+		d2rect);
+	rt->SetTransform(&oldmatrix);
 
 	m_video_sink->UnlockBitmap();
 }
