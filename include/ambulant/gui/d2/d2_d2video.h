@@ -79,7 +79,7 @@ class d2_d2video_renderer
 
 	void BitmapAvailable(CVideoD2DBitmapRenderer *caller);
   private:
-    bool _open(const std::string& url, HWND parent);
+    bool _open(const std::string& url);
 	bool _can_play();
 	void _start(double t);
 	bool _stop();

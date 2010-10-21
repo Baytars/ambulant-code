@@ -39,13 +39,13 @@ interface ID2D1Bitmap;
 
 class CVideoD2DBitmapRenderer;
 
-class IVideoD2DBitmapRendererCallback
+class AMBULANTAPI IVideoD2DBitmapRendererCallback
 {
   public:
 	virtual void BitmapAvailable(CVideoD2DBitmapRenderer *caller) = 0;
 };
 
-class CVideoD2DBitmapRenderer : public CBaseVideoRenderer
+class AMBULANTAPI CVideoD2DBitmapRenderer : public CBaseVideoRenderer
 {
 
 public:
