@@ -48,6 +48,19 @@
 #include "ambulant/gui/dx/html_bridge.h"
 //#include "ambulant/gui/d2/d2_playable.h"
 
+#if 1
+// This is a workaround for a bug in VS2008/MSSDK, where installation
+// order can mess up standard include files.
+// See <http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/4bc93a16-4ad5-496c-954c-45efbe4b180b>
+// for details.
+namespace std {
+ // TEMPLATE FUNCTION _Swap_adl
+ template<class _Ty> inline void _Swap_adl(_Ty& _Left, _Ty& _Right) {	// exchange values stored at _Left and _Right, using ADL
+  swap(_Left, _Right);
+ }
+}
+#endif
+
 interface ID2D1Factory;
 interface ID2D1HwndRenderTarget;
 interface ID2D1RenderTarget;

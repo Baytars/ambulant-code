@@ -183,13 +183,12 @@ void gui::d2::d2_d2video_renderer::start(double t) {
 	AM_DBG lib::logger::get_logger()->debug("start: %s", m_node->get_path_display_desc().c_str());
 	common::surface *surf = get_surface();
 
-	HWND parent = m_d2player->get_hwnd(); // XXX
 	net::url url = m_node->get_url("src");
 	_init_clip_begin_end();
 	if(url.is_local_file() || lib::win32::file_exists(url.get_file())) {
-		_open(url.get_file(), parent);
+		_open(url.get_file());
 	} else if(url.is_absolute()) {
-		_open(url.get_url(), parent);
+		_open(url.get_url());
 	} else {
 		lib::logger::get_logger()->show("The location specified for the data source does not exist. [%s]",
 			url.get_url().c_str());
@@ -240,7 +239,7 @@ void gui::d2::d2_d2video_renderer::start(double t) {
 	_schedule_update();
 }
 
-bool gui::d2::d2_d2video_renderer::_open(const std::string& url, HWND parent) {
+bool gui::d2::d2_d2video_renderer::_open(const std::string& url) {
 	HRESULT hr = CoCreateInstance(CLSID_FilterGraph,0,CLSCTX_INPROC_SERVER,
 		IID_IGraphBuilder,(void**)&m_graph_builder);
 	if(FAILED(hr)) {
