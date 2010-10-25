@@ -199,7 +199,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib strmbase.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib dwrite.lib strmbase.lib"
 				OutputFile="..\..\bin\win32\libambulant_shwin32.dll"
 				AdditionalLibraryDirectories="..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;&quot;$(FrameworkSDKDir)\Samples\multimedia\directshow\baseclasses\Release&quot;"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
@@ -281,7 +281,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib strmbasd.lib"
+				AdditionalDependencies="libjpeg.lib libpng.lib libexpat.lib zlib.lib windowscodecs.lib d2d1.lib dwrite.lib strmbasd.lib"
 				OutputFile="..\..\bin\win32\libambulant_shwin32_D.dll"
 				AdditionalLibraryDirectories="..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;&quot;$(FrameworkSDKDir)\Samples\multimedia\directshow\baseclasses\Debug&quot;"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
@@ -803,6 +803,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\libambulant\gui\d2\d2_text.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_window.cpp"
 						>
 					</File>
@@ -1243,6 +1247,10 @@
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_renderer.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_text.h"
 							>
 						</File>
 						<File

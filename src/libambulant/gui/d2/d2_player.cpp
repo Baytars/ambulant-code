@@ -44,7 +44,7 @@
 // Renderer playables
 //#include "ambulant/gui/d2/html_bridge.h"
 #include "ambulant/gui/d2/d2_fill.h"
-//#include "ambulant/gui/d2/d2_text.h"
+#include "ambulant/gui/d2/d2_text.h"
 #ifdef	WITH_SMIL30
 //#include "ambulant/gui/d2/d2_smiltext.h"
 #endif/*WITH_SMIL30*/
@@ -251,6 +251,7 @@ gui::d2::d2_player::init_playable_factory()
 	set_playable_factory(pf);
 	pf->add_factory(create_d2_fill_playable_factory(this, this));
 	pf->add_factory(create_d2_image_playable_factory(this, this));
+	pf->add_factory(create_d2_text_playable_factory(this, this));
 #ifdef USE_BASIC_VIDEO
 	pf->add_factory(create_d2_basicvideo_playable_factory(this, this));
 #endif
@@ -267,7 +268,6 @@ gui::d2::d2_player::init_playable_factory()
 	pf->add_factory(gui::sdl::create_sdl_playable_factory(this));
 #endif
 	pf->add_factory(create_d2_smiltext_playable_factory(this, this));
-	pf->add_factory(create_d2_text_playable_factory(this, this));
 #ifdef WITH_HTML_WIDGET
 	pf->add_factory(create_d2_html_playable_factory(this, this));
 #endif
