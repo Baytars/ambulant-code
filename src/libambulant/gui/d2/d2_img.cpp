@@ -45,7 +45,7 @@ inline D2D1_RECT_F d2_rectf(lib::rect r) {
 }
 
 extern const char d2_img_playable_tag[] = "img";
-extern const char d2_img_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirectX");
+extern const char d2_img_playable_renderer_uri[] = AM_SYSTEM_COMPONENT("RendererDirect2D");
 extern const char d2_img_playable_renderer_uri2[] = AM_SYSTEM_COMPONENT("RendererWicImg");
 extern const char d2_img_playable_renderer_uri3[] = AM_SYSTEM_COMPONENT("RendererImg");
 
@@ -54,7 +54,7 @@ IWICImagingFactory *gui::d2::d2_img_renderer::s_wic_factory = NULL;
 common::playable_factory *
 gui::d2::create_d2_image_playable_factory(common::factories *factory, common::playable_factory_machdep *mdp)
 {
-	smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirectX"), true);
+	smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererDirect2D"), true);
 	smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererWicImg"), true);
 	smil2::test_attrs::set_current_system_component_value(AM_SYSTEM_COMPONENT("RendererImg"), true);
 	return new common::single_playable_factory<
