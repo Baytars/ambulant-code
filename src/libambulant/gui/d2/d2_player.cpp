@@ -639,12 +639,16 @@ gui::d2::d2_player::new_window(const std::string &name,
 
 	// Create an os window
 	winfo->m_hwnd = m_hoster.new_os_window();
+	assert(winfo->m_hwnd);
 
 	// Rendertarget will be created on-demand
 	winfo->m_rendertarget = NULL;
+
 	// Region?
 	region *rgn = (region *) src;
 
+	// Set window size
+	PostMessage(winfo->m_hwnd, WM_SET_CLIENT_RECT, bounds.w, bounds.h);
 #ifdef JNK
 	// Clear the viewport
 	const common::region_info *ri = rgn->get_info();
