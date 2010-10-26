@@ -155,6 +155,7 @@ d2_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 
 	destrect.translate(m_dest->get_global_topleft());
 	
+	assert(strlen((char*)m_data) <= m_data_size);
 	lib::textptr text_data((char *)m_data);
 
 	rt->DrawText(
