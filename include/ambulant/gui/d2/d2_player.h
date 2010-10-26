@@ -48,7 +48,7 @@
 #include "ambulant/gui/dx/html_bridge.h"
 //#include "ambulant/gui/d2/d2_playable.h"
 
-#if 1
+#ifndef _UTILITY_
 // This is a workaround for a bug in VS2008/MSSDK, where installation
 // order can mess up standard include files.
 // See <http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/4bc93a16-4ad5-496c-954c-45efbe4b180b>
@@ -59,7 +59,7 @@ namespace std {
   swap(_Left, _Right);
  }
 }
-#endif
+#endif // _UTILITY_
 
 interface ID2D1Factory;
 interface ID2D1HwndRenderTarget;
@@ -215,10 +215,12 @@ class AMBULANTAPI d2_player :
 		return m_cur_wininfo?m_cur_wininfo->m_hwnd:_get_main_window();
 	}
   private:
+	bool _calc_fit(const RECT& dstrect, const lib::size& srcsize, float& xoff, float& yoff, float& fac);
 
 	// Structure to keep hwnd/window and rendertarget together
 	struct wininfo {
-		HWND m_hwnd; 
+		HWND m_hwnd;
+		RECT m_rect;
 		ID2D1HwndRenderTarget *m_rendertarget;
 		d2_window *m_window;
 //JNK		long m_f;

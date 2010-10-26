@@ -208,6 +208,7 @@ CMainFrame::OnViewFullScreen()
 		child->SetWindowPos(NULL, dx, dy, 0, 0, SWP_NOZORDER);
 	}
 #endif
+	InvalidateRect(NULL);
 }
 
 void

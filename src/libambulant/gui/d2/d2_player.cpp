@@ -465,6 +465,46 @@ void gui::d2::d2_player::on_char(int ch) {
 	if(m_player) m_player->on_char(ch);
 }
 
+bool gui::d2::d2_player::_calc_fit(
+	const RECT& dstrect,
+	const lib::size& srcsize,
+	float& xoff,
+	float& yoff,
+	float& fac)
+{
+	// First some sanity checks
+	if (srcsize.w == 0 || srcsize.h == 0) return false;
+	float w = dstrect.right-dstrect.left;
+	float h = dstrect.bottom-dstrect.top;
+	if (w == 0 || h == 0) return false;
+
+	// Compute sizes if we simply want to fill the area
+	fac = w / srcsize.w;
+	if (h / srcsize.h < fac) fac = h / srcsize.h;
+
+	// Now check whether we should scale at all
+	bool scale_up = false;
+	bool scale_down = true;
+	if (!scale_up && fac > 1) {
+		fac = 1;
+	}
+	if (!scale_down && fac < 1) {
+		fac = 1;
+	}
+
+	// Now compute "spare" pixels
+	float spare_x = w - (fac*srcsize.w);
+	float spare_y = h - (fac*srcsize.h);
+	if (spare_x < 0) spare_x = 0;
+	if (spare_y < 0) spare_y = 0;
+
+	// Compute offset
+	xoff = spare_x / 2;
+	yoff = spare_y / 2;
+
+	return xoff != 0 || yoff != 0 || fac != 1;
+}
+
 void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	HRESULT hr = S_OK;
 	// Create the Direct2D resources, in case they were lost
@@ -476,7 +516,37 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	ID2D1HwndRenderTarget *rt = wi->m_rendertarget;
 	if (rt == NULL) return;
 
+	// Check whether our window changed size. If so: communicate to d2d and
+	// paint background again.
+	RECT client_rect;
+	BOOL ok = GetClientRect(hwnd, &client_rect);
+	assert(ok);
+	BOOL changed_size = !EqualRect(&client_rect, &wi->m_rect);
+	if (changed_size) {
+		D2D1_SIZE_U new_size = { client_rect.right-client_rect.left, client_rect.bottom-client_rect.top };
+		rt->Resize(new_size);
+	}
+
 	rt->BeginDraw();
+
+	// Set the transformation
+	const lib::rect& wanted_rect = wi->m_window->get_rect();
+	float xoff, yoff, factor;
+	lib::logger::get_logger()->debug("d2_player::redraw(%d, %d, %d, %d)", client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
+	if (_calc_fit(client_rect, wanted_rect.size(), xoff, yoff, factor)) {
+		D2D1_MATRIX_3X2_F transform = {
+			factor, 0,
+			0, factor,
+			xoff, yoff
+		};
+		lib::logger::get_logger()->debug("d2_player::redraw offset %f,%f factor %f", xoff, yoff, factor);
+		if (changed_size) {
+			// XXXJACK paint background? Seems unnecessary...
+		}
+		rt->SetTransform(transform);
+	}
+
+	// Do the redraw
 	wi->m_window->redraw();
 	hr = rt->EndDraw();
 	m_cur_wininfo = NULL;
@@ -640,6 +710,7 @@ gui::d2::d2_player::new_window(const std::string &name,
 	// Create an os window
 	winfo->m_hwnd = m_hoster.new_os_window();
 	assert(winfo->m_hwnd);
+	GetClientRect(winfo->m_hwnd, &winfo->m_rect);
 
 	// Rendertarget will be created on-demand
 	winfo->m_rendertarget = NULL;
