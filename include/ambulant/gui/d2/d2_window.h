@@ -64,6 +64,7 @@ class d2_window : public common::gui_window {
 	void need_events(bool onoff) { /* Always get them on windows */ }
 	const std::string& get_name() const { return m_name;}
 	region *get_region() { return m_rgn;}
+	const lib::rect& get_rect() { return m_viewrc; }
 	void lock_redraw();
 	void unlock_redraw();
 
