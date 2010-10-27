@@ -803,6 +803,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\libambulant\gui\d2\d2_smiltext.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\libambulant\gui\d2\d2_text.cpp"
 						>
 					</File>
@@ -1247,6 +1251,10 @@
 						</File>
 						<File
 							RelativePath="..\..\include\ambulant\gui\d2\d2_renderer.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\include\ambulant\gui\d2\d2_smiltext.h"
 							>
 						</File>
 						<File
