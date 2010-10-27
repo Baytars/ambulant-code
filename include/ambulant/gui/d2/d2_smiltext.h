@@ -78,6 +78,8 @@ class d2_smiltext_renderer :
 	void recreate_d2d();
 	void discard_d2d();
   private:
+    bool _collect_text();
+	void _recreate_layout();
 	unsigned int _compute_rate(smil2::smiltext_align align, lib::size size, lib::rect r,  unsigned int dur); // Must go to engine
 
 	lib::color_t m_text_color;
@@ -85,7 +87,9 @@ class d2_smiltext_renderer :
 	static IDWriteFactory *s_write_factory;
 
 	IDWriteTextFormat *m_text_format;
+	std::wstring m_data;
 	IDWriteTextLayout *m_text_layout;
+	std::vector<int> m_run_begins;
 	ID2D1SolidColorBrush *m_brush;
 	
 	smil2::smiltext_engine m_engine;
