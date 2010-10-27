@@ -194,101 +194,203 @@ void
 d2_smiltext_renderer::smiltext_changed()
 {
 	m_lock.enter();
-//JNK	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//JNK	assert(m_text_storage);
 	m_engine.lock();
-	if (m_engine.is_changed()) {
-		lib::xml_string data;
-		smil2::smiltext_runs::const_iterator i;
-//JNK		[m_text_storage beginEditing];
-		if (m_engine.is_cleared()) {
-			// Completely new text. Clear our copy and render everything.
+	if (_collect_text())
+		_recreate_layout();
+	bool finished = m_engine.is_finished();
+	m_engine.unlock();
+	m_lock.leave();
+
+	m_dest->need_redraw();
+	if (finished)
+		m_context->stopped(m_cookie);
+}
+
+bool
+d2_smiltext_renderer::_collect_text()
+{
+	if (!m_engine.is_changed()) return false;
+	m_data = L"";
+	lib::xml_string newdata;
+	m_run_begins.clear();
+	m_run_begins.push_back(0);
+	smil2::smiltext_runs::const_iterator i;
+	
+	// For DirectWrite we always re-format the complete text
+	m_needs_conditional_space = false;
+	m_needs_conditional_newline = false;
+	for( i=m_engine.begin(); i!=m_engine.end(); i++) {
+		AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: another run");
+		switch((*i).m_command) {
+		case smil2::stc_break:
+			newdata = "\n\n";
 			m_needs_conditional_space = false;
 			m_needs_conditional_newline = false;
+			break;
+		case smil2::stc_condbreak:
+			if (m_needs_conditional_newline) {
+				newdata = "\n";
+				m_needs_conditional_space = false;
+				m_needs_conditional_newline = false;
+			}
+			break;
+		case smil2::stc_condspace:
+			if (m_needs_conditional_space) {
+				newdata = " ";
+				m_needs_conditional_newline = true;
+				m_needs_conditional_space = false;
+			}
+			break;
+		case smil2::stc_data:
+			if ( (*i).m_data == "") {
+				// I think we leave the conditionals alone, for an empty block.
+			} else {
+				char lastch = *((*i).m_data.rbegin());
+				if (lastch == '\r' || lastch == '\n' || lastch == '\f' || lastch == '\v') {
+					m_needs_conditional_newline = false;
+					m_needs_conditional_space = false;
+				} else
+				if (lastch == ' ' || lastch == '\t') {
+					m_needs_conditional_newline = true;
+					m_needs_conditional_space = false;
+				} else {
+					m_needs_conditional_newline = true;
+					m_needs_conditional_space = true;
+				}
+				newdata = (*i).m_data.c_str();
+			}
+			break;
+		default:
+			assert(0);
+		}
+		// Handle override textDirection here, by inserting the magic unicode
+		// commands
+		if ((*i).m_direction == smil2::stw_ltro) {
+			lib::logger::get_logger()->debug("cocoa_smiltext: should do ltro text");
+			newdata = "\u202d" + newdata + "\u202c";
+		} else if ((*i).m_direction == smil2::stw_rtlo) {
+			lib::logger::get_logger()->debug("cocoa_smiltext: should do rtlo text");
+			newdata = "\u202e" + newdata + "\u202c";
+		}
+		lib::textptr convert(newdata.c_str());
+		const wchar_t *wnewdata = convert.c_wstr();
+		m_data = m_data + wnewdata;
+		m_run_begins.push_back(m_data.length());
+	}
+
+	m_engine.done();
+	return true;
+}
+
+
+void
+d2_smiltext_renderer::_recreate_layout()
+{
+	// First we convert the wide string into a dw object
+	if (m_text_layout) m_text_layout->Release();
+	if (m_dest == NULL) return;
+	rect destrect = m_dest->get_rect();
+	FLOAT w = destrect.width();
+	FLOAT h = destrect.height();
+	HRESULT hr;
+	hr = s_write_factory->CreateTextLayout(m_data.c_str(), m_data.length(), m_text_format, w, h, &m_text_layout);
+	if (!SUCCEEDED(hr)) {
+		lib::logger::get_logger()->trace("d2_smiltext: Cannot CreateTextLayout: error 0x%x", hr);
+		return;
+	}
+#ifdef JNK
+	//JNK	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	lib::xml_string data;
+	smil2::smiltext_runs::const_iterator i;
+//JNK		[m_text_storage beginEditing];
+	if (m_engine.is_cleared()) {
+		// Completely new text. Clear our copy and render everything.
+		m_needs_conditional_space = false;
+		m_needs_conditional_newline = false;
 //JNK			NSRange all;
 //JNK			all.location = 0;
 //JNK			all.length = [m_text_storage length];
 //JNK			if (all.length);
 //JNK				[m_text_storage deleteCharactersInRange:all];
-			i = m_engine.begin();
-		} else {
-			// Only additions. Don't clear and only render the new stuff.
-			i = m_engine.newbegin();
-		}
-		while (i != m_engine.end()) {
-			AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: another run");
+		i = m_engine.begin();
+	} else {
+		// Only additions. Don't clear and only render the new stuff.
+		i = m_engine.newbegin();
+	}
+	while (i != m_engine.end()) {
+		AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: another run");
 //JNK			NSRange newrange;
 //JNK			// Add the new characters
 //JNK			newrange.location = [m_text_storage length];
 //JNK			newrange.length = 0;
 //JNK			NSMutableString *newdata = [NSMutableString stringWithUTF8String:""];
-			switch((*i).m_command) {
-			case smil2::stc_break:
+		switch((*i).m_command) {
+		case smil2::stc_break:
 //JNK				newdata = [NSMutableString stringWithUTF8String:"\n\n"];
+			m_needs_conditional_space = false;
+			m_needs_conditional_newline = false;
+			break;
+		case smil2::stc_condbreak:
+			if (m_needs_conditional_newline) {
+//JNK					newdata = [NSMutableString stringWithUTF8String:"\n"];
 				m_needs_conditional_space = false;
 				m_needs_conditional_newline = false;
-				break;
-			case smil2::stc_condbreak:
-				if (m_needs_conditional_newline) {
-//JNK					newdata = [NSMutableString stringWithUTF8String:"\n"];
-					m_needs_conditional_space = false;
-					m_needs_conditional_newline = false;
-				}
-				break;
-			case smil2::stc_condspace:
-				if (m_needs_conditional_space) {
+			}
+			break;
+		case smil2::stc_condspace:
+			if (m_needs_conditional_space) {
 //JNK					newdata = [NSMutableString stringWithUTF8String:" "];
+				m_needs_conditional_newline = true;
+				m_needs_conditional_space = false;
+			}
+			break;
+		case smil2::stc_data:
+			if ( (*i).m_data == "") {
+				// I think we leave the conditionals alone, for an empty block.
+			} else {
+				char lastch = *((*i).m_data.rbegin());
+				if (lastch == '\r' || lastch == '\n' || lastch == '\f' || lastch == '\v') {
+					m_needs_conditional_newline = false;
+					m_needs_conditional_space = false;
+				} else
+				if (lastch == ' ' || lastch == '\t') {
 					m_needs_conditional_newline = true;
 					m_needs_conditional_space = false;
-				}
-				break;
-			case smil2::stc_data:
-				if ( (*i).m_data == "") {
-					// I think we leave the conditionals alone, for an empty block.
 				} else {
-					char lastch = *((*i).m_data.rbegin());
-					if (lastch == '\r' || lastch == '\n' || lastch == '\f' || lastch == '\v') {
-						m_needs_conditional_newline = false;
-						m_needs_conditional_space = false;
-					} else
-					if (lastch == ' ' || lastch == '\t') {
-						m_needs_conditional_newline = true;
-						m_needs_conditional_space = false;
-					} else {
-						m_needs_conditional_newline = true;
-						m_needs_conditional_space = true;
-					}
-//JNK					newdata = [NSMutableString stringWithUTF8String:(*i).m_data.c_str()];
+					m_needs_conditional_newline = true;
+					m_needs_conditional_space = true;
 				}
-				break;
-			default:
-				assert(0);
+//JNK					newdata = [NSMutableString stringWithUTF8String:(*i).m_data.c_str()];
 			}
-			// Handle override textDirection here, by inserting the magic unicode
-			// commands
-			if ((*i).m_direction == smil2::stw_ltro) {
-				lib::logger::get_logger()->debug("cocoa_smiltext: should do ltro text");
+			break;
+		default:
+			assert(0);
+		}
+		// Handle override textDirection here, by inserting the magic unicode
+		// commands
+		if ((*i).m_direction == smil2::stw_ltro) {
+			lib::logger::get_logger()->debug("cocoa_smiltext: should do ltro text");
 //JNK				[newdata insertString: @"\u202d" atIndex: 0]; // LEFT-TO-RIGHT OVERRIDE
 //JNK				[newdata appendString: @"\u202c"]; // POP DIRECTIONAL FORMATTING
-			} else if ((*i).m_direction == smil2::stw_rtlo) {
-				lib::logger::get_logger()->debug("cocoa_smiltext: should do rtlo text");
+		} else if ((*i).m_direction == smil2::stw_rtlo) {
+			lib::logger::get_logger()->debug("cocoa_smiltext: should do rtlo text");
 //JNK				[newdata insertString: @"\u202e" atIndex: 0]; // RIGHT-TO-LEFT OVERRIDE
 //JNK				[newdata appendString: @"\u202c"]; // POP DIRECTIONAL FORMATTING
-			}
+		}
 //JNK			[m_text_storage replaceCharactersInRange:newrange withString:newdata];
 
-			// Prepare for setting the attribute info
+		// Prepare for setting the attribute info
 //JNK			NSMutableDictionary *attrs = [[NSMutableDictionary alloc] init];
 //JNK			newrange.length = [newdata length];
-			// Find font info
+		// Find font info
 //JNK			NSFont *text_font = NULL;
-			std::vector<std::string>::const_iterator fi;
-			for (fi=(*i).m_font_families.begin(); fi != (*i).m_font_families.end(); fi++) {
-				AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: look for font '%s'", (*fi).c_str());
+		std::vector<std::string>::const_iterator fi;
+		for (fi=(*i).m_font_families.begin(); fi != (*i).m_font_families.end(); fi++) {
+			AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: look for font '%s'", (*fi).c_str());
 //JNK				text_font = _select_font((*fi).c_str(), (*i).m_font_style, (*i).m_font_weight, (*i).m_font_size);
 //JNK				if (text_font) break;
-				AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: not found, try next");
-			}
+			AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext: not found, try next");
+		}
 //JNK			if (!text_font) {
 //JNK				text_font = [NSFont userFontOfSize: (*i).m_font_size];
 //JNK			}
@@ -296,108 +398,99 @@ d2_smiltext_renderer::smiltext_changed()
 //JNK			[attrs setValue:text_font forKey:NSFontAttributeName];
 
 #ifdef JNK
-			if (!(*i).m_transparent) {
-				// Find color info
-				double alfa = 1.0;
-				const common::region_info *ri = m_dest->get_info();
-				if (ri) alfa = ri->get_mediaopacity();
-				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
-						green:greenf((*i).m_color)
-						blue:bluef((*i).m_color)
-						alpha:(float)alfa];
-				[attrs setValue:color forKey:NSForegroundColorAttributeName];
-			}
-			if (!(*i).m_bg_transparent) {
-				// Find background color info
-				double alfa = 1.0;
-				const common::region_info *ri = m_dest->get_info();
-				if (ri) alfa = ri->get_mediabgopacity();
-				if (alfa != 1.0)
-					m_any_semiopaque_bg = true;
-				NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
-						green:greenf((*i).m_bg_color)
-						blue:bluef((*i).m_bg_color)
-						alpha:(float)alfa];
-				[attrs setValue:color forKey:NSBackgroundColorAttributeName];
-			}
+		if (!(*i).m_transparent) {
+			// Find color info
+			double alfa = 1.0;
+			const common::region_info *ri = m_dest->get_info();
+			if (ri) alfa = ri->get_mediaopacity();
+			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_color)
+					green:greenf((*i).m_color)
+					blue:bluef((*i).m_color)
+					alpha:(float)alfa];
+			[attrs setValue:color forKey:NSForegroundColorAttributeName];
+		}
+		if (!(*i).m_bg_transparent) {
+			// Find background color info
+			double alfa = 1.0;
+			const common::region_info *ri = m_dest->get_info();
+			if (ri) alfa = ri->get_mediabgopacity();
+			if (alfa != 1.0)
+				m_any_semiopaque_bg = true;
+			NSColor *color = [NSColor colorWithCalibratedRed:redf((*i).m_bg_color)
+					green:greenf((*i).m_bg_color)
+					blue:bluef((*i).m_bg_color)
+					alpha:(float)alfa];
+			[attrs setValue:color forKey:NSBackgroundColorAttributeName];
+		}
 #endif // JNK
-			// Finally do paragraph settings (which are cached)
-			if (m_cur_paragraph_style == NULL ||
-					m_cur_para_align != (*i).m_align ||
-					m_cur_para_writing_mode != (*i).m_writing_mode ||
-					m_cur_para_wrap != (*i).m_wrap) {
-				// Delete the old one, if needed
+		// Finally do paragraph settings (which are cached)
+		if (m_cur_paragraph_style == NULL ||
+				m_cur_para_align != (*i).m_align ||
+				m_cur_para_writing_mode != (*i).m_writing_mode ||
+				m_cur_para_wrap != (*i).m_wrap) {
+			// Delete the old one, if needed
 //JNK				if (m_cur_paragraph_style)
 //JNK					[m_cur_paragraph_style release];
-				// Remember the values
-				m_cur_para_align = (*i).m_align;
-				m_cur_para_writing_mode = (*i).m_writing_mode;
-				m_cur_para_wrap = (*i).m_wrap;
-				// Allocate the new one
+			// Remember the values
+			m_cur_para_align = (*i).m_align;
+			m_cur_para_writing_mode = (*i).m_writing_mode;
+			m_cur_para_wrap = (*i).m_wrap;
+			// Allocate the new one
 //JNK				NSMutableParagraphStyle *ps = [[NSMutableParagraphStyle alloc] init];
 //JNK				m_cur_paragraph_style = [ps retain];
-				// Set the paragraph writing direction
-				if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
+			// Set the paragraph writing direction
+			if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
 //JNK					[ps setBaseWritingDirection: NSWritingDirectionRightToLeft];
-				} else {
-					// All other directions are treated as left-to-right
+			} else {
+				// All other directions are treated as left-to-right
 //JNK					[ps setBaseWritingDirection: NSWritingDirectionLeftToRight];
-				}
-				if (m_params.m_mode != smil2::stm_crawl) {
-					// Set the paragraph text alignment, unless we have moving text
-					switch (m_cur_para_align) {
-					case smil2::sta_start:
-						if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
+			}
+			if (m_params.m_mode != smil2::stm_crawl) {
+				// Set the paragraph text alignment, unless we have moving text
+				switch (m_cur_para_align) {
+				case smil2::sta_start:
+					if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
 //JNK							[ps setAlignment: NSRightTextAlignment];
-						} else {
-							// All other directions are treated as left-to-right
+					} else {
+						// All other directions are treated as left-to-right
 //JNK							[ps setAlignment: NSLeftTextAlignment];
-						}
-						break;
-					case smil2::sta_end:
-						if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
-//JNK							[ps setAlignment: NSLeftTextAlignment];
-						} else {
-							// All other directions are treated as left-to-right
-//JNK							[ps setAlignment: NSRightTextAlignment];
-						}
-						break;
-					case smil2::sta_left:
-//JNK						[ps setAlignment: NSLeftTextAlignment];
-						break;
-					case smil2::sta_right:
-//JNK						[ps setAlignment: NSRightTextAlignment];
-						break;
-					case smil2::sta_center:
-//JNK						[ps setAlignment: NSCenterTextAlignment];
-						break;
 					}
+					break;
+				case smil2::sta_end:
+					if (m_cur_para_writing_mode == smil2::stw_rl_tb) {
+//JNK							[ps setAlignment: NSLeftTextAlignment];
+					} else {
+						// All other directions are treated as left-to-right
+//JNK							[ps setAlignment: NSRightTextAlignment];
+					}
+					break;
+				case smil2::sta_left:
+//JNK						[ps setAlignment: NSLeftTextAlignment];
+					break;
+				case smil2::sta_right:
+//JNK						[ps setAlignment: NSRightTextAlignment];
+					break;
+				case smil2::sta_center:
+//JNK						[ps setAlignment: NSCenterTextAlignment];
+					break;
 				}
-				// Set the paragraph wrap option
+			}
+			// Set the paragraph wrap option
 //JNK				if (m_cur_para_wrap)
 //JNK					[ps setLineBreakMode: NSLineBreakByWordWrapping];
 //JNK				else
 //JNK					[ps setLineBreakMode: NSLineBreakByClipping];
-			}
+		}
 //JNK			[attrs setValue:m_cur_paragraph_style forKey:NSParagraphStyleAttributeName];
 
-			// Set the attributes
+		// Set the attributes
 //JNK			[m_text_storage setAttributes:attrs range:newrange];
 
-			i++;
-		}
-//JNK		[m_text_storage endEditing];
-		m_engine.done();
-	} else {
-		AM_DBG lib::logger::get_logger()->debug("cocoa_smiltext::smiltext_changed: nothing changed");
+		i++;
 	}
-	bool finished = m_engine.is_finished();
-	m_engine.unlock();
-//JNK	[pool release];
-	m_lock.leave();
-	m_dest->need_redraw();
-	if (finished)
-		m_context->stopped(m_cookie);
+//JNK		[m_text_storage endEditing];
+	m_engine.done();
+#endif JNK
 }
 
 void
@@ -420,17 +513,8 @@ d2_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 
 	destrect.translate(m_dest->get_global_topleft());
 
-#ifdef JNK
-	assert(strlen((char*)m_data) <= m_data_size);
-	lib::textptr text_data((char *)m_data);
-
-	rt->DrawText(
-		text_data.c_wstr(),
-		wcslen(text_data.c_wstr()),
-		m_text_format,
-		d2_rectf(destrect),
-		m_brush);
-#endif JNK
+	D2D1_POINT_2F origin = { destrect.left(), destrect.top() };
+	rt->DrawTextLayout(origin, m_text_layout, m_brush);
 
 #ifdef JNK
 	NSRect cocoa_dstrect = [view NSRectForAmbulantRect: &dstrect];
