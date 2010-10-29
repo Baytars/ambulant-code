@@ -90,6 +90,9 @@ d2_smiltext_renderer::d2_smiltext_renderer(
 
 
 {
+#ifdef PARALLELS_MACPRO_BUG_WORKAROUND
+	lib::logger::get_logger()->trace("DirectWrite disabled, bug workaround by Jack");
+#else
 	if (s_write_factory == NULL) {
 		HRESULT hr;
 		hr = DWriteCreateFactory(
@@ -100,6 +103,7 @@ d2_smiltext_renderer::d2_smiltext_renderer(
 			lib::logger::get_logger()->error("Cannot create DirectWrite factory: error 0x%x", hr);
 		}
 	}
+#endif
 }
 
 void
@@ -124,7 +128,6 @@ d2_smiltext_renderer::init_with_node(const lib::node *node)
 		m_brush->Release();
 		m_brush = NULL;
 	}
-	assert(s_write_factory);
 	if (!s_write_factory) return;
 	HRESULT hr;
 	hr = s_write_factory->CreateTextFormat(
@@ -293,6 +296,7 @@ d2_smiltext_renderer::_recreate_layout()
 	FLOAT w = destrect.width();
 	FLOAT h = destrect.height();
 	HRESULT hr;
+	if (s_write_factory == NULL) return;
 	hr = s_write_factory->CreateTextLayout(m_data.c_str(), m_data.length(), m_text_format, w, h, &m_text_layout);
 	if (!SUCCEEDED(hr)) {
 		lib::logger::get_logger()->trace("d2_smiltext: Cannot CreateTextLayout: error 0x%x", hr);

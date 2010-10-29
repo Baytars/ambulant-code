@@ -79,6 +79,9 @@ d2_text_renderer::d2_text_renderer(
 	m_brush(NULL)
 
 {
+#ifdef PARALLELS_MACPRO_BUG_WORKAROUND
+	lib::logger::get_logger()->trace("DirectWrite disabled, bug workaround by Jack");
+#else
 	if (s_write_factory == NULL) {
 		HRESULT hr;
 		hr = DWriteCreateFactory(
@@ -89,6 +92,7 @@ d2_text_renderer::d2_text_renderer(
 			lib::logger::get_logger()->error("Cannot create DirectWrite factory: error 0x%x", hr);
 		}
 	}
+#endif
 }
 
 void
@@ -113,7 +117,6 @@ d2_text_renderer::init_with_node(const lib::node *node)
 		m_brush->Release();
 		m_brush = NULL;
 	}
-	assert(s_write_factory);
 	if (!s_write_factory) return;
 	HRESULT hr;
 	hr = s_write_factory->CreateTextFormat(
