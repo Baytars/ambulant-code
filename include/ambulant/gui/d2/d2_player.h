@@ -48,7 +48,7 @@
 #include "ambulant/gui/dx/html_bridge.h"
 //#include "ambulant/gui/d2/d2_playable.h"
 
-#ifndef _UTILITY_
+#if 1
 // This is a workaround for a bug in VS2008/MSSDK, where installation
 // order can mess up standard include files.
 // See <http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/4bc93a16-4ad5-496c-954c-45efbe4b180b>
@@ -59,7 +59,7 @@ namespace std {
   swap(_Left, _Right);
  }
 }
-#endif // _UTILITY_
+#endif 
 
 interface ID2D1Factory;
 interface ID2D1HwndRenderTarget;
