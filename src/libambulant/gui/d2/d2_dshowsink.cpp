@@ -9,6 +9,10 @@
 
 #include <cassert>
 
+#ifndef AM_DBG
+#define AM_DBG if(0)
+#endif
+
 //for unicode
 //#include "tchar.h"
 
@@ -99,7 +103,8 @@ CVideoD2DBitmapRenderer::CVideoD2DBitmapRenderer(LPUNKNOWN pUnk, HRESULT *phr)
 	m_width(0),
 	m_height(0),
 	m_pitch(0),
-	m_has_alpha(false)
+	m_has_alpha(false),
+	m_ignore_timestamps(false)
 {
 #ifdef JNK
 	m_bUseDynamicTextures = FALSE;
@@ -205,15 +210,15 @@ HRESULT CVideoD2DBitmapRenderer::CheckMediaType(const CMediaType *pmt)
 
 	if (IsEqualGUID(*pmt->Type(), MEDIATYPE_Video)) {
 		if (IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_RGB24)) {
-			/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_RGB24");
+			AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_RGB24");
 			hr = S_OK;
 		}
 		if (IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_RGB32)) {
-			/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_RGB32");
+			AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_RGB32");
 			hr = S_OK;
 		}
 		if (IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_ARGB32)) {
-			/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_ARGB32");
+			AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_ARGB32");
 			hr = S_OK;
 		}
 	}
@@ -234,10 +239,10 @@ HRESULT CVideoD2DBitmapRenderer::SetMediaType(const CMediaType *pmt)
 //JNK	D3DCAPS9 caps;
 	assert(IsEqualGUID(*pmt->Type(), MEDIATYPE_Video));
 	if (IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_RGB32)) {
-		/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_RGB32");
+		AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::SetMediaType: MEDIASUBTYPE_RGB32");
 		hr = S_OK;
 	} else if (IsEqualGUID(*pmt->Subtype(), MEDIASUBTYPE_ARGB32)) {
-		/*AM_DBG*/ ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::CheckMediaType: MEDIASUBTYPE_ARGB32");
+		AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::SetMediaType: MEDIASUBTYPE_ARGB32");
 		hr = S_OK;
 	} else {
 		assert(0);
@@ -340,8 +345,9 @@ HRESULT CVideoD2DBitmapRenderer::DoRenderSample( IMediaSample * pSample )
 
 	// Get the video bitmap buffer
 	pSample->GetPointer( &pBmpBuffer );
-	ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::DoRenderSample() called");
-	if (m_rt == NULL) return S_OK;
+	AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::DoRenderSample() called");
+	if (m_rt == NULL) 
+		return S_OK;
 
 	ID2D1Bitmap *bitmap = NULL;
 	D2D1_SIZE_U size = D2D1::SizeU(m_width, m_height);
@@ -354,11 +360,14 @@ HRESULT CVideoD2DBitmapRenderer::DoRenderSample( IMediaSample * pSample )
 		ambulant::lib::logger::get_logger()->trace("CVideoD2DBitmapRenderer::DoRenderSample: CreateBitmap: error 0x%x", hr);
 	}
 	// XXX Lock
+	AM_DBG ambulant::lib::logger::get_logger()->debug("CVideoD2DBitmapRenderer::DoRenderSample: new bitmap is 0x%x", bitmap);
 	ID2D1Bitmap *old_bitmap = m_d2bitmap;
 	m_d2bitmap = bitmap;
 	// XXX Unlock
-	if (old_bitmap) old_bitmap->Release();
-	if (m_callback) m_callback->BitmapAvailable(this);
+	if (old_bitmap) 
+		old_bitmap->Release();
+	if (m_callback) 
+		m_callback->BitmapAvailable(this);
 #ifdef JNK
 	// Lock the Texture
 	D3DLOCKED_RECT d3dlr;
@@ -418,6 +427,20 @@ HRESULT CVideoD2DBitmapRenderer::DoRenderSample( IMediaSample * pSample )
 	}
 #endif // JNK
 	return S_OK;
+}
+
+HRESULT CVideoD2DBitmapRenderer::ShouldDrawSampleNow(IMediaSample *pMediaSample,
+                                                __inout REFERENCE_TIME *ptrStart,
+                                                __inout REFERENCE_TIME *ptrEnd)
+{
+	HRESULT rv;
+	if (m_ignore_timestamps) {
+		rv = S_OK;
+	} else {
+		rv = CBaseVideoRenderer::ShouldDrawSampleNow(pMediaSample, ptrStart, ptrEnd);
+	}
+	AM_DBG ambulant::lib::logger::get_logger()->debug("ShouldDrawSampleNow(..., %lld, %lld) [ignoretimestamp=%d] -> 0x%x", (long long)*ptrStart, (long long)*ptrEnd, m_ignore_timestamps, rv);
+	return rv;
 }
 
 #ifdef JNK

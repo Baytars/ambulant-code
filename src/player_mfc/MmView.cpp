@@ -290,7 +290,6 @@ void MmView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-	TRACE0("MmView::OnDraw()\n");
 	// TODO: add draw code for native data here
 	if(player)
 		player->redraw(m_hWnd, pDC->m_hDC);
