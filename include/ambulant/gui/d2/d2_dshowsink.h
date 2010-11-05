@@ -84,29 +84,11 @@ private:
 	ID2D1Bitmap *m_d2bitmap;
 //	ID2D1Bitmap *m_d2bitmap_next;
 	IVideoD2DBitmapRendererCallback *m_callback;
-#ifdef JNK
-	void SetVideoTexture(LPDIRECT3DTEXTURE9* ppTexture);
-#endif // JNK
-
-#ifdef JNK
-	BOOL m_bUseDynamicTextures;
-#endif // JNK
 	int m_width;   // Video width
 	int m_height;  // Video Height
 	int m_pitch;   // Video Pitch
 	bool m_has_alpha;
 	bool m_ignore_timestamps;
-
-#ifdef JNK
-	//The rendertarget where our renderer renders the video to
-	LPDIRECT3DTEXTURE9 m_lpVideoTargetTexture;
-	LPDIRECT3DSURFACE9 m_lpVideoTargetSurface;
-
-	//this one is the texture and surface where the Video will be copied to via StretchRect,
-	//when using dynamic textures.
-	LPDIRECT3DTEXTURE9* m_ppVideoDestTexture;
-	LPDIRECT3DSURFACE9 m_lpVideoDestSurface;
-#endif
 
 };
 
