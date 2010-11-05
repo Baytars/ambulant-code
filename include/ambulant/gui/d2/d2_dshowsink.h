@@ -65,9 +65,14 @@ public:
 
 	HRESULT DoRenderSample(IMediaSample * pSample);
 
+	HRESULT ShouldDrawSampleNow(IMediaSample *pMediaSample,
+            __inout REFERENCE_TIME *ptrStart,
+            __inout REFERENCE_TIME *ptrEnd);
+
 	void SetRenderTarget(ID2D1RenderTarget *rt);
 
 	void SetCallback(IVideoD2DBitmapRendererCallback *callback);
+	void SetIgnoreTimestamps(bool ignore) { m_ignore_timestamps = ignore; }
 	
 	ID2D1Bitmap *LockBitmap();
 
@@ -90,6 +95,7 @@ private:
 	int m_height;  // Video Height
 	int m_pitch;   // Video Pitch
 	bool m_has_alpha;
+	bool m_ignore_timestamps;
 
 #ifdef JNK
 	//The rendertarget where our renderer renders the video to

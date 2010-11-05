@@ -532,14 +532,14 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	// Set the transformation
 	const lib::rect& wanted_rect = wi->m_window->get_rect();
 	float xoff, yoff, factor;
-	lib::logger::get_logger()->debug("d2_player::redraw(%d, %d, %d, %d)", client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
+	AM_DBG lib::logger::get_logger()->debug("d2_player::redraw(%d, %d, %d, %d)", client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
 	if (_calc_fit(client_rect, wanted_rect.size(), xoff, yoff, factor)) {
 		D2D1_MATRIX_3X2_F transform = {
 			factor, 0,
 			0, factor,
 			xoff, yoff
 		};
-		lib::logger::get_logger()->debug("d2_player::redraw offset %f,%f factor %f", xoff, yoff, factor);
+		AM_DBG lib::logger::get_logger()->debug("d2_player::redraw offset %f,%f factor %f", xoff, yoff, factor);
 		if (changed_size) {
 			// XXXJACK paint background? Seems unnecessary...
 		}
