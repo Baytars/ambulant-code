@@ -177,7 +177,9 @@ class AMBULANTAPI d2_player :
 	void on_done();
 
 	common::window_factory *get_window_factory() { return this;}
-	void redraw(HWND hwnd, HDC hdc);
+
+	void redraw(HWND hwnd, HDC hdc, RECT *dirty=NULL);
+
 
 	///////////////////
 	// Timeslices services and transitions
@@ -223,11 +225,11 @@ class AMBULANTAPI d2_player :
 		RECT m_rect;
 		ID2D1HwndRenderTarget *m_rendertarget;
 		d2_window *m_window;
-//JNK		long m_f;
 	};
 	// Valid only during redraw():
 	wininfo* m_cur_wininfo;
 	wininfo* _get_wininfo(HWND hwnd);
+	wininfo* _get_wininfo(d2_window *window);
 	common::gui_window* _get_window(HWND hwnd);
 	HWND _get_main_window();
 

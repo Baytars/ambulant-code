@@ -22,6 +22,7 @@
  */
 
 #include "ambulant/gui/d2/d2_window.h"
+#include "ambulant/gui/d2/d2_player.h"
 #include "ambulant/common/region.h"
 
 #include "ambulant/lib/logger.h"
@@ -35,14 +36,14 @@ using namespace ambulant;
 gui::d2::d2_window::d2_window(const std::string& name,
 	lib::size bounds,
 	region *rgn,
-	common::window_factory *wf,
+	d2_player *player,
 	HWND hwnd)
 :	common::gui_window(rgn),
 	m_rgn(rgn),
 	m_name(name),
 	m_hwnd(hwnd),
 	m_viewrc(lib::point(0, 0), lib::size(bounds.w, bounds.h)),
-	m_wf(wf),
+	m_player(player),
 	m_locked(0),
 	m_redraw_rect_valid(false)
 {
@@ -52,7 +53,7 @@ gui::d2::d2_window::d2_window(const std::string& name,
 
 gui::d2::d2_window::~d2_window() {
 	AM_DBG lib::logger::get_logger()->debug("~d2_window()");
-	m_wf->window_done(m_name);
+	m_player->window_done(m_name);
 }
 
 void gui::d2::d2_window::_need_redraw(const lib::rect &r) {
@@ -63,8 +64,11 @@ void gui::d2::d2_window::_need_redraw(const lib::rect &r) {
 		if(!m_redraw_rect_valid) {
 			m_redraw_rect = r;
 			m_redraw_rect_valid = true;
-		} else m_redraw_rect |= r;
-	}}
+		} else {
+			m_redraw_rect |= r;
+		}
+	}
+}
 
 void gui::d2::d2_window::need_redraw(const lib::rect &r) {
 	m_redraw_rect_lock.enter();
@@ -77,11 +81,11 @@ void gui::d2::d2_window::redraw(const lib::rect &r) {
 	lib::rect rc = r;
 	rc &= m_viewrc;
 	if(!m_locked) {
-		AM_DBG lib::logger::get_logger()->debug("d2_window::need_redraw(%d,%d,%d,%d): drawing", rc.left(), rc.top(), rc.width(), rc.height());
+		AM_DBG lib::logger::get_logger()->debug("d2_window::redraw(%d,%d,%d,%d): drawing", rc.left(), rc.top(), rc.width(), rc.height());
 		//assert(!m_redraw_rect_valid);
 		m_rgn->redraw(rc, this);
 	} else {
-		AM_DBG lib::logger::get_logger()->debug("d2_window::need_redraw(%d,%d,%d,%d): queueing", rc.left(), rc.top(), rc.width(), rc.height());
+		AM_DBG lib::logger::get_logger()->debug("d2_window::redraw(%d,%d,%d,%d): queueing", rc.left(), rc.top(), rc.width(), rc.height());
 		if(!m_redraw_rect_valid) {
 			m_redraw_rect = rc;
 			m_redraw_rect_valid = true;

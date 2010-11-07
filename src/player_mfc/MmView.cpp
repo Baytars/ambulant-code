@@ -286,13 +286,16 @@ BOOL MmView::PreCreateWindow(CREATESTRUCT& cs)
 // MmView drawing
 void MmView::OnDraw(CDC* pDC)
 {
+	CPaintDC *pPDC = dynamic_cast<CPaintDC*>(pDC);
+	RECT *pRect = NULL;
+	if (pPDC) pRect = &pPDC->m_ps.rcPaint;
 	MmDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
 	// TODO: add draw code for native data here
 	if(player)
-		player->redraw(m_hWnd, pDC->m_hDC);
+		player->redraw(m_hWnd, pDC->m_hDC, pRect);
 
 }
 

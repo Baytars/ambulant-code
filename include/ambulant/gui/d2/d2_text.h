@@ -64,10 +64,6 @@ class d2_text_renderer : public d2_renderer<renderer_playable_dsall> {
 	void recreate_d2d();
 	void discard_d2d();
   private:
-#ifdef JNK
-	bool _calc_fit(CGContextRef ctx, float width, size_t& lbegin, size_t& lend);
-	bool _fits(CGContextRef ctx, float width, const char *str, size_t strlen);
-#endif // JNK
 	lib::color_t m_text_color;
 
 	static IDWriteFactory *s_write_factory;
