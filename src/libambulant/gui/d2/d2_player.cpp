@@ -331,7 +331,7 @@ gui::d2::d2_player::_recreate_d2d(wininfo *wi)
 	D2D1_SIZE_U size = D2D1::SizeU(rc.right-rc.left, rc.bottom-rc.top);
 
 	HRESULT hr = m_d2d->CreateHwndRenderTarget(
-		D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT, D2D1::PixelFormat(), 0, 0, D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE),
+		D2D1::RenderTargetProperties(),
 		D2D1::HwndRenderTargetProperties(wi->m_hwnd, size, D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS),
 		&wi->m_rendertarget);
 
@@ -505,7 +505,7 @@ bool gui::d2::d2_player::_calc_fit(
 	return xoff != 0 || yoff != 0 || fac != 1;
 }
 
-void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
+void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc, RECT *dirty) {
 	HRESULT hr = S_OK;
 	// Create the Direct2D resources, in case they were lost
 	wininfo *wi = _get_wininfo(hwnd);
@@ -523,6 +523,8 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	assert(ok);
 	BOOL changed_size = !EqualRect(&client_rect, &wi->m_rect);
 	if (changed_size) {
+		wi->m_rect = client_rect;
+		dirty = NULL;
 		D2D1_SIZE_U new_size = { client_rect.right-client_rect.left, client_rect.bottom-client_rect.top };
 		rt->Resize(new_size);
 	}
@@ -534,20 +536,26 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc) {
 	float xoff, yoff, factor;
 	AM_DBG lib::logger::get_logger()->debug("d2_player::redraw(%d, %d, %d, %d)", client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
 	if (_calc_fit(client_rect, wanted_rect.size(), xoff, yoff, factor)) {
+		// WE have to do scaling. Setup the matrix.
 		D2D1_MATRIX_3X2_F transform = {
 			factor, 0,
 			0, factor,
 			xoff, yoff
 		};
 		AM_DBG lib::logger::get_logger()->debug("d2_player::redraw offset %f,%f factor %f", xoff, yoff, factor);
-		if (changed_size) {
-			// XXXJACK paint background? Seems unnecessary...
-		}
 		rt->SetTransform(transform);
+		// Lazy programmer alert: we cannot use the dirty rect as-is, 
+		// need to do the transform, at some time. For now we clear it.
+		dirty = NULL;
 	}
 
 	// Do the redraw
-	wi->m_window->redraw();
+	if (dirty) {
+		lib::rect r(lib::point(dirty->left, dirty->top), lib::size(dirty->right-dirty->left, dirty->bottom-dirty->top));
+		wi->m_window->redraw(r);
+	} else {
+		wi->m_window->redraw();
+	}
 	hr = rt->EndDraw();
 	m_cur_wininfo = NULL;
 	if (hr == D2DERR_RECREATE_TARGET) {
@@ -729,7 +737,6 @@ gui::d2::d2_player::new_window(const std::string &name,
 
 	// Create a concrete gui_window
 	winfo->m_window = new d2_window(name, bounds, rgn, this, winfo->m_hwnd);
-//JNK	winfo->f = 0;
 
 	// Store the wininfo struct
 	m_windows[name] = winfo;
@@ -772,16 +779,6 @@ gui::d2::d2_player::new_background_renderer(const common::region_info *src) {
 	return new d2_background_renderer(src, this);
 }
 
-#ifdef JNK
-gui::d2::viewport* gui::d2::d2_player::create_viewport(int w, int h, HWND hwnd) {
-	AM_DBG m_logger->debug("d2_player::create_viewport(%d, %d)", w, h);
-	PostMessage(hwnd, WM_SET_CLIENT_RECT, w, h);
-	viewport *v = new gui::d2::viewport(w, h, hwnd);
-	v->redraw();
-	return v;
-}
-#endif
-
 gui::d2::d2_player::wininfo*
 gui::d2::d2_player::_get_wininfo(HWND hwnd) {
 	wininfo *winfo = 0;
@@ -789,6 +786,17 @@ gui::d2::d2_player::_get_wininfo(HWND hwnd) {
 	for(it=m_windows.begin();it!=m_windows.end();it++) {
 		wininfo *wi = (*it).second;
 		if(wi->m_hwnd == hwnd) {winfo = wi;break;}
+	}
+	return winfo;
+}
+
+gui::d2::d2_player::wininfo*
+gui::d2::d2_player::_get_wininfo(d2_window *window) {
+	wininfo *winfo = 0;
+	std::map<std::string, wininfo*>::iterator it;
+	for(it=m_windows.begin();it!=m_windows.end();it++) {
+		wininfo *wi = (*it).second;
+		if(wi->m_window == window) {winfo = wi;break;}
 	}
 	return winfo;
 }

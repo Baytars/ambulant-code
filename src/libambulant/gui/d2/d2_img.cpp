@@ -226,99 +226,13 @@ fail:
 	// Notify scheduler that we're done playing
 	m_context->stopped(m_cookie);
 }
-#ifdef JNK
-void
-gui::dx::d2_img_renderer::_create_ddsurf(viewport *v)
-{
-	if (m_ddsurf) return;
-	assert(m_original);
-	assert(s_wic_factory);
-	HRESULT hr = S_OK;
-
-	// Check format (redundant, really, but still...)
-    WICPixelFormatGUID pixelFormat;
-    hr = m_original->GetPixelFormat(&pixelFormat);
-	if (!SUCCEEDED(hr) || (pixelFormat != dxparams::I()->wic_format())) {
-		lib::logger::get_logger()->debug("WIC renderer: Unexpected pixel format");
-		return;
-	}
-
-	// Create DIB section
-	UINT w = 0, h = 0;
-	hr = m_original->GetSize(&w, &h);
-	if(!SUCCEEDED(hr)) {
-		lib::logger::get_logger()->debug("WIC renderer: GetSize() failed 0x%x", hr);
-		return;
-	}
-	struct myBITMAPINFO {
-		BITMAPINFOHEADER bmiHeader;
-		DWORD masks[4];
-	} bminfo;
-	ZeroMemory(&bminfo, sizeof(bminfo));
-    bminfo.bmiHeader.biSize         = sizeof(BITMAPINFOHEADER);
-    bminfo.bmiHeader.biWidth        = w;
-    bminfo.bmiHeader.biHeight       = -(LONG)h;
-    bminfo.bmiHeader.biPlanes       = 1;
-    bminfo.bmiHeader.biBitCount     = 32;
-    bminfo.bmiHeader.biCompression  = dxparams::I()->bmi_compression();
-	bminfo.masks[0] = 0x00ff0000;
-	bminfo.masks[1] = 0x0000ff00;
-	bminfo.masks[2] = 0x000000ff;
-	bminfo.masks[3] = 0xff000000;
-	void *buffer;
-	HBITMAP dib_bitmap = CreateDIBSection(
-		NULL, 
-		(BITMAPINFO *)&bminfo,
-		DIB_RGB_COLORS,
-		&buffer,
-		NULL,
-		0);
-	assert(dib_bitmap);
-	assert(buffer);
-	if (dib_bitmap == NULL || buffer == NULL) {
-		lib::logger::get_logger()->debug("WIC renderer: Could not allocate DIBSection");
-		return;
-	}
-
-
-	// Copy data into the DIB
-	LONG stride = 4*w;
-	LONG buffer_size = h*stride;
-	ZeroMemory(buffer, buffer_size); // DBG
-	hr = m_original->CopyPixels(NULL, stride, buffer_size, (BYTE *)buffer);
-	if (!SUCCEEDED(hr)) {
-		lib::logger::get_logger()->debug("WIC renderer: CopyPixels failed 0x%x", hr);
-		return;
-	}
-
-	// Create DD surface
-	assert(m_ddsurf == NULL);
-	m_ddsurf = v->create_surface(w, h);
-
-	// Copy the pixels
-	HDC surface_hdc = NULL;
-	hr = m_ddsurf->GetDC(&surface_hdc);
-	assert(SUCCEEDED(hr));
-	HDC bitmap_hdc = CreateCompatibleDC(surface_hdc);
-	assert(bitmap_hdc);
-	HBITMAP hbmp_old = (HBITMAP) SelectObject(bitmap_hdc, dib_bitmap);
-	::BitBlt(surface_hdc, 0, 0, w, h, bitmap_hdc, 0, 0, SRCCOPY);
-	SelectObject(bitmap_hdc, hbmp_old);
-	DeleteDC(bitmap_hdc);
-	m_ddsurf->ReleaseDC(surface_hdc);
-
-	// Clean up
-	if (dib_bitmap) DeleteObject(dib_bitmap);
-}
-#endif
 
 bool gui::d2::d2_img_renderer::stop() {
 	AM_DBG lib::logger::get_logger()->debug("d2_img_renderer::stop(0x%x)", this);
 	if (m_dest) m_dest->renderer_done(this);
 	m_dest = NULL;
 	m_activated = false;
-//JNK	m_dxplayer->stopped(this);
-//	m_dest->need_redraw();
+	m_context->stopped(m_cookie);
 	return true;
 }
 
@@ -428,33 +342,7 @@ void gui::d2::d2_img_renderer::redraw_body(const lib::rect& dirty, common::gui_w
 		D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
 		d2_rectf(img_rect));
 
-#ifdef JNK
-	// A complete repaint would be:
-	// {img, img_rect } -> img_reg_rc
 
-	// We have to paint only the intersection.
-	// Otherwise we will override upper layers
-	lib::rect img_reg_rc_dirty = img_reg_rc & dirty;
-	if(img_reg_rc_dirty.empty()) {
-		// this renderer has no pixels for the dirty rect
-		AM_DBG lib::logger::get_logger()->debug("d2_img_renderer::redraw NOT: empty dirty region %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
-		return;
-	}
-
-	// Find the part of the image that is mapped to img_reg_rc_dirty
-	lib::rect img_rect_dirty = reverse_transform(&img_reg_rc_dirty,
-		&img_rect, &img_reg_rc);
-
-	// Translate img_reg_rc_dirty to viewport coordinates
-	lib::point topleft = m_dest->get_global_topleft();
-	img_reg_rc_dirty.translate(topleft);
-
-	// keep rect for debug messages
-	m_msg_rect |= img_reg_rc_dirty;
-
-	// Finally blit img_rect_dirty to img_reg_rc_dirty
-	AM_DBG lib::logger::get_logger()->debug("d2_img_renderer::redraw %0x %s ", m_dest, m_node->get_url("src").get_url().c_str());
-#endif
 #ifdef NOTYET
 	dx_transition *tr = get_transition();
 	if (tr && tr->is_fullscreen()) {

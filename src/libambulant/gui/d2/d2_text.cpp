@@ -142,6 +142,7 @@ d2_text_renderer::~d2_text_renderer()
 void
 d2_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 {
+	// XXXJACK: if our color.opacity has been animated we should re-create
 	recreate_d2d();
 
 	m_lock.enter();
@@ -168,45 +169,6 @@ d2_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		d2_rectf(destrect),
 		m_brush);
 
-#ifdef JNK
-	d2Rect d2_dstrect = [view d2RectForAmbulantRect: &dstrect];
-	// Set the text matrix
-	d2ContextSetTextMatrix(ctx, d2AffineTransformIdentity);
-	// Set the color
-	double alfa = 1.0;
-#ifdef WITH_SMIL30
-	const common::region_info *ri = m_dest->get_info();
-	if (ri) alfa = ri->get_mediaopacity();
-#endif
-	d2Float components[] = {redf(m_text_color), greenf(m_text_color), bluef(m_text_color), alfa};
-	CGColorSpaceRef genericColorSpace = CGColorSpaceCreateDeviceRGB();
-	CGContextSetFillColorSpace(ctx, genericColorSpace);
-	CGContextSetFillColor(ctx, components);
-	// Set the font
-	AM_DBG lib::logger::get_logger()->debug("d2_text: select font %s, size %f", m_font_name, m_font_size);
-	CGContextSelectFont(ctx, m_font_name, m_font_size, kCGEncodingMacRoman);
-	// Calculate sizes
-	float lineheight = m_font_size;
-	// XXXX These calculations assume COCOA_USE_BOTLEFT
-	float x = CGRectGetMinX(cg_dstrect);
-	float y = CGRectGetMaxY(cg_dstrect) - lineheight;
-	float w = CGRectGetWidth(cg_dstrect);
-	size_t lbegin, lend;
-	const char *cdata = (char *)m_data;
-	lbegin = 0;
-	lend = 0;
-	while(_calc_fit(ctx, w, lbegin, lend) ) {
-		AM_DBG lib::logger::get_logger()->debug("d2_text: draw line at (%f, %f)", x, y);
-		CGContextSetTextPosition(ctx, x, y);
-		AM_DBG{ CGAffineTransform mtx = CGContextGetTextMatrix(ctx); lib::logger::get_logger()->debug("cg_text: textmatrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
-		AM_DBG{ CGAffineTransform mtx = CGContextGetCTM(ctx); lib::logger::get_logger()->debug("cg_text: matrix: (%f, %f) (%f, %f) (%f, %f)", mtx.a, mtx.b, mtx.c, mtx.d, mtx.tx, mtx.ty); }
-		CGContextSetTextDrawingMode(ctx, kCGTextFill);
-		CGContextShowText(ctx, cdata+lbegin, lend-lbegin);
-		lbegin = lend;
-		y -= lineheight;
-	}
-	CGColorSpaceRelease(genericColorSpace);
-#endif // JNK
 	m_lock.leave();
 }
 
@@ -234,48 +196,11 @@ d2_text_renderer::recreate_d2d()
 void
 d2_text_renderer::discard_d2d()
 {
-#ifdef JNK
-	if (m_d2bitmap) {
-//		m_d2bitmap->Release();
-		m_d2bitmap = NULL;
+	if (m_brush) {
+		m_brush->Release();
+		m_brush = NULL;
 	}
-#endif // JNK
 }
-
-#ifdef JNK
-bool
-d2_text_renderer::_calc_fit(d2ContextRef ctx, float width, size_t& lbegin, size_t& lend)
-{
-	const char *cdata = (const char *)m_data;
-	// Find beginning point
-	if (lbegin > 0)
-		while (lbegin < m_data_size && isspace(cdata[lbegin])) lbegin++;
-	if (cdata[lbegin] == '\0' || lbegin >= m_data_size) return false;
-	lend = lbegin+1;
-	int lendcand = lend;
-	do {
-		while (cdata[lendcand] != '\0' && lendcand < m_data_size && !isspace(cdata[lendcand])) lendcand++;
-		if (!_fits(ctx, width, cdata+lbegin, lendcand-lbegin))
-			return true;
-		lend = lendcand;
-		if (cdata[lend] == '\r' || cdata[lend] == '\n')
-			return true;
-		while (isspace(cdata[lendcand]) && lendcand < m_data_size) lendcand++;
-	} while(cdata[lendcand] != '\0' && lendcand < m_data_size);
-	return true;
-}
-
-bool
-d2_text_renderer::_fits(d2ContextRef ctx, float maxwidth, const char *data, size_t datalen)
-{
-	CGPoint beginpos = CGContextGetTextPosition(ctx);
-	CGContextSetTextDrawingMode(ctx, kCGTextInvisible);
-	CGContextShowText(ctx, data, datalen);
-	CGPoint endpos = CGContextGetTextPosition(ctx);
-	float width = endpos.x - beginpos.x;
-	return width <= maxwidth;
-}
-#endif // JNK
 
 } // namespace d2
 

@@ -47,12 +47,14 @@ namespace gui {
 
 namespace d2 {
 
+class d2_player;
+
 class d2_window : public common::gui_window {
   public:
 	d2_window(const std::string& name,
 		lib::size bounds,
 		region *rgn,
-		common::window_factory *wf,
+		d2_player *player,
 		HWND hwnd);
 	~d2_window();
 
@@ -75,10 +77,7 @@ class d2_window : public common::gui_window {
 	HWND m_hwnd;	// Windows window
 	std::string m_name; // for easy access
 	lib::rect m_viewrc;
-	common::window_factory *m_wf;
-#ifdef JNK
-	viewport* m_viewport;
-#endif
+	d2_player *m_player;	// Link back to our owning player
 
 	// lock/unlock redraw
 	lib::critical_section m_redraw_rect_lock;

@@ -170,17 +170,17 @@ d2_background_renderer::redraw(const lib::rect &dirty, common::gui_window *windo
 	if (!m_mustrender || m_brush == NULL) return;
 
 	const rect &r =	 m_dst->get_rect();
+	rect dstrect = dirty & r;
 	AM_DBG logger::get_logger()->debug("d2_bg_renderer::drawbackground(0x%x, local_ltrb=(%d,%d,%d,%d)", (void *)this, r.left(), r.top(), r.right(), r.bottom());
 
 	d2_window *cwindow = (d2_window *)window;
-//JNK	AmbulantView *view = (AmbulantView *)cwindow->view();
 	AM_DBG lib::logger::get_logger()->debug("d2_bg_renderer::drawbackground: clearing to 0x%x opacity %f", (long)m_src->get_bgcolor(), m_src->get_bgopacity());
-	rect dstrect_whole = r;
-	dstrect_whole.translate(m_dst->get_global_topleft());
+	dstrect.translate(m_dst->get_global_topleft());
 
 	ID2D1RenderTarget *rt = m_d2player->get_rendertarget();
 	assert(rt);
-	D2D1_RECT_F rr = D2D1::RectF(dstrect_whole.left(), dstrect_whole.top(), dstrect_whole.right(), dstrect_whole.bottom());
+//	D2D1_RECT_F rr = D2D1::RectF(dstrect_whole.left(), dstrect_whole.top(), dstrect_whole.right(), dstrect_whole.bottom());
+	D2D1_RECT_F rr = D2D1::RectF(dstrect.left(), dstrect.top(), dstrect.right(), dstrect.bottom());
 	rt->FillRectangle(rr, m_brush);
 #ifdef D2D_NOTYET
 	if (m_bgimage) {
@@ -222,7 +222,6 @@ d2_background_renderer::keep_as_background()
 	AM_DBG lib::logger::get_logger()->debug("d2_background_renderer::keep_as_background() called");
 	if (m_bgimage) {
 		AM_DBG lib::logger::get_logger()->debug("d2_background_renderer::keep_as_background: delete old m_image");
-//JNK		[m_bgimage release];
 		m_bgimage = NULL;
 	}
 	d2_window *cwindow = (d2_window *)m_dst->get_gui_window();
