@@ -128,6 +128,11 @@ void gui::d2::d2_img_renderer::start(double t) {
 			GENERIC_READ,
 			WICDecodeMetadataCacheOnDemand,
 			&decoder);
+		if (!SUCCEEDED(hr)) {
+			lib::logger::get_logger()->trace("%s: cannot CreateDecoderFromFilename: error 0x%x", url.get_url().c_str(), hr);
+			lib::logger::get_logger()->error("%s: cannot open image", url.get_url().c_str());
+			goto fail;
+		}
 	} else {
 		// Remote file, go through data buffer, etc.
 		size_t size;
