@@ -734,13 +734,30 @@ gui::d2::d2_player::new_window(const std::string &name,
 	region *rgn = (region *) src;
 
 	// Set window size
-	PostMessage(winfo->m_hwnd, WM_SET_CLIENT_RECT, bounds.w, bounds.h);
-#ifdef JNK
-	// Clear the viewport
-	const common::region_info *ri = rgn->get_info();
-	winfo->v->set_background(ri?ri->get_bgcolor():d2params::I()->invalid_color());
-	winfo->v->clear();
+	int w = bounds.w;
+	int h = bounds.h;
+	int borders_w = 20; // XXXX
+	int borders_h = 60; // XXXX
+	float factor = 1.0;
+	RECT desktop_rect;
+#if 0
+	GetWindowRect(::GetDesktopWindow(), &desktop_rect);
+#else
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop_rect, 0);
 #endif
+	if (w > desktop_rect.right-desktop_rect.left - borders_w) {
+		factor = float(desktop_rect.right-desktop_rect.left - borders_w) / w;
+	}
+	if (h > desktop_rect.bottom - desktop_rect.top - borders_h) {
+		float f2 = float(desktop_rect.bottom - desktop_rect.top - borders_h) / h;
+		if (f2 < factor) factor = f2;
+	}
+	if (factor < 1.0) {
+		w = int(w*factor);
+		h = int(h*factor);
+		// XXX To DO: position correctly on screen too.
+	}
+	PostMessage(winfo->m_hwnd, WM_SET_CLIENT_RECT, w, h);
 
 	// Create a concrete gui_window
 	winfo->m_window = new d2_window(name, bounds, rgn, this, winfo->m_hwnd);
