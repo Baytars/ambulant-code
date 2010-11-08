@@ -547,6 +547,8 @@ void gui::d2::d2_player::redraw(HWND hwnd, HDC hdc, RECT *dirty) {
 		// Lazy programmer alert: we cannot use the dirty rect as-is, 
 		// need to do the transform, at some time. For now we clear it.
 		dirty = NULL;
+	} else {
+		rt->SetTransform(D2D1::Matrix3x2F::Identity());
 	}
 
 	// Do the redraw
@@ -718,7 +720,12 @@ gui::d2::d2_player::new_window(const std::string &name,
 	// Create an os window
 	winfo->m_hwnd = m_hoster.new_os_window();
 	assert(winfo->m_hwnd);
+#if 1
+	// Set "old" rect to empty, so the first redraw will recalculate the matrix
+	SetRectEmpty(&winfo->m_rect);
+#else
 	GetClientRect(winfo->m_hwnd, &winfo->m_rect);
+#endif
 
 	// Rendertarget will be created on-demand
 	winfo->m_rendertarget = NULL;
