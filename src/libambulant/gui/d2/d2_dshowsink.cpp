@@ -66,20 +66,14 @@ CVideoD2DBitmapRenderer::LockBitmap()
 {
 	// XXX Lock it.
 //	assert(m_d2bitmap_next == NULL);
+	if (m_d2bitmap) m_d2bitmap->AddRef();
 	return m_d2bitmap;
 }
 
 void
-CVideoD2DBitmapRenderer::UnlockBitmap()
+CVideoD2DBitmapRenderer::UnlockBitmap(ID2D1Bitmap *bitmap)
 {
-#if 0
-	if (m_d2bitmap != m_d2bitmap_next) {
-		// A new one has arrived, in the mean time.
-		if (m_d2bitmap) m_d2bitmap->Release();
-		m_d2bitmap = m_d2bitmap_next;
-		m_d2bitmap_next = NULL;
-	}
-#endif
+	bitmap->Release();
 	// XXX Unlock it.
 }
 

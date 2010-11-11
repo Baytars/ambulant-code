@@ -76,13 +76,12 @@ public:
 	
 	ID2D1Bitmap *LockBitmap();
 
-	void UnlockBitmap();
+	void UnlockBitmap(ID2D1Bitmap *bitmap);
 
 	void DestroyBitmap();
 private:
 	ID2D1RenderTarget *m_rt;
 	ID2D1Bitmap *m_d2bitmap;
-//	ID2D1Bitmap *m_d2bitmap_next;
 	IVideoD2DBitmapRendererCallback *m_callback;
 	int m_width;   // Video width
 	int m_height;  // Video Height
