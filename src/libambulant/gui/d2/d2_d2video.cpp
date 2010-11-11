@@ -471,7 +471,7 @@ void gui::d2::d2_d2video_renderer::redraw_body(const lib::rect &dirty, common::g
 		d2rect);
 	rt->SetTransform(&oldmatrix);
 
-	m_video_sink->UnlockBitmap();
+	m_video_sink->UnlockBitmap(bitmap);
 }
 
 void gui::d2::d2_d2video_renderer::BitmapAvailable(CVideoD2DBitmapRenderer *caller)
