@@ -340,8 +340,11 @@ int MmView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		LocateWelcomeDoc(TEXT("Welcome.smil"))){;}
 #endif
 
+#if 0
+	// This interferes with starting up in fullscreen mode
 	PostMessage(WM_SET_CLIENT_RECT,
 		common::default_layout_width, ambulant::common::default_layout_height);
+#endif
 #ifdef WITH_SPLASH_SCREEN
 	PostMessage(WM_COMMAND, ID_HELP_WELCOME);
 #else
