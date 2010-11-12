@@ -732,32 +732,40 @@ gui::d2::d2_player::new_window(const std::string &name,
 
 	// Region?
 	region *rgn = (region *) src;
-
-	// Set window size
-	int w = bounds.w;
-	int h = bounds.h;
-	int borders_w = 20; // XXXX
-	int borders_h = 60; // XXXX
-	float factor = 1.0;
-	RECT desktop_rect;
+	bool is_fullscreen = false;
+	HWND parent_hwnd = GetParent(winfo->m_hwnd);
+	if (parent_hwnd) {
+		long parent_style = GetWindowLong(parent_hwnd, GWL_STYLE);
+		if ( (parent_style & WS_CAPTION) == 0) 
+			is_fullscreen = true;
+	}
+	if  (!is_fullscreen) {
+		// Set window size
+		int w = bounds.w;
+		int h = bounds.h;
+		int borders_w = 20; // XXXX
+		int borders_h = 60; // XXXX
+		float factor = 1.0;
+		RECT desktop_rect;
 #if 0
-	GetWindowRect(::GetDesktopWindow(), &desktop_rect);
+		GetWindowRect(::GetDesktopWindow(), &desktop_rect);
 #else
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop_rect, 0);
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &desktop_rect, 0);
 #endif
-	if (w > desktop_rect.right-desktop_rect.left - borders_w) {
-		factor = float(desktop_rect.right-desktop_rect.left - borders_w) / w;
+		if (w > desktop_rect.right-desktop_rect.left - borders_w) {
+			factor = float(desktop_rect.right-desktop_rect.left - borders_w) / w;
+		}
+		if (h > desktop_rect.bottom - desktop_rect.top - borders_h) {
+			float f2 = float(desktop_rect.bottom - desktop_rect.top - borders_h) / h;
+			if (f2 < factor) factor = f2;
+		}
+		if (factor < 1.0) {
+			w = int(w*factor);
+			h = int(h*factor);
+			// XXX To DO: position correctly on screen too.
+		}
+		PostMessage(winfo->m_hwnd, WM_SET_CLIENT_RECT, w, h);
 	}
-	if (h > desktop_rect.bottom - desktop_rect.top - borders_h) {
-		float f2 = float(desktop_rect.bottom - desktop_rect.top - borders_h) / h;
-		if (f2 < factor) factor = f2;
-	}
-	if (factor < 1.0) {
-		w = int(w*factor);
-		h = int(h*factor);
-		// XXX To DO: position correctly on screen too.
-	}
-	PostMessage(winfo->m_hwnd, WM_SET_CLIENT_RECT, w, h);
 
 	// Create a concrete gui_window
 	winfo->m_window = new d2_window(name, bounds, rgn, this, winfo->m_hwnd);
