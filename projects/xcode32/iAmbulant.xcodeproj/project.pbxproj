@@ -64,6 +64,7 @@
 		04B75E2E12B80F5500161EB5 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B75E2D12B80F5500161EB5 /* CoreText.framework */; };
 		04B75E6112B8104A00161EB5 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B75E6012B8104A00161EB5 /* ImageIO.framework */; };
 		04B75E6B12B8106900161EB5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04B75E6A12B8106900161EB5 /* QuartzCore.framework */; };
+		04D4484A12BED58E009624F8 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04D4484912BED58E009624F8 /* MainWindow-iPad.xib */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
@@ -194,6 +195,7 @@
 		04B75E2D12B80F5500161EB5 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		04B75E6012B8104A00161EB5 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = ../../../../../../Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = SOURCE_ROOT; };
 		04B75E6A12B8106900161EB5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = ../../../../../../Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = SOURCE_ROOT; };
+		04D4484912BED58E009624F8 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "../../src/player_iphone/Resources-iPad/MainWindow-iPad.xib"; sourceTree = SOURCE_ROOT; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* iAmbulant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iAmbulant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -238,6 +240,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0483917212BED1C9002260A6 /* Resources-iPad */ = {
+			isa = PBXGroup;
+			children = (
+				04D4484912BED58E009624F8 /* MainWindow-iPad.xib */,
+			);
+			name = "Resources-iPad";
+			sourceTree = "<group>";
+		};
 		04B75D5C12B80C8300161EB5 /* Configuration Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -269,7 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				04B75D9012B80D1300161EB5 /* libambulant.dylib */,
-				04B75D9212B80D1300161EB5 /* libambulantGC.dylib */,
+				04B75D9212B80D1300161EB5 /* libambulantCG.dylib */,
 				04B75D9412B80D1300161EB5 /* libambulantCGstatic.a */,
 				04B75D9612B80D1300161EB5 /* libambulantIPhone.a */,
 			);
@@ -338,6 +348,7 @@
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
+				0483917212BED1C9002260A6 /* Resources-iPad */,
 				04B75DA512B80E5E00161EB5 /* third_party_packages */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				04B75E6A12B8106900161EB5 /* QuartzCore.framework */,
@@ -471,10 +482,10 @@
 			remoteRef = 04B75D8F12B80D1300161EB5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		04B75D9212B80D1300161EB5 /* libambulantGC.dylib */ = {
+		04B75D9212B80D1300161EB5 /* libambulantCG.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = libambulantGC.dylib;
+			path = libambulantCG.dylib;
 			remoteRef = 04B75D9112B80D1300161EB5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -524,6 +535,7 @@
 				04B75D4412B80C2A00161EB5 /* Welcome.smil in Resources */,
 				041E94CC12B816EE00399893 /* Entitlements.plist in Resources */,
 				0483912212BEC681002260A6 /* ITunesArtwork in Resources */,
+				04D4484A12BED58E009624F8 /* MainWindow-iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,6 +610,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = "iAmbulant-Info.plist";
 				PRODUCT_NAME = iAmbulant;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -619,6 +632,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = "iAmbulant-Info.plist";
 				PRODUCT_NAME = iAmbulant;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -637,6 +651,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = "iAmbulant-Info.plist";
 				PRODUCT_NAME = iAmbulant;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
