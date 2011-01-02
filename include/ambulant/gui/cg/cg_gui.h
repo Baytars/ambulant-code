@@ -138,6 +138,10 @@ common::playable_factory *create_cg_text_playable_factory(common::factories *fac
 - (CGRect)rect;
 @end
 
+// XXXJACK this needs thought. The intention is that a double-tap
+// does the "most useful" thing, based on previous double-taps, zooms,
+// and pans. Should investigate what Safari does and try to duplicate
+// that.
 enum ZoomState {
     zoomNaturalSize,
 //  zoomRegion,
@@ -167,19 +171,14 @@ enum ZoomState {
 #ifdef	WITH_UIKIT
 	BOOL M_auto_center;
 	BOOL M_auto_resize;
-	CGRect current_frame;
-	CGRect original_frame;
-	CGAffineTransform current_transform;
-	ambulant::lib::size original_bounds;
-    ZoomState zoomState;
+	CGPoint center_before_translate;  // During pan, this holds the original frame
+	CGFloat scale_before_zoom;  // During zoom, this holds the original matrix
+	ambulant::lib::size smil_window_size;   // What SMIL thinks the window size is
+    ZoomState zoomState;    // Whether we last double-tapped to natural or fullscreen view
 #endif//WITH_UIKIT
 }
 
 #ifdef	WITH_UIKIT
-@property(nonatomic) CGRect	current_frame;
-@property(nonatomic) CGRect	original_frame;
-@property(nonatomic) CGAffineTransform current_transform;
-@property(nonatomic) ambulant::lib::size original_bounds;
 
 - (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize;
 - (BOOL) tappedAtPoint:(CGPoint) location;
