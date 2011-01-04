@@ -139,13 +139,14 @@ application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictio
 	autoCenter = prefs->m_auto_center;
 	autoResize = prefs->m_auto_resize;
 	nativeRenderer = ! prefs->m_prefer_ffmpeg;
-#if 1
-    // XXXJACK this is needed to make rotation work somewhat:-(
-    tabBarController.view.alpha = 0.0;
-    tabBarController.view.hidden = true;
-    [window addSubview:tabBarController.view];
-    [window addSubview:viewController.view];   
-#endif
+
+	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+	[[NSNotificationCenter defaultCenter]
+        addObserver:self
+        selector:@selector(orientationChanged:)
+        name:UIDeviceOrientationDidChangeNotification
+        object: nil];
+
     return YES;
 }
 
@@ -260,28 +261,26 @@ applicationDidBecomeActive:(UIApplication *)application {
         showPlayer = [viewController canPlay];
     }
        
-    // XXXJACK: Don't add views we don't directly need.
+    // Note: the order of adding the views to the window is important.
+    // Only the first viewController will be informed about rotation, see
+    // <http://developer.apple.com/library/ios/#qa/qa2010/qa1688.html>. 
     if (showPlayer) {
-        tabBarController.view.alpha = 0.0;
-        tabBarController.view.hidden = true;
-        [window addSubview:tabBarController.view];
         viewController.view.alpha = 1.0;
         viewController.view.hidden = false;
-        [window addSubview:viewController.view];
+
+        tabBarController.view.alpha = 0.0;
+        tabBarController.view.hidden = true;
     } else {
         viewController.view.alpha = 0.0;
         viewController.view.hidden = true;
-        [window addSubview:viewController.view];
+
         tabBarController.view.alpha = 1.0;
         tabBarController.view.hidden = false;
-        [window addSubview:tabBarController.view];
     }
-	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-	[[NSNotificationCenter defaultCenter]
-        addObserver:self
-        selector:@selector(orientationChanged:)
-        name:UIDeviceOrientationDidChangeNotification
-        object: nil];
+    [window addSubview:viewController.view];
+    [window addSubview:tabBarController.view];
+    [window addSubview:viewController.view];
+
     [window makeKeyAndVisible];
 }
 

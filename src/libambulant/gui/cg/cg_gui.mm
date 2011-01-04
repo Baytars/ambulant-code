@@ -383,7 +383,7 @@ bad:
 	// but drawing should use bottom-left. Either I have done something really stupid or there is something
 	// I don't understand about the basics of UIKit.
 	// For now, we convert the y coordinate.
-	my_rect.origin.y = (CGRectGetMaxY([self bounds])-(my_rect.origin.y+my_rect.size.height));
+//XXXRECT	my_rect.origin.y = (CGRectGetMaxY([self bounds])-(my_rect.origin.y+my_rect.size.height));
 #endif
 	[arect release];
 	AM_DBG NSLog(@"AmbulantView.asyncRedrawForAmbulantRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(my_rect), CGRectGetMinY(my_rect), CGRectGetMaxX(my_rect), CGRectGetMaxY(my_rect));
@@ -404,18 +404,28 @@ bad:
 
 - (void)drawRect:(CGRect)rect
 {
-	AM_DBG NSLog(@"AmbulantView.drawRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetMaxX(rect), CGRectGetMaxY(rect));
+	/*AM_DBG*/ NSLog(@"AmbulantView.drawRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetMaxX(rect), CGRectGetMaxY(rect));
+	UIView *todo = self;
+	while (todo) {
+		/*AM_DBG*/ NSLog(@"    UIView: 0x%x %@", todo, todo);
+		/*AM_DBG*/ NSLog(@"        frame: (%f, %f, %f, %f)", todo.frame.origin.x, todo.frame.origin.y, todo.frame.size.width, todo.frame.size.height);
+		/*AM_DBG*/ NSLog(@"        bounds: (%f, %f, %f, %f)", todo.bounds.origin.x, todo.bounds.origin.y, todo.bounds.size.width, todo.bounds.size.height);
+		/*AM_DBG*/ NSLog(@"        center: (%f, %f)", todo.center.x, todo.center.y);
+		/*AM_DBG*/ NSLog(@"        matrix: (%f, %f, %f, %f, %f, %f)", todo.transform.a, todo.transform.b, todo.transform.c, todo.transform.d, todo.transform.tx, todo.transform.ty);
+		todo = todo.superview;
+	}
+	NSLog(@"");
 #ifdef WITH_UIKIT
 	// There is something very funny going on. The coordinates passed in rect seem to be top-left based,
 	// but drawing should use bottom-left. Either I have done something really stupid or there is something
 	// I don't understand about the basics of UIKit.
 	// For now, we convert the y coordinate.
-//XXXRECT	rect.origin.y = (CGRectGetMaxY([self bounds])-(rect.origin.y+rect.size.height));
+	rect.origin.y = (CGRectGetMaxY([self bounds])-(rect.origin.y+rect.size.height));
 #endif
 //#define CG_REDRAW_DEBUG
 #ifdef CG_REDRAW_DEBUG
 	{
-		float components[] = { 0, 1, 1, 1};
+		float components[] = { 20, 40, 60, 80};
 		CGColorSpaceRef genericColorSpace = CGColorSpaceCreateDeviceRGB();
 		CGContextSetFillColorSpace([self getCGContext], genericColorSpace);
 		CGColorSpaceRelease(genericColorSpace);
@@ -571,7 +581,6 @@ bad:
     }
 	CGSize mybounds = CGSizeMake(smil_window_size.w, smil_window_size.h);
 	CGRect myframe = self.frame;
-    myframe.origin = CGPointMake(0,0);
 	CGRect mainframe = [[UIScreen mainScreen] applicationFrame];
     /*AM_DBG*/ NSLog(@"my frame: %f, %f, %f, %f", myframe.origin.x, myframe.origin.y, myframe.size.width, myframe.size.height);
 	/*AM_DBG*/ NSLog(@"Mainscreen: %f,%f,%f,%f", mainframe.origin.x,mainframe.origin.y,mainframe.size.width,mainframe.size.height);
@@ -608,17 +617,17 @@ bad:
 		if (wasRotated) {
 			delta = (myframe.size.width - mybounds.width * scale) / 2;
 			myframe.origin.x += delta;
-			myframe.size.width -= delta;
+			myframe.size.width -= 2*delta;
 			delta = (myframe.size.height - mybounds.height * scale) / 2;
 			myframe.origin.y += delta;
-			myframe.size.height -= delta;
+			myframe.size.height -= 2*delta;
 		} else {
 			delta = (myframe.size.height - mybounds.height * scale) / 2;		
 			myframe.origin.y += delta;
-			myframe.size.height -= delta;
+			myframe.size.height -= 2*delta;
 			delta = (myframe.size.width - mybounds.width * scale) / 2;
 			myframe.origin.x += delta;
-			myframe.size.width -= delta;
+			myframe.size.width -= 2*delta;
 		}
 	}
 	AM_DBG ambulant::lib::logger::get_logger()->debug("adaptDisplayAfterRotation: myframe=orig(%d,%d),size(%d,%d)",(int)myframe.origin.x, (int)myframe.origin.y,(int)myframe.size.width,(int)myframe.size.height);

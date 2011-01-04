@@ -58,7 +58,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void) awakeFromNib
 {
-    AM_DBG NSLog(@"AmbulantViewController viewDidLoad(0x%x)", self);
+    /*AM_DBG*/ NSLog(@"AmbulantViewController awakeFromNib(0x%x) %@ view %@ playerView %@", self, self, self.view, playerView);
 
 	// prepare to react when device is rotated
 	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -110,14 +110,14 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 // - install gesture recognizers
 - (void) viewDidLoad {
-	AM_DBG NSLog(@"AmbulantViewController viewDidLoad(0x%x)", self);
+    /*AM_DBG*/ NSLog(@"AmbulantViewController viewDidLoad(0x%x) %@ view %@ playerView %@", self, self, self.view, playerView);
     [super viewDidLoad];
     [self initGestures];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	/*AM_DBG*/ NSLog(@"AmbulantViewController viewWillAppear(0x%x)", self);
+    /*AM_DBG*/ NSLog(@"AmbulantViewController viewWillAppear(0x%x) %@ view %@ playerView %@", self, self, self.view, playerView);
 }
 
 - (void)viewDidAppear:(BOOL)animated
