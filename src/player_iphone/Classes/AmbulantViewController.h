@@ -37,7 +37,7 @@ class document_embedder : public ambulant::common::embedder {
 				<UITextFieldDelegate> {
 	document_embedder *embedder;    // Our class to handle inter-SMIL-document commands.
 	mainloop *myMainloop;   // Controller object for the SMIL player
-	IBOutlet id view; // our main view, contains playerView and interactionView
+//	IBOutlet id view; // our main view, contains playerView and interactionView
 	IBOutlet AmbulantView* playerView;
 	IBOutlet UIView* interactionView;
 	IBOutlet AmbulantAppDelegate* delegate; // Our higher-level controller

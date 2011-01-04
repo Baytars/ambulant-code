@@ -45,7 +45,7 @@
 					<object class="IBUIView" id="402757605">
 						<reference key="NSNextResponder" ref="774585933"/>
 						<int key="NSvFlags">274</int>
-						<string key="NSFrameSize">{480, 460}</string>
+						<string key="NSFrameSize">{320, 460}</string>
 						<reference key="NSSuperview" ref="774585933"/>
 						<object class="NSColor" key="IBUIBackgroundColor" id="286202398">
 							<int key="NSColorSpace">3</int>
@@ -452,7 +452,7 @@
 						<bytes key="NSTransformStruct">P4AAAL+AAABC+AAAw4EAAA</bytes>
 					</object>
 					<string>AmbulantView</string>
-					<string>{{893, 107}, {320, 480}}</string>
+					<string>{{1100, 689}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<object class="NSAffineTransform">
@@ -673,7 +673,6 @@
 							<string>interactionView</string>
 							<string>playPauseButton</string>
 							<string>playerView</string>
-							<string>view</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -681,7 +680,6 @@
 							<string>UIView</string>
 							<string>UIButton</string>
 							<string>AmbulantView</string>
-							<string>id</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -692,7 +690,6 @@
 							<string>interactionView</string>
 							<string>playPauseButton</string>
 							<string>playerView</string>
-							<string>view</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -711,10 +708,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">playerView</string>
 								<string key="candidateClassName">AmbulantView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">view</string>
-								<string key="candidateClassName">id</string>
 							</object>
 						</object>
 					</object>
