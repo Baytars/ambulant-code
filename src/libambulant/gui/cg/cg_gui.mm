@@ -387,17 +387,21 @@ bad:
 
 - (void)drawRect:(CGRect)rect
 {
+    CGContextRef myContext = [self getCGContext];
+    CGContextSaveGState(myContext);
     //
     // CG has default coordinate system with the origin bottom-left, we want topleft.
+    // But: if we are running in an NSView then the coordinate system has already
+    // been setup wrt. isFlipped, so we do nothing.
     //
-     CGContextRef myContext = [self getCGContext];
-    CGContextSaveGState(myContext);
-    float view_height = CGRectGetHeight(CGRectFromViewRect(self.bounds));
-    CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
-    CGContextConcatCTM(myContext, matrix);
-    // Also adapt the dirty rect
-    matrix = CGAffineTransformInvert(matrix);
-    rect = CGRectApplyAffineTransform(rect, matrix);
+    if (![self isFlipped]) {
+        float view_height = CGRectGetHeight(CGRectFromViewRect(self.bounds));
+        CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
+        CGContextConcatCTM(myContext, matrix);
+        // Also adapt the dirty rect
+        matrix = CGAffineTransformInvert(matrix);
+        rect = CGRectApplyAffineTransform(rect, matrix);
+    }
     
 #ifdef WITH_UIKIT
 	/*AM_DBG*/ NSLog(@"AmbulantView.drawRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetMaxX(rect), CGRectGetMaxY(rect));

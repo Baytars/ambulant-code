@@ -245,10 +245,10 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 
 			CGContextSaveGState(myContext);
 			CGContextClipToRect(myContext, cg_dstrect);
-		float x_scale = (float)dstrect.width() / (float)srcrect.width();
-		float y_scale = (float)dstrect.height() / (float)srcrect.height();
-		CGAffineTransform matrix = CGAffineTransformMake(x_scale, 0, 0, y_scale, 0, 0);
-		CGContextConcatCTM(myContext, matrix);
+            float x_scale = (float)dstrect.width() / (float)srcrect.width();
+            float y_scale = (float)dstrect.height() / (float)srcrect.height();
+            CGAffineTransform matrix = CGAffineTransformMake(x_scale, 0, 0, y_scale, 0, 0);
+            CGContextConcatCTM(myContext, matrix);
 			CGRect cg_fullsrcrect = CGRectMake(-srcrect.left()+dest_origin.x, -srcrect.top()+dest_origin.y, srcrect.width(), srcrect.height());
 			CGContextDrawLayerInRect(myContext, cg_fullsrcrect, m_cglayer);
 
@@ -318,6 +318,13 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 		assert(dstrect.size() == srcrect.size());
 #endif
 		CGContextClipToRect(myContext, cg_dstrect); // XXXJACK DEBUG
+        // We need to mirror the image, because CGImage uses bottom-left coordinates.
+        // The full formula is
+        // y' = -(y - midy) + midy
+        // y' = 2*midy - y
+        // y' = 2*top + height - midy
+        CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, 2*CGRectGetMinY(cg_dstrect)+CGRectGetHeight(cg_dstrect));
+        CGContextConcatCTM(myContext, matrix);
 		CGContextDrawImage(myContext, cg_dstrect, imageToDraw);
 	}
     CGContextRestoreGState(myContext);
