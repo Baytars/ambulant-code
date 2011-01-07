@@ -349,6 +349,18 @@ bad:
 	return arect;
 }
 
+- (CGAffineTransform) transformForRect: (const CGRect *)rect flipped: (BOOL)flipped
+{
+	CGFloat fy = flipped?-1:1;
+	CGFloat tx = CGRectGetMinX(*rect);
+	CGFloat ty = CGRectGetMinY(*rect);
+	if (flipped) {
+		ty += CGRectGetMinY(*rect)+CGRectGetHeight(*rect);
+	}
+	CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, fy, tx, ty);
+	return matrix;
+}
+
 - (ambulant::lib::rect) ambulantRectForCGRectForLayout: (const CGRect *)nsrect
 {
 	assert(false); // defined and implemented for completeness, but not tested yet. 

@@ -109,8 +109,14 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	rect dstrect = r;
 	dstrect.translate(m_dest->get_global_topleft());
 	CGRect cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
-	// Set the text matrix
-	CGContextSetTextMatrix(ctx, CGAffineTransformIdentity);
+	// Set the text matrix. 
+	// We need to mirror the text (again).
+	// The full formula is
+	// y' = -(y - midy) + midy
+	// y' = 2*midy - y
+	// y' = 2*top + height - midy
+	CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, 2*CGRectGetMinY(cg_dstrect)+CGRectGetHeight(cg_dstrect));
+	CGContextSetTextMatrix(ctx, matrix);
 	// Set the color
 	double alfa = 1.0;
 #ifdef WITH_SMIL30
@@ -128,7 +134,7 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 	float lineheight = m_font_size;
 	// XXXX These calculations assume COCOA_USE_BOTLEFT
 	float x = CGRectGetMinX(cg_dstrect);
-	float y = CGRectGetMaxY(cg_dstrect) - lineheight;
+	float y = CGRectGetMinY(cg_dstrect) + lineheight;
 	float w = CGRectGetWidth(cg_dstrect);
 	size_t lbegin, lend;
 	const char *cdata = (char *)m_data;
@@ -142,7 +148,7 @@ cg_text_renderer::redraw_body(const rect &dirty, gui_window *window)
 		CGContextSetTextDrawingMode(ctx, kCGTextFill);
 		CGContextShowText(ctx, cdata+lbegin, lend-lbegin);
 		lbegin = lend;
-		y -= lineheight;
+		y += lineheight;
 	}
 	CGColorSpaceRelease(genericColorSpace);
 	m_lock.leave();

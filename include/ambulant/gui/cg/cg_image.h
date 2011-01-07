@@ -31,7 +31,7 @@
 //#include "ambulant/lib/mtsync.h"
 //#include <CoreGraphics/CoreGraphics.h>
 
-#undef WITH_OLD_CROP_CODE
+#define WITH_OLD_CROP_CODE
 
 namespace ambulant {
 

@@ -325,6 +325,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
         // y' = 2*top + height - midy
         CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, 2*CGRectGetMinY(cg_dstrect)+CGRectGetHeight(cg_dstrect));
         CGContextConcatCTM(myContext, matrix);
+		matrix = CGContextGetCTM(myContext);
 		CGContextDrawImage(myContext, cg_dstrect, imageToDraw);
 	}
     CGContextRestoreGState(myContext);
