@@ -413,6 +413,14 @@ bad:
     // But: if we are running in an NSView then the coordinate system has already
     // been setup wrt. isFlipped, so we do nothing.
     //
+#ifdef WITH_UIKIT
+	float view_height = CGRectGetHeight(CGRectFromViewRect(self.bounds));
+	CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
+	// CGContextConcatCTM(myContext, matrix);
+	// Also adapt the dirty rect
+	//matrix = CGAffineTransformInvert(matrix);
+	//rect = CGRectApplyAffineTransform(rect, matrix);
+#else
     if (![self isFlipped]) {
         float view_height = CGRectGetHeight(CGRectFromViewRect(self.bounds));
         CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
@@ -421,6 +429,7 @@ bad:
         matrix = CGAffineTransformInvert(matrix);
         rect = CGRectApplyAffineTransform(rect, matrix);
     }
+#endif
     
 #ifdef WITH_UIKIT
 	/*AM_DBG*/ NSLog(@"AmbulantView.drawRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(rect), CGRectGetMinY(rect), CGRectGetMaxX(rect), CGRectGetMaxY(rect));
@@ -438,7 +447,7 @@ bad:
 	// but drawing should use bottom-left. Either I have done something really stupid or there is something
 	// I don't understand about the basics of UIKit.
 	// For now, we convert the y coordinate.
-	rect.origin.y = (CGRectGetMaxY([self bounds])-(rect.origin.y+rect.size.height));
+//	rect.origin.y = (CGRectGetMaxY([self bounds])-(rect.origin.y+rect.size.height));
 #endif
 #define CG_REDRAW_DEBUG
 #ifdef CG_REDRAW_DEBUG
@@ -499,15 +508,6 @@ bad:
 	if (!ambulant_window) {
 		AM_DBG NSLog(@"Redraw AmbulantView: NULL ambulant_window");
 	} else {
-#ifdef WITH_UIKIT
-		CGRect bounds = [self bounds];
-		AM_DBG NSLog(@"ambulantview: bounds (%f, %f, %f, %f)", bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-//		CGContextRef myContext = UIGraphicsGetCurrentContext();
-		CGContextSaveGState(myContext);
-		float view_height = CGRectGetHeight(CGRectFromViewRect([self bounds]));
-		CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, view_height);
-		CGContextConcatCTM(myContext, matrix);
-#endif
 		// If we have seen transitions we always redraw the whole view
 		// XXXJACK interaction of fullscreen transitions and overlay windows
 		// is completely untested, and probably broken.
@@ -517,9 +517,6 @@ bad:
 		AM_DBG NSLog(@"ambulantView: call redraw ambulant-ltrb=(%d, %d, %d, %d)", arect.left(), arect.top(), arect.right(), arect.bottom());
 		ambulant_window->redraw(arect);
 //		[self _screenTransitionPostRedraw];
-#ifdef WITH_UIKIT
-		CGContextRestoreGState(myContext);
-#endif
 #ifdef DUMP_REDRAW
 		// Debug code: dump the contents of the view into an image
 		[self dumpToImageID: "redraw"];
