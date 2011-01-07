@@ -210,6 +210,7 @@ enum ZoomState {
 - (CGRect) CGRectForAmbulantRectForLayout: (const ambulant::lib::rect *) arect;
 - (ambulant::lib::rect) ambulantRectForCGRect: (const CGRect *)nsrect;
 - (ambulant::lib::rect) ambulantRectForCGRectForLayout: (const CGRect *)nsrect;
+- (CGAffineTransform) transformForRect: (const CGRect *)rect flipped: (BOOL)flipped translated: (BOOL)translated;
 
 - (void) asyncRedrawForAmbulantRect: (NSRectHolder *)arect;
 - (void) syncDisplayIfNeeded: (id) dummy;

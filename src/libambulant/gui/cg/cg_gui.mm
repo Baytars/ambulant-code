@@ -349,13 +349,20 @@ bad:
 	return arect;
 }
 
-- (CGAffineTransform) transformForRect: (const CGRect *)rect flipped: (BOOL)flipped
+- (CGAffineTransform) transformForRect: (const CGRect *)rect flipped: (BOOL)flipped translated: (BOOL)translated
 {
 	CGFloat fy = flipped?-1:1;
-	CGFloat tx = CGRectGetMinX(*rect);
-	CGFloat ty = CGRectGetMinY(*rect);
-	if (flipped) {
-		ty += CGRectGetMinY(*rect)+CGRectGetHeight(*rect);
+	CGFloat tx = 0;
+	CGFloat ty = 0;
+	if (translated) {
+		tx = CGRectGetMinX(*rect);
+		if (flipped) {
+			ty = CGRectGetMinY(*rect)+CGRectGetHeight(*rect);
+		} else {
+			ty = CGRectGetMinY(*rect);
+		}
+	} else if (flipped) {
+		ty = 2*CGRectGetMinY(*rect)+CGRectGetHeight(*rect);
 	}
 	CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, fy, tx, ty);
 	return matrix;
