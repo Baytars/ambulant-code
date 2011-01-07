@@ -514,13 +514,9 @@ cg_smiltext_renderer::redraw_body(const rect &dirty, gui_window *window)
 	// Save the graphics state to be restored on return
 	CGContext* context = [view getCGContext];	
 	CGContextSaveGState(context);
-	// Initialize Text Matrix (otherwise giant characters may sometimes appear).
-	// We need to mirror the text (again).
-	// The full formula is
-	// y' = -(y - midy) + midy
-	// y' = 2*midy - y
-	// y' = 2*top + height - midy
-	CGAffineTransform matrix = CGAffineTransformMake(1, 0, 0, -1, 0, 2*CGRectGetMinY(cg_final_dst_rect)+CGRectGetHeight(cg_final_dst_rect));
+	// Initialize Text Matrix (otherwise giant characters may sometimes appear) and
+	// transformation matrix.
+	CGAffineTransform matrix = [view transformForRect: &cg_final_dst_rect flipped: YES translated: NO];
 	CGContextConcatCTM(context, matrix);
 	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
 	
