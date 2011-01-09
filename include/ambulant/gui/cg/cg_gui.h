@@ -170,9 +170,9 @@ enum ZoomState {
 	CGRect current_frame;
 	CGRect original_frame;
 	CGAffineTransform current_transform;
-	ambulant::lib::size original_bounds;
     ZoomState zoomState;
 #endif//WITH_UIKIT
+	ambulant::lib::size original_bounds;
 }
 
 #ifdef	WITH_UIKIT
@@ -198,6 +198,7 @@ enum ZoomState {
 - (bool)ignoreResize;
 #ifndef WITH_UIKIT
 - (BOOL)isFlipped;
+- (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize;
 #endif
 
 - (void)ambulantSetSize: (ambulant::lib::size) bounds;
