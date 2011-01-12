@@ -535,18 +535,12 @@ bad:
 
 - (void)ambulantSetSize: (ambulant::lib::size) bounds
 {
-// Remember frame and bounds and adapt the window reqested in the current view
+    // Remember frame and bounds and adapt the window reqested in the current view
 	original_bounds = bounds;
-#if WITH_UIKIT
-//	NSLog(@"ambulantSetSize: not yet implemented for UIKit");
-	if (original_frame.size.height == 0  && original_frame.size.width == 0) {
-		original_frame.size.height = self.frame.size.height;
-		original_frame.size.width  = self.frame.size.width;
-	}
-	current_frame = original_frame;
-//JNK	[self adaptDisplayAfterRotation: UIDeviceOrientationPortrait withAutoCenter: M_auto_center withAutoResize: M_auto_resize];
-    [[self superview] adaptDisplayAfterRotation];
-#else
+    if ([[self superview] respondsToSelector: @selector(adaptDisplayAfterRotation)])
+        [[self superview] adaptDisplayAfterRotation];
+
+#ifndef WITH_UIKIT
 	// Get the position of our view in window coordinates
 	NSPoint origin = NSMakePoint(0,0);
 	NSView *superview = [self superview];
@@ -567,7 +561,7 @@ bad:
 		AM_DBG NSLog(@"Size changed on %@ to (%f, %f)", window, ns_size.width, ns_size.height);
 	}
 	[window makeKeyAndOrderFront: self];
-#endif
+#endif // !WITH_UIKIT
 }
 
 #ifdef WITH_UIKIT
