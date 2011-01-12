@@ -38,10 +38,10 @@ class document_embedder : public ambulant::common::embedder {
 @end
 
 enum ZoomState {
+    zoomFillScreen,
     zoomNaturalSize,
 //  zoomRegion,
-    zoomFillScreen,
-    zoomLast
+    zoomUser
 };
 
 @interface AmbulantScalerView : UIView {
@@ -52,7 +52,7 @@ enum ZoomState {
 	CGAffineTransform current_transform;
     ZoomState zoomState;
 }
-- (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize;
+- (void) adaptDisplayAfterRotation;
 - (void) zoomWithScale: (float) scale inState: (UIGestureRecognizerState) state;
 - (void) autoZoomAtPoint: (CGPoint) point;
 - (void) translateWithPoint: (CGPoint) point inState: (UIGestureRecognizerState) state;

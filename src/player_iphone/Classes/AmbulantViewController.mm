@@ -246,10 +246,9 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	if (orientation == currentOrientation || ! [self isSupportedOrientation: orientation]) {
 		return;
 	}
-	ambulant::iOSpreferences* prefs = ambulant::iOSpreferences::get_preferences();
 	currentOrientation = orientation;
 	if (scalerView != NULL) {
-		[scalerView adaptDisplayAfterRotation: orientation withAutoCenter: prefs->m_auto_center withAutoResize: prefs->m_auto_resize];
+		[scalerView adaptDisplayAfterRotation];
 	}
 }
 
@@ -408,24 +407,27 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 @end
 
 @implementation AmbulantScalerView
-- (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize {
+- (void) adaptDisplayAfterRotation {
+
+	ambulant::iOSpreferences* prefs = ambulant::iOSpreferences::get_preferences();
 	if (self.alpha == 0.0) {
 		// view disabled, another view is made visible (e.g. tabBarViewController)
 		return;
 	}
 	// adapt the ambulant window needed (bounds) in the current View
-	M_auto_center = autoCenter;
-	M_auto_resize = autoResize;
-	bool auto_resize = (bool) autoResize;
-	bool auto_center = (bool) autoCenter;
-    if (autoResize) {
+	bool auto_resize = (bool) prefs->m_auto_resize;
+	bool auto_center = (bool) prefs->m_auto_center;
+    if (auto_resize) {
         zoomState = zoomFillScreen;
     } else {
         zoomState = zoomNaturalSize;
     }
 	CGSize mybounds;
-	mybounds.width = original_bounds.w;
-	mybounds.height = original_bounds.h;
+    UIView *playerView = [[self subviews] objectAtIndex: 0];
+    assert(playerView);
+    if (!playerView) return;
+	mybounds.width = playerView.bounds.size.width; // XXX Frame??
+	mybounds.height = playerView.bounds.size.height;
 #if PRESERVE_ZOOM
 	// pan/zoom combined with auto scale/auto center does not work smoothly.
 	// for now, rotating the device implies undo of all pan/zoom settings.
@@ -439,6 +441,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	CGRect mainframe = [[UIScreen mainScreen] applicationFrame];
 	AM_DBG NSLog(@"Mainscreen: %f,%f,%f,%f", mainframe.origin.x,mainframe.origin.y,mainframe.size.width,mainframe.size.height);
 	BOOL wasRotated = false;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 	if (orientation == UIDeviceOrientationLandscapeLeft
 		|| orientation == UIDeviceOrientationLandscapeRight) {
 		wasRotated = true;
@@ -510,6 +513,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	if (state == UIGestureRecognizerStateEnded) {
 		current_transform = self.transform;
 	}
+    zoomState = zoomUser;
 }
 
 - (void) translateWithPoint: (CGPoint) point inState: (UIGestureRecognizerState) state {
@@ -521,6 +525,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	if (state == UIGestureRecognizerStateEnded) {
 		current_frame = newFrame;
 	}
+    zoomState = zoomUser;
 }
 
 - (void) autoZoomAtPoint: (CGPoint) point
@@ -528,9 +533,8 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     // Advance to "next" zoomstate, currently only fill-screen and natural-size.
     // Eventually we will add zoom-to-region here.
     zoomState = (ZoomState)(zoomState + 1);
-    if (zoomState == zoomLast) zoomState = zoomNaturalSize;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    [self adaptDisplayAfterRotation: orientation withAutoCenter: M_auto_center withAutoResize: (zoomState == zoomFillScreen)];
+    if (zoomState >= zoomUser) zoomState = zoomFillScreen;
+    [self adaptDisplayAfterRotation];
 }
 
 @end
