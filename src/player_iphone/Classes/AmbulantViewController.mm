@@ -74,36 +74,37 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 - (void) initGestures
 {
     assert(playerView);
+    assert(scalerView);
 	// prepare to react on "tap" gesture (select object in playerView with 1 finger tap)
 	UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]
 										  initWithTarget:self action:@selector(handleTapGesture:)];
-	[playerView addGestureRecognizer:tapGesture];
+	[scalerView addGestureRecognizer:tapGesture];
     [tapGesture release];
 	
 	// prepare to react on "double tap" gesture (select object in playerView with 1 finger tap)
 	UITapGestureRecognizer *doubleTapGesture = [[UITapGestureRecognizer alloc]
 										  initWithTarget:self action:@selector(handleDoubleTapGesture:)];
 	doubleTapGesture.numberOfTapsRequired = 2;
-	[playerView addGestureRecognizer:doubleTapGesture];
+	[scalerView addGestureRecognizer:doubleTapGesture];
     [doubleTapGesture release];
 	
 	
 	// prepare to react on "longPress" gesture (hold finger in one spot, longer than 0.4 sec.)
     UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc]
 													  initWithTarget:self action:@selector(handleLongPressGesture:)];
-    [playerView addGestureRecognizer:longPressGesture];
+    [scalerView addGestureRecognizer:longPressGesture];
     [longPressGesture release];
 
 	// prepare to react on "pinch" gesture (zoom playerView with 2 fingers)
 	UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc]
 											  initWithTarget:self action:@selector(handlePinchGesture:)];
-	[playerView addGestureRecognizer:pinchGesture];
+	[scalerView addGestureRecognizer:pinchGesture];
     [pinchGesture release];
 
 	// prepare to react on "pan" gesture (move playerView with one finger)
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc]
 										  initWithTarget:self action:@selector(handlePanGesture:)];
-    [playerView addGestureRecognizer:panGesture];
+    [scalerView addGestureRecognizer:panGesture];
     [panGesture release];
 }
 
@@ -171,8 +172,9 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	}
     if (!currentURL) return;
     if (!playerView) {
-        (void)self.view; // This loads the view
+        [self view]; // This loads the view
     }
+    assert(self.view);
     assert(currentURL);
     assert(playerView);
     assert(embedder);	
@@ -256,6 +258,10 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	if (want_show && interactionView.hidden) {
 		interactionView.hidden = false;
 		interactionView.opaque = true;
+        assert(self.view);
+        assert(interactionView);
+        [self.view bringSubviewToFront:interactionView];
+//        NSLog(@"view: %@\nscalerView: %@\ninteractionView: %@\nplayerView: %@", view, scalerView, interactionView, playerView);
         [NSObject cancelPreviousPerformRequestsWithTarget: self selector:@selector(autoHideInteractionView) object:nil];
         [self performSelector:@selector(autoHideInteractionView) withObject:nil afterDelay:(NSTimeInterval)5.0];
 	} else {
