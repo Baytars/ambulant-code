@@ -226,8 +226,10 @@
 									<int key="NSColorSpace">1</int>
 									<bytes key="NSRGB">MC4wODQ3NjY3NDYgMC42MzA4NDM2NCAwLjkwMjE3Mzk0AA</bytes>
 								</object>
+								<int key="IBUIContentMode">1</int>
 								<bool key="IBUIMultipleTouchEnabled">YES</bool>
 								<int key="IBUITag">1</int>
+								<string key="IBUIContentStretch">{{0, 0}, {0, 0}}</string>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 						</object>
@@ -238,6 +240,8 @@
 							<bytes key="NSRGB">MSAwLjg1MDc1MjQ3IDAuMzM2MzEyMTIAA</bytes>
 						</object>
 						<bool key="IBUIOpaque">NO</bool>
+						<int key="IBUIContentMode">1</int>
+						<string key="IBUIContentStretch">{{0, 0}, {0, 0}}</string>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
 				</object>
@@ -247,7 +251,9 @@
 					<int key="NSColorSpace">1</int>
 					<bytes key="NSRGB">MC45MjM5MTMwNiAwLjE0MjQ5OTIxIDAuMDc3MDc0MzQ5AA</bytes>
 				</object>
+				<int key="IBUIContentMode">1</int>
 				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
+				<string key="IBUIContentStretch">{{0, 0}, {0, 0}}</string>
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>
 		</object>
@@ -735,7 +741,6 @@
 							<string>playPauseButton</string>
 							<string>playerView</string>
 							<string>scalerView</string>
-							<string>view</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -744,7 +749,6 @@
 							<string>UIButton</string>
 							<string>AmbulantView</string>
 							<string>AmbulantScalerView</string>
-							<string>AmbulantContainerView</string>
 						</object>
 					</object>
 					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -756,7 +760,6 @@
 							<string>playPauseButton</string>
 							<string>playerView</string>
 							<string>scalerView</string>
-							<string>view</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -779,10 +782,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">scalerView</string>
 								<string key="candidateClassName">AmbulantScalerView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">view</string>
-								<string key="candidateClassName">AmbulantContainerView</string>
 							</object>
 						</object>
 					</object>

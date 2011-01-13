@@ -408,7 +408,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 @implementation AmbulantScalerView
 - (void) adaptDisplayAfterRotation {
-
+#if 0
 	ambulant::iOSpreferences* prefs = ambulant::iOSpreferences::get_preferences();
 	if (self.alpha == 0.0) {
 		// view disabled, another view is made visible (e.g. tabBarViewController)
@@ -422,12 +422,11 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     } else {
         zoomState = zoomNaturalSize;
     }
-	CGSize mybounds;
     UIView *playerView = [[self subviews] objectAtIndex: 0];
     assert(playerView);
     if (!playerView) return;
-	mybounds.width = playerView.bounds.size.width; // XXX Frame??
-	mybounds.height = playerView.bounds.size.height;
+	CGSize playerBounds = playerView.bounds.size;
+#ifdef JNK
 #if PRESERVE_ZOOM
 	// pan/zoom combined with auto scale/auto center does not work smoothly.
 	// for now, rotating the device implies undo of all pan/zoom settings.
@@ -440,30 +439,38 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 #endif ///PRESERVE_ZOOM
 	CGRect mainframe = [[UIScreen mainScreen] applicationFrame];
 	AM_DBG NSLog(@"Mainscreen: %f,%f,%f,%f", mainframe.origin.x,mainframe.origin.y,mainframe.size.width,mainframe.size.height);
+#endif // JNK
+    CGSize myBounds = self.bounds.size;
+    /*AM_DBG*/ NSLog(@"self: %@\nsuperview: %@", self, self.superview);
+    /*AM_DBG*/ NSLog(@"myBounds: %f, %f, myFrame: %f, %f, %f, %f", myBounds.width, myBounds.height, self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);
 	BOOL wasRotated = false;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 	if (orientation == UIDeviceOrientationLandscapeLeft
 		|| orientation == UIDeviceOrientationLandscapeRight) {
 		wasRotated = true;
+#ifdef JNK
 		if (auto_center || auto_resize) {
 			myframe.size.height = mainframe.size.width; // depends on nib
 			myframe.size.width = mainframe.size.height;
 		}
+#endif
 		[[UIApplication sharedApplication] setStatusBarHidden: YES withAnimation: UIStatusBarAnimationNone];
 	} else if (orientation == UIDeviceOrientationPortrait 
 			   || orientation == UIDeviceOrientationPortraitUpsideDown) {
+#ifdef JNK
 		if (auto_center || auto_resize) {
 			myframe.size.width = mainframe.size.width;
 			myframe.size.height = mainframe.size.height;
 		}
+#endif
 		[[UIApplication sharedApplication] setStatusBarHidden: NO withAnimation: UIStatusBarAnimationNone];
 	} else {
 		return;
 	}
 	float scale = 1.0;
 	if (auto_resize) {
-		float scale_x = myframe.size.width / mybounds.width;
-		float scale_y = myframe.size.height / mybounds.height;
+		float scale_x = playerBounds.width / myBounds.width;
+		float scale_y = playerBounds.height / myBounds.height;
 		// find the smallest scale factor for both x- and y-directions
 		scale = scale_x < scale_y ? scale_x : scale_y;
 	}
@@ -472,31 +479,41 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 #else
 	self.transform = CGAffineTransformMakeScale(scale, scale);
 #endif ///PRESERVE_ZOOM
-	
+    if (auto_center) {
+        playerView.center = CGPointMake(myBounds.width/2, myBounds.height/2);
+    } else {
+        playerView.center = CGPointMake(playerBounds.width*scale/2, playerBounds.height*scale/2);
+    }
+#if 0
 	// center my frame in the available space
 	float delta = 0;
 	if (auto_center) {
 		if (wasRotated) {
-			delta = (myframe.size.width - mybounds.width * scale) / 2;
+			delta = (myframe.size.width - playerBounds.width * scale) / 2;
 			myframe.origin.x += delta;
 			myframe.size.width -= delta;
-			delta = (myframe.size.height - mybounds.height * scale) / 2;
+			delta = (myframe.size.height - playerBounds.height * scale) / 2;
 			myframe.origin.y += delta;
 			myframe.size.height -= delta;
 		} else {
-			delta = (myframe.size.height - mybounds.height * scale) / 2;		
+			delta = (myframe.size.height - playerBounds.height * scale) / 2;		
 			myframe.origin.y += delta;
 			myframe.size.height -= delta;
-			delta = (myframe.size.width - mybounds.width * scale) / 2;
+			delta = (myframe.size.width - playerBounds.width * scale) / 2;
 			myframe.origin.x += delta;
 			myframe.size.width -= delta;
 		}
 	}
 	AM_DBG ambulant::lib::logger::get_logger()->debug("adaptDisplayAfterRotation: myframe=orig(%d,%d),size(%d,%d)",(int)myframe.origin.x, (int)myframe.origin.y,(int)myframe.size.width,(int)myframe.size.height);
 	self.frame = myframe;
-
+#endif
 	// redisplay AmbulantView using the new settings
 	[self setNeedsDisplay];
+#endif
+}
+
+- (void) layoutSubviews {
+    NSLog(@"LayoutSubviews");
 }
 
 - (void) zoomWithScale: (float) scale  inState: (UIGestureRecognizerState) state {
