@@ -536,10 +536,18 @@ bad:
 - (void)ambulantSetSize: (ambulant::lib::size) bounds
 {
     // Remember frame and bounds and adapt the window reqested in the current view
-	original_bounds = bounds;
+	AM_DBG NSLog(@"setSize before: %@ %f,%f", self, self.bounds.size.width, self.bounds.size.height);
+    original_bounds = bounds;
+    CGRect newBounds = CGRectMake(0, 0, bounds.w, bounds.h);
+    self.bounds = newBounds;
+    CGRect newFrame = self.frame;
+    newFrame.size = newBounds.size;
+    self.frame = newFrame;
+    AM_DBG NSLog(@"setSize after set bounds: %@ %f,%f", self, self.bounds.size.width, self.bounds.size.height);
     if ([[self superview] respondsToSelector: @selector(adaptDisplayAfterRotation)])
         [[self superview] adaptDisplayAfterRotation];
 
+    AM_DBG NSLog(@"setSize after aDAR: %@ %f,%f", self, self.bounds.size.width, self.bounds.size.height);
 #ifndef WITH_UIKIT
 	// Get the position of our view in window coordinates
 	NSPoint origin = NSMakePoint(0,0);

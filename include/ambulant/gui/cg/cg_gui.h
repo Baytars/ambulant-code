@@ -167,9 +167,6 @@ common::playable_factory *create_cg_text_playable_factory(common::factories *fac
 }
 
 #ifdef	WITH_UIKIT
-@property(nonatomic) CGRect	current_frame;
-@property(nonatomic) CGRect	original_frame;
-@property(nonatomic) CGAffineTransform current_transform;
 @property(nonatomic) ambulant::lib::size original_bounds;
 
 - (BOOL) tappedAtPoint:(CGPoint) location;
