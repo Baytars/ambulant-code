@@ -301,6 +301,8 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 }
 
 - (void) adjustAnchorPointForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+#if 0
+    // XXXJACK: should move to zoomView?
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
         UIView *piece = gestureRecognizer.view;
         CGPoint locationInView = [gestureRecognizer locationInView:piece];
@@ -315,6 +317,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
         piece.layer.anchorPoint = CGPointMake(0.5, 0.5);
         piece.center = centerInSuperview;
     }
+#endif
 }
 
 - (IBAction) handlePinchGesture:(UIPinchGestureRecognizer *)sender { // zoom
@@ -422,11 +425,12 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     } else {
         zoomState = zoomNaturalSize;
     }
+#endif // 0
     UIView *playerView = [[self subviews] objectAtIndex: 0];
     assert(playerView);
     if (!playerView) return;
-	CGSize playerBounds = playerView.bounds.size;
 #ifdef JNK
+	CGSize playerBounds = playerView.bounds.size;
 #if PRESERVE_ZOOM
 	// pan/zoom combined with auto scale/auto center does not work smoothly.
 	// for now, rotating the device implies undo of all pan/zoom settings.
@@ -439,34 +443,21 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 #endif ///PRESERVE_ZOOM
 	CGRect mainframe = [[UIScreen mainScreen] applicationFrame];
 	AM_DBG NSLog(@"Mainscreen: %f,%f,%f,%f", mainframe.origin.x,mainframe.origin.y,mainframe.size.width,mainframe.size.height);
-#endif // JNK
     CGSize myBounds = self.bounds.size;
-    /*AM_DBG*/ NSLog(@"self: %@\nsuperview: %@", self, self.superview);
     /*AM_DBG*/ NSLog(@"myBounds: %f, %f, myFrame: %f, %f, %f, %f", myBounds.width, myBounds.height, self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);
+#endif // JNK
+    /*AM_DBG*/ NSLog(@"playerView: %@ self: %@\nsuperview: %@", playerView, self, self.superview);
 	BOOL wasRotated = false;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-	if (orientation == UIDeviceOrientationLandscapeLeft
-		|| orientation == UIDeviceOrientationLandscapeRight) {
+	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
 		wasRotated = true;
-#ifdef JNK
-		if (auto_center || auto_resize) {
-			myframe.size.height = mainframe.size.width; // depends on nib
-			myframe.size.width = mainframe.size.height;
-		}
-#endif
 		[[UIApplication sharedApplication] setStatusBarHidden: YES withAnimation: UIStatusBarAnimationNone];
-	} else if (orientation == UIDeviceOrientationPortrait 
-			   || orientation == UIDeviceOrientationPortraitUpsideDown) {
-#ifdef JNK
-		if (auto_center || auto_resize) {
-			myframe.size.width = mainframe.size.width;
-			myframe.size.height = mainframe.size.height;
-		}
-#endif
+	} else if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
 		[[UIApplication sharedApplication] setStatusBarHidden: NO withAnimation: UIStatusBarAnimationNone];
 	} else {
 		return;
 	}
+#ifdef JNK
 	float scale = 1.0;
 	if (auto_resize) {
 		float scale_x = playerBounds.width / myBounds.width;
@@ -484,63 +475,41 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     } else {
         playerView.center = CGPointMake(playerBounds.width*scale/2, playerBounds.height*scale/2);
     }
-#if 0
-	// center my frame in the available space
-	float delta = 0;
-	if (auto_center) {
-		if (wasRotated) {
-			delta = (myframe.size.width - playerBounds.width * scale) / 2;
-			myframe.origin.x += delta;
-			myframe.size.width -= delta;
-			delta = (myframe.size.height - playerBounds.height * scale) / 2;
-			myframe.origin.y += delta;
-			myframe.size.height -= delta;
-		} else {
-			delta = (myframe.size.height - playerBounds.height * scale) / 2;		
-			myframe.origin.y += delta;
-			myframe.size.height -= delta;
-			delta = (myframe.size.width - playerBounds.width * scale) / 2;
-			myframe.origin.x += delta;
-			myframe.size.width -= delta;
-		}
-	}
-	AM_DBG ambulant::lib::logger::get_logger()->debug("adaptDisplayAfterRotation: myframe=orig(%d,%d),size(%d,%d)",(int)myframe.origin.x, (int)myframe.origin.y,(int)myframe.size.width,(int)myframe.size.height);
-	self.frame = myframe;
-#endif
+#endif // JNK
 	// redisplay AmbulantView using the new settings
+    [self setNeedsLayout];
 	[self setNeedsDisplay];
-#endif
 }
 
 - (void) layoutSubviews {
     NSLog(@"LayoutSubviews");
+    [super layoutSubviews];
 }
 
 - (void) zoomWithScale: (float) scale  inState: (UIGestureRecognizerState) state {
 	if (state == UIGestureRecognizerStateBegan) {
-		current_transform = self.transform;
+		zoom_transform = self.transform;
 	}
-	// the current scale factors for 'x' and 'y' are in the 'a' and 'd' fields, respectively
-	// self.transform = CGAffineTransformMakeScale (scale*self.transform.a, scale*self.transform.d);
-	
-	self.transform = CGAffineTransformMakeScale (scale*current_transform.a,
-												 scale*current_transform.d);
-	// self.current_transform = self.transform;
-	current_frame = self.frame; //changing tranform also changes frame
+    self.transform = CGAffineTransformScale(zoom_transform, scale, scale);
 	if (state == UIGestureRecognizerStateEnded) {
-		current_transform = self.transform;
 	}
     zoomState = zoomUser;
 }
 
 - (void) translateWithPoint: (CGPoint) point inState: (UIGestureRecognizerState) state {
-	CGRect newFrame = current_frame;
-	newFrame.origin.x += point.x;
-	newFrame.origin.y += point.y;
+    UIView *playerView = [[self subviews] objectAtIndex: 0];
+    assert(playerView);
+    if (!playerView) return;
+	if (state == UIGestureRecognizerStateBegan) {
+        translation_origin = playerView.center;
+    }
+    
+    CGPoint newCenter = translation_origin;
+	newCenter.x += point.x;
+	newCenter.y += point.y;
+    playerView.center = newCenter;
 	
-	self.frame = newFrame;
 	if (state == UIGestureRecognizerStateEnded) {
-		current_frame = newFrame;
 	}
     zoomState = zoomUser;
 }

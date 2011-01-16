@@ -45,12 +45,9 @@ enum ZoomState {
 };
 
 @interface AmbulantScalerView : UIView {
-	BOOL M_auto_center;
-	BOOL M_auto_resize;
-	CGRect current_frame;
-	CGRect original_frame;
-	CGAffineTransform current_transform;
-    ZoomState zoomState;
+    ZoomState zoomState;  // What sort of zooming we currently use
+    CGPoint translation_origin; // During translation: point of origin of subwindow
+    CGAffineTransform zoom_transform; // During zoom: original scale factor
 }
 - (void) adaptDisplayAfterRotation;
 - (void) zoomWithScale: (float) scale inState: (UIGestureRecognizerState) state;
