@@ -38,6 +38,7 @@ class document_embedder : public ambulant::common::embedder {
 @end
 
 enum ZoomState {
+    zoomUnknown,    // Only before first setting, will load from preferences
     zoomFillScreen,
     zoomNaturalSize,
 //  zoomRegion,

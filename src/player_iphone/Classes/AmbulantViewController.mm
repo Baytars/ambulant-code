@@ -410,43 +410,30 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 @end
 
 @implementation AmbulantScalerView
-- (void) adaptDisplayAfterRotation {
-#if 0
-	ambulant::iOSpreferences* prefs = ambulant::iOSpreferences::get_preferences();
-	if (self.alpha == 0.0) {
-		// view disabled, another view is made visible (e.g. tabBarViewController)
-		return;
-	}
-	// adapt the ambulant window needed (bounds) in the current View
-	bool auto_resize = (bool) prefs->m_auto_resize;
-	bool auto_center = (bool) prefs->m_auto_center;
-    if (auto_resize) {
-        zoomState = zoomFillScreen;
-    } else {
-        zoomState = zoomNaturalSize;
+- (void) adaptDisplayAfterRotation
+{
+    bool auto_center = true;
+
+    // Initialize the zoomState, if not done already
+    if (zoomState == zoomUnknown) {
+        // adapt the ambulant window needed (bounds) in the current View
+        ambulant::iOSpreferences *prefs = ambulant::iOSpreferences::get_preferences();
+        bool auto_resize = (bool) prefs->m_auto_resize;
+        auto_center = (bool) prefs->m_auto_center;
+        if (auto_resize) {
+            zoomState = zoomFillScreen;
+        } else {
+            zoomState = zoomNaturalSize;
+        }
     }
-#endif // 0
+
+    // Find the playerView
     UIView *playerView = [[self subviews] objectAtIndex: 0];
     assert(playerView);
     if (!playerView) return;
-#ifdef JNK
-	CGSize playerBounds = playerView.bounds.size;
-#if PRESERVE_ZOOM
-	// pan/zoom combined with auto scale/auto center does not work smoothly.
-	// for now, rotating the device implies undo of all pan/zoom settings.
-	// This is useable, albeit maybe not always desirable.
-	// Shake gesture or UIDeviveOrientationFaceDown would be obvious
-	// implementation for Undo pan/zoom (Shake is commonly used fo Undo/Redo).
-	CGRect myframe = current_frame;
-#else
-	CGRect myframe = current_frame = original_frame;
-#endif ///PRESERVE_ZOOM
-	CGRect mainframe = [[UIScreen mainScreen] applicationFrame];
-	AM_DBG NSLog(@"Mainscreen: %f,%f,%f,%f", mainframe.origin.x,mainframe.origin.y,mainframe.size.width,mainframe.size.height);
-    CGSize myBounds = self.bounds.size;
-    /*AM_DBG*/ NSLog(@"myBounds: %f, %f, myFrame: %f, %f, %f, %f", myBounds.width, myBounds.height, self.frame.origin.x,self.frame.origin.y,self.frame.size.width,self.frame.size.height);
-#endif // JNK
     /*AM_DBG*/ NSLog(@"playerView: %@ self: %@\nsuperview: %@", playerView, self, self.superview);
+
+    // Hide or show the status bar
 	BOOL wasRotated = false;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
@@ -457,25 +444,22 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	} else {
 		return;
 	}
-#ifdef JNK
-	float scale = 1.0;
-	if (auto_resize) {
-		float scale_x = playerBounds.width / myBounds.width;
-		float scale_y = playerBounds.height / myBounds.height;
+    
+    // Resize the player view, if zoomState requires it. This always centers.
+	if (zoomState == zoomFillScreen) {
+        float scale = 1.0;
+		float scale_x = self.bounds.size.width / playerView.bounds.size.width;
+		float scale_y = self.bounds.size.height / playerView.bounds.size.height;
 		// find the smallest scale factor for both x- and y-directions
 		scale = scale_x < scale_y ? scale_x : scale_y;
+        CGRect playerFrame = CGRectMake(0, 0, playerView.bounds.size.width*scale, playerView.bounds.size.height*scale);
+        playerView.frame = playerFrame; // XXXJACK Incorrect: also changes bounds!
 	}
-#if PRESERVE_ZOOM
-	//self.transform = CGAffineTransformScale(self.transform, scale, scale);
-#else
-	self.transform = CGAffineTransformMakeScale(scale, scale);
-#endif ///PRESERVE_ZOOM
-    if (auto_center) {
-        playerView.center = CGPointMake(myBounds.width/2, myBounds.height/2);
-    } else {
-        playerView.center = CGPointMake(playerBounds.width*scale/2, playerBounds.height*scale/2);
+    if (auto_center && (zoomState == zoomFillScreen || zoomState == zoomNaturalSize)) {
+        playerView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
     }
-#endif // JNK
+        
+
 	// redisplay AmbulantView using the new settings
     [self setNeedsLayout];
 	[self setNeedsDisplay];
