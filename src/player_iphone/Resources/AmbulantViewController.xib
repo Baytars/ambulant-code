@@ -214,7 +214,7 @@
 					</object>
 					<object class="IBUIView" id="714822777">
 						<reference key="NSNextResponder" ref="774585933"/>
-						<int key="NSvFlags">256</int>
+						<int key="NSvFlags">301</int>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBUIView" id="446682655">
@@ -239,6 +239,7 @@
 							<bytes key="NSRGB">MSAwLjg1MDc1MjQ3IDAuMzM2MzEyMTIAA</bytes>
 						</object>
 						<bool key="IBUIOpaque">NO</bool>
+						<int key="IBUIContentMode">4</int>
 						<string key="IBUIContentStretch">{{0, 0}, {0, 0}}</string>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
@@ -368,8 +369,8 @@
 						<reference key="object" ref="774585933"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="714822777"/>
 							<reference ref="214127161"/>
+							<reference ref="714822777"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
