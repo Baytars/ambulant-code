@@ -448,17 +448,65 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     // Resize the player view, if zoomState requires it. This always centers.
 	if (zoomState == zoomFillScreen) {
         float scale = 1.0;
-		float scale_x = self.bounds.size.width / playerView.bounds.size.width;
-		float scale_y = self.bounds.size.height / playerView.bounds.size.height;
+        // Get the relevant widths and heights
+        float self_width = self.bounds.size.width;
+        float self_height = self.bounds.size.height;
+        if (wasRotated) {
+            float tmp = self_width;
+            self_width = self_height;
+            self_height = tmp;
+        }
+        float child_width = playerView.bounds.size.width;
+        float child_height = playerView.bounds.size.height;
+		float scale_x = self_width / child_width;
+		float scale_y = self_height / child_height;
 		// find the smallest scale factor for both x- and y-directions
 		scale = scale_x < scale_y ? scale_x : scale_y;
-        CGRect playerFrame = CGRectMake(0, 0, playerView.bounds.size.width*scale, playerView.bounds.size.height*scale);
-        playerView.frame = playerFrame; // XXXJACK Incorrect: also changes bounds!
+        // Find the offsets relative to our origin
+        float offset_x = (self_width - (child_width*scale)) / 2;
+        float offset_y = (self_height - (child_height*scale)) / 2;
+        // The order of changing things is very tricky, because everything depends on each other, but some things
+        // more so than other things (mis-quoting George Orwell).
+        // - transform changes affect frame
+        // - frame changes change bounds
+        // - bounds changes affect frame
+        // - bounds changes affect child frames
+        // - bounds changes, therefore, also affect child bounds
+ //       NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+ //       NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+ //       self.transform = CGAffineTransformIdentity;
+        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+        self.transform = CGAffineTransformScale(self.transform, scale, scale);
+        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+ //       self.transform = CGAffineTransformTranslate(self.transform, -offset_x, -offset_y);
+ //       NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+ //       NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+        self.bounds = CGRectMake(0, 0, self_width/scale, self_height/scale);
+        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+        playerView.bounds = CGRectMake(0, 0, child_width, child_height);
+        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+        CGFloat parent_center_x = [self superview].bounds.size.width / 2;
+        CGFloat parent_center_y = [self superview].bounds.size.height / 2;
+        if (wasRotated) {
+            CGFloat tmp = parent_center_x;
+            parent_center_x = parent_center_y;
+            parent_center_y = tmp;
+        }
+        self.center = CGPointMake(parent_center_x, parent_center_y);
+        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+        
 	}
     if (auto_center && (zoomState == zoomFillScreen || zoomState == zoomNaturalSize)) {
         playerView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
     }
-        
+    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+       
 
 	// redisplay AmbulantView using the new settings
     [self setNeedsLayout];
@@ -467,7 +515,13 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void) layoutSubviews {
     NSLog(@"LayoutSubviews");
+    UIView *playerView = [[self subviews] objectAtIndex: 0];
+    assert(playerView);
+    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
     [super layoutSubviews];
+    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
+    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
 }
 
 - (void) zoomWithScale: (float) scale  inState: (UIGestureRecognizerState) state {
