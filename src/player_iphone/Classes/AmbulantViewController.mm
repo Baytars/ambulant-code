@@ -16,6 +16,17 @@
 #define AM_DBG if(0)
 #endif
 
+#if 1
+static void dumpView(char *label, UIView *v) {
+    std::string indent = "";
+    while (v) {
+        NSLog(@"%s %s%@ bounds=(%f,%f,%f,%f)", label, indent.c_str(), v, v.bounds.origin.x, v.bounds.origin.y, v.bounds.size.width, v.bounds.size.height);
+        indent = indent + "-> ";
+        v = [v superview];
+    }
+}
+#endif // 1
+
 #pragma mark -
 #pragma mark document_embedder
 
@@ -409,6 +420,8 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 @end
 
+#pragma mark -
+
 @implementation AmbulantScalerView
 - (void) adaptDisplayAfterRotation
 {
@@ -444,7 +457,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 	} else {
 		return;
 	}
-    
+#if 0
     // Resize the player view, if zoomState requires it. This always centers.
 	if (zoomState == zoomFillScreen) {
         float scale = 1.0;
@@ -506,7 +519,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     }
     NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
     NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-       
+#endif
 
 	// redisplay AmbulantView using the new settings
     [self setNeedsLayout];
@@ -556,6 +569,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 {
     // Advance to "next" zoomstate, currently only fill-screen and natural-size.
     // Eventually we will add zoom-to-region here.
+    dumpView("autoZoomAtPoint", self);
     zoomState = (ZoomState)(zoomState + 1);
     if (zoomState >= zoomUser) zoomState = zoomFillScreen;
     [self adaptDisplayAfterRotation];
