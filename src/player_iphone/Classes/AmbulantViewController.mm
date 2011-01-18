@@ -20,7 +20,7 @@
 static void dumpView(char *label, UIView *v) {
     std::string indent = "";
     while (v) {
-        NSLog(@"%s %s%@ bounds=(%f,%f,%f,%f)", label, indent.c_str(), v, v.bounds.origin.x, v.bounds.origin.y, v.bounds.size.width, v.bounds.size.height);
+        NSLog(@"%s %s%@ bounds=(%f,%f,%f,%f) anchor=%f,%f center=%f,%f", label, indent.c_str(), v, v.bounds.origin.x, v.bounds.origin.y, v.bounds.size.width, v.bounds.size.height, v.layer.anchorPoint.x, v.layer.anchorPoint.y, v.center.x, v.center.y);
         indent = indent + "-> ";
         v = [v superview];
     }
@@ -312,7 +312,6 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 }
 
 - (void) adjustAnchorPointForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-#if 0
     // XXXJACK: should move to zoomView?
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
         UIView *piece = gestureRecognizer.view;
@@ -328,7 +327,6 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
         piece.layer.anchorPoint = CGPointMake(0.5, 0.5);
         piece.center = centerInSuperview;
     }
-#endif
 }
 
 - (IBAction) handlePinchGesture:(UIPinchGestureRecognizer *)sender { // zoom
@@ -416,6 +414,17 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
    [super didReceiveMemoryWarning];
 	
 	// Release any cached data, images, etc that aren't in use.
+}
+
+@end
+
+#pragma mark -
+
+@implementation AmbulantContainerView
+- (void) layoutSubviews {
+    dumpView("layoutSubviews container before", [[self subviews] objectAtIndex: 0]);
+    [super layoutSubviews];
+    dumpView("layoutSubviews container after", [[self subviews] objectAtIndex: 0]);
 }
 
 @end
@@ -527,14 +536,14 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 }
 
 - (void) layoutSubviews {
-    NSLog(@"LayoutSubviews");
-    UIView *playerView = [[self subviews] objectAtIndex: 0];
-    assert(playerView);
-    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-    [super layoutSubviews];
-    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
+    dumpView("layoutSubviews before", [[self subviews] objectAtIndex: 0]);
+//    [super layoutSubviews];
+//    dumpView("layoutSubviews after", [[self subviews] objectAtIndex: 0]);
+}
+
+- (CGSize)sizeThatFits: (CGSize) size {
+    NSLog(@"sizeThatFits %f, %f", size.width, size.height);
+    return self.bounds.size;
 }
 
 - (void) zoomWithScale: (float) scale  inState: (UIGestureRecognizerState) state {
@@ -552,13 +561,13 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     assert(playerView);
     if (!playerView) return;
 	if (state == UIGestureRecognizerStateBegan) {
-        translation_origin = playerView.center;
+        translation_origin = self.center;
     }
     
     CGPoint newCenter = translation_origin;
-	newCenter.x += point.x;
-	newCenter.y += point.y;
-    playerView.center = newCenter;
+	newCenter.x += point.x*self.transform.a;
+	newCenter.y += point.y*self.transform.d;
+    self.center = newCenter;
 	
 	if (state == UIGestureRecognizerStateEnded) {
 	}
@@ -569,7 +578,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 {
     // Advance to "next" zoomstate, currently only fill-screen and natural-size.
     // Eventually we will add zoom-to-region here.
-    dumpView("autoZoomAtPoint", self);
+    dumpView("autoZoomAtPoint", [[self subviews] objectAtIndex: 0]);
     zoomState = (ZoomState)(zoomState + 1);
     if (zoomState >= zoomUser) zoomState = zoomFillScreen;
     [self adaptDisplayAfterRotation];
