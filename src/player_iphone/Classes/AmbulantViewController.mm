@@ -537,8 +537,42 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void) layoutSubviews {
     dumpView("layoutSubviews before", [[self subviews] objectAtIndex: 0]);
-//    [super layoutSubviews];
-//    dumpView("layoutSubviews after", [[self subviews] objectAtIndex: 0]);
+    UIView *playerView = [[self subviews] objectAtIndex: 0];
+    assert(playerView);
+    if (!playerView) return;
+    if (zoomState == zoomFillScreen) {
+        /*AM_DBG*/ NSLog(@"LayoutSubviews fillScreen");
+        
+        // We start by making ourselves the same size as the child, and centering the child.
+        self.bounds = playerView.bounds;
+        playerView.bounds = self.bounds;
+        CGSize pSize = self.bounds.size;
+        CGFloat ourWidth, ourHeight;
+        ourWidth = pSize.width;
+        ourHeight = pSize.height;
+        playerView.center = CGPointMake(ourWidth/2, ourHeight/2);
+        
+        // Now we need to determine our scale factor and (x,y) offset
+        pSize = [self superview].bounds.size;
+        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+        CGFloat availableWidth, availableHeight;
+        if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
+            availableWidth = pSize.height;
+            availableHeight = pSize.width;
+        } else {
+            availableWidth = pSize.width;
+            availableHeight = pSize.height;
+        }
+		// find the smallest scale factor for both x- and y-directions
+		float scale_x = availableWidth / ourWidth;
+		float scale_y = availableHeight / ourHeight;
+		float scale = scale_x < scale_y ? scale_x : scale_y;
+        float scale_cur = abs(self.transform.a+self.transform.b);
+        self.transform = CGAffineTransformScale(self.transform, scale/scale_cur, scale/scale_cur);
+
+        self.center = CGPointMake(availableWidth/2, availableHeight/2);
+    }
+    dumpView("layoutSubviews after", [[self subviews] objectAtIndex: 0]);
 }
 
 - (CGSize)sizeThatFits: (CGSize) size {
@@ -581,7 +615,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     dumpView("autoZoomAtPoint", [[self subviews] objectAtIndex: 0]);
     zoomState = (ZoomState)(zoomState + 1);
     if (zoomState >= zoomUser) zoomState = zoomFillScreen;
-    [self adaptDisplayAfterRotation];
+    [self setNeedsLayout];
 }
 
 @end

@@ -121,6 +121,13 @@ def appendPath(varname, value):
     if not value in oldlist:
         oldlist.append(value)
     os.putenv(varname, ':'.join(oldlist))
+
+# If the environment variable AMBULANT_3PP has been set that is where we should
+# build the third party packages
+override_3pp = os.getenv("AMBULANT_3PP")
+if override_3pp:
+    os.chdir(override_3pp)
+    print '+ building in', os.getcwd()
     
 # Locate ambulant base directory
 dir=os.getcwd()
@@ -245,7 +252,7 @@ third_party_packages={
 
         TPP("ffmpeg",
             url="http://ffmpeg.org/releases/ffmpeg-0.6.1.tar.gz",
-            checkcmd="pkg-config --atleast-version=53.47.0 libavformat",
+            checkcmd="pkg-config --atleast-version=52.64.2 libavformat",
             buildcmd=
                 "mkdir ffmpeg-0.6.1-universal && "
                 "cd ffmpeg-0.6.1-universal && "
