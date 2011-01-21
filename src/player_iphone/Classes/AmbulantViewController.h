@@ -47,6 +47,7 @@ enum ZoomState {
 
 @interface AmbulantScalerView : UIView {
     ZoomState zoomState;  // What sort of zooming we currently use
+	bool anchorTopLeft;	// Only for zoomFillScreen and zoomNaturalSize: anchorpoint is not center
     CGPoint translation_origin; // During translation: point of origin of subwindow
     CGAffineTransform zoom_transform; // During zoom: original scale factor
 }
@@ -54,6 +55,7 @@ enum ZoomState {
 - (void) zoomWithScale: (float) scale inState: (UIGestureRecognizerState) state;
 - (void) autoZoomAtPoint: (CGPoint) point;
 - (void) translateWithPoint: (CGPoint) point inState: (UIGestureRecognizerState) state;
+- (void) recomputeZoom;
 @end
 
 @interface AmbulantViewController : UIViewController 
