@@ -544,8 +544,8 @@ bad:
     newFrame.size = newBounds.size;
     self.frame = newFrame;
     AM_DBG NSLog(@"setSize after set bounds: %@ %f,%f", self, self.bounds.size.width, self.bounds.size.height);
-    if ([[self superview] respondsToSelector: @selector(adaptDisplayAfterRotation)])
-        [[self superview] adaptDisplayAfterRotation];
+	if ([[self superview] respondsToSelector:@selector(recomputeZoom)])
+		[[self superview] recomputeZoom];
 
     AM_DBG NSLog(@"setSize after aDAR: %@ %f,%f", self, self.bounds.size.width, self.bounds.size.height);
 #ifndef WITH_UIKIT

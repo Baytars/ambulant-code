@@ -17,7 +17,7 @@
 #endif
 
 #if 1
-static void dumpView(char *label, UIView *v) {
+static void dumpView(const char *label, UIView *v) {
     std::string indent = "";
     while (v) {
         NSLog(@"%s %s%@ bounds=(%f,%f,%f,%f) anchor=%f,%f center=%f,%f", label, indent.c_str(), v, v.bounds.origin.x, v.bounds.origin.y, v.bounds.size.width, v.bounds.size.height, v.layer.anchorPoint.x, v.layer.anchorPoint.y, v.center.x, v.center.y);
@@ -129,12 +129,12 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	/*AM_DBG*/ NSLog(@"AmbulantViewController viewWillAppear(0x%x)", self);
+	AM_DBG NSLog(@"AmbulantViewController viewWillAppear(0x%x)", self);
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-	/*AM_DBG*/ NSLog(@"AmbulantViewController viewDidAppear(0x%x)", self);
+	AM_DBG NSLog(@"AmbulantViewController viewDidAppear(0x%x)", self);
     [self play];
 }
 
@@ -406,6 +406,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 			myMainloop->get_playable_factory()->preferred_renderer(AM_SYSTEM_COMPONENT("RendererOpen"));
 		}
 	}
+	[scalerView recomputeZoom];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -422,9 +423,9 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 
 @implementation AmbulantContainerView
 - (void) layoutSubviews {
-    dumpView("layoutSubviews container before", [[self subviews] objectAtIndex: 0]);
+    AM_DBG dumpView("layoutSubviews container before", [[self subviews] objectAtIndex: 0]);
     [super layoutSubviews];
-    dumpView("layoutSubviews container after", [[self subviews] objectAtIndex: 0]);
+    AM_DBG dumpView("layoutSubviews container after", [[self subviews] objectAtIndex: 0]);
 }
 
 @end
@@ -434,105 +435,23 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 @implementation AmbulantScalerView
 - (void) adaptDisplayAfterRotation
 {
-    bool auto_center = true;
-
-    // Initialize the zoomState, if not done already
-    if (zoomState == zoomUnknown) {
-        // adapt the ambulant window needed (bounds) in the current View
-        ambulant::iOSpreferences *prefs = ambulant::iOSpreferences::get_preferences();
-        bool auto_resize = (bool) prefs->m_auto_resize;
-        auto_center = (bool) prefs->m_auto_center;
-        if (auto_resize) {
-            zoomState = zoomFillScreen;
-        } else {
-            zoomState = zoomNaturalSize;
-        }
-    }
-
-    // Find the playerView
-    UIView *playerView = [[self subviews] objectAtIndex: 0];
-    assert(playerView);
-    if (!playerView) return;
-    /*AM_DBG*/ NSLog(@"playerView: %@ self: %@\nsuperview: %@", playerView, self, self.superview);
-
-    // Hide or show the status bar
-	BOOL wasRotated = false;
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
 	if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-		wasRotated = true;
 		[[UIApplication sharedApplication] setStatusBarHidden: YES withAnimation: UIStatusBarAnimationNone];
 	} else if (orientation == UIDeviceOrientationPortrait || orientation == UIDeviceOrientationPortraitUpsideDown) {
 		[[UIApplication sharedApplication] setStatusBarHidden: NO withAnimation: UIStatusBarAnimationNone];
 	} else {
 		return;
 	}
-#if 0
-    // Resize the player view, if zoomState requires it. This always centers.
-	if (zoomState == zoomFillScreen) {
-        float scale = 1.0;
-        // Get the relevant widths and heights
-        float self_width = self.bounds.size.width;
-        float self_height = self.bounds.size.height;
-        if (wasRotated) {
-            float tmp = self_width;
-            self_width = self_height;
-            self_height = tmp;
-        }
-        float child_width = playerView.bounds.size.width;
-        float child_height = playerView.bounds.size.height;
-		float scale_x = self_width / child_width;
-		float scale_y = self_height / child_height;
-		// find the smallest scale factor for both x- and y-directions
-		scale = scale_x < scale_y ? scale_x : scale_y;
-        // Find the offsets relative to our origin
-        float offset_x = (self_width - (child_width*scale)) / 2;
-        float offset_y = (self_height - (child_height*scale)) / 2;
-        // The order of changing things is very tricky, because everything depends on each other, but some things
-        // more so than other things (mis-quoting George Orwell).
-        // - transform changes affect frame
-        // - frame changes change bounds
-        // - bounds changes affect frame
-        // - bounds changes affect child frames
-        // - bounds changes, therefore, also affect child bounds
- //       NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
- //       NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
- //       self.transform = CGAffineTransformIdentity;
-        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-        self.transform = CGAffineTransformScale(self.transform, scale, scale);
-        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
- //       self.transform = CGAffineTransformTranslate(self.transform, -offset_x, -offset_y);
- //       NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
- //       NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-        self.bounds = CGRectMake(0, 0, self_width/scale, self_height/scale);
-        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-        playerView.bounds = CGRectMake(0, 0, child_width, child_height);
-        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-        CGFloat parent_center_x = [self superview].bounds.size.width / 2;
-        CGFloat parent_center_y = [self superview].bounds.size.height / 2;
-        if (wasRotated) {
-            CGFloat tmp = parent_center_x;
-            parent_center_x = parent_center_y;
-            parent_center_y = tmp;
-        }
-        self.center = CGPointMake(parent_center_x, parent_center_y);
-        NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-        NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-        
-	}
-    if (auto_center && (zoomState == zoomFillScreen || zoomState == zoomNaturalSize)) {
-        playerView.center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
-    }
-    NSLog(@"self %@ bounds %f,%f,%f,%f", self, self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.height);
-    NSLog(@"playerView %@ bounds %f,%f,%f,%f", playerView, playerView.bounds.origin.x, playerView.bounds.origin.y, playerView.bounds.size.width, playerView.bounds.size.height);
-#endif
 
 	// redisplay AmbulantView using the new settings
     [self setNeedsLayout];
 	[self setNeedsDisplay];
+}
+
+- (void) recomputeZoom {
+	zoomState = zoomUnknown;
+	[self layoutSubviews];
 }
 
 - (void) layoutSubviews {
@@ -540,7 +459,22 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
     UIView *playerView = [[self subviews] objectAtIndex: 0];
     assert(playerView);
     if (!playerView) return;
-    if (zoomState == zoomFillScreen) {
+ 
+	   // Initialize the zoomState, if not done already
+    if (zoomState == zoomUnknown) {
+        // adapt the ambulant window needed (bounds) in the current View
+        ambulant::iOSpreferences *prefs = ambulant::iOSpreferences::get_preferences();
+         anchorTopLeft = !(bool) prefs->m_auto_center;
+        if (prefs->m_auto_resize) {
+            zoomState = zoomFillScreen;
+        } else {
+            zoomState = zoomNaturalSize;
+        }
+    }
+	
+    if (zoomState == zoomFillScreen || zoomState == zoomNaturalSize) {
+		// If we were showing the  presentation with a well-known aspect ratio (not
+		// user panned or zoomed) we recreate that from scratch
         /*AM_DBG*/ NSLog(@"LayoutSubviews fillScreen");
         
         // We start by making ourselves the same size as the child, and centering the child.
@@ -554,30 +488,33 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
         
         // Now we need to determine our scale factor and (x,y) offset
         pSize = [self superview].bounds.size;
-        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
         CGFloat availableWidth, availableHeight;
-        if (orientation == UIDeviceOrientationLandscapeLeft || orientation == UIDeviceOrientationLandscapeRight) {
-            availableWidth = pSize.height;
-            availableHeight = pSize.width;
-        } else {
-            availableWidth = pSize.width;
-            availableHeight = pSize.height;
-        }
+		// It seems our width/height has been adapted when we get here during an orientation change.
+		availableWidth = pSize.width;
+		availableHeight = pSize.height;
 		// find the smallest scale factor for both x- and y-directions
 		float scale_x = availableWidth / ourWidth;
 		float scale_y = availableHeight / ourHeight;
 		float scale = scale_x < scale_y ? scale_x : scale_y;
-        float scale_cur = abs(self.transform.a+self.transform.b);
+		if (zoomState == zoomNaturalSize)
+			scale = 1;
+        float scale_cur = fabs(self.transform.a+self.transform.c); // We know x/y scale are same, and one of a/c is zero.
         self.transform = CGAffineTransformScale(self.transform, scale/scale_cur, scale/scale_cur);
 
-        self.center = CGPointMake(availableWidth/2, availableHeight/2);
-    }
+        if (anchorTopLeft) {
+			CGRect curFrame = self.frame;
+			curFrame.origin = CGPointMake(0, 0);
+			self.frame = curFrame;
+		} else {
+			self.center = CGPointMake(availableWidth/2, availableHeight/2);
+		}
+		
+    } else {
+		// if we were showing a user-determined pan/zoom we keep the current
+		// aspect ratio and maintain the center.
+		// XXX to be done
+	}
     dumpView("layoutSubviews after", [[self subviews] objectAtIndex: 0]);
-}
-
-- (CGSize)sizeThatFits: (CGSize) size {
-    NSLog(@"sizeThatFits %f, %f", size.width, size.height);
-    return self.bounds.size;
 }
 
 - (void) zoomWithScale: (float) scale  inState: (UIGestureRecognizerState) state {
@@ -612,7 +549,7 @@ document_embedder::open(ambulant::net::url newdoc, bool start, ambulant::common:
 {
     // Advance to "next" zoomstate, currently only fill-screen and natural-size.
     // Eventually we will add zoom-to-region here.
-    dumpView("autoZoomAtPoint", [[self subviews] objectAtIndex: 0]);
+    AM_DBG dumpView("autoZoomAtPoint", [[self subviews] objectAtIndex: 0]);
     zoomState = (ZoomState)(zoomState + 1);
     if (zoomState >= zoomUser) zoomState = zoomFillScreen;
     [self setNeedsLayout];
