@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="77"/>
+			<integer value="6"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -203,10 +203,7 @@
 						</object>
 						<string key="NSFrame">{{0, 410}, {320, 50}}</string>
 						<reference key="NSSuperview" ref="774585933"/>
-						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC4xMTAwNjQwNCAwLjYwMzI2MDg3IDAuMDkwMjM2MTU3AA</bytes>
-						</object>
+						<reference key="IBUIBackgroundColor" ref="286202398"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIAutoresizesSubviews">NO</bool>
 						<int key="IBUITag">2</int>
@@ -220,24 +217,18 @@
 							<object class="IBUIView" id="446682655">
 								<reference key="NSNextResponder" ref="714822777"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{20, 20}, {320, 460}}</string>
+								<string key="NSFrameSize">{320, 460}</string>
 								<reference key="NSSuperview" ref="714822777"/>
-								<object class="NSColor" key="IBUIBackgroundColor">
-									<int key="NSColorSpace">1</int>
-									<bytes key="NSRGB">MC4wODQ3NjY3NDYgMC42MzA4NDM2NCAwLjkwMjE3Mzk0AA</bytes>
-								</object>
+								<reference key="IBUIBackgroundColor" ref="286202398"/>
 								<int key="IBUIContentMode">4</int>
 								<bool key="IBUIMultipleTouchEnabled">YES</bool>
 								<int key="IBUITag">1</int>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 						</object>
-						<string key="NSFrame">{{-20, -20}, {300, 200}}</string>
+						<string key="NSFrameSize">{320, 460}</string>
 						<reference key="NSSuperview" ref="774585933"/>
-						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MSAwLjg1MDc1MjQ3IDAuMzM2MzEyMTIAA</bytes>
-						</object>
+						<reference key="IBUIBackgroundColor" ref="286202398"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<int key="IBUIContentMode">1</int>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -246,8 +237,8 @@
 				<string key="NSFrameSize">{320, 460}</string>
 				<reference key="NSSuperview"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
-					<int key="NSColorSpace">1</int>
-					<bytes key="NSRGB">MC45MjM5MTMwNiAwLjE0MjQ5OTIxIDAuMDc3MDc0MzQ5AA</bytes>
+					<int key="NSColorSpace">3</int>
+					<bytes key="NSWhite">MAA</bytes>
 				</object>
 				<int key="IBUIContentMode">1</int>
 				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
