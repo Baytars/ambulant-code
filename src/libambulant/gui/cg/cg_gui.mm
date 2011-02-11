@@ -379,6 +379,8 @@ bad:
 	CGRect my_rect = [arect rect];
 	[arect release];
 	AM_DBG NSLog(@"AmbulantView.asyncRedrawForAmbulantRect: self=0x%x ltrb=(%f,%f,%f,%f)", self, CGRectGetMinX(my_rect), CGRectGetMinY(my_rect), CGRectGetMaxX(my_rect), CGRectGetMaxY(my_rect));
+	self.oldClearsContextBeforeDrawing = self.clearsContextBeforeDrawing;
+	self.clearsContextBeforeDrawing = NO;
 	[self setNeedsDisplayInRect: ViewRectFromCGRect(my_rect)];
 }
 
@@ -393,7 +395,8 @@ bad:
 
 - (void)drawRect:(CGRect)rect
 {
-	[AmbulantView dumpUIView: self withId: @"rd0"];
+	self.clearsContextBeforeDrawing = self.oldClearsContextBeforeDrawing;
+	[AmbulantView dumpScreenWithId: @"rd0"];
 
     CGContextRef myContext = [self getCGContext];
     CGContextSaveGState(myContext);
@@ -517,7 +520,7 @@ bad:
 	}
 #endif// CG_REDRAW_DEBUG
     CGContextRestoreGState(myContext);
-	[AmbulantView dumpUIView: self withId: @"rd1"];
+	[AmbulantView dumpScreenWithId: @"rd1"];
 }
 
 - (void)setAmbulantWindow: (ambulant::gui::cg::cg_window *)window
@@ -547,6 +550,7 @@ bad:
 @synthesize original_frame;
 @synthesize original_bounds;
 @synthesize current_transform;
+@synthesize oldClearsContextBeforeDrawing;
 
 - (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize {
 	if (ambulant_window == NULL ) {
@@ -802,91 +806,6 @@ bad:
 	AM_DBG NSLog(@"0x%x: tappedWithPoint at ambulant-point(%f, %f)", (void*)self, where.x, where.y);
 	if (ambulant_window) ambulant_window->user_event(amwhere);
 }
-
-+ (UIImage*)screenshot 
-// From: Technical Q&A QA1703.	Screen Capture in UIKit Applications
-{
-	// Create a graphics context with the target size
-	// On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
-	// On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
-	CGSize imageSize = [[UIScreen mainScreen] bounds].size;
-	if (NULL != UIGraphicsBeginImageContextWithOptions)
-		UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
-	else
-		UIGraphicsBeginImageContext(imageSize);
-	
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	
-	// Iterate over every window from back to front
-	for (UIWindow *window in [[UIApplication sharedApplication] windows]) 
-	{
-		if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen])
-		{
-			// -renderInContext: renders in the coordinate space of the layer,
-			// so we must first apply the layer's geometry to the graphics context
-			CGContextSaveGState(context);
-			// Center the context around the window's anchor point
-			CGContextTranslateCTM(context, [window center].x, [window center].y);
-			// Apply the window's transform about the anchor point
-			CGContextConcatCTM(context, [window transform]);
-			// Offset by the portion of the bounds left of and above the anchor point
-			CGContextTranslateCTM(context,
-								  -[window bounds].size.width * [[window layer] anchorPoint].x,
-								  -[window bounds].size.height * [[window layer] anchorPoint].y);
-			
-			// Render the layer hierarchy to the current context
-			[[window layer] renderInContext:context];
-			
-			// Restore the context
-			CGContextRestoreGState(context);
-		}
-	}
-	// Retrieve the screenshot image
-	UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-	
-	UIGraphicsEndImageContext();
-	
-	return image;
-}
-+ (UIImage*) viewDump: (UIView*) view {
-	
-	CGSize imageSize = [view bounds].size;
-	if (NULL != UIGraphicsBeginImageContextWithOptions)
-		UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
-	else
-		UIGraphicsBeginImageContext(imageSize);
-	
-	CGContextRef context = UIGraphicsGetCurrentContext();
-		
-	if (!view.window || ![view.window respondsToSelector:@selector(screen)] || [view.window screen] == [UIScreen mainScreen])
-	{
-		// -renderInContext: renders in the coordinate space of the layer,
-		// so we must first apply the layer's geometry to the graphics context
-		CGContextSaveGState(context);
-		// Center the context around the view's anchor point
-		CGContextTranslateCTM(context, [view center].x, [view center].y);
-		// Apply the view's transform about the anchor point
-		CGContextConcatCTM(context, [view transform]);
-		// Offset by the portion of the bounds left of and above the anchor point
-		CGContextTranslateCTM(context,
-							  -[view bounds].size.width * [[view layer] anchorPoint].x,
-							  -[view bounds].size.height * [[view layer] anchorPoint].y);
-		
-		// Render the layer hierarchy to the current context
-		[[view layer] renderInContext:context];
-		
-		// Restore the context
-		CGContextRestoreGState(context);
-	}
-
-	// Retrieve the screenshot image
-	UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-
-	UIGraphicsEndImageContext();
-
-	return image;
-}
-
 #else
 
 - (void)mouseDown: (NSEvent *)theEvent
@@ -1237,7 +1156,97 @@ bad:
 }
 #else// NOT_YET_UIKIT
 #ifdef __OBJC__
-//From http://www.gotow.net/creative/wordpress/?p=33 "Creating a UIImage from a CGLayer"
+
+// Get an UIImage of the iPhone/iPad screen
+// From: http://developer.apple.com/library/ios/#qa/qa2010/qa1703.html
+//		  Technical Q&A QA1703.	Screen Capture in UIKit Applications
++ (UIImage*) UIImageFromScreen 
+{
+	// Create a graphics context with the target size
+	// On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
+	// On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
+	CGSize imageSize = [[UIScreen mainScreen] bounds].size;
+	if (NULL != UIGraphicsBeginImageContextWithOptions)
+		UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+	else
+		UIGraphicsBeginImageContext(imageSize);
+	
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	
+	// Iterate over every window from back to front
+	for (UIWindow *window in [[UIApplication sharedApplication] windows]) 
+	{
+		if (![window respondsToSelector:@selector(screen)] || [window screen] == [UIScreen mainScreen])
+		{
+			// -renderInContext: renders in the coordinate space of the layer,
+			// so we must first apply the layer's geometry to the graphics context
+			CGContextSaveGState(context);
+			// Center the context around the window's anchor point
+			CGContextTranslateCTM(context, [window center].x, [window center].y);
+			// Apply the window's transform about the anchor point
+			CGContextConcatCTM(context, [window transform]);
+			// Offset by the portion of the bounds left of and above the anchor point
+			CGContextTranslateCTM(context,
+								  -[window bounds].size.width * [[window layer] anchorPoint].x,
+								  -[window bounds].size.height * [[window layer] anchorPoint].y);
+			
+			// Render the layer hierarchy to the current context
+			[[window layer] renderInContext:context];
+			
+			// Restore the context
+			CGContextRestoreGState(context);
+		}
+	}
+	// Retrieve the screenshot image
+	UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+	
+	UIGraphicsEndImageContext();
+	
+	return image;
+}
+
+// Get the entire content of an UIView*  (without subviews) as an UIImage*
++ (UIImage*) UIImageFromUIView: (UIView*) view {
+	
+	CGSize imageSize = [view bounds].size;
+	if (NULL != UIGraphicsBeginImageContextWithOptions)
+		UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+	else
+		UIGraphicsBeginImageContext(imageSize);
+	
+	CGContextRef context = UIGraphicsGetCurrentContext();
+	
+	if (!view.window || ![view.window respondsToSelector:@selector(screen)] || [view.window screen] == [UIScreen mainScreen])
+	{
+		// -renderInContext: renders in the coordinate space of the layer,
+		// so we must first apply the layer's geometry to the graphics context
+		CGContextSaveGState(context);
+		// Center the context around the view's anchor point
+		CGContextTranslateCTM(context, [view center].x, [view center].y);
+		// Apply the view's transform about the anchor point
+		CGContextConcatCTM(context, [view transform]);
+		// Offset by the portion of the bounds left of and above the anchor point
+		CGContextTranslateCTM(context,
+							  -[view bounds].size.width * [[view layer] anchorPoint].x,
+							  -[view bounds].size.height * [[view layer] anchorPoint].y);
+		
+		// Render the layer hierarchy to the current context
+		[[view layer] renderInContext:context];
+		
+		// Restore the context
+		CGContextRestoreGState(context);
+	}
+	
+	// Retrieve the screenshot image
+	UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+	
+	UIGraphicsEndImageContext();
+	
+	return image;
+}
+
+// Get an UIImage* from the contents of a CGLayerRef
+// From: http://www.gotow.net/creative/wordpress/?p=33 "Creating a UIImage from a CGLayer"
 + (UIImage*) UIImageFromCGLayer: (CGLayerRef) layer
 {
 	// Create the bitmap context
@@ -1290,6 +1299,9 @@ bad:
 	return ui_img;
 }
 
+// write a CGImageRef to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
 + (void) dumpCGImage: (CGImageRef) img withId: (NSString*) id {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	UIImage* ui_image = [UIImage imageWithCGImage: img];
@@ -1315,26 +1327,80 @@ bad:
 	[pool release];
 }
 
-+ (void) dumpUIView: (UIView*) view withId: (NSString*) id
+// write the contents of an iPhone/iPad screen to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
++ (void) dumpScreenWithId: (NSString*) id
 {
-	UIImage *image = [AmbulantView viewDump:view];
+	UIImage *image = [AmbulantView UIImageFromScreen];
 	[AmbulantView dumpCGImage:image.CGImage withId: id];
 	//	[image release];
 }
+
+// write the contents of an UIView to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
++ (void) dumpUIView: (UIView*) view withId: (NSString*) id
+{
+	UIImage *image = [AmbulantView UIImageFromUIView:view];
+	[AmbulantView dumpCGImage:image.CGImage withId: id];
+	//	[image release];
+}
+
+// write the contents of an CGLayer to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
 + (void) dumpCGLayer: (CGLayerRef) cglr withId: (NSString*) id
 {
 	UIImage* image = [AmbulantView UIImageFromCGLayer: cglr];
 	[AmbulantView dumpCGImage:image.CGImage withId: id];
 }
 
+// From: http://developer.apple.com/library/ios/#documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_context/dq_context.html%23//apple_ref/doc/uid/TP30001066-CH203-TPXREF101
+// Quartz 2D Programming Guide, Graphics Contexts, Create Bitmap Graphics Context
+CGContextRef CreateBitmapContext (CGSize size)
+{
+	CGContextRef context = NULL;
+	CGColorSpaceRef colorSpace; 
+	void* bitmapData; 
+	int bitmapByteCount, bitmapBytesPerRow;
+	
+	bitmapBytesPerRow	= (size.width * 4);
+	bitmapByteCount	= (bitmapBytesPerRow * size.height);
+	colorSpace = CGColorSpaceCreateDeviceRGB(); 
+
+	context = CGBitmapContextCreate (NULL,
+									 size.width,
+									 size.height,
+									 8,      // bits per component
+									 bitmapBytesPerRow,
+									 colorSpace,
+									 kCGImageAlphaPremultipliedLast);
+    if (context== NULL)
+    {
+        free (bitmapData);
+        NSLog(@"CreateBitmapContext: Context not created");
+        return NULL;
+    }
+    CGColorSpaceRelease( colorSpace );
+	
+    return context;
+}	
+
 - (CGLayerRef) getTransitionSurface
 {
 	if (transition_surface == NULL) {
 		// It does not exist yet. Create it.
 		CGContextRef ctxr = [self getCGContext];
-		transition_surface = CGLayerCreateWithContext(ctxr, self.bounds.size, NULL);
-		CGContextSetBlendMode(ctxr, kCGBlendModeClear);
-		CGContextFillRect(ctxr, CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.width));
+		CGContextRef tr_ctxr = CreateBitmapContext(self.bounds.size);
+		transition_surface = CGLayerCreateWithContext(tr_ctxr, self.bounds.size, NULL);
+		CGRect rect = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width, self.bounds.size.width);
+//		CGContextClearRect(tr_ctxr, rect);
+		CGContextSaveGState(tr_ctxr);
+		CGContextSetBlendMode(tr_ctxr, kCGBlendModeClear);
+		CGContextFillRect(tr_ctxr, rect);
+		CGContextRestoreGState(tr_ctxr);
+		[AmbulantView dumpCGLayer:transition_surface withId:@"TS0"];
 	}
 	return transition_surface;
 }
@@ -1388,7 +1454,7 @@ bad:
 	// setup drawing to transition surface
 	/*AM_DBG*/ NSLog(@"_screenTransitionPreRedraw: setup for transition redraw");
 	CGLayerRef surf = [self getTransitionSurface];
-	[AmbulantView dumpUIView: self withId: @"pre"];
+	[AmbulantView dumpScreenWithId: @"pre"];
 	UIGraphicsPushContext(CGLayerGetContext(surf));
 }
 
@@ -1431,7 +1497,7 @@ bad:
 		/*AM_DBG*/ NSLog(@"_screenTransitionPostRedraw: cleanup after transition done");
 		fullscreen_engine = NULL;
 	}
-	[AmbulantView dumpUIView: self withId: @"pst"];
+	[AmbulantView dumpScreenWithId: @"pst"];
 }
 
 

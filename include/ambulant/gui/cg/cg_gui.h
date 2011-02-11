@@ -155,7 +155,8 @@ enum ZoomState {
 	CGLayerRef transition_tmpsurface;
 	ambulant::smil2::transition_engine *fullscreen_engine;
 	ambulant::lib::transition_info::time_type fullscreen_now;
-#else //WITH_UIKIT
+	BOOL oldClearsContextBeforeDrawing;
+#else // ! WITH_UIKIT
 	NSImage *transition_surface;
 	NSImage *transition_tmpsurface;
 	NSImage *fullscreen_previmage;
@@ -168,7 +169,7 @@ enum ZoomState {
 	BOOL overlay_window_needs_clear;
 	//	int overlay_window_count;
 #endif // WITH_QUICKTIME_OVERLAY
-#endif//WITH_UIKIT
+#endif// ! WITH_UIKIT
 #ifdef	WITH_UIKIT
 	BOOL M_auto_center;
 	BOOL M_auto_resize;
@@ -185,12 +186,14 @@ enum ZoomState {
 @property(nonatomic) CGRect	original_frame;
 @property(nonatomic) CGAffineTransform current_transform;
 @property(nonatomic) ambulant::lib::size original_bounds;
+@property(nonatomic) BOOL oldClearsContextBeforeDrawing;
 - (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize;
 - (BOOL) tappedAtPoint:(CGPoint) location;
 - (void) zoomWithScale: (float) scale inState: (UIGestureRecognizerState) state;
 - (void) translateWithPoint: (CGPoint) point inState: (UIGestureRecognizerState) state;
 - (void) autoZoomAtPoint: (CGPoint) point;
 - (void) drawTestRect:(CGRect)rect;
+
 #endif//WITH_UIKIT
 
 - (id)initWithFrame:(CGRect)frameRect;
@@ -222,15 +225,38 @@ enum ZoomState {
 
 #ifdef WITH_UIKIT
 - (void) tappedWithPoint: (CGPoint)where;
-// return the entire iPhone/iPad screen
-+ (UIImage*) screenshot;
-// return the entire contents of specified view on iPhone/iPad
-+ (UIImage*) viewDump: (UIView*) view;
-#else
+
+// Graphics debugging routines
+
+// Get an UIImage of the iPhone/iPad screen
++ (UIImage*) UIImageFromScreen; 
+
+// Get the entire content of an UIView*  (without subviews) as an UIImage*
++ (UIImage*) UIImageFromUIView: (UIView*) view;
+
+// Get an UIImage* from the contents of a CGLayerRef
++ (UIImage*) UIImageFromCGLayer: (CGLayerRef) layer;
+	
+// write a CGImageRef to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
++ (void) dumpCGImage: (CGImageRef) img withId: (NSString*) id;
+
+// write the contents of an UIView to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
++ (void) dumpUIView: (UIView*) view withId: (NSString*) id;
+
+// write the contents of an iPhone/iPad screen to the file: "$HOME/Documents/<number>.<id>.png" where
+// where $HOME refers to the Application home directory and
+// and number is a numeric string circular variying between "0000" and "9999".   
++ (void) dumpScreenWithId: (NSString*) id;
+
+#else // ! WITH_UIKIT
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseMoved: (NSEvent *)theEvent;
 - (void)pseudoMouseMove: (id)dummy;
-#endif
+#endif //! WITH_UIKIT
 
 - (BOOL)wantsDefaultClipping;
 
@@ -289,7 +315,7 @@ enum ZoomState {
 // Called when the view hierarchy has changed
 - (void) viewDidMoveToSuperview;
 #endif//JUNK
-#else //WITH_UIKIT
+#else // ! WITH_UIKIT
 // while in a transition, getTransitionSurface returns the surface that the
 // transitioning element should be drawn to.
 - (NSImage *)getTransitionSurface;
@@ -339,7 +365,7 @@ enum ZoomState {
 
 // Called when the view hierarchy has changed
 - (void) viewDidMoveToSuperview;
-#endif //WITH_UIKIT
+#endif // ! WITH_UIKIT
 @end
 
 #endif // __OBJC__

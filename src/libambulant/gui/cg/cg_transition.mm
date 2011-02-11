@@ -368,7 +368,8 @@ cg_transition_blitclass_poly::update()
 	lib::rect fullsrcrect = lib::rect(lib::point(0, 0), lib::size(view.bounds.size.width,view.bounds.size.height));  // Original image size
 	CGRect cg_fullsrcrect = [view CGRectForAmbulantRect: &fullsrcrect];
 	CGContextSaveGState(ctx);
-	CGContextSetBlendMode(ctx, kCGBlendModeNormal);
+//	CGContextSetBlendMode(ctx, kCGBlendModeMultiply);
+//	CGContextSetAlpha(ctx, 0.5);
 	CGContextDrawLayerInRect(ctx, cg_fullsrcrect, [view getTransitionSurface]);
 	CGContextRestoreGState(ctx);
 	CFRelease(path);
