@@ -81,7 +81,7 @@ class cg_window : public common::gui_window {
 
 	void set_size(lib::size bounds);
 
-  private:
+ private:
 	void *m_view;
 };
 
@@ -148,22 +148,27 @@ enum ZoomState {
 @interface AmbulantView : VIEW_SUPERCLASS
 {
 	ambulant::gui::cg::cg_window *ambulant_window;
-//	NSImage *transition_surface;
-//	NSImage *transition_tmpsurface;
 	int transition_count;
 	int fullscreen_count;
-//	NSImage *fullscreen_previmage;
-//	NSImage *fullscreen_oldimage;
-//	ambulant::smil2::transition_engine *fullscreen_engine;
+#ifdef	WITH_UIKIT
+	CGLayerRef transition_surface;
+	CGLayerRef transition_tmpsurface;
+	ambulant::smil2::transition_engine *fullscreen_engine;
 	ambulant::lib::transition_info::time_type fullscreen_now;
+#else //WITH_UIKIT
+	NSImage *transition_surface;
+	NSImage *transition_tmpsurface;
+	NSImage *fullscreen_previmage;
+	NSImage *fullscreen_oldimage;
 #ifdef WITH_QUICKTIME_OVERLAY
 	NSWindow *overlay_window;
 	BOOL overlay_window_needs_unlock;
 	BOOL overlay_window_needs_reparent;
 	BOOL overlay_window_needs_flush;
 	BOOL overlay_window_needs_clear;
-//	int overlay_window_count;
+	//	int overlay_window_count;
 #endif // WITH_QUICKTIME_OVERLAY
+#endif//WITH_UIKIT
 #ifdef	WITH_UIKIT
 	BOOL M_auto_center;
 	BOOL M_auto_resize;
@@ -180,7 +185,6 @@ enum ZoomState {
 @property(nonatomic) CGRect	original_frame;
 @property(nonatomic) CGAffineTransform current_transform;
 @property(nonatomic) ambulant::lib::size original_bounds;
-
 - (void) adaptDisplayAfterRotation: (UIDeviceOrientation) orientation withAutoCenter: (BOOL) autoCenter withAutoResize: (bool) autoResize;
 - (BOOL) tappedAtPoint:(CGPoint) location;
 - (void) zoomWithScale: (float) scale inState: (UIGestureRecognizerState) state;
@@ -218,6 +222,10 @@ enum ZoomState {
 
 #ifdef WITH_UIKIT
 - (void) tappedWithPoint: (CGPoint)where;
+// return the entire iPhone/iPad screen
++ (UIImage*) screenshot;
+// return the entire contents of specified view on iPhone/iPad
++ (UIImage*) viewDump: (UIView*) view;
 #else
 - (void)mouseDown: (NSEvent *)theEvent;
 - (void)mouseMoved: (NSEvent *)theEvent;
@@ -229,7 +237,59 @@ enum ZoomState {
 - (void) incrementTransitionCount;
 - (void) decrementTransitionCount;
 
-#if NOT_YET_UIKIT
+#ifdef WITH_UIKIT
+/// while in a transition, getTransitionSurface returns the surface that the
+// transitioning element should be drawn to.
+- (CGLayerRef) getTransitionSurface;
+
+// internal: release the transition surfaces when we're done with it.
+- (void)_releaseTransitionSurfaces;
+
+// while in a transition, if we need an auxiliary surface (to draw a clipping
+// path or something like that) getTransitionTmpSurface will return one.
+- (CGLayerRef) getTransitionTmpSurface;
+
+// while in a transition, getTransitionOldSource will return the old pixels,
+// i.e. the pixels "behind" the transitioning element.
+- (CGLayerRef) getTransitionOldSource;
+
+// while in a transition, getTransitionNewSource will return the new pixels,
+// i.e. the pixels the transitioning element drew into getTransitionSurface.
+- (CGLayerRef) getTransitionNewSource;
+
+// Return the current on-screen image, caters for AVFoundation movies
+- (CGLayerRef) _getOnScreenImage;
+
+// Return part of the onscreen image, does not cater for AVFoundation
+- (CGImageRef) getOnScreenImageForRect: (CGRect)bounds;
+
+- (void) startScreenTransition;
+- (void) endScreenTransition;
+- (void) screenTransitionStep: (ambulant::smil2::transition_engine *)engine
+		elapsed: (ambulant::lib::transition_info::time_type)now;
+
+- (void) _screenTransitionPreRedraw;
+- (void) _screenTransitionPostRedraw;
+
+#ifdef	JUNK
+// Called by a renderer if it requires an overlay window.
+// The overlay window is refcounted.
+- (void) requireOverlayWindow;
+
+// Helper
+- (void) _createOverlayWindow: (id)dummy;
+
+// Called by a renderer redraw() if subsequent redraws in the current redraw sequence
+// should go to the overlay window
+- (void) useOverlayWindow;
+
+// Called by a renderer if the overlay window is no longer required.
+- (void) releaseOverlayWindow;
+
+// Called when the view hierarchy has changed
+- (void) viewDidMoveToSuperview;
+#endif//JUNK
+#else //WITH_UIKIT
 // while in a transition, getTransitionSurface returns the surface that the
 // transitioning element should be drawn to.
 - (NSImage *)getTransitionSurface;
@@ -258,7 +318,7 @@ enum ZoomState {
 - (void) startScreenTransition;
 - (void) endScreenTransition;
 - (void) screenTransitionStep: (ambulant::smil2::transition_engine *)engine
-		elapsed: (ambulant::lib::transition_info::time_type)now;
+					  elapsed: (ambulant::lib::transition_info::time_type)now;
 
 - (void) _screenTransitionPreRedraw;
 - (void) _screenTransitionPostRedraw;
@@ -279,7 +339,7 @@ enum ZoomState {
 
 // Called when the view hierarchy has changed
 - (void) viewDidMoveToSuperview;
-#endif // NOT_YET_UIKIT
+#endif //WITH_UIKIT
 @end
 
 #endif // __OBJC__
