@@ -393,6 +393,8 @@ bad:
 
 - (void)drawRect:(CGRect)rect
 {
+	[AmbulantView dumpUIView: self withId: @"rd0"];
+
     CGContextRef myContext = [self getCGContext];
     CGContextSaveGState(myContext);
 #ifndef WITH_UIKIT
@@ -513,8 +515,9 @@ bad:
         CGContextAddLines(myContext, points, sizeof(points)/sizeof(points[0]));
         CGContextStrokePath(myContext);
 	}
-#endif// CG_REDRAW_DEBU
+#endif// CG_REDRAW_DEBUG
     CGContextRestoreGState(myContext);
+	[AmbulantView dumpUIView: self withId: @"rd1"];
 }
 
 - (void)setAmbulantWindow: (ambulant::gui::cg::cg_window *)window
