@@ -27,11 +27,12 @@
 #endif//WITH_IPHONE
 #include "ambulant/gui/cg/cg_gui.h"
 #include "ambulant/gui/cg/cg_image.h"
+#include "ambulant/gui/cg/cg_transition.h"
 #include "ambulant/common/region_dim.h"
 #include "ambulant/common/region_info.h"
 #include "ambulant/smil2/test_attrs.h"
 
-//#define AM_DBG
+#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -226,6 +227,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
  	AmbulantView *view = (AmbulantView *)cwindow->view();
 #ifdef WITH_UIKIT
 	CGContextRef myContext = UIGraphicsGetCurrentContext();
+	double alfa = 1.0;
 #else
 	CGContextRef myContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
 #endif
@@ -278,7 +280,6 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	//
 	// Determine drawing parameters
 	//
-	double alfa = 1.0;
 #ifdef WITH_SMIL30
 	const common::region_info *ri = m_dest->get_info();
 	if (ri) alfa = ri->get_mediaopacity();
@@ -289,7 +290,7 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 	//
 #ifdef WITH_SMIL30
 	lib::rect croprect = m_dest->get_crop_rect(m_size);
-	AM_DBG logger::get_logger()->debug("cg_image::redraw, clip 0x%x (%d %d) -> (%d, %d, %d, %d)", m_dest, m_size.w, m_size.h, croprect.x, croprect.y, croprect.w, croprect.h);
+	AM_DBG logger::get_logger()->debug("cg_image::redraw_body(0x%x): clip 0x%x (%d %d) -> (%d, %d, %d, %d)", this, m_dest, m_size.w, m_size.h, croprect.x, croprect.y, croprect.w, croprect.h);
 
 	dstrect = m_dest->get_fit_rect(croprect, m_size, &srcrect, m_alignment);
 #else
@@ -297,8 +298,8 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 #endif
 	dstrect.translate(dest_origin);
 	cg_dstrect = [view CGRectForAmbulantRect: &dstrect];
-	AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: draw image (ltrb) (%d, %d, %d, %d) -> (%f, %f, %f, %f)",
-		srcrect.left(), srcrect.top(), srcrect.right(), srcrect.bottom(),
+	AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw_body(0x%x): draw image (ltrb) (%d, %d, %d, %d) -> (%f, %f, %f, %f)",
+		this, srcrect.left(), srcrect.top(), srcrect.right(), srcrect.bottom(),
 		CGRectGetMinX(cg_dstrect), CGRectGetMinY(cg_dstrect), CGRectGetMaxX(cg_dstrect), CGRectGetMaxY(cg_dstrect));
 
 	//
@@ -328,8 +329,8 @@ cg_image_renderer::redraw_body(const rect &dirty, gui_window *window)
 		lib::rect fullsrcrect = lib::rect(lib::point(0, 0), m_size);  // Original image size
 		fullsrcrect.translate(lib::point(-srcrect.left(), srcrect.bottom()-m_size.h)); // Translate so the right topleft pixel is in place
 		CGRect cg_fullsrcrect = [view CGRectForAmbulantRect: &fullsrcrect];
-		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw: draw layer to (%f, %f, %f, %f) clip (%f, %f, %f, %f) scale (%f, %f)",
-			CGRectGetMinX(cg_fullsrcrect), CGRectGetMinY(cg_fullsrcrect), CGRectGetMaxX(cg_fullsrcrect), CGRectGetMaxY(cg_fullsrcrect),
+		AM_DBG logger::get_logger()->debug("cg_image_renderer.redraw_body(0x%x): draw layer to (%f, %f, %f, %f) clip (%f, %f, %f, %f) scale (%f, %f)",
+			this, CGRectGetMinX(cg_fullsrcrect), CGRectGetMinY(cg_fullsrcrect), CGRectGetMaxX(cg_fullsrcrect), CGRectGetMaxY(cg_fullsrcrect),
 			CGRectGetMinX(cg_dstrect), CGRectGetMinY(cg_dstrect), CGRectGetMaxX(cg_dstrect), CGRectGetMaxY(cg_dstrect),
 			x_scale, y_scale);
 
