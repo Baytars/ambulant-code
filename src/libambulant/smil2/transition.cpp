@@ -262,7 +262,7 @@ transition_engine_bowtiewipe::compute()
 	int ymid = (y0 + y1)/2;
 	int width = x1 - x0;
 	int height = y1 - y0;
-
+	m_newpolygonlist.clear();
 	if (m_progress <= 0.5) {
 		int xleft, xright, ytop, ybot;
 		std::vector<lib::point> poly;
@@ -277,8 +277,8 @@ transition_engine_bowtiewipe::compute()
 		poly.push_back(lib::point(xmid,   ytop));
 		m_newpolygonlist.push_back(poly);
 		poly.clear();
-		poly.push_back(lib::point(xleft,  y1));
 		poly.push_back(lib::point(xright, y1));
+		poly.push_back(lib::point(xleft,  y1));
 		poly.push_back(lib::point(xmid,   ybot));
 		m_newpolygonlist.push_back(poly);
 	} else {
@@ -288,19 +288,19 @@ transition_engine_bowtiewipe::compute()
 		double deltax = value*width;
 		xleft  = static_cast<int>(round(xmid - deltax));
 		xright = static_cast<int>(round(xmid + deltax));
-		double deltay = value*width;
+		double deltay = value*height;
 		ytop   = static_cast<int>(round(y0   + deltay));
 		ybot   = static_cast<int>(round(y1   - deltay));
 		poly.push_back(lib::point(x0,  y0));
-		poly.push_back(lib::point(x0,  ytop));
-		poly.push_back(lib::point(xleft, ymid));
-		poly.push_back(lib::point(x0,  ybot));
-		poly.push_back(lib::point(x0,  y1));
-		poly.push_back(lib::point(x1,  y1));
-		poly.push_back(lib::point(x1,  ybot));
-		poly.push_back(lib::point(xright, ymid));
-		poly.push_back(lib::point(x1,  ytop));
 		poly.push_back(lib::point(x1,  y0));
+		poly.push_back(lib::point(x1,  ytop));
+		poly.push_back(lib::point(xright, ymid));
+		poly.push_back(lib::point(x1,  ybot));
+		poly.push_back(lib::point(x1,  y1));
+		poly.push_back(lib::point(x0,  y1));
+		poly.push_back(lib::point(x0,  ybot));
+		poly.push_back(lib::point(xleft, ymid));
+		poly.push_back(lib::point(x0,  ytop));
 		m_newpolygonlist.push_back(poly);
 	}
 }
@@ -359,9 +359,9 @@ transition_engine_pentagonwipe::get_template(int *size)
 
 lib::dpoint ambulant::smil2::transition_engine_arrowheadwipe::m_template[] = {
 	lib::dpoint(0.000000, 0.500000),
-	lib::dpoint(1.732051, 1.000000),
+	lib::dpoint(-1.732051, 1.000000),
 	lib::dpoint(0.000000, -2.000000),
-	lib::dpoint(-1.732051, 1.000000)
+	lib::dpoint(1.732051, 1.000000)
 };
 
 lib::dpoint *
@@ -385,12 +385,21 @@ transition_engine_trianglewipe::get_template(int *size)
 }
 
 lib::dpoint ambulant::smil2::transition_engine_hexagonwipe::m_template[] = {
-	lib::dpoint(0.000000, 1.154701),
-	lib::dpoint(1.000000, 0.577350),
-	lib::dpoint(1.000000, -0.577350),
-	lib::dpoint(0.000000, -1.154701),
-	lib::dpoint(-1.000000, -0.577350),
-	lib::dpoint(-1.000000, 0.577350)
+	/* horizontal (113) [default] */
+	lib::dpoint(1.154701, 0.000000),
+	lib::dpoint(0.577350, 1.000000),
+	lib::dpoint(-0.577350, 1.000000),
+	lib::dpoint(-1.154701, 0.000000),
+	lib::dpoint(-0.577350, -1.000000),
+	lib::dpoint(0.577350, -1.000000)
+	/* vertical (114) 
+    lib::dpoint(0.000000, 1.154701),
+    lib::dpoint(-1.000000, 0.577350),
+    lib::dpoint(-1.000000, -0.577350),
+    lib::dpoint(0.000000, -1.154701),
+    lib::dpoint(1.000000, -0.577350),
+    lib::dpoint(1.000000, 0.577350)/
+	 */
 };
 
 lib::dpoint *
