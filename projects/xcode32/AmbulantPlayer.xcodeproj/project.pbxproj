@@ -80,9 +80,8 @@
 		041DCB3612B64CF7003407C8 /* libUsageEnvironment.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 041DCB2912B64CF7003407C8 /* libUsageEnvironment.a */; };
 		041DCB3A12B64D1D003407C8 /* libltdl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 041DCB3912B64D1D003407C8 /* libltdl.a */; };
 		04290D17132EBB3E0015D7B7 /* libamplugin_xerces(CG).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 04290B46132EB5F60015D7B7 /* libamplugin_xerces(CG).so */; };
-		04290D18132EBB450015D7B7 /* libamplugin_xpath_state(CG).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 04290B6E132EB69A0015D7B7 /* libamplugin_xpath_state(CG).so */; };
 		04290D19132EBB4C0015D7B7 /* libamplugin_python(CG).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 04290BB2132EB71D0015D7B7 /* libamplugin_python(CG).so */; };
-		042ADA421152D83E009CA791 /* libamplugin_xpath_state(Cocoa).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 042ADA411152D831009CA791 /* libamplugin_xpath_state(Cocoa).so */; };
+		042ADA421152D83E009CA791 /* libamplugin_xpath_state.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 042ADA411152D831009CA791 /* libamplugin_xpath_state.so */; };
 		042ADAA91152DA4F009CA791 /* libamplugin_xerces(Cocoa).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 042ADAA81152DA4A009CA791 /* libamplugin_xerces(Cocoa).so */; };
 		042ADB0C1152DE69009CA791 /* libamplugin_python(Cocoa).so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = 042ADB0B1152DE65009CA791 /* libamplugin_python(Cocoa).so */; };
 		04428EBE11577E960067C868 /* DTDCache in Resources */ = {isa = PBXBuildFile; fileRef = 04428EBD11577E960067C868 /* DTDCache */; };
@@ -156,13 +155,6 @@
 			remoteGlobalIDString = 04290B42132EB5D80015D7B7;
 			remoteInfo = "plugin_xerces (CG)";
 		};
-		04290B6D132EB69A0015D7B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 042ADA3C1152D831009CA791 /* plugin_xpath_state.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 04290B67132EB67B0015D7B7;
-			remoteInfo = "plugin_xpath_state (CG)";
-		};
 		04290B89132EB6DC0015D7B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 042AD9511152CC13009CA791 /* plugin.xcodeproj */;
@@ -183,13 +175,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 04290B9C132EB6FD0015D7B7;
 			remoteInfo = "plugin_python (CG)";
-		};
-		04290D21132EBB7E0015D7B7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 042ADA3C1152D831009CA791 /* plugin_xpath_state.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 04290B5B132EB67B0015D7B7;
-			remoteInfo = "plugin_xpath_state (CG)";
 		};
 		04290D23132EBB7E0015D7B7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -293,7 +278,7 @@
 			files = (
 				042ADAA91152DA4F009CA791 /* libamplugin_xerces(Cocoa).so in Copy Plugins */,
 				042ADB0C1152DE69009CA791 /* libamplugin_python(Cocoa).so in Copy Plugins */,
-				042ADA421152D83E009CA791 /* libamplugin_xpath_state(Cocoa).so in Copy Plugins */,
+				042ADA421152D83E009CA791 /* libamplugin_xpath_state.so in Copy Plugins */,
 			);
 			name = "Copy Plugins";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,7 +290,6 @@
 			dstSubfolderSpec = 13;
 			files = (
 				04290D17132EBB3E0015D7B7 /* libamplugin_xerces(CG).so in Copy Plugins */,
-				04290D18132EBB450015D7B7 /* libamplugin_xpath_state(CG).so in Copy Plugins */,
 				04290D19132EBB4C0015D7B7 /* libamplugin_python(CG).so in Copy Plugins */,
 			);
 			name = "Copy Plugins";
@@ -530,8 +514,7 @@
 		042ADA3D1152D831009CA791 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				042ADA411152D831009CA791 /* libamplugin_xpath_state(Cocoa).so */,
-				04290B6E132EB69A0015D7B7 /* libamplugin_xpath_state(CG).so */,
+				042ADA411152D831009CA791 /* libamplugin_xpath_state.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -705,7 +688,6 @@
 			dependencies = (
 				0405BFF612B621C0007AD3B2 /* PBXTargetDependency */,
 				04290D20132EBB7E0015D7B7 /* PBXTargetDependency */,
-				04290D22132EBB7E0015D7B7 /* PBXTargetDependency */,
 				04290D24132EBB7E0015D7B7 /* PBXTargetDependency */,
 			);
 			name = AmbulantPlayerCG;
@@ -815,13 +797,6 @@
 			remoteRef = 04290B45132EB5F60015D7B7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		04290B6E132EB69A0015D7B7 /* libamplugin_xpath_state(CG).so */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = "libamplugin_xpath_state(CG).so";
-			remoteRef = 04290B6D132EB69A0015D7B7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		04290B8A132EB6DC0015D7B7 /* libamplugin_plugin(CG).so */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
@@ -843,10 +818,10 @@
 			remoteRef = 042AD9551152CC13009CA791 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		042ADA411152D831009CA791 /* libamplugin_xpath_state(Cocoa).so */ = {
+		042ADA411152D831009CA791 /* libamplugin_xpath_state.so */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
-			path = "libamplugin_xpath_state(Cocoa).so";
+			path = libamplugin_xpath_state.so;
 			remoteRef = 042ADA401152D831009CA791 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1100,11 +1075,6 @@
 			isa = PBXTargetDependency;
 			name = "plugin_python (CG)";
 			targetProxy = 04290D1F132EBB7E0015D7B7 /* PBXContainerItemProxy */;
-		};
-		04290D22132EBB7E0015D7B7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "plugin_xpath_state (CG)";
-			targetProxy = 04290D21132EBB7E0015D7B7 /* PBXContainerItemProxy */;
 		};
 		04290D24132EBB7E0015D7B7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
