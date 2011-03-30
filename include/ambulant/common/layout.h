@@ -318,7 +318,8 @@ class layout_manager {
 	/// Return the surface on which the given node should be rendered.
 	virtual surface *get_surface(const lib::node *node) = 0;
 
-	/// Returns the imagge aligment parameters for the given node.
+	/// Returns the image aligment parameters for the given node. Accept an optional
+	/// argument to specify that changes in animation should be forwarded.
 	virtual alignment *get_alignment(const lib::node *node) = 0;
 
 	/// Return the object that will receive notifications when the given node is animated.

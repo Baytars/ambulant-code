@@ -437,6 +437,17 @@ inline std::string repr(const ambulant::common::region_dim& rd) {
 	return sz;
 }
 
+inline std::string repr(const ambulant::common::region_dim_spec& rds) {
+	return "region_dim_spec(l=" + 
+		repr(rds.left) +
+		",t=" + repr(rds.top) +
+		",r=" + repr(rds.right) +
+		",b=" + repr(rds.bottom) +
+		",w=" + repr(rds.width) +
+		",h=" + repr(rds.height) +
+		")";
+}
+
 ///////////////////////////////
 // std::ostream for debug output
 #include <ostream>

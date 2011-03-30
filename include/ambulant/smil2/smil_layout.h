@@ -30,6 +30,7 @@
 #include "ambulant/common/layout.h"
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/document.h"
+#include <cassert>
 
 namespace ambulant {
 namespace common {
@@ -46,6 +47,63 @@ namespace ambulant {
 namespace smil2 {
 
 class region_node;
+
+class regpoint_node :
+	public common::animation_notification,
+	public common::animation_destination
+{
+  public:
+	regpoint_node(const lib::node *n);
+	virtual ~regpoint_node() {}
+	
+	const lib::node* dom_node() { return m_node; }
+	std::string get_name() const { return m_node->get_attribute("id"); };
+	const char *get_regalign() const { return m_node->get_attribute("regAlign"); }
+	void forward_animation_notifications(animation_notification *an);
+
+	rect get_rect(const lib::rect *default_rect = NULL) const {assert(0); return lib::rect(); };
+	fit_t get_fit() const  {assert(0); return fit_default; };
+	color_t get_bgcolor() const  {assert(0); return 0; };
+	double get_bgopacity() const  {assert(0); return 0; };
+	bool get_transparent() const  {assert(0); return true; };
+	zindex_t get_zindex() const  {assert(0); return 0; };
+	bool get_showbackground() const  {assert(0); return false; };
+	bool is_subregion() const  {assert(0); return false; };
+	double get_soundlevel() const  {assert(0); return 1.0; };
+	sound_alignment get_soundalign() const  {assert(0); return sa_default; };
+	tiling get_tiling() const  {assert(0); return tiling_default; };
+	const char *get_bgimage() const  {assert(0); return NULL; };
+	rect get_crop_rect(const size& srcsize) const  {assert(0); return lib::rect(); };
+	double get_mediaopacity() const  {assert(0); return 1.0;  };
+	double get_mediabgopacity() const  {assert(0); return 1.0; };
+	bool is_chromakey_specified() const  {assert(0); return false; };
+	lib::color_t get_chromakey() const  {assert(0); return 0; };
+	lib::color_t get_chromakeytolerance() const  {assert(0); return 0; };
+	double get_chromakeyopacity() const  {assert(0); return 1.0; };
+
+	region_dim get_region_dim(const std::string& which, bool fromdom = false) const;
+	color_t get_region_color(const std::string& which, bool fromdom = false) const { assert(0); return 0; };
+	zindex_t get_region_zindex(bool fromdom = false) const { assert(0); return 0; };
+	double get_region_soundlevel(bool fromdom = false) const { assert(0); return 0; };
+	sound_alignment get_region_soundalign(bool fromdom = false) const { assert(0); return sa_default; };
+	const region_dim_spec& get_region_panzoom(bool fromdom = false) const { assert(0); static region_dim_spec s; return s; };
+	double get_region_opacity(const std::string& which, bool fromdom = false) const { assert(0); return 1.0; };
+	void set_region_dim(const std::string& which, const region_dim& rd);
+	void set_region_color(const std::string& which, lib::color_t clr) { assert(0); };
+	void set_region_zindex(common::zindex_t z) { assert(0); };
+	void set_region_soundlevel(double level) { assert(0); };
+	void set_region_soundalign(sound_alignment sa) { assert(0); };
+	void set_region_panzoom(const region_dim_spec& rds) { assert(0); };
+	void set_region_opacity(const std::string& which, double level) { assert(0); };
+
+	void animated();
+  private:
+	bool fix_from_dom_node();
+	const lib::node* m_node;
+	region_dim_spec m_rds;
+	region_dim_spec m_display_rds;
+	std::set<animation_notification*> m_an_clients;
+};
 
 class smil_layout_manager :
 	public common::layout_manager,
@@ -87,7 +145,7 @@ class smil_layout_manager :
 
 	std::vector<common::surface_template*> m_rootsurfaces;
 	std::map<std::string, region_node*> m_id2region;
-	std::map<std::string, lib::node*> m_id2regpoint;
+	std::map<std::string, regpoint_node*> m_id2regpoint;
 	std::map<std::string, std::list<region_node*> > m_name2region;
 	std::map<const lib::node*, region_node*> m_node2region;
 	bool m_uses_bgimages;
