@@ -83,6 +83,9 @@ smil_layout_manager::~smil_layout_manager()
 	std::vector<common::surface_template*>::iterator i;
 	for (i=m_rootsurfaces.begin(); i != m_rootsurfaces.end(); i++)
 		delete (*i);
+	std::map<std::string, regpoint_node*>::iterator i2;
+	for (i2=m_id2regpoint.begin(); i2 != m_id2regpoint.end(); i2++)
+		delete (*i2).second;
 	// XXX Delete m_layout_tree tree
 	delete m_layout_tree;
 	delete m_surface_factory;
@@ -169,7 +172,7 @@ smil_layout_manager::build_layout_tree(lib::node *layout_root, lib::document *do
 			if (tp == common::l_regpoint) {
 				if (pid) {
 					std::string id = pid;
-					m_id2regpoint[id] = n;
+					m_id2regpoint[id] = new regpoint_node(n);
 				} else {
 					lib::logger::get_logger()->trace("smil_layout_manager: regPoint node without id attribute");
 				}
@@ -463,13 +466,30 @@ smil_layout_manager::get_region(const lib::node *n) {
 common::animation_notification *
 smil_layout_manager::get_animation_notification(const lib::node *n) {
 	region_node *rn = get_region_node_for(n, true);
-	return rn?rn->get_animation_notification():NULL;
+	if (rn) return rn->get_animation_notification();
+	// Otherwise it could be a regPoint
+	const char *nid = n->get_attribute("id");
+	if (nid) {
+		std::map<std::string, regpoint_node*>::iterator it = m_id2regpoint.find(nid);
+		if (it != m_id2regpoint.end())
+			return (*it).second;
+	}
+	return NULL;
 }
 
 common::animation_destination *
 smil_layout_manager::get_animation_destination(const lib::node *n) {
 	region_node *rn = get_region_node_for(n, true);
-	return rn?rn->get_animation_destination():NULL;
+	if (rn) return rn->get_animation_destination();
+	// Otherwise it could be a regPoint
+	// Otherwise it could be a regPoint
+	const char *nid = n->get_attribute("id");
+	if (nid) {
+		std::map<std::string, regpoint_node*>::iterator it = m_id2regpoint.find(nid);
+		if (it != m_id2regpoint.end())
+			return (*it).second;
+	}
+	return NULL;
 }
 
 #ifdef WITH_SMIL30
@@ -510,8 +530,10 @@ get_regiondim_attr(const lib::node *rn, const char *attrname)
 {
 	const char *attrvalue = rn->get_attribute(attrname);
 	common::region_dim rd;
-	if (attrvalue == NULL || *attrvalue == '\0') {
-		// pass: region_dim are initialized as auto
+	if (attrvalue == NULL || *attrvalue == '\0'
+		|| strcmp(attrvalue, "auto") == 0)
+	{
+		// Do nothing: auto is the default
 	} else {
 		int ivalue;
 		char *endptr;
@@ -589,25 +611,29 @@ smil_layout_manager::get_alignment(const lib::node *n)
 
 	common::regpoint_spec image_fixpoint = common::regpoint_spec(0, 0);
 	common::regpoint_spec surface_fixpoint = common::regpoint_spec(0, 0);
-	lib::node *regpoint_node = NULL;
+	regpoint_node *rp_node = NULL;
 
 	// Now we try to decode the regPoint. Note that this means a predefined regPoint name cannot be overridden
 	// with a regPoint element with that same name.
 	if (!decode_regpoint(surface_fixpoint, regPoint) && regPoint != NULL) {
 		// Non-standard regpoint. Look it up.
-		std::map<std::string, lib::node*>::iterator it = m_id2regpoint.find(regPoint);
+		std::map<std::string, regpoint_node*>::iterator it;
+		it = m_id2regpoint.find(regPoint);
 		if (it == m_id2regpoint.end()) {
 			lib::logger::get_logger()->trace("%s: unknown %s value: %s", rpnode->get_sig().c_str(), rpname, regPoint);
 			lib::logger::get_logger()->warn(gettext("Syntax error in SMIL document"));
 		} else {
-			regpoint_node = (*it).second;
-			// XXXJACK we only look at top/left here, but we should look at bottom and right too...
-			surface_fixpoint.left = get_regiondim_attr(regpoint_node, "left");
-			surface_fixpoint.top = get_regiondim_attr(regpoint_node, "top");
+			rp_node = (*it).second;
+			// Tell regpoint to forward animation notifications
+			animation_notification *an = get_animation_notification(n);
+			if (an) rp_node->forward_animation_notifications(an);
+			// Get regpoint values from the regpoint node.
+			surface_fixpoint.left = rp_node->get_region_dim("left");
+			surface_fixpoint.top = rp_node->get_region_dim("top");
 			// Fifth priority: pick up regAlign from regPoint
 			if (regAlign == NULL) {
-				regAlign = regpoint_node->get_attribute("regAlign");
-				ranode = regpoint_node;
+				regAlign = rp_node->get_regalign();
+				ranode = rp_node->dom_node();
 			}
 		}
 	}
@@ -667,6 +693,69 @@ smil_layout_manager::load_bgimages(common::factories *factories)
 	bgimage_loader *loader = new bgimage_loader(m_layout_section, factories);
 	loader->run(this);
 	loader->release();
+}
+
+regpoint_node::regpoint_node(const lib::node *n)
+:	m_node(n)
+{
+	fix_from_dom_node();
+}
+
+region_dim
+regpoint_node::get_region_dim(const std::string& which, bool fromdom) const
+{
+	const common::region_dim_spec& myrds = fromdom?m_rds:m_display_rds;
+	if(which == "left") return myrds.left;
+	else if(which == "right") return myrds.right;
+	else if(which == "top") return myrds.top;
+	else if(which == "bottom") return myrds.bottom;
+	assert(false);
+	return common::region_dim();
+}
+
+void
+regpoint_node::set_region_dim(const std::string& which, const region_dim& rd)
+{
+	/*AM_DBG*/ lib::logger::get_logger()->debug("regpoint_node::set_region_dim(\"%s\", \"%s\") to %s", m_node->get_attribute("id"), which.c_str(), repr(rd).c_str());
+	common::region_dim_spec& myrds = m_display_rds;
+	if(which == "left") myrds.left = rd;
+	else if(which == "width") myrds.width = rd;
+	else if(which == "right") myrds.right = rd;
+	else if(which == "top") myrds.top = rd;
+	else if(which == "height") myrds.height = rd;
+	else if(which == "bottom") myrds.bottom = rd;
+	else assert(0);
+}
+
+void
+regpoint_node::forward_animation_notifications(animation_notification *an)
+{
+	assert(an);
+	m_an_clients.insert(an);
+}
+
+void
+regpoint_node::animated()
+{
+	/*AM_DBG*/ lib::logger::get_logger()->debug("regpoint_node::animated() rds=%s", repr(m_display_rds).c_str());
+	std::set<animation_notification*>::iterator it;
+	for (it=m_an_clients.begin(); it != m_an_clients.end(); it++) {
+		animation_notification *client = *it;
+		client->animated();
+	}
+}
+
+bool
+regpoint_node::fix_from_dom_node()
+{
+	common::region_dim_spec rdspec;
+	rdspec.left = get_regiondim_attr(m_node, "left");
+	rdspec.right = get_regiondim_attr(m_node, "right");
+	rdspec.top = get_regiondim_attr(m_node, "top");
+	rdspec.bottom = get_regiondim_attr(m_node, "bottom");
+	m_rds = rdspec;
+	m_display_rds = m_rds;
+	return true;
 }
 
 bgimage_loader::bgimage_loader(const lib::node *layout_root, common::factories *factories)

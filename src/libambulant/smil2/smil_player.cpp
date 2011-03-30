@@ -1010,6 +1010,7 @@ smil_player::_new_playable(const lib::node *n) {
 		common::renderer *rend = np->get_renderer();
 
 		if (rend) {
+			// First connect the surface
 			AM_DBG m_logger->debug("smil_player::_new_playable: surface	 set,rend = 0x%x, np = 0x%x", (void*) rend, (void*) np);
 			rend->set_surface(surf);
 			const alignment *align = m_layout_manager->get_alignment(n);
