@@ -1,0 +1,10 @@
+build
+Makefile.in
+Makefile
+.DS_Store
+.deps
+.libs
+cocoambulant_executable
+cocoambulant.app
+.gdb_history
+.DS_Store
