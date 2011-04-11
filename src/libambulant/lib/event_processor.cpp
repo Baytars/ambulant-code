@@ -250,7 +250,7 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		m_lock.leave();
 #ifdef GB_GCD_EXAMPLE
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",e);
+			AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",e);
 			e->fire();
 			delete e;
 		});
