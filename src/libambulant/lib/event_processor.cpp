@@ -25,6 +25,10 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/logger.h"
 #include <map>
+#define GB_GCD_EXAMPLE
+#ifdef GB_GCD_EXAMPLE
+#include <dispatch/dispatch.h>
+#endif
 
 #if defined(AMBULANT_PLATFORM_WIN32)
 #include <windows.h>
@@ -244,8 +248,17 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		AM_DBG logger::get_logger()->debug("serve_event(0x%x)",e);
 		qp->pop();
 		m_lock.leave();
+#ifdef GB_GCD_EXAMPLE
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+			logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",e);
+			e->fire();
+			delete e;
+		});
+#else
 		e->fire();
 		delete e;
+#endif
+
 		m_lock.enter();
 	}
 	return must_serve;
