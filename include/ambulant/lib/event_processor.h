@@ -153,7 +153,7 @@ class event_processor_impl : public event_processor, public BASE_THREAD {
 	
 
 /// Implementation of event_processor by using GCD.
-
+#ifdef WITH_GCD_EVENT_PROCESSOR
 class event_processor_impl_gcd : public event_processor {
 public:
 	event_processor_impl_gcd(timer *t);
@@ -180,7 +180,7 @@ protected:
 	critical_section_cv m_lock;
 		
 };
-
+#endif
 	
 /// Machine-dependent factory function
 AMBULANTAPI event_processor *event_processor_factory(timer *t);

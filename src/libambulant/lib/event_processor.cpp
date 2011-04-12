@@ -25,8 +25,8 @@
 #include "ambulant/lib/event_processor.h"
 #include "ambulant/lib/logger.h"
 #include <map>
-#define GB_GCD_EXAMPLE
-#ifdef GB_GCD_EXAMPLE
+
+#ifdef WITH_GCD_EVENT_PROCESSOR
 #include <dispatch/dispatch.h>
 #endif
 
@@ -44,7 +44,7 @@ using namespace lib;
 lib::event_processor *
 lib::event_processor_factory(timer *t)
 {
-#ifndef GB_GCD_EXAMPLE
+#ifndef WITH_GCD_EVENT_PROCESSOR
 	return new event_processor_impl(t);
 #else
 	return new event_processor_impl_gcd(t);
@@ -252,7 +252,7 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		AM_DBG logger::get_logger()->debug("serve_event(0x%x)",e);
 		qp->pop();
 		m_lock.leave();
-#ifdef GB_GCD_EXAMPLE
+#ifdef WITH_GCD_EVENT_PROCESSOR
 		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 			AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",e);
 			e->fire();
@@ -292,6 +292,7 @@ event_processor_impl::dump()
 }
 #endif
 
+#ifdef WITH_GCD_EVENT_PROCESSOR
 event_processor_impl_gcd::event_processor_impl_gcd(timer *t)
 :	m_timer(t),
 m_observer(NULL)
@@ -322,8 +323,8 @@ event_processor_impl_gcd::add_event(event *pe, time_type t,
 	m_lock.enter();
 	// Insert the event into the correct queue.
 	switch(priority) {
-		case ep_high:
-		{
+		case ep_high: {
+			// t is in milliseconds and dispatch_time is expecting time instant in nanoseconds
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
@@ -331,8 +332,7 @@ event_processor_impl_gcd::add_event(event *pe, time_type t,
 			});	
 		}
 			break;
-		case ep_med:
-		{
+		case ep_med: {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
@@ -340,8 +340,7 @@ event_processor_impl_gcd::add_event(event *pe, time_type t,
 			});
 		}
 			break;
-		case ep_low:
-		{
+		case ep_low: {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
@@ -366,4 +365,5 @@ event_processor_impl_gcd::cancel_all_events()
 {
 	AM_DBG logger::get_logger()->debug("cancel_all_events()");
 }
+#endif
 
