@@ -87,8 +87,11 @@ smil_player::initialize()
 {
 	assert(m_doc);
 	document_loaded(m_doc);
-
+#ifdef WITH_GCD_EVENT_PROCESSOR
+	m_event_processor = gcd_event_processor_factory(m_timer);
+#else
 	m_event_processor = event_processor_factory(m_timer);
+#endif
 #ifdef WITH_SMIL30
 	create_state_engine();
 #endif // WITH_SMIL30

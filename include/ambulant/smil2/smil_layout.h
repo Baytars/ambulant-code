@@ -30,6 +30,7 @@
 #include "ambulant/common/layout.h"
 #include "ambulant/lib/node.h"
 #include "ambulant/lib/document.h"
+#include "ambulant/lib/lib_gcd_event_processor_impl.h"
 
 namespace ambulant {
 namespace common {

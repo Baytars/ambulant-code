@@ -150,38 +150,7 @@ class event_processor_impl : public event_processor, public BASE_THREAD {
 	std::queue<event*> m_low_q;
 
 };
-	
-
-/// Implementation of event_processor by using GCD.
-#ifdef WITH_GCD_EVENT_PROCESSOR
-class event_processor_impl_gcd : public event_processor {
-public:
-	event_processor_impl_gcd(timer *t);
-	~event_processor_impl_gcd();
-	
-	timer *get_timer() const; 
-	//unsigned long run();
-	
-	void add_event(event *pe, time_type t, event_priority priority);
-	bool cancel_event(event *pe, event_priority priority = ep_low);
-	void cancel_all_events();
-	void set_observer(event_processor_observer *obs) {m_observer = obs; };
-
-protected:
-	// Called by platform-specific subclasses.
-	// Should hold m_lock when calling.
-	//void _serve_events();
-	
-	// the timer for this processor
-	timer *m_timer;
-	event_processor_observer *m_observer;
-	
-	// protects whole data structure
-	critical_section_cv m_lock;
 		
-};
-#endif
-	
 /// Machine-dependent factory function
 AMBULANTAPI event_processor *event_processor_factory(timer *t);
 

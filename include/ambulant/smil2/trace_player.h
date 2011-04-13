@@ -28,6 +28,7 @@
 
 #include "ambulant/lib/timer.h"
 #include "ambulant/lib/event_processor.h"
+#include "ambulant/lib/lib_gcd_event_processor_impl.h"
 #include "ambulant/lib/event.h"
 #include "ambulant/lib/node.h"
 #include "ambulant/smil2/time_node.h"

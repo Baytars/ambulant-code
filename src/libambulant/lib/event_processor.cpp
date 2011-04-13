@@ -26,9 +26,6 @@
 #include "ambulant/lib/logger.h"
 #include <map>
 
-#ifdef WITH_GCD_EVENT_PROCESSOR
-#include <dispatch/dispatch.h>
-#endif
 //xxxbo
 #define GB_MULTI_THREAD
 #ifdef GB_MULTI_THREAD
@@ -49,11 +46,7 @@ using namespace lib;
 lib::event_processor *
 lib::event_processor_factory(timer *t)
 {
-#ifndef WITH_GCD_EVENT_PROCESSOR
 	return new event_processor_impl(t);
-#else
-	return new event_processor_impl_gcd(t);
-#endif
 }
 
 event_processor_impl::event_processor_impl(timer *t)
@@ -270,13 +263,6 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		AM_DBG logger::get_logger()->debug("serve_event(0x%x)",e);
 		qp->pop();
 		m_lock.leave();
-#ifdef WITH_GCD_EVENT_PROCESSOR
-		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-			AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",e);
-			e->fire();
-			delete e;
-		});
-#else
 	#ifndef GB_MULTI_THREAD
 		e->fire();
 		delete e;
@@ -286,7 +272,6 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		pthread_t thread_id; 
 		err = pthread_create(&thread_id, NULL, &event_proc, e);
 	#endif
-#endif
 
 		m_lock.enter();
 	}
@@ -317,78 +302,4 @@ event_processor_impl::dump()
 }
 #endif
 
-#ifdef WITH_GCD_EVENT_PROCESSOR
-event_processor_impl_gcd::event_processor_impl_gcd(timer *t)
-:	m_timer(t),
-m_observer(NULL)
-{
-	m_lock.enter();
-	assert(t != 0);
-	m_lock.leave();
-}
-
-event_processor_impl_gcd::~event_processor_impl_gcd()
-{
-	AM_DBG lib::logger::get_logger()->debug("event_processor 0x%x deleted", (void *)this);
-	cancel_all_events();
-}
-
-timer *
-event_processor_impl_gcd::get_timer() const
-{
-	return m_timer;
-}
-
-void
-event_processor_impl_gcd::add_event(event *pe, time_type t,
-								event_priority priority)
-{
-	
-	AM_DBG logger::get_logger()->debug("add_event(0x%x, t=%d, pri=%d)",pe,t,priority);
-	m_lock.enter();
-	// Insert the event into the correct queue.
-	switch(priority) {
-		case ep_high: {
-			// t is in milliseconds and dispatch_time is expecting time instant in nanoseconds
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
-				pe->fire();
-				delete pe;
-			});	
-		}
-			break;
-		case ep_med: {
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
-				pe->fire();
-				delete pe;
-			});
-		}
-			break;
-		case ep_low: {
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
-				pe->fire();
-				delete pe;
-			});			
-		}
-			break;
-	}
-	m_lock.leave();
-}
-
-bool
-event_processor_impl_gcd::cancel_event(event *pe, event_priority priority)
-{
-	bool succeeded = false;
-	AM_DBG logger::get_logger()->debug("cancel_event(0x%x, pri=%d)",pe,priority);
-	return succeeded;
-}
-
-void
-event_processor_impl_gcd::cancel_all_events()
-{
-	AM_DBG logger::get_logger()->debug("cancel_all_events()");
-}
-#endif
 
