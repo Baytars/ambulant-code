@@ -22,6 +22,7 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/asb.h"
 #include "ambulant/lib/event_processor.h"
+#include "ambulant/lib/lib_gcd_event_processor_impl.h"
 
 //#define AM_DBG if(1)
 #ifndef AM_DBG
@@ -490,7 +491,11 @@ datasource_reader::datasource_reader(datasource *src)
 	m_data(NULL),
 	m_size(0)
 {
+#ifdef WITH_GCD_EVENT_PROCESSOR
+	m_event_processor = lib::gcd_event_processor_factory(m_timer);
+#else
 	m_event_processor = lib::event_processor_factory(m_timer);
+#endif
 }
 
 datasource_reader::~datasource_reader()

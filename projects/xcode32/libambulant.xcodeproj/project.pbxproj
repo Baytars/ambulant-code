@@ -361,6 +361,8 @@
 		04ACA7A212B6369900AE64EE /* timegraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04791D2D115194C10007DD71 /* timegraph.cpp */; };
 		04ACA7A312B6369A00AE64EE /* animate_a.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04791D1E115194C10007DD71 /* animate_a.cpp */; };
 		04ACA7A412B6369B00AE64EE /* time_node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04791D2A115194C10007DD71 /* time_node.cpp */; };
+		38973CC41355DAB500522391 /* lib_gcd_event_processor_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 38973CC31355DAB500522391 /* lib_gcd_event_processor_impl.h */; };
+		38973CC81355DACC00522391 /* lib_gcd_event_processor_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 38973CC71355DACC00522391 /* lib_gcd_event_processor_impl.cpp */; };
 		939CEABC12E85FD40003D62E /* cg_transition.h in Headers */ = {isa = PBXBuildFile; fileRef = 939CEABB12E85FD40003D62E /* cg_transition.h */; };
 		939CEABD12E85FD40003D62E /* cg_transition.h in Headers */ = {isa = PBXBuildFile; fileRef = 939CEABB12E85FD40003D62E /* cg_transition.h */; };
 		939CEACD12E8659E0003D62E /* cg_transition.mm in Sources */ = {isa = PBXBuildFile; fileRef = 939CEACC12E8659E0003D62E /* cg_transition.mm */; };
@@ -840,6 +842,8 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF5E0370ADEE00C91783 /* libambulant_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libambulant_Prefix.pch; sourceTree = "<group>"; };
+		38973CC31355DAB500522391 /* lib_gcd_event_processor_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lib_gcd_event_processor_impl.h; sourceTree = "<group>"; };
+		38973CC71355DACC00522391 /* lib_gcd_event_processor_impl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lib_gcd_event_processor_impl.cpp; sourceTree = "<group>"; };
 		939CEABB12E85FD40003D62E /* cg_transition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cg_transition.h; path = cg/cg_transition.h; sourceTree = "<group>"; };
 		939CEACC12E8659E0003D62E /* cg_transition.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cg_transition.mm; path = cg/cg_transition.mm; sourceTree = "<group>"; };
 		93BBA28412DCABC500EE7501 /* cg_avfoundation_video.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cg_avfoundation_video.mm; path = cg/cg_avfoundation_video.mm; sourceTree = "<group>"; };
@@ -1293,6 +1297,7 @@
 		04791C321151943B0007DD71 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				38973CC31355DAB500522391 /* lib_gcd_event_processor_impl.h */,
 				04791C331151943B0007DD71 /* profile.h */,
 				04791C341151943B0007DD71 /* abstract_mtsync.h */,
 				04791C351151943B0007DD71 /* amstream.h */,
@@ -1610,6 +1615,7 @@
 		04791CEF115194C10007DD71 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				38973CC71355DACC00522391 /* lib_gcd_event_processor_impl.cpp */,
 				04791CF0115194C10007DD71 /* nscontext.cpp */,
 				04791CF1115194C10007DD71 /* colors.cpp */,
 				04791CF2115194C10007DD71 /* delta_timer.cpp */,
@@ -1802,6 +1808,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				38973CC41355DAB500522391 /* lib_gcd_event_processor_impl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2261,6 +2268,7 @@
 				04791DB8115194C10007DD71 /* timegraph.cpp in Sources */,
 				04791DB9115194C10007DD71 /* trace_player.cpp in Sources */,
 				04791DBA115194C10007DD71 /* transition.cpp in Sources */,
+				38973CC81355DACC00522391 /* lib_gcd_event_processor_impl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
