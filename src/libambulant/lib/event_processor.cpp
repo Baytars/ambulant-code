@@ -27,7 +27,7 @@
 #include <map>
 
 //xxxbo
-#define GB_MULTI_THREAD
+//#define GB_MULTI_THREAD
 #ifdef GB_MULTI_THREAD
 #include <pthread.h>
 #endif

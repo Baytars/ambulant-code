@@ -22,7 +22,9 @@
 #include "ambulant/net/datasource.h"
 #include "ambulant/lib/asb.h"
 #include "ambulant/lib/event_processor.h"
+#ifdef WITH_GCD_EVENT_PROCESSOR
 #include "ambulant/lib/lib_gcd_event_processor_impl.h"
+#endif
 
 //#define AM_DBG if(1)
 #ifndef AM_DBG
