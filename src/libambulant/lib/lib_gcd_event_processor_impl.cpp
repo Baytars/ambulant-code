@@ -66,7 +66,7 @@ event_processor_impl_gcd::add_event(event *pe, time_type t,
 								event_priority priority)
 {
 	
-	/*AM_DBG*/ logger::get_logger()->debug("lib_gcd_event_processor_impl:add_event(0x%x, t=%d, pri=%d)",pe,t,priority);
+	AM_DBG logger::get_logger()->debug("lib_gcd_event_processor_impl:add_event(0x%x, t=%d, pri=%d)",pe,t,priority);
 	m_lock.enter();
 	// Insert the event into the correct queue.
 	switch(priority) {
