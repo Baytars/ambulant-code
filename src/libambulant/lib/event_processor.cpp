@@ -26,6 +26,12 @@
 #include "ambulant/lib/logger.h"
 #include <map>
 
+//xxxbo
+//#define GB_MULTI_THREAD
+#ifdef GB_MULTI_THREAD
+#include <pthread.h>
+#endif
+
 #if defined(AMBULANT_PLATFORM_WIN32)
 #include <windows.h>
 #endif
@@ -233,6 +239,19 @@ event_processor_impl::_events_available(delta_timer& dt, std::queue<event*> *qp)
 	return !qp->empty();
 }
 
+// xxxbo 
+#ifdef GB_MULTI_THREAD
+void *
+event_proc(void *pParam)
+{
+	event* e = static_cast<event*>(pParam);
+	(void)e->fire();
+	delete e;
+	pthread_exit(NULL); // returns never
+	return NULL;
+}
+#endif
+
 bool
 event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 // serve a single event from a delta_timer run queue
@@ -244,8 +263,16 @@ event_processor_impl::_serve_event(delta_timer& dt, std::queue<event*> *qp)
 		AM_DBG logger::get_logger()->debug("serve_event(0x%x)",e);
 		qp->pop();
 		m_lock.leave();
+	#ifndef GB_MULTI_THREAD
 		e->fire();
 		delete e;
+	#else
+		//logger::get_logger()->debug("create thread to serve_event(0x%x)",e);
+		int err;
+		pthread_t thread_id; 
+		err = pthread_create(&thread_id, NULL, &event_proc, e);
+	#endif
+
 		m_lock.enter();
 	}
 	return must_serve;
@@ -274,3 +301,5 @@ event_processor_impl::dump()
 //		lib::logger::get_logger()->trace("	0x%x", (void *)*i);
 }
 #endif
+
+

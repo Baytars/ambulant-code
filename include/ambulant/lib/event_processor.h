@@ -150,7 +150,7 @@ class event_processor_impl : public event_processor, public BASE_THREAD {
 	std::queue<event*> m_low_q;
 
 };
-
+		
 /// Machine-dependent factory function
 AMBULANTAPI event_processor *event_processor_factory(timer *t);
 
