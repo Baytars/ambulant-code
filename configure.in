@@ -256,6 +256,21 @@ fi
 AC_MSG_RESULT($with_seamless)
 
 #
+# Do we want gcd event processor support?
+#
+AC_MSG_CHECKING(for --with-gcd-event-processor)
+AC_ARG_WITH([gcd-event-processor],
+    AS_HELP_STRING([--with-gcd-event-processor],[Enable gcd event processor]),
+    [with_gcd_event_processor=${withval}],
+    [with_gcd_event_processor=yes])
+if test "x$with_gcd_event_processor" = xyes;
+then
+    AC_DEFINE(WITH_GCD_EVENT_PROCESSOR, 1, [Define to enable gcd event processor support])
+fi
+AC_MSG_RESULT($with_gcd_event_processor)
+
+
+#
 # Do we want clock resynchronisation?
 #
 AC_MSG_CHECKING(for --with-clock-sync)
