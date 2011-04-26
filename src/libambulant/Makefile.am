@@ -257,6 +257,7 @@ libambulant_la_SOURCES = \
 	lib/delta_timer.cpp \
 	lib/document.cpp \
 	lib/event_processor.cpp \
+	lib/lib_gcd_event_processor_impl\
 	lib/gpaths.cpp \
 	lib/logger.cpp \
 	lib/nfa.cpp \
