@@ -94,6 +94,7 @@ loggers_manager::~loggers_manager() {
 	std::map<std::string, lib::logger*>::iterator it;
 	for(it=loggers.begin();it!=loggers.end();it++)
 		delete (*it).second;
+	loggers.clear();
 }
 
 static 

@@ -47,6 +47,7 @@ lib::document::document()
 
 lib::document::~document() {
 	if (m_root_owned) delete m_root;
+	m_namespaces.cleanup();
 	// m_state is borrowed.
 }
 

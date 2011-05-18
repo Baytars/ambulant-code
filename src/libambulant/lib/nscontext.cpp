@@ -234,6 +234,11 @@ nscontext::init_supported_namespaces() {
 void
 nscontext::cleanup()
 {
+	if(s_supported_namespaces == NULL)
+	{
+		return;
+	}
+	s_supported_namespaces->clear();
 	delete s_supported_namespaces;
 	s_supported_namespaces = NULL;
 }
