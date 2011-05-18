@@ -568,3 +568,12 @@ test_attrs::get_system_language_weight(std::string lang)
 }
 #endif
 
+test_attrs::~test_attrs()
+{
+	active_tests_attrs_map.clear();
+	active_custom_tests_attrs_map.clear();
+#ifdef WITH_SMIL30
+	active_language_map.clear();
+#endif
+}
+

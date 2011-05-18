@@ -1,0 +1,82 @@
+diff -racN ./ambulant-2.2/include/ambulant/smil2/test_attrs.h ./ambulant-2.2-new/include/ambulant/smil2/test_attrs.h
+*** ./ambulant-2.2/include/ambulant/smil2/test_attrs.h	2010-05-21 15:33:14.000000000 +0200
+--- ./ambulant-2.2-new/include/ambulant/smil2/test_attrs.h	2011-05-13 17:20:09.349098208 +0200
+***************
+*** 54,60 ****
+  class AMBULANTAPI test_attrs {
+    public:
+  	test_attrs(const lib::node *n);
+! 	
+  	// Returns true when the target node is selected.
+  	bool selected() const;
+  	
+--- 54,61 ----
+  class AMBULANTAPI test_attrs {
+    public:
+  	test_attrs(const lib::node *n);
+!     ~test_attrs();
+! 		
+  	// Returns true when the target node is selected.
+  	bool selected() const;
+  	
+diff -racN ./ambulant-2.2/src/libambulant/lib/document.cpp ./ambulant-2.2-new/src/libambulant/lib/document.cpp
+*** ./ambulant-2.2/src/libambulant/lib/document.cpp	2010-05-21 15:33:14.000000000 +0200
+--- ./ambulant-2.2-new/src/libambulant/lib/document.cpp	2011-05-13 17:21:00.928896070 +0200
+***************
+*** 47,52 ****
+--- 47,53 ----
+  
+  lib::document::~document() {
+  	if (m_root_owned) delete m_root;
++ 	m_namespaces.cleanup();
+  	// m_state is borrowed.
+  }
+  
+diff -racN ./ambulant-2.2/src/libambulant/lib/logger.cpp ./ambulant-2.2-new/src/libambulant/lib/logger.cpp
+*** ./ambulant-2.2/src/libambulant/lib/logger.cpp	2010-05-21 15:33:14.000000000 +0200
+--- ./ambulant-2.2-new/src/libambulant/lib/logger.cpp	2011-05-13 17:22:05.235742722 +0200
+***************
+*** 94,99 ****
+--- 94,100 ----
+  	std::map<std::string, lib::logger*>::iterator it;
+  	for(it=loggers.begin();it!=loggers.end();it++)
+  		delete (*it).second;
++ 	loggers.clear();
+  }
+  
+  static 
+diff -racN ./ambulant-2.2/src/libambulant/lib/nscontext.cpp ./ambulant-2.2-new/src/libambulant/lib/nscontext.cpp
+*** ./ambulant-2.2/src/libambulant/lib/nscontext.cpp	2010-05-21 15:33:14.000000000 +0200
+--- ./ambulant-2.2-new/src/libambulant/lib/nscontext.cpp	2011-05-13 17:26:20.491720804 +0200
+***************
+*** 234,239 ****
+--- 234,244 ----
+  void
+  nscontext::cleanup()
+  {
++ 	if(s_supported_namespaces == NULL)
++ 	{
++ 		return;
++ 	}
++ 	s_supported_namespaces->clear();
+  	delete s_supported_namespaces;
+  	s_supported_namespaces = NULL;
+  }
+diff -racN ./ambulant-2.2/src/libambulant/smil2/test_attrs.cpp ./ambulant-2.2-new/src/libambulant/smil2/test_attrs.cpp
+*** ./ambulant-2.2/src/libambulant/smil2/test_attrs.cpp	2010-05-21 15:33:14.000000000 +0200
+--- ./ambulant-2.2-new/src/libambulant/smil2/test_attrs.cpp	2011-05-13 17:23:46.340694101 +0200
+***************
+*** 568,570 ****
+--- 568,579 ----
+  }
+  #endif
+  
++ test_attrs::~test_attrs()
++ {
++ 	active_tests_attrs_map.clear();
++ 	active_custom_tests_attrs_map.clear();
++ #ifdef WITH_SMIL30
++ 	active_language_map.clear();
++ #endif
++ }
++ 

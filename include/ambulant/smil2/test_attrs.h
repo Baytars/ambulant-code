@@ -54,7 +54,8 @@ class state_test_methods_impl;
 class AMBULANTAPI test_attrs {
   public:
 	test_attrs(const lib::node *n);
-	
+    ~test_attrs();
+		
 	// Returns true when the target node is selected.
 	bool selected() const;
 	
