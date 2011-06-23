@@ -23,7 +23,7 @@ class MyTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
         
 def main():
-    server = MyTCPServer(("localhost", PORT), MyTCPHandler)
+    server = MyTCPServer(("", PORT), MyTCPHandler)
     server.serve_forever()
         
 if __name__ == "__main__":
