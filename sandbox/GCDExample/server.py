@@ -7,7 +7,7 @@ import time
 # Tunable constants
 PORT=12345
 DELAY=5
-QUEUESIZE=20
+QUEUESIZE=200
 
 class MyTCPHandler(SocketServer.BaseRequestHandler):
 
