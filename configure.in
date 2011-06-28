@@ -267,7 +267,10 @@ if test "x$with_gcd_event_processor" = xyes;
 then
     AC_DEFINE(WITH_GCD_EVENT_PROCESSOR, 1, [Define to enable gcd event processor support])
 fi
+GCD_LIBS="-ldispatch"
+AC_SUBST(GCD_LIBS)
 AC_MSG_RESULT($with_gcd_event_processor)
+
 
 
 #
@@ -1219,6 +1222,7 @@ ambulant-$AMBULANT_VERSION will be built with following parameters:
 
     Build with npambulant plugin:   ${with_npambulant}
     Use shared libs internally:     ${with_ambulant_shared_lib}
+    Build with GCD:				${with_gcd_event_processor}
      "
 
 if test "x$with_frontend" = "xfalse"; then

@@ -644,7 +644,7 @@ third_party_packages={
             ),
 
         TPP("xulrunner-sdk",
-            url="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.2.16/sdk/xulrunner-1.9.2.16.en-US.linux-i686.sdk.tar.bz2",
+            url="http://releases.mozilla.org/pub/mozilla.org/xulrunner/releases/1.9.2.18/sdk/xulrunner-1.9.2.18.en-US.linux-i686.sdk.tar.bz2",
             checkcmd="test -d xulrunner-sdk",
             buildcmd="test -d xulrunner-sdk"
             ),
