@@ -31,6 +31,8 @@
 #define AM_DBG if(0)
 #endif
 
+//#define GB_BLOCK
+
 using namespace ambulant;
 using namespace lib;
 
@@ -61,6 +63,16 @@ event_processor_impl_gcd::get_timer() const
 	return m_timer;
 }
 
+#ifndef GB_BLOCK
+void gb_serve_event(event *gb_e)
+{
+	/*AM_DBG*/ logger::get_logger()->debug("before server_event(0x%x) in GCD", gb_e);
+	gb_e->fire();
+	/*AM_DBG*/ logger::get_logger()->debug("after server_event(0x%x) in GCD", gb_e);
+	delete gb_e;
+}
+#endif
+
 void
 event_processor_impl_gcd::add_event(event *pe, time_type t,
 								event_priority priority)
@@ -72,27 +84,39 @@ event_processor_impl_gcd::add_event(event *pe, time_type t,
 	switch(priority) {
 		case ep_high: {
 			// t is in milliseconds and dispatch_time is expecting time instant in nanoseconds
+#ifdef GB_BLOCK
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
 				delete pe;
 			});	
+#else
+			dispatch_after_f(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), pe, (dispatch_function_t)gb_serve_event);
+#endif
 		}
 			break;
 		case ep_med: {
+#ifdef GB_BLOCK
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
 				delete pe;
 			});
+#else
+			dispatch_after_f(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), pe, (dispatch_function_t)gb_serve_event);
+#endif
 		}
 			break;
 		case ep_low: {
+#ifdef GB_BLOCK
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 				AM_DBG logger::get_logger()->debug("I am in global queue and serve_envet(0x%x)",pe);
 				pe->fire();
 				delete pe;
-			});			
+			});	
+#else
+			dispatch_after_f(dispatch_time(DISPATCH_TIME_NOW, t*1000000),dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), pe, (dispatch_function_t)gb_serve_event);
+#endif		
 		}
 			break;
 	}

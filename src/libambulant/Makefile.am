@@ -16,7 +16,7 @@ libambulant_live=
 endif
 libambulant_sdl=-L$(ambulantlibdir) -lambulant_sdl
 libambulant_gstreamer=-L$(ambulantlibdir) -lambulant_gstreamer
-libambulant_gtk=-L$(ambulantlibdir) -lambulant_gtk
+libambulant_gtk=-L$(ambulantlibdir) -lambulant_gtk -ldispatch
 libambulant_qt=-L$(ambulantlibdir) -lambulant_qt
 else
 #
@@ -123,7 +123,7 @@ libambulant_gtk_la_SOURCES = \
 	gui/gtk/gtk_util.cpp \
 	gui/gtk/gtk_video_renderer.cpp \
 	gui/gtk/gtk_factory.cpp
-libambulant_gtk_la_LDFLAGS=$(libambulant_live) $(libambulant_ffmpeg) $(libambulant_core) $(GTK_LIBS)
+libambulant_gtk_la_LDFLAGS=$(libambulant_live) $(libambulant_ffmpeg) $(libambulant_core) $(GTK_LIBS) $(GCD_LIBS)
 libambulant_gtk_la_DEPENDENCIES=$(toolkit_live_libraries) $(toolkit_ffmpeg_libraries) libambulant.la
 else
 gtkincludes=
@@ -245,7 +245,8 @@ libambulant_la_LDFLAGS= \
 	$(expat_core_libs) \
 	$(xerces_core_libs) \
 	$(platlibs) \
-	$(PTHREAD_LIBS)
+	$(PTHREAD_LIBS) \
+	$(GCD_LIBS)
 
 libambulant_la_SOURCES = \
 	get_version.cpp \
