@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import pygtk
 pygtk.require('2.0')

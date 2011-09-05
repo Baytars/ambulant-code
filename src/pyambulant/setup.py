@@ -13,7 +13,7 @@ else:
 if sys.platform == 'linux2':
     # Not really the correct test, but okay for the time being
     WITH_GTK=True
-    WITH_QT=True
+    WITH_QT=False
 else:
     WITH_GTK=False
     WITH_QT=False
