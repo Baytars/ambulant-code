@@ -256,7 +256,7 @@ IPHONE_SIMULATOR_COMMON_CONFIGURE="./configure --prefix='%s' CFLAGS='%s' CXXFLAG
 #
 # Common flags for Linux
 #
-LINUX_COMMON_CONFIGURE="./configure --prefix='%s'" % COMMON_INSTALLDIR
+LINUX_COMMON_CONFIGURE="./configure CFLAGS=-fabi-version=0 CXXFLAGS=$CFLAGS --prefix='%s'" % COMMON_INSTALLDIR
 
 #
 # Common Win32 flags
