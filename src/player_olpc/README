@@ -1,0 +1,17 @@
+How to create a working AmbulantPlayer for OLPC 1st generation build 767 on Fedora 9.
+-------------------------------------------------------------------------------------
+
+For OLPC with XO build 767 (compatible with Fedora 9) I installed following additional
+packages using yum:
+
+Fedora 9> sudo yum install autoconf automake gcc-c++ libtool gettextize gettext-devel gtk2-devel pygtk2-devel
+
+Then ./create-xo-installer creates an auto-install file in:
+
+Fedora 9> ./tmp/ambulant-xo-installer.sh 
+
+to be executed (after copying to olpc home dir e.g. using wifi or an USB disk)
+on a compatible XO machine by executing this script as super-user:
+
+olpc@xo> sudo ./ambulant-xo-installer.sh 
+
