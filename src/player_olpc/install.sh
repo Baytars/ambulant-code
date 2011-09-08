@@ -47,8 +47,8 @@ usr/lib/libavutil.so.50.7.0 \
 usr/lib/libswscale.so \
 usr/lib/libswscale.so.0 \
 usr/lib/libswscale.so.0.9.0 \
-usr/lib/python2.7/site-packages/ambulant-2.2-py2.7.egg-info \
-usr/lib/python2.7/site-packages/ambulant.so \
+usr/lib/python2.5/site-packages/ambulant-2.2-py2.5.egg-info \
+usr/lib/python2.5/site-packages/ambulant.so \
 usr/bin/AmbulantPlayer_gtk \
 usr/bin/AmbulantPlayer \
 usr/bin/ambulantplayerglue.py \
@@ -73,7 +73,7 @@ case $# in
 	fi
 	;;
 esac
-if [ $HELP = "YES" ] ; then echo "Usage: $NAME  [-uninstall -files -help ]"; exit
+if [ $HELP = "YES" ] ; then echo "Usage: $NAME  [-uninstall | -files | -help ]"; exit
 fi
 if [ $PRINTFILES = "YES" ] ; then echo $FILES; exit
 fi
@@ -85,9 +85,8 @@ then cd /;sudo rm -fr $FILES usr/lib/python$PYTHON_VERSION/site-packages/ambulan
 else 
     ZIP=$PWD/ambulant-xo-installer.sh
     cd /;sudo unzip $ZIP $FILES
-    sudo cp usr/lib/python2.7/site-packages/ambulant-2.2-py2.7.egg-info \
-	usr/lib/python2.7/site-packages/ambulant.so \
-	usr/lib/python$PYTHON_VERSION/site-packages
+# enable the oss sound system on the XO 
+    modprobe snd-pcm-oss
 fi
 exit
 X=<<EOF
