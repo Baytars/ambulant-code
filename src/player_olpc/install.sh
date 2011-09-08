@@ -51,10 +51,9 @@ usr/lib/python2.5/site-packages/ambulant-2.2-py2.5.egg-info \
 usr/lib/python2.5/site-packages/ambulant.so \
 usr/bin/AmbulantPlayer_gtk \
 usr/bin/AmbulantPlayer \
-usr/bin/ambulantplayerglue.py \
+usr/bin/ambulantglue.py \
 usr/bin/player_pygtk.py \
-usr/share/ambulant \
-usr/share/ambulant/*"
+usr/share/ambulant"
 #DBG set -x
 #DBG echo n=$# 
 
@@ -84,7 +83,7 @@ if [ $UNINSTALL = "YES" ] ;
 then cd /;sudo rm -fr $FILES usr/lib/python$PYTHON_VERSION/site-packages/ambulant*;
 else 
     ZIP=$PWD/ambulant-xo-installer.sh
-    cd /;sudo unzip $ZIP $FILES
+    cd /;sudo unzip $ZIP
 # enable the oss sound system on the XO 
     modprobe snd-pcm-oss
 fi
