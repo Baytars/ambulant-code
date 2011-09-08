@@ -11,9 +11,11 @@ if [ ! -e usr ]; then mkdir usr; fi
 (cd ../../../third_party_packages/installed;tar cf - .)|(cd usr;tar xf -)
 DEST=$PWD
 PATH=$DEST/usr/bin:$PATH
+# The C-compiler flag -fabi-version=0 was added to achieve binary compatibilty with the
+# libraries on factory installed XO-1 machines 
 (cd ../../..;[ -e $PWD/configure ] || ./autogen.sh && ./configure CFLAGS=-fabi-version=0 CXXFLAGS=-fabi-version=0 --prefix=/usr --without-qt --with-python --with-python-plugin && make DESTDIR=$DEST install)
-cp ../../pyambulant/player_pygtk/player_pygtk.py tmp/usr/bin
-cp ../../pyambulant/player_pygtk/ambulantglue.py tmp/usr/bin
+cp ../../pyambulant/player_pygtk/player_pygtk.py ./usr/bin
+cp ../../pyambulant/player_pygtk/ambulantglue.py ./usr/bin
 zip -r -y ../Ambulant.zip `../install.sh -files`
 cd ..
 cat ./install.sh Ambulant.zip > ambulant-xo-installer.sh
