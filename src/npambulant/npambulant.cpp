@@ -71,7 +71,7 @@ class stderr_ostream : public ambulant::lib::ostream {
 int stderr_ostream::write(const char *cstr)
 {
 #ifdef XP_WIN32
-	OutputDebugStringA(cstr);
+	OutputDebugString(cstr);
 #endif
 	fprintf(stderr, "%s", cstr);
 	return strlen(cstr);
@@ -142,8 +142,9 @@ npambulant::npambulant(
 	m_argn = (char**) malloc (sizeof(char*)*argc);
 	m_argv = (char**) malloc (sizeof(char*)*argc);
 	for (int i=0; i<m_argc; i++) {
-		m_argn[i] = strdup(argn[i]);
-		m_argv[i] = strdup(argv[i]);
+		LOG("argn[%i]=%s argv[%i]=%s",i,argn[i],i,argv[i]);
+		m_argn[i] = argn[i]?strdup(argn[i]):NULL;
+		m_argv[i] = argv[i]?strdup(argv[i]):NULL;
 	}
 	s_npambulant_last_instance = pNPInstance;
 }
