@@ -33,7 +33,7 @@ static LRESULT CALLBACK PluginWinProc(HWND, UINT, WPARAM, LPARAM);
 
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/preferences.h"
-// #define AM_DBG if(1)
+//#define AM_DBG if(1)
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
@@ -72,6 +72,7 @@ int stderr_ostream::write(const char *cstr)
 {
 #ifdef XP_WIN32
 	OutputDebugString(cstr);
+	OutputDebugStringA(cstr);
 #endif
 	fprintf(stderr, "%s", cstr);
 	return strlen(cstr);
@@ -101,7 +102,7 @@ npambulant::npambulant(
 	m_ambulant_player(NULL),
 	m_Window(NULL)
 {
-m_url = net::url();
+	m_url = net::url();
 #ifdef XP_WIN
 	m_hWnd = NULL;
 	m_lpOldProc = NULL;
@@ -599,7 +600,7 @@ npambulant::handleEvent(void* event) {
 		}
  	} else  if (cocoaEvent.type == NPCocoaEventMouseMoved || cocoaEvent.type == NPCocoaEventMouseDown || cocoaEvent.type == NPCocoaEventMouseEntered || cocoaEvent.type == NPCocoaEventMouseExited) {
  		if (m_view != NULL && m_mainloop != NULL) {
-		    event_data e_data;
+		        event_data e_data;
 			unsigned long int NSLeftMouseDown = 1, NSMouseMoved = 5, NSMouseEntered = 8, NSMouseExited = 9; //XXX needs #include <NSEvent.h >
 			CGPoint p = CGPointMake(cocoaEvent.data.mouse.pluginX, cocoaEvent.data.mouse.pluginY);
 			p = CGPointApplyAffineTransform(p, CGAffineTransformInvert(CGAffineTransformScale(CGAffineTransformIdentity, m_zoom, m_zoom)));
