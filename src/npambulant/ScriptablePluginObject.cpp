@@ -4,6 +4,7 @@
 #ifdef _DEBUG
 #define ptrdiff_t long int // but not defined in Visual C++ 7.1.
 #endif//_DEBUG
+#define _X86_
 #endif//XP_WIN32
 
 #include "ScriptablePluginObject.h"
