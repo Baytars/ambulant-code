@@ -44,6 +44,10 @@
 // Hack: 1.9.2 npai.h on MacOS 64 bit does not include next file (for good reasons) so we do it...
 #include <Carbon/Carbon.h>
 #endif
+
+#ifdef XP_WIN32
+#define _X86_ // prevents errors like:.../winnt.h(6361): error C2146: syntax error : missing ';' before identifier 'ContextRecord'
+#endif//XP_WIN
 #include "npapi.h"
 #include "npruntime.h"
 #include "prtypes.h"
@@ -258,7 +262,7 @@ class npambulant
 extern "C" {
 void npambulant_display_message(int level, const char *message);
 };
-#ifndef	XP_WIN32
+
 #ifndef	XP_WIN32
 #define LOG(formatAndArgs...) AM_DBG { \
 					fprintf (stderr, "%s(%p):  ", __PRETTY_FUNCTION__, this); \
