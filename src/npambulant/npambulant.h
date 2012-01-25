@@ -100,6 +100,9 @@ typedef void *jref;
 #include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #endif // MOZ_X11
+#ifdef XP_MACOSX
+#include <CoreFoundation/CoreFoundation.h>
+#endif
 #ifdef	WITH_GTK
 class gtk_mainloop;
 #elif WITH_CG
@@ -116,6 +119,7 @@ typedef ambulant::gui::dx::dx_player ambulant_gui_player;
 typedef ambulant::gui::dx::dx_player_callbacks gui_callbacks;
 typedef ambulant::gui::dx::dx_player_callbacks ambulant_baseclass_player_callbacks;
 #endif // WITH_D2D
+
 #include <ambulant/net/url.h>
 class ambulant_player_callbacks : public ambulant_baseclass_player_callbacks {
 
@@ -254,14 +258,13 @@ class npambulant
 extern "C" {
 void npambulant_display_message(int level, const char *message);
 };
-#if 0
-// XXXJACK this looks like pretty incorrect C++....
+
+#ifndef	XP_WIN32
 #define LOG(formatAndArgs...) AM_DBG { \
 					fprintf (stderr, "%s(%p):  ", __PRETTY_FUNCTION__, this); \
 					fprintf(stderr, formatAndArgs); fprintf(stderr, "\n");	\
 					}
 #else
-extern void xxxjacklog(...);
-#define LOG if(0) xxxjacklog
-#endif
+#define LOG AM_DBG ambulant::lib::logger::get_logger()->debug
+#endif//XP_WIN32
 #endif // __CPLUGIN_H__
