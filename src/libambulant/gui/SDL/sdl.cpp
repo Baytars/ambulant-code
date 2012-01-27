@@ -53,6 +53,22 @@ sdl_renderer_factory::supports(common::renderer_select *rs)
 {
 	const lib::xml_string& tag = rs->get_tag();
 	if (tag != "" && tag != "ref" && tag != "audio" && tag != "prefetch") return false;
+	
+#if 1 //xxxbo: according to the extension filename to justify whether support or not
+	const lib::xml_string& src_uri = rs->get_url().get_url();
+	/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory::supports: the uri is %s", src_uri.c_str());
+	int location_extension_filename = src_uri.rfind(".");
+	if (location_extension_filename	> 0) { 
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory::supports: the location of extension filename is %d", location_extension_filename);
+		const lib::xml_string& extension_filename = src_uri.substr(location_extension_filename);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory::supports: the extension filename is %s", extension_filename.c_str());
+		if (extension_filename == ".mp3" || extension_filename == ".wav") {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("sdl_renderer_factory::supports: the music is %s", extension_filename.c_str());
+			return true;
+		}
+	}
+#endif
+	
 	const char *renderer_uri = rs->get_renderer_uri();
 #if 1
 	// Stopgap for MyVideos: We don't want the SDL renderer to

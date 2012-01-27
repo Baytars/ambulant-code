@@ -291,6 +291,22 @@ class single_playable_factory : public playable_factory {
 			strcmp(renderer_uri, Renderer_uri) != 0 &&
 			strcmp(renderer_uri, Renderer_uri2) != 0&&
 			strcmp(renderer_uri, Renderer_uri3) != 0) return false;
+		
+#if 1 //xxxbo: according to the extension filename to justify whether support or not
+		const lib::xml_string& src_uri = rs->get_url().get_url();
+		/*AM_DBG*/ lib::logger::get_logger()->debug("single_playable_factory::supports: the uri is %s", src_uri.c_str());
+		int location_extension_filename = src_uri.rfind(".");
+		if (location_extension_filename	> 0) { 
+			/*AM_DBG*/ lib::logger::get_logger()->debug("single_playable_factory::supports: the location of extension filename is %d", location_extension_filename);
+			const lib::xml_string& extension_filename = src_uri.substr(location_extension_filename);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("single_playable_factory::supports: the extension filename is %s", extension_filename.c_str());
+			if (extension_filename == ".mp3" || extension_filename == ".wav") {
+				/*AM_DBG*/ lib::logger::get_logger()->debug("single_playable_factory::supports: the music is %s", extension_filename.c_str());
+				return false;
+			}
+		}
+#endif
+		
 		return true;
 	}
 
