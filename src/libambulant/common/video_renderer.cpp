@@ -67,7 +67,18 @@ video_renderer::video_renderer(
 		return;
 	}
 
+	//xxxbo 2012-01-17
+#if 0
+	int level = 0;
+	if (m_dest) {
+		const common::region_info *info = m_dest->get_info();
+		level = info ? info->get_soundlevel() : 1;
+	}
+	if (m_src->has_audio() && level > 0) {
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::video_renderer(): not creating audio renderer since soundlevel is 0 !");
+#else
 	if (m_src->has_audio()) {
+#endif //xxxbo endif
 		m_audio_ds = m_src->get_audio_datasource();
 
 		if (m_audio_ds) {
@@ -397,14 +408,20 @@ video_renderer::data_avail()
 		assert(tag != "prefetch");
 	}
 	if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
 		// If we have an audio renderer and the soundlevel is not 0, then we should let it do the stopped() callback.
-		int level;
+		int level = 0;
 		if (m_dest) {
             const common::region_info *info = m_dest->get_info();
             level = info ? info->get_soundlevel() : 1;
+			/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: sourndlevel = %d ", level );
 		}
+		//xxxbo 2012-01-20
+#if 1
 		if (m_audio_renderer == NULL || level == 0) m_context->stopped(m_cookie, 0); 
+#else
+		if (m_audio_renderer == NULL ) m_context->stopped(m_cookie, 0); 
+#endif
 		
 		// Remember how far we officially got (discounting any fill=continue behaviour)
 		m_previous_clip_position = m_clip_end;
@@ -448,7 +465,7 @@ video_renderer::data_avail()
 #endif
 	if (frame_ts_micros > now_micros + frame_duration) {
 		// Frame is too early. Do nothing, just schedule a new event at the correct time and we will get this same frame again.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
 		m_frame_early++;
 	} else
 	if (frame_ts_micros <= m_last_frame_timestamp) {

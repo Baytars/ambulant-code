@@ -42,6 +42,10 @@
 #define AM_DBG if(0)
 #endif
 
+//xxxbo 2012-01-27
+//#define URL_PLUS_CLIP_BEGIN	1
+//xxxbo end
+
 using namespace ambulant;
 using namespace smil2;
 
@@ -332,8 +336,18 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 	common::playable *np = NULL;
 	if (n->get_attribute("src")) {
 		// It may be in the URL-based playable cache. Let us look.
+		//xxxbo 2012-01-27
+#ifdef URL_PLUS_CLIP_BEGIN
+		// here we have to get clip_begin/clip_end from the node
+		const char *clip_begin_attr = n->get_attribute("clipBegin");
+		std::string s(clip_begin_attr);
+		std::map<const std::string, common::playable *>::iterator it_url_based =
+		m_cached_playables.find(n->get_url("src").get_url()+s);
+
+#else
 		std::map<const std::string, common::playable *>::iterator it_url_based =
 			m_cached_playables.find(n->get_url("src").get_url());
+#endif //xxxbo end
 		if (it_url_based != m_cached_playables.end()) {
 			np = (*it_url_based).second;
 			m_playables_cs.enter();
@@ -353,7 +367,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
 			if (n->get_local_name() == "prefetch") { 
 				surf = NULL;
 			}
-			AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n, n->get_sig().c_str(), np, rend, surf);
+			/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s clipbegin=%s: cached playable 0x%x, renderer 0x%x, surface 0x%x", n, n->get_sig().c_str(), n->get_attribute("clipBegin"), np, rend, surf);
 
 			if (rend && surf) {
 				// XXXJACK: if rend->get_surface() == surf, couldn't we skip re-setting it?
@@ -366,7 +380,7 @@ common::playable *smil_player::create_playable(const lib::node *n) {
                 const alignment *align = m_layout_manager->get_alignment(n);
                 rend->set_alignment(align);			}
 		} else {
-			AM_DBG lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s: no cached playable", n, n->get_sig().c_str());
+			/*AM_DBG*/ lib::logger::get_logger()->debug("smil_plager::create_playable(0x%x)%s clipbegin=%s: no cached playable", n, n->get_sig().c_str(), n->get_attribute("clipBegin"));
 		}
 	}
 	if( np == NULL ) {
@@ -489,8 +503,17 @@ void smil_player::stop_playable(const lib::node *n) {
 		can_cache = false;
 	} else {
 		// See if there is one in the cache already
+		//xxxbo 2012-01-27
+#ifdef URL_PLUS_CLIP_BEGIN
+		// here we have to get clip_begin/clip_end from the node
+		const char *clip_begin_attr = n->get_attribute("clipBegin");
+		std::string s(clip_begin_attr);
+		std::map<const std::string, common::playable *>::iterator it_url_based =
+		m_cached_playables.find((victim.first->get_url("src")).get_url()+s);
+#else		
 		std::map<const std::string, common::playable *>::iterator it_url_based =
 		m_cached_playables.find((victim.first->get_url("src")).get_url());
+#endif
 		common::playable *np = (it_url_based != m_cached_playables.end())?(*it_url_based).second:0;
 		if( np != NULL ) {
 			lib::logger::get_logger()->debug("smil_player::stop_playable: destroying, cache entry occupied for %s", victim.first->get_url("src").get_url().c_str());
@@ -518,7 +541,16 @@ void smil_player::stop_playable(const lib::node *n) {
 	if (can_cache) {
 		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer", victim.first->get_sig().c_str());
 		m_playables_cs.enter();
-		m_cached_playables[(victim.first->get_url("src")).get_url()] = victim.second;
+		//xxxbo 2012-01-27
+#ifdef URL_PLUS_CLIP_BEGIN
+		// here we have to get clip_begin/clip_end from the node
+		const char *clip_begin_attr = n->get_attribute("clipBegin");
+		std::string s(clip_begin_attr);
+		m_cached_playables[(victim.first->get_url("src")).get_url()+s] = victim.second;
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer", ((victim.first->get_url("src")).get_url()+s).c_str());
+#else
+	 	m_cached_playables[(victim.first->get_url("src")).get_url()] = victim.second;
+#endif //xxxbo end
 		m_playables_cs.leave();
 		//xxxbo: if this playable is created for prefetch, we don't destroy it.
 		//xxxbo: we use node id as the index to find the corresponding time_node in time graph for each node in dom tree.
@@ -1045,7 +1077,12 @@ void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::
 	assert(victim.first);
 	assert(victim.second);
 
+	//xxxbo 2012-01-27
+#ifdef URL_PLUS_CLIP_BEGIN
+	std::string url = victim.first->get_url("src").get_url()+victim.first->get_attribute("clipBegin");
+#else
 	std::string url = victim.first->get_url("src").get_url();
+#endif
 	m_playables_cs.enter();
 	std::map<const std::string, common::playable *>::iterator it_url_based = m_cached_playables.find(url);
 	if (it_url_based != m_cached_playables.end()) {
@@ -1057,7 +1094,7 @@ void smil_player::destroy_playable_in_cache(std::pair<const lib::node*, common::
 		}
 		m_cached_playables.erase(it_url_based);
 		m_playables_cs.leave();
-		AM_DBG lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: stop the playable in the cache for %s", victim.first->get_sig().c_str());
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::destroy_playable_in_cache: stop the playable in the cache for %s", url.c_str());
 		victim.second->post_stop();
 		long rem = victim.second->release();
 		if (rem > 0) m_logger->debug("smil_player::destroy_playable_in_cache: playable(0x%x) %s still has refcount of %ld", victim.second, victim.second->get_sig().c_str(), rem);

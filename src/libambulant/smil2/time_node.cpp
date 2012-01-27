@@ -25,6 +25,8 @@
 #include <stack>
 #include <set>
 #include <list>
+//xxxbo 2012-01-10
+#include <pthread.h>
 
 #include "ambulant/lib/logger.h"
 
@@ -644,6 +646,30 @@ const time_node::interval_type& time_node::get_last_interval() const {
 	return m_interval;
 }
 
+
+//xxxbo 2012-01-10
+typedef struct struct_thread_arg {
+	time_node * ptimenode;
+	time_node::time_type offset;
+} thread_arg;
+
+static void * thread_start_playable(void *arg) {
+	thread_arg *p_arg = (thread_arg *)arg;
+	time_node * p_gb_timenode = p_arg->ptimenode;
+	time_node::time_type offset = p_arg->offset;
+	p_gb_timenode->start_playable(offset); 
+	delete p_arg;
+}
+
+static void * thread_start_prefetch(void *arg) {
+	thread_arg *p_arg = (thread_arg *)arg;
+	time_node * p_gb_timenode = p_arg->ptimenode;
+	time_node::time_type offset = p_arg->offset;
+	p_gb_timenode->start_prefetch(offset); 
+	delete p_arg;
+}
+
+
 // Activates the interval of this node.
 // This function is one of the activities executed when a node enters the active state.
 // See active_state::enter() function for the complete list of activities.
@@ -711,13 +737,39 @@ void time_node::activate(qtime_type timestamp) {
 			raise_update_event(timestamp);
 			sync_node()->raise_update_event(timestamp);
 		}
+		
+		//xxxbo 2012-01-10
+		// to improve the concurrent performance by creating threads
+#if 1
 		else if (is_prefetch()) {
 			start_prefetch(sd_offset);
 			assert(m_state->ident() == ts_active);
 			raise_update_event(timestamp);
 			sync_node()->raise_update_event(timestamp);
 		}
-		else start_playable(sd_offset);
+		else start_playable(sd_offset);		
+#else
+		else if (is_prefetch()) {
+			pthread_t thread_gb;
+			int iret;
+			thread_arg * gb_arg = new thread_arg;
+			gb_arg->ptimenode = this;
+			gb_arg->offset = sd_offset;
+			iret = pthread_create( &thread_gb, NULL, thread_start_prefetch, (void*) gb_arg);
+			//start_prefetch(sd_offset);
+			assert(m_state->ident() == ts_active);
+			raise_update_event(timestamp);
+			sync_node()->raise_update_event(timestamp);
+		}
+		else {
+			pthread_t thread_gb;
+			int iret;
+			thread_arg * gb_arg = new thread_arg;
+			gb_arg->ptimenode = this;
+			gb_arg->offset = sd_offset;
+			iret = pthread_create( &thread_gb, NULL, thread_start_playable, (void*) gb_arg);
+		}		
+#endif
 		if(m_timer) m_timer->resume();
 	}
 }

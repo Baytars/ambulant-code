@@ -318,6 +318,9 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 
 	net::audio_format_choices supported(s_ambulant_format);
 	net::url url = node->get_url("src");
+	
+	//xxxbo 2012-01-20
+	m_gb_node_url = url.get_url().c_str();
 
 	_init_clip_begin_end();
 	m_previous_clip_position = m_clip_begin;
@@ -358,6 +361,10 @@ gui::sdl::sdl_audio_renderer::sdl_audio_renderer(
 {
 	net::audio_format_choices supported(s_ambulant_format);
 	net::url url = node->get_url("src");
+	
+	//xxxbo 2012-01-20
+	m_gb_node_url = url.get_url().c_str();
+	
 	AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer::sdl_audio_renderer(%s) this=0x%x, ds = 0x%x", node->get_sig().c_str(), (void*) this, (void*) ds);
 	if (init() != 0)
 		return;
@@ -466,7 +473,8 @@ gui::sdl::sdl_audio_renderer::get_data(size_t bytes_wanted, Uint8 **ptr)
 
 		// Now communicate it to the clock.
 		if (clock_drift) {
-			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock", clock_drift);
+			//xxxbo 2012-01-20
+			AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: audio clock %dms ahead of document clock for %s", clock_drift, m_gb_node_url.c_str());
 			// First, if there is no master clock, we assume that role
 			if (s_master_clock_renderer == NULL /* And syncBehavior != canSlip */ )
 				s_master_clock_renderer = this;
@@ -475,13 +483,17 @@ gui::sdl::sdl_audio_renderer::get_data(size_t bytes_wanted, Uint8 **ptr)
 			if (s_master_clock_renderer == this) {
 				// We communicate the drift to the clock. If the clock can make only a partial adjustment
 				// it will return us the amount we still have to adjust.
+				//xxxbo 2012-01-16
+#if 1
+				AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: master clock is for %s", m_gb_node_url.c_str());
 				residual_clock_drift = m_event_processor->get_timer()->set_drift(clock_drift);
+#endif //xxxbo endif
 			} else {
 				// We are not the master, so we don't set the clock. In stead, we adjust our own idea of time.
 				residual_clock_drift = clock_drift;
 			}
 			if (residual_clock_drift) {
-				AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: adjusting audio clock by %ld ms (audio skip/insert not implemented)", residual_clock_drift);
+				AM_DBG lib::logger::get_logger()->debug("sdl_audio_renderer: adjusting audio clock by %ld ms (audio skip/insert not implemented) for %s", residual_clock_drift, m_gb_node_url.c_str());
 				m_audio_clock -= residual_clock_drift;
 				// XXXX We should also read and throw away audio data if residual_clock_drift is < 0, or insert zero bytes if it is > 0.
 			}
