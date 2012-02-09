@@ -251,6 +251,25 @@ AC_ARG_WITH([dummy-plugin],
 AM_CONDITIONAL(WITH_DUMMY_PLUGIN, test x$with_dummy_plugin = xtrue)
 AC_MSG_RESULT($with_dummy_plugin)
 
+# Do we want the experimental NCL plugin ?
+#
+
+AC_MSG_CHECKING(for --with-ncl-plugin)
+AC_ARG_WITH([ncl-plugin],
+    AS_HELP_STRING([--with-ncl-plugin],[Enable the exprimenta NCL plugin (default: disabled)]),
+	[
+		case "${withval}" in
+		yes)  	with_ncl_plugin=true
+				;;
+		no)		with_ncl_plugin=false
+				;;
+		*)		AC_MSG_ERROR("--with-ncl-plugin takes no argument")
+				;;
+		esac],
+	[with_ncl_plugin=false])
+AM_CONDITIONAL(WITH_NCL_PLUGIN, test x$with_ncl_plugin = xtrue)
+AC_MSG_RESULT($with_ncl_plugin)
+
 #
 # Do we want GCD event processor support?
 #
