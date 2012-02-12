@@ -24,6 +24,9 @@
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/gui_player.h"
 #include "ambulant/smil2/test_attrs.h"
+using namespace ::ambulant;
+using namespace ::ambulant::common;
+using namespace ::ambulant::lib;
 
 #include "util/functions.h"
 using namespace ::br::pucrio::telemidia::util;
@@ -33,6 +36,9 @@ using namespace ::br::pucrio::telemidia::ginga::lssm;
 
 #include "cm/IComponentManager.h"
 using namespace ::br::pucrio::telemidia::ginga::core::cm;
+
+#include "player/INCLPlayer.h"
+using namespace ::br::pucrio::telemidia::ginga::core::player;
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -86,7 +92,7 @@ class ncl_plugin : public common::playable_imp
 	void seek(double where) {};
 	//void stop();
 	bool stop();
-	void pause();
+	void pause(pause_display d=display_show);
 	void resume();
 
   private:
@@ -96,7 +102,8 @@ class ncl_plugin : public common::playable_imp
 	// In Ginga, a Presentation Engine Manager steers all presentations
 	IPresentationEngineManager* m_pem;
 	IComponentManager* m_cm; // Needed to get one
-};
+	INCLPlayer* m_player;
+ };
 
 
 bool
@@ -145,18 +152,18 @@ ncl_plugin::ncl_plugin(
 	m_file = m_url.get_path().c_str();
 	m_cm  = IComponentManager::getCMInstance(); 	
 	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false);
-
 //X	if (fileExists(m_file) /* || isRemoteDoc */) {
 		m_pem->setIsLocalNcl(true, NULL);
 		if (m_pem->openNclFile(m_file)) {
-//X			m_pem->startPresentation(m_file, "");
+			m_pem->startPresentation(m_file, "");
+			m_player = m_pem->getNclPlayer(m_file); // m_url.get_url());
 		}
 //X	}
 }
 
 ncl_plugin::~ncl_plugin() {
 	if (m_pem != NULL) {
-//TBD	  	m_pem->stopPresentation();
+	  	m_player->stop();
 		delete m_pem;
 	}
 }
@@ -179,22 +186,22 @@ bool
 ncl_plugin::stop()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::stop(0x%x): ", (void*) this);
-//TBD	m_pem->stopPresentation();
+	m_player->stop();
 	return true;
 }
 
 void
-ncl_plugin::pause()
+ncl_plugin::pause(pause_display d)
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::pause(0x%x): ", (void*) this);
-//TBD	m_pem->pausePressed();
+	m_player->pause();
 }
 
 void
 ncl_plugin::resume()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::resume(0x%x): ", (void*) this);
-//TBD	m_pem->pausePressed();
+	m_player->resume();
 }
 
 
