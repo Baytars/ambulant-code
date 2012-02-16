@@ -37,8 +37,8 @@ using namespace ::br::pucrio::telemidia::ginga::lssm;
 #include "cm/IComponentManager.h"
 using namespace ::br::pucrio::telemidia::ginga::core::cm;
 
-#include "player/INCLPlayer.h"
-using namespace ::br::pucrio::telemidia::ginga::core::player;
+#include "mb/ILocalScreenManager.h"
+using namespace ::br::pucrio::telemidia::ginga::core::mb;
 
 #define AM_DBG
 #ifndef AM_DBG
@@ -100,9 +100,10 @@ class ncl_plugin : public common::playable_imp
 	net::url m_url;
 	const char* m_file;
 	// In Ginga, a Presentation Engine Manager steers all presentations
+	ILocalScreenManager*	m_dm; // persisent static object
+	GingaScreenID		m_screenId;
 	IPresentationEngineManager* m_pem;
-	IComponentManager* m_cm; // Needed to get one
-	INCLPlayer* m_player;
+	IComponentManager*	m_cm; // persisent static object
  };
 
 
@@ -146,24 +147,28 @@ ncl_plugin::ncl_plugin(
 	common::playable_factory_machdep *mdp)
 :	common::playable_imp(context, cookie, node, evp, factory, mdp)
 {
+	int argc = 0;
+	char* argv[] = { NULL };
 	m_node = node;
 	m_url  = node->get_url("src");
-	AM_DBG lib::logger::get_logger()->debug("ncl_plugin_factory::new_playable(0x%x) : src=\"%s\"", (void*)this, repr(m_url).c_str());
+	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_plugin(0x%x) : src=\"%s\", file=\"%s\", protocol=\"%s\", host=\"%s\", ref=\"%s\", path=\"%s\"", (void*)this, repr(m_url).c_str(), m_url.get_file().c_str(), m_url.get_protocol().c_str(), m_url.get_host().c_str(), m_url.get_ref().c_str(), m_url.get_path().c_str());
 	m_file = m_url.get_path().c_str();
 	m_cm  = IComponentManager::getCMInstance(); 	
-	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false);
+	m_dm = ((LocalScreenManagerCreator*)(m_cm->getObject("LocalScreenManager")))();
+	m_screenId = m_dm->createScreen(argc, argv);
+	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false, m_screenId);
 //X	if (fileExists(m_file) /* || isRemoteDoc */) {
-		m_pem->setIsLocalNcl(true, NULL);
+		m_pem->setIsLocalNcl(false, NULL);
 		if (m_pem->openNclFile(m_file)) {
 			m_pem->startPresentation(m_file, "");
-			m_player = m_pem->getNclPlayer(m_file); // m_url.get_url());
-		}
+			AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_plugin(0x%x) : m_pem(0x%x)->startPresentation(%s)", (void*)this, m_file);
+		}	
 //X	}
 }
 
 ncl_plugin::~ncl_plugin() {
 	if (m_pem != NULL) {
-	  	m_player->stop();
+		stop();
 		delete m_pem;
 	}
 }
@@ -181,12 +186,11 @@ ncl_plugin::start(double t)
 	m_pem->startPresentation(m_file, "");
 }
 
-
 bool
 ncl_plugin::stop()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::stop(0x%x): ", (void*) this);
-	m_player->stop();
+	m_pem->stopPresentation(m_file);
 	return true;
 }
 
@@ -194,14 +198,14 @@ void
 ncl_plugin::pause(pause_display d)
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::pause(0x%x): ", (void*) this);
-	m_player->pause();
+        m_pem->pausePresentation(m_file);
 }
 
 void
 ncl_plugin::resume()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::resume(0x%x): ", (void*) this);
-	m_player->resume();
+	m_pem->resumePresentation(m_file);
 }
 
 
