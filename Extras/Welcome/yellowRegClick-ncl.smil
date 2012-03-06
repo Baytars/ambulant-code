@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+     yellowRegClick-ncl.ncl: very simple example to render a yellow rectangle
+     on a gray background in ncl; when the yellow region is clicked, the string
+     "someValue" is presented on the ncl port 'infoOut'
+-->
+<smil version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <layout>
+      <root-layout width="640" height="480" backgroundColor="black"/>
+      <region xml:id="screen" left="0" top="0" width="640" height="480" backgroundColor="gray"/>
+    </layout>
+  </head>
+  <body>
+    <ref xml:id="media-01" src="./yellowRegClick.ncl" region="screen" >
+      <param name="renderer" value="http://www.ambulantplayer.org/component/RendererNCLPlugin"/>
+    </ref>
+  </body>
+</smil>
