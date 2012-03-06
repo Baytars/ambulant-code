@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+     yellowRegClickState-ncl.smil: very simple example to render in a yellow rectangle
+     on a gray background in as specified in yellowClick.ncl; when the yellow region is
+     clicked, the string "someValue" is presented on ncl port 'infoOut', picked up by the
+     ncl_plugin, and used to change the value of the Smil-State variable of the same name,
+     causing a stateChanged event so that both the image is shown and the audio is played.
+-->
+<smil version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <layout>
+      <root-layout width="640" height="480" backgroundColor="black"/>
+      <region xml:id="screen" left="0" top="0" width="640" height="480" backgroundColor="gray"/>
+    </layout>
+    <state xml:id="state">
+      <data>
+	<infoOut>1</infoOut>
+      </data>
+    </state>
+
+  </head>
+  <body>
+    <par dur="3600" >
+      <ref xml:id="media-01" begin="0" src="./yellowRegClick.ncl" region="screen" >
+       <param name="renderer" value="http://www.ambulantplayer.org/component/RendererNCLPlugin"/>
+      </ref>
+      <img src="data/ambulant.png" region="screen" begin="state.stateChanged(infoOut)" dur="8" top="220" left="220" />
+      <audio src="data/AmbulantTune.mp3" begin="state.stateChanged(infoOut)" dur="8" />
+    </par>
+  </body>
+</smil>
