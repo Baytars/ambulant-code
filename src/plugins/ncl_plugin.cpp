@@ -37,6 +37,8 @@
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/common/gui_player.h"
 #include "ambulant/smil2/test_attrs.h"
+#include "ambulant/common/state.h"
+
 using namespace ::ambulant;
 using namespace ::ambulant::common;
 using namespace ::ambulant::lib;
@@ -90,35 +92,7 @@ class ncl_plugin_factory : public common::playable_factory {
 	common::playable_factory_machdep *m_mdp;
 };
 
-class ncl_plugin; // forward
-
-class ncl_listener : public IPlayerListener {
-  public:
-  ncl_listener() : m_state(NULL) {}
-
-	void updateStatus(short code, string parameter, short type, string value) {
-		if (type == IPlayer::TYPE_ATTRIBUTION) {
-		  /*AM_DBG*/ lib::logger::get_logger()->debug("ncl_listener::updateStatus(code=%d, parameter=%s, type=%d, value=%s,) event received",code, parameter.c_str(), type, value.c_str());
-			// test if state was specified in .smil source
-	  		if (m_state != NULL) {
-				// test if "var_name" is specified as a state variable
-				if (m_state->bool_expression (parameter.c_str())) {
-					string old_value = m_state->string_expression(parameter.c_str());
-					if (old_value != value) {
-						m_state->set_value (parameter.c_str(), value.c_str());
-					}
-				}
-			}
-		}
-	}
-  void set_state_component (state_component* sc) {
-	m_state = sc;
-  }
-  private:
-	state_component* m_state;
-};
-
-class ncl_plugin : public common::playable_imp
+class ncl_plugin : public common::playable_imp, public 	common::state_change_callback, public IPlayerListener
 {
   public:
   ncl_plugin(
@@ -130,7 +104,7 @@ class ncl_plugin : public common::playable_imp
 	common::playable_factory_machdep *mdp);
 
 	~ncl_plugin();
-
+	// playable_imp
 	void data_avail();
 	void start(double where);
 	void seek(double where) {};
@@ -138,12 +112,17 @@ class ncl_plugin : public common::playable_imp
 	bool stop();
 	void pause(pause_display d=display_show);
 	void resume();
+	// state_change_callback
+	void on_state_change(const char *ref);
+	// IPlayerListener
+	void updateStatus(short code, string parameter, short type, string value);
 
   private:
 	net::url m_url;
 	const char* m_file;
-	ncl_listener* m_listener;
-
+	state_component* m_state;
+	bool m_wanted; //X
+  
 	IComponentManager*	m_cm; // persisent static object
 	ILocalScreenManager*	m_dm; // persisent static object
 	GingaScreenID		m_screenId;
@@ -191,8 +170,11 @@ ncl_plugin::ncl_plugin(
 	common::playable_factory_machdep *mdp)
 :	common::playable_imp(context, cookie, node, evp, factory, mdp)
 {
-	int argc = 2;
-	char* argv[] = { (char*) "--asystem", (char*) "xine"};
+	int argc = 4;
+	// select xine audio, because the default (FusionSound) sounds ugly)
+	char* argv[] = { (char*) "--asystem", (char*) "xine",
+			 (char*) "--enable-log", (char*) "stdout",
+	};
 	m_url  = node->get_url("src");
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_plugin(0x%x) : src=\"%s\", file=\"%s\", protocol=\"%s\", host=\"%s\", ref=\"%s\", path=\"%s\"", (void*)this, repr(m_url).c_str(), m_url.get_file().c_str(), m_url.get_protocol().c_str(), m_url.get_host().c_str(), m_url.get_ref().c_str(), m_url.get_path().c_str());
 	m_file = m_url.get_path().c_str();
@@ -200,15 +182,15 @@ ncl_plugin::ncl_plugin(
 	m_dm = ((LocalScreenManagerCreator*)(m_cm->getObject("LocalScreenManager")))();
 	m_screenId = m_dm->createScreen(argc, argv);
 	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false, m_screenId);
-	m_listener = new ncl_listener();
-	m_listener->set_state_component (node->get_context()->get_state());
+	m_state = node->get_context()->get_state();
 
 	m_pem->setIsLocalNcl(false, NULL);
 	if (m_pem->openNclFile(m_file)) {
-		m_pem->addPlayerListener(m_file, m_listener);
+		m_pem->addPlayerListener(m_file, this);
 		m_pem->startPresentation(m_file, "");
 		AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_plugin(0x%x) : m_pem(0x%x)->startPresentation(%s)", (void*)this, m_file);
 	}	
+	m_wanted = false;
 }
 
 ncl_plugin::~ncl_plugin() {
@@ -222,9 +204,6 @@ ncl_plugin::~ncl_plugin() {
 	}
 	if (m_cm != NULL) {
 //		delete m_cm; // static object, leak !
-	}
-	if (m_listener != NULL) {
-		delete m_listener;
 	}
 }
 
@@ -261,6 +240,39 @@ ncl_plugin::resume()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::resume(0x%x): ", (void*) this);
 	m_pem->resumePresentation(m_file);
+}
+
+void
+ncl_plugin::on_state_change(const char *ref)
+{
+	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::on_state_change(%s)", ref);
+	if (m_state != NULL) {
+//		if (m_state->bool_expression (ref)) {
+			std::string value = m_state->string_expression(ref);
+			AM_DBG lib::logger::get_logger()->debug("ncl_plugin::on_state_change(%s) value=%s", ref, value.c_str());
+			m_pem->setPropertyValue(m_file, ref, value);
+
+//		}
+	}
+}
+
+void
+ncl_plugin::updateStatus(short code, string parameter, short type, string value) {
+	if (code == IPlayer::PL_NOTIFY_STOP && type == IPlayer::TYPE_ATTRIBUTION) {
+	  /*AM_DBG*/ lib::logger::get_logger()->debug("ncl_listener::updateStatus(code=%d, parameter=%s, type=%d, value=%s,) event received",code, parameter.c_str(), type, value.c_str());
+		// test if state was specified in .smil source
+  		if (m_state != NULL) {
+			// test if "var_name" is specified as a state variable
+			if (m_state->bool_expression (parameter.c_str())) {
+				string old_value = m_state->string_expression(parameter.c_str());
+				if (old_value != value) {
+					m_state->set_value (parameter.c_str(), value.c_str());
+					if ( ! m_wanted) m_state->want_state_change(parameter.c_str(), this); //X
+					m_wanted = true;
+				}
+			}
+		}
+	}
 }
 
 static ambulant::common::factories *
