@@ -31,7 +31,6 @@
     <port id="yellow" component="yellowMed"/>
     <port id="infoOut" component="yellowMed" interface="info"/>
 
-    <media id="backgdMed" descriptor="backgdDsc"/>
     <media id="yellowMed" descriptor="yellowDesc">
     	<property name="info"/>
     </media>
