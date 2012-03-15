@@ -16,8 +16,8 @@ TRYMIRROR=True
 #   python build-third-party-packages.py -m
 # in the directory on the server.
 MIRRORBASE="http://www.ambulantplayer.org/thirdpartymirror/2.3/"
-MIRRORDATE="20110522"
-LIVEMIRRORDATE="2012.02.29"
+LIVE_MIRRORDATE="2012.02.29"
+SDL_MIRRORDATE="20120306"
 
 #
 # Path names for Windows programs and such
@@ -406,7 +406,7 @@ third_party_packages={
         TPP("SDL",
             url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
 #			url="http://www.ambulantplayer.org/thirdpartymirror/2.3/SDL-1.3-20110522.tar.gz",
-            url2="SDL-1.3-%s.tar.gz"%MIRRORDATE,
+            url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
             checkcmd="pkg-config --atleast-version=1.3.0 sdl",
             buildcmd=
                 "cd SDL-1.3.0-* && "
@@ -418,11 +418,11 @@ third_party_packages={
             ),
         TPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             checkcmd="test -f ./live/liveMedia/libliveMedia.a",
             buildcmd=
                 "cd live && "
-                "tar xf %s/third_party_packages/live-osx-fatbuild-patches.tar && "
+                "tar xf %s/third_party_packages/live-patches.tar && "
                 "./genMakefiles macosx3264 && "
                 "make ${MAKEFLAGS} " % AMBULANT_DIR
             ),
@@ -453,9 +453,6 @@ third_party_packages={
             buildcmd="test -d xulrunner-sdk"
             )
         ],
-
-
-
 
     'mac10.4' : [
         TPP("expat", 
@@ -513,11 +510,11 @@ third_party_packages={
             ),
         TPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             checkcmd="test -f ./live/liveMedia/libliveMedia.a",
             buildcmd=
                 "cd live && "
-                "tar xf %s/third_party_packages/live-osx-fatbuild-patches.tar && "
+                "tar xf %s/third_party_packages/live-patches.tar && "
                 "./genMakefiles macosxfat && "
                 "make ${MAKEFLAGS} " % AMBULANT_DIR
             ),
@@ -602,7 +599,7 @@ third_party_packages={
 
         TPP("SDL",
             url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
-            url2="SDL-1.3-%s.tar.gz"%MIRRORDATE,
+            url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
             checkcmd="test -f %s/lib/libSDL.a" % COMMON_INSTALLDIR,
             buildcmd=
                 "cd SDL-1.3.0-*  && "
@@ -616,11 +613,11 @@ third_party_packages={
 
         TPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             checkcmd="test -f ./live/liveMedia/libliveMedia.a",
             buildcmd=
                 "set -x;cd live && "
-                "tar xf %s/third_party_packages/live-iOS-patches.tar && "
+                "tar xf %s/third_party_packages/live-patches.tar && "
                 "./genMakefiles iOS-Device-armv6 && "
                 "make clean;make ${MAKEFLAGS}; for i in `ls */*.a`; do mv $i `dirname $i`/`basename $i .a`-armv6; done &&" 
                  "./genMakefiles iOS-Device-armv7 && "
@@ -691,7 +688,7 @@ third_party_packages={
 
         TPP("SDL",
             url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
-            url2="SDL-1.3-%s.tar.gz"%MIRRORDATE,
+            url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
             checkcmd="test -f %s/lib/libSDL.a" % COMMON_INSTALLDIR,
             buildcmd=
                 "cd SDL-1.3.0-*  && "
@@ -705,11 +702,11 @@ third_party_packages={
 
         TPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             checkcmd="test -f ./live/liveMedia/libliveMedia.a",
             buildcmd=
                 "cd live && "
-                "tar xf %s/third_party_packages/live-iOS-patches.tar && "
+                "tar xf %s/third_party_packages/live-patches.tar && "
                 "./genMakefiles iOS-Simulator && "
                 "make clean;make ${MAKEFLAGS} " % AMBULANT_DIR
             ),
@@ -803,7 +800,7 @@ third_party_packages={
 
         TPP("SDL",
             url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
-            url2="SDL-1.3-%s.tar.gz"%MIRRORDATE,
+            url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
             checkcmd="pkg-config --atleast-version=1.3.0 sdl",
             buildcmd=
                 "cd SDL-1.3.0-* && "
@@ -814,11 +811,11 @@ third_party_packages={
 
         TPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             checkcmd="test -f ./live/liveMedia/libliveMedia.a",
             buildcmd=
                 "cd live && "
-                        "( grep fPIC config.linux >/dev/null || patch -i %s/third_party_packages/live.patch config.linux ) &&"
+                "tar xf %s/third_party_packages/live-patches.tar && "
                 "./genMakefiles linux && "
                 "make ${MAKEFLAGS} " % (AMBULANT_DIR)
             ),
@@ -904,7 +901,7 @@ third_party_packages={
         # NOTE: the double quotes are needed because of weird cmd.exe unquoting
         WinTPP("live",
             url="http://www.live555.com/liveMedia/public/live555-latest.tar.gz",
-            url2="live555-%s.tar.gz"%LIVEMIRRORDATE,
+            url2="live555-%s.tar.gz"%LIVE_MIRRORDATE,
             extractcmd='cmd /c "%s live555-latest.tar.gz && %s live555-latest.tar"' % (WINDOWS_UNTAR, WINDOWS_UNTAR),
             checkcmd="if not exist live\\liveMedia\\COPYING exit 1",
             # Build is done by FINAL
