@@ -99,7 +99,7 @@ class ncl_plugin_factory : public common::playable_factory {
 	common::playable_factory_machdep *m_mdp;
 };
 
-class ncl_plugin : public common::playable_imp, public common::state_change_callback, public IPlayerListener
+class ncl_plugin : public common::renderer_playable, public common::state_change_callback, public IPlayerListener
 {
   public:
   ncl_plugin(
@@ -119,6 +119,10 @@ class ncl_plugin : public common::playable_imp, public common::state_change_call
 	bool stop();
 	void pause(pause_display d=display_show);
 	void resume();
+	// renderer imp.
+	void redraw(const rect&, ambulant::common::gui_window*);
+	void set_intransition(const ambulant::lib::transition_info*) {}
+	void start_outtransition(const ambulant::lib::transition_info*) {}
 	// state_change_callback
 	void on_state_change(const char *ref);
 	// IPlayerListener
@@ -140,10 +144,12 @@ class ncl_plugin : public common::playable_imp, public common::state_change_call
 	IPresentationEngineManager* m_pem;
 	char** m_argv;
 	int m_argc;
-	int m_x_winid;
+	long int m_x_winid;
  
 	// ambulant-ncl event processor handling
+	GtkWidget* m_ambulant_window;
 	GdkWindow* m_toplevel_window;
+/*JNK
 	lib::event* m_update_event;
 	void _schedule_callback(double when, void (ncl_plugin::*fun_addr)());
 	void _update(void); 
@@ -155,6 +161,7 @@ class ncl_plugin : public common::playable_imp, public common::state_change_call
 #define AM_NCL_UPDATE_DELAY_MS 2000.0
 #define AM_NCL_SIGNAL_INIT "ncl-plugin-init"
 #define AM_NCL_SIGNAL_UPDATE "ncl-plugin-update"
+*/
 };
 
 bool
@@ -239,26 +246,23 @@ ncl_plugin::ncl_plugin(
 	lib::event_processor *evp,
 	common::factories* factory,
 	common::playable_factory_machdep *mdp)
-  :	m_pem(NULL),
-	m_running(false),
+  :	m_node(node),
 	m_state(NULL),
-	m_node(node),
+	m_pem(NULL),
 	m_cm(NULL),
 	m_dm(NULL),
-	m_update_event(NULL),
+	m_ambulant_window(NULL),
 	m_toplevel_window(NULL),
-	m_signal_init(0),
-	m_signal_update(0),
-	common::playable_imp(context, cookie, node, evp, factory, mdp), m_mdp(mdp)
+	common::renderer_playable(context, cookie, node, evp, factory, mdp), m_mdp(mdp)
 {
 	// select xine audio, because the default (FusionSound) sounds ugly)
 	static char* s_argv[] = {
-			(char*) "--asystem", (char*) "SDL2_ffmpeg",
-			(char*) "--enable-log", (char*) "stdout",
+//			(char*) "--asystem", (char*) "SDL2_ffmpeg",
+//			(char*) "--enable-log", (char*) "stdout",
 			(char*) "--vsystem", (char*) "sdl",
-			(char*) "--external-renderer",
-//			(char*) "--embed",
-			(char*) NULL // --embed must be last one
+//			(char*) "--external-renderer",
+			(char*) "--parent",
+			(char*) NULL // --parent must be last one
 	};
 	static int s_argc = sizeof s_argv/sizeof s_argv[0];
 	m_argv = s_argv;
@@ -268,7 +272,10 @@ ncl_plugin::ncl_plugin(
 	m_file = m_url.get_path().c_str();
 	// rest of initialization needs to be done in main thread, because X11 is called
 	gtk_mainloop* ml = (gtk_mainloop*) m_mdp;
-	m_toplevel_window = gtk_widget_get_parent_window(ml->get_document_widget());
+	m_ambulant_window = ml->get_document_widget();
+	m_toplevel_window = gtk_widget_get_parent_window(m_ambulant_window);
+//	ncl_init();
+/*JNK
 	if (m_signal_init == 0) {
 		m_signal_init = g_signal_new (AM_NCL_SIGNAL_INIT, g_object_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__POINTER, GTK_TYPE_NONE, 1, G_TYPE_POINTER);
 	}
@@ -278,6 +285,7 @@ ncl_plugin::ncl_plugin(
 	m_handler_id_init = g_signal_connect_swapped (G_OBJECT(m_toplevel_window), AM_NCL_SIGNAL_INIT, G_CALLBACK (gtk_C_callback_init), (gpointer) this );
 	m_handler_id_update = g_signal_connect_swapped (G_OBJECT(m_toplevel_window), AM_NCL_SIGNAL_UPDATE, G_CALLBACK (gtk_C_callback_update), (gpointer) this );
 	g_signal_emit_by_name(G_OBJECT(m_toplevel_window), AM_NCL_SIGNAL_INIT, 0, (gpointer) this);
+*/
 }
 
 ncl_plugin::~ncl_plugin() {
@@ -286,18 +294,27 @@ ncl_plugin::~ncl_plugin() {
 		stop();
 		delete m_pem;
 	}
+/*JNK
 	if (m_update_event != NULL) {
 		// remove all references from event queue
 		m_running = false;
 		while (m_event_processor->cancel_event(m_update_event, lib::ep_med));
 		delete m_update_event;
 	}
+JNK*/
+
 	if (m_dm != NULL) {
 //		delete m_dm; // static object, leak !
 	}
 	if (m_cm != NULL) {
 //		delete m_cm; // static object, leak !
 	}
+//	if (m_argv != NULL && m_argc >= 1) {
+//		char* p = m_argv[m_argc-1];
+//		if (p != NULL) {
+//			free(p);
+//		}
+//	}
 }
 
 void 
@@ -305,18 +322,28 @@ ncl_plugin::ncl_init() {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x): ", (void*)  this);
 	// disconnect from the signal that brought us here
 	// g_signal_handler_disconnect(G_OBJECT(m_toplevel_window), m_handler_id_init);
-	// For Ginga-SDL, we need to pass the X11 Window Id of the toplevel window,
-	// because it has a non-empty title
-	m_x_winid =  GDK_WINDOW_XID (m_toplevel_window);
+	// For Ginga-SDL, we need to pass the X11 Window Id of the first child of the toplevel window
+	Window* children; //JNK following
+	unsigned int n_children;
+	Window root;
+	Window parent;
+	XWindowAttributes attr;
+	XQueryTree(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID (m_toplevel_window), &root, &parent, &children, &n_children);
+	m_x_winid = GDK_WINDOW_XID (m_toplevel_window);// NOT JNK
+	XGetWindowAttributes(gdk_x11_get_default_xdisplay(), (Window) m_x_winid, &attr); //JNK until here
 	m_cm  = IComponentManager::getCMInstance();
 	setLogToNullDev();
 	m_dm = ((LocalScreenManagerCreator*)(m_cm->getObject("LocalScreenManager")))();
-	setLogToStdoutDev();
 //	char x_win_str[80];
 //	sprintf(x_win_str, "%ld", x_winid);
-	std::string x_win_string = ultostr(m_x_winid);
-	m_argv[m_argc-1] = (char*)x_win_string.c_str();
+	char buf[256];
+	lib::rect r = m_dest->get_rect();
+	r.translate(m_dest->get_global_topleft());
+	sprintf(buf,"%s,%ld,%d,%d,%d,%d", XDisplayName(NULL), m_x_winid, r.left(),r.top(),r.width(),r.height());
+	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x): %s,%ld,%d,%d,%d,%d", (void*)this, XDisplayName(NULL), m_x_winid, r.left(),r.top(),r.width(),r.height());
+	m_argv[m_argc-1] = strdup(buf);
 	unsigned long int x = strtoul(m_argv[m_argc-1], NULL, 10);
+
 	m_screenId = m_dm->createScreen(m_argc, m_argv);
 	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false, m_screenId);
 	m_pem->setIsLocalNcl(false, NULL);
@@ -335,9 +362,11 @@ ncl_plugin::ncl_init() {
 				m_state->want_state_change(it->c_str(), this);
 			}
 		}
+//JNK		start(0.0);
 		AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x) : m_pem(0x%x)->startPresentation(%s)", (void*)this, m_file);
-		_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
+//JNK		_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
 	}
+	setLogToStdoutDev();
 }
 
 void
@@ -350,11 +379,17 @@ void
 ncl_plugin::start(double t)
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::start(0x%x): t=%f", (void*) this, t);
-	if (m_pem != NULL) {
-		m_pem->startPresentation(m_file, "");
-		m_running = true;
-		_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
+	if (m_pem == NULL) {
+		ncl_init();
 	}
+//	renderer_playable* base = this;
+//	base->start(t);
+	m_pem->startPresentation(m_file, "");
+	m_dest->show(this);
+	m_dest->need_redraw(m_dest->get_rect());
+	m_context->started(m_cookie);
+//JNK	m_running = true;
+//JNK	_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
 }
 
 bool
@@ -362,8 +397,8 @@ ncl_plugin::stop()
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::stop(0x%x): ", (void*) this);
 	if (m_pem != NULL) {
-		m_running = false;
 		m_pem->stopPresentation(m_file);
+		m_context->stopped(m_cookie);
 	}
 	return true;
 }
@@ -400,6 +435,14 @@ ncl_plugin::on_state_change(const char *ref)
 	}
 }
 
+void 
+ncl_plugin::redraw(const rect& r, ambulant::common::gui_window* window) {
+	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::redraw(0x%x) LTWH=(%d,%d, %d,%d), window=0x%x", this, r.left(),r.top(),r.width(),r.height(), window);
+//	if (m_dm != NULL) {
+//		m_dm->refreshScreen(m_screenId); // for --external-renderer
+//	}
+}
+
 void
 ncl_plugin::updateStatus(short code, string parameter, short type, string value) {
 	if (code == IPlayer::PL_NOTIFY_STOP && type == IPlayer::TYPE_ATTRIBUTION) {
@@ -416,6 +459,8 @@ ncl_plugin::updateStatus(short code, string parameter, short type, string value)
 		}
 	}
 }
+
+/*JNK
 typedef lib::no_arg_callback<ncl_plugin> update_callback;
   
 void
@@ -449,6 +494,7 @@ ncl_plugin::ncl_update() {
 		this->_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
 	}
 }
+JNK*/
 
 static ambulant::common::factories *
 bug_workaround(ambulant::common::factories* factory)
