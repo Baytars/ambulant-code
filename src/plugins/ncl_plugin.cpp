@@ -249,7 +249,7 @@ ncl_plugin::ncl_plugin(
 //			(char*) "--asystem", (char*) "SDL2_ffmpeg",
 //			(char*) "--enable-log", (char*) "stdout",
 			(char*) "--vsystem", (char*) "sdl",
-//	(char*) "--external-renderer",
+//			(char*) "--external-renderer",
 			(char*) "--parent",
 			(char*) NULL // --parent must be last one
 	};
