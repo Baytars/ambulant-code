@@ -149,19 +149,6 @@ class ncl_plugin : public common::renderer_playable, public common::state_change
 	// ambulant-ncl event processor handling
 	GtkWidget* m_ambulant_window;
 	GdkWindow* m_toplevel_window;
-/*JNK
-	lib::event* m_update_event;
-	void _schedule_callback(double when, void (ncl_plugin::*fun_addr)());
-	void _update(void); 
-	bool m_running;
-	guint m_signal_init;
-	guint m_signal_update;
-	gulong m_handler_id_init;
-	gulong m_handler_id_update;
-#define AM_NCL_UPDATE_DELAY_MS 2000.0
-#define AM_NCL_SIGNAL_INIT "ncl-plugin-init"
-#define AM_NCL_SIGNAL_UPDATE "ncl-plugin-update"
-*/
 };
 
 bool
@@ -189,12 +176,13 @@ ncl_plugin_factory::new_playable(
 		rv = new ncl_plugin(context, cookie, node, evp, m_factory, m_mdp);
 		AM_DBG lib::logger::get_logger()->debug("ncl_plugin_factory::new_playable(0x%x): node 0x%x: returning ncl_plugin 0x%x", (void*)this, (void *)node, (void *)rv);
 	} else {
-	  AM_DBG lib::logger::get_logger()->debug("ncl_plugin_factory::new_playable(0x%x) : plugin does not support \"%s\"", (void*)this, tag.c_str());
+		AM_DBG lib::logger::get_logger()->debug("ncl_plugin_factory::new_playable(0x%x) : plugin does not support \"%s\"", (void*)this, tag.c_str());
 		return NULL;
 	}
 	return rv;
 }
 
+#ifdef	JNK
 string ultostr(Window vValue) {
 	unsigned long int value;
 	string strValue;
@@ -238,6 +226,7 @@ void gtk_C_callback_update(void *userdata)
 	((ncl_plugin*) userdata)->ncl_update();
 }
 };
+#endif//JNK
 
 ncl_plugin::ncl_plugin(
 	common::playable_notification *context,
@@ -260,7 +249,7 @@ ncl_plugin::ncl_plugin(
 //			(char*) "--asystem", (char*) "SDL2_ffmpeg",
 //			(char*) "--enable-log", (char*) "stdout",
 			(char*) "--vsystem", (char*) "sdl",
-//			(char*) "--external-renderer",
+//	(char*) "--external-renderer",
 			(char*) "--parent",
 			(char*) NULL // --parent must be last one
 	};
@@ -274,8 +263,8 @@ ncl_plugin::ncl_plugin(
 	gtk_mainloop* ml = (gtk_mainloop*) m_mdp;
 	m_ambulant_window = ml->get_document_widget();
 	m_toplevel_window = gtk_widget_get_parent_window(m_ambulant_window);
-//	ncl_init();
 /*JNK
+//	ncl_init();
 	if (m_signal_init == 0) {
 		m_signal_init = g_signal_new (AM_NCL_SIGNAL_INIT, g_object_get_type(), G_SIGNAL_RUN_LAST, 0, 0, 0, g_cclosure_marshal_VOID__POINTER, GTK_TYPE_NONE, 1, G_TYPE_POINTER);
 	}
@@ -334,8 +323,6 @@ ncl_plugin::ncl_init() {
 	m_cm  = IComponentManager::getCMInstance();
 	setLogToNullDev();
 	m_dm = ((LocalScreenManagerCreator*)(m_cm->getObject("LocalScreenManager")))();
-//	char x_win_str[80];
-//	sprintf(x_win_str, "%ld", x_winid);
 	char buf[256];
 	lib::rect r = m_dest->get_rect();
 	r.translate(m_dest->get_global_topleft());
@@ -362,9 +349,7 @@ ncl_plugin::ncl_init() {
 				m_state->want_state_change(it->c_str(), this);
 			}
 		}
-//JNK		start(0.0);
-		AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x) : m_pem(0x%x)->startPresentation(%s)", (void*)this, m_file);
-//JNK		_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
+		AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x) : m_pem(0x%x)->startPresentation(%s)", (void*)this, m_pem, m_file);
 	}
 	setLogToStdoutDev();
 }
@@ -402,7 +387,6 @@ ncl_plugin::stop()
 	}
 	return true;
 }
-
 void
 ncl_plugin::pause(pause_display d)
 {
@@ -426,12 +410,10 @@ ncl_plugin::on_state_change(const char *ref)
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::on_state_change(%s)", ref);
 	if (m_state != NULL) {
-//		if (m_state->bool_expression (ref)) {
-			std::string value = m_state->string_expression(ref);
-			AM_DBG lib::logger::get_logger()->debug("ncl_plugin::on_state_change(%s) value=%s", ref, value.c_str());
-			m_pem->setPropertyValue(m_file, ref, value);
+		std::string value = m_state->string_expression(ref);
+		AM_DBG lib::logger::get_logger()->debug("ncl_plugin::on_state_change(%s) value=%s", ref, value.c_str());
+		m_pem->setPropertyValue(m_file, ref, value);
 
-//		}
 	}
 }
 
@@ -449,52 +431,14 @@ ncl_plugin::updateStatus(short code, string parameter, short type, string value)
 	  /*AM_DBG*/ lib::logger::get_logger()->debug("ncl_plugin::updateStatus(0x%x) code=%d, parameter=%s, type=%d, value=%s: event received",(void*) this, code, parameter.c_str(), type, value.c_str());
 		// test if state was specified in .smil source
   		if (m_state != NULL) {
-			// test if "var_name" is specified as a state variable
-//			if (m_state->bool_expression (parameter.c_str())) {
-				string old_value = m_state->string_expression(parameter.c_str());
-				if (old_value != value) {
-					m_state->set_value (parameter.c_str(), value.c_str());
-				}
-//			}
+			// test if  state variable "var_name" has changed
+			string old_value = m_state->string_expression(parameter.c_str());
+			if (old_value != value) {
+				m_state->set_value (parameter.c_str(), value.c_str());
+			}
 		}
 	}
 }
-
-/*JNK
-typedef lib::no_arg_callback<ncl_plugin> update_callback;
-  
-void
-ncl_plugin::_schedule_callback(double when, void (ncl_plugin::* fun_addr)()) {
-  AM_DBG lib::logger::get_logger()->debug("ncl_plugin::_schedule_callback(0x%x) when=%f", (void*) this, when);
-	if (m_update_event == NULL) {
-		m_update_event = new update_callback(this, fun_addr);
-	}
-	if (m_running) {
-		m_event_processor->add_event(m_update_event, when, lib::ep_med);
-		m_update_event = NULL;
-	}
-}
-
-void
-ncl_plugin::_update() {
-	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::_update(0x%x) m_running=%d, m_dm=0x%x, m_screenId=0x%x ", (void*) this, m_running, m_dm, m_screenId);
-	if (this != NULL && m_running && m_toplevel_window != NULL) {
-		if (m_running) { // do the actual update in main thread
-//			g_signal_connect_swapped (G_OBJECT(m_toplevel_window), AM_NCL_SIGNAL_NAME, G_CALLBACK (gtk_C_callback_update), (gpointer) this );
-			g_signal_emit_by_name(G_OBJECT(m_toplevel_window), AM_NCL_SIGNAL_UPDATE, 0, (gpointer) this);
-		}	
-	}
-}
-
-void
-ncl_plugin::ncl_update() {
-	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_update(0x%x) m_running=%d, m_dm=0x%x, m_screenId=0x%x ", (void*) this, m_running, m_dm, m_screenId);
-	if (this != NULL && m_running && m_dm != NULL) {
-		m_dm->refreshScreen(m_screenId);
-		this->_schedule_callback(AM_NCL_UPDATE_DELAY_MS, &ncl_plugin::_update);
-	}
-}
-JNK*/
 
 static ambulant::common::factories *
 bug_workaround(ambulant::common::factories* factory)
@@ -523,7 +467,7 @@ void initialize(
 	common::global_playable_factory *pf = factory->get_playable_factory();
 	if (pf) {
 		ncl_plugin_factory *bpf = new ncl_plugin_factory(factory,(playable_factory_machdep*) player);
-	pf->add_factory(bpf);
+		pf->add_factory(bpf);
 		lib::logger::get_logger()->trace("ncl_plugin: registered");
 	}
 }
