@@ -95,7 +95,6 @@ gtk_logger::gtk_logger()
 	int level = prefs->m_log_level;
 	logger->set_level(level);
 	logger->set_ostream(new gtk_logger_ostream);
-
 	// create the GUI object
 	m_logger_window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
 	gtk_window_set_title (m_logger_window, "Ambulant-logger");

@@ -12,7 +12,7 @@
     </layout>
   </head>
   <body>
-    <ref xml:id="media-01" src="./yellowRegClick.ncl" region="screen" >
+    <ref xml:id="media-01" src="./yellowRegClick.ncl" region="screen" begin="5" >
       <param name="renderer" value="http://www.ambulantplayer.org/component/RendererNCLPlugin"/>
     </ref>
   </body>

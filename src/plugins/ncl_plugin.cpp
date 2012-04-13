@@ -317,9 +317,10 @@ ncl_plugin::ncl_init() {
 	Window root;
 	Window parent;
 	XWindowAttributes attr;
-	XQueryTree(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID (m_toplevel_window), &root, &parent, &children, &n_children);
+
+//JNK   XQueryTree(gdk_x11_get_default_xdisplay(), GDK_WINDOW_XID (m_toplevel_window), &root, &parent, &children, &n_children);
+//JNK	XGetWindowAttributes(gdk_x11_get_default_xdisplay(), (Window) m_x_winid, &attr); //JNK until here
 	m_x_winid = GDK_WINDOW_XID (m_toplevel_window);// NOT JNK
-	XGetWindowAttributes(gdk_x11_get_default_xdisplay(), (Window) m_x_winid, &attr); //JNK until here
 	m_cm  = IComponentManager::getCMInstance();
 	setLogToNullDev();
 	m_dm = ((LocalScreenManagerCreator*)(m_cm->getObject("LocalScreenManager")))();
