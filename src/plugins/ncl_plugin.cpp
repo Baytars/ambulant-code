@@ -327,6 +327,7 @@ ncl_plugin::ncl_init() {
 	char buf[256];
 	lib::rect r = m_dest->get_rect();
 	r.translate(m_dest->get_global_topleft());
+	r.translate(lib::point(0,25)); // XXXX compensate for menu bar
 	sprintf(buf,"%s,%ld,%d,%d,%d,%d", XDisplayName(NULL), m_x_winid, r.left(),r.top(),r.width(),r.height());
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x): %s,%ld,%d,%d,%d,%d", (void*)this, XDisplayName(NULL), m_x_winid, r.left(),r.top(),r.width(),r.height());
 	m_argv[m_argc-1] = strdup(buf);
