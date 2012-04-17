@@ -122,6 +122,7 @@ gtk_mainloop::~gtk_mainloop()
 //	delete m_gui_screen;
 	// We need to delete gui_player::m_player before deleting m_doc, because the
 	// timenode graph in the player has referrences to the node graph in m_doc.
+	set_embedder(NULL);
 	if (m_player) {
 		m_player->terminate();
 		m_player->release();
