@@ -29,14 +29,14 @@
       <ref xml:id="media-01" begin="100ms" src="./yellowRegClickInOut.ncl" region="screen_ncl" >
        <param name="renderer" value="http://www.ambulantplayer.org/component/RendererNCLPlugin"/>
       </ref>
-      <img src="data/ambulant.png" region="screen" begin="state.stateChanged(infoOutPrt)" dur="8" top="0%" left="0%" >
-	<area xml:id="browse" href="http://www.ambulantplayer.org" external="true" show="new">
-	</area>
-      </img>
+      <img xml:id="img-ambulant" src="data/ambulant.png" region="screen" begin="state.stateChanged(infoOutPrt)" dur="8" top="0%" left="0%" />
       <setvalue ref="infoInPrt" value="'AmbulantString'" begin="browse.activateEvent" dur="1" />
       <seq begin="state.stateChanged(infoOutPrt)" >
 	<audio src="data/AmbulantTune.mp3" dur="8" />
-	<img src="data/visit.png" dur="5" region="screen_smil" />
+	<img xml:id="img-visit" src="data/visit.png" dur="5" region="screen_smil" >
+	  <area xml:id="browse" href="http://www.ambulantplayer.org" external="true" show="new">
+	  </area>
+        </img>
       </seq>
     </par>
   </body>
