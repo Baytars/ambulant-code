@@ -1,6 +1,6 @@
 EXTRA_DIST=plugin.cpp plugin_ffmpeg.cpp pyamplugin_state pythonplugin.cpp \
     wkdombridge.h wkdombridge.m wkdombridge.mm wkdomplugin.cpp \
-    xercesplugin.cpp xpath_stateplugin.cpp
+    xercesplugin.cpp xpath_stateplugin.cpp ncl_plugin.cpp
     
 ambulantlibdir=$(top_builddir)/src/libambulant/.libs
 if WITH_AMBULANT_SHARED_LIB
@@ -82,6 +82,28 @@ python_plugin=
 python_include=
 endif
 
+# The NCL plugin. only build when asked to build
+
+if WITH_NCL_PLUGIN
+ncl_plugin = libamplugin_ncl.la
+libamplugin_ncl_la_SOURCES = ncl_plugin.cpp
+libamplugin_ncl_la_LDFLAGS = -module -L$(prefix)/lib/ginga  -L/usr/lib/i386-linux-gnu
+libamplugin_ncl_la_LIBADD = $(libambulant_core) \
+                          -lgingaccsystem \
+			  -lGL	
+
+else
+ncl_plugin=
+endif
+
+if WITH_GTK
+gtk_libs=$(GTK_LIBS)
+gtk_includes=$(GTK_CFLAGS)
+else
+gtk_libs=
+gtk_includes=
+endif # WITH_GTK
+
 # Now tie it all together.
 # XXXX Need to set install directory
 
@@ -92,9 +114,12 @@ pkglib_LTLIBRARIES = \
     $(dummy_state_plugin) \
     $(xpath_state_plugin) \
     $(wkdom_plugin) \
-    $(python_plugin)
+    $(python_plugin) \
+    $(ncl_plugin)
 
 AM_CPPFLAGS = -I$(top_builddir)/include -I$(top_srcdir)/include \
-	 $(xerces_includes) $(python_includes) \
+	 $(xerces_includes) \
+	 $(gtk_includes) \
+	 $(python_includes) \
 	 $(xpath_state_includes)
 
