@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+     yellowRegClickInOut-ncl.smil: simple example that renders a yellow rectangle
+     on a gray background in as specified in yellowClickInOut.ncl; when the yellow region is
+     clicked, a string is presented on the NCL port 'infoOutPrt', picked up by the
+     ncl_plugin, and used to change the value of the Smil-State variable of the same name,
+     causing a stateChanged event so that both a (smil) image is shown and the audio is played
+     When the latter image is clicked, the value of the Smil-State variable infoInPrt is put
+     on the NCL port of the same name, causing the example to be repeated by putting again
+     a string on the NCL port 'infoOutPrt'
+-->
+<smil version="3.0" xmlns="http://www.w3.org/ns/SMIL">
+  <head>
+    <layout>
+      <root-layout width="640" height="480" backgroundColor="black"/>
+      <region xml:id="screen_smil" left="0%" top="0" width="50%" height="100%" backgroundColor="gray"/>
+      <region xml:id="screen_ncl" left="50%" top="0" width="50%" height="100%" backgroundColor="gray"/>
+    </layout>
+    <state xml:id="state">
+      <data>
+	<infoInPrt>"'empty'"</infoInPrt>
+	<infoOutPrt>"'empty'"</infoOutPrt>
+      </data>
+    </state>
+
+  </head>
+  <body>
+    <par dur="3600" >
+      <ref xml:id="media-01" begin="100ms" src="./yellowRegClickInOut.ncl" region="screen_ncl" >
+       <param name="renderer" value="http://www.ambulantplayer.org/component/RendererNCLPlugin"/>
+      </ref>
+      <img xml:id="img-ambulant" src="data/ambulant.png" region="screen" begin="state.stateChanged(infoOutPrt)" dur="8" top="0%" left="0%" />
+      <setvalue ref="infoInPrt" value="'AmbulantString'" begin="browse.activateEvent" dur="1" />
+      <seq begin="state.stateChanged(infoOutPrt)" >
+	<audio src="data/AmbulantTune.mp3" dur="8" />
+	<img xml:id="img-visit" src="data/visit.png" dur="5" region="screen_smil" >
+	  <area xml:id="browse" href="http://www.ambulantplayer.org" external="true" show="new">
+	  </area>
+        </img>
+      </seq>
+    </par>
+  </body>
+</smil>
