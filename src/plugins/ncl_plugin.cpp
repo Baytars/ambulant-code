@@ -41,7 +41,7 @@
 #define WITH_GTK
 #ifdef  WITH_GTK
 #include "ambulant/gui/gtk/gtk_factory.h"
-#include "../src/player_gtk/gtk_mainloop.h"
+#include "gtk_mainloop.h"
 #include <gdk/gdkx.h>
 #include <GL/glx.h>
 #endif//WITH_GTK
@@ -128,7 +128,7 @@ class ncl_plugin : public common::renderer_playable, public common::state_change
 	// IPlayerListener
 	void updateStatus(short code, string parameter, short type, string value);
 	// callback: initialize/update Ginga in main thread since X11 is involved
-	void ncl_init();
+	bool ncl_init();
 	void ncl_update();
   private:
 	net::url m_url;
@@ -306,7 +306,7 @@ JNK*/
 //	}
 }
 
-void 
+bool
 ncl_plugin::ncl_init() {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::ncl_init(0x%x): ", (void*)  this);
 	// disconnect from the signal that brought us here
@@ -336,6 +336,12 @@ ncl_plugin::ncl_init() {
 	m_screenId = m_dm->createScreen(m_argc, m_argv);
 	m_pem = ((PEMCreator*)(m_cm->getObject("PresentationEngineManager")))(0, 0, 0, 0, 0, false, m_screenId);
 	m_pem->setIsLocalNcl(false, NULL);
+	FILE* file;
+	if ((file = fopen(m_file,"r")) != NULL) {
+		fclose(file);
+	} else {
+		return false; //XXXX error msg
+	}
 	if (m_pem->openNclFile(m_file)) {
 		m_pem->addPlayerListener(m_file, this);
 		m_pem->startPresentation(m_file, "");
@@ -366,8 +372,8 @@ void
 ncl_plugin::start(double t)
 {
 	AM_DBG lib::logger::get_logger()->debug("ncl_plugin::start(0x%x): t=%f", (void*) this, t);
-	if (m_pem == NULL) {
-		ncl_init();
+	if (m_pem == NULL && ! ncl_init()) {
+		return;
 	}
 //	renderer_playable* base = this;
 //	base->start(t);
