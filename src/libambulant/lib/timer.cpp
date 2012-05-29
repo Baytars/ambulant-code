@@ -27,6 +27,7 @@
 
 #include "ambulant/lib/logger.h"
 #include <cmath>
+#include <cassert>
 
 #ifndef AM_DBG
 #define AM_DBG if(0)
@@ -45,6 +46,9 @@ lib::timer_control_impl::timer_control_impl(lib::timer* parent, double speed /* 
 	m_speed(speed),
 	m_running(run),
 	m_drift(0)
+#ifdef WITH_REMOTE_SYNC
+    , m_observer(NULL)
+#endif
 {
 	AM_DBG lib::logger::get_logger()->debug("lib::timer_control_impl(0x%x), parent=0x%x", this, parent);
 }
@@ -106,6 +110,10 @@ lib::timer_control_impl::_start(time_type t) {
 	m_parent_epoch = m_parent->elapsed();
 	m_local_epoch = t;
 	m_running = true;
+#ifdef WITH_REMOTE_SYNC
+	if (m_observer) m_observer->started();
+#endif
+
 }
 
 void
@@ -119,6 +127,9 @@ void
 lib::timer_control_impl::_stop() {
 	m_local_epoch = 0;
 	m_running = false;
+#ifdef WITH_REMOTE_SYNC
+	if (m_observer) m_observer->stopped();
+#endif
 }
 
 void
@@ -132,6 +143,9 @@ lib::timer_control_impl::_pause() {
 	if(m_running) {
 		m_local_epoch += _apply_speed_manip(m_parent->elapsed() - m_parent_epoch);
 		m_running = false;
+#ifdef WITH_REMOTE_SYNC
+		if (m_observer) m_observer->paused();
+#endif
 	}
 }
 
@@ -147,6 +161,9 @@ lib::timer_control_impl::_resume() {
 	if(!m_running) {
 		m_parent_epoch = m_parent->elapsed();
 		m_running = true;
+#ifdef WITH_REMOTE_SYNC
+		if (m_observer) m_observer->resumed();
+#endif
 	}
 }
 
@@ -228,3 +245,14 @@ lib::timer_control_impl::skew(signed_time_type skew_) {
 	}
 	m_lock.leave();
 }
+
+#ifdef WITH_REMOTE_SYNC
+void
+lib::timer_control_impl::set_observer(timer_observer *obs) {
+	if (obs) {
+		assert(m_observer == NULL);
+	}
+	m_observer = obs;
+}
+
+#endif
