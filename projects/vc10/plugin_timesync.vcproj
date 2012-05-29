@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="plugin"
-	ProjectGUID="{D2E0FB0F-6190-4A38-BAFF-3FC75104D568}"
+	Name="plugin_timesync"
+	ProjectGUID="{fd0fadf1-b9fb-4c68-98c5-00cd1aa043d63}"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -63,16 +63,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../../bin/win32/libampluginD_plugin.dll"
+				OutputFile="../../bin/win32/libampluginD_timesync.dll"
 				LinkIncremental="0"
 				IgnoreDefaultLibraryNames="LIBC.lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/plugin.pdb"
+				ProgramDatabaseFile="$(OutDir)/plugin_timesync.pdb"
 				GenerateMapFile="true"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/plugin.lib"
+				ImportLibrary="$(OutDir)/plugin_timesync.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -142,7 +142,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="../../bin/win32/libamplugin_plugin.dll"
+				OutputFile="../../bin/win32/libamplugin_timesync.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -150,7 +150,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/plugin.lib"
+				ImportLibrary="$(OutDir)/plugin_timesync.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -220,7 +220,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				OutputFile="../../bin/win32/libamplugin_pluginDX.dll"
+				OutputFile="../../bin/win32/libamplugin_timesyncDX.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -228,7 +228,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/plugin.lib"
+				ImportLibrary="$(OutDir)/plugin_timesync.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -301,16 +301,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../../bin/win32/libampluginD_pluginDX.dll"
+				OutputFile="../../bin/win32/libampluginD_timesyncDX.dll"
 				LinkIncremental="0"
 				IgnoreDefaultLibraryNames="LIBC.lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/plugin.pdb"
+				ProgramDatabaseFile="$(OutDir)/plugin_timesync.pdb"
 				GenerateMapFile="true"
 				SubSystem="0"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/plugin.lib"
+				ImportLibrary="$(OutDir)/plugin_timesync.lib"
 				TargetMachine="1"
 			/>
 			<Tool
