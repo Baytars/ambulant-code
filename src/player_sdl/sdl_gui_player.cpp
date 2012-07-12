@@ -17,12 +17,14 @@
 // along with Ambulant Player; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifdef WITH_GSTREAMER
-#include "ambulant/gui/gstreamer/gstreamer_renderer_factory.h"
-#endif
-#ifdef WITH_SDL
+/* 
+ * sdl_gui_player.cpp - SDL2 player for Ambulant
+ *               this code is copied from gtk_mainloop.cpp
+ */
+
+#ifdef WITH_SDL2
 #include "ambulant/gui/SDL/sdl_factory.h"
-#endif
+
 #include "ambulant/lib/document.h"
 #include "ambulant/net/datasource.h"
 #include "ambulant/net/posix_datasource.h"
@@ -34,15 +36,14 @@
 #include "ambulant/net/ffmpeg_factory.h"
 #endif
 #include "ambulant/gui/none/none_factory.h"
-#include "ambulant/gui/gtk/gtk_factory.h"
-#include "ambulant/gui/gtk/gtk_fill.h"
-#ifdef	WITH_GTK_HTML_WIDGET
-#include "ambulant/gui/gtk/gtk_html_renderer.h"
-#endif
-#include "ambulant/gui/gtk/gtk_image_renderer.h"
-#include "ambulant/gui/gtk/gtk_smiltext.h"
-#include "ambulant/gui/gtk/gtk_text_renderer.h"
-#include "ambulant/gui/gtk/gtk_video_renderer.h"
+#include "ambulant/gui/SDL/sdl_factory.h"
+//X #include "ambulant/gui/SDL/sdl_fill.h"
+//X #include "ambulant/gui/SDL/sdl_image_renderer.h"
+//X #include "ambulant/gui/SDL/sdl_smiltext.h"
+//X #include "ambulant/gui/SDL/sdl_text_renderer.h"
+#include "ambulant/gui/SDL/sdl_video.h"
+#include "ambulant/gui/SDL/sdl_window.h"
+#include "ambulant/common/layout.h"
 #include "ambulant/common/plugin_engine.h"
 #include "ambulant/lib/parser_factory.h"
 #ifdef WITH_XERCES_BUILTIN
@@ -52,21 +53,16 @@
 #include "ambulant/net/rtsp_factory.h"
 #endif
 
-//#include "ambulant/lib/expat_parser.h"
-
-
-//#include "ambulant/lib/tree_builder.h"
-
-#include "gtk_mainloop.h"
+#include "sdl_gui.h"
+#include "sdl_gui_player.h"
 
 using namespace ambulant;
-using namespace gui::gtk;
+using namespace gui::sdl;
 
 //#define AM_DBG
 #ifndef AM_DBG
 #define AM_DBG if(0)
 #endif
-
 
 void
 open_web_browser(const std::string &href)
@@ -91,10 +87,11 @@ open_web_browser(const std::string &href)
 	}
 }
 
-gtk_mainloop::gtk_mainloop(gtk_gui* gui)
+sdl_gui_player::sdl_gui_player(sdl_gui* gui)
 :	m_gui(gui),
-	m_running(false),
-	m_gtk_widget(NULL)
+	m_logger(NULL),
+	m_sdl_window(NULL),
+	m_running(false)
 {
 	gui_player();
 	m_logger = lib::logger::get_logger();
@@ -104,21 +101,27 @@ gtk_mainloop::gtk_mainloop(gtk_gui* gui)
 	init_factories();
 	init_plugins();
 
-	const char *filename = "";
+	const char *filename = NULL;
 	if (m_gui) filename = m_gui->filename();
+	if (filename == NULL) {
+        	return; // no argument given
+	}
 	net::url url = net::url::from_filename(filename);
 	m_doc = create_document(url);
 	if (!m_doc) {
 		return;
 	}
+	create_top_window();
 	common::preferences *prefs = common::preferences::get_preferences();
 	m_logger->debug(" creating smil2 player %s", prefs->repr().c_str());
 	m_player = create_player(filename);
+	m_sdl_window->set_evp(m_player->get_evp()); // for timestamps
+	m_sdl_window->get_ambulant_sdl_window()->set_gui_player (this);
 }
 
-gtk_mainloop::~gtk_mainloop()
+sdl_gui_player::~sdl_gui_player()
 {
-	AM_DBG m_logger->debug("gtk_mainloop::~gtk_mainloop() m_player=0x%x", m_player);
+//TBD	AM_DBG m_logger->debug("sdl_gui_player::~sdl_gui_player() m_player=0x%x", m_player);
 //	delete m_gui_screen;
 	// We need to delete gui_player::m_player before deleting m_doc, because the
 	// timenode graph in the player has referrences to the node graph in m_doc.
@@ -134,66 +137,30 @@ gtk_mainloop::~gtk_mainloop()
 		delete m_doc;
 		m_doc = NULL;
 	}
-	delete m_gtk_widget;
+//TBD	delete m_sdl_window;
 	//delete m_window_factory;
 }
 
 void
-gtk_mainloop::init_window_factory()
-{
-	m_gtk_widget = new gtk_ambulant_widget(m_gui->get_document_container());
-	common::window_factory* gtk_wf = create_gtk_window_factory(m_gtk_widget, this);
-	set_window_factory(gtk_wf);
-}
-
-
-void
-gtk_mainloop::init_playable_factory()
-{
-	common::global_playable_factory *pf = common::get_global_playable_factory();
-	set_playable_factory(pf);
-
-	AM_DBG m_logger->debug("gtk_mainloop: adding QGtk playable factories");
-	pf->add_factory(create_gtk_fill_playable_factory(this, NULL));
-#ifdef	WITH_GTK_HTML_WIDGET
-	pf->add_factory(create_gtk_html_playable_factory(this, NULL));
-#endif
-	pf->add_factory(create_gtk_image_playable_factory(this, NULL));
-	pf->add_factory(create_gtk_smiltext_playable_factory(this, NULL));
-	pf->add_factory(create_gtk_text_playable_factory(this, NULL));
-	pf->add_factory(create_gtk_video_playable_factory(this, NULL));
-
-#ifdef WITH_SDL
-	AM_DBG lib::logger::get_logger()->debug("gtk_mainloop: add factory for SDL");
-	pf->add_factory(gui::sdl::create_sdl_playable_factory(this));
-#endif // WITH_SDL
-#ifdef WITH_GSTREAMER
-	AM_DBG logger::get_logger()->debug("add factory for GStreamer");
-	pf->add_factory(gui::gstreamer::create_gstreamer_renderer_factory(this));
-	AM_DBG logger::get_logger()->debug("add factory for GStreamer done");
-#endif
-}
-
-void
-gtk_mainloop::init_datasource_factory()
+sdl_gui_player::init_datasource_factory()
 {
 	net::datasource_factory *df = new net::datasource_factory();
 	set_datasource_factory(df);
 #ifdef WITH_LIVE
-	AM_DBG m_logger->debug("mainloop::mainloop: add live_audio_datasource_factory");
+	AM_DBG m_logger->debug("player::player: add live_audio_datasource_factory");
 	df->add_video_factory(net::create_live_video_datasource_factory());
 	df->add_audio_factory(net::create_live_audio_datasource_factory());
 #endif
 #ifdef WITH_FFMPEG
-	AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_audio_datasource_factory");
+	AM_DBG m_logger->debug("player::player: add ffmpeg_audio_datasource_factory");
 	df->add_audio_factory(net::get_ffmpeg_audio_datasource_factory());
-	AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_decoder_finder");
+	AM_DBG m_logger->debug("sdl_gui_player::sdl_gui_player: add ffmpeg_audio_decoder_finder");
 	df->add_audio_decoder_finder(net::get_ffmpeg_audio_decoder_finder());
-	AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add ffmpeg_audio_filter_finder");
+	AM_DBG m_logger->debug("sdl_gui_player::sdl_gui_player: add ffmpeg_audio_filter_finder");
 	df->add_audio_filter_finder(net::get_ffmpeg_audio_filter_finder());
-	AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_video_datasource_factory");
+	AM_DBG m_logger->debug("player::player: add ffmpeg_video_datasource_factory");
 	df->add_video_factory(net::get_ffmpeg_video_datasource_factory());
-	AM_DBG m_logger->debug("mainloop::mainloop: add ffmpeg_raw_datasource_factory");
+	AM_DBG m_logger->debug("player::player: add ffmpeg_raw_datasource_factory");
 	df->add_raw_factory(net::get_ffmpeg_raw_datasource_factory());
 #endif
 
@@ -203,27 +170,46 @@ gtk_mainloop::init_datasource_factory()
 	// If you define WITH_STDIO_DATASOURCE we prefer to use the stdio datasource,
 	// however.
 
-	AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add stdio_datasource_factory");
+	AM_DBG m_logger->debug("sdl_gui_player::sdl_gui_player: add stdio_datasource_factory");
 	df->add_raw_factory(net::create_stdio_datasource_factory());
 #endif
-	AM_DBG m_logger->debug("gtk_mainloop::gtk_mainloop: add posix_datasource_factory");
+	AM_DBG m_logger->debug("sdl_gui_player::sdl_gui_player: add posix_datasource_factory");
 	df->add_raw_factory(net::create_posix_datasource_factory());
 }
 
+
 void
-gtk_mainloop::init_parser_factory()
+sdl_gui_player::redraw() {
+	if (m_sdl_window != NULL) {
+		ambulant_sdl_window* sdl_window = m_sdl_window->get_ambulant_sdl_window();
+		if (sdl_window != NULL) {
+			sdl_window->redraw(m_rect);
+		}
+	}
+}
+
+void
+sdl_gui_player::init_playable_factory()
 {
-	lib::global_parser_factory *pf = lib::global_parser_factory::get_parser_factory();
-	set_parser_factory(pf);
-#ifdef WITH_XERCES_BUILTIN
-	pf->add_factory(new lib::xerces_factory());
-	AM_DBG m_logger->debug("mainloop::mainloop: add xerces_factory");
-#endif
+	common::global_playable_factory *pf = common::get_global_playable_factory();
+	set_playable_factory(pf);
+
+	AM_DBG m_logger->debug("sdl_gui_player: adding QSdl playable factories");
+//TBD	pf->add_factory(create_sdl_fill_playable_factory(this, NULL));
+//TBD	pf->add_factory(create_sdl_image_playable_factory(this, NULL));
+//TBD	pf->add_factory(create_sdl_smiltext_playable_factory(this, NULL));
+//TBD	pf->add_factory(create_sdl_text_playable_factory(this, NULL));
+//TBD	pf->add_factory(create_sdl_video_playable_factory(this, NULL));
+
+//#ifdef WITH_SDL
+	AM_DBG lib::logger::get_logger()->debug("sdl_gui_player: add factory for SDL");
+	pf->add_factory(gui::sdl::create_sdl_playable_factory(this));
+//#endif // WITH_SDL
 }
 
 
 ambulant::common::player*
-gtk_mainloop::create_player(const char* filename) {
+sdl_gui_player::create_player(const char* filename) {
 	ambulant::common::player* player;
 	player = create_smil2_player(m_doc, this, get_embedder());
 
@@ -233,23 +219,86 @@ gtk_mainloop::create_player(const char* filename) {
 }
 
 void
-gtk_mainloop::show_file(const net::url &url)
+sdl_gui_player::init_window_factory()
+{
+	m_sdl_window = new sdl_ambulant_window(m_gui->get_document_container());
+//JNK	common::window_factory* sdl_wf = create_sdl_window_factory(m_sdl_window, this);
+	common::window_factory* sdl_wf = gui::sdl::create_sdl_window_factory(m_sdl_window, this);
+	set_window_factory(sdl_wf);
+}
+
+void
+sdl_gui_player::create_top_window () {
+	m_size = get_window_factory()->get_default_size();
+	int width = m_size.w;
+	int height = m_size.h;
+	m_origin = lib::point(0,0);
+	m_rect = lib::rect(m_origin, m_size);
+	AM_DBG lib::logger::get_logger()->debug("sdl_gui_player::create_top_window(0x%x): width = %d, height = %d",(void *)this, width, height);
+#ifdef JNK
+	static SDL_Renderer* s_renderer = NULL; //XXXX member !
+	static SDL_Texture* s_texture = NULL; //XXXX member !
+	static SDL_Window* s_window = NULL; //XXXX member, embed  !
+	if (s_texture == NULL) {
+		s_window = SDL_CreateWindow("SDL2 Video_Test", 0,0,width,height,0); //XXXX consider SDL_CreateWindowFrom(XwinID) !
+		assert (s_window);
+		s_renderer = SDL_CreateRenderer(s_window, -1, SDL_RENDERER_ACCELERATED);
+		if (s_renderer == NULL) {
+			AM_DBG lib::logger::get_logger()->trace("sdl_video_renderer.redraw(0x%x): trying software renderer", this);
+			s_renderer = SDL_CreateRenderer(s_window, -1, SDL_RENDERER_SOFTWARE);
+			if (s_renderer == NULL) {
+				lib::logger::get_logger()->warn("Cannot open: %s", "SDL video renderer");
+				return;
+			}
+		}
+		assert(s_renderer);
+		s_texture = SDL_CreateTexture(s_renderer, SDL_PIXELFORMAT, SDL_TEXTUREACCESS_STREAMING, width, height);
+	}
+	assert(s_texture);
+#endif//JNK
+}
+
+void
+sdl_gui_player::init_parser_factory()
+{
+	lib::global_parser_factory *pf = lib::global_parser_factory::get_parser_factory();
+	set_parser_factory(pf);
+#ifdef WITH_XERCES_BUILTIN
+	pf->add_factory(new lib::xerces_factory());
+	AM_DBG m_logger->debug("player::player: add xerces_factory");
+#endif
+}
+
+#ifdef JNK
+
+ambulant::common::player*
+sdl_gui_player::create_player(const char* filename) {
+	ambulant::common::player* player;
+	player = create_smil2_player(m_doc, this, get_embedder());
+
+	player->initialize();
+
+	return player;
+}
+
+void
+sdl_gui_player::show_file(const net::url &url)
 {
 	open_web_browser(url.get_url());
 }
 
 void
-gtk_mainloop::done(common::player *p)
+sdl_gui_player::done(common::player *p)
 {
-	AM_DBG m_logger->debug("gtk_mainloop: implementing: done()");
+	AM_DBG m_logger->debug("sdl_gui_player: implementing: done()");
 	//m_gui->player_done();
 }
 
 bool
-gtk_mainloop::player_done()
+sdl_gui_player::player_done()
   // return true when the last player is done
 {
-	AM_DBG m_logger->debug("gtk_mainloop: implementing: player_done");
+	AM_DBG m_logger->debug("sdl_gui_player: implementing: player_done");
 #if 0
 	if(!m_frames.empty()) {
 		frame *pf = m_frames.top();
@@ -266,16 +315,16 @@ gtk_mainloop::player_done()
 }
 
 void
-gtk_mainloop::close(common::player *p)
+sdl_gui_player::close(common::player *p)
 {
-	AM_DBG m_logger->trace("gtk_mainloop: implementing: close document");
+	AM_DBG m_logger->trace("sdl_gui_player: implementing: close document");
 	stop();
 }
 
 void
-gtk_mainloop::open(net::url newdoc, bool start, common::player *old)
+sdl_gui_player::open(net::url newdoc, bool start, common::player *old)
 {
-	AM_DBG m_logger->trace("gtk_mainloop::open \"%s\"",newdoc.get_url().c_str());
+	AM_DBG m_logger->trace("sdl_gui_player::open \"%s\"",newdoc.get_url().c_str());
 	// Parse the provided URL.
 	m_doc = create_document(newdoc);
 	if(!m_doc) {
@@ -288,12 +337,12 @@ gtk_mainloop::open(net::url newdoc, bool start, common::player *old)
 	msg += start ? "S-" : "	 ";
 	msg += old	 ? "O-" : "	 ";
 	msg += newdoc.get_url();
-	m_gui->internal_message(gtk_logger::CUSTOM_NEW_DOCUMENT,
+	m_gui->internal_message(sdl_logger::CUSTOM_NEW_DOCUMENT,
 				strdup(msg.c_str()));
 }
 
 void
-gtk_mainloop::player_start(gchar* document_name, bool start, bool old)
+sdl_gui_player::player_start(gchar* document_name, bool start, bool old)
 {
 	AM_DBG m_logger->debug("player_start(%s,%d,%d)",document_name,start,old); //m_logger->debug("player_start(%s,%d,%d)",document_name.ascii(),start,old);
 	if (old) {
@@ -325,7 +374,7 @@ gtk_mainloop::player_start(gchar* document_name, bool start, bool old)
 }
 
 /*
-char* gtk_mainloop::convert_data_to_image(const guchar* data, gsize size){
+char* sdl_gui_player::convert_data_to_image(const guchar* data, gsize size){
 	GdkPixbufLoader *loader =  gdk_pixbuf_loader_new ();
 	char* filename = 0;
 	GError *error = NULL;
@@ -348,6 +397,9 @@ char* gtk_mainloop::convert_data_to_image(const guchar* data, gsize size){
 */
 
 ambulant::common::gui_screen*
-gtk_mainloop::get_gui_screen(){
-	return m_gtk_widget;
+sdl_gui_player::get_gui_screen(){
+	return m_sdl_window;
 }
+#endif//JNK
+
+#endif//WITH_SDL2

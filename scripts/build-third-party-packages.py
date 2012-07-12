@@ -790,25 +790,31 @@ third_party_packages={
             ),
 
         TPP("ffmpeg",
-            url="http://ffmpeg.org/releases/ffmpeg-0.6.5.tar.gz",
-            url2="ffmpeg-0.6.5.tar.gz",
-            checkcmd="pkg-config --atleast-version=52.64.2 libavformat",
+            url="http://ffmpeg.org/releases/ffmpeg-0.9.1.tar.gz",
+            url2="ffmpeg-0.9.1.tar.gz",
+            checkcmd="pkg-config --atleast-version=53.24.2 libavformat",
             buildcmd=
-                "cd ffmpeg-0.6.5&& "
-                "%s --enable-gpl --enable-libfaad --enable-shared --disable-bzlib --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
+                "cd ffmpeg-0.9.1&& "
+                "%s  --enable-shared --disable-bzlib --extra-cflags=-I%s/include --extra-ldflags=-L%s/lib&&"
                 "make install " % 
                     (LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
             ),
 
         TPP("SDL",
-            url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
-            url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
-            checkcmd="pkg-config --atleast-version=1.3.0 sdl",
+#           url="http://www.libsdl.org/tmp/SDL-1.3.tar.gz",
+#           url2="SDL-1.3-%s.tar.gz"%SDL_MIRRORDATE,
+            # patch takes care of SDL bug #1513 http://bugzilla.libsdl.org/buglist.cgi?quicksearch=SDL_SetWindowSize
+            checkcmd="pkg-config --atleast-version=2.0.0 sdl2",
             buildcmd=
-                "cd SDL-1.3.0-* && "
-                "%s &&"
+               "if [ ! -e SDL ] ; then hg clone http://hg.libsdl.org/SDL; "
+               "cd SDL && "
+               "patch -p1 < %s/third_party_packages/SDL-bug-1513.patch;" 
+               "fi; mkdir build; cd build &&"
+# Note: SDL 2.0 wants a different build directory, therefore one '.' is preprended
+                ".%s --disable-video-x11-xinput&&"
                 "make ${MAKEFLAGS} && "
-                "make install" % (LINUX_COMMON_CONFIGURE)
+                "make install &&"
+                "cd .." % (AMBULANT_DIR, LINUX_COMMON_CONFIGURE)
             ),
 
         TPP("live",
@@ -953,6 +959,7 @@ third_party_packages={
         ],
     
 }
+third_party_packages['mac10.7'] = third_party_packages['mac10.6']
 
 def checkenv_win32(target):
     ok = True
@@ -994,6 +1001,12 @@ def checkenv_unix(target):
         rv = False
     return rv
     
+def get_mac_build_platform():
+	un = os.uname()
+	if un[0] != 'Darwin': return None
+	major, minor, micro = un[2].split('.')
+	osx_minor = int(major)-4
+	return "mac10.%d" % osx_minor
 
 def checkenv_mac(target):
     rv = True
@@ -1002,9 +1015,17 @@ def checkenv_mac(target):
     if os.system("xcodebuild -version >/dev/null") != 0:
         print "** xcodebuild not in $PATH"
         rv = False
-    # Make sure we have MACOSX_DEPLOYMENT_TARGET set
-    if target != 'mac10.6' and not os.environ.has_key('MACOSX_DEPLOYMENT_TARGET'):
-        print '** MACOSX_DEPLOYMENT_TARGET must be set for %s development' % target
+    # Make sure we have MACOSX_DEPLOYMENT_TARGET set, if needed
+    build_platform = get_mac_build_platform()
+    if target != build_platform and not os.environ.has_key('MACOSX_DEPLOYMENT_TARGET'):
+        print '** MACOSX_DEPLOYMENT_TARGET must be set for %s development on %s' % (target, build_platform)
+        rv = False
+    if target != build_platform and not os.environ.has_key('SDKROOT'):
+        print '** SDKROOT must be set for %s development on %s' % (target, build_platform)
+        rv = False
+    # We need gas-preprocessor, for ffmpeg
+    if os.system("gas-preprocessor.pl 2>&1 | grep Unrecognized >/dev/null") != 0:
+        print '** Need gas-preprocessor.pl on $PATH. See https://github.com/yuvi/gas-preprocessor'
         rv = False
     return rv
 
@@ -1046,6 +1067,7 @@ def checkenv_iphone(target):
     return rv
         
 environment_checkers = {
+    'mac10.7' : checkenv_mac,
     'mac10.6' : checkenv_mac,
     'mac10.4' : checkenv_mac,
     'iOS-Simulator' : checkenv_iphone,
