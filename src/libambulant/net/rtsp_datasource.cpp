@@ -25,7 +25,6 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/common/preferences.h"
 #include "GroupsockHelper.hh"
-#include <cfloat>
 
 ///// Added by Bo Gao begin 2007-11-07
 //AVCodecParserContext * h264parserctx;
@@ -207,9 +206,6 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		return NULL;
 	}
 	context->duration = context->media_session->playEndTime();
-	if (context->duration == 0) {
-		context->duration = DBL_MAX;
-	}
 	context->last_expected_pts = (timestamp_t) (context->duration*1000000); // do not skip last frame
 	AM_DBG lib::logger::get_logger()->debug("rtps_demux::supported: last_expected_pts = %ld", context->last_expected_pts);
 	// next set up the rtp subsessions.
@@ -636,7 +632,9 @@ rtsp_demux::after_reading_audio(size_t sz, unsigned truncated, struct timeval pt
 	m_context->audio_packet = NULL;
 	AM_DBG lib::logger::get_logger()->debug("after reading audio: rpts=%lld, end=%lld\n\n", rpts, m_context->last_expected_pts);
 
-	if (m_context->last_expected_pts >= 0 && rpts >= m_context->last_expected_pts) {
+	// Note by Jack: we use strict greater than zero for last_expected_pts. It seems live streams will have
+	// a duration of zero, and therefore a last_expected_pts of zero.
+	if (m_context->last_expected_pts > 0 && rpts >= m_context->last_expected_pts) {
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: last_pts = %lld\n\n", rpts);
 		m_context->eof = true;
 	}
@@ -790,7 +788,9 @@ done:
 	}
 	
 	AM_DBG lib::logger::get_logger()->debug("after reading video: pts=%lld, end=%lld", m_context->last_pts, m_context->last_expected_pts);
-	if (m_context->last_expected_pts >= 0 && m_context->last_pts >= m_context->last_expected_pts) {
+	// Note by Jack: we use strict greater than zero for last_expected_pts. It seems live streams will have
+	// a duration of zero, and therefore a last_expected_pts of zero.
+	if (m_context->last_expected_pts > 0 && m_context->last_pts >= m_context->last_expected_pts) {
 		lib::logger::get_logger()->debug("after_reading_video: last_pts = %lld", m_context->last_pts);
 		m_context->eof = true;
 	}
