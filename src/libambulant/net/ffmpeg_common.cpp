@@ -161,11 +161,12 @@ ffmpeg_demux::ffmpeg_demux(AVFormatContext *con, timestamp_t clip_begin, timesta
 ffmpeg_demux::~ffmpeg_demux()
 {
 	m_lock.enter();
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::~ffmpeg_demux()");
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::~ffmpeg_demux() before av_close_input_file");
 	if (m_con) {
 		av_close_input_file(m_con);
 		// Implies av_free(m_con);
 	}
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::~ffmpeg_demux() after av_close_input_file");	
 	m_con = NULL;
 	m_lock.leave();
 }
@@ -241,6 +242,8 @@ ffmpeg_demux::supported(const net::url& url)
 void
 ffmpeg_demux::cancel()
 {
+	//xxxbo 2012-02-21
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::cancel()");
 	if (is_running()) stop();
 	release();
 }
@@ -377,7 +380,7 @@ ffmpeg_demux::remove_datasink(int stream_index)
 		ds->push_data(0, 0, 0);
 		ds->release();
 	}
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_demux::remove_datasink(0x%x): stream_index=%d ds=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, ds, m_current_sink, m_nstream);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_demux::remove_datasink(0x%x): stream_index=%d ds=0x%x m_current_sink=0x%x m_nstream=%d", this, stream_index, ds, m_current_sink, m_nstream);
 	if (m_nstream <= 0) cancel();
 }
 

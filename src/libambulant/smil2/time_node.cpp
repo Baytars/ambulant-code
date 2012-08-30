@@ -740,7 +740,7 @@ void time_node::activate(qtime_type timestamp) {
 		
 		//xxxbo 2012-01-10
 		// to improve the concurrent performance by creating threads
-#if 1
+#if 0
 		else if (is_prefetch()) {
 			start_prefetch(sd_offset);
 			assert(m_state->ident() == ts_active);

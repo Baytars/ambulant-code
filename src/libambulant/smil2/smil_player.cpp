@@ -470,7 +470,7 @@ void smil_player::start_transition(const lib::node *n, const lib::transition_inf
 
 // Request to stop the playable of the node.
 void smil_player::stop_playable(const lib::node *n) {
-	AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable(%s)", n->get_sig().c_str());
+	/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::stop_playable(%s)", n->get_sig().c_str());
 	if (n == m_focus) {
 		m_focus = NULL;
 		highlight(n, false);
@@ -538,8 +538,14 @@ void smil_player::stop_playable(const lib::node *n) {
 	if (must_post_stop) {
 		victim.second->post_stop();
 	}
+	//xxxbo 2012-02-16
+	// if this node is not prefetch, then don't cache it to avoid the competing bandwidth with prefetch node
+#if 1
 	if (can_cache) {
-		AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer", victim.first->get_sig().c_str());
+#else
+	if (can_cache && (*m_dom2tn->find(victim.first->get_numid())).second->is_prefetch() ) {	
+#endif //xxxbo 2012-02-16
+		/*AM_DBG*/ lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer", victim.first->get_sig().c_str());
 		m_playables_cs.enter();
 		//xxxbo 2012-01-27
 #ifdef URL_PLUS_CLIP_BEGIN
@@ -565,7 +571,17 @@ void smil_player::stop_playable(const lib::node *n) {
 			// For now, we put the event in the low-priority queue. Kees thinks that this is good enough.
 			// Jack is not sure, but anything that forestalls me diving into this code is a welcome excuse:-)
 			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: schedule destructor in 20ms for %s", victim.first->get_sig().c_str());
+			//xxxbo 2012-01-31
+			// instead of postpone the destroy of playble, destroy it now for booting the http connection for my experiment 
+#if 1
 			m_event_processor->add_event(destroy_event, 20, lib::ep_low);
+#else
+			//xxxbo 2012-02-16
+			// instead add event, detroy it directly to avoid the competing bandwidth with the prefetch node
+			//m_event_processor->add_event(destroy_event, 0, lib::ep_low);
+			//destroy_playable_in_cache(victim);
+#endif
+			//xxxbo end
 		} else {
 			AM_DBG lib::logger::get_logger()->debug("smil_player::stop_playable: cache %s renderer without destructor callback", victim.first->get_sig().c_str());
 		}
@@ -853,7 +869,7 @@ smil_player::stopped(int n, double t) {
 void
 smil_player::stopped_async(async_arg aa) {
 	m_scheduler->lock();
-	AM_DBG m_logger->debug("smil_player::stopped_async: node %s is stopped_async", aa.first->get_sig().c_str());
+	/*AM_DBG*/ m_logger->debug("smil_player::stopped_async: node %s is stopped_async", aa.first->get_sig().c_str());
 	aa.first->on_eom(aa.second);
 	m_scheduler->unlock();
 }
@@ -1223,6 +1239,8 @@ void smil_player::_update() {
 		if(m_root->is_active()) {
 			lib::event *update_event = new lib::no_arg_callback<smil_player>(this,
 				&smil_player::update);
+			//xxxbo 2012-02-17
+			AM_DBG lib::logger::get_logger()->debug("smil_player::_update(): dt is %lld", dt);
 			m_event_processor->add_event(update_event, dt, lib::ep_high);
 		} else {
 			m_scheduler->reset_document();
