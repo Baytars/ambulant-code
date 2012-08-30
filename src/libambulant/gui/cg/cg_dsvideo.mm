@@ -89,7 +89,7 @@ cg_dsvideo_renderer::cg_dsvideo_renderer(
 cg_dsvideo_renderer::~cg_dsvideo_renderer()
 {
 	m_lock.enter();
-	AM_DBG logger::get_logger()->debug("~cg_dsvideo_renderer(0x%x)", (void *)this);
+	/*AM_DBG*/ logger::get_logger()->debug("~cg_dsvideo_renderer(0x%x)", (void *)this);
 	if (m_image) CGImageRelease(m_image);
 	m_image = NULL;
 	m_lock.leave();

@@ -47,7 +47,7 @@
 // On second thoughts this seems a bad idea, so setting MIN_VIDEO_FRAMES to zero.
 #define MIN_VIDEO_FRAMES 0
 // How many video frames we would like to buffer at most.
-// #define MAX_VIDEO_FRAMES 100 
+//#define MAX_VIDEO_FRAMES 100 
 // xxxbo: decrease the buffer size for the memory limited device, such as IPad, etc. 
 #define MAX_VIDEO_FRAMES 10 
 
@@ -200,7 +200,7 @@ ffmpeg_video_decoder_datasource::ffmpeg_video_decoder_datasource(video_datasourc
 
 ffmpeg_video_decoder_datasource::~ffmpeg_video_decoder_datasource()
 {
-	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::~ffmpeg_video_decoder_datasource(0x%x)", (void*)this);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::~ffmpeg_video_decoder_datasource(0x%x)", (void*)this);
 	stop();
 	if (m_img_convert_ctx) sws_freeContext(m_img_convert_ctx);
 	if (m_dropped_count) lib::logger::get_logger()->debug("ffmpeg_video_decoder: dropped %d of %d frames after decoding", m_dropped_count, m_frame_count);

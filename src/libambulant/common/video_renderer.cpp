@@ -93,7 +93,7 @@ video_renderer::video_renderer(
 }
 
 video_renderer::~video_renderer() {
-	AM_DBG lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
+	/*AM_DBG*/ lib::logger::get_logger()->debug("~video_renderer(0x%x)", (void*)this);
 	m_lock.enter();
 
 	if (m_dest) m_dest->renderer_done(this);
@@ -165,7 +165,7 @@ video_renderer::start (double where)
 		m_post_stop_called = false;
 	} else {
 		lib::event * e = new dataavail_callback (this, &video_renderer::data_avail);
-		AM_DBG lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
+		/*AM_DBG*/ lib::logger::get_logger ()->debug ("video_renderer::start(%f) this = 0x%x, cookie=%d, dest=0x%x, timer=0x%x, epoch=%d", where, (void *) this, (int)m_cookie, (void*)m_dest, m_timer, m_epoch);
 		m_src->start_frame (m_event_processor, e, 0);
 		m_activated = true;
 		m_post_stop_called = false;
@@ -478,7 +478,7 @@ video_renderer::data_avail()
 		frame_ts_micros = m_last_frame_timestamp+frame_duration;
 	} else {
 		// Everything is fine. Display the frame.
-		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
+		/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES
@@ -502,6 +502,41 @@ video_renderer::data_avail()
 			frame_ts_micros = now_micros - frame_duration;
 			m_src->frame_processed(frame_ts_micros);
 		}
+		
+		//xxxbo 2012-02-25
+		// we stop the renderer right now instead of wait for the next call for data_avail
+#if 1
+		if (m_src->end_of_file() || (m_clip_end > 0 && frame_ts_micros > m_clip_end)) {
+			/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: stopping playback. eof=%d, ts=%lld, now=%lld, clip_end=%lld ", (int)m_src->end_of_file(), frame_ts_micros, now_micros, m_clip_end );
+			// If we have an audio renderer and the soundlevel is not 0, then we should let it do the stopped() callback.
+			int level = 0;
+			if (m_dest) {
+				const common::region_info *info = m_dest->get_info();
+				level = info ? info->get_soundlevel() : 1;
+				/*AM_DBG*/ lib::logger::get_logger()->debug("video_renderer::data_avail: sourndlevel = %d ", level );
+			}
+			//xxxbo 2012-01-20
+#if 1
+			if (m_audio_renderer == NULL || level == 0) m_context->stopped(m_cookie, 0); 
+#else
+			if (m_audio_renderer == NULL ) m_context->stopped(m_cookie, 0); 
+#endif
+			
+			// Remember how far we officially got (discounting any fill=continue behaviour)
+			m_previous_clip_position = m_clip_end;
+			// If we are past real end-of-file we always stop playback.
+			// If we are past clip_end we continue playback if we're playing a fill=ambulant:continue node.
+			// XXXJACK: this may lead to multiple stopped() callbacks (above). Need to fix.
+			// XXXJACK: but: clearing m_activated (below) may fix that.
+			if (m_src->end_of_file() || !is_fill_continue_node()) {
+				AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: m_activated is set to false 11");
+				m_activated = false;
+				m_lock.leave();
+				return;
+			}
+		}
+		
+#endif //xxxbo 2012-02-25 end
 	}
 
 	AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: start_frame(..., %d)", (int)frame_ts_micros);

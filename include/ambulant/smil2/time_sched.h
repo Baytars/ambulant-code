@@ -74,7 +74,13 @@ class scheduler {
 
 	bool m_locked;
 	lib::critical_section m_lock;
+	//xxxbo 2012-02-15 
+	// decrease the idle_resolution from 100 milliseconds to 20 milliseconds
+#if 0
 	enum { idle_resolution = 100};
+#else
+	enum { idle_resolution = 10};
+#endif //xxxbo 2012-02-25 end
   public:
 	void lock();
 	void unlock();
