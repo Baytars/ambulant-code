@@ -745,17 +745,6 @@ third_party_packages={
         ],
 
     'linux' : [
-        TPP("libtool", 
-            url="http://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz",
-            url2="libtool-2.2.6a.tar.gz",
-            checkcmd="test -f %s/lib/libltdl.a" % COMMON_INSTALLDIR,
-            buildcmd=
-                "cd libtool-2.2.6 && "
-                        "%s --enable-ltdl-install &&"
-                "make ${MAKEFLAGS} && "
-                "make install" % LINUX_COMMON_CONFIGURE
-            ),
-
         TPP("expat", 
             url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
             url2="expat-2.0.1.tar.gz",
@@ -897,13 +886,13 @@ third_party_packages={
         TPP("libdispatch",
 #           url="",   # no tar-balls available, got it from a 'git' repo
 #           url2="libdispatch.tar.gz",
-            checkcmd="test -f /usr/include/dispatch/dispatch.h -o -f %s/include/dispatch/dispatch.h" % COMMON_INSTALLDIR,
-            buildcmd=
-                "if test \! -e libdispatch ; then git clone git://git.macosforge.org/libdispatch.git libdispatch ; "
-                "patch -p1 < %s/third_party_packages/libdispatch-patches ; fi && "
-                "cd libdispatch && if test \! -e configure ; then bash ./autogen.sh ; fi && "
-                "%s CPPFLAGS=-I%s/include LDFLAGS=-L%s/lib &&"
-                "make install " % (AMBULANT_DIR, LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
+# skip      checkcmd="test -f /usr/include/dispatch/dispatch.h -o -f %s/include/dispatch/dispatch.h" % COMMON_INSTALLDIR,
+# skip      buildcmd=
+# skip          "if test \! -e libdispatch ; then git clone git://git.macosforge.org/libdispatch.git libdispatch ; "
+# skip          "cd libdispatch && patch -p1 < %s/third_party_packages/libdispatch-patches ; fi && "
+# skip          "if test \! -e configure ; then bash ./autogen.sh ; fi && "
+# skip          "%s CPPFLAGS=-I%s/include LDFLAGS=-L%s/lib &&"
+# skip          "make install " % (AMBULANT_DIR, LINUX_COMMON_CONFIGURE, COMMON_INSTALLDIR, COMMON_INSTALLDIR)
             ),
 
         TPP("live",
