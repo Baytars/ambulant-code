@@ -792,7 +792,7 @@ sdl_ambulant_window::create_sdl_surface_and_pixels(SDL_Rect* r, uint8_t** pixels
 // Using the following call will create a surface that fails to produce a proper SDL_Texture* later
 // using SDL_CreateTextureFromSurface(), although this function does not indicate an error.
 // The alternative using the default masks does not show this problem. Bug in SDL2 ?? 
-// disabled:		*surface = SDL_CreateRGBSurfaceFrom(*pixels, r->w, r->h, 32, r->w*SDL_BPP, rmask, gmask, bmask, amask);
+// disabled:	 *surface = SDL_CreateRGBSurfaceFrom(*pixels, r->w, r->h, 32, r->w*SDL_BPP, rmask, gmask, bmask, amask);
 			if (*surface == NULL) {
 				/* or using the default masks for the depth: */
 				*surface = SDL_CreateRGBSurfaceFrom(*pixels, r->w, r->h, 32, r->w*SDL_BPP, 0, 0, 0, 0);
