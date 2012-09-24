@@ -453,7 +453,16 @@ third_party_packages={
             url2="%s.en-US.mac-i386.sdk.tar.bz2" % XULRUNNER_VERSION,
             checkcmd="test -d xulrunner-sdk",
             buildcmd="test -d xulrunner-sdk"
-            )
+            ),
+        TPP("libltdl", # Workaround/hack for missing libltdl on 10.8
+            checkcmd="test -f ../libltdl/.libs/libltdlc.a",
+            buildcmd=
+                "rm -rf ../libltdl &&"
+                "mkdir ../libltdl &&"
+                "cd ../libltdl &&"
+                "../../libltdl/configure CFLAGS='%s' --disable-dependency-tracking &&"
+                "make" % MAC106_COMMON_CFLAGS
+            ),
         ],
 
     'mac10.4' : [
@@ -736,17 +745,6 @@ third_party_packages={
         ],
 
     'linux' : [
-        TPP("libtool", 
-            url="http://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz",
-            url2="libtool-2.2.6a.tar.gz",
-            checkcmd="test -f %s/lib/libltdl.a" % COMMON_INSTALLDIR,
-            buildcmd=
-                "cd libtool-2.2.6 && "
-                        "%s --enable-ltdl-install &&"
-                "make ${MAKEFLAGS} && "
-                "make install" % LINUX_COMMON_CONFIGURE
-            ),
-
         TPP("expat", 
             url="http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-2.0.1.tar.gz?use_mirror=autoselect",
             url2="expat-2.0.1.tar.gz",
