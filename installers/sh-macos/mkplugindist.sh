@@ -10,7 +10,11 @@ if [ x$1 == x-p ]; then
 fi
 dirname=$1
 installroot=$2
-plugin_srcdir="$installroot/Library/Internet Plug-Ins/$plugin_name"
+# A slash is added here at the end to force the desired behaviour of the 'cp' program
+plugin_srcdir="$installroot/Library/Internet Plug-Ins/$plugin_name/"
+#
+# Check arguments and build environment sanity
+#
 if [ x$dirname == x ]; then
 	echo Usage: $0 [-p pluginname] dirname [installroot]
 	echo dirname is where the distribution will be created.
@@ -30,62 +34,49 @@ if [ ! -d "$plugin_srcdir" ]; then
 	exit 3
 fi
 #
-# Create the directory
+# This installer is constructed from a template 'npambulant-template.dmg', which was created
+# using 'Disk Utility', were its Volume name (npambulant-plugin) was defined (read-write).
+# The background image was defined by creating and copying an initial background image
+# in /Volumes/npambulant-plugin/.background/background.png.
+# Next, in 'Terminal' the command 'open  /Volumes/npambulant-plugin/.background' and using the 'Finder'
+# window 'npambulant-plugin' select 'View->Show View Option'. Then, in the 'View Options' window
+# under 'Background' select 'Image' and drag file 'backgound.png' from the '.background' window
+# into the provided space.
+# Finally, the disk 'npambulant-plugin' was 'Eject'ed and its corresponding .dmg was compressed using:
+# 'hdiutil convert npambulant-plugin-rw.dmg -format UDZO -o npambulant-plugin.dmg'
+# The template has all visuals (icons and background), but the files are empty.
+# Their contents are copied in by executing this script.
+# All content files are easily modifyable and under version control.
+# To change the disk layout, repeat the disk creation procedure described above.
 #
-mkdir $dirname
+# This method seems to be more reliable than fiddling appearance using 'osascript', because some
+# 'Finder' versions seem to use "optimized" techniques to handle folder backgrounds, etc. Based on:
+# http://stackoverflow.com/questions/96882/how-do-i-create-a-nice-looking-dmg-for-mac-os-x-using-command-line-tools, 8th answer
 #
-# Unpack the template (which contains files needed and their icon position, etc)
+# Create the new .dmg by copying the template
 #
-
-cat $scriptdir/plugintemplate.tar | (cd $dirname ; tar xf -; mv placeholder.plugin $plugin_name)
-
+cp npambulant-template.dmg $dirname.dmg 
+#
+# Convert it into a writable image and attach it to the file system (mount)
+#
+hdiutil convert $dirname.dmg -format UDRW -o $dirname-rw.dmg
+hdiutil attach $dirname-rw.dmg
 #
 # Copy the files, overwriting placeholders
 #
-cp -r "$plugin_srcdir" $dirname/$plugin_name
+cp npambulant-installer-README /Volumes/npambulant-plugin/README
+cp npambulant-installer-bg.png /Volumes/npambulant-plugin/.background/background.png
+# Copy recursively the Contents of $plugin_srcdir to the target directory
+cp -R "$plugin_srcdir" /Volumes/npambulant-plugin/npambulant.plugin
 #
-# Create temporary disk image (.dmg) and mount it
+# Done, detach and compress the new disk
 #
-hdiutil create -srcfolder $dirname $dirname-rw.dmg -format UDRW -attach
-#
-# Modify the appearance of the new disk (size, background image)
-#
-osascript - << END-OF-SCRIPT
-tell application "Finder"
-    tell disk "$dirname"
-	open 
-        tell container window
-            set current view to icon view
-            set toolbar visible to false
-            set statusbar visible to false
-            set x to 100
-            set y to 100
-            set w to 640
-            set h to 360
-            set bounds to {x, y, x + w, y + h}
-        end tell
-	set opts to the icon view options of container window
-     	tell opts
-       	    set icon size to 64
-            set shows icon preview to false
-            set shows item info to false
-            set icon size to 64
-            set text size to 16
-            set arrangement to not arranged
-            set label position to bottom
-     	end tell
-       	set background picture of opts to file ".folderbg:folderbg.png"		
-   end tell
-end tell
-END-OF-SCRIPT
-#
-# Done, unmount and compress the new disk
-#
-hdiutil detach /Volumes/$dirname
+hdiutil detach /Volumes/npambulant-plugin
+rm $dirname.dmg
 sleep 5
 hdiutil convert $dirname-rw.dmg -format UDZO -o $dirname.dmg
 #
 # Cleanup
 #
-#rm $dirname-rw.dmg
-#rm -r $dirname
+rm $dirname-rw.dmg
+
