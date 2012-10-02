@@ -25,6 +25,7 @@
 #include "ambulant/lib/logger.h"
 #include "ambulant/common/preferences.h"
 #include "GroupsockHelper.hh"
+#include <cfloat>
 
 ///// Added by Bo Gao begin 2007-11-07
 //AVCodecParserContext * h264parserctx;
@@ -206,6 +207,9 @@ ambulant::net::rtsp_demux::supported(const net::url& url)
 		return NULL;
 	}
 	context->duration = context->media_session->playEndTime();
+	if (context->duration == 0) {
+		context->duration = DBL_MAX;
+	}
 	context->last_expected_pts = (timestamp_t) (context->duration*1000000); // do not skip last frame
 	AM_DBG lib::logger::get_logger()->debug("rtps_demux::supported: last_expected_pts = %ld", context->last_expected_pts);
 	// next set up the rtp subsessions.
@@ -289,6 +293,19 @@ ambulant::net::rtsp_demux::set_clip_end(timestamp_t clip_end)
 	m_clip_end = clip_end;
 	m_critical_section.leave();
 }
+
+long
+ambulant::net::rtsp_demux::get_bandwidth_usage_data(int stream_index, const char **resource)
+{
+	m_critical_section.enter();
+    assert(stream_index >= 0 && stream_index <= MAX_STREAMS);
+    long rv = m_context->data_consumed[stream_index];
+    m_context->data_consumed[stream_index] = 0;
+    *resource = "rtsp";
+	m_critical_section.leave();
+    return rv;
+}
+
 
 static unsigned char* parseH264ConfigStr(char const* configStr, size_t& configSize);
 
@@ -619,7 +636,9 @@ rtsp_demux::after_reading_audio(size_t sz, unsigned truncated, struct timeval pt
 	m_context->audio_packet = NULL;
 	AM_DBG lib::logger::get_logger()->debug("after reading audio: rpts=%lld, end=%lld\n\n", rpts, m_context->last_expected_pts);
 
-	if (m_context->last_expected_pts >= 0 && rpts >= m_context->last_expected_pts) {
+	// Note by Jack: we use strict greater than zero for last_expected_pts. It seems live streams will have
+	// a duration of zero, and therefore a last_expected_pts of zero.
+	if (m_context->last_expected_pts > 0 && rpts >= m_context->last_expected_pts) {
 		AM_DBG lib::logger::get_logger()->debug("after_reading_audio: last_pts = %lld\n\n", rpts);
 		m_context->eof = true;
 	}
@@ -773,7 +792,9 @@ done:
 	}
 	
 	AM_DBG lib::logger::get_logger()->debug("after reading video: pts=%lld, end=%lld", m_context->last_pts, m_context->last_expected_pts);
-	if (m_context->last_expected_pts >= 0 && m_context->last_pts >= m_context->last_expected_pts) {
+	// Note by Jack: we use strict greater than zero for last_expected_pts. It seems live streams will have
+	// a duration of zero, and therefore a last_expected_pts of zero.
+	if (m_context->last_expected_pts > 0 && m_context->last_pts >= m_context->last_expected_pts) {
 		lib::logger::get_logger()->debug("after_reading_video: last_pts = %lld", m_context->last_pts);
 		m_context->eof = true;
 	}
@@ -785,8 +806,10 @@ done:
 void
 rtsp_demux::_push_data_to_sink (int sink_index, timestamp_t pts, const uint8_t* inbuf, size_t sz) {
 	demux_datasink* sink = m_context->sinks[sink_index];
-
 	bool accepted = false;
+
+	// Keep statistics
+	m_context->data_consumed[sink_index] += sz;
 
 	while (sink && ! exit_requested() && ! accepted) {
 		m_critical_section.leave();
