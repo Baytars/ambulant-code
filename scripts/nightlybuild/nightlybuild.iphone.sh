@@ -82,12 +82,13 @@ cd $BUILDDIR
 case x$BRANCH in
 x)	;;
 *)
-	hg up -r $BRANCH
+hg up -r $BRANCH
 esac
 sh autogen.sh
 #
 # Build CG player
 #
+# export MAKEFLAGS=-j`sysctl -a|grep core_count|awk '{print $2}'`
 cd projects/xcode32
 xcodebuild -project libambulant.xcodeproj \
 	-target libambulantiPhone \
@@ -104,8 +105,8 @@ xcodebuild -project iAmbulant.xcodeproj \
 	-configuration Distribution \
 	-sdk iphoneos4.3 \
 	build
-##	DSTROOT=$BUILDHOME/$DESTDIR \
-##	INSTALL_PATH=/Applications \
+## DSTROOT=$BUILDHOME/$DESTDIR \
+## INSTALL_PATH=/Applications \
 cd ../..
 #
 # Create installer IPA file and upload
