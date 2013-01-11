@@ -1,5 +1,6 @@
-ambulant (2.4.1) unstable; urgency=low
+ambulant (2.4.1) Precise; urgency=low
 
+  * Adapted for Ubuntu
   * Incorporating changes by PICCORO Lenz McKAY into mainstream
   
  -- Jack Jansen <Jack.Jansen@cwi.nl>  Tue, 10 Jan 2013 10:55:11 -0100
