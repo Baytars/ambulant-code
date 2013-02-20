@@ -493,7 +493,9 @@ ffmpeg_demux::run()
 			m_clip_begin_changed = false;
 		}
 		m_lock.leave();
+        PKT_TRACE("before  FF_av_read", 0)
 		int ret = av_read_frame(m_con, pkt);
+        PKT_TRACE("after FF_av_read", pkt->pts)
 		m_lock.enter();
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: av_read_packet returned ret= %d, (%d, 0x%x, %d, %d)", ret, (int)pkt->pts ,pkt->data, pkt->size, pkt->stream_index);
 
@@ -548,6 +550,7 @@ ffmpeg_demux::run()
 
 				if (pts != (int64_t)AV_NOPTS_VALUE) {
 					pts = av_rescale_q(pts, m_con->streams[pkt->stream_index]->time_base, AMBULANT_TIMEBASE);
+                    PKT_TRACE("FF_av_rescale_q", pts)
 
 					if (pkt->stream_index == audio_streamnr) {
 						last_valid_audio_pts = pts;
@@ -599,6 +602,7 @@ ffmpeg_demux::run()
 
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
+                PKT_TRACE("before FF_push_data", pkt->pts)
 				accepted = sink->push_data((timestamp_t)pts, pkt->data, (size_t)pkt->size);
 				if ( ! accepted) {
 					// wait until space available in sink
@@ -613,6 +617,7 @@ ffmpeg_demux::run()
 					sink->push_data(0,0,0);
 					sink->release();
 				}
+                PKT_TRACE("after FF_push_data", pkt->pts)
 				m_current_sink = NULL;
 				sink = m_sinks[pkt->stream_index];
 			}

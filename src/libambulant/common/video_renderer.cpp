@@ -1,6 +1,6 @@
 // This file is part of Ambulant Player, www.ambulantplayer.org.
 //
-// Copyright (C) 2003-2012 Stichting CWI, 
+// Copyright (C) 2003-2012 Stichting CWI,
 // Science Park 123, 1098 XG Amsterdam, The Netherlands.
 //
 // Ambulant Player is free software; you can redistribute it and/or modify
@@ -376,6 +376,7 @@ void
 video_renderer::data_avail()
 {
 	m_lock.enter();
+    PKT_TRACE("enter VR_data_avail", 0)
     if (m_src) {
         // Get bandwidth usage data
         const char *resource;
@@ -407,6 +408,7 @@ video_renderer::data_avail()
 	net::timestamp_t now_micros = (net::timestamp_t)(now()*1000000);
 	net::timestamp_t frame_ts_micros;	// Timestamp of frame in "buf" (in microseconds)
 	buf = m_src->get_frame(now_micros, &frame_ts_micros, &size);
+    PKT_TRACE("after VR_get_frame", frame_ts_micros)
 
 	AM_DBG lib::logger::get_logger()->debug("data_avail(%s): now_micros = %lld, frame_ts_micros = %lld, %d bytes", m_node->get_sig().c_str(), now_micros, frame_ts_micros, size);
 
@@ -429,6 +431,7 @@ video_renderer::data_avail()
 			// for now we hack around it.
 			m_src->start_frame (m_event_processor, e, m_clip_begin);
 		}
+        PKT_TRACE("leave1 VR_data_avail",0)
 		m_lock.leave();
 		return;
 	}
@@ -458,8 +461,9 @@ video_renderer::data_avail()
 		if (m_src->end_of_file() || !is_fill_continue_node()) {
 			AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: m_activated is set to false 11");
 			m_activated = false;
+            PKT_TRACE("leave2 VR_data_avail",0)
 			m_lock.leave();
-			return;
+ 			return;
 		}
 	}
 
@@ -505,6 +509,8 @@ video_renderer::data_avail()
 		// Everything is fine. Display the frame.
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
 		_push_frame(buf, size);
+        PKT_TRACE("after VR_push_frame", frame_ts_micros)
+       
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES
 		m_prev_frame_dropped = false;
@@ -535,6 +541,7 @@ video_renderer::data_avail()
 	// the m_event_processor clock (even though it is in microseconds, not milliseconds). Very bad design,
 	// for now we hack around it.
 	m_src->start_frame (m_event_processor, e, frame_ts_micros+((net::timestamp_t)m_epoch*1000));
+    PKT_TRACE("leave3 VR_data_avail",0)
 	m_lock.leave();
 }
 
