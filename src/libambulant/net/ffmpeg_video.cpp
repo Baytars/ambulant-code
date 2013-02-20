@@ -521,7 +521,8 @@ ffmpeg_video_decoder_datasource::data_avail()
 
 	// Get the input data
 	inbuf = (uint8_t*) m_src->get_frame(0, &ipts, &sz);
-
+    PKT_TRACE("DS_get_frame", ipts)
+    
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
 
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available, ipts = %lld", sz, ipts);
@@ -602,6 +603,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 			avpkt.data = ptr;
 			avpkt.size = sz;
 			len = avcodec_decode_video2(m_con, frame, &got_pic, &avpkt);
+            PKT_TRACE("DS_avcodec_decode_video2", ipts)
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video: used %d of %d bytes, gotpic = %d, ipts = %lld", len, sz, got_pic, ipts);
 			// It seems avcodec_decode_video sometimes returns 0 if skip_frame is used. Sigh.
 			if (len == 0 && !got_pic) {
@@ -747,7 +749,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail:done decoding (0x%x) ", m_con);
 		av_free(frame);
 		m_src->frame_processed(0); // XXXJACK: Should pass ipts, for sanity check
-	}
+ 	}
   out_of_memory:
 	// Now tell our client, if we have data available or are at end of file.
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::data_avail(): m_frames.size() returns %d, (eof=%d)", m_frames.size(), m_src->end_of_file());
@@ -774,6 +776,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 		m_src->start_frame(m_event_processor, e, ipts);
 		m_start_input = false;
 	}
+    PKT_TRACE("leave DS_data_avail", ipts)
 
 	m_lock.leave();
 }
@@ -858,6 +861,7 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	if (rv == NULL) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame(now=%lld): about to return NULL frame (ts=%lld), should not happen", now, *timestamp_p);
 	}
+    PKT_TRACE("leave DS_get_frame", *timestamp_p)
 	m_lock.leave();
 	return rv;
 }
