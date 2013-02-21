@@ -521,7 +521,9 @@ ffmpeg_video_decoder_datasource::data_avail()
 
 	// Get the input data
 	inbuf = (uint8_t*) m_src->get_frame(0, &ipts, &sz);
+#ifdef  WITH_PKT_TRACE
     PKT_TRACE("DS_get_frame", ipts)
+#endif//WITH_PKT_TRACE
     
 	AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: %d bytes available", sz);
 
@@ -603,7 +605,9 @@ ffmpeg_video_decoder_datasource::data_avail()
 			avpkt.data = ptr;
 			avpkt.size = sz;
 			len = avcodec_decode_video2(m_con, frame, &got_pic, &avpkt);
+#ifdef  WITH_PKT_TRACE
             PKT_TRACE("DS_avcodec_decode_video2", ipts)
+#endif//WITH_PKT_TRACE
 			AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource.data_avail: avcodec_decode_video: used %d of %d bytes, gotpic = %d, ipts = %lld", len, sz, got_pic, ipts);
 			// It seems avcodec_decode_video sometimes returns 0 if skip_frame is used. Sigh.
 			if (len == 0 && !got_pic) {
@@ -776,7 +780,9 @@ ffmpeg_video_decoder_datasource::data_avail()
 		m_src->start_frame(m_event_processor, e, ipts);
 		m_start_input = false;
 	}
+#ifdef  WITH_PKT_TRACE
     PKT_TRACE("leave DS_data_avail", ipts)
+#endif//WITH_PKT_TRACE
 
 	m_lock.leave();
 }
@@ -861,7 +867,9 @@ ffmpeg_video_decoder_datasource::get_frame(timestamp_t now, timestamp_t *timesta
 	if (rv == NULL) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::get_frame(now=%lld): about to return NULL frame (ts=%lld), should not happen", now, *timestamp_p);
 	}
+#ifdef  WITH_PKT_TRACE
     PKT_TRACE("leave DS_get_frame", *timestamp_p)
+#endif//WITH_PKT_TRACE
 	m_lock.leave();
 	return rv;
 }

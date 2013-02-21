@@ -573,7 +573,9 @@ bool
 demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, size_t sz)
 {
 	m_lock.enter();
+#ifdef  WITH_PKT_TRACE
     PKT_TRACE("enter DM_push_data", pts)
+#endif//WITH_PKT_TRACE
 
 	m_src_end_of_file = (sz == 0);
 
@@ -581,15 +583,19 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, size_t 
 	if ( ! m_thread) {
 		// video stopped
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): no demux thread, returning");
-		m_lock.leave();
+#ifdef  WITH_PKT_TRACE
         PKT_TRACE("leave1 DM_push_data", pts)
+#endif//WITH_PKT_TRACE
+        m_lock.leave();
 		return true;
 	}
 	if ( _buffer_full()) {
 		// video stopped
 		AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): buffer full, returning");
-		m_lock.leave();
+#ifdef  WITH_PKT_TRACE
         PKT_TRACE("leave2 DM_push_data", pts)
+#endif//WITH_PKT_TRACE
+        m_lock.leave();
 		return false;
 	}
 	if(sz > 0) {
@@ -619,7 +625,9 @@ demux_video_datasource::push_data(timestamp_t pts, const uint8_t *inbuf, size_t 
 			AM_DBG lib::logger::get_logger()->debug("demux_video_datasource::push_data(): No client callback");
 		}
 	}
+#ifdef  WITH_PKT_TRACE
     PKT_TRACE("leave3 DM_push_data", pts)
+#endif//WITH_PKT_TRACE
 	m_lock.leave();
 	return true;
 }

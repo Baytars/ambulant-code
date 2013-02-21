@@ -85,6 +85,9 @@ cg_dsvideo_renderer::cg_dsvideo_renderer(
 	common::factories *factory,
 	common::playable_factory_machdep *mdp)
 :	cg_renderer<common::video_renderer>(context, cookie, node, evp, factory, mdp),
+#ifdef WITH_PKT_TRACE
+    m_ts(0),
+#endif//WITH_PKT_TRACE
 	m_image(NULL)
 {
 	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer(): 0x%x created", (void*)this);
@@ -112,7 +115,11 @@ my_free_frame(void *ptr, const void *ptr2, size_t size)
 }
 
 void
+#ifndef WITH_PKT_TRACE
 cg_dsvideo_renderer::_push_frame(char* frame, size_t size)
+#else
+cg_dsvideo_renderer::_push_frame(char* frame, size_t size, unsigned long int ts)
+#endif
 {
 	m_lock.enter();
 	if (m_image) {
@@ -146,6 +153,10 @@ cg_dsvideo_renderer::_push_frame(char* frame, size_t size)
 		return;
 	}
 	AM_DBG lib::logger::get_logger()->debug("cg_dsvideo_renderer::push_frame: created CGImage 0x%x", m_image);
+#ifdef WITH_PKT_TRACE
+    m_ts = ts;
+    PKT_TRACE("CG_push_frame", m_ts)
+#endif//WITH_PKT_TRACE
 	m_lock.leave();
 }
 
@@ -217,7 +228,9 @@ cg_dsvideo_renderer::redraw_body(const rect &dirty, gui_window *window)
 		m_event_processor->add_event(ev, delay);
 	}
 #endif
-
+#ifdef WITH_PKT_TRACE
+    PKT_TRACE("CG_redraw_body", m_ts)
+#endif//WITH_PKT_TRACE
 	m_lock.leave();
 }
 
