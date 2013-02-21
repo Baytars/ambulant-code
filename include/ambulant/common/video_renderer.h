@@ -93,6 +93,7 @@ class video_renderer : public common::renderer_playable {
 	/// eventually free()ing frame. This method is protected because it shares
 	/// the m_lock mutex.
 	virtual void _push_frame(char* frame, size_t size) = 0;
+	virtual void _push_frame(char* frame, size_t size, unsigned long int ts) { _push_frame (frame, size); } // PKT_TRACE
 
   protected:
 	lib::size m_size;		///< (width, height) of the video data.
