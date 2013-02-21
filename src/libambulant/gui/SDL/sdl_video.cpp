@@ -68,7 +68,8 @@ sdl_video_renderer::sdl_video_renderer(
 
 	m_data(NULL),
 	m_datasize(0),
-   	m_img_displayed(0)
+	m_img_displayed(0),
+	m_ts(0)
 {
 	SDL_Init(SDL_INIT_VIDEO);
 }
@@ -88,13 +89,15 @@ sdl_video_renderer::pixel_layout()
 }
 
 void
-sdl_video_renderer::_push_frame(char* frame, size_t size)
+sdl_video_renderer::_push_frame(char* frame, size_t size, unsigned long int ts)
 {
 	AM_DBG lib::logger::get_logger()->debug("sdl_video_renderer::_push_frame: frame=0x%x, size=%d, this=0x%x", (void*) frame, size, (void*) this);
 	if (m_data)
 		free(m_data);
 	m_data = frame;
 	m_datasize = size;
+	m_ts = ts;
+	PKT_TRACE("leave SD_push_frame", ts);
 }
 
 
@@ -165,6 +168,7 @@ sdl_video_renderer::redraw(const lib::rect &dirty, common::gui_window* w)
 		SDL_FreeSurface(surface);
 		free (pixels[0]);
 	}
+	PKT_TRACE("leave SD_redraw", m_ts)
 	m_lock.leave();
 }
 

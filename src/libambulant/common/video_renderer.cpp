@@ -508,9 +508,12 @@ video_renderer::data_avail()
 	} else {
 		// Everything is fine. Display the frame.
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: display frame (timestamp = %lld)",frame_ts_micros);
-		_push_frame(buf, size);
+#ifdef	PKT_TRACE
+		_push_frame(buf, size, frame_ts_micros);
         PKT_TRACE("after VR_push_frame", frame_ts_micros)
-       
+#else
+		_push_frame(buf, size);
+#endif//PKT_TRACE
 		m_src->frame_processed_keepdata(frame_ts_micros, buf);
 #ifdef DROP_LATE_FRAMES
 		m_prev_frame_dropped = false;

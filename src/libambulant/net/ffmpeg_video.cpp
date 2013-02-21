@@ -652,7 +652,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 #ifdef WITH_EXPERIMENTAL_FRAME_DROP_STATISTICS
 			m_frame_count_temp++;
 #endif
-			if (pts < m_oldest_timestamp_wanted) {
+			if ( ! get_is_live() && pts < m_oldest_timestamp_wanted) {
 				// A non-essential frame while skipping forward.
 #ifdef WITH_EXPERIMENTAL_FRAME_DROP_STATISTICS
 				AM_DBG lib::logger::get_logger()->debug("AfterDecodingDropping pts %lld", pts);
@@ -661,7 +661,7 @@ ffmpeg_video_decoder_datasource::data_avail()
 #endif
 				drop_this_frame = true;
 			}
-			if (m_frames.size() > 0 && pts < m_frames.front().first) {
+			if ( ! get_is_live() && m_frames.size() > 0 && pts < m_frames.front().first) {
 				// A frame that came after this frame has already been consumed.
 				// We should drop this frame.
 #ifdef WITH_EXPERIMENTAL_FRAME_DROP_STATISTICS

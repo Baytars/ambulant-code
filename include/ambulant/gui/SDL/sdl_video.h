@@ -95,12 +95,14 @@ class sdl_video_renderer :  public common::video_renderer  {
 	void start_outtransition(const lib::transition_info* info) {}
 
   protected:
-	void _push_frame(char* frame, size_t size);
+	void _push_frame(char* frame, size_t size, unsigned long int ts);
+	void _push_frame(char* frame, size_t size) { _push_frame (frame, size, 0); }
 private:
 	long int m_img_displayed;
 	char* m_data;
 	unsigned int m_datasize;
 	void render_frame();
+	unsigned long int m_ts;
 };
 
 
