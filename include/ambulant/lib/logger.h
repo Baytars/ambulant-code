@@ -254,6 +254,11 @@ inline bool logger::suppressed(int level) {
 } // namespace ambulant
 
 #define LOGGER_ASSERT(exp) if(!(exp)) ambulant::lib::logger::assert_expr(exp, #exp)
+#define WITH_PKT_TRACE
+#ifdef  WITH_PKT_TRACE
 #define PKT_TRACE(s,t) lib::logger::get_logger()->debug("PKT-TRACE: %s | %lu", /*__PRETTY_FUNCTION__,*/ s,(unsigned long)t);
+#else
+#define PKT_TRACE
+#endif//WITH_PKT_TRACE
 
 #endif //

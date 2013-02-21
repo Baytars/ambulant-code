@@ -25,6 +25,7 @@
 #include "ambulant/gui/cg/cg_renderer.h"
 #include "ambulant/common/video_renderer.h"
 #include "ambulant/lib/mtsync.h"
+#include "ambulant/lib/logger.h" // for PKT_TRACE
 //#include <Cocoa/Cocoa.h>
 
 namespace ambulant {
@@ -52,10 +53,18 @@ class cg_dsvideo_renderer :
 	void redraw_body(const rect &dirty, gui_window *window);
 
   protected:
+#ifndef WITH_PKT_TRACE
 	void _push_frame(char* frame, size_t size);
+#else
+    void _push_frame(char* frame, size_t size, unsigned long int ts);
+    void _push_frame(char* frame, size_t size) { _push_frame(frame, size); }
+#endif//WITH_PKT_TRACE
   private:
 	CGImageRef m_image;
 	critical_section m_lock;
+#ifdef  WITH_PKT_TRACE
+    unsigned long int m_ts;
+#endif//WITH_PKT_TRACE
 };
 
 } // namespace cg
