@@ -609,7 +609,7 @@ ffmpeg_demux::run()
 				AM_DBG lib::logger::get_logger()->debug("ffmpeg_parser::run: calling %d.push_data(%lld, 0x%x, %d, %d) pts=%lld", pkt->stream_index, pkt->pts, pkt->data, pkt->size, pkt->duration, pts);
 				m_lock.leave();
 #ifdef  WITH_PKT_TRACE
-                PKT_TRACE("before FF_push_data", pkt->pts)
+                PKT_TRACE("before FF_push_data", pts)
 #endif//WITH_PKT_TRACE
 				accepted = sink->push_data((timestamp_t)pts, pkt->data, (size_t)pkt->size);
 				if ( ! accepted) {
@@ -626,7 +626,7 @@ ffmpeg_demux::run()
 					sink->release();
 				}
 #ifdef  WITH_PKT_TRACE
-                PKT_TRACE("after FF_push_data", pkt->pts)
+                PKT_TRACE("after FF_push_data", pts)
 #endif//WITH_PKT_TRACE
 				m_current_sink = NULL;
 				sink = m_sinks[pkt->stream_index];

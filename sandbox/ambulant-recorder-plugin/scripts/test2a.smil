@@ -8,7 +8,7 @@
 <body>
  <par>
  <!-- works with vlc 1.13 streamer -->
- <video id="video-01" src="rtsp://wroclaw.sen.cwi.nl:5544/webcam" region="all" dur="20" >
+ <video id="video-01" src="rtsp://wroclaw.sen.cwi.nl:5544/webcam" region="all" dur="36000" >
    <param name="is_live" value="true"/>
  </video>
 </par>
