@@ -777,6 +777,9 @@ ffmpeg_video_decoder_datasource::data_avail()
 	if (!m_src->end_of_file() && !_buffer_full()) {
 		AM_DBG lib::logger::get_logger()->debug("ffmpeg_video_decoder_datasource::start_frame() Calling m_src->start_frame(..)");
 		lib::event *e = new framedone_callback(this, &ffmpeg_video_decoder_datasource::data_avail);
+#ifdef  WITH_PKT_TRACE
+        PKT_TRACE("start_frame DS_data_avail", ipts)
+#endif//WITH_PKT_TRACE
 		m_src->start_frame(m_event_processor, e, ipts);
 		m_start_input = false;
 	}
