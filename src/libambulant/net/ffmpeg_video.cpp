@@ -292,6 +292,9 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 				lib::logger::get_logger()->debug("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
 				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
 			}
+			if (get_is_live()) {
+				delta_milli = 0;
+			}
 			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
 		} else {
 			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource::start(): no client callback!");
