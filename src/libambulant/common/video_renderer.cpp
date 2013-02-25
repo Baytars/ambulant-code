@@ -372,6 +372,8 @@ video_renderer::resume()
 	m_lock.leave();
 }
 
+#undef  AM_DBG
+#define AM_DBG if(0)
 void
 video_renderer::data_avail()
 {
@@ -501,7 +503,7 @@ video_renderer::data_avail()
 		m_prev_frame_dropped = true;
 	} else
 #endif
-	if ( ! m_src->get_is_live()  && frame_ts_micros > now_micros + frame_duration) {
+	if (frame_ts_micros > now_micros + frame_duration) {
 		// Frame is too early. Do nothing, just schedule a new event at the correct time and we will get this same frame again.
 		AM_DBG lib::logger::get_logger()->debug("video_renderer::data_avail: frame early, ts=%lld, now=%lld, dur=%lld)",frame_ts_micros, now_micros, frame_duration);
 		m_frame_early++;
@@ -557,6 +559,8 @@ video_renderer::data_avail()
 #endif//WITH_PKT_TRACE
 	m_lock.leave();
 }
+#undef  AM_DBG
+#define AM_DBG if(0)
 
 void
 video_renderer::redraw(const lib::rect &dirty, common::gui_window *window)

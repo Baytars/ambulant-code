@@ -262,6 +262,8 @@ ffmpeg_video_decoder_datasource::get_audio_datasource()
 	return rv;
 }
 
+#undef  AM_DBG
+#define AM_DBG if(0)
 void
 ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp,
 	ambulant::lib::event *callbackk, timestamp_t timestamp)
@@ -292,10 +294,10 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 				lib::logger::get_logger()->debug("ffmpeg_video: frame is %f seconds in the future", delta_milli / 1000.0);
 				lib::logger::get_logger()->debug("ffmpeg_video: elapsed()=%dms, timestamp=%dms", now_milli, timestamp_milli);
 			}
-			if (get_is_live()) {
+			if (get_is_live() && delta_milli != 0) {
 				delta_milli = 0;
 			}
-			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_high);
+			evp->add_event(callbackk, delta_milli+1, ambulant::lib::ep_med);
 		} else {
 			lib::logger::get_logger()->debug("Internal error: ffmpeg_video_decoder_datasource::start(): no client callback!");
 			lib::logger::get_logger()->warn(gettext("Programmer error encountered during video playback"));
@@ -317,6 +319,8 @@ ffmpeg_video_decoder_datasource::start_frame(ambulant::lib::event_processor *evp
 	}
 	m_lock.leave();
 }
+#undef  AM_DBG
+#define AM_DBG if(0)
 
 void
 ffmpeg_video_decoder_datasource::start_prefetch(ambulant::lib::event_processor *evp)
