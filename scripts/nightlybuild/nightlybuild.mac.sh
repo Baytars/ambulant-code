@@ -131,7 +131,7 @@ cd ../..
 # Build plugin installer, upload
 #
 cd installers/sh-macos
-sh make-dmg-installer.sh -n 'Ambulant Web Plugin' -t npambulant-template.dmg -s "$BUILDHOME/$DESTDIR/Library/Internet Plug-ins/npambulant.plugin/." -d "npambulant.plugin/." -s npambulant-installer-README -d ./README -s ../../COPYING  -d ./COPYING
+sh make-dmg-installer.sh -n 'Ambulant Web Plugin' -x -t npambulant-template.dmg -s "$BUILDHOME/$DESTDIR/Library/Internet Plug-ins/npambulant.plugin/." -d "npambulant.plugin/." -s npambulant-installer-README -d ./README -s ../../COPYING  -d ./COPYING
 mv "Ambulant Web Plugin.dmg" $PLUGINDMGNAME
 scp $PLUGINDMGNAME $DESTINATION_PLUGIN
 #
