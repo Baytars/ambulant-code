@@ -195,6 +195,8 @@ def main():
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], 'vncs:')
 		for o, v in opts:
+			if verbose:
+				print "opt=%s v=%s" % (opt, v)
 			if o == '-v':	
 				verbose = True
 			if o == '-n':
