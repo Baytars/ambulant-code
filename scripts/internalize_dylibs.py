@@ -205,6 +205,8 @@ def main():
 				if not ':' in v:
 					raise getopt.error
 				instlibdir, reallibdir = v.split(':')
+				if verbose:
+					print "instlibdir=%s reallibdir=%s" % (instlibdir, reallibdir)
 		if len(args) != 1:
 			raise getopt.error('missing arguments')
 	except getopt.error:
