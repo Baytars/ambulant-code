@@ -116,15 +116,15 @@ cd ../..
 #
 cd $BUILDHOME/$BUILDDIR
 cd projects/xcode43
-rm -rf "$HOME/Library/Internet Plug-Ins/npambulant.plugin"
-mkdir -p "$HOME/Library/Internet Plug-Ins"
+rm -rf "$BUILDHOME/Library/Internet Plug-Ins/npambulant.plugin"
+mkdir -p "$BUILDHOME/Library/Internet Plug-Ins"
 xcodebuild -project npambulant.xcodeproj \
 	-target npambulant \
 	-configuration Release -sdk macosx10.7 \
 	AMBULANT_BUILDDIR=$BUILDHOME/$BUILDDIR \
 	AMBULANT_3PP=$BUILDHOME/$BUILDDIR/build-3264/third_party_packages \
 	DSTROOT=$BUILDHOME/$DESTDIR \
-	INSTALL_PATH="/Library/Internet Plug-ins" \
+	INSTALL_PATH=$BUILDHOME/"/Library/Internet Plug-ins" \
 	install
 cd ../..
 #

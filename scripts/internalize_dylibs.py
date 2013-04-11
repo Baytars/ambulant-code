@@ -78,6 +78,8 @@ class Internalizer:
 				self.add(name)
 
 	def add(self, src, copy=False):
+		if self.verbose:
+			print "add(%s, %s, %d)" % (self, src, copy)
 		if self.instlibdir and os.path.commonprefix([src, self.instlibdir]) == self.instlibdir:
 			src = self.staginglibdir + src[len(self.instlibdir):]
 		while os.path.islink(self.dstrelative(src)):
@@ -195,8 +197,6 @@ def main():
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], 'vncs:')
 		for o, v in opts:
-			if verbose:
-				print "opt=%s value=%s" % (o, v)
 			if o == '-v':	
 				verbose = True
 			if o == '-n':
@@ -209,6 +209,8 @@ def main():
 				instlibdir, reallibdir = v.split(':')
 				if verbose:
 					print "instlibdir=%s reallibdir=%s" % (instlibdir, reallibdir)
+		if verbose:
+			print "opts=%s args=%s" % (opts, args)
 		if len(args) != 1:
 			raise getopt.error('missing arguments')
 	except getopt.error:
