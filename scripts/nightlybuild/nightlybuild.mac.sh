@@ -119,6 +119,7 @@ cd projects/xcode43
 export DSTROOT=$BUILDHOME/$DESTDIR
 rm -rf "$DSTROOT/Library/Internet Plug-Ins/npambulant.plugin"
 mkdir -p "$DSTROOT/Library/Internet Plug-Ins"
+export DYLD_LIBRARY_PATH=$BUILDHOME/$DESTDIR/Applications/Ambulant Player.app/Contents/Frameworks
 xcodebuild -project npambulant.xcodeproj \
 	-target npambulant \
 	-configuration Release -sdk macosx10.7 \
