@@ -229,7 +229,10 @@ class sdl_ambulant_window : public ambulant::common::gui_screen
 	/// return the corresponding sdl_ambulant_window* given its SDL windowID (used by SDL event loop)
 	static sdl_ambulant_window* get_sdl_ambulant_window  (Uint32 windowID);
 //X	bool set_screenshot(char **screenshot_data, size_t *screenshot_size);
-
+	
+	SDL_Surface* scale_pixels_to_SDL_Surface (void* pixels, lib::size size, lib::rect src_rect, lib::rect dst_rect, Uint32 amask, Uint32 rmask, Uint32 gmask, Uint32 bmask);
+	SDL_Surface* scale_SDL_Surface (SDL_Surface* surf, lib::rect src_rect, lib::rect dst_rect)
+	{ return scale_pixels_to_SDL_Surface (surf->pixels, lib::size(surf->w, surf->h), src_rect, dst_rect, surf->format->Amask, surf->format->Rmask, surf->format->Gmask, surf->format->Bmask); }
 	// For the gui_screen implementation
 	void* m_screenshot_data;
 	long int m_screenshot_size;
@@ -252,6 +255,7 @@ class sdl_ambulant_window : public ambulant::common::gui_screen
 	SDL_Renderer* m_sdl_screen_renderer; // the "real" renderer, for SDL_Present()
 	lib::event_processor* m_evp;
 	uint8_t* m_screen_pixels;
+	struct SwsContext* m_sws_context;
 	// window counter (with s_lock protection) is used to assuere that the SdlWindow
 	// in drawing callback functions are still valid pointers at the time the callback
 	// is executed by the main thread */
@@ -260,7 +264,7 @@ class sdl_ambulant_window : public ambulant::common::gui_screen
 	// sdl_ambulant_window maintains 2 mappings:
 	// - s_window_renderer_map: to find a SDL_Renderer* given a SDL_Window* (for drawing) 
 	// - s_id_sdl_ambulant_window_map: to find a sdl_ambulant_window* given a window_id
-	static std::map<SDL_Window*, SDL_Renderer*> s_window_renderer_map; //XX is this really needed ????
+	//XX static std::map<SDL_Window*, SDL_Renderer*> s_window_renderer_map; //XX is this really needed ????
 	static std::map<int, sdl_ambulant_window*> s_id_sdl_ambulant_window_map;
 
 	std::stack<SDL_Surface*> m_transition_surfaces;
