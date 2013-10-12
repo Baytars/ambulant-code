@@ -391,6 +391,246 @@ ffmpeg_decoder_datasource::readdone(size_t len)
 	m_lock.leave();
 }
 
+#define WITH_AVCODEC_DECODE_AUDIO4
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+int
+ffmpeg_decoder_datasource::decode_audio_data_from_AVPacket(AVCodecContext* avctx, AVPacket* avpkt,  uint8_t* outbuf, int* outsize)
+//  decode_audio_data_from_AVPacket: copy-paste code from avcodec_decode_audio3() in ffmpeg-1.0/ibavcodec/utils.c
+{
+	if (avctx == NULL || avpkt == NULL || outbuf == NULL || outsize == NULL) {
+		return -1;
+	}
+	AVFrame avframe;
+	int got_frame = 0, ret = avcodec_decode_audio4(avctx, &avframe, &got_frame, avpkt);
+
+	int ch, plane_size;
+        int planar    = av_sample_fmt_is_planar(avctx->sample_fmt);
+        int data_size = av_samples_get_buffer_size(&plane_size, avctx->channels,
+                                                   avframe.nb_samples,
+                                                   avctx->sample_fmt, 1);
+	if (ret >= 0 && got_frame) {
+        	if (*outsize < data_size) {
+        		av_log(avctx, AV_LOG_ERROR, "output buffer size is too small for "
+			       "the current frame (%d < %d)\n", *outsize, data_size);
+			return AVERROR(EINVAL);
+		}
+
+		memcpy(outbuf, avframe.extended_data[0], plane_size);
+
+		if (planar && avctx->channels > 1) {
+        		uint8_t *out = ((uint8_t *)outbuf) + plane_size;
+			for (ch = 1; ch < avctx->channels; ch++) {
+                		memcpy(out, avframe.extended_data[ch], plane_size);
+				out += plane_size;
+			}
+		}
+		*outsize = data_size;
+	} else {
+        	*outsize = 0;
+	}
+	return ret;
+}
+#endif//WITH_AVCODEC_DECODE_AUDIO4
+
+#ifdef KEES
+void
+ffmpeg_decoder_datasource::data_avail()
+{
+	m_lock.enter();
+	AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: called : m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);
+	size_t sz;
+	if (m_con) {
+		if (m_src == NULL) {
+			m_lock.leave();
+			lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No datasource !");
+			lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+			return;
+		}
+		if (!m_buffer.buffer_full()) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_src->get_read_ptr() m_src=0x%x, this=0x%x", (void*) m_src, (void*) this);
+
+			ts_packet_t audio_packet = m_src->get_ts_packet_t();
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed %lld, pts %lld", m_elapsed, audio_packet.timestamp);
+			uint8_t *inbuf = (uint8_t*) audio_packet.data;
+			sz = audio_packet.size;
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: %d bytes available", (int)sz);
+
+			// Note: outsize is only written by avcodec_decode_audio, not read!
+			// You must always supply a buffer that is AVCODEC_MAX_AUDIO_FRAME_SIZE
+			// bytes big!
+			int outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+			uint8_t *outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize+FFMPEG_OUTPUT_ALIGNMENT-1);
+			if (outbuf) {
+				if(inbuf) {
+					// Don't feed too much data to the decoder, it doesn't like to do lists ;-)
+					size_t cursz = sz;
+					if (cursz > AVCODEC_MAX_AUDIO_FRAME_SIZE/2) cursz = AVCODEC_MAX_AUDIO_FRAME_SIZE/2;
+					// avcodec_decode_audio2 may require the output buffer to be aligned on a 16-byte boundary.
+					// So we request 15 bytes more, pass an aligned pointer, and copy down if needed.
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+					uint8_t* ffmpeg_outbuf = (uint8_t*) (((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+#else // ! WITH_AVCODEC_DECODE_AUDIO4
+					short *ffmpeg_outbuf = (short *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+#endif//WITH_AVCODEC_DECODE_AUDIO4
+					AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio(0x%x, 0x%x, 0x%x(%d), 0x%x, %d)", (void*)m_con, (void*)outbuf, (void*)&outsize, outsize, (void*)inbuf, (int)cursz);
+
+					// Adapted to the new api avcodec_decode_audio3
+					AVPacket avpkt;
+					av_init_packet(&avpkt);
+					avpkt.data = inbuf;
+					avpkt.size = (int)cursz;
+					AM_DBG lib::logger::get_logger()->debug("avocodec_decode_audio: calling avcodec_decode_audio3(..., 0x%x, %d, ...)", (void*)ffmpeg_outbuf, (int)outsize);
+					assert(ffmpeg_outbuf);
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+#endif//WITH_AVCODEC_DECODE_AUDIO4
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+					int decoded = decode_audio_data_from_AVPacket(m_con, &avpkt, ffmpeg_outbuf, &outsize);
+#else // ! WITH_AVCODEC_DECODE_AUDIO4
+					int decoded = avcodec_decode_audio3(m_con, ffmpeg_outbuf, &outsize, &avpkt);
+#endif//WITH_AVCODEC_DECODE_AUDIO4
+					if (decoded < 0) outsize = 0;
+#if FFMPEG_OUTPUT_ALIGNMENT-1
+					if (outsize > 0 && (uint8_t *)ffmpeg_outbuf != outbuf)
+						memmove(outbuf, ffmpeg_outbuf, outsize);
+#endif
+					///// Feeding the successive block of one rtsp mp3 packet to ffmpeg to decode,
+					///// since ffmpeg can only decode the limited length of around 522(522 or 523
+					///// in the case of using testOnDemandRTSPServer as the RTSP server) bytes data
+					///// at one time. This idea is borrowed from VLC, according to:
+					///// vlc-0.8.6c/module/codec/ffmpeg/audio.c:L253-L254.
+					AM_DBG lib::logger::get_logger()->debug("avocodec_decode_audio: converted %d of %d bytes to %d", decoded, (int)cursz, outsize);
+					while (decoded > 0 && decoded < (int)cursz) {
+						inbuf += decoded;
+						cursz -= decoded;
+						m_buffer.pushdata(outsize);
+						outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+						outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize);
+						if (outbuf == NULL) {
+							// At this point we are committed to push the data downstream. So if the output buffer is full our
+							// only option is to enlarge the buffer.
+							size_t newbufsize = m_buffer.size()*2;
+							lib::logger::get_logger()->trace("avcodec_decode_audio: enlarging audio output buffer to %d", newbufsize);
+							m_buffer.set_max_size(newbufsize);
+							outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize);
+						}
+						assert(outbuf);
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+						ffmpeg_outbuf = (uint8_t*)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+#else // ! WITH_AVCODEC_DECODE_AUDIO4
+						ffmpeg_outbuf = (short *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+#endif// ! WITH_AVCODEC_DECODE_AUDIO4
+						//xxxbo Over rtsp, one packet may contain multiple frames, so updating the beginning address of avpkt.data is needed  
+						avpkt.data = inbuf;
+						AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio: again calling avcodec_decode_audio3(..., 0x%x, %d, ...)", (void*)ffmpeg_outbuf, (int)outsize);
+						assert(ffmpeg_outbuf);
+#ifdef  WITH_AVCODEC_DECODE_AUDIO4
+						decoded = decode_audio_data_from_AVPacket(m_con, &avpkt, ffmpeg_outbuf, &outsize);
+#else // ! WITH_AVCODEC_DECODE_AUDIO4
+						decoded = avcodec_decode_audio3(m_con, (short*) ffmpeg_outbuf, &outsize, &avpkt);
+						if (decoded < 0) outsize = 0;
+#endif// ! WITH_AVCODEC_DECODE_AUDIO4
+						AM_DBG lib::logger::get_logger()->debug("avocodec_decode_audio: converted additional %d of %d bytes to %d", decoded, cursz, outsize);
+#if FFMPEG_OUTPUT_ALIGNMENT-1
+						if (outsize > 0 && (uint8_t *)ffmpeg_outbuf != outbuf)
+							memmove(outbuf, ffmpeg_outbuf, outsize);
+#endif
+					}
+
+					// If this loop ends with decoded == 0 and cursz > 0, it means that not all bytes
+					// have been fed to the decoder.
+					if (decoded == 0 && cursz > 0)
+						lib::logger::get_logger()->trace("ffmpeg_audio_decoder: last %d bytes of packet dropped");
+
+					inbuf = (uint8_t*) audio_packet.data;
+					free(inbuf);
+
+					_need_fmt_uptodate();
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : %d bps, %d channels",m_fmt.samplerate, m_fmt.channels);
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : %d bytes decoded  to %d bytes", decoded,outsize );
+
+					assert(m_fmt.samplerate);
+					timestamp_t duration = ((timestamp_t) outsize) * sizeof(uint8_t)*8 / (m_fmt.samplerate* m_fmt.channels * m_fmt.bits);
+					timestamp_t old_elapsed = audio_packet.timestamp;
+#if 1
+					// We only warn, we don't reset. Resetting has adverse consequences...
+					if (old_elapsed < m_elapsed) {
+						lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: got old data for timestamp %lld. Reset from %lld", old_elapsed, m_elapsed);
+					}
+#else
+					if (old_elapsed < m_elapsed) {
+						size_t to_discard = m_buffer.size();
+						(void)m_buffer.get_read_ptr();
+						m_buffer.readdone(to_discard);
+						lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: got old data for timestamp %lld. Flushing buffer (%d bytes) from %lld", old_elapsed, to_discard, m_elapsed);
+					}
+#endif
+					m_elapsed = old_elapsed + duration;
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail elapsed = %d ", m_elapsed);
+
+					// We need to do some tricks to handle clip_begin falling within this buffer.
+					// First we push all the data we have into the buffer, then we check whether the beginning
+					// should have been skipped and, if so, read out the bytes.
+					if (m_elapsed > m_src->get_clip_begin()) {
+						AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail We passed clip_begin : (outsize = %d) ", outsize);
+						if (outsize > 0) {
+							m_buffer.pushdata(outsize);
+						} else {
+							m_buffer.pushdata(0);
+						}
+						if (old_elapsed < m_src->get_clip_begin()) {
+							assert(m_buffer.size() == (size_t)outsize);
+							timestamp_t delta_t_unwanted = m_src->get_clip_begin() - old_elapsed;
+							assert(delta_t_unwanted > 0);
+							size_t bytes_unwanted = (size_t)(delta_t_unwanted * ((m_fmt.samplerate* m_fmt.channels * m_fmt.bits)/(sizeof(uint8_t)*8))/1000000);
+							bytes_unwanted &= ~3;
+							AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource: clip_begin within buffer, dropping %lld us, %d bytes", delta_t_unwanted, bytes_unwanted);
+							(void)m_buffer.get_read_ptr();
+							assert(m_buffer.size() > bytes_unwanted);
+							m_buffer.readdone(bytes_unwanted);
+						}
+					} else {
+						AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail: m_elapsed = %lld < clip_begin = %lld, skipped %d bytes", m_elapsed, m_src->get_clip_begin(), outsize);
+						m_buffer.pushdata(0);
+					}
+
+					AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource.data_avail : m_src->readdone(%d) called m_src=0x%x, this=0x%x", decoded,(void*) m_src, (void*) this );
+				} else {
+					m_buffer.pushdata(0);
+				}
+			} else {
+				lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail: no room in output buffer");
+				lib::logger::get_logger()->warn(gettext("Programmer error encountered during audio playback"));
+				m_buffer.pushdata(0);
+				AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail m_src->readdone(0) called this=0x%x");
+			}
+		}
+		// Restart reading if we still have room to accomodate more data
+		// XXX The note regarding m_elapsed holds here as well.
+		if (!m_src->end_of_file() && m_event_processor && !m_buffer.buffer_full() ) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling m_src->start() again");
+			lib::event *e = new readdone_callback(this, &ffmpeg_decoder_datasource::data_avail);
+			m_src->start(m_event_processor, e);
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail: not calling start: eof=%d m_ep=0x%x buffull=%d", (int)m_src->end_of_file(), (void*)m_event_processor, (int)m_buffer.buffer_full());
+		}
+
+		if ( m_client_callback && (m_buffer.buffer_not_empty() ||  _end_of_file()  ) ) {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): calling client callback (%d, %d)", m_buffer.size(), _end_of_file());
+			assert(m_event_processor);
+			if (m_elapsed >= m_src->get_clip_begin()) {
+				m_event_processor->add_event(m_client_callback, 0, ambulant::lib::ep_med);
+				m_client_callback = NULL;
+				m_event_processor = NULL;
+			}
+		} else {
+			AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No client callback!");
+		}
+	} else {
+		AM_DBG lib::logger::get_logger()->debug("ffmpeg_decoder_datasource::data_avail(): No decoder, flushing available data");
+	}
+	m_lock.leave();
+}
+#else
 void
 ffmpeg_decoder_datasource::data_avail()
 {
@@ -449,7 +689,7 @@ ffmpeg_decoder_datasource::data_avail()
 				if (cursz > AVCODEC_MAX_AUDIO_FRAME_SIZE/2) cursz = AVCODEC_MAX_AUDIO_FRAME_SIZE/2;
 				// avcodec_decode_audio2 may require the output buffer to be aligned on a 16-byte boundary.
 				// So we request 15 bytes more, pass an aligned pointer, and copy down if needed.
-				short *ffmpeg_outbuf = (short *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+				uint8_t *ffmpeg_outbuf = (uint8_t *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
 				AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio(0x%x, 0x%x, 0x%x(%d), 0x%x, %d)", (void*)m_con, (void*)outbuf, (void*)&outsize, outsize, (void*)inbuf, (int)cursz);
 
 				// Adapted to the new api avcodec_decode_audio3
@@ -459,7 +699,7 @@ ffmpeg_decoder_datasource::data_avail()
 				avpkt.size = (int)cursz;
 				AM_DBG lib::logger::get_logger()->debug("avocodec_decode_audio: calling avcodec_decode_audio3(..., 0x%x, %d, ...)", (void*)ffmpeg_outbuf, (int)outsize);
 				assert(ffmpeg_outbuf);
-				int decoded = avcodec_decode_audio3(m_con, ffmpeg_outbuf, &outsize, &avpkt);
+				int decoded = decode_audio_data_from_AVPacket(m_con, &avpkt, ffmpeg_outbuf, &outsize);
 				if (decoded < 0) outsize = 0;
 #if FFMPEG_OUTPUT_ALIGNMENT-1
 				if (outsize > 0 && (uint8_t *)ffmpeg_outbuf != outbuf)
@@ -486,12 +726,12 @@ ffmpeg_decoder_datasource::data_avail()
 						outbuf = (uint8_t*) m_buffer.get_write_ptr(outsize);
 					}
 					assert(outbuf);
-					ffmpeg_outbuf = (short *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
+					ffmpeg_outbuf = (uint8_t *)(((size_t)outbuf+FFMPEG_OUTPUT_ALIGNMENT-1) & ~(FFMPEG_OUTPUT_ALIGNMENT-1));
 					//xxxbo Over rtsp, one packet may contain multiple frames, so updating the beginning address of avpkt.data is needed  
 					avpkt.data = inbuf;
 					AM_DBG lib::logger::get_logger()->debug("avcodec_decode_audio: again calling avcodec_decode_audio3(..., 0x%x, %d, ...)", (void*)ffmpeg_outbuf, (int)outsize);
 					assert(ffmpeg_outbuf);
-					decoded = avcodec_decode_audio3(m_con, (short*) ffmpeg_outbuf, &outsize, &avpkt);
+					decoded = decode_audio_data_from_AVPacket(m_con, &avpkt, ffmpeg_outbuf, &outsize);
 					if (decoded < 0) outsize = 0;
 					AM_DBG lib::logger::get_logger()->debug("avocodec_decode_audio: converted additional %d of %d bytes to %d", decoded, cursz, outsize);
 #if FFMPEG_OUTPUT_ALIGNMENT-1
@@ -592,6 +832,7 @@ ffmpeg_decoder_datasource::data_avail()
 	}
 	m_lock.leave();
 }
+#endif
 
 bool
 ffmpeg_decoder_datasource::end_of_file()
