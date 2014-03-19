@@ -388,7 +388,7 @@ else:
     
     
 third_party_packages={
-    'debian' : [
+    'ubuntu' : [
         DebianTPP("automake"),
         DebianTPP("autoconf"),
         DebianTPP("libtool"),
@@ -417,6 +417,32 @@ third_party_packages={
         DebianTPP("libavcodec-ffmpeg-dev", ppa="ppa:samrog131/ppa"),
         DebianTPP("libavutil-ffmpeg-dev", ppa="ppa:samrog131/ppa"),
         DebianTPP("libswscale-ffmpeg-dev", ppa="ppa:samrog131/ppa"),
+
+    ],
+ 
+   'debian' : [
+        DebianTPP("automake"),
+        DebianTPP("autoconf"),
+        DebianTPP("libtool"),
+        DebianTPP("gettext"),
+        DebianTPP("autotools-dev"),
+        DebianTPP("gettext"),
+        DebianTPP("libgtk2.0-dev"),
+        DebianTPP("libgdk-pixbuf2.0-dev"),
+        DebianTPP("libxml2-dev"),
+        DebianTPP("libltdl-dev"),
+        DebianTPP("libsdl1.2-dev"),
+        DebianTPP("libxerces-c-dev"),
+        DebianTPP("libexpat1-dev"),
+        DebianTPP("python-dev"),
+        DebianTPP("python-gtk2-dev"),
+        DebianTPP("python-gobject-dev"),
+        DebianTPP("libdispatch-dev"),
+        
+        DebianTPP("libavformat-dev"),
+        DebianTPP("libavcodec-dev"),
+        DebianTPP("libavutil-dev"),
+        DebianTPP("libswscale-dev"),
 
     ],
  
@@ -1114,7 +1140,8 @@ environment_checkers = {
     'iphoneos' : checkenv_iphone,
     'linux': checkenv_unix,
     'win32': checkenv_win32,
-    'debian': checkenv_debian,
+    'ubuntu': checkenv_debian,
+    'debian' : checkenv_debian,
 }
 
 def main():
