@@ -31,7 +31,13 @@ public class AmbulantSDLPlayer extends SDLActivity {
 		System.loadLibrary("SDL2");
 		System.loadLibrary("SDL2_image");
 		System.loadLibrary("SDL2_ttf");
-		System.loadLibrary("main");
+		System.loadLibrary("ambulant");
+//		System.loadLibrary("AmbulantSDLPlayer");
+//		System.loadLibrary("ambulant");
+
+//		System.loadLibrary("testJNI");
+	}
+}
 //		System.loadLibrary("AmbulantSDLPlayer");
 //		System.loadLibrary("ambulant");
 
