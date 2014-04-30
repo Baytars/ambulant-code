@@ -39,7 +39,8 @@
 #include "ambulant/gui/SDL/sdl_factory.h"
 #include "ambulant/gui/SDL/sdl_fill.h"
 #include "ambulant/gui/SDL/sdl_image_renderer.h"
-#include "ambulant/gui/SDL/sdl_smiltext.h"
+#include "ambulant/gui/SDL/sdl_pango_smiltext.h"
+#include "ambulant/gui/SDL/sdl_ttf_smiltext.h"
 //#include "ambulant/gui/SDL/sdl_text_renderer.h"
 #include "ambulant/gui/SDL/sdl_video.h"
 #include "ambulant/gui/SDL/sdl_window.h"
@@ -52,6 +53,7 @@
 
 #include "sdl_gui_player.h"
 #include "sdl_gui.h"
+#include <unistd.h>
 
 using namespace ambulant;
 using namespace gui::sdl;
@@ -109,7 +111,7 @@ sdl_gui_player::sdl_gui_player(sdl_gui* gui)
 	if (!m_doc) {
 		return;
 	}
-	create_top_window();
+	create_top_window(filename);
 	common::preferences *prefs = common::preferences::get_preferences();
 	m_logger->debug(" creating smil2 player %s", prefs->repr().c_str());
 	m_player = create_player(filename);
@@ -238,7 +240,7 @@ sdl_gui_player::init_window_factory()
 }
 
 void
-sdl_gui_player::create_top_window () {
+sdl_gui_player::create_top_window (const char *filename) {
 	m_size = get_window_factory()->get_default_size();
 	int width = m_size.w;
 	int height = m_size.h;
@@ -250,7 +252,7 @@ sdl_gui_player::create_top_window () {
 	static SDL_Texture* s_texture = NULL; //XXXX member !
 	static SDL_Window* s_window = NULL; //XXXX member, embed  !
 	if (s_texture == NULL) {
-		s_window = SDL_CreateWindow("SDL2 Video_Test", 0,0,width,height,0); //XXXX consider SDL_CreateWindowFrom(XwinID) !
+		s_window = SDL_CreateWindow(basename(filename), 0,0,width,height,0); //XXXX consider SDL_CreateWindowFrom(XwinID) !
 		assert (s_window);
 		s_renderer = SDL_CreateRenderer(s_window, -1, SDL_RENDERER_ACCELERATED);
 		if (s_renderer == NULL) {
